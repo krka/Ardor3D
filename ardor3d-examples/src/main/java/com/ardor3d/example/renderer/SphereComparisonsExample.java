@@ -12,7 +12,6 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.extension.shape.GeoSphere;
 import com.ardor3d.framework.FrameWork;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -24,6 +23,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.shape.GeoSphere;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;

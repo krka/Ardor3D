@@ -12,8 +12,6 @@ package com.ardor3d.example.effect;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.extension.shape.Teapot;
-import com.ardor3d.extension.shape.Torus;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameWork;
 import com.ardor3d.image.Texture;
@@ -34,6 +32,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.extension.QuadImposterNode;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.scenegraph.visitor.UpdateModelBoundVisitor;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;

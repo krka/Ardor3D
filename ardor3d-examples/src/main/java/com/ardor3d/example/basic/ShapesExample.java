@@ -14,8 +14,6 @@ import java.nio.FloatBuffer;
 import java.util.logging.Logger;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.extension.shape.Teapot;
-import com.ardor3d.extension.shape.Torus;
 import com.ardor3d.framework.FrameWork;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -41,6 +39,8 @@ import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.shape.OrientedBox;
 import com.ardor3d.scenegraph.shape.Pyramid;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;

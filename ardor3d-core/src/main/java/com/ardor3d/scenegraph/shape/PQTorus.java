@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.shape;
+package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
