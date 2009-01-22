@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/aopalliance-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-snapshot-20080820.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/guice-1.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
