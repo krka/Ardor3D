@@ -1,0 +1,153 @@
+/**
+ * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it 
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
+
+package com.ardor3d.extension.shape;
+
+import java.io.IOException;
+
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector2;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.util.export.Ardor3DExporter;
+import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.geom.BufferUtils;
+
+/**
+ * An approximations of a flat circle. It is simply defined with a radius. It starts out flat along the Z, with center
+ * at the origin.
+ */
+public class Disk extends Mesh {
+
+    private static final long serialVersionUID = 1L;
+
+    private int shellSamples;
+
+    private int radialSamples;
+
+    private double radius;
+
+    public Disk() {}
+
+    /**
+     * Creates a flat disk (circle) at the origin flat along the Z. Usually, a higher sample number creates a better
+     * looking cylinder, but at the cost of more vertex information.
+     * 
+     * @param name
+     *            The name of the disk.
+     * @param shellSamples
+     *            The number of shell samples.
+     * @param radialSamples
+     *            The number of radial samples.
+     * @param radius
+     *            The radius of the disk.
+     */
+    public Disk(final String name, final int shellSamples, final int radialSamples, final double radius) {
+        super(name);
+
+        this.shellSamples = shellSamples;
+        this.radialSamples = radialSamples;
+        this.radius = radius;
+
+        final int radialless = radialSamples - 1;
+        final int shellLess = shellSamples - 1;
+        // allocate vertices
+        final int verts = 1 + radialSamples * shellLess;
+        _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
+        _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
+        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector3Buffer(verts)), 0);
+
+        final int tris = radialSamples * (2 * shellLess - 1);
+        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
+
+        setGeometryData(shellLess);
+        setIndexData(radialless, shellLess);
+
+    }
+
+    private void setGeometryData(final int shellLess) {
+        // generate geometry
+        // center of disk
+        _meshData.getVertexBuffer().put(0).put(0).put(0);
+
+        for (int x = 0; x < _meshData.getVertexCount(); x++) {
+            _meshData.getNormalBuffer().put(0).put(0).put(1);
+        }
+
+        _meshData.getTextureCoords(0).coords.put(.5f).put(.5f);
+
+        final double inverseShellLess = 1.0 / shellLess;
+        final double inverseRadial = 1.0 / radialSamples;
+        final Vector3 radialFraction = new Vector3();
+        final Vector2 texCoord = new Vector2();
+        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+            final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
+            final double cos = MathUtils.cos(angle);
+            final double sin = MathUtils.sin(angle);
+            final Vector3 radial = new Vector3(cos, sin, 0);
+
+            for (int shellCount = 1; shellCount < shellSamples; shellCount++) {
+                final double fraction = inverseShellLess * shellCount; // in (0,R]
+                radialFraction.set(radial).multiplyLocal(fraction);
+                final int i = shellCount + shellLess * radialCount;
+                texCoord.setX(0.5 * (1.0 + radialFraction.getX()));
+                texCoord.setY(0.5 * (1.0 + radialFraction.getY()));
+                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).coords, i);
+
+                radialFraction.multiplyLocal(radius);
+                BufferUtils.setInBuffer(radialFraction, _meshData.getVertexBuffer(), i);
+            }
+        }
+    }
+
+    private void setIndexData(final int radialless, final int shellLess) {
+        // generate connectivity
+        int index = 0;
+        for (int radialCount0 = radialless, radialCount1 = 0; radialCount1 < radialSamples; radialCount0 = radialCount1++) {
+            _meshData.getIndexBuffer().put(0);
+            _meshData.getIndexBuffer().put(1 + shellLess * radialCount0);
+            _meshData.getIndexBuffer().put(1 + shellLess * radialCount1);
+            index += 3;
+            for (int iS = 1; iS < shellLess; iS++, index += 6) {
+                final int i00 = iS + shellLess * radialCount0;
+                final int i01 = iS + shellLess * radialCount1;
+                final int i10 = i00 + 1;
+                final int i11 = i01 + 1;
+                _meshData.getIndexBuffer().put(i00);
+                _meshData.getIndexBuffer().put(i10);
+                _meshData.getIndexBuffer().put(i11);
+                _meshData.getIndexBuffer().put(i00);
+                _meshData.getIndexBuffer().put(i11);
+                _meshData.getIndexBuffer().put(i01);
+            }
+        }
+    }
+
+    @Override
+    public void write(final Ardor3DExporter e) throws IOException {
+        super.write(e);
+        final OutputCapsule capsule = e.getCapsule(this);
+        capsule.write(shellSamples, "shellSamples", 0);
+        capsule.write(radialSamples, "radialSamples", 0);
+        capsule.write(radius, "radius", 0);
+    }
+
+    @Override
+    public void read(final Ardor3DImporter e) throws IOException {
+        super.read(e);
+        final InputCapsule capsule = e.getCapsule(this);
+        shellSamples = capsule.readInt("shellSamples", 0);
+        radialSamples = capsule.readInt("radialSamples", 0);
+        radius = capsule.readDouble("raidus", 0);
+    }
+}
