@@ -7,7 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-awt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-jogl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-primitives"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-swt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
