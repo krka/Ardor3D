@@ -29,6 +29,12 @@
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>ardor3d</id>
+            <url>http://ardor3d.com:8081/nexus/content/repositories/thirdparty</url>
+            <name>Ardor3D repository</name>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <build>
