@@ -1,0 +1,72 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                       http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ardor3d</groupId>
+    <artifactId>ardor3d</artifactId>
+    <packaging>pom</packaging>
+    <version>0.4-SNAPSHOT</version>
+    <name>Ardor 3D</name>
+
+    <modules>
+        <module>ardor3d-core</module>
+        <module>ardor3d-jogl</module>
+        <module>ardor3d-lwjgl</module>
+        <module>ardor3d-swt</module>
+        <module>ardor3d-awt</module>
+        <module>ardor3d-examples</module>
+        <module>ardor3d-effects</module>
+    </modules>
+
+    <!-- This repository is needed because of lwjgl, jogl and jinput
+         Ardor3D should host it's own repository-->
+    <repositories>
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.5</source>
+                        <target>1.5</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <!-- version>2.2</version -->
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+	    <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <version>2.4</version>
+	    <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+

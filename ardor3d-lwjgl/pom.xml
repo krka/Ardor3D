@@ -1,0 +1,45 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ardor3d</groupId>
+        <artifactId>ardor3d</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>ardor3d-lwjgl</artifactId>
+    <packaging>jar</packaging>
+    <name>Ardor 3D LWJGL</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <version>ardor3d-2.0.1</version>
+        </dependency>
+        <!-- dependency>
+            <groupId>com.projectdarkstar.ext.org.lwjgl</groupId>
+            <artifactId>lwjgl_util_applet</artifactId>
+            <version>2.0rc2</version>
+        </dependency -->
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl_util</artifactId>
+            <version>ardor3d-2.0.1</version>
+        </dependency>
+        <!-- dependency>
+            <groupId>com.projectdarkstar.ext.net.java.dev.jinput</groupId>
+            <artifactId>jinput</artifactId>
+            <version>SNAPSHOT</version> --> <!-- TODO: prefer not using snapshot if possible! -->
+        <!-- /dependency -->
+    </dependencies>
+</project>
