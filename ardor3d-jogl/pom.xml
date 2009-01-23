@@ -21,10 +21,10 @@
             <artifactId>ardor3d-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency> <!-- TODO: should we treat jogl the same way as we treat lwjgl, etc., storing 'our version'? -->
-            <groupId>com.projectdarkstar.ext.net.java.dev.jogl</groupId>
+        <dependency> 
+            <groupId>net.java.dev.jogl</groupId>
             <artifactId>jogl</artifactId>
-            <version>1.1.1</version>
+            <version>ardor3d-1.1.2-pre-20080523</version>
         </dependency>
         <dependency>
             <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
