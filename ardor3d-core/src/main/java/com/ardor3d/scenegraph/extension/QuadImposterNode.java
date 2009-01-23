@@ -70,11 +70,13 @@ public class QuadImposterNode extends Node {
     protected final Vector3 lastCamDir = new Vector3();
     protected double lastCamDist;
 
-    protected Vector3[] corners;
+    protected Vector3[] corners = new Vector3[8];
     protected final Vector3 center = new Vector3();
     protected final Vector3 extents = new Vector3();
-    protected final Vector2 minScreenPos = new Vector2(Float.MAX_VALUE, Float.MAX_VALUE);
-    protected final Vector2 maxScreenPos = new Vector2(Float.MIN_VALUE, Float.MIN_VALUE);
+    protected final Vector2 minScreenPos = new Vector2();
+    protected final Vector2 maxScreenPos = new Vector2();
+    protected final Vector2 minMaxScreenPos = new Vector2();
+    protected final Vector2 maxMinScreenPos = new Vector2();
     protected final Vector3 tempVec = new Vector3();
     protected double minZ;
     protected double nearPlane;
@@ -110,7 +112,6 @@ public class QuadImposterNode extends Node {
         targetScene = new Node();
         super.attachChild(targetScene);
 
-        corners = new Vector3[8];
         for (int i = 0; i < corners.length; i++) {
             corners[i] = new Vector3();
         }
@@ -219,7 +220,7 @@ public class QuadImposterNode extends Node {
             final BoundingBox bbox = (BoundingBox) worldBound;
             bbox.getExtent(extents);
         } else if (worldBound instanceof BoundingSphere) {
-            final BoundingSphere bsphere = (BoundingSphere) targetScene.getWorldBound();
+            final BoundingSphere bsphere = (BoundingSphere) worldBound;
             extents.set(bsphere.getRadius(), bsphere.getRadius(), bsphere.getRadius());
         }
 
@@ -237,7 +238,7 @@ public class QuadImposterNode extends Node {
         }
 
         minScreenPos.set(Double.MAX_VALUE, Double.MAX_VALUE);
-        maxScreenPos.set(Double.MIN_VALUE, Double.MIN_VALUE);
+        maxScreenPos.set(-Double.MAX_VALUE, -Double.MAX_VALUE);
         minZ = Double.MAX_VALUE;
         for (int i = 0; i < corners.length; i++) {
             minScreenPos.setX(Math.min(corners[i].getX(), minScreenPos.getX()));
@@ -248,20 +249,18 @@ public class QuadImposterNode extends Node {
 
             minZ = Math.min(corners[i].getZ(), minZ);
         }
+        maxMinScreenPos.set(maxScreenPos.getX(), minScreenPos.getY());
+        minMaxScreenPos.set(minScreenPos.getX(), maxScreenPos.getY());
 
-        tRenderer.getCamera().getWorldCoordinates(new Vector2(maxScreenPos.getX(), maxScreenPos.getY()), minZ,
-                corners[0]);
-        tRenderer.getCamera().getWorldCoordinates(new Vector2(maxScreenPos.getX(), minScreenPos.getY()), minZ,
-                corners[1]);
-        tRenderer.getCamera().getWorldCoordinates(new Vector2(minScreenPos.getX(), minScreenPos.getY()), minZ,
-                corners[2]);
-        tRenderer.getCamera().getWorldCoordinates(new Vector2(minScreenPos.getX(), maxScreenPos.getY()), minZ,
-                corners[3]);
+        tRenderer.getCamera().getWorldCoordinates(maxScreenPos, minZ, corners[0]);
+        tRenderer.getCamera().getWorldCoordinates(maxMinScreenPos, minZ, corners[1]);
+        tRenderer.getCamera().getWorldCoordinates(minScreenPos, minZ, corners[2]);
+        tRenderer.getCamera().getWorldCoordinates(minMaxScreenPos, minZ, corners[3]);
         center.set(corners[0]).addLocal(corners[1]).addLocal(corners[2]).addLocal(corners[3]).multiplyLocal(0.25);
 
         lastCamDir.set(center).subtractLocal(tRenderer.getCamera().getLocation());
         lastCamDist = nearPlane = lastCamDir.length();
-        farPlane = nearPlane + extents.length() * 2.0 + 100;
+        farPlane = nearPlane + extents.length() * 2.0;
         lastCamDir.normalizeLocal();
 
         final FloatBuffer vertexBuffer = imposterQuad.getMeshData().getVertexBuffer();

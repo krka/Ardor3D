@@ -927,6 +927,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         }
 
         _updatePMatrix = true;
+        _updateMVPMatrix = true;
         _updateInverseMVPMatrix = true;
 
         _frustumDirty = true;

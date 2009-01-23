@@ -170,12 +170,14 @@ public class JoglShaderObjectsStateUtil {
                     .getStateRecord(StateType.GLSLShader);
             context.setCurrentState(StateType.GLSLShader, state);
 
-            if (state._needSendShader) {
-                sendToGL(state);
-            }
+            if (state.isEnabled()) {
+                if (state._needSendShader) {
+                    sendToGL(state);
+                }
 
-            if (state._shaderDataLogic != null) {
-                state._shaderDataLogic.applyData(state, state._meshData);
+                if (state._shaderDataLogic != null) {
+                    state._shaderDataLogic.applyData(state, state._meshData);
+                }
             }
 
             if (!record.isValid() || record.getReference() != state || state.needsRefresh()) {

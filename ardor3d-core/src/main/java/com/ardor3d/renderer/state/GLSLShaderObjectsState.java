@@ -79,7 +79,7 @@ public class GLSLShaderObjectsState extends RenderState {
     /** The Mesh this shader currently operates on during rendering */
     public MeshData _meshData;
 
-    public boolean _needSendShader = false;
+    public boolean _needSendShader = true;
 
     /** OpenGL id for this program. * */
     public int _programID = -1;
