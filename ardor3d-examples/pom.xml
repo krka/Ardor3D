@@ -18,7 +18,7 @@
 <!-- TODO: decide if this is needed and if so, make this into a more final solution -->
     <properties>
         <main.class>com.ardor3d.example.basic.BoxExample</main.class>
-        <lwjgl.natives>${basedir}/../../ardor3d-lwjgl/trunk/lib/lwjgl/native</lwjgl.natives>
+        <lwjgl.natives>${basedir}/../ardor3d-lwjgl/src/main/native</lwjgl.natives>
     </properties>
 
     <build>
