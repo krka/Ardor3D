@@ -18,8 +18,8 @@ import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.light.Light;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.light.SpotLight;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Plane;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -103,7 +103,7 @@ public class LightUtil {
         return strength(l.getAmbient()) + strength(l.getDiffuse());
     }
 
-    protected static double strength(final ColorRGBA color) {
+    protected static double strength(final ReadOnlyColorRGBA color) {
         return Math.sqrt(color.getRed() * color.getRed() + color.getGreen() * color.getGreen() + color.getBlue()
                 * color.getBlue());
     }

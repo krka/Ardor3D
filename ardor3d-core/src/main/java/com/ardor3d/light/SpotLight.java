@@ -12,6 +12,7 @@ package com.ardor3d.light;
 
 import java.io.IOException;
 
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Ardor3dException;
@@ -39,7 +40,7 @@ public class SpotLight extends PointLight {
      */
     public SpotLight() {
         super();
-        getAmbient().set(0, 0, 0, 1);
+        setAmbient(new ColorRGBA(0, 0, 0, 1));
     }
 
     /**

@@ -191,7 +191,7 @@ public abstract class Light implements Serializable, Savable {
      * 
      * @return the specular color value of the light.
      */
-    public ColorRGBA getSpecular() {
+    public ReadOnlyColorRGBA getSpecular() {
         return specular;
     }
 
@@ -201,7 +201,7 @@ public abstract class Light implements Serializable, Savable {
      * @param specular
      *            the specular color value of the light.
      */
-    public void setSpecular(final ColorRGBA specular) {
+    public void setSpecular(final ReadOnlyColorRGBA specular) {
         this.specular.set(specular);
     }
 
@@ -210,7 +210,7 @@ public abstract class Light implements Serializable, Savable {
      * 
      * @return the diffuse color value for this light.
      */
-    public ColorRGBA getDiffuse() {
+    public ReadOnlyColorRGBA getDiffuse() {
         return diffuse;
     }
 
@@ -220,7 +220,7 @@ public abstract class Light implements Serializable, Savable {
      * @param diffuse
      *            the diffuse color value for this light.
      */
-    public void setDiffuse(final ColorRGBA diffuse) {
+    public void setDiffuse(final ReadOnlyColorRGBA diffuse) {
         this.diffuse.set(diffuse);
     }
 
@@ -229,7 +229,7 @@ public abstract class Light implements Serializable, Savable {
      * 
      * @return the ambient color value for this light.
      */
-    public ColorRGBA getAmbient() {
+    public ReadOnlyColorRGBA getAmbient() {
         return ambient;
     }
 
@@ -239,7 +239,7 @@ public abstract class Light implements Serializable, Savable {
      * @param ambient
      *            the ambient color value for this light.
      */
-    public void setAmbient(final ColorRGBA ambient) {
+    public void setAmbient(final ReadOnlyColorRGBA ambient) {
         this.ambient.set(ambient);
     }
 
