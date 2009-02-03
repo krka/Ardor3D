@@ -35,7 +35,7 @@ public class Point extends Mesh {
     private boolean antialiased = false;
 
     public Point() {
-
+        this("point", null, null, null, (TexCoords) null);
     }
 
     /**
@@ -58,6 +58,7 @@ public class Point extends Mesh {
         super(name);
         reconstruct(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
                 .createFloatBuffer(color), TexCoords.makeNew(texture));
+        _meshData.setIndexMode(IndexMode.Points);
     }
 
     /**
@@ -79,26 +80,6 @@ public class Point extends Mesh {
             final TexCoords coords) {
         super(name);
         reconstruct(vertex, normal, color, coords);
-    }
-
-    @Override
-    public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final TexCoords coords) {
-        super.reconstruct(vertices, normals, colors, coords);
-        generateIndices();
-    }
-
-    public void generateIndices() {
-        if (_meshData.getIndexBuffer() == null || _meshData.getIndexBuffer().limit() != _meshData.getVertexCount()) {
-            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getVertexCount()));
-        } else {
-            _meshData.getIndexBuffer().rewind();
-        }
-
-        for (int x = 0; x < _meshData.getVertexCount(); x++) {
-            _meshData.getIndexBuffer().put(x);
-        }
-
         _meshData.setIndexMode(IndexMode.Points);
     }
 

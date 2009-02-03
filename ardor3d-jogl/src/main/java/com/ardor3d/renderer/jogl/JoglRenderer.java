@@ -914,7 +914,7 @@ public class JoglRenderer extends Renderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            gl.glDrawArrays(glIndexMode, 0, vertexBuffer.limit());
+            gl.glDrawArrays(glIndexMode, 0, vertexBuffer.limit() / 3);
         } else {
             int offset = 0;
             int indexModeCounter = 0;

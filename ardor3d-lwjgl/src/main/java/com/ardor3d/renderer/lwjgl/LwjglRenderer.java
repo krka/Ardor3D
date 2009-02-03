@@ -874,7 +874,7 @@ public class LwjglRenderer extends Renderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            GL11.glDrawArrays(glIndexMode, 0, vertexBuffer.limit());
+            GL11.glDrawArrays(glIndexMode, 0, vertexBuffer.limit() / 3);
         } else {
             int offset = 0;
             int indexModeCounter = 0;
