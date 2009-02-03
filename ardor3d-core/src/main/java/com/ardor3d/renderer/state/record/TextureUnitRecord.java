@@ -54,7 +54,7 @@ public class TextureUnitRecord extends StateRecord {
         super.invalidate();
 
         Arrays.fill(enabled, false);
-        texMatrix.loadIdentity();
+        texMatrix.setIdentity();
         texScale.zero();
         boundTexture = -1;
         envMode = null;

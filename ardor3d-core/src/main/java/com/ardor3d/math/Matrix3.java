@@ -131,10 +131,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * Same as set(IDENTITY)
      * 
      * @return this matrix for chaining
-     * 
-     *         .
      */
-    public Matrix3 loadIdentity() {
+    public Matrix3 setIdentity() {
         return set(IDENTITY);
     }
 
@@ -152,8 +150,6 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param column
      * @param value
      * @return this matrix for chaining
-     * 
-     *         .
      * @throws ArrayIndexOutOfBoundsException
      *             if row and column are not in bounds [0, 2]
      */
@@ -175,8 +171,6 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param m21
      * @param m22
      * @return this matrix for chaining
-     * 
-     *         .
      */
     public Matrix3 set(final double m00, final double m01, final double m02, final double m10, final double m11,
             final double m12, final double m20, final double m21, final double m22) {
@@ -216,8 +210,6 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * 
      * @param quaternion
      * @return this matrix for chaining
-     * 
-     *         .
      */
     public Matrix3 set(final ReadOnlyQuaternion quaternion) {
         return quaternion.toRotationMatrix(this);
@@ -232,8 +224,6 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      *             if source is null.
      * @throws ArrayIndexOutOfBoundsException
      *             if source array has a length less than 9.
-     * 
-     *             .
      */
     public Matrix3 fromArray(final double[] source) {
         return fromArray(source, true);

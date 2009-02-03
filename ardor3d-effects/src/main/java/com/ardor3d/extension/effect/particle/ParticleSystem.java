@@ -1125,7 +1125,7 @@ public abstract class ParticleSystem extends Node {
         _upXemit.zero();
         _absUpVector.zero();
         _abUpMinUp.zero();
-        _rotMatrix.loadIdentity();
+        _rotMatrix.setIdentity();
         initializeParticles(_numParticles);
     }
 }

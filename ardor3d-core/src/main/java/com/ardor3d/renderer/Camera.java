@@ -1026,7 +1026,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
 
     protected void updateProjectionMatrix() {
         if (isParallelProjection()) {
-            _projection.loadIdentity();
+            _projection.setIdentity();
             _projection.setValue(0, 0, 2.0 / (_frustumRight - _frustumLeft));
             _projection.setValue(1, 1, 2.0 / (_frustumBottom - _frustumTop));
             _projection.setValue(2, 2, -2.0 / (_frustumFar - _frustumNear));
@@ -1035,7 +1035,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
             _projection.setValue(3, 1, -(_frustumBottom + _frustumTop) / (_frustumBottom - _frustumTop));
             _projection.setValue(3, 2, -(_frustumFar + _frustumNear) / (_frustumFar - _frustumNear));
         } else {
-            _projection.loadIdentity();
+            _projection.setIdentity();
             _projection.setValue(0, 0, (2.0 * _frustumNear) / (_frustumRight - _frustumLeft));
             _projection.setValue(1, 1, (2.0 * _frustumNear) / (_frustumTop - _frustumBottom));
             _projection.setValue(2, 0, (_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
@@ -1056,7 +1056,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     protected void updateModelViewMatrix() {
-        _modelView.loadIdentity();
+        _modelView.setIdentity();
         _modelView.setValue(0, 0, -_left.getX());
         _modelView.setValue(1, 0, -_left.getY());
         _modelView.setValue(2, 0, -_left.getZ());
@@ -1069,7 +1069,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _modelView.setValue(1, 2, -_direction.getY());
         _modelView.setValue(2, 2, -_direction.getZ());
 
-        _transMatrix.loadIdentity();
+        _transMatrix.setIdentity();
         _transMatrix.setValue(3, 0, -_location.getX());
         _transMatrix.setValue(3, 1, -_location.getY());
         _transMatrix.setValue(3, 2, -_location.getZ());

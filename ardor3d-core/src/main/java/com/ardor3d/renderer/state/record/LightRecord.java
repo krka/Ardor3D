@@ -101,6 +101,6 @@ public class LightRecord extends StateRecord {
         enabled = false;
 
         position.set(-1, -1, -1, -1);
-        modelViewMatrix.loadIdentity();
+        modelViewMatrix.setIdentity();
     }
 }

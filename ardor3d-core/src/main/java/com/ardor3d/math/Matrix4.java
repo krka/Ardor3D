@@ -151,7 +151,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * 
      * @return this matrix for chaining
      */
-    public Matrix4 loadIdentity() {
+    public Matrix4 setIdentity() {
         return set(IDENTITY);
     }
 
