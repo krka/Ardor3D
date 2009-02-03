@@ -35,7 +35,7 @@ public class Line extends Mesh {
     private boolean antialiased = false;
 
     public Line() {
-
+        this("line");
     }
 
     /**
