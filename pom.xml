@@ -85,12 +85,13 @@
     </build>
 
     <profiles>
-        <!-- Hudson by default defines a property BUILD_NUMBER which is used to enable the profile. -->
+        <!-- This profile activated by specifying -Denv=ci on command line -->
         <profile>
             <id>hudson</id>
             <activation>
                 <property>
-                    <name>BUILD_NUMBER</name>
+                    <name>env</name>
+                    <value>ci</value>
                 </property>
             </activation>
             <build>
