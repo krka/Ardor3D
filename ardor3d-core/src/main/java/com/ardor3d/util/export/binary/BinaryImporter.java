@@ -56,10 +56,15 @@ public class BinaryImporter implements Ardor3DImporter {
     }
 
     public Savable load(final InputStream is) throws IOException {
-        return load(is, null);
+        return load(is, null, null);
     }
 
     public Savable load(final InputStream is, final ReadListener listener) throws IOException {
+        return load(is, listener, null);
+    }
+
+    public Savable load(final InputStream is, final ReadListener listener, final ByteArrayOutputStream reuseableStream)
+            throws IOException {
         contentTable = new HashMap<Integer, Savable>();
         final GZIPInputStream zis = new GZIPInputStream(is);
         BufferedInputStream bis = new BufferedInputStream(zis);
@@ -118,7 +123,10 @@ public class BinaryImporter implements Ardor3DImporter {
             listener.readBytes(bytes);
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = reuseableStream;
+        if (baos == null) {
+            baos = new ByteArrayOutputStream(bytes);
+        }
         int size = -1;
         final byte[] cache = new byte[4096];
         while ((size = bis.read(cache)) != -1) {
