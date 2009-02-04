@@ -270,12 +270,12 @@ public class LwjglLightStateUtil {
         // From OpenGL Docs:
         // The light position is transformed by the contents of the current top
         // of the ModelView matrix stack when you specify the light position
-        // with a call to glLightfv(GL_LIGHT_POSITION,…). If you later change
+        // with a call to glLightfv(GL_LIGHT_POSITION,...). If you later change
         // the ModelView matrix, such as when the view changes for the next
         // frame, the light position isn't automatically retransformed by the
         // new contents of the ModelView matrix. If you want to update the
-        // light’s position, you must again specify the light position with a
-        // call to glLightfv(GL_LIGHT_POSITION,…).
+        // light's position, you must again specify the light position with a
+        // call to glLightfv(GL_LIGHT_POSITION,...).
 
         // XXX: This is a hack until we get a better lighting model up
         final ReadOnlyMatrix4 modelViewMatrix = ContextManager.getCurrentContext().getCurrentCamera()
@@ -304,12 +304,12 @@ public class LwjglLightStateUtil {
         // From OpenGL Docs:
         // The light position is transformed by the contents of the current top
         // of the ModelView matrix stack when you specify the light position
-        // with a call to glLightfv(GL_LIGHT_POSITION,…). If you later change
+        // with a call to glLightfv(GL_LIGHT_POSITION,...). If you later change
         // the ModelView matrix, such as when the view changes for the next
         // frame, the light position isn't automatically retransformed by the
         // new contents of the ModelView matrix. If you want to update the
-        // light’s position, you must again specify the light position with a
-        // call to glLightfv(GL_LIGHT_POSITION,…).
+        // light's position, you must again specify the light position with a
+        // call to glLightfv(GL_LIGHT_POSITION,...).
         record.lightBuffer.clear();
         record.lightBuffer.put(directionX);
         record.lightBuffer.put(directionY);
