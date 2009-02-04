@@ -136,25 +136,25 @@ Ardor3D should host it's own repository-->
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
-      <!-- plugin>
+      <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <encoding>UTF-8</encoding>
         </configuration>        
-      </plugin -->
+      </plugin>
       <!-- http://mojo.codehaus.org/cobertura-maven-plugin/usage.html -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
       </plugin>
       <!-- http://mojo.codehaus.org/findbugs-maven-plugin/usage.html -->
-      <!-- plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
         <configuration>
           <threshold>Normal</threshold>
         </configuration>
-      </plugin -->
+      </plugin>
     </plugins>
   </reporting>
 </project>
