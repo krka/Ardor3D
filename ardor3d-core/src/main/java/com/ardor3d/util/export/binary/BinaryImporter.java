@@ -126,6 +126,8 @@ public class BinaryImporter implements Ardor3DImporter {
         ByteArrayOutputStream baos = reuseableStream;
         if (baos == null) {
             baos = new ByteArrayOutputStream(bytes);
+        } else {
+            baos.reset();
         }
         int size = -1;
         final byte[] cache = new byte[4096];
