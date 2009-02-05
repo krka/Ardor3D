@@ -22,7 +22,7 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
@@ -87,7 +87,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected final Node _root = new Node();
 
-    protected final FrameWork _frameWork;
+    protected final FrameHandler _frameWork;
 
     protected LightState _lightState;
 
@@ -108,7 +108,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     protected ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
 
     @Inject
-    public ExampleBase(final LogicalLayer logicalLayer, final FrameWork frameWork) {
+    public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
         _logicalLayer = logicalLayer;
         _frameWork = frameWork;
     }
@@ -316,7 +316,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 });
 
         final LogicalLayer ll = injector.getInstance(LogicalLayer.class);
-        final FrameWork frameWork = injector.getInstance(FrameWork.class);
+        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
         final ExampleBase gameThread = injector.getInstance(ExampleBase.class);
         final NativeCanvas canvas = injector.getInstance(NativeCanvas.class);
         final Updater updater = injector.getInstance(Updater.class);

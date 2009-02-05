@@ -13,7 +13,7 @@ package com.ardor3d.example.basic;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.InputState;
@@ -40,7 +40,7 @@ public class SwitchNodeExample extends ExampleBase {
     }
 
     @Inject
-    public SwitchNodeExample(final LogicalLayer logicalLayer, final FrameWork frameWork) {
+    public SwitchNodeExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
         super(logicalLayer, frameWork);
     }
 

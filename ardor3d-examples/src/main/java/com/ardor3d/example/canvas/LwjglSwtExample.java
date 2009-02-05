@@ -30,11 +30,9 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import com.ardor3d.example.Exit;
-import com.ardor3d.example.app.DefaultScene;
-import com.ardor3d.example.app.RotatingCubeGame;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.CanvasRenderer;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.input.Key;
@@ -59,10 +57,10 @@ public class LwjglSwtExample {
 
         final Injector injector = Guice.createInjector(Stage.PRODUCTION, ardorModule);
 
-        final FrameWork frameWork = injector.getInstance(FrameWork.class);
+        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
 
         final MyExit exit = new MyExit();
-        final DefaultScene scene = new DefaultScene();
+        final ExampleScene scene = new ExampleScene();
         final RotatingCubeGame game = new RotatingCubeGame(scene, exit, injector.getInstance(LogicalLayer.class), Key.T);
 
         frameWork.registerUpdater(game);
@@ -121,11 +119,11 @@ public class LwjglSwtExample {
         display.dispose();
     }
 
-    private static void addNewCanvas(final TabFolder tabFolder, final DefaultScene scene, final Injector injector) {
+    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final Injector injector) {
         i++;
         logger.info("Adding canvas");
 
-        final FrameWork frameWork = injector.getInstance(FrameWork.class);
+        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
 
         // Add a new tab to hold our canvas
         final TabItem item = new TabItem(tabFolder, SWT.NONE);

@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.example.app;
+package com.ardor3d.example.canvas;
 
 import java.util.Random;
 
@@ -44,7 +44,7 @@ import com.google.inject.Inject;
 
 public class RotatingCubeGame implements Updater {
     // private final Canvas view;
-    private final DefaultScene scene;
+    private final ExampleScene scene;
     private final Exit exit;
     private final LogicalLayer logicalLayer;
     private final Key toggleRotationKey;
@@ -62,7 +62,7 @@ public class RotatingCubeGame implements Updater {
     private int rotationSign = 1;
 
     @Inject
-    public RotatingCubeGame(final DefaultScene scene, final Exit exit, final LogicalLayer logicalLayer,
+    public RotatingCubeGame(final ExampleScene scene, final Exit exit, final LogicalLayer logicalLayer,
             final Key toggleRotationKey) {
         this.scene = scene;
         this.exit = exit;

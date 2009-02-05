@@ -28,7 +28,7 @@ public final class ArdorModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(Timer.class).in(Scopes.SINGLETON);
-        bind(FrameWork.class).in(Scopes.SINGLETON);
+        bind(FrameHandler.class).in(Scopes.SINGLETON);
         bind(LogicalLayer.class).in(Scopes.SINGLETON);
     }
 

@@ -13,7 +13,7 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.InputState;
@@ -49,7 +49,7 @@ public class QuadImposterExample extends ExampleBase {
     }
 
     @Inject
-    public QuadImposterExample(final LogicalLayer logicalLayer, final FrameWork frameWork, final Timer timer) {
+    public QuadImposterExample(final LogicalLayer logicalLayer, final FrameHandler frameWork, final Timer timer) {
         super(logicalLayer, frameWork);
         _timer = timer;
     }

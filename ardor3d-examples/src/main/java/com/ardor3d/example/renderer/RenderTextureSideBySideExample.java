@@ -13,7 +13,7 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -52,7 +52,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     }
 
     @Inject
-    public RenderTextureSideBySideExample(final LogicalLayer layer, final FrameWork frameWork,
+    public RenderTextureSideBySideExample(final LogicalLayer layer, final FrameHandler frameWork,
             final DisplaySettings settings, final Timer timer) {
         super(layer, frameWork);
         _settings = settings;

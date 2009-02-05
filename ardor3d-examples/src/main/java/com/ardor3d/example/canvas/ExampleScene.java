@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.example.app;
+package com.ardor3d.example.canvas;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Scene;
@@ -21,10 +21,10 @@ import com.ardor3d.scenegraph.Node;
  * The framework should provide a default implementation of a scene, probably with a root node and a stats node, just
  * like today. Probably, controllers don't belong here, but I also don't think they belong in the Node API.
  */
-public final class DefaultScene implements Scene {
+public final class ExampleScene implements Scene {
     private final Node root;
 
-    public DefaultScene() {
+    public ExampleScene() {
         root = new Node("root");
     }
 

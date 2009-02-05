@@ -26,8 +26,8 @@ import com.google.inject.Inject;
 /**
  * Does the work needed in a given frame.
  */
-public class FrameWork {
-    private static final Logger logger = Logger.getLogger(FrameWork.class.toString());
+public class FrameHandler {
+    private static final Logger logger = Logger.getLogger(FrameHandler.class.toString());
 
     /**
      * Thread synchronization of the updaters list is delegated to the CopyOnWriteArrayList.
@@ -44,7 +44,7 @@ public class FrameWork {
     private final Timer _timer;
 
     @Inject
-    public FrameWork(final Timer timer) {
+    public FrameHandler(final Timer timer) {
         _timer = timer;
         _updaters = new CopyOnWriteArrayList<Updater>();
         _canvases = new CopyOnWriteArrayList<Canvas>();
@@ -94,7 +94,7 @@ public class FrameWork {
             final boolean success = latch.await(5, TimeUnit.SECONDS);
 
             if (!success) {
-                logger.logp(Level.SEVERE, FrameWork.class.toString(), "updateFrame",
+                logger.logp(Level.SEVERE, FrameHandler.class.toString(), "updateFrame",
                         "Timeout while waiting for renderers");
                 // FIXME: should probably reset update flag in canvases?
             }

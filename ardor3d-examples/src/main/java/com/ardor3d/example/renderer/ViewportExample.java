@@ -12,7 +12,7 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
@@ -45,7 +45,7 @@ public class ViewportExample extends ExampleBase {
     }
 
     @Inject
-    public ViewportExample(final LogicalLayer layer, final FrameWork frameWork) {
+    public ViewportExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 

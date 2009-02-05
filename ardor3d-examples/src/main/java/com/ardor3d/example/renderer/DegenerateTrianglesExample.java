@@ -15,7 +15,7 @@ import java.nio.IntBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.InputState;
@@ -55,7 +55,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
     }
 
     @Inject
-    public DegenerateTrianglesExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
+    public DegenerateTrianglesExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

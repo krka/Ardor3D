@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -54,7 +54,7 @@ public class ExportImportExample extends ExampleBase {
     }
 
     @Inject
-    public ExportImportExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
+    public ExportImportExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

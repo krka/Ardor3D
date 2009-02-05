@@ -13,7 +13,7 @@ package com.ardor3d.example.basic;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -64,7 +64,7 @@ public class ShapesExample extends ExampleBase {
     }
 
     @Inject
-    public ShapesExample(final LogicalLayer layer, final FrameWork frameWork) {
+    public ShapesExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 

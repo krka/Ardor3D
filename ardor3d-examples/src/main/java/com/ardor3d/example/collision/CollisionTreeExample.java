@@ -16,7 +16,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.CollisionData;
 import com.ardor3d.intersection.CollisionResults;
@@ -51,7 +51,7 @@ public class CollisionTreeExample extends ExampleBase {
     }
 
     @Inject
-    public CollisionTreeExample(final LogicalLayer layer, final FrameWork frameWork) {
+    public CollisionTreeExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 

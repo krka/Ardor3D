@@ -15,7 +15,7 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.effect.water.HeightGenerator;
 import com.ardor3d.extension.effect.water.ProjectedGrid;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.InputState;
@@ -42,7 +42,7 @@ public class ProjectedGridExample extends ExampleBase {
     }
 
     @Inject
-    public ProjectedGridExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
+    public ProjectedGridExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

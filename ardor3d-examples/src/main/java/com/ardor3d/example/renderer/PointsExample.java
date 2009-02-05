@@ -13,7 +13,7 @@ package com.ardor3d.example.renderer;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.state.BlendState;
@@ -30,7 +30,7 @@ public class PointsExample extends ExampleBase {
     }
 
     @Inject
-    public PointsExample(final LogicalLayer layer, final FrameWork frameWork) {
+    public PointsExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 

@@ -20,10 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import com.ardor3d.example.Exit;
-import com.ardor3d.example.app.DefaultScene;
-import com.ardor3d.example.app.RotatingCubeGame;
 import com.ardor3d.framework.ArdorModule;
-import com.ardor3d.framework.FrameWork;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.awt.AwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.input.Key;
@@ -45,15 +43,15 @@ public class LwjglAwtExample {
 
         final Injector injector = Guice.createInjector(Stage.PRODUCTION, ardorModule);
 
-        final FrameWork frameWork = injector.getInstance(FrameWork.class);
+        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
 
         final MyExit exit = new MyExit();
         final LogicalLayer logicalLayer = injector.getInstance(LogicalLayer.class);
 
-        final DefaultScene scene1 = new DefaultScene();
+        final ExampleScene scene1 = new ExampleScene();
         final RotatingCubeGame game1 = new RotatingCubeGame(scene1, exit, logicalLayer, Key.T);
 
-        final DefaultScene scene2 = new DefaultScene();
+        final ExampleScene scene2 = new ExampleScene();
         final RotatingCubeGame game2 = new RotatingCubeGame(scene2, exit, logicalLayer, Key.G);
 
         frameWork.registerUpdater(game1);
@@ -105,8 +103,8 @@ public class LwjglAwtExample {
         System.exit(0);
     }
 
-    private static void addCanvas(final JFrame frame, final DefaultScene scene, final LogicalLayer logicalLayer,
-            final FrameWork frameWork) throws Exception {
+    private static void addCanvas(final JFrame frame, final ExampleScene scene, final LogicalLayer logicalLayer,
+            final FrameHandler frameWork) throws Exception {
         final AwtCanvas theCanvas = new AwtCanvas();
 
         theCanvas.setCanvasRenderer(new LwjglCanvasRenderer(scene));
