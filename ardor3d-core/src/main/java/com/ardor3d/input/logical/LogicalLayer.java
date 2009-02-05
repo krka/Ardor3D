@@ -28,14 +28,14 @@ import com.google.inject.Inject;
  */
 @ThreadSafe
 public final class LogicalLayer {
-    private final Set<InputSource> inputs = new CopyOnWriteArraySet<InputSource>();
-    private final Set<InputTrigger> triggers = new CopyOnWriteArraySet<InputTrigger>();
+    private final Set<InputSource> _inputs = new CopyOnWriteArraySet<InputSource>();
+    private final Set<InputTrigger> _triggers = new CopyOnWriteArraySet<InputTrigger>();
 
     @Inject
     public LogicalLayer() {}
 
     public void registerInput(final Canvas source, final PhysicalLayer physicalLayer) {
-        inputs.add(new InputSource(source, physicalLayer));
+        _inputs.add(new InputSource(source, physicalLayer));
     }
 
     /**
@@ -45,7 +45,7 @@ public final class LogicalLayer {
      *            the trigger to check
      */
     public void registerTrigger(final InputTrigger inputTrigger) {
-        triggers.add(inputTrigger);
+        _triggers.add(inputTrigger);
     }
 
     /**
@@ -55,7 +55,7 @@ public final class LogicalLayer {
      *            the trigger to stop checking
      */
     public void deregisterTrigger(final InputTrigger inputTrigger) {
-        triggers.remove(inputTrigger);
+        _triggers.remove(inputTrigger);
     }
 
     /**
@@ -67,7 +67,7 @@ public final class LogicalLayer {
      */
     @MainThread
     public synchronized void checkTriggers(final double tpf) {
-        for (final InputSource is : inputs) {
+        for (final InputSource is : _inputs) {
             is.physicalLayer.readState();
 
             final List<InputState> newStates = is.physicalLayer.drainAvailableStates();
@@ -88,7 +88,7 @@ public final class LogicalLayer {
     }
 
     private void checkAndPerformTriggers(final Canvas source, final TwoInputStates states, final double tpf) {
-        for (final InputTrigger trigger : triggers) {
+        for (final InputTrigger trigger : _triggers) {
             trigger.performIfValid(source, states, tpf);
         }
     }

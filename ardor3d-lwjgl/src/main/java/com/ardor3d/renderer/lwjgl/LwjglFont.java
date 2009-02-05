@@ -35,21 +35,21 @@ public class LwjglFont {
     public static final int ITALICS = 1;
 
     // display list offset.
-    private int base;
+    private int _base;
 
     // buffer that holds the text.
-    private ByteBuffer scratch;
+    private ByteBuffer _scratch;
 
     // Color to render the font.
-    private final ColorRGBA fontColor;
+    private final ColorRGBA _fontColor;
 
     /**
      * Constructor instantiates a new LwjglFont object. The initial color is set to white.
      * 
      */
     public LwjglFont() {
-        fontColor = new ColorRGBA(1, 1, 1, 1);
-        scratch = BufferUtils.createByteBuffer(1);
+        _fontColor = new ColorRGBA(1, 1, 1, 1);
+        _scratch = BufferUtils.createByteBuffer(1);
         buildDisplayList();
     }
 
@@ -58,7 +58,7 @@ public class LwjglFont {
      * to <code>buildDisplayLists</code> is made.
      */
     public void deleteFont() {
-        GL11.glDeleteLists(base, 256);
+        GL11.glDeleteLists(_base, 256);
     }
 
     /**
@@ -69,7 +69,7 @@ public class LwjglFont {
      *            the color to set.
      */
     public void setColor(final ColorRGBA color) {
-        fontColor.set(color);
+        _fontColor.set(color);
     }
 
     /**
@@ -106,23 +106,23 @@ public class LwjglFont {
         }
         GL11.glTranslated(x, y, 0);
         GL11.glScaled(scale.getX(), scale.getY(), scale.getZ());
-        GL11.glListBase(base - 32 + (128 * set));
+        GL11.glListBase(_base - 32 + (128 * set));
 
         // Put the string into a "pointer"
-        if (text.length() > scratch.capacity()) {
-            scratch = BufferUtils.createByteBuffer(text.length());
+        if (text.length() > _scratch.capacity()) {
+            _scratch = BufferUtils.createByteBuffer(text.length());
         } else {
-            scratch.clear();
+            _scratch.clear();
         }
 
         final int charLen = text.length();
         for (int z = 0; z < charLen; z++) {
-            scratch.put((byte) text.charAt(z));
+            _scratch.put((byte) text.charAt(z));
         }
-        scratch.flip();
-        GL11.glColor4f(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getAlpha());
+        _scratch.flip();
+        GL11.glColor4f(_fontColor.getRed(), _fontColor.getGreen(), _fontColor.getBlue(), _fontColor.getAlpha());
         // call the list for each letter in the string.
-        GL11.glCallLists(scratch);
+        GL11.glCallLists(_scratch);
         // set color back to white
         GL11.glColor4f(1, 1, 1, 1);
 
@@ -142,13 +142,13 @@ public class LwjglFont {
         float cx;
         float cy;
 
-        base = GL11.glGenLists(256);
+        _base = GL11.glGenLists(256);
 
         for (int loop = 0; loop < 256; loop++) {
             cx = (loop % 16) / 16.0f;
             cy = (loop / 16) / 16.0f;
 
-            GL11.glNewList(base + loop, GL11.GL_COMPILE);
+            GL11.glNewList(_base + loop, GL11.GL_COMPILE);
             GL11.glBegin(GL11.GL_QUADS);
             GL11.glTexCoord2f(cx, 1 - cy - 0.0625f);
             GL11.glVertex2i(0, 0);
@@ -167,7 +167,7 @@ public class LwjglFont {
     @Override
     public String toString() {
         String string = super.toString();
-        string += "\nColor: " + fontColor.toString();
+        string += "\nColor: " + _fontColor.toString();
 
         return string;
     }

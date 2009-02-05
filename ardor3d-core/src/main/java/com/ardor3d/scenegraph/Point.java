@@ -31,8 +31,8 @@ public class Point extends Mesh {
 
     private static final long serialVersionUID = 1L;
 
-    private float pointSize = 1.0f;
-    private boolean antialiased = false;
+    private float _pointSize = 1.0f;
+    private boolean _antialiased = false;
 
     public Point() {
         this("point", null, null, null, (TexCoords) null);
@@ -87,7 +87,7 @@ public class Point extends Mesh {
      * @return true if points are to be drawn antialiased
      */
     public boolean isAntialiased() {
-        return antialiased;
+        return _antialiased;
     }
 
     /**
@@ -99,14 +99,14 @@ public class Point extends Mesh {
      *            true if the line should be antialiased.
      */
     public void setAntialiased(final boolean antialiased) {
-        this.antialiased = antialiased;
+        _antialiased = antialiased;
     }
 
     /**
      * @return the pixel size of each point.
      */
     public float getPointSize() {
-        return pointSize;
+        return _pointSize;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Point extends Mesh {
      *            The size to set.
      */
     public void setPointSize(final float size) {
-        pointSize = size;
+        _pointSize = size;
     }
 
     /**
@@ -147,16 +147,16 @@ public class Point extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(pointSize, "pointSize", 1);
-        capsule.write(antialiased, "antialiased", false);
+        capsule.write(_pointSize, "pointSize", 1);
+        capsule.write(_antialiased, "antialiased", false);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        pointSize = capsule.readFloat("pointSize", 1);
-        antialiased = capsule.readBoolean("antialiased", false);
+        _pointSize = capsule.readFloat("pointSize", 1);
+        _antialiased = capsule.readBoolean("antialiased", false);
     }
 
     @Override

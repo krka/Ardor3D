@@ -20,56 +20,56 @@ import com.ardor3d.renderer.Renderer;
  */
 public class BasicPassManager {
 
-    protected List<Pass> passes = new ArrayList<Pass>();
+    protected List<Pass> _passes = new ArrayList<Pass>();
 
     public void add(final Pass toAdd) {
         if (toAdd != null) {
-            passes.add(toAdd);
+            _passes.add(toAdd);
         }
     }
 
     public void insert(final Pass toAdd, final int index) {
-        passes.add(index, toAdd);
+        _passes.add(index, toAdd);
     }
 
     public boolean contains(final Pass s) {
-        return passes.contains(s);
+        return _passes.contains(s);
     }
 
     public boolean remove(final Pass toRemove) {
-        return passes.remove(toRemove);
+        return _passes.remove(toRemove);
     }
 
     public Pass get(final int index) {
-        return passes.get(index);
+        return _passes.get(index);
     }
 
     public int passes() {
-        return passes.size();
+        return _passes.size();
     }
 
     public void clearAll() {
         cleanUp();
-        passes.clear();
+        _passes.clear();
     }
 
     public void cleanUp() {
-        for (int i = 0, sSize = passes.size(); i < sSize; i++) {
-            final Pass p = passes.get(i);
+        for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
+            final Pass p = _passes.get(i);
             p.cleanUp();
         }
     }
 
     public void renderPasses(final Renderer r) {
-        for (int i = 0, sSize = passes.size(); i < sSize; i++) {
-            final Pass p = passes.get(i);
+        for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
+            final Pass p = _passes.get(i);
             p.renderPass(r);
         }
     }
 
     public void updatePasses(final double tpf) {
-        for (int i = 0, sSize = passes.size(); i < sSize; i++) {
-            final Pass p = passes.get(i);
+        for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
+            final Pass p = _passes.get(i);
             p.updatePass(tpf);
         }
     }

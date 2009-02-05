@@ -58,27 +58,27 @@ public class CollisionTreeManager {
     public static final int DEFAULT_MAX_TRIS_PER_LEAF = 16;
 
     // the singleton instance of the manager
-    private static CollisionTreeManager instance = new CollisionTreeManager();
+    private static CollisionTreeManager _instance = new CollisionTreeManager();
 
     // the cache and protected list for storing trees.
-    private final Map<Mesh, CollisionTree> cache;
-    private List<Mesh> protectedList;
+    private final Map<Mesh, CollisionTree> _cache;
+    private List<Mesh> _protectedList;
 
-    private boolean generateTrees = true;
-    private boolean doSort;
+    private boolean _generateTrees = true;
+    private boolean _doSort;
 
-    private CollisionTree.Type treeType = CollisionTree.Type.AABB;
+    private CollisionTree.Type _treeType = CollisionTree.Type.AABB;
 
-    private int maxTrisPerLeaf = DEFAULT_MAX_TRIS_PER_LEAF;
+    private int _maxTrisPerLeaf = DEFAULT_MAX_TRIS_PER_LEAF;
     private final static int maxElements = DEFAULT_MAX_ELEMENTS;
 
-    private CollisionTreeController treeRemover;
+    private CollisionTreeController _treeRemover;
 
     /**
      * private constructor for the Singleton. Initializes the cache.
      */
     private CollisionTreeManager() {
-        cache = Collections.synchronizedMap(new LinkedHashMap<Mesh, CollisionTree>(1));
+        _cache = Collections.synchronizedMap(new LinkedHashMap<Mesh, CollisionTree>(1));
         setCollisionTreeController(new UsageTreeController());
     }
 
@@ -88,7 +88,7 @@ public class CollisionTreeManager {
      * @return the singleton instance of the manager.
      */
     public static CollisionTreeManager getInstance() {
-        return instance;
+        return _instance;
     }
 
     /**
@@ -98,7 +98,7 @@ public class CollisionTreeManager {
      *            the controller used to clean the cache.
      */
     public void setCollisionTreeController(final CollisionTreeController treeRemover) {
-        this.treeRemover = treeRemover;
+        _treeRemover = treeRemover;
     }
 
     /**
@@ -112,20 +112,20 @@ public class CollisionTreeManager {
     public synchronized CollisionTree getCollisionTree(final Mesh mesh) {
         CollisionTree toReturn = null;
 
-        toReturn = cache.get(mesh);
+        toReturn = _cache.get(mesh);
 
         // we didn't have it in the cache, create it if possible.
         if (toReturn == null) {
-            if (generateTrees) {
-                return generateCollisionTree(treeType, mesh, false);
+            if (_generateTrees) {
+                return generateCollisionTree(_treeType, mesh, false);
             } else {
                 return null;
             }
         } else {
             // we had it in the cache, to keep the keyset in order, reinsert
             // this element
-            cache.remove(mesh);
-            cache.put(mesh, toReturn);
+            _cache.remove(mesh);
+            _cache.put(mesh, toReturn);
             return toReturn;
         }
     }
@@ -195,21 +195,21 @@ public class CollisionTreeManager {
      */
     public CollisionTree generateCollisionTree(final CollisionTree tree, final Mesh mesh, final boolean protect) {
         if (tree != null) {
-            tree.construct(mesh, doSort);
-            cache.put(mesh, tree);
+            tree.construct(mesh, _doSort);
+            _cache.put(mesh, tree);
             // This mesh has been added by outside sources and labeled
             // as protected. Therefore, put it in the protected list
             // so it is not removed by a controller.
             if (protect) {
-                if (protectedList == null) {
-                    protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
+                if (_protectedList == null) {
+                    _protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
                 }
-                protectedList.add(mesh);
+                _protectedList.add(mesh);
             }
 
             // Are we over our max? Test
-            if (cache.size() > maxElements && treeRemover != null) {
-                treeRemover.clean(cache, protectedList, maxElements);
+            if (_cache.size() > maxElements && _treeRemover != null) {
+                _treeRemover.clean(_cache, _protectedList, maxElements);
             }
         }
         return tree;
@@ -222,7 +222,7 @@ public class CollisionTreeManager {
      *            the mesh to remove the corresponding collision tree.
      */
     public void removeCollisionTree(final Mesh mesh) {
-        cache.remove(mesh);
+        _cache.remove(mesh);
     }
 
     /**
@@ -250,9 +250,9 @@ public class CollisionTreeManager {
      *            the mesh key for the tree to update.
      */
     public void updateCollisionTree(final Mesh mesh) {
-        final CollisionTree ct = cache.get(mesh);
+        final CollisionTree ct = _cache.get(mesh);
         if (ct != null) {
-            generateCollisionTree(ct, mesh, protectedList != null && protectedList.contains(mesh));
+            generateCollisionTree(ct, mesh, _protectedList != null && _protectedList.contains(mesh));
         }
     }
 
@@ -280,7 +280,7 @@ public class CollisionTreeManager {
      * @return true to sort tree, false otherwise.
      */
     public boolean isDoSort() {
-        return doSort;
+        return _doSort;
     }
 
     /**
@@ -290,7 +290,7 @@ public class CollisionTreeManager {
      *            true to sort trees, false otherwise.
      */
     public void setDoSort(final boolean doSort) {
-        this.doSort = doSort;
+        _doSort = doSort;
     }
 
     /**
@@ -299,7 +299,7 @@ public class CollisionTreeManager {
      * @return true if this manager is generating trees, false otherwise.
      */
     public boolean isGenerateTrees() {
-        return generateTrees;
+        return _generateTrees;
     }
 
     /**
@@ -309,7 +309,7 @@ public class CollisionTreeManager {
      *            true to generate trees, false otherwise.
      */
     public void setGenerateTrees(final boolean generateTrees) {
-        this.generateTrees = generateTrees;
+        _generateTrees = generateTrees;
     }
 
     /**
@@ -317,7 +317,7 @@ public class CollisionTreeManager {
      * @see CollisionTree.Type
      */
     public CollisionTree.Type getTreeType() {
-        return treeType;
+        return _treeType;
     }
 
     /**
@@ -326,7 +326,7 @@ public class CollisionTreeManager {
      * @see CollisionTree.Type
      */
     public void setTreeType(final CollisionTree.Type treeType) {
-        this.treeType = treeType;
+        _treeType = treeType;
     }
 
     /**
@@ -335,7 +335,7 @@ public class CollisionTreeManager {
      * @return the maximum number of triangles a leaf will contain.
      */
     public int getMaxTrisPerLeaf() {
-        return maxTrisPerLeaf;
+        return _maxTrisPerLeaf;
     }
 
     /**
@@ -345,7 +345,7 @@ public class CollisionTreeManager {
      *            the maximum number of triangles a leaf will contain.
      */
     public void setMaxTrisPerLeaf(final int maxTrisPerLeaf) {
-        this.maxTrisPerLeaf = maxTrisPerLeaf;
+        _maxTrisPerLeaf = maxTrisPerLeaf;
     }
 
 }

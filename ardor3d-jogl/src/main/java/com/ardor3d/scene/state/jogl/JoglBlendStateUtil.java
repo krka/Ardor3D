@@ -25,7 +25,7 @@ import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.BlendStateRecord;
 
-public class JoglBlendStateUtil {
+public abstract class JoglBlendStateUtil {
 
     public static void apply(final JoglRenderer renderer, final BlendState state) {
         // ask for the current state record

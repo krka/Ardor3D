@@ -15,8 +15,8 @@ import com.ardor3d.util.Ardor3dException;
 
 public class IntersectionRecord {
 
-    private double[] distances;
-    private Vector3[] points;
+    private double[] _distances;
+    private Vector3[] _points;
 
     /**
      * Instantiates a new IntersectionRecord with no distances or points assigned.
@@ -37,8 +37,8 @@ public class IntersectionRecord {
         if (distances.length != points.length) {
             throw new Ardor3dException("The distances and points variables must have an equal number of elements.");
         }
-        this.distances = distances;
-        this.points = points;
+        _distances = distances;
+        _points = points;
     }
 
     /**
@@ -47,10 +47,10 @@ public class IntersectionRecord {
      * @return the number of intersections that occurred.
      */
     public int getNumberOfIntersection() {
-        if (points == null) {
+        if (_points == null) {
             return 0;
         }
-        return points.length;
+        return _points.length;
     }
 
     /**
@@ -61,7 +61,7 @@ public class IntersectionRecord {
      * @return the point at the index of the array.
      */
     public Vector3 getIntersectionPoint(final int index) {
-        return points[index];
+        return _points[index];
     }
 
     /**
@@ -72,7 +72,7 @@ public class IntersectionRecord {
      * @return the distance at the index of the array.
      */
     public double getIntersectionDistance(final int index) {
-        return distances[index];
+        return _distances[index];
     }
 
     /**
@@ -82,8 +82,8 @@ public class IntersectionRecord {
      */
     public double getClosestDistance() {
         double min = Double.MAX_VALUE;
-        if (distances != null) {
-            for (final double val : distances) {
+        if (_distances != null) {
+            for (final double val : _distances) {
                 if (val < min) {
                     min = val;
                 }
@@ -99,9 +99,9 @@ public class IntersectionRecord {
     public int getClosestIntersection() {
         double min = Double.MAX_VALUE;
         int index = -1;
-        if (distances != null) {
-            for (int i = distances.length; --i >= 0;) {
-                final double val = distances[i];
+        if (_distances != null) {
+            for (int i = _distances.length; --i >= 0;) {
+                final double val = _distances[i];
                 if (val < min) {
                     min = val;
                     index = i;
@@ -118,9 +118,9 @@ public class IntersectionRecord {
     public int getFurthestIntersection() {
         double max = Double.MIN_VALUE;
         int index = -1;
-        if (distances != null) {
-            for (int i = distances.length; --i >= 0;) {
-                final double val = distances[i];
+        if (_distances != null) {
+            for (int i = _distances.length; --i >= 0;) {
+                final double val = _distances[i];
                 if (val > max) {
                     max = val;
                     index = i;

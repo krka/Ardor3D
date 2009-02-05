@@ -23,7 +23,7 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.MaterialStateRecord;
 
-public class JoglMaterialStateUtil {
+public abstract class JoglMaterialStateUtil {
 
     public static void apply(final JoglRenderer renderer, final MaterialState state) {
         final GL gl = GLU.getCurrentGL();

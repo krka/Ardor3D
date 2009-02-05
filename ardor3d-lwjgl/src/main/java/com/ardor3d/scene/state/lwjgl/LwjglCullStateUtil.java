@@ -21,7 +21,7 @@ import com.ardor3d.renderer.state.CullState.PolygonWind;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.CullStateRecord;
 
-public class LwjglCullStateUtil {
+public abstract class LwjglCullStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final CullState state) {
         // ask for the current state record

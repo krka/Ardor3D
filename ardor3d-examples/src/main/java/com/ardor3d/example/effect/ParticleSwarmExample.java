@@ -44,8 +44,7 @@ public class ParticleSwarmExample extends ExampleBase {
     }
 
     @Inject
-    public ParticleSwarmExample(final LogicalLayer layer, final FrameWork frameWork,
-            final Timer timer) {
+    public ParticleSwarmExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

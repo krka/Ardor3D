@@ -31,15 +31,15 @@ public class PhysicalLayer {
 
     private static final Logger logger = Logger.getLogger(PhysicalLayer.class.getName());
 
-    private final BlockingQueue<InputState> stateQueue;
-    private final KeyboardWrapper keyboardWrapper;
-    private final MouseWrapper mouseWrapper;
-    private final FocusWrapper focusWrapper;
+    private final BlockingQueue<InputState> _stateQueue;
+    private final KeyboardWrapper _keyboardWrapper;
+    private final MouseWrapper _mouseWrapper;
+    private final FocusWrapper _focusWrapper;
 
-    private KeyboardState currentKeyboardState;
-    private MouseState currentMouseState;
+    private KeyboardState _currentKeyboardState;
+    private MouseState _currentMouseState;
 
-    private boolean inited = false;
+    private boolean _inited = false;
 
     private static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
     private static final List<InputState> EMPTY_LIST = ImmutableList.of();
@@ -47,13 +47,13 @@ public class PhysicalLayer {
     @Inject
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final FocusWrapper focusWrapper) {
-        this.keyboardWrapper = keyboardWrapper;
-        this.mouseWrapper = mouseWrapper;
-        this.focusWrapper = focusWrapper;
-        stateQueue = new LinkedBlockingQueue<InputState>();
+        _keyboardWrapper = keyboardWrapper;
+        _mouseWrapper = mouseWrapper;
+        _focusWrapper = focusWrapper;
+        _stateQueue = new LinkedBlockingQueue<InputState>();
 
-        currentKeyboardState = KeyboardState.NOTHING;
-        currentMouseState = MouseState.NOTHING;
+        _currentKeyboardState = KeyboardState.NOTHING;
+        _currentMouseState = MouseState.NOTHING;
     }
 
     /**
@@ -64,13 +64,13 @@ public class PhysicalLayer {
      *             if too many state changes have happened since the last call to this method
      */
     public void readState() {
-        if (!inited) {
+        if (!_inited) {
             init();
         }
 
-        KeyboardState oldKeyState = currentKeyboardState;
-        MouseState oldMouseState = currentMouseState = new MouseState(currentMouseState.getX(), currentMouseState
-                .getY(), 0, 0, 0, currentMouseState.getButtonStates(), currentMouseState.getClickCounts());
+        KeyboardState oldKeyState = _currentKeyboardState;
+        MouseState oldMouseState = _currentMouseState = new MouseState(_currentMouseState.getX(), _currentMouseState
+                .getY(), 0, 0, 0, _currentMouseState.getButtonStates(), _currentMouseState.getClickCounts());
 
         final long loopExitTime = System.nanoTime() + MAX_INPUT_POLL_TIME;
 
@@ -80,14 +80,14 @@ public class PhysicalLayer {
 
             // if there is no new input, exit the loop. Otherwise, add a new input state to the queue, and
             // see if there is even more input to read.
-            if (oldKeyState.equals(currentKeyboardState) && oldMouseState.equals(currentMouseState)) {
+            if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)) {
                 break;
             }
 
-            stateQueue.add(new InputState(currentKeyboardState, currentMouseState));
+            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState));
 
-            oldKeyState = currentKeyboardState;
-            oldMouseState = currentMouseState;
+            oldKeyState = _currentKeyboardState;
+            oldMouseState = _currentMouseState;
 
             if (System.nanoTime() > loopExitTime) {
                 logger.severe("Spent too long collecting input data, this is probably an input system bug");
@@ -95,16 +95,16 @@ public class PhysicalLayer {
             }
         }
 
-        if (focusWrapper.getAndClearFocusLost()) {
+        if (_focusWrapper.getAndClearFocusLost()) {
             lostFocus();
         }
     }
 
     private void readMouseState() {
-        final PeekingIterator<MouseState> eventIterator = mouseWrapper.getEvents();
+        final PeekingIterator<MouseState> eventIterator = _mouseWrapper.getEvents();
 
         if (eventIterator.hasNext()) {
-            currentMouseState = eventIterator.next();
+            _currentMouseState = eventIterator.next();
         }
     }
 
@@ -112,7 +112,7 @@ public class PhysicalLayer {
         EnumSet<Key> keysDown = null;
         EnumSet<Key> keysChanged = null;
 
-        final PeekingIterator<KeyEvent> eventIterator = keyboardWrapper.getEvents();
+        final PeekingIterator<KeyEvent> eventIterator = _keyboardWrapper.getEvents();
 
         while (eventIterator.hasNext()) {
             // only initialising these variables if we actually have to use them; this
@@ -120,10 +120,10 @@ public class PhysicalLayer {
             if (keysDown == null) {
                 // EnumSet.copyOf fails if the collection is empty, since it needs at least one object to
                 // figure out which type of enum to deal with. Hence the check below.
-                if (currentKeyboardState.getKeysDown().isEmpty()) {
+                if (_currentKeyboardState.getKeysDown().isEmpty()) {
                     keysDown = EnumSet.noneOf(Key.class);
                 } else {
-                    keysDown = EnumSet.copyOf(currentKeyboardState.getKeysDown());
+                    keysDown = EnumSet.copyOf(_currentKeyboardState.getKeysDown());
                 }
 
                 keysChanged = EnumSet.noneOf(Key.class);
@@ -151,7 +151,7 @@ public class PhysicalLayer {
 
         // check if the current keyboard state should be updated
         if (keysChanged != null && !keysChanged.isEmpty()) {
-            currentKeyboardState = new KeyboardState(keysDown);
+            _currentKeyboardState = new KeyboardState(keysDown);
         }
     }
 
@@ -165,28 +165,28 @@ public class PhysicalLayer {
         // returning a reusable empty list to avoid object creation if there is no new
         // input available. There is a race condition here (input might become available right after
         // the check of isEmpty()) but that's OK, it won't do any harm if that is picked up next frame.
-        if (stateQueue.isEmpty()) {
+        if (_stateQueue.isEmpty()) {
             return EMPTY_LIST;
         }
 
         final LinkedList<InputState> result = new LinkedList<InputState>();
 
-        stateQueue.drainTo(result);
+        _stateQueue.drainTo(result);
 
         return result;
     }
 
     private void lostFocus() {
-        stateQueue.add(InputState.LOST_FOCUS);
-        currentKeyboardState = KeyboardState.NOTHING;
-        currentMouseState = MouseState.NOTHING;
+        _stateQueue.add(InputState.LOST_FOCUS);
+        _currentKeyboardState = KeyboardState.NOTHING;
+        _currentMouseState = MouseState.NOTHING;
     }
 
     private void init() {
-        inited = true;
+        _inited = true;
 
-        keyboardWrapper.init();
-        mouseWrapper.init();
-        focusWrapper.init();
+        _keyboardWrapper.init();
+        _mouseWrapper.init();
+        _focusWrapper.init();
     }
 }

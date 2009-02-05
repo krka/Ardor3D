@@ -54,8 +54,7 @@ public class ExportImportExample extends ExampleBase {
     }
 
     @Inject
-    public ExportImportExample(final LogicalLayer layer, final FrameWork frameWork,
-            final Timer timer) {
+    public ExportImportExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

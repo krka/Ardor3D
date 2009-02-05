@@ -33,15 +33,15 @@ public class BinaryOutputCapsule implements OutputCapsule {
     public static byte[] NULL_BYTES = new byte[] { (byte) -1 };
     public static byte[] DEFAULT_BYTES = new byte[] { (byte) -2 };
 
-    protected ByteArrayOutputStream baos;
-    protected byte[] bytes;
-    protected BinaryExporter exporter;
-    protected BinaryClassObject cObj;
+    protected ByteArrayOutputStream _baos;
+    protected byte[] _bytes;
+    protected BinaryExporter _exporter;
+    protected BinaryClassObject _cObj;
 
     public BinaryOutputCapsule(final BinaryExporter exporter, final BinaryClassObject bco) {
-        baos = new ByteArrayOutputStream();
-        this.exporter = exporter;
-        cObj = bco;
+        _baos = new ByteArrayOutputStream();
+        _exporter = exporter;
+        _cObj = bco;
     }
 
     public void write(final byte value, final String name, final byte defVal) throws IOException {
@@ -364,11 +364,11 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
 
     protected void writeAlias(final String name, final byte fieldType) throws IOException {
-        if (cObj.nameFields.get(name) == null) {
+        if (_cObj._nameFields.get(name) == null) {
             generateAlias(name, fieldType);
         }
 
-        final byte alias = cObj.nameFields.get(name).alias;
+        final byte alias = _cObj._nameFields.get(name)._alias;
         write(alias);
     }
 
@@ -376,8 +376,8 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // If we run into classes with more than 256 fields, we need to expand this.
     // But I mean, come on...
     protected void generateAlias(final String name, final byte type) {
-        final byte alias = (byte) cObj.nameFields.size();
-        cObj.nameFields.put(name, new BinaryClassField(name, alias, type));
+        final byte alias = (byte) _cObj._nameFields.size();
+        _cObj._nameFields.put(name, new BinaryClassField(name, alias, type));
     }
 
     @Override
@@ -386,11 +386,11 @@ public class BinaryOutputCapsule implements OutputCapsule {
             return false;
         }
 
-        final byte[] other = ((BinaryOutputCapsule) arg0).bytes;
-        if (bytes.length != other.length) {
+        final byte[] other = ((BinaryOutputCapsule) arg0)._bytes;
+        if (_bytes.length != other.length) {
             return false;
         }
-        return Arrays.equals(bytes, other);
+        return Arrays.equals(_bytes, other);
     }
 
     public void finish() {
@@ -398,14 +398,14 @@ public class BinaryOutputCapsule implements OutputCapsule {
         // overridden like this
         // - finalize should not be called directly but is called by garbage
         // collection!!!
-        bytes = baos.toByteArray();
-        baos = null;
+        _bytes = _baos.toByteArray();
+        _baos = null;
     }
 
     // byte primitive
 
     protected void write(final byte value) throws IOException {
-        baos.write(value);
+        _baos.write(value);
     }
 
     protected void write(final byte[] value) throws IOException {
@@ -414,7 +414,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
             return;
         }
         write(value.length);
-        baos.write(value);
+        _baos.write(value);
     }
 
     protected void write(final byte[][] value) throws IOException {
@@ -431,7 +431,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // int primitive
 
     protected void write(final int value) throws IOException {
-        baos.write(deflate(ByteUtils.convertToBytes(value)));
+        _baos.write(deflate(ByteUtils.convertToBytes(value)));
     }
 
     protected void write(final int[] value) throws IOException {
@@ -459,7 +459,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // float primitive
 
     protected void write(final float value) throws IOException {
-        baos.write(ByteUtils.convertToBytes(value));
+        _baos.write(ByteUtils.convertToBytes(value));
     }
 
     protected void write(final float[] value) throws IOException {
@@ -487,7 +487,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // double primitive
 
     protected void write(final double value) throws IOException {
-        baos.write(ByteUtils.convertToBytes(value));
+        _baos.write(ByteUtils.convertToBytes(value));
     }
 
     protected void write(final double[] value) throws IOException {
@@ -515,7 +515,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // long primitive
 
     protected void write(final long value) throws IOException {
-        baos.write(deflate(ByteUtils.convertToBytes(value)));
+        _baos.write(deflate(ByteUtils.convertToBytes(value)));
     }
 
     protected void write(final long[] value) throws IOException {
@@ -543,7 +543,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // short primitive
 
     protected void write(final short value) throws IOException {
-        baos.write(ByteUtils.convertToBytes(value));
+        _baos.write(ByteUtils.convertToBytes(value));
     }
 
     protected void write(final short[] value) throws IOException {
@@ -571,7 +571,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // boolean primitive
 
     protected void write(final boolean value) throws IOException {
-        baos.write(ByteUtils.convertToBytes(value));
+        _baos.write(ByteUtils.convertToBytes(value));
     }
 
     protected void write(final boolean[] value) throws IOException {
@@ -606,7 +606,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
         // write our output as UTF-8. Java misspells UTF-8 as UTF8 for official use in java.lang
         final byte[] bytes = value.getBytes("UTF8");
         write(bytes.length);
-        baos.write(bytes);
+        _baos.write(bytes);
     }
 
     protected void write(final String[] value) throws IOException {
@@ -683,7 +683,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
             write(NULL_OBJECT);
             return;
         }
-        final int id = exporter.processBinarySavable(object);
+        final int id = _exporter.processBinarySavable(object);
         write(id);
     }
 

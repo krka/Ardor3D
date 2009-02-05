@@ -163,8 +163,8 @@ public final class Debugger {
     private static void drawOBB(final OrientedBoundingBox box, final Renderer r) {
         boundingOB.getCenter().set(box.getCenter());
         boundingOB.getxAxis().set(box.getXAxis());
-        boundingOB.getyAxis().set(box.getYAxis());
-        boundingOB.getzAxis().set(box.getZAxis());
+        boundingOB.getYAxis().set(box.getYAxis());
+        boundingOB.getZAxis().set(box.getZAxis());
         boundingOB.getExtent().set(box.getExtent());
         boundingOB.computeInformation();
         boundingOB.draw(r);

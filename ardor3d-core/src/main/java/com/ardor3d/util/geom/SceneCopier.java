@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
-public class SceneCopier {
+public abstract class SceneCopier {
 
     public static Spatial makeCopy(final Spatial source, final CopyLogic logic) {
         return makeCopy(source, null, logic);

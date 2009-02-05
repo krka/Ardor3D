@@ -22,7 +22,7 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.MaterialStateRecord;
 
-public class LwjglMaterialStateUtil {
+public abstract class LwjglMaterialStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final MaterialState state) {
         // ask for the current state record

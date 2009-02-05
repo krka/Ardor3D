@@ -25,25 +25,24 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public class NonIndexedNormalGenerator {
 
-    private final Vector3 temp1 = new Vector3();
+    private final Vector3 _temp1 = new Vector3();
 
-    private final Vector3 temp2 = new Vector3();
+    private final Vector3 _temp2 = new Vector3();
 
-    private final Vector3 temp3 = new Vector3();
+    private final Vector3 _temp3 = new Vector3();
 
-    private int[] indices;
+    private int[] _indices;
 
-    private double creaseAngle;
+    private double _creaseAngle;
 
-    private double[] faceNormals;
+    private double[] _faceNormals;
 
-    private int[] normalsToSet;
+    private int[] _normalsToSet;
 
     /**
      * Calculates the normals for a set of faces determined by the specified vertices. Every 3 consecutive vertices
-     * define one triangle.<br />
-     * <strong>Please note:</strong> This method uses class fields and is not synchronized! Therefore it should only be
-     * called from a single thread, unless synchronization is taken care of externally.
+     * define one triangle.<br /> <strong>Please note:</strong> This method uses class fields and is not synchronized!
+     * Therefore it should only be called from a single thread, unless synchronization is taken care of externally.
      * 
      * @param vertices
      *            The vertex coordinates. Every three values define one vertex
@@ -58,10 +57,10 @@ public class NonIndexedNormalGenerator {
      */
     public double[] generateNormals(final double[] vertices, final int[] indices, final double creaseAngle) {
 
-        this.indices = indices;
-        this.creaseAngle = creaseAngle;
-        normalsToSet = new int[10];
-        Arrays.fill(normalsToSet, -1);
+        _indices = indices;
+        _creaseAngle = creaseAngle;
+        _normalsToSet = new int[10];
+        Arrays.fill(_normalsToSet, -1);
 
         initFaceNormals(vertices);
 
@@ -78,22 +77,22 @@ public class NonIndexedNormalGenerator {
      *            The array containing all vertex coordinates
      */
     private void initFaceNormals(final double[] vertices) {
-        faceNormals = new double[vertices.length / 3];
+        _faceNormals = new double[vertices.length / 3];
 
         for (int i = 0; i * 9 < vertices.length; i++) {
-            temp1.set(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
-            temp2.set(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
-            temp3.set(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
+            _temp1.set(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
+            _temp2.set(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
+            _temp3.set(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
 
-            temp2.subtractLocal(temp1); // A -> B
-            temp3.subtractLocal(temp1); // A -> C
+            _temp2.subtractLocal(_temp1); // A -> B
+            _temp3.subtractLocal(_temp1); // A -> C
 
-            temp2.cross(temp3, temp1);
-            temp1.normalizeLocal(); // Normal
+            _temp2.cross(_temp3, _temp1);
+            _temp1.normalizeLocal(); // Normal
 
-            faceNormals[i * 3 + 0] = temp1.getX();
-            faceNormals[i * 3 + 1] = temp1.getY();
-            faceNormals[i * 3 + 2] = temp1.getZ();
+            _faceNormals[i * 3 + 0] = _temp1.getX();
+            _faceNormals[i * 3 + 1] = _temp1.getY();
+            _faceNormals[i * 3 + 2] = _temp1.getZ();
         }
     }
 
@@ -104,10 +103,10 @@ public class NonIndexedNormalGenerator {
      */
     private double[] getVertexNormals() {
 
-        final double[] normals = new double[faceNormals.length * 3];
-        final boolean[] setNormals = new boolean[faceNormals.length];
+        final double[] normals = new double[_faceNormals.length * 3];
+        final boolean[] setNormals = new boolean[_faceNormals.length];
 
-        for (int i = 0; i * 3 < faceNormals.length; i++) {
+        for (int i = 0; i * 3 < _faceNormals.length; i++) {
             for (int j = 0; j < 3; j++) {
                 if (!setNormals[i * 3 + j]) {
                     setInterpolatedNormal(normals, setNormals, i, j);
@@ -135,40 +134,40 @@ public class NonIndexedNormalGenerator {
             final int vertex) {
 
         // temp1: Normal of the face the specified vertex belongs to
-        temp1.set(faceNormals[face * 3 + 0], faceNormals[face * 3 + 1], faceNormals[face * 3 + 2]);
+        _temp1.set(_faceNormals[face * 3 + 0], _faceNormals[face * 3 + 1], _faceNormals[face * 3 + 2]);
 
         // temp2: Sum of all face normals to be interpolated
-        temp2.set(temp1);
+        _temp2.set(_temp1);
 
-        final int vertIndex = indices[face * 3 + vertex];
-        normalsToSet[0] = face * 3 + vertex;
+        final int vertIndex = _indices[face * 3 + vertex];
+        _normalsToSet[0] = face * 3 + vertex;
         int count = 1;
 
         /*
          * Get the normals of all faces containing the specified vertex whose angle to the specified one is less than
          * the crease angle
          */
-        for (int i = face * 3 + vertex + 1; i < indices.length; i++) {
-            if (indices[i] == vertIndex && !setNormals[face * 3 + vertex]) {
+        for (int i = face * 3 + vertex + 1; i < _indices.length; i++) {
+            if (_indices[i] == vertIndex && !setNormals[face * 3 + vertex]) {
                 // temp3: Normal of the face the current vertex belongs to
-                temp3.set(faceNormals[(i / 3) * 3 + 0], faceNormals[(i / 3) * 3 + 1], faceNormals[(i / 3) * 3 + 2]);
-                if (temp1.smallestAngleBetween(temp3) < creaseAngle) {
-                    normalsToSet = setValue(normalsToSet, count, i);
+                _temp3.set(_faceNormals[(i / 3) * 3 + 0], _faceNormals[(i / 3) * 3 + 1], _faceNormals[(i / 3) * 3 + 2]);
+                if (_temp1.smallestAngleBetween(_temp3) < _creaseAngle) {
+                    _normalsToSet = setValue(_normalsToSet, count, i);
                     count++;
-                    temp2.addLocal(temp3);
+                    _temp2.addLocal(_temp3);
                 }
             }
         }
 
-        temp2.normalizeLocal();
+        _temp2.normalizeLocal();
 
         // Set the normals for all vertices marked for interpolation
-        for (int i = 0; i < normalsToSet.length && normalsToSet[i] != -1; i++) {
-            normals[normalsToSet[i] * 3 + 0] = temp2.getX();
-            normals[normalsToSet[i] * 3 + 1] = temp2.getY();
-            normals[normalsToSet[i] * 3 + 2] = temp2.getZ();
-            setNormals[normalsToSet[i]] = true;
-            normalsToSet[i] = -1;
+        for (int i = 0; i < _normalsToSet.length && _normalsToSet[i] != -1; i++) {
+            normals[_normalsToSet[i] * 3 + 0] = _temp2.getX();
+            normals[_normalsToSet[i] * 3 + 1] = _temp2.getY();
+            normals[_normalsToSet[i] * 3 + 2] = _temp2.getZ();
+            setNormals[_normalsToSet[i]] = true;
+            _normalsToSet[i] = -1;
         }
     }
 
@@ -202,12 +201,12 @@ public class NonIndexedNormalGenerator {
      * @return The vertex normals
      */
     private double[] getFacetedVertexNormals() {
-        final double[] normals = new double[faceNormals.length * 3];
-        for (int i = 0; i * 3 < faceNormals.length; i++) {
+        final double[] normals = new double[_faceNormals.length * 3];
+        for (int i = 0; i * 3 < _faceNormals.length; i++) {
             for (int j = 0; j < 3; j++) {
-                normals[i * 9 + j + 0] = faceNormals[i * 3 + j];
-                normals[i * 9 + j + 3] = faceNormals[i * 3 + j];
-                normals[i * 9 + j + 6] = faceNormals[i * 3 + j];
+                normals[i * 9 + j + 0] = _faceNormals[i * 3 + j];
+                normals[i * 9 + j + 3] = _faceNormals[i * 3 + j];
+                normals[i * 9 + j + 6] = _faceNormals[i * 3 + j];
             }
         }
         return normals;

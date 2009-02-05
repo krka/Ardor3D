@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ClipStateRecord;
 
-public class JoglClipStateUtil {
+public abstract class JoglClipStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ClipState state) {
         // ask for the current state record

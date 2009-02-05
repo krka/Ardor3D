@@ -41,7 +41,7 @@ public class SwarmInfluence extends ParticleInfluence {
     private double _speedBump = DEFAULT_SPEED_BUMP;
     private double _maxSpeed = DEFAULT_MAX_SPEED;
 
-    private transient double maxSpeedSQ = DEFAULT_MAX_SPEED * DEFAULT_MAX_SPEED;
+    private transient double _maxSpeedSQ = DEFAULT_MAX_SPEED * DEFAULT_MAX_SPEED;
 
     public SwarmInfluence() {
         _swarmRangeSQ = DEFAULT_SWARM_RANGE_SQ;
@@ -76,7 +76,7 @@ public class SwarmInfluence extends ParticleInfluence {
             final double angle = workVect.smallestAngleBetween(workVect2);
             if (angle < _deviance) {
                 // if it is, increase the speed speedBump over time
-                if (pVelocity.lengthSquared() < maxSpeedSQ) {
+                if (pVelocity.lengthSquared() < _maxSpeedSQ) {
                     final double change = _speedBump * dt;
                     workVect2.multiplyLocal(change); // where workVector2 = pVelocity.normalizeLocal()
                     pVelocity.addLocal(workVect2);
@@ -153,7 +153,7 @@ public class SwarmInfluence extends ParticleInfluence {
 
     public void setMaxSpeed(final double maxSpeed) {
         _maxSpeed = maxSpeed;
-        maxSpeedSQ = maxSpeed * maxSpeed;
+        _maxSpeedSQ = maxSpeed * maxSpeed;
     }
 
     @Override

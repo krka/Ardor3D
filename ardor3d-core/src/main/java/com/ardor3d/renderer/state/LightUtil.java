@@ -24,17 +24,17 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 
-public class LightUtil {
+public abstract class LightUtil {
     private static class LightComparator implements Comparator<Light> {
-        private Spatial sp;
+        private Spatial _sp;
 
         public void setSpatial(final Spatial sp) {
-            this.sp = sp;
+            _sp = sp;
         }
 
         public int compare(final Light l1, final Light l2) {
-            final double v1 = getValueFor(l1, sp.getWorldBound());
-            final double v2 = getValueFor(l2, sp.getWorldBound());
+            final double v1 = getValueFor(l1, _sp.getWorldBound());
+            final double v2 = getValueFor(l2, _sp.getWorldBound());
             final double cmp = v1 - v2;
             if (0 > cmp) {
                 return 1;

@@ -31,16 +31,16 @@ final public class TextureKey implements Savable {
 
     protected URL _location = null;
     protected boolean _flipped;
-    protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
     protected Image.Format _format = Image.Format.Guess;
     protected String _fileType;
     protected transient Object _glContextRep = null;
+    protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
 
     public TextureKey() {}
 
     public TextureKey(final URL location, final boolean flipped, final Image.Format imageType,
             final Texture.MinificationFilter minFilter) {
-        this._location = location;
+        _location = location;
         _flipped = flipped;
         _minFilter = minFilter;
         _format = imageType;
@@ -151,7 +151,7 @@ final public class TextureKey implements Savable {
      *            The location to set.
      */
     public void setLocation(final URL location) {
-        this._location = location;
+        _location = location;
     }
 
     public String getFileType() {

@@ -28,6 +28,7 @@ public class RenderContext {
     /** List of states that override any set states on a spatial if not null. */
     protected final EnumMap<RenderState.StateType, RenderState> _enforcedStates = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
+
     protected final Stack<EnumMap<StateType, RenderState>> _enforcedBackStack = new Stack<EnumMap<StateType, RenderState>>();
 
     /** RenderStates a Spatial contains during rendering. */

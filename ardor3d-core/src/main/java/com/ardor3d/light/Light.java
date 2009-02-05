@@ -62,18 +62,18 @@ public abstract class Light implements Serializable, Savable {
     private final ColorRGBA diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
     private final ColorRGBA specular = new ColorRGBA(DEFAULT_SPECULAR);
 
-    private boolean attenuate;
-    private float constant = 1;
-    private float linear;
-    private float quadratic;
+    private boolean _attenuate;
+    private float _constant = 1;
+    private float _linear;
+    private float _quadratic;
 
-    private int lightMask = 0;
-    private int backLightMask = 0;
+    private int _lightMask = 0;
+    private int _backLightMask = 0;
 
-    private boolean enabled;
+    private boolean _enabled;
 
     /** when true, indicates the lights in this lightState will cast shadows. */
-    protected boolean shadowCaster;
+    protected boolean _shadowCaster;
 
     /**
      * Constructor instantiates a new <code>Light</code> object. All light color values are set to white.
@@ -95,7 +95,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the value for the constant attenuation.
      */
     public float getConstant() {
-        return constant;
+        return _constant;
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class Light implements Serializable, Savable {
      *            the value for the constant attenuation.
      */
     public void setConstant(final float constant) {
-        this.constant = constant;
+        _constant = constant;
     }
 
     /**
@@ -114,7 +114,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the value for the linear attenuation.
      */
     public float getLinear() {
-        return linear;
+        return _linear;
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class Light implements Serializable, Savable {
      *            the value for the linear attenuation.
      */
     public void setLinear(final float linear) {
-        this.linear = linear;
+        _linear = linear;
     }
 
     /**
@@ -133,7 +133,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the value for the quadratic attenuation.
      */
     public float getQuadratic() {
-        return quadratic;
+        return _quadratic;
     }
 
     /**
@@ -143,7 +143,7 @@ public abstract class Light implements Serializable, Savable {
      *            the value for the quadratic attenuation.
      */
     public void setQuadratic(final float quadratic) {
-        this.quadratic = quadratic;
+        _quadratic = quadratic;
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class Light implements Serializable, Savable {
      * @return true if attenuation is to be used, false otherwise.
      */
     public boolean isAttenuate() {
-        return attenuate;
+        return _attenuate;
     }
 
     /**
@@ -162,7 +162,7 @@ public abstract class Light implements Serializable, Savable {
      *            true to use attenuation, false not to.
      */
     public void setAttenuate(final boolean attenuate) {
-        this.attenuate = attenuate;
+        _attenuate = attenuate;
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class Light implements Serializable, Savable {
      * @return true if the light is enabled, false if it is not.
      */
     public boolean isEnabled() {
-        return enabled;
+        return _enabled;
     }
 
     /**
@@ -183,7 +183,7 @@ public abstract class Light implements Serializable, Savable {
      *            true to turn the light on, false to turn it off.
      */
     public void setEnabled(final boolean value) {
-        enabled = value;
+        _enabled = value;
     }
 
     /**
@@ -247,7 +247,7 @@ public abstract class Light implements Serializable, Savable {
      * @return Returns the lightMask - default is 0 or not masked.
      */
     public int getLightMask() {
-        return lightMask;
+        return _lightMask;
     }
 
     /**
@@ -258,7 +258,7 @@ public abstract class Light implements Serializable, Savable {
      *            The lightMask to set.
      */
     public void setLightMask(final int lightMask) {
-        this.lightMask = lightMask;
+        _lightMask = lightMask;
     }
 
     /**
@@ -266,7 +266,7 @@ public abstract class Light implements Serializable, Savable {
      * a stack and additional pushes will simply overwrite the backstored value.
      */
     public void pushLightMask() {
-        backLightMask = lightMask;
+        _backLightMask = _lightMask;
     }
 
     /**
@@ -275,14 +275,14 @@ public abstract class Light implements Serializable, Savable {
      * @see com.ardor3d.light.Light#pushLightMask()
      */
     public void popLightMask() {
-        lightMask = backLightMask;
+        _lightMask = _backLightMask;
     }
 
     /**
      * @return Returns whether this light is able to cast shadows.
      */
     public boolean isShadowCaster() {
-        return shadowCaster;
+        return _shadowCaster;
     }
 
     /**
@@ -290,7 +290,7 @@ public abstract class Light implements Serializable, Savable {
      *            true if this light can be used to derive shadows (when used in conjunction with a shadow pass.)
      */
     public void setShadowCaster(final boolean mayCastShadows) {
-        shadowCaster = mayCastShadows;
+        _shadowCaster = mayCastShadows;
     }
 
     /**
@@ -301,13 +301,13 @@ public abstract class Light implements Serializable, Savable {
      */
     public void copyFrom(final Light light) {
         ambient.set(light.ambient);
-        attenuate = light.attenuate;
-        constant = light.constant;
+        _attenuate = light._attenuate;
+        _constant = light._constant;
         diffuse.set(light.diffuse);
-        enabled = light.enabled;
-        linear = light.linear;
-        quadratic = light.quadratic;
-        shadowCaster = light.shadowCaster;
+        _enabled = light._enabled;
+        _linear = light._linear;
+        _quadratic = light._quadratic;
+        _shadowCaster = light._shadowCaster;
         specular.set(light.specular);
     }
 
@@ -316,14 +316,14 @@ public abstract class Light implements Serializable, Savable {
         capsule.write(ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
         capsule.write(diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
         capsule.write(specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
-        capsule.write(attenuate, "attenuate", false);
-        capsule.write(constant, "constant", 1);
-        capsule.write(linear, "linear", 0);
-        capsule.write(quadratic, "quadratic", 0);
-        capsule.write(lightMask, "lightMask", 0);
-        capsule.write(backLightMask, "backLightMask", 0);
-        capsule.write(enabled, "enabled", false);
-        capsule.write(shadowCaster, "shadowCaster", false);
+        capsule.write(_attenuate, "attenuate", false);
+        capsule.write(_constant, "constant", 1);
+        capsule.write(_linear, "linear", 0);
+        capsule.write(_quadratic, "quadratic", 0);
+        capsule.write(_lightMask, "lightMask", 0);
+        capsule.write(_backLightMask, "backLightMask", 0);
+        capsule.write(_enabled, "enabled", false);
+        capsule.write(_shadowCaster, "shadowCaster", false);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
@@ -331,14 +331,14 @@ public abstract class Light implements Serializable, Savable {
         ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
         diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
         specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
-        attenuate = capsule.readBoolean("attenuate", false);
-        constant = capsule.readFloat("constant", 1);
-        linear = capsule.readFloat("linear", 0);
-        quadratic = capsule.readFloat("quadratic", 0);
-        lightMask = capsule.readInt("lightMask", 0);
-        backLightMask = capsule.readInt("backLightMask", 0);
-        enabled = capsule.readBoolean("enabled", false);
-        shadowCaster = capsule.readBoolean("shadowCaster", false);
+        _attenuate = capsule.readBoolean("attenuate", false);
+        _constant = capsule.readFloat("constant", 1);
+        _linear = capsule.readFloat("linear", 0);
+        _quadratic = capsule.readFloat("quadratic", 0);
+        _lightMask = capsule.readInt("lightMask", 0);
+        _backLightMask = capsule.readInt("backLightMask", 0);
+        _enabled = capsule.readBoolean("enabled", false);
+        _shadowCaster = capsule.readBoolean("shadowCaster", false);
     }
 
     public Class<? extends Light> getClassTag() {

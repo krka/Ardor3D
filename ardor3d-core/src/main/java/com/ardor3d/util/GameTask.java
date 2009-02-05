@@ -28,11 +28,11 @@ public class GameTask<V> implements Future<V> {
 
     private final Callable<V> callable;
 
-    private V result;
-    private ExecutionException exception;
-    private boolean cancelled, finished;
-    private final ReentrantLock stateLock = new ReentrantLock();
-    private final Condition finishedCondition = stateLock.newCondition();
+    private V _result;
+    private ExecutionException _exception;
+    private boolean _cancelled, _finished;
+    private final ReentrantLock _stateLock = new ReentrantLock();
+    private final Condition _finishedCondition = _stateLock.newCondition();
 
     public GameTask(final Callable<V> callable) {
         this.callable = callable;
@@ -40,70 +40,70 @@ public class GameTask<V> implements Future<V> {
 
     public boolean cancel(final boolean mayInterruptIfRunning) {
         // TODO mayInterruptIfRunning was ignored in previous code, should this param be removed?
-        stateLock.lock();
+        _stateLock.lock();
         try {
-            if (result != null) {
+            if (_result != null) {
                 return false;
             }
-            cancelled = true;
+            _cancelled = true;
 
-            finishedCondition.signalAll();
+            _finishedCondition.signalAll();
 
             return true;
         } finally {
-            stateLock.unlock();
+            _stateLock.unlock();
         }
     }
 
     public V get() throws InterruptedException, ExecutionException {
-        stateLock.lock();
+        _stateLock.lock();
         try {
             while (!isDone()) {
-                finishedCondition.await();
+                _finishedCondition.await();
             }
-            if (exception != null) {
-                throw exception;
+            if (_exception != null) {
+                throw _exception;
             }
-            return result;
+            return _result;
         } finally {
-            stateLock.unlock();
+            _stateLock.unlock();
         }
     }
 
     public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException,
             TimeoutException {
-        stateLock.lock();
+        _stateLock.lock();
         try {
             if (!isDone()) {
-                finishedCondition.await(timeout, unit);
+                _finishedCondition.await(timeout, unit);
             }
-            if (exception != null) {
-                throw exception;
+            if (_exception != null) {
+                throw _exception;
             }
-            if (result == null) {
+            if (_result == null) {
                 throw new TimeoutException("Object not returned in time allocated.");
             }
-            return result;
+            return _result;
         } finally {
-            stateLock.unlock();
+            _stateLock.unlock();
         }
     }
 
     public boolean isCancelled() {
-        stateLock.lock();
+        _stateLock.lock();
         try {
-            return cancelled;
+            return _cancelled;
         } finally {
-            stateLock.unlock();
+            _stateLock.unlock();
         }
     }
 
     public boolean isDone() {
-        stateLock.lock();
+        _stateLock.lock();
         try {
-            return finished || cancelled || (exception != null);
+            return _finished || _cancelled || (_exception != null);
         } finally {
-            stateLock.unlock();
+            _stateLock.unlock();
         }
     }
 
@@ -115,25 +115,25 @@ public class GameTask<V> implements Future<V> {
         try {
             final V tmpResult = callable.call();
 
-            stateLock.lock();
+            _stateLock.lock();
             try {
-                result = tmpResult;
-                finished = true;
+                _result = tmpResult;
+                _finished = true;
 
-                finishedCondition.signalAll();
+                _finishedCondition.signalAll();
             } finally {
-                stateLock.unlock();
+                _stateLock.unlock();
             }
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "invoke()", "Exception", e);
 
-            stateLock.lock();
+            _stateLock.lock();
             try {
-                exception = new ExecutionException(e);
+                _exception = new ExecutionException(e);
 
-                finishedCondition.signalAll();
+                _finishedCondition.signalAll();
             } finally {
-                stateLock.unlock();
+                _stateLock.unlock();
             }
         }
     }

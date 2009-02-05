@@ -31,11 +31,11 @@ public class Disk extends Mesh {
 
     private static final long serialVersionUID = 1L;
 
-    private int shellSamples;
+    private int _shellSamples;
 
-    private int radialSamples;
+    private int _radialSamples;
 
-    private double radius;
+    private double _radius;
 
     public Disk() {}
 
@@ -55,9 +55,9 @@ public class Disk extends Mesh {
     public Disk(final String name, final int shellSamples, final int radialSamples, final double radius) {
         super(name);
 
-        this.shellSamples = shellSamples;
-        this.radialSamples = radialSamples;
-        this.radius = radius;
+        _shellSamples = shellSamples;
+        _radialSamples = radialSamples;
+        _radius = radius;
 
         final int radialless = radialSamples - 1;
         final int shellLess = shellSamples - 1;
@@ -84,27 +84,27 @@ public class Disk extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
         }
 
-        _meshData.getTextureCoords(0).coords.put(.5f).put(.5f);
+        _meshData.getTextureCoords(0)._coords.put(.5f).put(.5f);
 
         final double inverseShellLess = 1.0 / shellLess;
-        final double inverseRadial = 1.0 / radialSamples;
+        final double inverseRadial = 1.0 / _radialSamples;
         final Vector3 radialFraction = new Vector3();
         final Vector2 texCoord = new Vector2();
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
             final double cos = MathUtils.cos(angle);
             final double sin = MathUtils.sin(angle);
             final Vector3 radial = new Vector3(cos, sin, 0);
 
-            for (int shellCount = 1; shellCount < shellSamples; shellCount++) {
+            for (int shellCount = 1; shellCount < _shellSamples; shellCount++) {
                 final double fraction = inverseShellLess * shellCount; // in (0,R]
                 radialFraction.set(radial).multiplyLocal(fraction);
                 final int i = shellCount + shellLess * radialCount;
                 texCoord.setX(0.5 * (1.0 + radialFraction.getX()));
                 texCoord.setY(0.5 * (1.0 + radialFraction.getY()));
-                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).coords, i);
+                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0)._coords, i);
 
-                radialFraction.multiplyLocal(radius);
+                radialFraction.multiplyLocal(_radius);
                 BufferUtils.setInBuffer(radialFraction, _meshData.getVertexBuffer(), i);
             }
         }
@@ -113,7 +113,7 @@ public class Disk extends Mesh {
     private void setIndexData(final int radialless, final int shellLess) {
         // generate connectivity
         int index = 0;
-        for (int radialCount0 = radialless, radialCount1 = 0; radialCount1 < radialSamples; radialCount0 = radialCount1++) {
+        for (int radialCount0 = radialless, radialCount1 = 0; radialCount1 < _radialSamples; radialCount0 = radialCount1++) {
             _meshData.getIndexBuffer().put(0);
             _meshData.getIndexBuffer().put(1 + shellLess * radialCount0);
             _meshData.getIndexBuffer().put(1 + shellLess * radialCount1);
@@ -137,17 +137,17 @@ public class Disk extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(shellSamples, "shellSamples", 0);
-        capsule.write(radialSamples, "radialSamples", 0);
-        capsule.write(radius, "radius", 0);
+        capsule.write(_shellSamples, "shellSamples", 0);
+        capsule.write(_radialSamples, "radialSamples", 0);
+        capsule.write(_radius, "radius", 0);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        shellSamples = capsule.readInt("shellSamples", 0);
-        radialSamples = capsule.readInt("radialSamples", 0);
-        radius = capsule.readDouble("raidus", 0);
+        _shellSamples = capsule.readInt("shellSamples", 0);
+        _radialSamples = capsule.readInt("radialSamples", 0);
+        _radius = capsule.readDouble("raidus", 0);
     }
 }

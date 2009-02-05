@@ -127,7 +127,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
         meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
+        final FloatBuffer textureBuffer = meshData.getTextureCoords(0)._coords;
 
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2);
         final int[] indexLengths = new int[ySize - 1];
@@ -166,7 +166,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
         meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
+        final FloatBuffer textureBuffer = meshData.getTextureCoords(0)._coords;
 
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2 + (ySize - 1) * 2);
 

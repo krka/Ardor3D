@@ -65,13 +65,13 @@ public class BinaryClassField {
     public static final byte BYTEBUFFER = 122;
     public static final byte SHORTBUFFER = 123;
 
-    public byte type;
-    public String name;
-    public byte alias;
+    public byte _type;
+    public String _name;
+    public byte _alias;
 
     public BinaryClassField(final String name, final byte alias, final byte type) {
-        this.name = name;
-        this.alias = alias;
-        this.type = type;
+        _name = name;
+        _alias = alias;
+        _type = type;
     }
 }

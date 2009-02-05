@@ -761,8 +761,7 @@ public class JoglTextureStateUtil {
             }
             gl.glTexEnvf(GL.GL_TEXTURE_ENV, GL.GL_RGB_SCALE, texture.getCombineScaleRGB().floatValue());
             unitRecord.envRGBScale = texture.getCombineScaleRGB();
-        }
-        // Then Alpha Combine scale
+        } // Then Alpha Combine scale
         if (!unitRecord.isValid() || unitRecord.envAlphaScale != texture.getCombineScaleAlpha()) {
             if (!checked) {
                 checkAndSetUnit(unit, record, caps);

@@ -38,19 +38,19 @@ public class OrientedBoundingBox extends BoundingVolume {
     private static final long serialVersionUID = 1L;
 
     /** X axis of the Oriented Box. */
-    protected final Vector3 xAxis = new Vector3(1, 0, 0);
+    protected final Vector3 _xAxis = new Vector3(1, 0, 0);
 
     /** Y axis of the Oriented Box. */
-    protected final Vector3 yAxis = new Vector3(0, 1, 0);
+    protected final Vector3 _yAxis = new Vector3(0, 1, 0);
 
     /** Z axis of the Oriented Box. */
-    protected final Vector3 zAxis = new Vector3(0, 0, 1);
+    protected final Vector3 _zAxis = new Vector3(0, 0, 1);
 
     /** Extents of the box along the x,y,z axis. */
-    protected final Vector3 extent = new Vector3(0, 0, 0);
+    protected final Vector3 _extent = new Vector3(0, 0, 0);
 
     /** Vector array used to store the array of 8 corners the box has. */
-    protected final Vector3[] vectorStore = new Vector3[8];
+    protected final Vector3[] _vectorStore = new Vector3[8];
 
     /**
      * If true, the box's vectorStore array correctly represents the box's corners.
@@ -59,7 +59,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     public OrientedBoundingBox() {
         for (int x = 0; x < 8; x++) {
-            vectorStore[x] = new Vector3();
+            _vectorStore[x] = new Vector3();
         }
     }
 
@@ -85,14 +85,14 @@ public class OrientedBoundingBox extends BoundingVolume {
             store = new OrientedBoundingBox();
         }
         final OrientedBoundingBox toReturn = (OrientedBoundingBox) store;
-        toReturn.extent.set(Math.abs(extent.getX() * scale.getX()), Math.abs(extent.getY() * scale.getY()), Math
-                .abs(extent.getZ() * scale.getZ()));
-        rotate.applyPost(xAxis, toReturn.xAxis);
-        rotate.applyPost(yAxis, toReturn.yAxis);
-        rotate.applyPost(zAxis, toReturn.zAxis);
-        center.multiply(scale, toReturn.center);
-        rotate.applyPost(toReturn.center, toReturn.center);
-        toReturn.center.addLocal(translate);
+        toReturn._extent.set(Math.abs(_extent.getX() * scale.getX()), Math.abs(_extent.getY() * scale.getY()), Math
+                .abs(_extent.getZ() * scale.getZ()));
+        rotate.applyPost(_xAxis, toReturn._xAxis);
+        rotate.applyPost(_yAxis, toReturn._yAxis);
+        rotate.applyPost(_zAxis, toReturn._zAxis);
+        _center.multiply(scale, toReturn._center);
+        rotate.applyPost(toReturn._center, toReturn._center);
+        toReturn._center.addLocal(translate);
         toReturn.correctCorners = false;
         return toReturn;
     }
@@ -100,10 +100,10 @@ public class OrientedBoundingBox extends BoundingVolume {
     @Override
     public Side whichSide(final ReadOnlyPlane plane) {
         final ReadOnlyVector3 planeNormal = plane.getNormal();
-        final double fRadius = Math.abs(extent.getX() * (planeNormal.dot(xAxis)))
-                + Math.abs(extent.getY() * (planeNormal.dot(yAxis)))
-                + Math.abs(extent.getZ() * (planeNormal.dot(zAxis)));
-        final double fDistance = plane.pseudoDistance(center);
+        final double fRadius = Math.abs(_extent.getX() * (planeNormal.dot(_xAxis)))
+                + Math.abs(_extent.getY() * (planeNormal.dot(_yAxis)))
+                + Math.abs(_extent.getZ() * (planeNormal.dot(_zAxis)));
+        final double fDistance = plane.pseudoDistance(_center);
         if (fDistance <= -fRadius) {
             return Plane.Side.Inside;
         } else if (fDistance >= fRadius) {
@@ -158,14 +158,14 @@ public class OrientedBoundingBox extends BoundingVolume {
         }
         Vector3.releaseTempInstance(compVect1);
 
-        center.set(minX + maxX, minY + maxY, minZ + maxZ);
-        center.multiplyLocal(0.5);
+        _center.set(minX + maxX, minY + maxY, minZ + maxZ);
+        _center.multiplyLocal(0.5);
 
-        extent.set(maxX - center.getX(), maxY - center.getY(), maxZ - center.getZ());
+        _extent.set(maxX - _center.getX(), maxY - _center.getY(), maxZ - _center.getZ());
 
-        xAxis.set(1, 0, 0);
-        yAxis.set(0, 1, 0);
-        zAxis.set(0, 0, 1);
+        _xAxis.set(1, 0, 0);
+        _yAxis.set(0, 1, 0);
+        _zAxis.set(0, 0, 1);
 
         correctCorners = false;
     }
@@ -212,34 +212,34 @@ public class OrientedBoundingBox extends BoundingVolume {
 
         mergeBuf.rewind();
         for (int i = 0; i < 8; i++) {
-            mergeBuf.put((float) vectorStore[i].getX());
-            mergeBuf.put((float) vectorStore[i].getY());
-            mergeBuf.put((float) vectorStore[i].getZ());
+            mergeBuf.put((float) _vectorStore[i].getX());
+            mergeBuf.put((float) _vectorStore[i].getY());
+            mergeBuf.put((float) _vectorStore[i].getZ());
         }
-        mergeBuf.put((float) (mergeSphere.center.getX() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() + mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() + mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() + mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() - mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() + mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() - mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() + mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() - mergeSphere.getRadius()));
-        mergeBuf.put((float) (mergeSphere.center.getX() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getY() - mergeSphere.getRadius())).put(
-                (float) (mergeSphere.center.getZ() - mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() + mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() + mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() + mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() - mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() + mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() - mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() + mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() - mergeSphere.getRadius()));
+        mergeBuf.put((float) (mergeSphere._center.getX() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getY() - mergeSphere.getRadius())).put(
+                (float) (mergeSphere._center.getZ() - mergeSphere.getRadius()));
         containAABB(mergeBuf);
         correctCorners = false;
         return this;
@@ -255,34 +255,34 @@ public class OrientedBoundingBox extends BoundingVolume {
 
         mergeBuf.rewind();
         for (int i = 0; i < 8; i++) {
-            mergeBuf.put((float) vectorStore[i].getX());
-            mergeBuf.put((float) vectorStore[i].getY());
-            mergeBuf.put((float) vectorStore[i].getZ());
+            mergeBuf.put((float) _vectorStore[i].getX());
+            mergeBuf.put((float) _vectorStore[i].getY());
+            mergeBuf.put((float) _vectorStore[i].getZ());
         }
-        mergeBuf.put((float) (mergeBox.center.getX() + mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() + mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() + mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() - mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() + mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() + mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() + mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() - mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() + mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() + mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() + mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() - mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() - mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() - mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() + mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() - mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() + mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() - mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() + mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() - mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() - mergeBox.getZExtent()));
-        mergeBuf.put((float) (mergeBox.center.getX() - mergeBox.getXExtent())).put(
-                (float) (mergeBox.center.getY() - mergeBox.getYExtent())).put(
-                (float) (mergeBox.center.getZ() - mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() + mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() + mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() + mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() - mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() + mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() + mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() + mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() - mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() + mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() + mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() + mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() - mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() - mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() - mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() + mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() - mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() + mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() - mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() + mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() - mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() - mergeBox.getZExtent()));
+        mergeBuf.put((float) (mergeBox._center.getX() - mergeBox.getXExtent())).put(
+                (float) (mergeBox._center.getY() - mergeBox.getYExtent())).put(
+                (float) (mergeBox._center.getZ() - mergeBox.getZExtent()));
         containAABB(mergeBuf);
         correctCorners = false;
         return this;
@@ -308,7 +308,7 @@ public class OrientedBoundingBox extends BoundingVolume {
         // The first guess at the box center. This value will be updated later
         // after the input box vertices are projected onto axes determined by an
         // average of box axes.
-        final Vector3 kBoxCenter = (rkBox0.center.add(rkBox1.center, Vector3.fetchTempInstance())).multiplyLocal(.5);
+        final Vector3 kBoxCenter = (rkBox0._center.add(rkBox1._center, Vector3.fetchTempInstance())).multiplyLocal(.5);
 
         // A box's axes, when viewed as the columns of a matrix, form a rotation
         // matrix. The input box axes are converted to quaternions. The average
@@ -317,8 +317,8 @@ public class OrientedBoundingBox extends BoundingVolume {
         // result is converted back to a rotation matrix and its columns are
         // selected as the merged box axes.
         final Quaternion kQ0 = Quaternion.fetchTempInstance(), kQ1 = Quaternion.fetchTempInstance();
-        kQ0.fromAxes(rkBox0.xAxis, rkBox0.yAxis, rkBox0.zAxis);
-        kQ1.fromAxes(rkBox1.xAxis, rkBox1.yAxis, rkBox1.zAxis);
+        kQ0.fromAxes(rkBox0._xAxis, rkBox0._yAxis, rkBox0._zAxis);
+        kQ1.fromAxes(rkBox1._xAxis, rkBox1._yAxis, rkBox1._zAxis);
 
         if (kQ0.dot(kQ1) < 0.0) {
             kQ1.multiplyLocal(-1.0);
@@ -353,7 +353,7 @@ public class OrientedBoundingBox extends BoundingVolume {
             rkBox0.computeCorners();
         }
         for (i = 0; i < 8; i++) {
-            rkBox0.vectorStore[i].subtract(kBoxCenter, kDiff);
+            rkBox0._vectorStore[i].subtract(kBoxCenter, kDiff);
 
             fDot = kDiff.dot(newXaxis);
             if (fDot > kMax.getX()) {
@@ -382,7 +382,7 @@ public class OrientedBoundingBox extends BoundingVolume {
             rkBox1.computeCorners();
         }
         for (i = 0; i < 8; i++) {
-            rkBox1.vectorStore[i].subtract(kBoxCenter, kDiff);
+            rkBox1._vectorStore[i].subtract(kBoxCenter, kDiff);
 
             fDot = kDiff.dot(newXaxis);
             if (fDot > kMax.getX()) {
@@ -406,21 +406,21 @@ public class OrientedBoundingBox extends BoundingVolume {
             }
         }
 
-        xAxis.set(newXaxis);
-        yAxis.set(newYaxis);
-        zAxis.set(newZaxis);
+        _xAxis.set(newXaxis);
+        _yAxis.set(newYaxis);
+        _zAxis.set(newZaxis);
 
         final Vector3 tempVec = Vector3.fetchTempInstance();
-        extent.setX(.5 * (kMax.getX() - kMin.getX()));
-        kBoxCenter.addLocal(xAxis.multiply(.5 * (kMax.getX() + kMin.getX()), tempVec));
+        _extent.setX(.5 * (kMax.getX() - kMin.getX()));
+        kBoxCenter.addLocal(_xAxis.multiply(.5 * (kMax.getX() + kMin.getX()), tempVec));
 
-        extent.setY(.5 * (kMax.getY() - kMin.getY()));
-        kBoxCenter.addLocal(yAxis.multiply(.5 * (kMax.getY() + kMin.getY()), tempVec));
+        _extent.setY(.5 * (kMax.getY() - kMin.getY()));
+        kBoxCenter.addLocal(_yAxis.multiply(.5 * (kMax.getY() + kMin.getY()), tempVec));
 
-        extent.setZ(.5 * (kMax.getZ() - kMin.getZ()));
-        kBoxCenter.addLocal(zAxis.multiply(.5 * (kMax.getZ() + kMin.getZ()), tempVec));
+        _extent.setZ(.5 * (kMax.getZ() - kMin.getZ()));
+        kBoxCenter.addLocal(_zAxis.multiply(.5 * (kMax.getZ() + kMin.getZ()), tempVec));
 
-        center.set(kBoxCenter);
+        _center.set(kBoxCenter);
 
         correctCorners = false;
 
@@ -447,14 +447,14 @@ public class OrientedBoundingBox extends BoundingVolume {
         } else {
             toReturn = new OrientedBoundingBox();
         }
-        toReturn.extent.set(extent);
-        toReturn.xAxis.set(xAxis);
-        toReturn.yAxis.set(yAxis);
-        toReturn.zAxis.set(zAxis);
-        toReturn.center.set(center);
-        toReturn.checkPlane = checkPlane;
-        for (int x = vectorStore.length; --x >= 0;) {
-            toReturn.vectorStore[x].set(vectorStore[x]);
+        toReturn._extent.set(_extent);
+        toReturn._xAxis.set(_xAxis);
+        toReturn._yAxis.set(_yAxis);
+        toReturn._zAxis.set(_zAxis);
+        toReturn._center.set(_center);
+        toReturn._checkPlane = _checkPlane;
+        for (int x = _vectorStore.length; --x >= 0;) {
+            toReturn._vectorStore[x].set(_vectorStore[x]);
         }
         toReturn.correctCorners = correctCorners;
         return toReturn;
@@ -464,18 +464,18 @@ public class OrientedBoundingBox extends BoundingVolume {
      * Sets the vectorStore information to the 8 corners of the box.
      */
     public void computeCorners() {
-        final Vector3 tempAxis0 = xAxis.multiply(extent.getX(), Vector3.fetchTempInstance());
-        final Vector3 tempAxis1 = yAxis.multiply(extent.getY(), Vector3.fetchTempInstance());
-        final Vector3 tempAxis2 = zAxis.multiply(extent.getZ(), Vector3.fetchTempInstance());
+        final Vector3 tempAxis0 = _xAxis.multiply(_extent.getX(), Vector3.fetchTempInstance());
+        final Vector3 tempAxis1 = _yAxis.multiply(_extent.getY(), Vector3.fetchTempInstance());
+        final Vector3 tempAxis2 = _zAxis.multiply(_extent.getZ(), Vector3.fetchTempInstance());
 
-        vectorStore[0].set(center).subtractLocal(tempAxis0).subtractLocal(tempAxis1).subtractLocal(tempAxis2);
-        vectorStore[1].set(center).addLocal(tempAxis0).subtractLocal(tempAxis1).subtractLocal(tempAxis2);
-        vectorStore[2].set(center).addLocal(tempAxis0).addLocal(tempAxis1).subtractLocal(tempAxis2);
-        vectorStore[3].set(center).subtractLocal(tempAxis0).addLocal(tempAxis1).subtractLocal(tempAxis2);
-        vectorStore[4].set(center).subtractLocal(tempAxis0).subtractLocal(tempAxis1).addLocal(tempAxis2);
-        vectorStore[5].set(center).addLocal(tempAxis0).subtractLocal(tempAxis1).addLocal(tempAxis2);
-        vectorStore[6].set(center).addLocal(tempAxis0).addLocal(tempAxis1).addLocal(tempAxis2);
-        vectorStore[7].set(center).subtractLocal(tempAxis0).addLocal(tempAxis1).addLocal(tempAxis2);
+        _vectorStore[0].set(_center).subtractLocal(tempAxis0).subtractLocal(tempAxis1).subtractLocal(tempAxis2);
+        _vectorStore[1].set(_center).addLocal(tempAxis0).subtractLocal(tempAxis1).subtractLocal(tempAxis2);
+        _vectorStore[2].set(_center).addLocal(tempAxis0).addLocal(tempAxis1).subtractLocal(tempAxis2);
+        _vectorStore[3].set(_center).subtractLocal(tempAxis0).addLocal(tempAxis1).subtractLocal(tempAxis2);
+        _vectorStore[4].set(_center).subtractLocal(tempAxis0).subtractLocal(tempAxis1).addLocal(tempAxis2);
+        _vectorStore[5].set(_center).addLocal(tempAxis0).subtractLocal(tempAxis1).addLocal(tempAxis2);
+        _vectorStore[6].set(_center).addLocal(tempAxis0).addLocal(tempAxis1).addLocal(tempAxis2);
+        _vectorStore[7].set(_center).subtractLocal(tempAxis0).addLocal(tempAxis1).addLocal(tempAxis2);
 
         Vector3.releaseTempInstance(tempAxis0);
         Vector3.releaseTempInstance(tempAxis1);
@@ -550,14 +550,14 @@ public class OrientedBoundingBox extends BoundingVolume {
             }
         }
 
-        center.set(min.addLocal(max));
-        center.multiplyLocal(0.5);
+        _center.set(min.addLocal(max));
+        _center.multiplyLocal(0.5);
 
-        extent.set(max.getX() - center.getX(), max.getY() - center.getY(), max.getZ() - center.getZ());
+        _extent.set(max.getX() - _center.getX(), max.getY() - _center.getY(), max.getZ() - _center.getZ());
 
-        xAxis.set(1, 0, 0);
-        yAxis.set(0, 1, 0);
-        zAxis.set(0, 0, 1);
+        _xAxis.set(1, 0, 0);
+        _yAxis.set(0, 1, 0);
+        _zAxis.set(0, 0, 1);
 
         Vector3.releaseTempInstance(min);
         Vector3.releaseTempInstance(max);
@@ -628,14 +628,14 @@ public class OrientedBoundingBox extends BoundingVolume {
             }
         }
 
-        center.set(min.addLocal(max));
-        center.multiplyLocal(0.5);
+        _center.set(min.addLocal(max));
+        _center.multiplyLocal(0.5);
 
-        extent.set(max.getX() - center.getX(), max.getY() - center.getY(), max.getZ() - center.getZ());
+        _extent.set(max.getX() - _center.getX(), max.getY() - _center.getY(), max.getZ() - _center.getZ());
 
-        xAxis.set(1, 0, 0);
-        yAxis.set(0, 1, 0);
-        zAxis.set(0, 0, 1);
+        _xAxis.set(1, 0, 0);
+        _yAxis.set(0, 1, 0);
+        _zAxis.set(0, 0, 1);
 
         Vector3.releaseTempInstance(min);
         Vector3.releaseTempInstance(max);
@@ -657,11 +657,11 @@ public class OrientedBoundingBox extends BoundingVolume {
         // convenience variables
         final Vector3 akA[] = new Vector3[] { box0.getXAxis(), box0.getYAxis(), box0.getZAxis() };
         final Vector3[] akB = new Vector3[] { box1.getXAxis(), box1.getYAxis(), box1.getZAxis() };
-        final Vector3 afEA = box0.extent;
-        final Vector3 afEB = box1.extent;
+        final Vector3 afEA = box0._extent;
+        final Vector3 afEB = box1._extent;
 
         // compute difference of box centers, D = C1-C0
-        final Vector3 kD = box1.center.subtract(box0.center, Vector3.fetchTempInstance());
+        final Vector3 kD = box1._center.subtract(box0._center, Vector3.fetchTempInstance());
 
         final double[][] aafC = { new double[3], new double[3], new double[3] };
 
@@ -850,19 +850,19 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     @Override
     public boolean intersectsSphere(final BoundingSphere bs) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bs.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
             return false;
         }
 
-        final Vector3 compVect1 = Vector3.fetchTempInstance().set(bs.getCenter()).subtractLocal(center);
-        final Matrix3 tempMa = Matrix3.fetchTempInstance().fromAxes(xAxis, yAxis, zAxis);
+        final Vector3 compVect1 = Vector3.fetchTempInstance().set(bs.getCenter()).subtractLocal(_center);
+        final Matrix3 tempMa = Matrix3.fetchTempInstance().fromAxes(_xAxis, _yAxis, _zAxis);
 
         tempMa.applyPost(compVect1, compVect1);
 
         boolean result = false;
-        if (Math.abs(compVect1.getX()) < bs.getRadius() + extent.getX()
-                && Math.abs(compVect1.getY()) < bs.getRadius() + extent.getY()
-                && Math.abs(compVect1.getZ()) < bs.getRadius() + extent.getZ()) {
+        if (Math.abs(compVect1.getX()) < bs.getRadius() + _extent.getX()
+                && Math.abs(compVect1.getY()) < bs.getRadius() + _extent.getY()
+                && Math.abs(compVect1.getZ()) < bs.getRadius() + _extent.getZ()) {
             result = true;
         }
 
@@ -873,7 +873,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     @Override
     public boolean intersectsBoundingBox(final BoundingBox bb) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bb.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
             return false;
         }
 
@@ -887,14 +887,14 @@ public class OrientedBoundingBox extends BoundingVolume {
         int i;
 
         // convenience variables
-        final Vector3 akA[] = new Vector3[] { xAxis, yAxis, zAxis };
+        final Vector3 akA[] = new Vector3[] { _xAxis, _yAxis, _zAxis };
         final Vector3[] akB = new Vector3[] { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(),
                 Vector3.fetchTempInstance() };
-        final Vector3 afEA = extent;
+        final Vector3 afEA = _extent;
         final Vector3 afEB = Vector3.fetchTempInstance().set(bb.getXExtent(), bb.getYExtent(), bb.getZExtent());
 
         // compute difference of box centers, D = C1-C0
-        final Vector3 kD = bb.getCenter().subtract(center, Vector3.fetchTempInstance());
+        final Vector3 kD = bb.getCenter().subtract(_center, Vector3.fetchTempInstance());
 
         final double[][] aafC = { new double[3], new double[3], new double[3] };
 
@@ -1080,7 +1080,7 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     @Override
     public boolean intersectsOrientedBoundingBox(final OrientedBoundingBox obb) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(obb.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(obb._center)) {
             return false;
         }
 
@@ -1094,13 +1094,13 @@ public class OrientedBoundingBox extends BoundingVolume {
         int i;
 
         // convenience variables
-        final Vector3 akA[] = new Vector3[] { xAxis, yAxis, zAxis };
-        final Vector3[] akB = new Vector3[] { obb.xAxis, obb.yAxis, obb.zAxis };
-        final Vector3 afEA = extent;
-        final Vector3 afEB = obb.extent;
+        final Vector3 akA[] = new Vector3[] { _xAxis, _yAxis, _zAxis };
+        final Vector3[] akB = new Vector3[] { obb._xAxis, obb._yAxis, obb._zAxis };
+        final Vector3 afEA = _extent;
+        final Vector3 afEB = obb._extent;
 
         // compute difference of box centers, D = C1-C0
-        final Vector3 kD = obb.center.subtract(center, Vector3.fetchTempInstance());
+        final Vector3 kD = obb._center.subtract(_center, Vector3.fetchTempInstance());
 
         final double[][] aafC = { new double[3], new double[3], new double[3] };
 
@@ -1279,13 +1279,13 @@ public class OrientedBoundingBox extends BoundingVolume {
 
     @Override
     public boolean intersects(final ReadOnlyRay3 ray) {
-        if (!Vector3.isValid(center)) {
+        if (!Vector3.isValid(_center)) {
             return false;
         }
 
         double rhs;
         final ReadOnlyVector3 rayDir = ray.getDirection();
-        final Vector3 diff = Vector3.fetchTempInstance().set(ray.getOrigin()).subtractLocal(center);
+        final Vector3 diff = Vector3.fetchTempInstance().set(ray.getOrigin()).subtractLocal(_center);
         final Vector3 wCrossD = Vector3.fetchTempInstance();
 
         final double[] fWdU = new double[3];
@@ -1295,46 +1295,46 @@ public class OrientedBoundingBox extends BoundingVolume {
         final double[] fAWxDdU = new double[3];
 
         try {
-            fWdU[0] = rayDir.dot(xAxis);
+            fWdU[0] = rayDir.dot(_xAxis);
             fAWdU[0] = Math.abs(fWdU[0]);
-            fDdU[0] = diff.dot(xAxis);
+            fDdU[0] = diff.dot(_xAxis);
             fADdU[0] = Math.abs(fDdU[0]);
-            if (fADdU[0] > extent.getX() && fDdU[0] * fWdU[0] >= 0.0) {
+            if (fADdU[0] > _extent.getX() && fDdU[0] * fWdU[0] >= 0.0) {
                 return false;
             }
 
-            fWdU[1] = rayDir.dot(yAxis);
+            fWdU[1] = rayDir.dot(_yAxis);
             fAWdU[1] = Math.abs(fWdU[1]);
-            fDdU[1] = diff.dot(yAxis);
+            fDdU[1] = diff.dot(_yAxis);
             fADdU[1] = Math.abs(fDdU[1]);
-            if (fADdU[1] > extent.getY() && fDdU[1] * fWdU[1] >= 0.0) {
+            if (fADdU[1] > _extent.getY() && fDdU[1] * fWdU[1] >= 0.0) {
                 return false;
             }
 
-            fWdU[2] = rayDir.dot(zAxis);
+            fWdU[2] = rayDir.dot(_zAxis);
             fAWdU[2] = Math.abs(fWdU[2]);
-            fDdU[2] = diff.dot(zAxis);
+            fDdU[2] = diff.dot(_zAxis);
             fADdU[2] = Math.abs(fDdU[2]);
-            if (fADdU[2] > extent.getZ() && fDdU[2] * fWdU[2] >= 0.0) {
+            if (fADdU[2] > _extent.getZ() && fDdU[2] * fWdU[2] >= 0.0) {
                 return false;
             }
 
             rayDir.cross(diff, wCrossD);
 
-            fAWxDdU[0] = Math.abs(wCrossD.dot(xAxis));
-            rhs = extent.getY() * fAWdU[2] + extent.getZ() * fAWdU[1];
+            fAWxDdU[0] = Math.abs(wCrossD.dot(_xAxis));
+            rhs = _extent.getY() * fAWdU[2] + _extent.getZ() * fAWdU[1];
             if (fAWxDdU[0] > rhs) {
                 return false;
             }
 
-            fAWxDdU[1] = Math.abs(wCrossD.dot(yAxis));
-            rhs = extent.getX() * fAWdU[2] + extent.getZ() * fAWdU[0];
+            fAWxDdU[1] = Math.abs(wCrossD.dot(_yAxis));
+            rhs = _extent.getX() * fAWdU[2] + _extent.getZ() * fAWdU[0];
             if (fAWxDdU[1] > rhs) {
                 return false;
             }
 
-            fAWxDdU[2] = Math.abs(wCrossD.dot(zAxis));
-            rhs = extent.getX() * fAWdU[1] + extent.getY() * fAWdU[0];
+            fAWxDdU[2] = Math.abs(wCrossD.dot(_zAxis));
+            rhs = _extent.getX() * fAWdU[1] + _extent.getY() * fAWdU[0];
             if (fAWxDdU[2] > rhs) {
                 return false;
 
@@ -1359,12 +1359,12 @@ public class OrientedBoundingBox extends BoundingVolume {
 
         try {
             final double saveT0 = t[0], saveT1 = t[1];
-            final boolean notEntirelyClipped = clip(+direction.getX(), -diff.getX() - extent.getX(), t)
-                    && clip(-direction.getX(), +diff.getX() - extent.getX(), t)
-                    && clip(+direction.getY(), -diff.getY() - extent.getY(), t)
-                    && clip(-direction.getY(), +diff.getY() - extent.getY(), t)
-                    && clip(+direction.getZ(), -diff.getZ() - extent.getZ(), t)
-                    && clip(-direction.getZ(), +diff.getZ() - extent.getZ(), t);
+            final boolean notEntirelyClipped = clip(+direction.getX(), -diff.getX() - _extent.getX(), t)
+                    && clip(-direction.getX(), +diff.getX() - _extent.getX(), t)
+                    && clip(+direction.getY(), -diff.getY() - _extent.getY(), t)
+                    && clip(-direction.getY(), +diff.getY() - _extent.getY(), t)
+                    && clip(+direction.getZ(), -diff.getZ() - _extent.getZ(), t)
+                    && clip(-direction.getZ(), +diff.getZ() - _extent.getZ(), t);
 
             if (notEntirelyClipped && (t[0] != saveT0 || t[1] != saveT1)) {
                 if (t[1] > t[0]) {
@@ -1427,56 +1427,56 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     public void setXAxis(final Vector3 axis) {
-        xAxis.set(axis);
+        _xAxis.set(axis);
         correctCorners = false;
     }
 
     public void setYAxis(final Vector3 axis) {
-        yAxis.set(axis);
+        _yAxis.set(axis);
         correctCorners = false;
     }
 
     public void setZAxis(final Vector3 axis) {
-        zAxis.set(axis);
+        _zAxis.set(axis);
         correctCorners = false;
     }
 
     public void setExtent(final Vector3 ext) {
-        extent.set(ext);
+        _extent.set(ext);
         correctCorners = false;
     }
 
     public Vector3 getXAxis() {
-        return xAxis;
+        return _xAxis;
     }
 
     public Vector3 getYAxis() {
-        return yAxis;
+        return _yAxis;
     }
 
     public Vector3 getZAxis() {
-        return zAxis;
+        return _zAxis;
     }
 
     public Vector3 getExtent() {
-        return extent;
+        return _extent;
     }
 
     @Override
     public boolean contains(final ReadOnlyVector3 point) {
-        final Vector3 compVect1 = Vector3.fetchTempInstance().set(point).subtractLocal(center);
-        double coeff = compVect1.dot(xAxis);
-        if (Math.abs(coeff) > extent.getX()) {
+        final Vector3 compVect1 = Vector3.fetchTempInstance().set(point).subtractLocal(_center);
+        double coeff = compVect1.dot(_xAxis);
+        if (Math.abs(coeff) > _extent.getX()) {
             return false;
         }
 
-        coeff = compVect1.dot(yAxis);
-        if (Math.abs(coeff) > extent.getY()) {
+        coeff = compVect1.dot(_yAxis);
+        if (Math.abs(coeff) > _extent.getY()) {
             return false;
         }
 
-        coeff = compVect1.dot(zAxis);
-        if (Math.abs(coeff) > extent.getZ()) {
+        coeff = compVect1.dot(_zAxis);
+        if (Math.abs(coeff) > _extent.getZ()) {
             return false;
         }
 
@@ -1487,42 +1487,42 @@ public class OrientedBoundingBox extends BoundingVolume {
     @Override
     public double distanceToEdge(final ReadOnlyVector3 point) {
         // compute coordinates of point in box coordinate system
-        final Vector3 diff = point.subtract(center, Vector3.fetchTempInstance());
-        final Vector3 closest = Vector3.fetchTempInstance().set(diff.dot(xAxis), diff.dot(yAxis), diff.dot(zAxis));
+        final Vector3 diff = point.subtract(_center, Vector3.fetchTempInstance());
+        final Vector3 closest = Vector3.fetchTempInstance().set(diff.dot(_xAxis), diff.dot(_yAxis), diff.dot(_zAxis));
         Vector3.releaseTempInstance(diff);
 
         // project test point onto box
         double sqrDistance = 0.0;
         double delta;
 
-        if (closest.getX() < -extent.getX()) {
-            delta = closest.getX() + extent.getX();
+        if (closest.getX() < -_extent.getX()) {
+            delta = closest.getX() + _extent.getX();
             sqrDistance += delta * delta;
-            closest.setX(-extent.getX());
-        } else if (closest.getX() > extent.getX()) {
-            delta = closest.getX() - extent.getX();
+            closest.setX(-_extent.getX());
+        } else if (closest.getX() > _extent.getX()) {
+            delta = closest.getX() - _extent.getX();
             sqrDistance += delta * delta;
-            closest.setX(extent.getX());
+            closest.setX(_extent.getX());
         }
 
-        if (closest.getY() < -extent.getY()) {
-            delta = closest.getY() + extent.getY();
+        if (closest.getY() < -_extent.getY()) {
+            delta = closest.getY() + _extent.getY();
             sqrDistance += delta * delta;
-            closest.setY(-extent.getY());
-        } else if (closest.getY() > extent.getY()) {
-            delta = closest.getY() - extent.getY();
+            closest.setY(-_extent.getY());
+        } else if (closest.getY() > _extent.getY()) {
+            delta = closest.getY() - _extent.getY();
             sqrDistance += delta * delta;
-            closest.setY(extent.getY());
+            closest.setY(_extent.getY());
         }
 
-        if (closest.getZ() < -extent.getZ()) {
-            delta = closest.getZ() + extent.getZ();
+        if (closest.getZ() < -_extent.getZ()) {
+            delta = closest.getZ() + _extent.getZ();
             sqrDistance += delta * delta;
-            closest.setZ(-extent.getZ());
-        } else if (closest.getZ() > extent.getZ()) {
-            delta = closest.getZ() - extent.getZ();
+            closest.setZ(-_extent.getZ());
+        } else if (closest.getZ() > _extent.getZ()) {
+            delta = closest.getZ() - _extent.getZ();
             sqrDistance += delta * delta;
-            closest.setZ(extent.getZ());
+            closest.setZ(_extent.getZ());
         }
 
         Vector3.releaseTempInstance(closest);
@@ -1533,25 +1533,25 @@ public class OrientedBoundingBox extends BoundingVolume {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(xAxis, "xAxis", new Vector3(Vector3.UNIT_X));
-        capsule.write(yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
-        capsule.write(zAxis, "zAxis", new Vector3(Vector3.UNIT_Z));
-        capsule.write(extent, "extent", new Vector3(Vector3.ZERO));
+        capsule.write(_xAxis, "_xAxis", new Vector3(Vector3.UNIT_X));
+        capsule.write(_yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
+        capsule.write(_zAxis, "zAxis", new Vector3(Vector3.UNIT_Z));
+        capsule.write(_extent, "extent", new Vector3(Vector3.ZERO));
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        xAxis.set((Vector3) capsule.readSavable("xAxis", new Vector3(Vector3.UNIT_X)));
-        yAxis.set((Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y)));
-        zAxis.set((Vector3) capsule.readSavable("zAxis", new Vector3(Vector3.UNIT_Z)));
-        extent.set((Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO)));
+        _xAxis.set((Vector3) capsule.readSavable("xAxis", new Vector3(Vector3.UNIT_X)));
+        _yAxis.set((Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y)));
+        _zAxis.set((Vector3) capsule.readSavable("zAxis", new Vector3(Vector3.UNIT_Z)));
+        _extent.set((Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO)));
         correctCorners = false;
     }
 
     @Override
     public double getVolume() {
-        return (8 * extent.getX() * extent.getY() * extent.getZ());
+        return (8 * _extent.getX() * _extent.getY() * _extent.getZ());
     }
 }

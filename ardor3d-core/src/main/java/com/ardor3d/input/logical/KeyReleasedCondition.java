@@ -10,9 +10,9 @@
 
 package com.ardor3d.input.logical;
 
+import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
-import com.ardor3d.annotation.Immutable;
 import com.google.common.base.Predicate;
 
 /**

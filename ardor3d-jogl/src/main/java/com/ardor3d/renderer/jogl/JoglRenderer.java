@@ -798,20 +798,20 @@ public class JoglRenderer extends Renderer {
                 if ((caps.isVBOSupported() && vbo != null && vbo.getVBOTextureID(i) > 0)) {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     JoglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOTextureID(i));
-                    gl.glTexCoordPointer(texC.perVert, GL.GL_FLOAT, 0, 0);
+                    gl.glTexCoordPointer(texC._perVert, GL.GL_FLOAT, 0, 0);
                 } else if (texC == null) {
                     gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != texC.coords) {
+                } else if (_oldTextureBuffers[i] != texC._coords) {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     if (caps.isVBOSupported()) {
                         JoglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
-                    texC.coords.rewind();
-                    gl.glTexCoordPointer(texC.perVert, GL.GL_FLOAT, 0, texC.coords);
+                    texC._coords.rewind();
+                    gl.glTexCoordPointer(texC._perVert, GL.GL_FLOAT, 0, texC._coords);
                 } else {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                 }
-                _oldTextureBuffers[i] = texC != null ? texC.coords : null;
+                _oldTextureBuffers[i] = texC != null ? texC._coords : null;
             }
 
             if (ts.getNumberOfSetTextures() < _prevTextureNumber) {

@@ -32,39 +32,39 @@ public class OutlinePass extends RenderPass {
     public static final ReadOnlyColorRGBA DEFAULT_OUTLINE_COLOR = new ColorRGBA(ColorRGBA.BLACK);
 
     // render states needed to draw the outline
-    private final CullState frontCull;
-    private final CullState backCull;
-    private final WireframeState wireframeState;
-    private final LightState noLights;
-    private final TextureState noTexture;
-    private BlendState blendState;
+    private final CullState _frontCull;
+    private final CullState _backCull;
+    private final WireframeState _wireframeState;
+    private final LightState _noLights;
+    private final TextureState _noTexture;
+    private BlendState _blendState;
 
     public OutlinePass(final boolean antialiased) {
-        wireframeState = new WireframeState();
-        wireframeState.setFace(WireframeState.Face.FrontAndBack);
-        wireframeState.setLineWidth(DEFAULT_LINE_WIDTH);
-        wireframeState.setEnabled(true);
+        _wireframeState = new WireframeState();
+        _wireframeState.setFace(WireframeState.Face.FrontAndBack);
+        _wireframeState.setLineWidth(DEFAULT_LINE_WIDTH);
+        _wireframeState.setEnabled(true);
 
-        frontCull = new CullState();
-        frontCull.setCullFace(Face.Front);
+        _frontCull = new CullState();
+        _frontCull.setCullFace(Face.Front);
 
-        backCull = new CullState();
-        backCull.setCullFace(Face.Back);
+        _backCull = new CullState();
+        _backCull.setCullFace(Face.Back);
 
-        wireframeState.setAntialiased(antialiased);
+        _wireframeState.setAntialiased(antialiased);
 
-        noLights = new LightState();
-        noLights.setGlobalAmbient(DEFAULT_OUTLINE_COLOR);
-        noLights.setEnabled(true);
+        _noLights = new LightState();
+        _noLights.setGlobalAmbient(DEFAULT_OUTLINE_COLOR);
+        _noLights.setEnabled(true);
 
-        noTexture = new TextureState();
-        noTexture.setEnabled(true);
+        _noTexture = new TextureState();
+        _noTexture.setEnabled(true);
 
-        blendState = new BlendState();
-        blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        blendState.setBlendEnabled(true);
-        blendState.setEnabled(true);
+        _blendState = new BlendState();
+        _blendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        _blendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        _blendState.setBlendEnabled(true);
+        _blendState.setEnabled(true);
 
     }
 
@@ -76,16 +76,16 @@ public class OutlinePass extends RenderPass {
         }
 
         // normal render
-        _context.enforceState(frontCull);
+        _context.enforceState(_frontCull);
         super.doRender(renderer);
 
         // set up the render states
         // CullState.setFlippedCulling(true);
-        _context.enforceState(backCull);
-        _context.enforceState(wireframeState);
-        _context.enforceState(noLights);
-        _context.enforceState(noTexture);
-        _context.enforceState(blendState);
+        _context.enforceState(_backCull);
+        _context.enforceState(_wireframeState);
+        _context.enforceState(_noLights);
+        _context.enforceState(_noTexture);
+        _context.enforceState(_blendState);
 
         // this will draw the wireframe
         super.doRender(renderer);
@@ -96,26 +96,26 @@ public class OutlinePass extends RenderPass {
     }
 
     public void setOutlineWidth(final float width) {
-        wireframeState.setLineWidth(width);
+        _wireframeState.setLineWidth(width);
     }
 
     public float getOutlineWidth() {
-        return wireframeState.getLineWidth();
+        return _wireframeState.getLineWidth();
     }
 
     public void setOutlineColor(final ReadOnlyColorRGBA outlineColor) {
-        noLights.setGlobalAmbient(outlineColor);
+        _noLights.setGlobalAmbient(outlineColor);
     }
 
     public ReadOnlyColorRGBA getOutlineColor() {
-        return noLights.getGlobalAmbient();
+        return _noLights.getGlobalAmbient();
     }
 
     public BlendState getBlendState() {
-        return blendState;
+        return _blendState;
     }
 
     public void setBlendState(final BlendState alphaState) {
-        blendState = alphaState;
+        _blendState = alphaState;
     }
 }

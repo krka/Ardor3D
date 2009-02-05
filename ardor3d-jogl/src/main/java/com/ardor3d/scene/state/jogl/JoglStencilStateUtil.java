@@ -23,7 +23,7 @@ import com.ardor3d.renderer.state.StencilState.StencilFunction;
 import com.ardor3d.renderer.state.StencilState.StencilOperation;
 import com.ardor3d.renderer.state.record.StencilStateRecord;
 
-public class JoglStencilStateUtil {
+public abstract class JoglStencilStateUtil {
 
     public static void apply(final JoglRenderer renderer, final StencilState state) {
         final GL gl = GLU.getCurrentGL();

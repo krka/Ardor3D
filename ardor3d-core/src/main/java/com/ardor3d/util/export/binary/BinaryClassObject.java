@@ -15,10 +15,10 @@ import java.util.HashMap;
 public class BinaryClassObject {
 
     // When exporting, use nameFields field, importing use aliasFields.
-    public HashMap<String, BinaryClassField> nameFields;
-    public HashMap<Byte, BinaryClassField> aliasFields;
+    public HashMap<String, BinaryClassField> _nameFields;
+    public HashMap<Byte, BinaryClassField> _aliasFields;
 
-    public byte[] alias;
-    public String className;
+    public byte[] _alias;
+    public String _className;
 
 }

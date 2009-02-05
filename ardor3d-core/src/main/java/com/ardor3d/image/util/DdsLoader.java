@@ -40,7 +40,7 @@ public final class DdsLoader implements ImageLoader {
         reader.loadHeader();
         final List<ByteBuffer> data = reader.readData(flip);
 
-        return new Image(reader.pixelFormat_, reader.width_, reader.height_, 0, data, reader.sizes_);
+        return new Image(reader._pixelFormat, reader._width, reader._height, 0, data, reader._sizes);
     }
 
     /**
@@ -73,83 +73,83 @@ public final class DdsLoader implements ImageLoader {
 
         private static final double LOG2 = Math.log(2);
 
-        private int width_;
-        private int height_;
-        private int depth_; // XXX: currently unused
-        private int flags_;
-        private int pitchOrSize_;
-        private int mipMapCount_;
-        private int caps1_;
-        private int caps2_;
+        private int _width;
+        private int _height;
+        private int _depth; // XXX: currently unused
+        private int _flags;
+        private int _pitchOrSize;
+        private int _mipMapCount;
+        private int _caps1;
+        private int _caps2;
 
-        private boolean compressed_;
-        private boolean grayscaleOrAlpha_;
-        private Image.Format pixelFormat_;
-        private int bpp_;
-        private int[] sizes_;
+        private boolean _compressed;
+        private boolean _grayscaleOrAlpha;
+        private Image.Format _pixelFormat;
+        private int _bpp;
+        private int[] _sizes;
 
-        private int redMask_, greenMask_, blueMask_, alphaMask_;
+        private int _redMask, _greenMask, _blueMask, _alphaMask;
 
-        private final DataInput in_;
+        private final DataInput _in;
 
         public DDSReader(final InputStream in) {
-            in_ = new LittleEndien(in);
+            _in = new LittleEndien(in);
         }
 
         /**
          * Reads the header (first 128 bytes) of a DDS File
          */
         public void loadHeader() throws IOException {
-            if (in_.readInt() != 0x20534444 || in_.readInt() != 124) {
+            if (_in.readInt() != 0x20534444 || _in.readInt() != 124) {
                 throw new IOException("Not a DDS file");
             }
 
-            flags_ = in_.readInt();
+            _flags = _in.readInt();
 
-            if (!is(flags_, DDSD_MANDATORY)) {
+            if (!is(_flags, DDSD_MANDATORY)) {
                 throw new IOException("Mandatory flags missing");
             }
-            if (is(flags_, DDSD_DEPTH)) {
+            if (is(_flags, DDSD_DEPTH)) {
                 throw new IOException("Depth not supported");
             }
 
-            height_ = in_.readInt();
-            width_ = in_.readInt();
-            pitchOrSize_ = in_.readInt();
-            depth_ = in_.readInt();
-            mipMapCount_ = in_.readInt();
-            if (44 != in_.skipBytes(44)) {
+            _height = _in.readInt();
+            _width = _in.readInt();
+            _pitchOrSize = _in.readInt();
+            _depth = _in.readInt();
+            _mipMapCount = _in.readInt();
+            if (44 != _in.skipBytes(44)) {
                 throw new IOException("Unexpected number of bytes in file - too few.");
             }
             readPixelFormat();
-            caps1_ = in_.readInt();
-            caps2_ = in_.readInt();
-            if (12 != in_.skipBytes(12)) {
+            _caps1 = _in.readInt();
+            _caps2 = _in.readInt();
+            if (12 != _in.skipBytes(12)) {
                 throw new IOException("Unexpected number of bytes in file - too few.");
             }
 
-            if (!is(caps1_, DDSCAPS_TEXTURE)) {
+            if (!is(_caps1, DDSCAPS_TEXTURE)) {
                 throw new IOException("File is not a texture");
             }
 
-            if (is(caps2_, DDSCAPS2_VOLUME)) {
+            if (is(_caps2, DDSCAPS2_VOLUME)) {
                 throw new IOException("Volume textures not supported");
             } else {
-                depth_ = 0;
+                _depth = 0;
             }
 
-            final int expectedMipmaps = 1 + (int) Math.ceil(Math.log(Math.max(height_, width_)) / LOG2);
+            final int expectedMipmaps = 1 + (int) Math.ceil(Math.log(Math.max(_height, _width)) / LOG2);
 
-            if (is(caps1_, DDSCAPS_MIPMAP)) {
-                if (!is(flags_, DDSD_MIPMAPCOUNT)) {
-                    mipMapCount_ = expectedMipmaps;
-                } else if (mipMapCount_ != expectedMipmaps) {
+            if (is(_caps1, DDSCAPS_MIPMAP)) {
+                if (!is(_flags, DDSD_MIPMAPCOUNT)) {
+                    _mipMapCount = expectedMipmaps;
+                } else if (_mipMapCount != expectedMipmaps) {
                     // changed to warning- images often do not have the required amount,
                     // or specify that they have mipmaps but include only the top level..
-                    logger.warning("Got " + mipMapCount_ + "mipmaps, expected" + expectedMipmaps);
+                    logger.warning("Got " + _mipMapCount + "mipmaps, expected" + expectedMipmaps);
                 }
             } else {
-                mipMapCount_ = 1;
+                _mipMapCount = 1;
             }
 
             loadSizes();
@@ -159,122 +159,122 @@ public final class DdsLoader implements ImageLoader {
          * Reads the PixelFormat structure in a DDS file
          */
         private void readPixelFormat() throws IOException {
-            final int pfSize = in_.readInt();
+            final int pfSize = _in.readInt();
             if (pfSize != 32) {
                 throw new IOException("Pixel format size is " + pfSize + ", not 32");
             }
 
-            final int flags = in_.readInt();
+            final int flags = _in.readInt();
 
             if (is(flags, DDPF_FOURCC)) {
-                compressed_ = true;
-                final int fourcc = in_.readInt();
-                if (20 != in_.skipBytes(20)) {
+                _compressed = true;
+                final int fourcc = _in.readInt();
+                if (20 != _in.skipBytes(20)) {
                     throw new IOException("Unexpected number of bytes in file - too few.");
                 }
 
                 switch (fourcc) {
                     case PF_DXT1:
-                        bpp_ = 4;
+                        _bpp = 4;
                         if (is(flags, DDPF_ALPHAPIXELS)) {
-                            pixelFormat_ = Image.Format.NativeDXT1A;
+                            _pixelFormat = Image.Format.NativeDXT1A;
                         } else {
-                            pixelFormat_ = Image.Format.NativeDXT1;
+                            _pixelFormat = Image.Format.NativeDXT1;
                         }
                         break;
                     case PF_DXT3:
-                        bpp_ = 8;
-                        pixelFormat_ = Image.Format.NativeDXT3;
+                        _bpp = 8;
+                        _pixelFormat = Image.Format.NativeDXT3;
                         break;
                     case PF_DXT5:
-                        bpp_ = 8;
-                        pixelFormat_ = Image.Format.NativeDXT5;
+                        _bpp = 8;
+                        _pixelFormat = Image.Format.NativeDXT5;
                         break;
                     default:
                         throw new IOException("Unknown fourcc: " + string(fourcc));
                 }
 
-                final int size = ((width_ + 3) / 4) * ((height_ + 3) / 4) * bpp_ * 2;
+                final int size = ((_width + 3) / 4) * ((_height + 3) / 4) * _bpp * 2;
 
-                if (is(flags_, DDSD_LINEARSIZE)) {
-                    if (pitchOrSize_ == 0) {
+                if (is(_flags, DDSD_LINEARSIZE)) {
+                    if (_pitchOrSize == 0) {
                         logger.warning("Must use linear size with fourcc");
-                        pitchOrSize_ = size;
-                    } else if (pitchOrSize_ != size) {
-                        logger.warning("Expected size = " + size + ", real = " + pitchOrSize_);
+                        _pitchOrSize = size;
+                    } else if (_pitchOrSize != size) {
+                        logger.warning("Expected size = " + size + ", real = " + _pitchOrSize);
                     }
                 } else {
-                    pitchOrSize_ = size;
+                    _pitchOrSize = size;
                 }
             } else {
-                compressed_ = false;
+                _compressed = false;
 
                 // skip fourCC
-                in_.readInt();
+                _in.readInt();
 
-                bpp_ = in_.readInt();
-                redMask_ = in_.readInt();
-                greenMask_ = in_.readInt();
-                blueMask_ = in_.readInt();
-                alphaMask_ = in_.readInt();
+                _bpp = _in.readInt();
+                _redMask = _in.readInt();
+                _greenMask = _in.readInt();
+                _blueMask = _in.readInt();
+                _alphaMask = _in.readInt();
 
                 if (is(flags, DDPF_RGB)) {
                     if (is(flags, DDPF_ALPHAPIXELS)) {
-                        pixelFormat_ = Format.RGBA8;
+                        _pixelFormat = Format.RGBA8;
                     } else {
-                        pixelFormat_ = Format.RGB8;
+                        _pixelFormat = Format.RGB8;
                     }
                 } else if (is(flags, DDPF_GRAYSCALE)) {
-                    switch (bpp_) {
+                    switch (_bpp) {
                         case 4:
-                            pixelFormat_ = Format.Luminance4;
+                            _pixelFormat = Format.Luminance4;
                             break;
                         case 8:
-                            pixelFormat_ = Format.Luminance8;
+                            _pixelFormat = Format.Luminance8;
                             break;
                         case 12:
-                            pixelFormat_ = Format.Luminance12;
+                            _pixelFormat = Format.Luminance12;
                             break;
                         case 16:
-                            pixelFormat_ = Format.Luminance16;
+                            _pixelFormat = Format.Luminance16;
                             break;
                         default:
-                            throw new IOException("Unsupported Grayscale BPP: " + bpp_);
+                            throw new IOException("Unsupported Grayscale BPP: " + _bpp);
                     }
-                    grayscaleOrAlpha_ = true;
+                    _grayscaleOrAlpha = true;
                 } else if (is(flags, DDPF_ALPHA)) {
-                    switch (bpp_) {
+                    switch (_bpp) {
                         case 4:
-                            pixelFormat_ = Format.Alpha4;
+                            _pixelFormat = Format.Alpha4;
                             break;
                         case 8:
-                            pixelFormat_ = Format.Alpha8;
+                            _pixelFormat = Format.Alpha8;
                             break;
                         case 12:
-                            pixelFormat_ = Format.Alpha12;
+                            _pixelFormat = Format.Alpha12;
                             break;
                         case 16:
-                            pixelFormat_ = Format.Alpha16;
+                            _pixelFormat = Format.Alpha16;
                             break;
                         default:
-                            throw new IOException("Unsupported Alpha BPP: " + bpp_);
+                            throw new IOException("Unsupported Alpha BPP: " + _bpp);
                     }
-                    grayscaleOrAlpha_ = true;
+                    _grayscaleOrAlpha = true;
                 } else {
                     throw new IOException("Unknown PixelFormat in DDS file");
                 }
 
-                final int size = (bpp_ / 8 * width_);
+                final int size = (_bpp / 8 * _width);
 
-                if (is(flags_, DDSD_LINEARSIZE)) {
-                    if (pitchOrSize_ == 0) {
+                if (is(_flags, DDSD_LINEARSIZE)) {
+                    if (_pitchOrSize == 0) {
                         logger.warning("Linear size said to contain valid value but does not");
-                        pitchOrSize_ = size;
-                    } else if (pitchOrSize_ != size) {
-                        logger.warning("Expected size = " + size + ", real = " + pitchOrSize_);
+                        _pitchOrSize = size;
+                    } else if (_pitchOrSize != size) {
+                        logger.warning("Expected size = " + size + ", real = " + _pitchOrSize);
                     }
                 } else {
-                    pitchOrSize_ = size;
+                    _pitchOrSize = size;
                 }
             }
         }
@@ -283,21 +283,21 @@ public final class DdsLoader implements ImageLoader {
          * Computes the sizes of each mipmap level in bytes, and stores it in sizes_[].
          */
         private void loadSizes() {
-            int width = width_;
-            int height = height_;
+            int width = _width;
+            int height = _height;
 
-            sizes_ = new int[mipMapCount_];
+            _sizes = new int[_mipMapCount];
 
-            for (int i = 0; i < mipMapCount_; i++) {
+            for (int i = 0; i < _mipMapCount; i++) {
                 int size;
 
-                if (compressed_) {
-                    size = ((width + 3) / 4) * ((height + 3) / 4) * bpp_ * 2;
+                if (_compressed) {
+                    size = ((width + 3) / 4) * ((height + 3) / 4) * _bpp * 2;
                 } else {
-                    size = width * height * bpp_ / 8;
+                    size = width * height * _bpp / 8;
                 }
 
-                sizes_[i] = ((size + 3) / 4) * 4;
+                _sizes[i] = ((size + 3) / 4) * 4;
 
                 width = Math.max(width / 2, 1);
                 height = Math.max(height / 2, 1);
@@ -339,20 +339,20 @@ public final class DdsLoader implements ImageLoader {
         public ByteBuffer readGrayscale2D(final boolean flip, final int totalSize) throws IOException {
             final ByteBuffer buffer = BufferUtils.createByteBuffer(totalSize);
 
-            if (bpp_ == 8) {
+            if (_bpp == 8) {
                 logger.finest("Source image format: R8");
             }
 
-            assert bpp_ / 8 == Image.getEstimatedByteSize(pixelFormat_);
+            assert _bpp / 8 == Image.getEstimatedByteSize(_pixelFormat);
 
-            int width = width_;
-            int height = height_;
+            int width = _width;
+            int height = _height;
 
-            for (int mip = 0; mip < mipMapCount_; mip++) {
-                byte[] data = new byte[sizes_[mip]];
-                in_.readFully(data);
+            for (int mip = 0; mip < _mipMapCount; mip++) {
+                byte[] data = new byte[_sizes[mip]];
+                _in.readFully(data);
                 if (flip) {
-                    data = flipData(data, width * bpp_ / 8, height);
+                    data = flipData(data, width * _bpp / 8, height);
                 }
                 buffer.put(data);
 
@@ -375,37 +375,37 @@ public final class DdsLoader implements ImageLoader {
          *             If an error occured while reading from InputStream
          */
         public ByteBuffer readRGB2D(final boolean flip, final int totalSize) throws IOException {
-            final int redCount = count(redMask_), blueCount = count(blueMask_), greenCount = count(greenMask_), alphaCount = count(alphaMask_);
+            final int redCount = count(_redMask), blueCount = count(_blueMask), greenCount = count(_greenMask), alphaCount = count(_alphaMask);
 
-            if (redMask_ == 0x00FF0000 && greenMask_ == 0x0000FF00 && blueMask_ == 0x000000FF) {
-                if (alphaMask_ == 0xFF000000 && bpp_ == 32) {
+            if (_redMask == 0x00FF0000 && _greenMask == 0x0000FF00 && _blueMask == 0x000000FF) {
+                if (_alphaMask == 0xFF000000 && _bpp == 32) {
                     logger.finest("Data source format: BGRA8");
-                } else if (bpp_ == 24) {
+                } else if (_bpp == 24) {
                     logger.finest("Data source format: BGR8");
                 }
             }
 
-            final int sourcebytesPP = bpp_ / 8;
-            final int targetBytesPP = Image.getEstimatedByteSize(pixelFormat_);
+            final int sourcebytesPP = _bpp / 8;
+            final int targetBytesPP = Image.getEstimatedByteSize(_pixelFormat);
 
             final ByteBuffer dataBuffer = BufferUtils.createByteBuffer(totalSize);
 
-            int width = width_;
-            int height = height_;
+            int width = _width;
+            int height = _height;
 
             int offset = 0;
-            for (int mip = 0; mip < mipMapCount_; mip++) {
+            for (int mip = 0; mip < _mipMapCount; mip++) {
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
                         final byte[] b = new byte[sourcebytesPP];
-                        in_.readFully(b);
+                        _in.readFully(b);
 
                         final int i = byte2int(b);
 
-                        final byte red = (byte) (((i & redMask_) >> redCount));
-                        final byte green = (byte) (((i & greenMask_) >> greenCount));
-                        final byte blue = (byte) (((i & blueMask_) >> blueCount));
-                        final byte alpha = (byte) (((i & alphaMask_) >> alphaCount));
+                        final byte red = (byte) (((i & _redMask) >> redCount));
+                        final byte green = (byte) (((i & _greenMask) >> greenCount));
+                        final byte blue = (byte) (((i & _blueMask) >> blueCount));
+                        final byte alpha = (byte) (((i & _alphaMask) >> alphaCount));
 
                         if (flip) {
                             dataBuffer.position(offset + ((height - y - 1) * width + x) * targetBytesPP);
@@ -413,7 +413,7 @@ public final class DdsLoader implements ImageLoader {
                             // dataBuffer.position(offset + (y * width + x) * targetBytesPP);
                         }
 
-                        if (alphaMask_ == 0) {
+                        if (_alphaMask == 0) {
                             dataBuffer.put(red).put(green).put(blue);
                         } else {
                             dataBuffer.put(red).put(green).put(blue).put(alpha);
@@ -441,7 +441,7 @@ public final class DdsLoader implements ImageLoader {
          */
         public ByteBuffer readDXT2D(final int totalSize) throws IOException {
             final byte[] data = new byte[totalSize];
-            in_.readFully(data);
+            _in.readFully(data);
 
             logger.finest("Source image format: DXT");
 
@@ -469,25 +469,25 @@ public final class DdsLoader implements ImageLoader {
         public List<ByteBuffer> readData(final boolean flip) throws IOException {
             int totalSize = 0;
 
-            for (int i = 0; i < sizes_.length; i++) {
-                totalSize += sizes_[i];
+            for (int i = 0; i < _sizes.length; i++) {
+                totalSize += _sizes[i];
             }
 
             final List<ByteBuffer> allMaps = new ArrayList<ByteBuffer>();
-            if (is(caps2_, DDSCAPS2_CUBEMAP)) {
+            if (is(_caps2, DDSCAPS2_CUBEMAP)) {
                 for (int i = 0; i < 6; i++) {
-                    if (compressed_) {
+                    if (_compressed) {
                         allMaps.add(readDXT2D(totalSize));
-                    } else if (grayscaleOrAlpha_) {
+                    } else if (_grayscaleOrAlpha) {
                         allMaps.add(readGrayscale2D(flip, totalSize));
                     } else {
                         allMaps.add(readRGB2D(flip, totalSize));
                     }
                 }
             } else {
-                if (compressed_) {
+                if (_compressed) {
                     allMaps.add(readDXT2D(totalSize));
-                } else if (grayscaleOrAlpha_) {
+                } else if (_grayscaleOrAlpha) {
                     allMaps.add(readGrayscale2D(flip, totalSize));
                 } else {
                     allMaps.add(readRGB2D(flip, totalSize));

@@ -28,55 +28,51 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.TexCoords;
 
 /**
- * A utility class to generate normals for Meshes.<br />
- * <br />
- * The generator generates the normals using a given crease angle up to which the transitions between two triangles are
- * to be smoothed. Normals will be generated for the mesh, as long as it uses the default triangle mode (
- * <code>TRIANGLE</code>) - the modes <code>TRIANGLE_FAN</code> and <code>TRIANGLE_STRIP</code> are not supported.<br />
- * <br />
- * The generator currently only supports a single set of texture coordinates in a mesh. If more than one set of texture
- * coordinates is specified in a mesh, all sets after the first one will be deleted.<br />
- * <br />
- * <strong>Please note:</strong> The mesh must be <cite>manifold</cite>, i.e. only 2 triangles may be connected by one
- * edge, and the mesh has to be connected by means of edges, not vertices. Otherwise, the normal generation might fail,
- * with undefined results.
+ * A utility class to generate normals for Meshes.<br /> <br /> The generator generates the normals using a given crease
+ * angle up to which the transitions between two triangles are to be smoothed. Normals will be generated for the mesh,
+ * as long as it uses the default triangle mode ( <code>TRIANGLE</code>) - the modes <code>TRIANGLE_FAN</code> and
+ * <code>TRIANGLE_STRIP</code> are not supported.<br /> <br /> The generator currently only supports a single set of
+ * texture coordinates in a mesh. If more than one set of texture coordinates is specified in a mesh, all sets after the
+ * first one will be deleted.<br /> <br /> <strong>Please note:</strong> The mesh must be <cite>manifold</cite>, i.e.
+ * only 2 triangles may be connected by one edge, and the mesh has to be connected by means of edges, not vertices.
+ * Otherwise, the normal generation might fail, with undefined results.
  */
 public class NormalGenerator {
 
     private static final Logger logger = Logger.getLogger(NormalGenerator.class.getName());
 
     // The angle up to which edges between triangles are smoothed
-    private float creaseAngle;
+    private float _creaseAngle;
 
     // Source data
-    private Vector3[] sourceVerts;
-    private ColorRGBA[] sourceColors;
-    private Vector2[] sourceTexCoords;
-    private int[] sourceInds;
-    private LinkedList<Triangle> triangles;
+    private Vector3[] _sourceVerts;
+    private ColorRGBA[] _sourceColors;
+    private Vector2[] _sourceTexCoords;
+    private int[] _sourceInds;
+    private LinkedList<Triangle> _triangles;
 
     // Computed (destination) data for one mesh split
-    private List<Vector3> destVerts;
-    private List<ColorRGBA> destColors;
-    private List<Vector2> destTexCoords;
-    private LinkedList<Triangle> destTris;
-    private LinkedList<Edge> edges;
+    private List<Vector3> _destVerts;
+    private List<ColorRGBA> _destColors;
+    private List<Vector2> _destTexCoords;
+    private LinkedList<Triangle> _destTris;
+    private LinkedList<Edge> _edges;
 
     // The lists to store the split data for the final mesh
-    private LinkedList<LinkedList<Triangle>> splitMeshes;
-    private LinkedList<LinkedList<Edge>> splitMeshBorders;
-    private Vector3[] splitVerts;
-    private ColorRGBA[] splitColors;
-    private Vector2[] splitTexCoords;
-    private Vector3[] splitNormals;
-    private int[] splitIndices;
+    private LinkedList<LinkedList<Triangle>> _splitMeshes;
+    private LinkedList<LinkedList<Edge>> _splitMeshBorders;
+    private Vector3[] _splitVerts;
+    private ColorRGBA[] _splitColors;
+    private Vector2[] _splitTexCoords;
+    private Vector3[] _splitNormals;
+    private int[] _splitIndices;
 
     // The data used to compute the final mesh
-    private boolean[] borderIndices;
+    private boolean[] _borderIndices;
 
     // Temporary data used for computation
-    private final Vector3 compVect0 = new Vector3();
-    private final Vector3 compVect1 = new Vector3();
+    private final Vector3 _compVect0 = new Vector3();
+    private final Vector3 _compVect1 = new Vector3();
 
     /**
      * Generates the normals for one Mesh, using the specified crease angle.
@@ -89,7 +85,7 @@ public class NormalGenerator {
      */
     public void generateNormals(final Mesh mesh, final float creaseAngle) {
         if (mesh != null) {
-            this.creaseAngle = creaseAngle;
+            _creaseAngle = creaseAngle;
             generateNormals(mesh);
             cleanup();
         }
@@ -108,17 +104,17 @@ public class NormalGenerator {
         }
 
         // Get the data of the mesh as arrays
-        sourceInds = BufferUtils.getIntArray(mesh.getMeshData().getIndexBuffer());
-        sourceVerts = BufferUtils.getVector3Array(mesh.getMeshData().getVertexBuffer());
+        _sourceInds = BufferUtils.getIntArray(mesh.getMeshData().getIndexBuffer());
+        _sourceVerts = BufferUtils.getVector3Array(mesh.getMeshData().getVertexBuffer());
         if (mesh.getMeshData().getColorBuffer() != null) {
-            sourceColors = BufferUtils.getColorArray(mesh.getMeshData().getColorBuffer());
+            _sourceColors = BufferUtils.getColorArray(mesh.getMeshData().getColorBuffer());
         } else {
-            sourceColors = null;
+            _sourceColors = null;
         }
         if (mesh.getMeshData().getTextureCoords(0) != null) {
-            sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0).coords);
+            _sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0)._coords);
         } else {
-            sourceTexCoords = null;
+            _sourceTexCoords = null;
         }
 
         // Initialize the lists needed to generate the normals for the mesh
@@ -127,39 +123,39 @@ public class NormalGenerator {
         // Process all triangles in the mesh. Create one connected mesh for
         // every set of triangles that are connected by their vertex indices
         // with an angle not greater than the creaseAngle.
-        while (!triangles.isEmpty()) {
+        while (!_triangles.isEmpty()) {
             createMeshSplit();
         }
 
         // Duplicate all vertices that are shared by different split meshes
-        if (!splitMeshes.isEmpty()) {
-            borderIndices = new boolean[sourceVerts.length];
+        if (!_splitMeshes.isEmpty()) {
+            _borderIndices = new boolean[_sourceVerts.length];
             fillBorderIndices();
             duplicateCreaseVertices();
         }
 
         // Set up the arrays for reconstructing the mesh: Vertices,
         // texture coordinates, colors, normals and indices
-        splitVerts = destVerts.toArray(new Vector3[destVerts.size()]);
-        if (destColors != null) {
-            splitColors = destColors.toArray(new ColorRGBA[destColors.size()]);
+        _splitVerts = _destVerts.toArray(new Vector3[_destVerts.size()]);
+        if (_destColors != null) {
+            _splitColors = _destColors.toArray(new ColorRGBA[_destColors.size()]);
         } else {
-            splitColors = null;
+            _splitColors = null;
         }
-        if (destTexCoords != null) {
-            splitTexCoords = destTexCoords.toArray(new Vector2[destTexCoords.size()]);
+        if (_destTexCoords != null) {
+            _splitTexCoords = _destTexCoords.toArray(new Vector2[_destTexCoords.size()]);
         } else {
-            splitTexCoords = null;
+            _splitTexCoords = null;
         }
-        splitNormals = new Vector3[destVerts.size()];
-        for (int j = 0; j < splitNormals.length; j++) {
-            splitNormals[j] = new Vector3();
+        _splitNormals = new Vector3[_destVerts.size()];
+        for (int j = 0; j < _splitNormals.length; j++) {
+            _splitNormals[j] = new Vector3();
         }
         int numTris = 0;
-        for (final LinkedList<Triangle> tris : splitMeshes) {
+        for (final LinkedList<Triangle> tris : _splitMeshes) {
             numTris += tris.size();
         }
-        splitIndices = new int[numTris * 3];
+        _splitIndices = new int[numTris * 3];
 
         // For each of the split meshes, create the interpolated normals
         // between its triangles and set up its index array in the process
@@ -169,11 +165,11 @@ public class NormalGenerator {
 
         // Vertex buffer:
         FloatBuffer vertices = mesh.getMeshData().getVertexBuffer();
-        if (vertices.capacity() < splitVerts.length * 3) {
-            vertices = BufferUtils.createFloatBuffer(splitVerts);
+        if (vertices.capacity() < _splitVerts.length * 3) {
+            vertices = BufferUtils.createFloatBuffer(_splitVerts);
         } else {
             vertices.clear();
-            for (final Vector3 vertex : splitVerts) {
+            for (final Vector3 vertex : _splitVerts) {
                 vertices.put((float) vertex.getX()).put((float) vertex.getY()).put((float) vertex.getZ());
             }
             vertices.flip();
@@ -181,11 +177,11 @@ public class NormalGenerator {
 
         // Normal buffer:
         FloatBuffer normals = mesh.getMeshData().getNormalBuffer();
-        if (normals == null || normals.capacity() < splitNormals.length * 3) {
-            normals = BufferUtils.createFloatBuffer(splitNormals);
+        if (normals == null || normals.capacity() < _splitNormals.length * 3) {
+            normals = BufferUtils.createFloatBuffer(_splitNormals);
         } else {
             normals.clear();
-            for (final Vector3 normal : splitNormals) {
+            for (final Vector3 normal : _splitNormals) {
                 normals.put((float) normal.getX()).put((float) normal.getY()).put((float) normal.getZ());
             }
             normals.flip();
@@ -193,13 +189,13 @@ public class NormalGenerator {
 
         // Color buffer:
         FloatBuffer colors = null;
-        if (splitColors != null) {
+        if (_splitColors != null) {
             colors = mesh.getMeshData().getColorBuffer();
-            if (colors.capacity() < splitColors.length * 4) {
-                colors = BufferUtils.createFloatBuffer(splitColors);
+            if (colors.capacity() < _splitColors.length * 4) {
+                colors = BufferUtils.createFloatBuffer(_splitColors);
             } else {
                 colors.clear();
-                for (final ColorRGBA color : splitColors) {
+                for (final ColorRGBA color : _splitColors) {
                     colors.put(color.getRed()).put(color.getGreen()).put(color.getBlue()).put(color.getAlpha());
                 }
                 colors.flip();
@@ -208,13 +204,13 @@ public class NormalGenerator {
 
         // Tex coord buffer:
         FloatBuffer texCoords = null;
-        if (splitTexCoords != null) {
-            texCoords = mesh.getMeshData().getTextureCoords(0).coords;
-            if (texCoords.capacity() < splitTexCoords.length * 2) {
-                texCoords = BufferUtils.createFloatBuffer(splitTexCoords);
+        if (_splitTexCoords != null) {
+            texCoords = mesh.getMeshData().getTextureCoords(0)._coords;
+            if (texCoords.capacity() < _splitTexCoords.length * 2) {
+                texCoords = BufferUtils.createFloatBuffer(_splitTexCoords);
             } else {
                 texCoords.clear();
-                for (final Vector2 texCoord : splitTexCoords) {
+                for (final Vector2 texCoord : _splitTexCoords) {
                     texCoords.put((float) texCoord.getX()).put((float) texCoord.getY());
                 }
                 texCoords.flip();
@@ -223,11 +219,11 @@ public class NormalGenerator {
 
         // Index buffer:
         IntBuffer indices = mesh.getMeshData().getIndexBuffer();
-        if (indices.capacity() < splitIndices.length) {
-            indices = BufferUtils.createIntBuffer(splitIndices);
+        if (indices.capacity() < _splitIndices.length) {
+            indices = BufferUtils.createIntBuffer(_splitIndices);
         } else {
             indices.clear();
-            indices.put(splitIndices);
+            indices.put(_splitIndices);
             indices.flip();
         }
 
@@ -245,45 +241,45 @@ public class NormalGenerator {
      */
     private void initialize() {
         // Copy the source vertices as a base for the normal generation
-        destVerts = new ArrayList<Vector3>(sourceVerts.length);
-        for (int i = 0; i < sourceVerts.length; i++) {
-            destVerts.add(sourceVerts[i]);
+        _destVerts = new ArrayList<Vector3>(_sourceVerts.length);
+        for (int i = 0; i < _sourceVerts.length; i++) {
+            _destVerts.add(_sourceVerts[i]);
         }
-        if (sourceColors != null) {
-            destColors = new ArrayList<ColorRGBA>(sourceColors.length);
-            for (int i = 0; i < sourceColors.length; i++) {
-                destColors.add(sourceColors[i]);
+        if (_sourceColors != null) {
+            _destColors = new ArrayList<ColorRGBA>(_sourceColors.length);
+            for (int i = 0; i < _sourceColors.length; i++) {
+                _destColors.add(_sourceColors[i]);
             }
         } else {
-            destColors = null;
+            _destColors = null;
         }
-        if (sourceTexCoords != null) {
-            destTexCoords = new ArrayList<Vector2>(sourceTexCoords.length);
-            for (int i = 0; i < sourceTexCoords.length; i++) {
-                destTexCoords.add(sourceTexCoords[i]);
+        if (_sourceTexCoords != null) {
+            _destTexCoords = new ArrayList<Vector2>(_sourceTexCoords.length);
+            for (int i = 0; i < _sourceTexCoords.length; i++) {
+                _destTexCoords.add(_sourceTexCoords[i]);
             }
         } else {
-            destTexCoords = null;
+            _destTexCoords = null;
         }
 
         // Set up the base triangles of the mesh and their face normals
-        triangles = new LinkedList<Triangle>();
-        for (int i = 0; i * 3 < sourceInds.length; i++) {
-            final Triangle tri = new Triangle(sourceInds[i * 3 + 0], sourceInds[i * 3 + 1], sourceInds[i * 3 + 2]);
-            tri.computeNormal(sourceVerts);
-            triangles.add(tri);
+        _triangles = new LinkedList<Triangle>();
+        for (int i = 0; i * 3 < _sourceInds.length; i++) {
+            final Triangle tri = new Triangle(_sourceInds[i * 3 + 0], _sourceInds[i * 3 + 1], _sourceInds[i * 3 + 2]);
+            tri.computeNormal(_sourceVerts);
+            _triangles.add(tri);
         }
 
         // Set up the lists to store the created mesh split data
-        if (splitMeshes == null) {
-            splitMeshes = new LinkedList<LinkedList<Triangle>>();
+        if (_splitMeshes == null) {
+            _splitMeshes = new LinkedList<LinkedList<Triangle>>();
         } else {
-            splitMeshes.clear();
+            _splitMeshes.clear();
         }
-        if (splitMeshBorders == null) {
-            splitMeshBorders = new LinkedList<LinkedList<Edge>>();
+        if (_splitMeshBorders == null) {
+            _splitMeshBorders = new LinkedList<LinkedList<Edge>>();
         } else {
-            splitMeshBorders.clear();
+            _splitMeshBorders.clear();
         }
     }
 
@@ -293,21 +289,21 @@ public class NormalGenerator {
      * border of the split mesh in splitMeshBorders.
      */
     private void createMeshSplit() {
-        destTris = new LinkedList<Triangle>();
-        edges = new LinkedList<Edge>();
-        final Triangle tri = triangles.removeFirst();
-        destTris.addLast(tri);
-        edges.addLast(tri.edges[0]);
-        edges.addLast(tri.edges[1]);
-        edges.addLast(tri.edges[2]);
+        _destTris = new LinkedList<Triangle>();
+        _edges = new LinkedList<Edge>();
+        final Triangle tri = _triangles.removeFirst();
+        _destTris.addLast(tri);
+        _edges.addLast(tri.edges[0]);
+        _edges.addLast(tri.edges[1]);
+        _edges.addLast(tri.edges[2]);
 
         Triangle newTri;
         do {
             newTri = insertTriangle();
         } while (newTri != null);
 
-        splitMeshes.addLast(destTris);
-        splitMeshBorders.addLast(edges);
+        _splitMeshes.addLast(_destTris);
+        _splitMeshBorders.addLast(_edges);
     }
 
     /**
@@ -318,7 +314,7 @@ public class NormalGenerator {
      * @return The triangle, if one was found, or <code>null</code> otherwise
      */
     private Triangle insertTriangle() {
-        final ListIterator<Triangle> triIt = triangles.listIterator();
+        final ListIterator<Triangle> triIt = _triangles.listIterator();
         ListIterator<Edge> edgeIt = null;
 
         // Find a triangle that is connected to the border of the currently
@@ -329,7 +325,7 @@ public class NormalGenerator {
         Edge borderEdge = null;
         while (result == null && triIt.hasNext()) {
             final Triangle tri = triIt.next();
-            edgeIt = edges.listIterator();
+            edgeIt = _edges.listIterator();
             while (result == null && edgeIt.hasNext()) {
                 borderEdge = edgeIt.next();
                 for (int i = 0; i < tri.edges.length && result == null; i++) {
@@ -346,7 +342,7 @@ public class NormalGenerator {
         if (result != null) {
             // Connect the triangle to the split mesh
             triIt.remove();
-            destTris.addLast(result);
+            _destTris.addLast(result);
             borderEdge.connected = result;
             final Edge resultEdge = result.edges[connected];
             resultEdge.connected = borderEdge.parent;
@@ -387,7 +383,7 @@ public class NormalGenerator {
      */
     private void connectEdge(final Triangle triangle, final int i) {
         final Edge edge = triangle.edges[i];
-        final ListIterator<Edge> edgeIt = edges.listIterator();
+        final ListIterator<Edge> edgeIt = _edges.listIterator();
         boolean found = false;
         while (!found && edgeIt.hasNext()) {
             final Edge borderEdge = edgeIt.next();
@@ -396,15 +392,15 @@ public class NormalGenerator {
                 // border
                 found = true;
                 edgeIt.remove();
-                edges.remove(edge);
+                _edges.remove(edge);
                 if (!checkAngle(triangle, borderEdge.parent)) {
                     // Crease angle exceeded => duplicate the vertices, colors
                     // and texCoords
                     duplicateValues(edge.i0);
-                    edge.newI0 = destVerts.size() - 1;
+                    edge.newI0 = _destVerts.size() - 1;
                     triangle.edges[(i + 2) % 3].newI1 = edge.newI0;
                     duplicateValues(edge.i1);
-                    edge.newI1 = destVerts.size() - 1;
+                    edge.newI1 = _destVerts.size() - 1;
                     triangle.edges[(i + 1) % 3].newI0 = edge.newI1;
                 } else {
                     // Crease angle okay => share duplicate vertices, if
@@ -433,7 +429,7 @@ public class NormalGenerator {
      *         otherwise <code>false</code>
      */
     private boolean checkAngle(final Triangle tri1, final Triangle tri2) {
-        return (tri1.normal.smallestAngleBetween(tri2.normal) <= creaseAngle + MathUtils.ZERO_TOLERANCE);
+        return (tri1.normal.smallestAngleBetween(tri2.normal) <= _creaseAngle + MathUtils.ZERO_TOLERANCE);
     }
 
     /**
@@ -444,12 +440,12 @@ public class NormalGenerator {
      *            The index to copy the value in each list from
      */
     private void duplicateValues(final int index) {
-        destVerts.add(destVerts.get(index));
-        if (destColors != null) {
-            destColors.add(destColors.get(index));
+        _destVerts.add(_destVerts.get(index));
+        if (_destColors != null) {
+            _destColors.add(_destColors.get(index));
         }
-        if (destTexCoords != null) {
-            destTexCoords.add(destTexCoords.get(index));
+        if (_destTexCoords != null) {
+            _destTexCoords.add(_destTexCoords.get(index));
         }
     }
 
@@ -458,11 +454,11 @@ public class NormalGenerator {
      * splitMeshBorders. All values not set in the process are set to -1.
      */
     private void fillBorderIndices() {
-        Arrays.fill(borderIndices, false);
-        final LinkedList<Edge> edges0 = splitMeshBorders.getFirst();
+        Arrays.fill(_borderIndices, false);
+        final LinkedList<Edge> edges0 = _splitMeshBorders.getFirst();
         for (final Edge edge : edges0) {
-            borderIndices[edge.i0] = true;
-            borderIndices[edge.i1] = true;
+            _borderIndices[edge.i0] = true;
+            _borderIndices[edge.i1] = true;
         }
     }
 
@@ -471,16 +467,16 @@ public class NormalGenerator {
      * corresponding triangles).
      */
     private void duplicateCreaseVertices() {
-        if (splitMeshBorders.size() < 2) {
+        if (_splitMeshBorders.size() < 2) {
             return;
         }
 
-        final int[] replacementIndices = new int[sourceVerts.length];
+        final int[] replacementIndices = new int[_sourceVerts.length];
 
         // Check the borders of all split meshes, starting with the second one
-        final ListIterator<LinkedList<Edge>> borderIt = splitMeshBorders.listIterator();
+        final ListIterator<LinkedList<Edge>> borderIt = _splitMeshBorders.listIterator();
         borderIt.next();
-        final ListIterator<LinkedList<Triangle>> meshIt = splitMeshes.listIterator();
+        final ListIterator<LinkedList<Triangle>> meshIt = _splitMeshes.listIterator();
         meshIt.next();
         while (borderIt.hasNext()) {
             Arrays.fill(replacementIndices, -1);
@@ -496,10 +492,10 @@ public class NormalGenerator {
                 final Edge edge = edgeIt.next();
 
                 if (edge.newI0 == -1) {
-                    if (borderIndices[edge.i0]) {
+                    if (_borderIndices[edge.i0]) {
                         if (replacementIndices[edge.i0] == -1) {
                             duplicateValues(edge.i0);
-                            replacementIndices[edge.i0] = destVerts.size() - 1;
+                            replacementIndices[edge.i0] = _destVerts.size() - 1;
                         }
                     } else {
                         replacementIndices[edge.i0] = edge.i0;
@@ -507,10 +503,10 @@ public class NormalGenerator {
                 }
 
                 if (edge.newI1 == -1) {
-                    if (borderIndices[edge.i1]) {
+                    if (_borderIndices[edge.i1]) {
                         if (replacementIndices[edge.i1] == -1) {
                             duplicateValues(edge.i1);
-                            replacementIndices[edge.i1] = destVerts.size() - 1;
+                            replacementIndices[edge.i1] = _destVerts.size() - 1;
                         }
                     } else {
                         replacementIndices[edge.i1] = edge.i1;
@@ -520,13 +516,13 @@ public class NormalGenerator {
 
             // Replace all indices in the split mesh whose vertices have been
             // duplicated
-            for (int i = 0; i < borderIndices.length; i++) {
-                if (borderIndices[i]) {
+            for (int i = 0; i < _borderIndices.length; i++) {
+                if (_borderIndices[i]) {
                     for (final Triangle tri : destTris0) {
                         replaceIndex(tri, i, replacementIndices[i]);
                     }
                 } else if (replacementIndices[i] > -1) {
-                    borderIndices[i] = true;
+                    _borderIndices[i] = true;
                 }
             }
         }
@@ -563,15 +559,15 @@ public class NormalGenerator {
         // First, sum up the normals of the adjacent triangles for each vertex.
         // Store the triangle indices in the process.
         int count = 0;
-        for (final LinkedList<Triangle> tris : splitMeshes) {
+        for (final LinkedList<Triangle> tris : _splitMeshes) {
             for (final Triangle tri : tris) {
                 for (int i = 0; i < 3; i++) {
                     if (tri.edges[i].newI0 > -1) {
-                        splitNormals[tri.edges[i].newI0].addLocal(tri.normal);
-                        splitIndices[count++] = tri.edges[i].newI0;
+                        _splitNormals[tri.edges[i].newI0].addLocal(tri.normal);
+                        _splitIndices[count++] = tri.edges[i].newI0;
                     } else {
-                        splitNormals[tri.edges[i].i0].addLocal(tri.normal);
-                        splitIndices[count++] = tri.edges[i].i0;
+                        _splitNormals[tri.edges[i].i0].addLocal(tri.normal);
+                        _splitIndices[count++] = tri.edges[i].i0;
                     }
 
                 }
@@ -579,9 +575,9 @@ public class NormalGenerator {
         }
 
         // Normalize all normals
-        for (int i = 0; i < splitNormals.length; i++) {
-            if (splitNormals[i].distanceSquared(Vector3.ZERO) > MathUtils.ZERO_TOLERANCE) {
-                splitNormals[i].normalizeLocal();
+        for (int i = 0; i < _splitNormals.length; i++) {
+            if (_splitNormals[i].distanceSquared(Vector3.ZERO) > MathUtils.ZERO_TOLERANCE) {
+                _splitNormals[i].normalizeLocal();
             }
         }
     }
@@ -590,65 +586,65 @@ public class NormalGenerator {
      * Clears and nulls all used arrays and lists, so the garbage collector can clean them up.
      */
     private void cleanup() {
-        creaseAngle = 0;
-        Arrays.fill(sourceVerts, null);
-        sourceVerts = null;
-        if (sourceColors != null) {
-            Arrays.fill(sourceColors, null);
-            sourceColors = null;
+        _creaseAngle = 0;
+        Arrays.fill(_sourceVerts, null);
+        _sourceVerts = null;
+        if (_sourceColors != null) {
+            Arrays.fill(_sourceColors, null);
+            _sourceColors = null;
         }
-        if (sourceTexCoords != null) {
-            Arrays.fill(sourceTexCoords, null);
-            sourceTexCoords = null;
+        if (_sourceTexCoords != null) {
+            Arrays.fill(_sourceTexCoords, null);
+            _sourceTexCoords = null;
         }
-        sourceInds = null;
+        _sourceInds = null;
 
-        if (triangles != null) {
-            triangles.clear();
-            triangles = null;
+        if (_triangles != null) {
+            _triangles.clear();
+            _triangles = null;
         }
-        if (destVerts != null) {
-            destVerts.clear();
-            destVerts = null;
+        if (_destVerts != null) {
+            _destVerts.clear();
+            _destVerts = null;
         }
-        if (destColors != null) {
-            destColors.clear();
-            destColors = null;
+        if (_destColors != null) {
+            _destColors.clear();
+            _destColors = null;
         }
-        if (destTexCoords != null) {
-            destTexCoords.clear();
-            destTexCoords = null;
+        if (_destTexCoords != null) {
+            _destTexCoords.clear();
+            _destTexCoords = null;
         }
-        if (destTris != null) {
-            destTris.clear();
-            destTris = null;
+        if (_destTris != null) {
+            _destTris.clear();
+            _destTris = null;
         }
-        if (edges != null) {
-            edges.clear();
-            edges = null;
+        if (_edges != null) {
+            _edges.clear();
+            _edges = null;
         }
 
-        if (splitMeshes != null) {
-            for (final LinkedList<Triangle> tris : splitMeshes) {
+        if (_splitMeshes != null) {
+            for (final LinkedList<Triangle> tris : _splitMeshes) {
                 tris.clear();
             }
-            splitMeshes.clear();
-            splitMeshes = null;
+            _splitMeshes.clear();
+            _splitMeshes = null;
         }
-        if (splitMeshBorders != null) {
-            for (final LinkedList<Edge> edges : splitMeshBorders) {
+        if (_splitMeshBorders != null) {
+            for (final LinkedList<Edge> edges : _splitMeshBorders) {
                 edges.clear();
             }
-            splitMeshBorders.clear();
-            splitMeshBorders = null;
+            _splitMeshBorders.clear();
+            _splitMeshBorders = null;
         }
 
-        splitVerts = null;
-        splitNormals = null;
-        splitColors = null;
-        splitTexCoords = null;
-        splitIndices = null;
-        borderIndices = null;
+        _splitVerts = null;
+        _splitNormals = null;
+        _splitColors = null;
+        _splitTexCoords = null;
+        _splitIndices = null;
+        _borderIndices = null;
     }
 
     /**
@@ -691,9 +687,9 @@ public class NormalGenerator {
             final int i0 = edges[0].i0;
             final int i1 = edges[1].i0;
             final int i2 = edges[2].i0;
-            verts[i2].subtract(verts[i1], compVect0);
-            verts[i0].subtract(verts[i1], compVect1);
-            normal.set(compVect0.crossLocal(compVect1)).normalizeLocal();
+            verts[i2].subtract(verts[i1], _compVect0);
+            verts[i0].subtract(verts[i1], _compVect1);
+            normal.set(_compVect0.crossLocal(_compVect1)).normalizeLocal();
         }
 
         /**

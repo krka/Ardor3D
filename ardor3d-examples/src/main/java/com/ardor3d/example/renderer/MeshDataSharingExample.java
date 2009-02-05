@@ -41,8 +41,7 @@ public class MeshDataSharingExample extends ExampleBase {
     }
 
     @Inject
-    public MeshDataSharingExample(final LogicalLayer layer, final FrameWork frameWork,
-            final Timer timer) {
+    public MeshDataSharingExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }
@@ -74,8 +73,8 @@ public class MeshDataSharingExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, Format.Guess,
-                true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+                Format.Guess, true));
 
         sphere.setRenderState(ts);
 

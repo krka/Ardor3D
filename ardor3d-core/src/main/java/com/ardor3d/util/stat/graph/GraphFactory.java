@@ -29,7 +29,7 @@ import com.ardor3d.util.stat.StatCollector;
 /**
  * Factory class useful for setting up various types of graphs.
  */
-public class GraphFactory {
+public abstract class GraphFactory {
 
     /**
      * Makes a new line grapher and sets up a quad to display it.
@@ -49,8 +49,8 @@ public class GraphFactory {
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
 
-        final float dW = (float) width / grapher.texRenderer.getWidth();
-        final float dH = (float) height / grapher.texRenderer.getHeight();
+        final float dW = (float) width / grapher._textureRenderer.getWidth();
+        final float dH = (float) height / grapher._textureRenderer.getHeight();
 
         setupGraphQuad(quad, graphTex, dW, dH);
 
@@ -74,8 +74,8 @@ public class GraphFactory {
         grapher.setThreshold(1);
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
-        final float dW = (float) width / grapher.texRenderer.getWidth();
-        final float dH = (float) height / grapher.texRenderer.getHeight();
+        final float dW = (float) width / grapher._textureRenderer.getWidth();
+        final float dH = (float) height / grapher._textureRenderer.getHeight();
 
         setupGraphQuad(quad, graphTex, dW, dH);
 
@@ -99,8 +99,8 @@ public class GraphFactory {
         grapher.setThreshold(1);
         StatCollector.addStatListener(grapher);
         final Texture2D graphTex = setupGraphTexture(grapher);
-        final float dW = (float) width / grapher.texRenderer.getWidth();
-        final float dH = (float) height / grapher.texRenderer.getHeight();
+        final float dW = (float) width / grapher._textureRenderer.getWidth();
+        final float dH = (float) height / grapher._textureRenderer.getHeight();
 
         setupGraphQuad(quad, graphTex, dW, dH);
 
@@ -142,7 +142,7 @@ public class GraphFactory {
         quad.setRenderBucketType(RenderBucketType.Ortho);
         quad.setZOrder(-1);
 
-        final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0).coords;
+        final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0)._coords;
         tbuf.clear();
         tbuf.put(0).put(maxV);
         tbuf.put(0).put(0);

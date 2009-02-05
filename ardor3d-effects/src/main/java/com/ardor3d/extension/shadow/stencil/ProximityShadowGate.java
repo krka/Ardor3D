@@ -16,18 +16,18 @@ import com.ardor3d.scenegraph.Mesh;
 
 public class ProximityShadowGate implements ShadowGate {
 
-    private final Camera camera;
-    private final float distanceSQ;
+    private final Camera _camera;
+    private final float _distanceSQ;
 
     public ProximityShadowGate(final Camera cam, final float distance) {
-        camera = cam;
-        distanceSQ = distance * distance;
+        _camera = cam;
+        _distanceSQ = distance * distance;
     }
 
     public boolean shouldDrawShadows(final Mesh mesh) {
         final ReadOnlyVector3 trans = mesh.getWorldTranslation();
-        final ReadOnlyVector3 camLoc = camera.getLocation();
-        final boolean isCloseEnough = (trans.distanceSquared(camLoc) <= distanceSQ);
+        final ReadOnlyVector3 camLoc = _camera.getLocation();
+        final boolean isCloseEnough = (trans.distanceSquared(camLoc) <= _distanceSQ);
         return isCloseEnough;
     }
 

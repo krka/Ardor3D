@@ -11,12 +11,12 @@
 package com.ardor3d.util.stat;
 
 public class StatValue {
-    public double val;
-    public long iterations;
-    public double average = 0;
+    public double _val;
+    public long _iterations;
+    public double _average = 0;
 
     public StatValue(final double val, final long iterations) {
-        this.val = val;
-        this.iterations = iterations;
+        _val = val;
+        _iterations = iterations;
     }
 }

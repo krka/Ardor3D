@@ -62,7 +62,7 @@ public class BoundingSphere extends BoundingVolume {
      *            the center of the sphere.
      */
     public BoundingSphere(final double r, final ReadOnlyVector3 c) {
-        center.set(c);
+        _center.set(c);
         setRadius(r);
     }
 
@@ -81,9 +81,9 @@ public class BoundingSphere extends BoundingVolume {
             sphere = (BoundingSphere) store;
         }
 
-        center.multiply(scale, sphere.center);
-        rotate.applyPost(sphere.center, sphere.center);
-        sphere.center.addLocal(translate);
+        _center.multiply(scale, sphere._center);
+        rotate.applyPost(sphere._center, sphere._center);
+        sphere._center.addLocal(translate);
         sphere.setRadius(Math.abs(getMaxAxis(scale) * getRadius()) + radiusEpsilon - 1);
         return sphere;
     }
@@ -211,11 +211,11 @@ public class BoundingSphere extends BoundingVolume {
         switch (pnts) {
             case 0:
                 setRadius(0);
-                center.set(0, 0, 0);
+                _center.set(0, 0, 0);
                 break;
             case 1:
                 setRadius(1f - radiusEpsilon);
-                BufferUtils.populateFromBuffer(center, points, ap - 1);
+                BufferUtils.populateFromBuffer(_center, points, ap - 1);
                 break;
             case 2:
                 BufferUtils.populateFromBuffer(tempA, points, ap - 1);
@@ -243,7 +243,7 @@ public class BoundingSphere extends BoundingVolume {
         }
         for (int i = 0; i < p; i++) {
             BufferUtils.populateFromBuffer(tempA, points, i + ap);
-            if (tempA.distanceSquared(center) - (getRadius() * getRadius()) > radiusEpsilon - 1f) {
+            if (tempA.distanceSquared(_center) - (getRadius() * getRadius()) > radiusEpsilon - 1f) {
                 for (int j = i; j > 0; j--) {
                     BufferUtils.populateFromBuffer(tempB, points, j + ap);
                     BufferUtils.populateFromBuffer(tempC, points, j - 1 + ap);
@@ -279,7 +279,7 @@ public class BoundingSphere extends BoundingVolume {
         final double Denominator = 2.0 * (a.getX() * (b.getY() * c.getZ() - c.getY() * b.getZ()) - b.getX()
                 * (a.getY() * c.getZ() - c.getY() * a.getZ()) + c.getX() * (a.getY() * b.getZ() - b.getY() * a.getZ()));
         if (Denominator == 0) {
-            center.set(0, 0, 0);
+            _center.set(0, 0, 0);
             setRadius(0);
         } else {
             final Vector3 o = a.cross(b, null).multiplyLocal(c.lengthSquared()).addLocal(
@@ -287,7 +287,7 @@ public class BoundingSphere extends BoundingVolume {
                     b.cross(c, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
 
             setRadius(o.length() * radiusEpsilon);
-            O.add(o, center);
+            O.add(o, _center);
         }
     }
 
@@ -310,14 +310,14 @@ public class BoundingSphere extends BoundingVolume {
         final double Denominator = 2.0 * acrossB.dot(acrossB);
 
         if (Denominator == 0) {
-            center.set(0, 0, 0);
+            _center.set(0, 0, 0);
             setRadius(0);
         } else {
 
             final Vector3 o = acrossB.cross(a, null).multiplyLocal(b.lengthSquared()).addLocal(
                     b.cross(acrossB, null).multiplyLocal(a.lengthSquared())).divideLocal(Denominator);
             setRadius(o.length() * radiusEpsilon);
-            O.add(o, center);
+            O.add(o, _center);
         }
     }
 
@@ -334,7 +334,7 @@ public class BoundingSphere extends BoundingVolume {
         setRadius(Math.sqrt(((A.getX() - O.getX()) * (A.getX() - O.getX()) + (A.getY() - O.getY())
                 * (A.getY() - O.getY()) + (A.getZ() - O.getZ()) * (A.getZ() - O.getZ())) / 4f)
                 + radiusEpsilon - 1);
-        Vector3.lerp(O, A, .5, center);
+        Vector3.lerp(O, A, .5, _center);
     }
 
     /**
@@ -345,19 +345,19 @@ public class BoundingSphere extends BoundingVolume {
      *            the list of points to contain.
      */
     public void averagePoints(final Vector3[] points) {
-        center.set(points[0]);
+        _center.set(points[0]);
 
         for (int i = 1; i < points.length; i++) {
-            center.addLocal(points[i]);
+            _center.addLocal(points[i]);
         }
 
         final double quantity = 1.0 / points.length;
-        center.multiplyLocal(quantity);
+        _center.multiplyLocal(quantity);
 
         double maxRadiusSqr = 0;
         final Vector3 temp = Vector3.fetchTempInstance();
         for (int i = 0; i < points.length; i++) {
-            final Vector3 diff = points[i].subtract(center, temp);
+            final Vector3 diff = points[i].subtract(_center, temp);
             final double radiusSqr = diff.lengthSquared();
             if (radiusSqr > maxRadiusSqr) {
                 maxRadiusSqr = radiusSqr;
@@ -394,9 +394,9 @@ public class BoundingSphere extends BoundingVolume {
             sphere = (BoundingSphere) store;
         }
 
-        center.multiply(scale, sphere.center);
-        rotate.apply(sphere.center, sphere.center);
-        sphere.center.addLocal(translate);
+        _center.multiply(scale, sphere._center);
+        rotate.apply(sphere._center, sphere._center);
+        sphere._center.addLocal(translate);
         sphere.setRadius(Math.abs(getMaxAxis(scale) * getRadius()) + radiusEpsilon - 1);
         return sphere;
     }
@@ -430,7 +430,7 @@ public class BoundingSphere extends BoundingVolume {
      */
     @Override
     public Side whichSide(final ReadOnlyPlane plane) {
-        final double distance = plane.pseudoDistance(center);
+        final double distance = plane.pseudoDistance(_center);
 
         if (distance <= -getRadius()) {
             return Plane.Side.Inside;
@@ -468,7 +468,7 @@ public class BoundingSphere extends BoundingVolume {
             case AABB: {
                 final BoundingBox box = (BoundingBox) volume;
                 final Vector3 radVect = new Vector3(box.getXExtent(), box.getYExtent(), box.getZExtent());
-                final Vector3 tempCenter = box.center;
+                final Vector3 tempCenter = box._center;
                 final BoundingSphere rVal = new BoundingSphere();
                 return merge(radVect.length(), tempCenter, rVal);
             }
@@ -512,7 +512,7 @@ public class BoundingSphere extends BoundingVolume {
                 final BoundingBox box = (BoundingBox) volume;
                 final Vector3 radVect = Vector3.fetchTempInstance();
                 radVect.set(box.getXExtent(), box.getYExtent(), box.getZExtent());
-                final Vector3 temp_center = box.center;
+                final Vector3 temp_center = box._center;
                 final double radius = radVect.length();
                 Vector3.releaseTempInstance(radVect);
                 return merge(radius, temp_center, this);
@@ -543,22 +543,22 @@ public class BoundingSphere extends BoundingVolume {
         final FloatBuffer mergeBuf = BufferUtils.createFloatBufferOnHeap(8 * 3);
 
         for (int i = 0; i < 8; i++) {
-            mergeBuf.put((float) volume.vectorStore[i].getX());
-            mergeBuf.put((float) volume.vectorStore[i].getY());
-            mergeBuf.put((float) volume.vectorStore[i].getZ());
+            mergeBuf.put((float) volume._vectorStore[i].getX());
+            mergeBuf.put((float) volume._vectorStore[i].getY());
+            mergeBuf.put((float) volume._vectorStore[i].getZ());
         }
 
         // remember old radius and center
         final double oldRadius = getRadius();
-        final Vector3 oldCenter = Vector3.fetchTempInstance().set(center);
+        final Vector3 oldCenter = Vector3.fetchTempInstance().set(_center);
 
         // compute new radius and center from obb points
         computeFromPoints(mergeBuf);
-        final Vector3 newCenter = Vector3.fetchTempInstance().set(center);
+        final Vector3 newCenter = Vector3.fetchTempInstance().set(_center);
         final double newRadius = getRadius();
 
         // restore old center and radius
-        center.set(oldCenter);
+        _center.set(oldCenter);
         setRadius(oldRadius);
 
         // merge obb points result
@@ -571,7 +571,7 @@ public class BoundingSphere extends BoundingVolume {
     }
 
     private BoundingVolume merge(final double temp_radius, final ReadOnlyVector3 tempCenter, final BoundingSphere rVal) {
-        final Vector3 diff = tempCenter.subtract(center, Vector3.fetchTempInstance());
+        final Vector3 diff = tempCenter.subtract(_center, Vector3.fetchTempInstance());
         final double lengthSquared = diff.lengthSquared();
         final double radiusDiff = temp_radius - getRadius();
 
@@ -593,9 +593,9 @@ public class BoundingSphere extends BoundingVolume {
         final Vector3 rCenter = Vector3.fetchTempInstance();
         if (length > radiusEpsilon) {
             final double coeff = (length + radiusDiff) / (2.0 * length);
-            rCenter.set(center.addLocal(diff.multiplyLocal(coeff)));
+            rCenter.set(_center.addLocal(diff.multiplyLocal(coeff)));
         } else {
-            rCenter.set(center);
+            rCenter.set(_center);
         }
 
         rVal.setCenter(rCenter);
@@ -617,18 +617,18 @@ public class BoundingSphere extends BoundingVolume {
     public BoundingVolume clone(final BoundingVolume store) {
         if (store != null && store.getType() == Type.Sphere) {
             final BoundingSphere rVal = (BoundingSphere) store;
-            rVal.center.set(center);
+            rVal._center.set(_center);
             rVal.setRadius(_radius);
-            rVal.checkPlane = checkPlane;
+            rVal._checkPlane = _checkPlane;
             return rVal;
         }
 
-        return new BoundingSphere(getRadius(), center);
+        return new BoundingSphere(getRadius(), _center);
     }
 
     @Override
     public String toString() {
-        return "com.ardor3d.scene.BoundingSphere [Radius: " + getRadius() + " Center: " + center + "]";
+        return "com.ardor3d.scene.BoundingSphere [Radius: " + getRadius() + " Center: " + _center + "]";
     }
 
     @Override
@@ -642,7 +642,7 @@ public class BoundingSphere extends BoundingVolume {
 
     @Override
     public boolean intersectsSphere(final BoundingSphere bs) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bs.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
             return false;
         }
 
@@ -655,13 +655,13 @@ public class BoundingSphere extends BoundingVolume {
 
     @Override
     public boolean intersectsBoundingBox(final BoundingBox bb) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bb.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
             return false;
         }
 
-        if (Math.abs(bb.center.getX() - getCenter().getX()) < getRadius() + bb.getXExtent()
-                && Math.abs(bb.center.getY() - getCenter().getY()) < getRadius() + bb.getYExtent()
-                && Math.abs(bb.center.getZ() - getCenter().getZ()) < getRadius() + bb.getZExtent()) {
+        if (Math.abs(bb._center.getX() - getCenter().getX()) < getRadius() + bb.getXExtent()
+                && Math.abs(bb._center.getY() - getCenter().getY()) < getRadius() + bb.getYExtent()
+                && Math.abs(bb._center.getZ() - getCenter().getZ()) < getRadius() + bb.getZExtent()) {
             return true;
         }
 
@@ -675,7 +675,7 @@ public class BoundingSphere extends BoundingVolume {
 
     @Override
     public boolean intersects(final ReadOnlyRay3 ray) {
-        if (!Vector3.isValid(center)) {
+        if (!Vector3.isValid(_center)) {
             return false;
         }
 
@@ -751,7 +751,7 @@ public class BoundingSphere extends BoundingVolume {
 
     @Override
     public double distanceToEdge(final ReadOnlyVector3 point) {
-        return center.distance(point) - getRadius();
+        return _center.distance(point) - getRadius();
     }
 
     @Override

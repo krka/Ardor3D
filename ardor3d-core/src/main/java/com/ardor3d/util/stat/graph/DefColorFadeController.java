@@ -37,10 +37,10 @@ public class DefColorFadeController extends Controller {
 
     private static final long serialVersionUID = 1L;
 
-    private Mesh target;
-    private final float targetAlpha;
-    private final double rate;
-    private final boolean dir;
+    private Mesh _target;
+    private final float _targetAlpha;
+    private final double _rate;
+    private final boolean _dir;
 
     /**
      * Sets up a new instance of the controller. The
@@ -54,45 +54,45 @@ public class DefColorFadeController extends Controller {
      *            appropriate direction given the current default color's alpha.
      */
     public DefColorFadeController(final Mesh target, final float targetAlpha, double rate) {
-        this.target = target;
-        this.targetAlpha = targetAlpha;
-        dir = target.getDefaultColor().getAlpha() > targetAlpha;
-        if ((dir && rate > 0) || (!dir && rate < 0)) {
+        _target = target;
+        _targetAlpha = targetAlpha;
+        _dir = target.getDefaultColor().getAlpha() > targetAlpha;
+        if ((_dir && rate > 0) || (!_dir && rate < 0)) {
             rate *= -1;
         }
-        this.rate = rate;
+        _rate = rate;
     }
 
     @Override
     public void update(final double time, final Spatial caller) {
-        if (target == null) {
+        if (_target == null) {
             return;
         }
-        final ColorRGBA color = ColorRGBA.fetchTempInstance().set(target.getDefaultColor());
+        final ColorRGBA color = ColorRGBA.fetchTempInstance().set(_target.getDefaultColor());
         float alpha = color.getAlpha();
 
-        alpha += rate * time;
-        if (dir && alpha <= targetAlpha) {
-            alpha = targetAlpha;
-        } else if (!dir && alpha >= targetAlpha) {
-            alpha = targetAlpha;
+        alpha += _rate * time;
+        if (_dir && alpha <= _targetAlpha) {
+            alpha = _targetAlpha;
+        } else if (!_dir && alpha >= _targetAlpha) {
+            alpha = _targetAlpha;
         }
 
         if (alpha != 0) {
-            target.setCullHint(CullHint.Inherit);
+            _target.setCullHint(CullHint.Inherit);
         } else {
-            target.setCullHint(CullHint.Always);
+            _target.setCullHint(CullHint.Always);
         }
 
         color.setAlpha(alpha);
-        target.setDefaultColor(color);
+        _target.setDefaultColor(color);
         ColorRGBA.releaseTempInstance(color);
 
-        if (alpha == targetAlpha) {
-            target.removeController(this);
+        if (alpha == _targetAlpha) {
+            _target.removeController(this);
 
             // enable gc
-            target = null;
+            _target = null;
         }
     }
 

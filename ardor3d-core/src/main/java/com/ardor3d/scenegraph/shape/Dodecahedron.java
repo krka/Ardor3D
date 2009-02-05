@@ -31,7 +31,7 @@ public class Dodecahedron extends Mesh {
     private static final int NUM_POINTS = 20;
     private static final int NUM_TRIS = 36;
 
-    private double sideLength;
+    private double _sideLength;
 
     public Dodecahedron() {}
 
@@ -46,7 +46,7 @@ public class Dodecahedron extends Mesh {
      */
     public Dodecahedron(final String name, final double sideLength) {
         super(name);
-        this.sideLength = sideLength;
+        _sideLength = sideLength;
         // allocate vertices
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
@@ -116,13 +116,13 @@ public class Dodecahedron extends Mesh {
         final Vector3 vert = new Vector3();
         for (int i = 0; i < NUM_POINTS; i++) {
             BufferUtils.populateFromBuffer(vert, _meshData.getVertexBuffer(), i);
-            if (Math.abs(vert.getZ()) < sideLength) {
+            if (Math.abs(vert.getZ()) < _sideLength) {
                 tex.setX(0.5 * (1.0 + Math.atan2(vert.getY(), vert.getX()) * MathUtils.INV_PI));
             } else {
                 tex.setX(0.5);
             }
             tex.setY(Math.acos(vert.getZ()) * MathUtils.INV_PI);
-            _meshData.getTextureCoords(0).coords.put((float) tex.getX()).put((float) tex.getY());
+            _meshData.getTextureCoords(0)._coords.put((float) tex.getX()).put((float) tex.getY());
         }
     }
 
@@ -139,9 +139,9 @@ public class Dodecahedron extends Mesh {
         double fA = 1.0 / Math.sqrt(3.0f);
         double fB = Math.sqrt((3.0 - Math.sqrt(5.0)) / 6.0);
         double fC = Math.sqrt((3.0 + Math.sqrt(5.0)) / 6.0);
-        fA *= sideLength;
-        fB *= sideLength;
-        fC *= sideLength;
+        fA *= _sideLength;
+        fB *= _sideLength;
+        fC *= _sideLength;
 
         final FloatBuffer vbuf = _meshData.getVertexBuffer();
         vbuf.rewind();
@@ -171,7 +171,7 @@ public class Dodecahedron extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(sideLength, "sideLength", 0);
+        capsule.write(_sideLength, "sideLength", 0);
 
     }
 
@@ -179,7 +179,7 @@ public class Dodecahedron extends Mesh {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        sideLength = capsule.readInt("sideLength", 0);
+        _sideLength = capsule.readInt("sideLength", 0);
 
     }
 

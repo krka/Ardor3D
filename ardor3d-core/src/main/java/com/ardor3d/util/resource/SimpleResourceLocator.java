@@ -23,20 +23,20 @@ import java.net.URLEncoder;
  */
 public class SimpleResourceLocator implements ResourceLocator {
 
-    protected URI baseDir;
+    protected URI _baseDir;
 
     public SimpleResourceLocator(final URI baseDir) {
         if (baseDir == null) {
             throw new NullPointerException("baseDir can not be null.");
         }
-        this.baseDir = baseDir;
+        _baseDir = baseDir;
     }
 
     public SimpleResourceLocator(final URL baseDir) throws URISyntaxException {
         if (baseDir == null) {
             throw new NullPointerException("baseDir can not be null.");
         }
-        this.baseDir = baseDir.toURI();
+        _baseDir = baseDir.toURI();
     }
 
     public URL locateResource(String resourceName) {
@@ -54,7 +54,7 @@ public class SimpleResourceLocator implements ResourceLocator {
             // this fixes a bug in JRE1.5 (file handler does not decode "+" to spaces)
             spec = spec.replaceAll("\\+", "%20");
 
-            final URL rVal = new URL(baseDir.toURL(), spec);
+            final URL rVal = new URL(_baseDir.toURL(), spec);
             // open a stream to see if this is a valid resource
             // XXX: Perhaps this is wasteful? Also, what info will determine validity?
             rVal.openStream().close();
@@ -86,7 +86,7 @@ public class SimpleResourceLocator implements ResourceLocator {
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof SimpleResourceLocator) {
-            return baseDir.equals(((SimpleResourceLocator) obj).baseDir);
+            return _baseDir.equals(((SimpleResourceLocator) obj)._baseDir);
         }
         return false;
     }

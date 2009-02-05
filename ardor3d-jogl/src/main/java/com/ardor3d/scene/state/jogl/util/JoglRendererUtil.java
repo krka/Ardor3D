@@ -15,7 +15,7 @@ import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.renderer.state.record.RendererRecord;
 
-public class JoglRendererUtil {
+public abstract class JoglRendererUtil {
 
     public static void switchMode(final RendererRecord rendRecord, final int mode) {
         final GL gl = GLU.getCurrentGL();

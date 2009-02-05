@@ -29,7 +29,7 @@ import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.shader.ShaderVariable;
 
-public class LwjglShaderObjectsStateUtil {
+public abstract class LwjglShaderObjectsStateUtil {
     private static final Logger logger = Logger.getLogger(LwjglShaderObjectsStateUtil.class.getName());
 
     protected static void sendToGL(final GLSLShaderObjectsState state) {

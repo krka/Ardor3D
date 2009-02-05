@@ -27,28 +27,28 @@ import com.google.inject.Inject;
  */
 public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     @GuardedBy("this")
-    private final LinkedList<KeyEvent> upcomingEvents = new LinkedList<KeyEvent>();
+    private final LinkedList<KeyEvent> _upcomingEvents = new LinkedList<KeyEvent>();
 
     @GuardedBy("this")
-    private AwtKeyboardIterator currentIterator = null;
+    private AwtKeyboardIterator _currentIterator = null;
 
-    private final Component component;
+    private final Component _component;
 
     @Inject
     public AwtKeyboardWrapper(final Component component) {
-        this.component = component;
+        _component = component;
     }
 
     public void init() {
-        component.addKeyListener(this);
+        _component.addKeyListener(this);
     }
 
     public synchronized PeekingIterator<KeyEvent> getEvents() {
-        if (currentIterator == null || !currentIterator.hasNext()) {
-            currentIterator = new AwtKeyboardIterator();
+        if (_currentIterator == null || !_currentIterator.hasNext()) {
+            _currentIterator = new AwtKeyboardIterator();
         }
 
-        return currentIterator;
+        return _currentIterator;
     }
 
     public synchronized void keyTyped(final java.awt.event.KeyEvent e) {
@@ -56,22 +56,22 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final java.awt.event.KeyEvent e) {
-        upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.DOWN));
+        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.DOWN));
     }
 
     public synchronized void keyReleased(final java.awt.event.KeyEvent e) {
-        upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.UP));
+        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.UP));
     }
 
     private class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
         @Override
         protected KeyEvent computeNext() {
             synchronized (AwtKeyboardWrapper.this) {
-                if (upcomingEvents.isEmpty()) {
+                if (_upcomingEvents.isEmpty()) {
                     return endOfData();
                 }
 
-                return upcomingEvents.poll();
+                return _upcomingEvents.poll();
             }
         }
     }

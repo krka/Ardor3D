@@ -37,7 +37,7 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerShort;
 
 /** Utility class for updating shadervariables(uniforms and attributes) */
-public class LwjglShaderUtil {
+public abstract class LwjglShaderUtil {
     private static final Logger logger = Logger.getLogger(LwjglShaderUtil.class.getName());
 
     /**

@@ -24,18 +24,19 @@ import com.ardor3d.util.export.Savable;
  */
 public class VBOInfo implements Serializable, Savable {
     private static final long serialVersionUID = 1L;
-    private boolean useVBOVertex = false;
-    private boolean useVBOTexture = false;
-    private boolean useVBOColor = false;
-    private boolean useVBONormal = false;
-    private boolean useVBOFogCoords = false;
-    private boolean useVBOIndex = false;
-    private int vboVertexID = -1;
-    private int vboColorID = -1;
-    private int vboNormalID = -1;
-    private int vboFogCoordsID = -1;
-    private int[] vboTextureIDs = null;
-    private int vboIndexID = -1;
+
+    private boolean _useVBOVertex = false;
+    private boolean _useVBOTexture = false;
+    private boolean _useVBOColor = false;
+    private boolean _useVBONormal = false;
+    private boolean _useVBOFogCoords = false;
+    private boolean _useVBOIndex = false;
+    private int _vboVertexID = -1;
+    private int _vboColorID = -1;
+    private int _vboNormalID = -1;
+    private int _vboFogCoordsID = -1;
+    private int[] _vboTextureIDs = null;
+    private int _vboIndexID = -1;
 
     public VBOInfo() {
         this(false);
@@ -49,14 +50,14 @@ public class VBOInfo implements Serializable, Savable {
      *            true for enabled, false for disabled.
      */
     public VBOInfo(final boolean defaultVBO) {
-        useVBOColor = defaultVBO;
-        useVBOTexture = defaultVBO;
-        useVBOVertex = defaultVBO;
-        useVBONormal = defaultVBO;
-        useVBOFogCoords = defaultVBO;
-        useVBOIndex = false;
+        _useVBOColor = defaultVBO;
+        _useVBOTexture = defaultVBO;
+        _useVBOVertex = defaultVBO;
+        _useVBONormal = defaultVBO;
+        _useVBOFogCoords = defaultVBO;
+        _useVBOIndex = false;
 
-        vboTextureIDs = new int[2];
+        _vboTextureIDs = new int[2];
     }
 
     /**
@@ -66,12 +67,12 @@ public class VBOInfo implements Serializable, Savable {
      */
     public VBOInfo copy() {
         final VBOInfo copy = new VBOInfo();
-        copy.useVBOVertex = useVBOVertex;
-        copy.useVBOTexture = useVBOTexture;
-        copy.useVBOColor = useVBOColor;
-        copy.useVBONormal = useVBONormal;
-        copy.useVBOIndex = useVBOIndex;
-        copy.useVBOFogCoords = useVBOFogCoords;
+        copy._useVBOVertex = _useVBOVertex;
+        copy._useVBOTexture = _useVBOTexture;
+        copy._useVBOColor = _useVBOColor;
+        copy._useVBONormal = _useVBONormal;
+        copy._useVBOIndex = _useVBOIndex;
+        copy._useVBOFogCoords = _useVBOFogCoords;
         return copy;
     }
 
@@ -83,16 +84,16 @@ public class VBOInfo implements Serializable, Savable {
      *            new size of texcoord id array
      */
     public void resizeTextureIds(final int size) {
-        if (vboTextureIDs.length == size || size == 0) {
+        if (_vboTextureIDs.length == size || size == 0) {
             return;
         }
 
         final int[] newIDArray = new int[size];
-        for (int x = Math.min(size, vboTextureIDs.length); --x >= 0;) {
-            newIDArray[x] = vboTextureIDs[x];
+        for (int x = Math.min(size, _vboTextureIDs.length); --x >= 0;) {
+            newIDArray[x] = _vboTextureIDs[x];
         }
 
-        vboTextureIDs = newIDArray;
+        _vboTextureIDs = newIDArray;
     }
 
     /**
@@ -101,7 +102,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for vertexes.
      */
     public boolean isVBOVertexEnabled() {
-        return useVBOVertex;
+        return _useVBOVertex;
     }
 
     /**
@@ -110,7 +111,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for fog coords.
      */
     public boolean isVBOFogCoordsEnabled() {
-        return useVBOFogCoords;
+        return _useVBOFogCoords;
     }
 
     /**
@@ -119,7 +120,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for indices.
      */
     public boolean isVBOIndexEnabled() {
-        return useVBOIndex;
+        return _useVBOIndex;
     }
 
     /**
@@ -128,7 +129,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for textures.
      */
     public boolean isVBOTextureEnabled() {
-        return useVBOTexture;
+        return _useVBOTexture;
     }
 
     /**
@@ -137,7 +138,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for normals.
      */
     public boolean isVBONormalEnabled() {
-        return useVBONormal;
+        return _useVBONormal;
     }
 
     /**
@@ -146,7 +147,7 @@ public class VBOInfo implements Serializable, Savable {
      * @return If VBO is enabled for colors.
      */
     public boolean isVBOColorEnabled() {
-        return useVBOColor;
+        return _useVBOColor;
     }
 
     /**
@@ -156,7 +157,7 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for vertexes.
      */
     public void setVBOVertexEnabled(final boolean enabled) {
-        useVBOVertex = enabled;
+        _useVBOVertex = enabled;
     }
 
     /**
@@ -166,7 +167,7 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for fog coords.
      */
     public void setVBOFogCoordsEnabled(final boolean enabled) {
-        useVBOFogCoords = enabled;
+        _useVBOFogCoords = enabled;
     }
 
     /**
@@ -176,7 +177,7 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for indices.
      */
     public void setVBOIndexEnabled(final boolean enabled) {
-        useVBOIndex = enabled;
+        _useVBOIndex = enabled;
     }
 
     /**
@@ -186,7 +187,7 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for texture coordinates.
      */
     public void setVBOTextureEnabled(final boolean enabled) {
-        useVBOTexture = enabled;
+        _useVBOTexture = enabled;
     }
 
     /**
@@ -196,7 +197,7 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for normals
      */
     public void setVBONormalEnabled(final boolean enabled) {
-        useVBONormal = enabled;
+        _useVBONormal = enabled;
     }
 
     /**
@@ -206,81 +207,81 @@ public class VBOInfo implements Serializable, Savable {
      *            If true, VBO enabled for colors
      */
     public void setVBOColorEnabled(final boolean enabled) {
-        useVBOColor = enabled;
+        _useVBOColor = enabled;
     }
 
     public int getVBOVertexID() {
-        return vboVertexID;
+        return _vboVertexID;
     }
 
     public int getVBOTextureID(final int index) {
-        if (index >= vboTextureIDs.length) {
+        if (index >= _vboTextureIDs.length) {
             return -1;
         }
-        return vboTextureIDs[index];
+        return _vboTextureIDs[index];
     }
 
     public int getVBONormalID() {
-        return vboNormalID;
+        return _vboNormalID;
     }
 
     public int getVBOFogCoordsID() {
-        return vboFogCoordsID;
+        return _vboFogCoordsID;
     }
 
     public int getVBOColorID() {
-        return vboColorID;
+        return _vboColorID;
     }
 
     public void setVBOVertexID(final int id) {
-        vboVertexID = id;
+        _vboVertexID = id;
     }
 
     public void setVBOTextureID(final int index, final int id) {
-        if (index >= vboTextureIDs.length) {
+        if (index >= _vboTextureIDs.length) {
             resizeTextureIds(index + 1);
         }
-        vboTextureIDs[index] = id;
+        _vboTextureIDs[index] = id;
     }
 
     public void setVBONormalID(final int id) {
-        vboNormalID = id;
+        _vboNormalID = id;
     }
 
     public void setVBOFogCoordsID(final int id) {
-        vboFogCoordsID = id;
+        _vboFogCoordsID = id;
     }
 
     public void setVBOColorID(final int id) {
-        vboColorID = id;
+        _vboColorID = id;
     }
 
     public int getVBOIndexID() {
-        return vboIndexID;
+        return _vboIndexID;
     }
 
     public void setVBOIndexID(final int id) {
-        vboIndexID = id;
+        _vboIndexID = id;
     }
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(useVBOVertex, "useVBOVertex", false);
-        capsule.write(useVBOTexture, "useVBOTexture", false);
-        capsule.write(useVBOColor, "useVBOColor", false);
-        capsule.write(useVBONormal, "useVBONormal", false);
-        capsule.write(useVBOFogCoords, "useVBOFogCoords", false);
-        capsule.write(useVBOIndex, "useVBOIndex", false);
+        capsule.write(_useVBOVertex, "useVBOVertex", false);
+        capsule.write(_useVBOTexture, "useVBOTexture", false);
+        capsule.write(_useVBOColor, "useVBOColor", false);
+        capsule.write(_useVBONormal, "useVBONormal", false);
+        capsule.write(_useVBOFogCoords, "useVBOFogCoords", false);
+        capsule.write(_useVBOIndex, "useVBOIndex", false);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        useVBOVertex = capsule.readBoolean("useVBOVertex", false);
-        useVBOTexture = capsule.readBoolean("useVBOTexture", false);
-        useVBOColor = capsule.readBoolean("useVBOColor", false);
-        useVBONormal = capsule.readBoolean("useVBONormal", false);
-        useVBOFogCoords = capsule.readBoolean("useVBOFogCoords", false);
-        useVBOIndex = capsule.readBoolean("useVBOIndex", false);
+        _useVBOVertex = capsule.readBoolean("useVBOVertex", false);
+        _useVBOTexture = capsule.readBoolean("useVBOTexture", false);
+        _useVBOColor = capsule.readBoolean("useVBOColor", false);
+        _useVBONormal = capsule.readBoolean("useVBONormal", false);
+        _useVBOFogCoords = capsule.readBoolean("useVBOFogCoords", false);
+        _useVBOIndex = capsule.readBoolean("useVBOIndex", false);
     }
 
     public Class<? extends VBOInfo> getClassTag() {

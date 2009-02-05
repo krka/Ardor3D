@@ -28,13 +28,13 @@ import com.ardor3d.util.stat.StatType;
  */
 public abstract class AbstractStatGrapher implements StatListener {
 
-    protected TextureRenderer texRenderer;
-    protected Texture2D tex;
-    protected int gWidth, gHeight;
+    protected TextureRenderer _textureRenderer;
+    protected Texture2D _texture;
+    protected int _gWidth, _gHeight;
 
-    protected TreeMap<StatType, HashMap<String, Object>> config = new TreeMap<StatType, HashMap<String, Object>>();
+    protected TreeMap<StatType, HashMap<String, Object>> _config = new TreeMap<StatType, HashMap<String, Object>>();
 
-    protected boolean enabled = true;
+    protected boolean _enabled = true;
 
     /**
      * Must be constructed in the GL thread.
@@ -43,59 +43,59 @@ public abstract class AbstractStatGrapher implements StatListener {
      */
     public AbstractStatGrapher(final int width, final int height, final Renderer renderer,
             final ContextCapabilities caps) {
-        gWidth = width;
-        gHeight = height;
+        _gWidth = width;
+        _gHeight = height;
         // prepare our TextureRenderer
         final DisplaySettings settings = new DisplaySettings(width, height, 0, 0, 0, 8, 0, 0, false, false);
-        texRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer, caps,
+        _textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer, caps,
                 TextureRenderer.Target.Texture2D);
 
-        if (texRenderer != null) {
-            texRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));
+        if (_textureRenderer != null) {
+            _textureRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));
         }
     }
 
     // - set a texture for offscreen rendering
     public void setTexture(final Texture2D tex) {
-        texRenderer.setupTexture(tex);
-        this.tex = tex;
+        _textureRenderer.setupTexture(tex);
+        _texture = tex;
     }
 
-    public TextureRenderer getTexRenderer() {
-        return texRenderer;
+    public TextureRenderer getTextureRenderer() {
+        return _textureRenderer;
     }
 
     public void clearConfig() {
-        config.clear();
+        _config.clear();
     }
 
     public void clearConfig(final StatType type) {
-        if (config.get(type) != null) {
-            config.get(type).clear();
+        if (_config.get(type) != null) {
+            _config.get(type).clear();
         }
     }
 
     public void clearConfig(final StatType type, final String key) {
-        if (config.get(type) != null) {
-            config.get(type).remove(key);
+        if (_config.get(type) != null) {
+            _config.get(type).remove(key);
         }
     }
 
     public void addConfig(final StatType type, final HashMap<String, Object> configs) {
-        config.put(type, configs);
+        _config.put(type, configs);
     }
 
     public void addConfig(final StatType type, final String key, final Object value) {
-        HashMap<String, Object> vals = config.get(type);
+        HashMap<String, Object> vals = _config.get(type);
         if (vals == null) {
             vals = new HashMap<String, Object>();
-            config.put(type, vals);
+            _config.put(type, vals);
         }
         vals.put(key, value);
     }
 
     protected ColorRGBA getColorConfig(final StatType type, final String configName, final ColorRGBA defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof ColorRGBA) {
@@ -106,7 +106,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected String getStringConfig(final StatType type, final String configName, final String defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof String) {
@@ -117,7 +117,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected short getShortConfig(final StatType type, final String configName, final short defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Number) {
@@ -128,7 +128,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected int getIntConfig(final StatType type, final String configName, final int defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Number) {
@@ -139,7 +139,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected long getLongConfig(final StatType type, final String configName, final long defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Number) {
@@ -150,7 +150,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected float getFloatConfig(final StatType type, final String configName, final float defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Number) {
@@ -161,7 +161,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected double getDoubleConfig(final StatType type, final String configName, final double defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Number) {
@@ -172,7 +172,7 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     protected boolean getBooleanConfig(final StatType type, final String configName, final boolean defaultVal) {
-        final HashMap<String, Object> vals = config.get(type);
+        final HashMap<String, Object> vals = _config.get(type);
         if (vals != null && vals.containsKey(configName)) {
             final Object val = vals.get(configName);
             if (val instanceof Boolean) {
@@ -183,15 +183,15 @@ public abstract class AbstractStatGrapher implements StatListener {
     }
 
     public boolean hasConfig(final StatType type) {
-        return config.containsKey(type) && !config.get(type).isEmpty();
+        return _config.containsKey(type) && !_config.get(type).isEmpty();
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return _enabled;
     }
 
     public void setEnabled(final boolean enabled) {
-        this.enabled = enabled;
+        _enabled = enabled;
     }
 
     /**

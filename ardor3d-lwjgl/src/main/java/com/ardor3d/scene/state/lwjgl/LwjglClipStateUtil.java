@@ -19,7 +19,7 @@ import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ClipStateRecord;
 
-public class LwjglClipStateUtil {
+public abstract class LwjglClipStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final ClipState state) {
         // ask for the current state record

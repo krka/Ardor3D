@@ -11,27 +11,27 @@
 package com.ardor3d.util.export.binary;
 
 public class BinaryIdContentPair {
-    private int id;
-    private BinaryOutputCapsule content;
+    private int _id;
+    private BinaryOutputCapsule _content;
 
     public BinaryIdContentPair(final int id, final BinaryOutputCapsule content) {
-        this.id = id;
-        this.content = content;
+        _id = id;
+        _content = content;
     }
 
     public BinaryOutputCapsule getContent() {
-        return content;
+        return _content;
     }
 
     public void setContent(final BinaryOutputCapsule content) {
-        this.content = content;
+        _content = content;
     }
 
     public int getId() {
-        return id;
+        return _id;
     }
 
     public void setId(final int id) {
-        this.id = id;
+        _id = id;
     }
 }

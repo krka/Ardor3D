@@ -29,7 +29,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LightRecord;
 import com.ardor3d.renderer.state.record.LightStateRecord;
 
-public class LwjglLightStateUtil {
+public abstract class LwjglLightStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final LightState state) {
         final RenderContext context = ContextManager.getCurrentContext();

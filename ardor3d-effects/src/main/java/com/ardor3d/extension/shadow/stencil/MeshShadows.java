@@ -36,36 +36,36 @@ public class MeshShadows {
     private static final long serialVersionUID = 1L;
 
     /** the distance to which shadow volumes will be projected */
-    protected float projectionLength = 1000;
+    protected float _projectionLength = 1000;
 
     /** The triangles of our occluding mesh (one per triangle in the mesh) */
-    protected List<ShadowTriangle> faces;
+    protected List<ShadowTriangle> _faces;
 
     /** A bitset used for storing directional flags. */
-    protected BitSet facing;
+    protected BitSet _facing;
 
     /** The mesh that is the target of this shadow volume */
-    protected Mesh target = null;
+    protected Mesh _target = null;
 
     /** The arraylist of shadowvolumes in this grouping */
-    protected List<ShadowVolume> volumes = new ArrayList<ShadowVolume>();
+    protected List<ShadowVolume> _volumes = new ArrayList<ShadowVolume>();
 
     /** The world rotation of the target at the last mesh construction */
-    protected Matrix3 oldWorldRotation = new Matrix3();
+    protected Matrix3 _oldWorldRotation = new Matrix3();
 
     /** The world translation of the trimesh at the last mesh construction */
-    protected Vector3 oldWorldTranslation = new Vector3();
+    protected Vector3 _oldWorldTranslation = new Vector3();
 
     /** The world scale of the trimesh at the last mesh construction */
-    protected Vector3 oldWorldScale = new Vector3();
+    protected Vector3 _oldWorldScale = new Vector3();
 
-    private int maxIndex;
+    private int _maxIndex;
 
-    private int vertCount;
+    private int _vertCount;
 
-    public static long throttle = 1000 / 50; // 50 x a sec
-    private long lastTime;
-    private boolean nextTime = true;
+    public static long _throttle = 1000 / 50; // 50 x a sec
+    private long _lastTime;
+    private boolean _nextTime = true;
 
     /**
      * Constructor for <code>MeshShadows</code>
@@ -74,7 +74,7 @@ public class MeshShadows {
      *            the mesh that will be the target of the shadow volumes held in this grouping
      */
     public MeshShadows(final Mesh target) {
-        this.target = target;
+        _target = target;
         recreateFaces();
     }
 
@@ -90,7 +90,8 @@ public class MeshShadows {
      * @param factory
      */
     public void createGeometry(final LightState lightState) {
-        if (target.getMeshData().getPrimitiveCount(0) != maxIndex || target.getMeshData().getVertexCount() != vertCount) {
+        if (_target.getMeshData().getPrimitiveCount(0) != _maxIndex
+                || _target.getMeshData().getVertexCount() != _vertCount) {
             recreateFaces();
         }
 
@@ -123,7 +124,7 @@ public class MeshShadows {
                 if (lv == null) {
                     // Create a new light volume
                     lv = new ShadowVolume(light);
-                    volumes.add(lv);
+                    _volumes.add(lv);
                     lv.setUpdate(true);
                 }
 
@@ -131,7 +132,7 @@ public class MeshShadows {
                 if (lv.isUpdate()) {
                     lv.setUpdate(false);
 
-                    if (!target.isCastsShadows()) {
+                    if (!_target.isCastsShadows()) {
                         lv.setCullHint(Spatial.CullHint.Always);
                         continue;
                     }
@@ -143,12 +144,12 @@ public class MeshShadows {
                     // coordinates if
                     // we are going to do any work
                     if (vertex == null) {
-                        vertex = target.getWorldVectors(null);
+                        vertex = _target.getWorldVectors(null);
                     }
 
                     // Find out which triangles are facing the light
                     // triangle will be set true for faces towards the light
-                    processFaces(vertex, light, target);
+                    processFaces(vertex, light, _target);
 
                     // Get the edges that are in shadow
                     final ShadowEdge[] edges = getShadowEdges();
@@ -192,7 +193,7 @@ public class MeshShadows {
 
         } else {
             // There are no volumes
-            volumes.clear();
+            _volumes.clear();
         }
 
     }
@@ -239,11 +240,11 @@ public class MeshShadows {
                 p0.subtract(location, direction).normalizeLocal();
             }
             // Project the other edges to infinity
-            p1 = direction.multiply(projectionLength, p1).addLocal(p0);
+            p1 = direction.multiply(_projectionLength, p1).addLocal(p0);
             if (!directional) {
                 p3.subtract(location, direction).normalizeLocal();
             }
-            p2 = direction.multiply(projectionLength, p2).addLocal(p3);
+            p2 = direction.multiply(_projectionLength, p2).addLocal(p3);
 
             // Now we need to add a quad to the model
             final int vertexOffset = e * 4;
@@ -298,10 +299,10 @@ public class MeshShadows {
         // Create a dynamic structure to contain the vertices
         final List<ShadowEdge> shadowEdges = new ArrayList<ShadowEdge>();
         // Now work through the faces
-        for (int t = 0; t < maxIndex; t++) {
+        for (int t = 0; t < _maxIndex; t++) {
             // Check whether this is a front facing triangle
-            if (facing.get(t)) {
-                final ShadowTriangle tri = faces.get(t);
+            if (_facing.get(t)) {
+                final ShadowTriangle tri = _faces.get(t);
                 // If it is then check if any of the edges are connected to a
                 // back facing triangle or are unconnected
                 checkAndAdd(tri.edge1, shadowEdges);
@@ -320,7 +321,7 @@ public class MeshShadows {
 
         }
         // check if the connected triangle is back facing
-        else if (!facing.get(edge.triangle)) {
+        else if (!_facing.get(edge.triangle)) {
             // if it is then add the edge
             shadowEdges.add(edge);
 
@@ -371,7 +372,7 @@ public class MeshShadows {
                 compVect.subtract(vLight, vLight).normalizeLocal();
             }
             // See if it is back facing
-            facing.set(tri, (n.dot(vLight) >= 0));
+            _facing.set(tri, (n.dot(vLight) >= 0));
         }
 
         Vector3.releaseTempInstance(v0);
@@ -392,41 +393,41 @@ public class MeshShadows {
         boolean voidLights = false;
         boolean same = true;
 
-        final float passTime = System.currentTimeMillis() - lastTime;
+        final float passTime = System.currentTimeMillis() - _lastTime;
 
-        final ReadOnlyVector3 worldTranslation = target.getWorldTranslation();
-        final ReadOnlyVector3 worldScale = target.getWorldScale();
-        final ReadOnlyMatrix3 worldRotation = target.getWorldRotation();
+        final ReadOnlyVector3 worldTranslation = _target.getWorldTranslation();
+        final ReadOnlyVector3 worldScale = _target.getWorldScale();
+        final ReadOnlyMatrix3 worldRotation = _target.getWorldRotation();
 
-        if (nextTime) {
-            if (passTime > throttle) {
+        if (_nextTime) {
+            if (passTime > _throttle) {
                 voidLights = true;
-                nextTime = false;
+                _nextTime = false;
             }
         } else {
             // First see if we need to void all volumes as the target has
             // changed
-            if (!worldRotation.equals(oldWorldRotation)) {
+            if (!worldRotation.equals(_oldWorldRotation)) {
                 voidLights = true;
-            } else if (!worldScale.equals(oldWorldScale)) {
+            } else if (!worldScale.equals(_oldWorldScale)) {
                 voidLights = true;
-            } else if (!worldTranslation.equals(oldWorldTranslation)) {
+            } else if (!worldTranslation.equals(_oldWorldTranslation)) {
                 voidLights = true;
             }
         }
         // Configure the current settings
-        oldWorldRotation.set(worldRotation);
-        oldWorldScale.set(worldScale);
-        oldWorldTranslation.set(worldTranslation);
+        _oldWorldRotation.set(worldRotation);
+        _oldWorldScale.set(worldScale);
+        _oldWorldTranslation.set(worldTranslation);
 
         // See if we need to update all of the volumes
         if (voidLights) {
-            for (int v = 0, vSize = volumes.size(); v < vSize; v++) {
-                final ShadowVolume sv = volumes.get(v);
+            for (int v = 0, vSize = _volumes.size(); v < vSize; v++) {
+                final ShadowVolume sv = _volumes.get(v);
                 sv.setUpdate(true);
             }
-            lastTime = System.currentTimeMillis();
-            nextTime = false;
+            _lastTime = System.currentTimeMillis();
+            _nextTime = false;
             return false;
         }
 
@@ -441,7 +442,7 @@ public class MeshShadows {
                 if (testLight.getType() == Light.Type.Directional) {
                     final DirectionalLight dl = (DirectionalLight) testLight;
                     final ReadOnlyVector3 direction = dl.getDirection();
-                    if (!v.direction.equals(direction)) {
+                    if (!v._direction.equals(direction)) {
                         v.setUpdate(true);
                         v.setDirection(direction);
                         same = false;
@@ -449,7 +450,7 @@ public class MeshShadows {
                 } else if (testLight.getType() == Light.Type.Point) {
                     final PointLight pl = (PointLight) testLight;
                     final ReadOnlyVector3 loc = pl.getLocation();
-                    if (!v.position.equals(loc)) {
+                    if (!v._position.equals(loc)) {
                         v.setUpdate(true);
                         v.setPosition(loc);
                         same = false;
@@ -472,7 +473,7 @@ public class MeshShadows {
 
         index.rewind();
 
-        for (int t = 0; t < maxIndex; t++) {
+        for (int t = 0; t < _maxIndex; t++) {
             if (t != face) {
                 final int offset = t * 3;
                 final int t0 = index.get(offset), t1 = index.get(offset + 1), t2 = index.get(offset + 2);
@@ -493,27 +494,27 @@ public class MeshShadows {
      */
     public void recreateFaces() {
         // make a copy of the original indices
-        maxIndex = 0;
-        facing = new BitSet();
-        final IntBuffer index = BufferUtils.clone(target.getMeshData().getIndexBuffer());
+        _maxIndex = 0;
+        _facing = new BitSet();
+        final IntBuffer index = BufferUtils.clone(_target.getMeshData().getIndexBuffer());
         if (index == null) {
             return;
         }
         index.clear();
 
         // Create a ShadowTriangle object for each face
-        faces = new ArrayList<ShadowTriangle>();
+        _faces = new ArrayList<ShadowTriangle>();
 
-        maxIndex = index.capacity() / 3;
-        vertCount = target.getMeshData().getVertexCount();
+        _maxIndex = index.capacity() / 3;
+        _vertCount = _target.getMeshData().getVertexCount();
 
         // Create a bitset for holding direction flags
-        facing = new BitSet(maxIndex);
+        _facing = new BitSet(_maxIndex);
 
         // Loop through all of the triangles
-        for (int t = 0; t < maxIndex; t++) {
+        for (int t = 0; t < _maxIndex; t++) {
             final ShadowTriangle tri = new ShadowTriangle();
-            faces.add(tri);
+            _faces.add(tri);
             final int offset = t * 3;
             final int t0 = index.get(offset), t1 = index.get(offset + 1), t2 = index.get(offset + 2);
             edgeConnected(t, index, t0, t1, tri.edge1);
@@ -530,9 +531,9 @@ public class MeshShadows {
      * @return a shadow volume for the light or null if one does not exist
      */
     public ShadowVolume getShadowVolume(final Light light) {
-        for (int v = 0, vSize = volumes.size(); v < vSize; v++) {
-            final ShadowVolume vol = volumes.get(v);
-            if (vol.light.equals(light)) {
+        for (int v = 0, vSize = _volumes.size(); v < vSize; v++) {
+            final ShadowVolume vol = _volumes.get(v);
+            if (vol._light.equals(light)) {
                 return vol;
             }
         }
@@ -543,7 +544,7 @@ public class MeshShadows {
      * @return Returns the projectionLength.
      */
     public float getProjectionLength() {
-        return projectionLength;
+        return _projectionLength;
     }
 
     /**
@@ -551,10 +552,10 @@ public class MeshShadows {
      *            The projectionLength to set.
      */
     public void setProjectionLength(final float projectionLength) {
-        this.projectionLength = projectionLength;
+        _projectionLength = projectionLength;
         // force update of volumes
-        for (int v = 0, vSize = volumes.size(); v < vSize; v++) {
-            volumes.get(v).setUpdate(true);
+        for (int v = 0, vSize = _volumes.size(); v < vSize; v++) {
+            _volumes.get(v).setUpdate(true);
         }
     }
 
@@ -562,7 +563,7 @@ public class MeshShadows {
      * @return Returns the volumes.
      */
     public List<ShadowVolume> getVolumes() {
-        return volumes;
+        return _volumes;
     }
 
 }

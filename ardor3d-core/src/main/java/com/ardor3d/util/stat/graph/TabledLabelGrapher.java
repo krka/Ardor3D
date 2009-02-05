@@ -39,34 +39,34 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
 
     public static final int DEFAULT_DECIMALS = 2;
 
-    protected Node graphRoot = new Node("root");
-    protected int eventCount = 0;
-    protected int threshold = 1;
-    protected int columns = 1;
+    protected Node _graphRoot = new Node("root");
+    protected int _eventCount = 0;
+    protected int _threshold = 1;
+    protected int _columns = 1;
 
-    protected Quad bgQuad = new Quad("bgQuad", 1, 1);
+    protected Quad _bgQuad = new Quad("bgQuad", 1, 1);
 
-    protected BlendState defBlendState = null;
+    protected BlendState _defBlendState = null;
 
-    private final HashMap<StatType, LabelEntry> entries = new HashMap<StatType, LabelEntry>();
+    private final HashMap<StatType, LabelEntry> _entries = new HashMap<StatType, LabelEntry>();
 
-    private boolean minimalBackground;
+    private boolean _minimalBackground;
 
-    private AbstractStatGrapher linkedGraph;
+    private AbstractStatGrapher _linkedGraph;
 
     public TabledLabelGrapher(final int width, final int height, final Renderer renderer, final ContextCapabilities caps) {
         super(width, height, renderer, caps);
 
-        defBlendState = new BlendState();
-        defBlendState.setEnabled(true);
-        defBlendState.setBlendEnabled(true);
-        defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        graphRoot.setRenderState(defBlendState);
+        _defBlendState = new BlendState();
+        _defBlendState.setEnabled(true);
+        _defBlendState.setBlendEnabled(true);
+        _defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        _graphRoot.setRenderState(_defBlendState);
 
-        bgQuad.setRenderBucketType(RenderBucketType.Ortho);
-        bgQuad.setDefaultColor(new ColorRGBA(ColorRGBA.BLACK));
-        graphRoot.setCullHint(CullHint.Never);
+        _bgQuad.setRenderBucketType(RenderBucketType.Ortho);
+        _bgQuad.setDefaultColor(new ColorRGBA(ColorRGBA.BLACK));
+        _graphRoot.setCullHint(CullHint.Never);
     }
 
     public void statsUpdated() {
@@ -78,16 +78,16 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
         StatCollector.pause();
 
         // some basic stats:
-        final int texWidth = gWidth;
-        final int texHeight = gHeight;
+        final int texWidth = _gWidth;
+        final int texHeight = _gHeight;
 
         // On stat event:
         // - check if enough events have been triggered to cause an update.
-        eventCount++;
-        if (eventCount < threshold) {
+        _eventCount++;
+        if (_eventCount < _threshold) {
             return;
         } else {
-            eventCount = 0;
+            _eventCount = 0;
         }
 
         int col = 0;
@@ -95,16 +95,16 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
         final float colSize = texWidth / (float) getColumns();
 
         // clear visitations
-        for (final StatType type : entries.keySet()) {
-            entries.get(type).visited = false;
+        for (final StatType type : _entries.keySet()) {
+            _entries.get(type).visited = false;
         }
 
         // - We only care about the most recent stats
         synchronized (StatCollector.getHistorical()) {
             final MultiStatSample sample = StatCollector.getHistorical().get(StatCollector.getHistorical().size() - 1);
             // - go through things we are configured for
-            for (final StatType type : config.keySet()) {
-                StatValue val = sample.values.get(type);
+            for (final StatType type : _config.keySet()) {
+                StatValue val = sample._values.get(type);
                 if (val == null) {
                     if (!StatCollector.hasHistoricalStat(type)) {
                         continue;
@@ -113,18 +113,18 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                     }
                 }
 
-                LabelEntry entry = entries.get(type);
+                LabelEntry entry = _entries.get(type);
                 // Prepare our entry object as needed.
                 if (entry == null) {
                     entry = new LabelEntry(type);
-                    entries.put(type, entry);
-                    graphRoot.attachChild(entry.text);
+                    _entries.put(type, entry);
+                    _graphRoot.attachChild(entry.text);
                 }
                 entry.visited = true;
 
                 // Update text value
-                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val.average
-                        : val.val;
+                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val._average
+                        : val._val;
                 entry.text.print(getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()) + " "
                         + stripVal(value, type));
 
@@ -136,7 +136,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 // the corresponding color from a linked line grapher, or if
                 // none, use white.
                 entry.text.setTextColor(getColorConfig(type, ConfigKeys.TextColor.name(),
-                        linkedGraph != null ? linkedGraph.getColorConfig(type, LineGrapher.ConfigKeys.Color.name(),
+                        _linkedGraph != null ? _linkedGraph.getColorConfig(type, LineGrapher.ConfigKeys.Color.name(),
                                 new ColorRGBA(ColorRGBA.WHITE)) : new ColorRGBA(ColorRGBA.WHITE)));
 
                 // Update text placement.
@@ -147,11 +147,11 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 entry.text.setTranslation(colSize * col, lastY - labelHeight, 0);
 
                 // Update line key as needed
-                if (linkedGraph != null && linkedGraph.hasConfig(type) && linkedGraph instanceof TableLinkable) {
+                if (_linkedGraph != null && _linkedGraph.hasConfig(type) && _linkedGraph instanceof TableLinkable) {
                     // add line keys
-                    entry.lineKey = ((TableLinkable) linkedGraph).updateLineKey(type, entry.lineKey);
-                    if (entry.lineKey.getParent() != graphRoot) {
-                        graphRoot.attachChild(entry.lineKey);
+                    entry.lineKey = ((TableLinkable) _linkedGraph).updateLineKey(type, entry.lineKey);
+                    if (entry.lineKey.getParent() != _graphRoot) {
+                        _graphRoot.attachChild(entry.lineKey);
                     }
                     final ReadOnlyVector3 tLoc = entry.text.getTranslation();
                     entry.lineKey.setTranslation((float) (tLoc.getX() + entry.text.getWidth() + 15), (float) (tLoc
@@ -167,8 +167,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 }
             }
 
-            for (final Iterator<StatType> i = entries.keySet().iterator(); i.hasNext();) {
-                final LabelEntry entry = entries.get(i.next());
+            for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
+                final LabelEntry entry = _entries.get(i.next());
                 // - Go through the entries list and remove any that were not
                 // visited.
                 if (!entry.visited) {
@@ -179,33 +179,33 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
             }
         }
 
-        graphRoot.updateGeometricState(0, true);
+        _graphRoot.updateGeometricState(0, true);
 
-        final ColorRGBA bgColor = ColorRGBA.fetchTempInstance().set(texRenderer.getBackgroundColor());
-        if (minimalBackground) {
+        final ColorRGBA bgColor = ColorRGBA.fetchTempInstance().set(_textureRenderer.getBackgroundColor());
+        if (_minimalBackground) {
             bgColor.setAlpha(0);
-            texRenderer.setBackgroundColor(bgColor);
+            _textureRenderer.setBackgroundColor(bgColor);
 
             lastY -= 3;
             if (col != 0) {
                 lastY -= maxY;
             }
-            bgQuad.resize(texWidth, texHeight - lastY);
-            bgQuad.setRenderState(defBlendState);
-            bgQuad.setTranslation(texWidth / 2f, texHeight - (texHeight - lastY) / 2f, 0);
-            bgQuad.updateGeometricState(0, true);
+            _bgQuad.resize(texWidth, texHeight - lastY);
+            _bgQuad.setRenderState(_defBlendState);
+            _bgQuad.setTranslation(texWidth / 2f, texHeight - (texHeight - lastY) / 2f, 0);
+            _bgQuad.updateGeometricState(0, true);
 
             // - Draw our bg quad
-            texRenderer.render(bgQuad, tex);
+            _textureRenderer.render(_bgQuad, _texture);
 
             // - Now, draw to texture via a TextureRenderer
-            texRenderer.render(graphRoot, tex, false);
+            _textureRenderer.render(_graphRoot, _texture, false);
         } else {
             bgColor.setAlpha(1);
-            texRenderer.setBackgroundColor(bgColor);
+            _textureRenderer.setBackgroundColor(bgColor);
 
             // - Now, draw to texture via a TextureRenderer
-            texRenderer.render(graphRoot, tex);
+            _textureRenderer.render(_graphRoot, _texture);
         }
         ColorRGBA.releaseTempInstance(bgColor);
 
@@ -243,34 +243,34 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
     }
 
     public int getThreshold() {
-        return threshold;
+        return _threshold;
     }
 
     public void setThreshold(final int threshold) {
-        this.threshold = threshold;
+        _threshold = threshold;
     }
 
     public int getColumns() {
-        return columns;
+        return _columns;
     }
 
     public void setColumns(final int columns) {
         if (columns < 1) {
             throw new IllegalArgumentException("columns must be >= 1 (" + columns + ")");
         }
-        this.columns = columns;
+        _columns = columns;
     }
 
     public boolean isMinimalBackground() {
-        return minimalBackground;
+        return _minimalBackground;
     }
 
     public void setMinimalBackground(final boolean minimalBackground) {
-        this.minimalBackground = minimalBackground;
+        _minimalBackground = minimalBackground;
     }
 
     public void linkTo(final AbstractStatGrapher grapher) {
-        linkedGraph = grapher;
+        _linkedGraph = grapher;
     }
 
     class LabelEntry {
@@ -289,8 +289,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
     @Override
     public void reset() {
         synchronized (StatCollector.getHistorical()) {
-            for (final Iterator<StatType> i = entries.keySet().iterator(); i.hasNext();) {
-                final LabelEntry entry = entries.get(i.next());
+            for (final Iterator<StatType> i = _entries.keySet().iterator(); i.hasNext();) {
+                final LabelEntry entry = _entries.get(i.next());
                 entry.text.removeFromParent();
                 entry.lineKey.removeFromParent();
                 i.remove();

@@ -24,7 +24,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * <code>ColorMipMapGenerator</code>
  * 
  */
-public class ColorMipMapGenerator {
+public abstract class ColorMipMapGenerator {
 
     /**
      * Generates an ardor3d Image object containing a mipmapped Image. Each mipmap is a solid color. The first X mipmap

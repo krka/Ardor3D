@@ -36,18 +36,18 @@ public class BinaryImporter implements Ardor3DImporter {
     // TODO: Provide better cleanup and reuse of this class -- Good for now.
 
     // Key - alias, object - bco
-    protected HashMap<String, BinaryClassObject> classes;
+    protected HashMap<String, BinaryClassObject> _classes;
     // Key - id, object - the savable
-    protected HashMap<Integer, Savable> contentTable;
+    protected HashMap<Integer, Savable> _contentTable;
     // Key - savable, object - capsule
-    protected IdentityHashMap<Savable, BinaryInputCapsule> capsuleTable;
+    protected IdentityHashMap<Savable, BinaryInputCapsule> _capsuleTable;
     // Key - id, opject - location in the file
-    protected HashMap<Integer, Integer> locationTable;
+    protected HashMap<Integer, Integer> _locationTable;
 
-    public static boolean debug = false;
+    public static boolean _debug = false;
 
-    protected byte[] dataArray;
-    protected int aliasWidth;
+    protected byte[] _dataArray;
+    protected int _aliasWidth;
 
     public BinaryImporter() {}
 
@@ -65,27 +65,27 @@ public class BinaryImporter implements Ardor3DImporter {
 
     public Savable load(final InputStream is, final ReadListener listener, final ByteArrayOutputStream reuseableStream)
             throws IOException {
-        contentTable = new HashMap<Integer, Savable>();
+        _contentTable = new HashMap<Integer, Savable>();
         final GZIPInputStream zis = new GZIPInputStream(is);
         BufferedInputStream bis = new BufferedInputStream(zis);
         final int numClasses = ByteUtils.readInt(bis);
         int bytes = 4;
-        aliasWidth = ((int) MathUtils.log(numClasses, 256) + 1);
-        classes = new HashMap<String, BinaryClassObject>(numClasses);
+        _aliasWidth = ((int) MathUtils.log(numClasses, 256) + 1);
+        _classes = new HashMap<String, BinaryClassObject>(numClasses);
         for (int i = 0; i < numClasses; i++) {
-            final String alias = readString(bis, aliasWidth);
+            final String alias = readString(bis, _aliasWidth);
 
             final int classLength = ByteUtils.readInt(bis);
             final String className = readString(bis, classLength);
             final BinaryClassObject bco = new BinaryClassObject();
-            bco.alias = alias.getBytes();
-            bco.className = className;
+            bco._alias = alias.getBytes();
+            bco._className = className;
 
             final int fields = ByteUtils.readInt(bis);
-            bytes += (8 + aliasWidth + classLength);
+            bytes += (8 + _aliasWidth + classLength);
 
-            bco.nameFields = new HashMap<String, BinaryClassField>(fields);
-            bco.aliasFields = new HashMap<Byte, BinaryClassField>(fields);
+            bco._nameFields = new HashMap<String, BinaryClassField>(fields);
+            bco._aliasFields = new HashMap<Byte, BinaryClassField>(fields);
             for (int x = 0; x < fields; x++) {
                 final byte fieldAlias = (byte) bis.read();
                 final byte fieldType = (byte) bis.read();
@@ -93,11 +93,11 @@ public class BinaryImporter implements Ardor3DImporter {
                 final int fieldNameLength = ByteUtils.readInt(bis);
                 final String fieldName = readString(bis, fieldNameLength);
                 final BinaryClassField bcf = new BinaryClassField(fieldName, fieldAlias, fieldType);
-                bco.nameFields.put(fieldName, bcf);
-                bco.aliasFields.put(fieldAlias, bcf);
+                bco._nameFields.put(fieldName, bcf);
+                bco._aliasFields.put(fieldAlias, bcf);
                 bytes += (6 + fieldNameLength);
             }
-            classes.put(alias, bco);
+            _classes.put(alias, bco);
         }
         if (listener != null) {
             listener.readBytes(bytes);
@@ -106,12 +106,12 @@ public class BinaryImporter implements Ardor3DImporter {
         final int numLocs = ByteUtils.readInt(bis);
         bytes = 4;
 
-        capsuleTable = new IdentityHashMap<Savable, BinaryInputCapsule>(numLocs);
-        locationTable = new HashMap<Integer, Integer>(numLocs);
+        _capsuleTable = new IdentityHashMap<Savable, BinaryInputCapsule>(numLocs);
+        _locationTable = new HashMap<Integer, Integer>(numLocs);
         for (int i = 0; i < numLocs; i++) {
             final int id = ByteUtils.readInt(bis);
             final int loc = ByteUtils.readInt(bis);
-            locationTable.put(id, loc);
+            _locationTable.put(id, loc);
             bytes += 8;
         }
 
@@ -139,17 +139,17 @@ public class BinaryImporter implements Ardor3DImporter {
         }
         bis = null;
 
-        dataArray = baos.toByteArray();
+        _dataArray = baos.toByteArray();
         baos = null;
 
         final Savable rVal = readObject(id);
-        if (debug) {
+        if (_debug) {
             logger.info("Importer Stats: ");
             logger.info("Tags: " + numClasses);
             logger.info("Objects: " + numLocs);
-            logger.info("Data Size: " + dataArray.length);
+            logger.info("Data Size: " + _dataArray.length);
         }
-        dataArray = null;
+        _dataArray = null;
         return rVal;
     }
 
@@ -183,7 +183,7 @@ public class BinaryImporter implements Ardor3DImporter {
     }
 
     public BinaryInputCapsule getCapsule(final Savable id) {
-        return capsuleTable.get(id);
+        return _capsuleTable.get(id);
     }
 
     protected String readString(final InputStream f, final int length) throws IOException {
@@ -198,7 +198,7 @@ public class BinaryImporter implements Ardor3DImporter {
     protected String readString(final int length, final int offset) throws IOException {
         final byte[] data = new byte[length];
         for (int j = 0; j < length; j++) {
-            data[j] = dataArray[j + offset];
+            data[j] = _dataArray[j + offset];
         }
 
         return new String(data);
@@ -206,17 +206,17 @@ public class BinaryImporter implements Ardor3DImporter {
 
     public Savable readObject(final int id) {
 
-        if (contentTable.get(id) != null) {
-            return contentTable.get(id);
+        if (_contentTable.get(id) != null) {
+            return _contentTable.get(id);
         }
 
         try {
-            int loc = locationTable.get(id);
+            int loc = _locationTable.get(id);
 
-            final String alias = readString(aliasWidth, loc);
-            loc += aliasWidth;
+            final String alias = readString(_aliasWidth, loc);
+            loc += _aliasWidth;
 
-            final BinaryClassObject bco = classes.get(alias);
+            final BinaryClassObject bco = _classes.get(alias);
 
             if (bco == null) {
                 logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "NULL class object: "
@@ -224,20 +224,20 @@ public class BinaryImporter implements Ardor3DImporter {
                 return null;
             }
 
-            final int dataLength = ByteUtils.convertIntFromBytes(dataArray, loc);
+            final int dataLength = ByteUtils.convertIntFromBytes(_dataArray, loc);
             loc += 4;
 
             final BinaryInputCapsule cap = new BinaryInputCapsule(this, bco);
-            cap.setContent(dataArray, loc, loc + dataLength);
+            cap.setContent(_dataArray, loc, loc + dataLength);
 
-            final Savable out = BinaryClassLoader.fromName(bco.className, cap);
+            final Savable out = BinaryClassLoader.fromName(bco._className, cap);
 
-            capsuleTable.put(out, cap);
-            contentTable.put(id, out);
+            _capsuleTable.put(out, cap);
+            _contentTable.put(id, out);
 
             out.read(this);
 
-            capsuleTable.remove(out);
+            _capsuleTable.remove(out);
 
             return out;
 

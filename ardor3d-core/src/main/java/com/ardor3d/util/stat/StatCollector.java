@@ -27,7 +27,7 @@ import com.ardor3d.util.Timer;
  * This class acts as a centralized data store for statistics. As data is added to the collector, a sum total is kept as
  * well as the total number of data samples given for the particular stat.
  */
-public class StatCollector {
+public abstract class StatCollector {
     private static final Logger logger = Logger.getLogger(StatCollector.class.getName());
 
     private static final double TO_MS = 1.0 / 1000000;
@@ -71,8 +71,6 @@ public class StatCollector {
 
     private static long pausedStartTime;
 
-    protected StatCollector() {}
-
     /**
      * Construct a new StatCollector.
      * 
@@ -95,8 +93,8 @@ public class StatCollector {
                 val = new StatValue(0, 0);
                 current.put(type, val);
             }
-            val.val += statValue;
-            val.iterations++;
+            val._val += statValue;
+            val._iterations++;
         }
     }
 
@@ -112,14 +110,14 @@ public class StatCollector {
             if (top != null) {
                 // tally timer and include in stats.
                 final StatValue val = current.get(top);
-                val.val += (timeMS - lastTimeCheckMS);
+                val._val += (timeMS - lastTimeCheckMS);
             } else {
                 StatValue val = current.get(StatType.STAT_UNSPECIFIED_TIMER);
                 if (val == null) {
                     val = new StatValue(0, 1);
                     current.put(StatType.STAT_UNSPECIFIED_TIMER, val);
                 }
-                val.val += (timeMS - lastTimeCheckMS);
+                val._val += (timeMS - lastTimeCheckMS);
             }
 
             lastTimeCheckMS = timeMS;
@@ -131,7 +129,7 @@ public class StatCollector {
                     val = new StatValue(0, 0);
                     current.put(type, val);
                 }
-                val.iterations++;
+                val._iterations++;
             }
         }
     }
@@ -149,7 +147,7 @@ public class StatCollector {
 
             // tally timer and include in stats.
             final StatValue val = current.get(top);
-            val.val += (timeMS - lastTimeCheckMS);
+            val._val += (timeMS - lastTimeCheckMS);
 
             lastTimeCheckMS = timeMS;
 
@@ -175,42 +173,42 @@ public class StatCollector {
             if (!timeStatStack.isEmpty()) {
                 // tally timer and include in stats.
                 final StatValue val = current.get(timeStatStack.peek());
-                val.val += (timeMS - lastTimeCheckMS);
+                val._val += (timeMS - lastTimeCheckMS);
                 lastTimeCheckMS = timeMS;
                 // reset iterations of all stack to 0
                 for (int x = timeStatStack.size(); --x >= 0;) {
                     final StatValue val2 = current.get(timeStatStack.get(x));
                     if (val2 != null) {
-                        val2.iterations = 0;
+                        val2._iterations = 0;
                     }
                 }
 
                 // current iterations is 1 (for the current call.)
-                val.iterations = 1;
+                val._iterations = 1;
             } else {
                 final StatValue val = current.get(StatType.STAT_UNSPECIFIED_TIMER);
                 if (val != null) {
-                    val.val += (timeMS - lastTimeCheckMS);
+                    val._val += (timeMS - lastTimeCheckMS);
                     lastTimeCheckMS = timeMS;
-                    val.iterations = 1;
+                    val._iterations = 1;
                 }
             }
 
             final StatValue val = current.get(StatType.STAT_UNSPECIFIED_TIMER);
             if (val != null) {
-                val.val -= (pausedTime * TO_MS);
+                val._val -= (pausedTime * TO_MS);
             }
 
             // Add "current" hash into historical stat list
             final MultiStatSample sample = MultiStatSample.createNew(current);
-            sample.actualTime = elapsed - (pausedTime * TO_MS);
+            sample._actualTime = elapsed - (pausedTime * TO_MS);
             historical.add(sample); // adds onto tail
 
             // reset the "current" hash... basically set things to 0 to decrease
             // object recreation
             for (final StatValue value : current.values()) {
-                value.iterations = 0;
-                value.val = 0;
+                value._iterations = 0;
+                value._val = 0;
             }
         }
 
@@ -223,7 +221,7 @@ public class StatCollector {
         while (historical.size() > maxSamples) {
             final MultiStatSample removed = historical.remove(0); // removes from head
             if (removed != null) {
-                startOffset += removed.actualTime;
+                startOffset += removed._actualTime;
             }
         }
 
@@ -337,7 +335,7 @@ public class StatCollector {
 
     public static boolean hasHistoricalStat(final StatType type) {
         for (final MultiStatSample mss : historical) {
-            if (mss.values.containsKey(type)) {
+            if (mss._values.containsKey(type)) {
                 return true;
             }
         }

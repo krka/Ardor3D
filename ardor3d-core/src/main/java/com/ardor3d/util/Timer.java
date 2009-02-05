@@ -15,13 +15,13 @@ public class Timer {
     private static final long TIMER_RESOLUTION = 1000000000L;
     private static final double INVERSE_TIMER_RESOLUTION = 1.0 / TIMER_RESOLUTION;
 
-    private long startTime;
-    private long previousTime;
-    private double tpf;
-    private double fps;
+    private long _startTime;
+    private long _previousTime;
+    private double _tpf;
+    private double _fps;
 
     public Timer() {
-        startTime = System.nanoTime();
+        _startTime = System.nanoTime();
     }
 
     public double getTimeInSeconds() {
@@ -29,7 +29,7 @@ public class Timer {
     }
 
     public long getTime() {
-        return System.nanoTime() - startTime;
+        return System.nanoTime() - _startTime;
     }
 
     public long getResolution() {
@@ -37,21 +37,21 @@ public class Timer {
     }
 
     public double getFrameRate() {
-        return fps;
+        return _fps;
     }
 
     public double getTimePerFrame() {
-        return tpf;
+        return _tpf;
     }
 
     public void update() {
-        tpf = (getTime() - previousTime) * INVERSE_TIMER_RESOLUTION;
-        fps = 1.0 / tpf;
-        previousTime = getTime();
+        _tpf = (getTime() - _previousTime) * INVERSE_TIMER_RESOLUTION;
+        _fps = 1.0 / _tpf;
+        _previousTime = getTime();
     }
 
     public void reset() {
-        startTime = System.nanoTime();
-        previousTime = getTime();
+        _startTime = System.nanoTime();
+        _previousTime = getTime();
     }
 }

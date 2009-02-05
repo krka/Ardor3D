@@ -31,7 +31,7 @@ import com.ardor3d.util.export.OutputCapsule;
 public class CameraNode extends Node {
     private static final long serialVersionUID = 1L;
 
-    private Camera camera;
+    private Camera _camera;
 
     public CameraNode() {}
 
@@ -45,7 +45,7 @@ public class CameraNode extends Node {
      */
     public CameraNode(final String name, final Camera camera) {
         super(name);
-        this.camera = camera;
+        _camera = camera;
     }
 
     /**
@@ -53,10 +53,10 @@ public class CameraNode extends Node {
      * space.)
      */
     public void updateFromCamera() {
-        final ReadOnlyVector3 camLeft = camera.getLeft();
-        final ReadOnlyVector3 camUp = camera.getUp();
-        final ReadOnlyVector3 camDir = camera.getDirection();
-        final ReadOnlyVector3 camLoc = camera.getLocation();
+        final ReadOnlyVector3 camLeft = _camera.getLeft();
+        final ReadOnlyVector3 camUp = _camera.getUp();
+        final ReadOnlyVector3 camDir = _camera.getDirection();
+        final ReadOnlyVector3 camLoc = _camera.getLocation();
 
         final Matrix3 rotation = Matrix3.fetchTempInstance();
         rotation.fromAxes(camLeft, camUp, camDir);
@@ -74,7 +74,7 @@ public class CameraNode extends Node {
      *            the camera that this node controls.
      */
     public void setCamera(final Camera camera) {
-        this.camera = camera;
+        _camera = camera;
     }
 
     /**
@@ -83,7 +83,7 @@ public class CameraNode extends Node {
      * @return the camera this node controls.
      */
     public Camera getCamera() {
-        return camera;
+        return _camera;
     }
 
     /**
@@ -93,10 +93,10 @@ public class CameraNode extends Node {
     @Override
     public void updateWorldTransform(final boolean recurse) {
         super.updateWorldTransform(recurse);
-        if (camera != null) {
+        if (_camera != null) {
             final ReadOnlyVector3 worldTranslation = getWorldTranslation();
             final ReadOnlyMatrix3 worldRotation = getWorldRotation();
-            camera.setFrame(worldTranslation, worldRotation);
+            _camera.setFrame(worldTranslation, worldRotation);
         }
     }
 
@@ -104,7 +104,7 @@ public class CameraNode extends Node {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(camera, "camera", null);
+        capsule.write(_camera, "camera", null);
 
     }
 
@@ -112,7 +112,7 @@ public class CameraNode extends Node {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        camera = (Camera) capsule.readSavable("camera", null);
+        _camera = (Camera) capsule.readSavable("camera", null);
 
     }
 }

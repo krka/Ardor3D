@@ -27,9 +27,9 @@ import com.ardor3d.util.geom.BufferUtils;
 public class StripBox extends Mesh implements Savable {
     private static final long serialVersionUID = 1L;
 
-    public double xExtent, yExtent, zExtent;
+    public double _xExtent, _yExtent, _zExtent;
 
-    public final Vector3 center = new Vector3(0f, 0f, 0f);
+    public final Vector3 _center = new Vector3(0f, 0f, 0f);
 
     /**
      * instantiates a new <code>StripBox</code> object. All information must be applies later. For internal usage only
@@ -98,12 +98,12 @@ public class StripBox extends Mesh implements Savable {
      *            The new maxPoint of the box.
      */
     public void setData(final Vector3 minPoint, final Vector3 maxPoint) {
-        center.set(maxPoint).addLocal(minPoint).multiplyLocal(0.5f);
+        _center.set(maxPoint).addLocal(minPoint).multiplyLocal(0.5f);
 
-        final double x = maxPoint.getX() - center.getX();
-        final double y = maxPoint.getY() - center.getY();
-        final double z = maxPoint.getZ() - center.getZ();
-        setData(center, x, y, z);
+        final double x = maxPoint.getX() - _center.getX();
+        final double y = maxPoint.getY() - _center.getY();
+        final double z = maxPoint.getZ() - _center.getZ();
+        setData(_center, x, y, z);
     }
 
     /**
@@ -122,12 +122,12 @@ public class StripBox extends Mesh implements Savable {
      */
     public void setData(final Vector3 center, final double xExtent, final double yExtent, final double zExtent) {
         if (center != null) {
-            this.center.set(center);
+            _center.set(center);
         }
 
-        this.xExtent = xExtent;
-        this.yExtent = yExtent;
-        this.zExtent = zExtent;
+        _xExtent = xExtent;
+        _yExtent = yExtent;
+        _zExtent = zExtent;
 
         setVertexData();
         setNormalData();
@@ -184,7 +184,7 @@ public class StripBox extends Mesh implements Savable {
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
             _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
+            final FloatBuffer tex = _meshData.getTextureCoords(0)._coords;
             tex.put(1).put(0); // 0
             tex.put(0).put(0); // 1
             tex.put(0).put(1); // 2
@@ -217,7 +217,7 @@ public class StripBox extends Mesh implements Savable {
      */
     @Override
     public StripBox clone() {
-        final StripBox rVal = new StripBox(getName() + "_clone", center.clone(), xExtent, yExtent, zExtent);
+        final StripBox rVal = new StripBox(getName() + "_clone", _center.clone(), _xExtent, _yExtent, _zExtent);
         return rVal;
     }
 
@@ -227,19 +227,19 @@ public class StripBox extends Mesh implements Savable {
      */
     public Vector3[] computeVertices() {
 
-        final Vector3 akEAxis[] = { Vector3.UNIT_X.multiply(xExtent, Vector3.fetchTempInstance()),
-                Vector3.UNIT_Y.multiply(yExtent, Vector3.fetchTempInstance()),
-                Vector3.UNIT_Z.multiply(zExtent, Vector3.fetchTempInstance()) };
+        final Vector3 akEAxis[] = { Vector3.UNIT_X.multiply(_xExtent, Vector3.fetchTempInstance()),
+                Vector3.UNIT_Y.multiply(_yExtent, Vector3.fetchTempInstance()),
+                Vector3.UNIT_Z.multiply(_zExtent, Vector3.fetchTempInstance()) };
 
         final Vector3 rVal[] = new Vector3[8];
-        rVal[0] = center.subtract(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[1] = center.add(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[2] = center.add(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[3] = center.subtract(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[4] = center.add(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[5] = center.subtract(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[6] = center.add(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[7] = center.subtract(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
+        rVal[0] = _center.subtract(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
+        rVal[1] = _center.add(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
+        rVal[2] = _center.add(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
+        rVal[3] = _center.subtract(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
+        rVal[4] = _center.add(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
+        rVal[5] = _center.subtract(akEAxis[0], new Vector3()).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
+        rVal[6] = _center.add(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
+        rVal[7] = _center.subtract(akEAxis[0], new Vector3()).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
         for (final Vector3 axis : akEAxis) {
             Vector3.releaseTempInstance(axis);
         }
@@ -252,7 +252,7 @@ public class StripBox extends Mesh implements Savable {
      * @return The box's center.
      */
     public Vector3 getCenter() {
-        return center;
+        return _center;
     }
 
     /**
@@ -263,17 +263,17 @@ public class StripBox extends Mesh implements Savable {
      *            The new center.
      */
     public void setCenter(final Vector3 aCenter) {
-        center.set(aCenter);
+        _center.set(aCenter);
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(xExtent, "xExtent", 0);
-        capsule.write(yExtent, "yExtent", 0);
-        capsule.write(zExtent, "zExtent", 0);
-        capsule.write(center, "center", new Vector3(Vector3.ZERO));
+        capsule.write(_xExtent, "xExtent", 0);
+        capsule.write(_yExtent, "yExtent", 0);
+        capsule.write(_zExtent, "zExtent", 0);
+        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
 
     }
 
@@ -281,9 +281,9 @@ public class StripBox extends Mesh implements Savable {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        xExtent = capsule.readDouble("xExtent", 0);
-        yExtent = capsule.readDouble("yExtent", 0);
-        zExtent = capsule.readDouble("zExtent", 0);
-        center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
+        _xExtent = capsule.readDouble("xExtent", 0);
+        _yExtent = capsule.readDouble("yExtent", 0);
+        _zExtent = capsule.readDouble("zExtent", 0);
+        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
     }
 }

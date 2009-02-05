@@ -22,8 +22,8 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Quad extends Mesh {
 
     private static final long serialVersionUID = 1L;
-    protected double width = 0;
-    protected double height = 0;
+    protected double _width = 0;
+    protected double _height = 0;
 
     public Quad() {
 
@@ -64,8 +64,8 @@ public class Quad extends Mesh {
      *            the new height of the <code>Quad</code>.
      */
     public void resize(final double width, final double height) {
-        this.width = width;
-        this.height = height;
+        _width = width;
+        _height = height;
 
         _meshData.getVertexBuffer().clear();
         _meshData.getVertexBuffer().put((float) (-width / 2)).put((float) (height / 2)).put(0);
@@ -83,8 +83,8 @@ public class Quad extends Mesh {
      *            the height of the <code>Quad</code>.
      */
     public void initialize(final double width, final double height) {
-        this.width = width;
-        this.height = height;
+        _width = width;
+        _height = height;
 
         final int verts = 4;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
@@ -120,10 +120,10 @@ public class Quad extends Mesh {
     }
 
     public double getWidth() {
-        return width;
+        return _width;
     }
 
     public double getHeight() {
-        return height;
+        return _height;
     }
 }

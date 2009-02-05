@@ -26,85 +26,85 @@ public class WanderInfluence extends ParticleInfluence {
     public static final double DEFAULT_DISTANCE = .2f;
     public static final double DEFAULT_JITTER = .005f;
 
-    private double wanderRadius = DEFAULT_RADIUS;
-    private double wanderDistance = DEFAULT_DISTANCE;
-    private double wanderJitter = DEFAULT_JITTER;
+    private double _wanderRadius = DEFAULT_RADIUS;
+    private double _wanderDistance = DEFAULT_DISTANCE;
+    private double _wanderJitter = DEFAULT_JITTER;
 
-    private ArrayList<Vector3> wanderTargets = new ArrayList<Vector3>(1);
-    private final Vector3 workVect = new Vector3();
+    private ArrayList<Vector3> _wanderTargets = new ArrayList<Vector3>(1);
+    private final Vector3 _workVect = new Vector3();
 
     @Override
     public void prepare(final ParticleSystem system) {
-        if (wanderTargets.size() != system.getNumParticles()) {
-            wanderTargets = new ArrayList<Vector3>(system.getNumParticles());
+        if (_wanderTargets.size() != system.getNumParticles()) {
+            _wanderTargets = new ArrayList<Vector3>(system.getNumParticles());
             for (int x = system.getNumParticles(); --x >= 0;) {
-                wanderTargets.add(new Vector3(system.getEmissionDirection()).normalizeLocal());
+                _wanderTargets.add(new Vector3(system.getEmissionDirection()).normalizeLocal());
             }
         }
     }
 
     @Override
     public void apply(final double dt, final Particle particle, final int index) {
-        if (wanderRadius == 0 && wanderDistance == 0 && wanderJitter == 0) {
+        if (_wanderRadius == 0 && _wanderDistance == 0 && _wanderJitter == 0) {
             return;
         }
 
-        final Vector3 wanderTarget = wanderTargets.get(index);
+        final Vector3 wanderTarget = _wanderTargets.get(index);
 
         wanderTarget.addLocal(calcNewJitter(), calcNewJitter(), calcNewJitter());
         wanderTarget.normalizeLocal();
-        wanderTarget.multiplyLocal(wanderRadius);
+        wanderTarget.multiplyLocal(_wanderRadius);
 
-        workVect.set(particle.getVelocity()).normalizeLocal().multiplyLocal(wanderDistance);
-        workVect.addLocal(wanderTarget).normalizeLocal();
-        workVect.multiplyLocal(particle.getVelocity().length());
-        particle.getVelocity().set(workVect);
+        _workVect.set(particle.getVelocity()).normalizeLocal().multiplyLocal(_wanderDistance);
+        _workVect.addLocal(wanderTarget).normalizeLocal();
+        _workVect.multiplyLocal(particle.getVelocity().length());
+        particle.getVelocity().set(_workVect);
     }
 
     private double calcNewJitter() {
-        return ((MathUtils.nextRandomFloat() * 2.0f) - 1.0f) * wanderJitter;
+        return ((MathUtils.nextRandomFloat() * 2.0f) - 1.0f) * _wanderJitter;
     }
 
     public double getWanderDistance() {
-        return wanderDistance;
+        return _wanderDistance;
     }
 
     public void setWanderDistance(final double wanderDistance) {
-        this.wanderDistance = wanderDistance;
+        _wanderDistance = wanderDistance;
     }
 
     public double getWanderJitter() {
-        return wanderJitter;
+        return _wanderJitter;
     }
 
     public void setWanderJitter(final double wanderJitter) {
-        this.wanderJitter = wanderJitter;
+        _wanderJitter = wanderJitter;
     }
 
     public double getWanderRadius() {
-        return wanderRadius;
+        return _wanderRadius;
     }
 
     public void setWanderRadius(final double wanderRadius) {
-        this.wanderRadius = wanderRadius;
+        _wanderRadius = wanderRadius;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule cap = e.getCapsule(this);
-        cap.write(wanderRadius, "wanderRadius", DEFAULT_RADIUS);
-        cap.write(wanderDistance, "wanderDistance", DEFAULT_DISTANCE);
-        cap.write(wanderJitter, "wanderJitter", DEFAULT_JITTER);
+        cap.write(_wanderRadius, "wanderRadius", DEFAULT_RADIUS);
+        cap.write(_wanderDistance, "wanderDistance", DEFAULT_DISTANCE);
+        cap.write(_wanderJitter, "wanderJitter", DEFAULT_JITTER);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule cap = e.getCapsule(this);
-        wanderRadius = cap.readDouble("wanderRadius", DEFAULT_RADIUS);
-        wanderDistance = cap.readDouble("wanderDistance", DEFAULT_DISTANCE);
-        wanderJitter = cap.readDouble("wanderJitter", DEFAULT_JITTER);
+        _wanderRadius = cap.readDouble("wanderRadius", DEFAULT_RADIUS);
+        _wanderDistance = cap.readDouble("wanderDistance", DEFAULT_DISTANCE);
+        _wanderJitter = cap.readDouble("wanderJitter", DEFAULT_JITTER);
     }
 
     @Override

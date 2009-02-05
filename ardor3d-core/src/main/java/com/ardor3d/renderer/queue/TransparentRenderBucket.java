@@ -28,7 +28,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
     private final ZBufferState _transparentZBuff;
 
     /** boolean for enabling / disabling two pass transparency rendering. */
-    private boolean twoPassTransparent = true;
+    private boolean _twoPassTransparent = true;
 
     public TransparentRenderBucket(final Renderer renderer) {
         super(renderer);
@@ -46,7 +46,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
         for (int i = 0; i < _currentListSize; i++) {
             final Spatial spatial = _currentList[i];
 
-            if (twoPassTransparent
+            if (_twoPassTransparent
                     && spatial instanceof Mesh
                     && ((((Mesh) spatial)._getWorldRenderState(RenderState.StateType.Cull) == null || !((Mesh) spatial)
                             ._getWorldRenderState(RenderState.StateType.Cull).isEnabled()))) {
@@ -82,11 +82,11 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
     }
 
     public boolean isTwoPassTransparency() {
-        return twoPassTransparent;
+        return _twoPassTransparent;
     }
 
     public void setTwoPassTransparency(final boolean twoPassTransparent) {
-        this.twoPassTransparent = twoPassTransparent;
+        _twoPassTransparent = twoPassTransparent;
     }
 
     private class TransparentComparator implements Comparator<Spatial> {

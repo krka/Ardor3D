@@ -744,17 +744,13 @@ public class PropertiesGameSettings {
 
     /**
      * Sets default* static variables according to GameSettings.DEFAULT_* values and an optional .properties file. Note
-     * that we are talking about <b>defaults</b> here, not user-specific settings.
-     * <P/>
-     * This method should be called once the game name is known to the subclass. To override any default with your
-     * subclass (as opposed to by using a .properties file), just set the static variable before or after calling this
-     * method (before or after depends on the precedence you want among programmatic and declarative DEFAULT_*, default*
-     * settings).
-     * <P/>
-     * Add new setting names by making your own method which does its own thing and calls
-     * AbstractGameSettings.assignDefaults(propfilename).
-     * <P/>
-     * Property file paths are relative to CLASSPATH element roots.
+     * that we are talking about <b>defaults</b> here, not user-specific settings. <P/> This method should be called
+     * once the game name is known to the subclass. To override any default with your subclass (as opposed to by using a
+     * .properties file), just set the static variable before or after calling this method (before or after depends on
+     * the precedence you want among programmatic and declarative DEFAULT_*, default* settings). <P/> Add new setting
+     * names by making your own method which does its own thing and calls
+     * AbstractGameSettings.assignDefaults(propfilename). <P/> Property file paths are relative to CLASSPATH element
+     * roots.
      * 
      * @param propFileName
      *            Properties file read as CLASSPATH resource. If you give null, no properties file will be loaded.

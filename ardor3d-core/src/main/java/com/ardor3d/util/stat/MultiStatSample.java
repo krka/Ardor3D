@@ -13,24 +13,24 @@ package com.ardor3d.util.stat;
 import java.util.HashMap;
 
 public class MultiStatSample {
-    public HashMap<StatType, StatValue> values = new HashMap<StatType, StatValue>();
-    public double actualTime = 0.0;
+    public HashMap<StatType, StatValue> _values = new HashMap<StatType, StatValue>();
+    public double _actualTime = 0.0;
 
     public static MultiStatSample createNew(final HashMap<StatType, StatValue> current) {
         final MultiStatSample rVal = new MultiStatSample();
-        final double frames = current.containsKey(StatType.STAT_FRAMES) ? current.get(StatType.STAT_FRAMES).val : 0;
+        final double frames = current.containsKey(StatType.STAT_FRAMES) ? current.get(StatType.STAT_FRAMES)._val : 0;
         for (final StatType type : current.keySet()) {
             final StatValue entry = current.get(type);
             // only count values we've seen at
             // least 1 time from this sample set.
-            if (entry.iterations != 0) {
-                final StatValue store = new StatValue(entry.val, entry.iterations);
+            if (entry._iterations != 0) {
+                final StatValue store = new StatValue(entry._val, entry._iterations);
                 if (frames > 0) {
-                    store.average = store.val / frames;
+                    store._average = store._val / frames;
                 } else {
-                    store.average = store.val / store.iterations;
+                    store._average = store._val / store._iterations;
                 }
-                rVal.values.put(type, store);
+                rVal._values.put(type, store);
             }
         }
         return rVal;

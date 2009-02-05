@@ -35,14 +35,14 @@ public abstract class BoundingVolume implements Serializable, Savable {
         Sphere, AABB, OBB;
     }
 
-    protected int checkPlane = 0;
+    protected int _checkPlane = 0;
 
-    protected final Vector3 center = new Vector3();
+    protected final Vector3 _center = new Vector3();
 
     public BoundingVolume() {}
 
     public BoundingVolume(final Vector3 center) {
-        this.center.set(center);
+        _center.set(center);
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class BoundingVolume implements Serializable, Savable {
      * 
      */
     public int getCheckPlane() {
-        return checkPlane;
+        return _checkPlane;
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class BoundingVolume implements Serializable, Savable {
      * @param value
      */
     public final void setCheckPlane(final int value) {
-        checkPlane = value;
+        _checkPlane = value;
     }
 
     /**
@@ -185,11 +185,11 @@ public abstract class BoundingVolume implements Serializable, Savable {
     public abstract BoundingVolume clone(BoundingVolume store);
 
     public final ReadOnlyVector3 getCenter() {
-        return center;
+        return _center;
     }
 
     public final void setCenter(final ReadOnlyVector3 newCenter) {
-        center.set(newCenter);
+        _center.set(newCenter);
     }
 
     /**
@@ -200,7 +200,7 @@ public abstract class BoundingVolume implements Serializable, Savable {
      * @return distance
      */
     public final double distanceTo(final ReadOnlyVector3 point) {
-        return center.distance(point);
+        return _center.distance(point);
     }
 
     /**
@@ -211,7 +211,7 @@ public abstract class BoundingVolume implements Serializable, Savable {
      * @return distance
      */
     public final double distanceSquaredTo(final ReadOnlyVector3 point) {
-        return center.distanceSquared(point);
+        return _center.distanceSquared(point);
     }
 
     /**
@@ -290,11 +290,11 @@ public abstract class BoundingVolume implements Serializable, Savable {
     public abstract boolean contains(ReadOnlyVector3 point);
 
     public void write(final Ardor3DExporter e) throws IOException {
-        e.getCapsule(this).write(center, "center", new Vector3(Vector3.ZERO));
+        e.getCapsule(this).write(_center, "center", new Vector3(Vector3.ZERO));
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
-        center.set((Vector3) e.getCapsule(this).readSavable("center", new Vector3(Vector3.ZERO)));
+        _center.set((Vector3) e.getCapsule(this).readSavable("center", new Vector3(Vector3.ZERO)));
     }
 
     public Class<? extends BoundingVolume> getClassTag() {

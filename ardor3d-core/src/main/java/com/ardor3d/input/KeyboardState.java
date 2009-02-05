@@ -21,38 +21,38 @@ import com.ardor3d.annotation.Immutable;
  */
 @Immutable
 public class KeyboardState {
-    private final EnumSet<Key> keysDown;
-    private final Set<Key> keysDownView;
+    private final EnumSet<Key> _keysDown;
+    private final Set<Key> _keysDownView;
     public static final KeyboardState NOTHING = new KeyboardState(EnumSet.noneOf(Key.class));
 
     public KeyboardState(final EnumSet<Key> keysDown) {
         // keeping the keysDown as an EnumSet rather than as an unmodifiableSet in order to get
         // the performance benefit of working with the fast implementations of contains(),
         // removeAll(), etc., in EnumSet. The intention is that the keysDown set should never change.
-        this.keysDown = keysDown;
-        keysDownView = Collections.unmodifiableSet(keysDown);
+        _keysDown = keysDown;
+        _keysDownView = Collections.unmodifiableSet(keysDown);
     }
 
     public boolean isDown(final Key key) {
-        return keysDown.contains(key);
+        return _keysDown.contains(key);
     }
 
     public Set<Key> getKeysDown() {
-        return keysDownView;
+        return _keysDownView;
     }
 
     public EnumSet<Key> getKeysReleasedSince(final KeyboardState previous) {
-        final EnumSet<Key> result = EnumSet.copyOf(previous.keysDown);
+        final EnumSet<Key> result = EnumSet.copyOf(previous._keysDown);
 
-        result.removeAll(keysDown);
+        result.removeAll(_keysDown);
 
         return result;
     }
 
     public EnumSet<Key> getKeysPressedSince(final KeyboardState previous) {
-        final EnumSet<Key> result = EnumSet.copyOf(keysDown);
+        final EnumSet<Key> result = EnumSet.copyOf(_keysDown);
 
-        result.removeAll(previous.keysDown);
+        result.removeAll(previous._keysDown);
 
         return result;
 
@@ -60,8 +60,6 @@ public class KeyboardState {
 
     @Override
     public String toString() {
-        return "KeyboardState{" +
-                "keysDown=" + keysDown +
-                '}';
+        return "KeyboardState{" + "keysDown=" + _keysDown + '}';
     }
 }

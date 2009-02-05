@@ -24,13 +24,14 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
 
     private static final long serialVersionUID = 1L;
 
-    private CanvasRenderer canvasRenderer;
-    private boolean inited = false;
+    private CanvasRenderer _canvasRenderer;
+    private boolean _inited = false;
 
-    private volatile boolean updated = false;
-    private CountDownLatch latch = null; // this would have to be volatile if we are not careful with the order of reads
+    private volatile boolean _updated = false;
+    private CountDownLatch _latch = null; // this would have to be volatile if we are not careful with the order of
+                                          // reads
 
-    // and writes between this one and 'updated'
+    // and writes between this one and '_updated'
 
     // TODO: get rid of exception and ensure correct pixel format according to DisplaySystem
     public AwtCanvas() throws LWJGLException {
@@ -38,7 +39,7 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     public void setCanvasRenderer(final CanvasRenderer canvasRenderer) {
-        this.canvasRenderer = canvasRenderer;
+        _canvasRenderer = canvasRenderer;
     }
 
     public void init() {
@@ -46,28 +47,28 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     public void draw(final CountDownLatch latch) {
-        if (updated) {
-            throw new IllegalStateException("'updated' should be false when draw() is called");
+        if (_updated) {
+            throw new IllegalStateException("'_updated' should be false when draw() is called");
         }
 
-        // need to set latch before updated, for memory consistency reasons
-        this.latch = latch;
-        updated = true;
+        // need to set _latch before _updated, for memory consistency reasons
+        _latch = latch;
+        _updated = true;
         repaint();
     }
 
     @Override
     @MainThread
     protected void paintGL() {
-        if (!inited) {
+        if (!_inited) {
             privateInit();
         }
 
-        if (!updated) {
+        if (!_updated) {
             return;
         }
 
-        if (canvasRenderer.draw()) {
+        if (_canvasRenderer.draw()) {
             try {
                 swapBuffers();
             } catch (final LWJGLException e) {
@@ -75,18 +76,18 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
             }
         }
 
-        updated = false;
-        latch.countDown();
+        _updated = false;
+        _latch.countDown();
     }
 
     private void privateInit() {
         final DisplaySettings settings = new DisplaySettings(getWidth(), getHeight(), 0, 0, 0, 8, 0, 0, false, false);
 
-        canvasRenderer.init(settings, false); // false - do not do back buffer swap, awt will do that.
-        inited = true;
+        _canvasRenderer.init(settings, false); // false - do not do back buffer swap, awt will do that.
+        _inited = true;
     }
 
     public CanvasRenderer getCanvasRenderer() {
-        return canvasRenderer;
+        return _canvasRenderer;
     }
 }

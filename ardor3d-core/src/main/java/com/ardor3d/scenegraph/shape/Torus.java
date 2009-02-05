@@ -25,13 +25,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Torus extends Mesh {
     private static final long serialVersionUID = 1L;
 
-    private int circleSamples;
+    private int _circleSamples;
 
-    private int radialSamples;
+    private int _radialSamples;
 
-    private double innerRadius;
+    private double _innerRadius;
 
-    private double outerRadius;
+    private double _outerRadius;
 
     public Torus() {
 
@@ -55,10 +55,10 @@ public class Torus extends Mesh {
             final double outerRadius) {
 
         super(name);
-        this.circleSamples = circleSamples;
-        this.radialSamples = radialSamples;
-        this.innerRadius = innerRadius;
-        this.outerRadius = outerRadius;
+        _circleSamples = circleSamples;
+        _radialSamples = radialSamples;
+        _innerRadius = innerRadius;
+        _outerRadius = outerRadius;
 
         setGeometryData();
         setIndexData();
@@ -67,7 +67,7 @@ public class Torus extends Mesh {
 
     private void setGeometryData() {
         // allocate vertices
-        final int verts = ((circleSamples + 1) * (radialSamples + 1));
+        final int verts = ((_circleSamples + 1) * (_radialSamples + 1));
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
 
         // allocate normals if requested
@@ -77,23 +77,23 @@ public class Torus extends Mesh {
         _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
 
         // generate geometry
-        final double inverseCircleSamples = 1.0 / circleSamples;
-        final double inverseRadialSamples = 1.0 / radialSamples;
+        final double inverseCircleSamples = 1.0 / _circleSamples;
+        final double inverseRadialSamples = 1.0 / _radialSamples;
         int i = 0;
         // generate the cylinder itself
         final Vector3 radialAxis = new Vector3(), torusMiddle = new Vector3(), tempNormal = new Vector3();
-        for (int circleCount = 0; circleCount < circleSamples; circleCount++) {
+        for (int circleCount = 0; circleCount < _circleSamples; circleCount++) {
             // compute center point on torus circle at specified angle
             final double circleFraction = circleCount * inverseCircleSamples;
             final double theta = MathUtils.TWO_PI * circleFraction;
             final double cosTheta = MathUtils.cos(theta);
             final double sinTheta = MathUtils.sin(theta);
             radialAxis.set(cosTheta, sinTheta, 0);
-            radialAxis.multiply(outerRadius, torusMiddle);
+            radialAxis.multiply(_outerRadius, torusMiddle);
 
             // compute slice vertices with duplication at end point
             final int iSave = i;
-            for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+            for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
                 final double radialFraction = radialCount * inverseRadialSamples;
                 // in [0,1)
                 final double phi = MathUtils.TWO_PI * radialFraction;
@@ -109,46 +109,46 @@ public class Torus extends Mesh {
                             (float) -tempNormal.getZ());
                 }
 
-                tempNormal.multiplyLocal(innerRadius).addLocal(torusMiddle);
+                tempNormal.multiplyLocal(_innerRadius).addLocal(torusMiddle);
                 _meshData.getVertexBuffer().put((float) tempNormal.getX()).put((float) tempNormal.getY()).put(
                         (float) tempNormal.getZ());
 
-                _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
+                _meshData.getTextureCoords(0)._coords.put((float) radialFraction).put((float) circleFraction);
                 i++;
             }
 
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-            _meshData.getTextureCoords(0).coords.put(1.0f).put((float) circleFraction);
+            _meshData.getTextureCoords(0)._coords.put(1.0f).put((float) circleFraction);
 
             i++;
         }
 
         // duplicate the cylinder ends to form a torus
-        for (int iR = 0; iR <= radialSamples; iR++, i++) {
+        for (int iR = 0; iR <= _radialSamples; iR++, i++) {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iR, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iR, i);
-            BufferUtils.copyInternalVector2(_meshData.getTextureCoords(0).coords, iR, i);
-            _meshData.getTextureCoords(0).coords.put(i * 2 + 1, 1.0f);
+            BufferUtils.copyInternalVector2(_meshData.getTextureCoords(0)._coords, iR, i);
+            _meshData.getTextureCoords(0)._coords.put(i * 2 + 1, 1.0f);
         }
     }
 
     private void setIndexData() {
         // allocate connectivity
-        final int tris = (2 * circleSamples * radialSamples);
+        final int tris = (2 * _circleSamples * _radialSamples);
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
         int i;
         // generate connectivity
         int connectionStart = 0;
         int index = 0;
-        for (int circleCount = 0; circleCount < circleSamples; circleCount++) {
+        for (int circleCount = 0; circleCount < _circleSamples; circleCount++) {
             int i0 = connectionStart;
             int i1 = i0 + 1;
-            connectionStart += radialSamples + 1;
+            connectionStart += _radialSamples + 1;
             int i2 = connectionStart;
             int i3 = i2 + 1;
-            for (i = 0; i < radialSamples; i++, index += 6) {
+            for (i = 0; i < _radialSamples; i++, index += 6) {
                 if (true) {
                     _meshData.getIndexBuffer().put(i0++);
                     _meshData.getIndexBuffer().put(i2);
@@ -172,20 +172,20 @@ public class Torus extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(circleSamples, "circleSamples", 0);
-        capsule.write(radialSamples, "radialSamples", 0);
-        capsule.write(innerRadius, "innerRadius", 0);
-        capsule.write(outerRadius, "outerRadius", 0);
+        capsule.write(_circleSamples, "circleSamples", 0);
+        capsule.write(_radialSamples, "radialSamples", 0);
+        capsule.write(_innerRadius, "innerRadius", 0);
+        capsule.write(_outerRadius, "outerRadius", 0);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        circleSamples = capsule.readInt("circleSamples", 0);
-        radialSamples = capsule.readInt("radialSamples", 0);
-        innerRadius = capsule.readDouble("innerRadius", 0);
-        outerRadius = capsule.readDouble("outerRaidus", 0);
+        _circleSamples = capsule.readInt("circleSamples", 0);
+        _radialSamples = capsule.readInt("radialSamples", 0);
+        _innerRadius = capsule.readDouble("innerRadius", 0);
+        _outerRadius = capsule.readDouble("outerRaidus", 0);
     }
 
 }

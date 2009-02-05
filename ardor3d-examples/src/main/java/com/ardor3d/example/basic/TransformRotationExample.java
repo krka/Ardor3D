@@ -30,8 +30,7 @@ public class TransformRotationExample extends ExampleBase {
     }
 
     @Inject
-    public TransformRotationExample(final LogicalLayer logicalLayer,
-            final FrameWork frameWork) {
+    public TransformRotationExample(final LogicalLayer logicalLayer, final FrameWork frameWork) {
         super(logicalLayer, frameWork);
     }
 

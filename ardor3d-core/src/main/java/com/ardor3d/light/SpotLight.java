@@ -28,9 +28,9 @@ import com.ardor3d.util.export.OutputCapsule;
  */
 public class SpotLight extends PointLight {
     private static final long serialVersionUID = 1L;
-    // attributes
-    private float angle;
-    private float exponent;
+
+    private float _angle;
+    private float _exponent;
     private final Vector3 _direction = new Vector3(Vector3.UNIT_Z);
 
     /**
@@ -65,7 +65,7 @@ public class SpotLight extends PointLight {
      * @return the angle (in degrees)
      */
     public float getAngle() {
-        return angle;
+        return _angle;
     }
 
     /**
@@ -80,7 +80,7 @@ public class SpotLight extends PointLight {
         if (angle < 0 || (angle > 90 && angle != 180)) {
             throw new Ardor3dException("invalid angle.  Angle must be between 0 and 90, or 180");
         }
-        this.angle = angle;
+        _angle = angle;
     }
 
     /**
@@ -90,7 +90,7 @@ public class SpotLight extends PointLight {
      * @return the spot exponent of this light.
      */
     public float getExponent() {
-        return exponent;
+        return _exponent;
     }
 
     /**
@@ -101,7 +101,7 @@ public class SpotLight extends PointLight {
      *            the spot exponent of this light. Should be between 0-128
      */
     public void setExponent(final float exponent) {
-        this.exponent = exponent;
+        _exponent = exponent;
     }
 
     /**
@@ -119,8 +119,8 @@ public class SpotLight extends PointLight {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_direction, "direction", new Vector3(Vector3.UNIT_Z));
-        capsule.write(angle, "angle", 0);
-        capsule.write(exponent, "exponent", 0);
+        capsule.write(_angle, "angle", 0);
+        capsule.write(_exponent, "exponent", 0);
 
     }
 
@@ -129,8 +129,8 @@ public class SpotLight extends PointLight {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
         _direction.set((Vector3) capsule.readSavable("direction", new Vector3(Vector3.UNIT_Z)));
-        angle = capsule.readFloat("angle", 0);
-        exponent = capsule.readFloat("exponent", 0);
+        _angle = capsule.readFloat("angle", 0);
+        _exponent = capsule.readFloat("exponent", 0);
     }
 
 }

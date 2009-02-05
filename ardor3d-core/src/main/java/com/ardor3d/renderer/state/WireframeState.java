@@ -35,11 +35,11 @@ public class WireframeState extends RenderState {
     }
 
     /** Default wireframe of front and back. */
-    protected Face face = Face.FrontAndBack;
+    protected Face _face = Face.FrontAndBack;
     /** Default line width of 1 pixel. */
-    protected float lineWidth = 1.0f;
+    protected float _lineWidth = 1.0f;
     /** Default line style */
-    protected boolean antialiased = false;
+    protected boolean _antialiased = false;
 
     @Override
     public StateType getType() {
@@ -58,7 +58,7 @@ public class WireframeState extends RenderState {
             throw new IllegalArgumentException("Line width must be positive");
         }
 
-        lineWidth = width;
+        _lineWidth = width;
         setNeedsRefresh(true);
     }
 
@@ -68,7 +68,7 @@ public class WireframeState extends RenderState {
      * @return the current LineWidth
      */
     public float getLineWidth() {
-        return lineWidth;
+        return _lineWidth;
     }
 
     /**
@@ -83,7 +83,7 @@ public class WireframeState extends RenderState {
         if (face == null) {
             throw new IllegalArgumentException("face can not be null.");
         }
-        this.face = face;
+        _face = face;
         setNeedsRefresh(true);
     }
 
@@ -93,7 +93,7 @@ public class WireframeState extends RenderState {
      * @return The face state (one of WS_FRONT, WS_BACK, or WS_FRONT_AND_BACK)
      */
     public Face getFace() {
-        return face;
+        return _face;
     }
 
     /**
@@ -105,7 +105,7 @@ public class WireframeState extends RenderState {
      *            true for using smoothed antialiased lines.
      */
     public void setAntialiased(final boolean antialiased) {
-        this.antialiased = antialiased;
+        _antialiased = antialiased;
         setNeedsRefresh(true);
     }
 
@@ -113,25 +113,25 @@ public class WireframeState extends RenderState {
      * @return whether this wireframe uses antialiasing for drawing lines.
      */
     public boolean isAntialiased() {
-        return antialiased;
+        return _antialiased;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(face, "face", Face.FrontAndBack);
-        capsule.write(lineWidth, "lineWidth", 1);
-        capsule.write(antialiased, "antialiased", false);
+        capsule.write(_face, "face", Face.FrontAndBack);
+        capsule.write(_lineWidth, "lineWidth", 1);
+        capsule.write(_antialiased, "antialiased", false);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        face = capsule.readEnum("face", Face.class, Face.FrontAndBack);
-        lineWidth = capsule.readFloat("lineWidth", 1);
-        antialiased = capsule.readBoolean("antialiased", false);
+        _face = capsule.readEnum("face", Face.class, Face.FrontAndBack);
+        _lineWidth = capsule.readFloat("lineWidth", 1);
+        _antialiased = capsule.readBoolean("antialiased", false);
     }
 
     @Override

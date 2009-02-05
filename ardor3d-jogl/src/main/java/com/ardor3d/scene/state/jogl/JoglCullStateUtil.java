@@ -22,7 +22,7 @@ import com.ardor3d.renderer.state.CullState.PolygonWind;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.CullStateRecord;
 
-public class JoglCullStateUtil {
+public abstract class JoglCullStateUtil {
 
     public static void apply(final JoglRenderer renderer, final CullState state) {
         // ask for the current state record

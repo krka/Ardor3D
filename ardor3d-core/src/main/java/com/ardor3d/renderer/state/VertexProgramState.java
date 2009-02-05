@@ -33,14 +33,14 @@ public class VertexProgramState extends RenderState {
     private static final Logger logger = Logger.getLogger(VertexProgramState.class.getName());
 
     /** Environmental parameters applied to all vertex programs */
-    protected static float[][] envparameters = new float[96][];
+    protected static float[][] _envparameters = new float[96][];
 
     /** If any local parameters for this VP state are set */
-    protected boolean usingParameters = false;
+    protected boolean _usingParameters = false;
 
     /** Parameters local to this vertex program */
-    protected float[][] parameters;
-    protected ByteBuffer program;
+    protected float[][] _parameters;
+    protected ByteBuffer _program;
 
     protected int _programID = -1;
 
@@ -61,14 +61,14 @@ public class VertexProgramState extends RenderState {
             throw new IllegalArgumentException("Vertex program parameters must be of type float[4]");
         }
 
-        envparameters[paramID] = param;
+        _envparameters[paramID] = param;
     }
 
     /**
      * Creates a new VertexProgramState. <code>load(URL)</code> must be called before the state can be used.
      */
     public VertexProgramState() {
-        parameters = new float[96][];
+        _parameters = new float[96][];
     }
 
     /**
@@ -87,8 +87,8 @@ public class VertexProgramState extends RenderState {
             throw new IllegalArgumentException("Vertex program parameters must be of type float[4]");
         }
 
-        usingParameters = true;
-        parameters[paramID] = param;
+        _usingParameters = true;
+        _parameters[paramID] = param;
         setNeedsRefresh(true);
     }
 
@@ -117,9 +117,9 @@ public class VertexProgramState extends RenderState {
             inputStream.close();
             outputStream.close();
 
-            program = BufferUtils.createByteBuffer(data.length);
-            program.put(data);
-            program.rewind();
+            _program = BufferUtils.createByteBuffer(data.length);
+            _program.put(data);
+            _program.rewind();
             _programID = -1;
             setNeedsRefresh(true);
 
@@ -147,9 +147,9 @@ public class VertexProgramState extends RenderState {
     public void load(final String programContents) {
         try {
             final byte[] bytes = programContents.getBytes();
-            program = BufferUtils.createByteBuffer(bytes.length);
-            program.put(bytes);
-            program.rewind();
+            _program = BufferUtils.createByteBuffer(bytes.length);
+            _program.put(bytes);
+            _program.rewind();
             _programID = -1;
             setNeedsRefresh(true);
 
@@ -160,7 +160,7 @@ public class VertexProgramState extends RenderState {
     }
 
     public ByteBuffer getProgramAsBuffer() {
-        return program;
+        return _program;
     }
 
     public int _getProgramID() {
@@ -172,15 +172,15 @@ public class VertexProgramState extends RenderState {
     }
 
     public boolean isUsingParameters() {
-        return usingParameters;
+        return _usingParameters;
     }
 
     public float[][] _getParameters() {
-        return parameters;
+        return _parameters;
     }
 
     public static float[][] _getEnvParameters() {
-        return envparameters;
+        return _envparameters;
     }
 
     /**
@@ -192,13 +192,13 @@ public class VertexProgramState extends RenderState {
      */
     private void writeObject(final java.io.ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
-        if (program == null) {
+        if (_program == null) {
             s.writeInt(0);
         } else {
-            s.writeInt(program.capacity());
-            program.rewind();
-            for (int x = 0, len = program.capacity(); x < len; x++) {
-                s.writeByte(program.get());
+            s.writeInt(_program.capacity());
+            _program.rewind();
+            for (int x = 0, len = _program.capacity(); x < len; x++) {
+                s.writeByte(_program.get());
             }
         }
     }
@@ -215,11 +215,11 @@ public class VertexProgramState extends RenderState {
         s.defaultReadObject();
         final int len = s.readInt();
         if (len == 0) {
-            program = null;
+            _program = null;
         } else {
-            program = BufferUtils.createByteBuffer(len);
+            _program = BufferUtils.createByteBuffer(len);
             for (int x = 0; x < len; x++) {
-                program.put(s.readByte());
+                _program.put(s.readByte());
             }
         }
     }
@@ -228,18 +228,18 @@ public class VertexProgramState extends RenderState {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(usingParameters, "usingParameters", false);
-        capsule.write(parameters, "parameters", new float[96][]);
-        capsule.write(program, "program", null);
+        capsule.write(_usingParameters, "usingParameters", false);
+        capsule.write(_parameters, "parameters", new float[96][]);
+        capsule.write(_program, "program", null);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        usingParameters = capsule.readBoolean("usingParameters", false);
-        parameters = capsule.readFloatArray2D("parameters", new float[96][]);
-        program = capsule.readByteBuffer("program", null);
+        _usingParameters = capsule.readBoolean("usingParameters", false);
+        _parameters = capsule.readFloatArray2D("parameters", new float[96][]);
+        _program = capsule.readByteBuffer("program", null);
     }
 
     @Override

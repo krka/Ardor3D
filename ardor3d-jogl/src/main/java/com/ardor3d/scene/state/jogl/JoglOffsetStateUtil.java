@@ -21,7 +21,7 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.OffsetStateRecord;
 
-public class JoglOffsetStateUtil {
+public abstract class JoglOffsetStateUtil {
 
     public static void apply(final JoglRenderer renderer, final OffsetState state) {
         // ask for the current state record

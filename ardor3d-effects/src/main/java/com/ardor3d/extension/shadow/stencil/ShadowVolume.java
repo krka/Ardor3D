@@ -29,10 +29,10 @@ import com.ardor3d.scenegraph.VBOInfo;
 public class ShadowVolume extends Mesh {
     private static final long serialVersionUID = 1L;
 
-    protected Light light = null;
-    protected final Vector3 position = new Vector3();
-    protected final Vector3 direction = new Vector3();
-    protected boolean update = true;
+    protected Light _light = null;
+    protected final Vector3 _position = new Vector3();
+    protected final Vector3 _direction = new Vector3();
+    protected boolean _update = true;
     protected static int _ordinal = 0;
 
     /**
@@ -44,15 +44,15 @@ public class ShadowVolume extends Mesh {
     public ShadowVolume(final Light light) {
         super("LV" + _ordinal++);
 
-        this.light = light;
+        _light = light;
         setModelBound(new BoundingBox());
         updateModelBound();
 
         // Initialize the location and direction of the light
         if (light.getType() == Light.Type.Point) {
-            position.set(((PointLight) light).getLocation());
+            _position.set(((PointLight) light).getLocation());
         } else if (light.getType() == Light.Type.Directional) {
-            direction.set(((DirectionalLight) light).getDirection());
+            _direction.set(((DirectionalLight) light).getDirection());
         }
 
         // It will change so make sure VBO is off
@@ -82,7 +82,7 @@ public class ShadowVolume extends Mesh {
      * @return Returns the direction.
      */
     public Vector3 getDirection(final Vector3 store) {
-        return store.set(direction);
+        return store.set(_direction);
     }
 
     /**
@@ -90,14 +90,14 @@ public class ShadowVolume extends Mesh {
      *            The direction to set.
      */
     public void setDirection(final ReadOnlyVector3 direction) {
-        this.direction.set(direction);
+        _direction.set(direction);
     }
 
     /**
      * @return Returns the position.
      */
     public Vector3 getPosition(final Vector3 store) {
-        return store.set(position);
+        return store.set(_position);
     }
 
     /**
@@ -105,14 +105,14 @@ public class ShadowVolume extends Mesh {
      *            The position to set.
      */
     public void setPosition(final ReadOnlyVector3 position) {
-        this.position.set(position);
+        _position.set(position);
     }
 
     /**
      * @return Returns whether this volume needs updating.
      */
     public boolean isUpdate() {
-        return update;
+        return _update;
     }
 
     /**
@@ -120,14 +120,14 @@ public class ShadowVolume extends Mesh {
      *            sets whether this volume needs updating.
      */
     public void setUpdate(final boolean update) {
-        this.update = update;
+        _update = update;
     }
 
     /**
      * @return Returns the light.
      */
     public Light getLight() {
-        return light;
+        return _light;
     }
 
     /**
@@ -135,7 +135,7 @@ public class ShadowVolume extends Mesh {
      *            The light to set.
      */
     public void setLight(final Light light) {
-        this.light = light;
+        _light = light;
     }
 
 }

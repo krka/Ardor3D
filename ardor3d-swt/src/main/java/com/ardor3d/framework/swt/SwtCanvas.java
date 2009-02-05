@@ -26,8 +26,8 @@ import com.ardor3d.framework.DisplaySettings;
  * A canvas for embedding into SWT applications.
  */
 public class SwtCanvas extends GLCanvas implements Canvas {
-    private CanvasRenderer canvasRenderer;
-    private boolean inited = false;
+    private CanvasRenderer _canvasRenderer;
+    private boolean _inited = false;
 
     public SwtCanvas(final Composite composite, final int style, final GLData glData) {
         super(composite, style, glData);
@@ -35,7 +35,7 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     }
 
     public void setCanvasRenderer(final CanvasRenderer renderer) {
-        canvasRenderer = renderer;
+        _canvasRenderer = renderer;
     }
 
     @MainThread
@@ -49,8 +49,8 @@ public class SwtCanvas extends GLCanvas implements Canvas {
         final DisplaySettings settings = new DisplaySettings(Math.max(size.x, 1), Math.max(size.y, 1), 0, 0, 0, 8, 0,
                 0, false, false);
 
-        canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
-        inited = true;
+        _canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
+        _inited = true;
     }
 
     @MainThread
@@ -60,14 +60,14 @@ public class SwtCanvas extends GLCanvas implements Canvas {
 
     @MainThread
     public void draw(final CountDownLatch latch) {
-        if (!inited) {
+        if (!_inited) {
             privateInit();
         }
 
         if (!isDisposed() && isVisible()) {
             setCurrent();
 
-            if (canvasRenderer.draw()) {
+            if (_canvasRenderer.draw()) {
                 swapBuffers();
             }
         }
@@ -76,6 +76,6 @@ public class SwtCanvas extends GLCanvas implements Canvas {
     }
 
     public CanvasRenderer getCanvasRenderer() {
-        return canvasRenderer;
+        return _canvasRenderer;
     }
 }

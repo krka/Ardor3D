@@ -85,9 +85,11 @@ public class MaterialState extends RenderState {
     protected final ColorRGBA _diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
     protected final ColorRGBA _specular = new ColorRGBA(DEFAULT_SPECULAR);
     protected final ColorRGBA _emissive = new ColorRGBA(DEFAULT_EMISSIVE);
-    protected float shininess = DEFAULT_SHININESS;
-    protected ColorMaterial colorMaterial = DEFAULT_COLOR_MATERIAL;
-    protected MaterialFace materialFace = DEFAULT_MATERIAL_FACE;
+
+    protected float _shininess = DEFAULT_SHININESS;
+
+    protected ColorMaterial _colorMaterial = DEFAULT_COLOR_MATERIAL;
+    protected MaterialFace _materialFace = DEFAULT_MATERIAL_FACE;
 
     /**
      * Constructor instantiates a new <code>MaterialState</code> object.
@@ -162,7 +164,7 @@ public class MaterialState extends RenderState {
      * @return the shininess value of the material.
      */
     public float getShininess() {
-        return shininess;
+        return _shininess;
     }
 
     /**
@@ -173,7 +175,7 @@ public class MaterialState extends RenderState {
         if (shininess < 0 || shininess > 128) {
             throw new IllegalArgumentException("Shininess must be between 0 and 128.");
         }
-        this.shininess = shininess;
+        _shininess = shininess;
         setNeedsRefresh(true);
     }
 
@@ -182,7 +184,7 @@ public class MaterialState extends RenderState {
      * @see ColorMaterial
      */
     public ColorMaterial getColorMaterial() {
-        return colorMaterial;
+        return _colorMaterial;
     }
 
     /**
@@ -195,7 +197,7 @@ public class MaterialState extends RenderState {
         if (material == null) {
             throw new IllegalArgumentException("material can not be null.");
         }
-        colorMaterial = material;
+        _colorMaterial = material;
         setNeedsRefresh(true);
     }
 
@@ -205,7 +207,7 @@ public class MaterialState extends RenderState {
      * @return the current face setting
      */
     public MaterialFace getMaterialFace() {
-        return materialFace;
+        return _materialFace;
     }
 
     /**
@@ -217,10 +219,10 @@ public class MaterialState extends RenderState {
      *             if material is null
      */
     public void setMaterialFace(final MaterialFace face) {
-        if (materialFace == null) {
+        if (_materialFace == null) {
             throw new IllegalArgumentException("face can not be null.");
         }
-        materialFace = face;
+        _materialFace = face;
         setNeedsRefresh(true);
     }
 
@@ -237,9 +239,9 @@ public class MaterialState extends RenderState {
         capsule.write(_diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
         capsule.write(_specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
         capsule.write(_emissive, "emissive", new ColorRGBA(DEFAULT_EMISSIVE));
-        capsule.write(shininess, "shininess", DEFAULT_SHININESS);
-        capsule.write(colorMaterial, "colorMaterial", DEFAULT_COLOR_MATERIAL);
-        capsule.write(materialFace, "materialFace", DEFAULT_MATERIAL_FACE);
+        capsule.write(_shininess, "shininess", DEFAULT_SHININESS);
+        capsule.write(_colorMaterial, "colorMaterial", DEFAULT_COLOR_MATERIAL);
+        capsule.write(_materialFace, "materialFace", DEFAULT_MATERIAL_FACE);
     }
 
     @Override
@@ -250,9 +252,9 @@ public class MaterialState extends RenderState {
         _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
         _specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
         _emissive.set((ColorRGBA) capsule.readSavable("emissive", new ColorRGBA(DEFAULT_EMISSIVE)));
-        shininess = capsule.readFloat("shininess", DEFAULT_SHININESS);
-        colorMaterial = capsule.readEnum("colorMaterial", ColorMaterial.class, DEFAULT_COLOR_MATERIAL);
-        materialFace = capsule.readEnum("materialFace", MaterialFace.class, DEFAULT_MATERIAL_FACE);
+        _shininess = capsule.readFloat("shininess", DEFAULT_SHININESS);
+        _colorMaterial = capsule.readEnum("colorMaterial", ColorMaterial.class, DEFAULT_COLOR_MATERIAL);
+        _materialFace = capsule.readEnum("materialFace", MaterialFace.class, DEFAULT_MATERIAL_FACE);
     }
 
     @Override

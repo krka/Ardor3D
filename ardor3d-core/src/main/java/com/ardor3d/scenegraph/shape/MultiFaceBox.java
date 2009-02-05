@@ -40,7 +40,7 @@ public class MultiFaceBox extends Box {
     }
 
     private void remap() {
-        final FloatBuffer fb = _meshData.getTextureCoords(0).coords;
+        final FloatBuffer fb = _meshData.getTextureCoords(0)._coords;
         fb.rewind();
         for (int i = 0; i < 6; i++) {
             final float top = i / 8f;

@@ -30,14 +30,14 @@ public class ResourceLocatorTool {
     public static final String TYPE_AUDIO = "audio";
     public static final String TYPE_SHADER = "shader";
 
-    private static final Map<String, List<ResourceLocator>> locatorMap = new HashMap<String, List<ResourceLocator>>();
+    private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<String, List<ResourceLocator>>();
 
     public static URL locateResource(final String resourceType, final String resourceName) {
         if (resourceName == null) {
             return null;
         }
-        synchronized (locatorMap) {
-            final List<ResourceLocator> bases = locatorMap.get(resourceType);
+        synchronized (_locatorMap) {
+            final List<ResourceLocator> bases = _locatorMap.get(resourceType);
             if (bases != null) {
                 for (int i = bases.size(); --i >= 0;) {
                     final ResourceLocator loc = bases.get(i);
@@ -67,11 +67,11 @@ public class ResourceLocatorTool {
         if (locator == null) {
             return;
         }
-        synchronized (locatorMap) {
-            List<ResourceLocator> bases = locatorMap.get(resourceType);
+        synchronized (_locatorMap) {
+            List<ResourceLocator> bases = _locatorMap.get(resourceType);
             if (bases == null) {
                 bases = new ArrayList<ResourceLocator>();
-                locatorMap.put(resourceType, bases);
+                _locatorMap.put(resourceType, bases);
             }
 
             if (!bases.contains(locator)) {
@@ -81,8 +81,8 @@ public class ResourceLocatorTool {
     }
 
     public static boolean removeResourceLocator(final String resourceType, final ResourceLocator locator) {
-        synchronized (locatorMap) {
-            final List<ResourceLocator> bases = locatorMap.get(resourceType);
+        synchronized (_locatorMap) {
+            final List<ResourceLocator> bases = _locatorMap.get(resourceType);
             if (bases == null) {
                 return false;
             }

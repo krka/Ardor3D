@@ -26,7 +26,7 @@ import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
-public class JoglTextureUtil {
+public abstract class JoglTextureUtil {
     public static boolean isCompressedType(final Format format) {
         switch (format) {
             case NativeDXT1:

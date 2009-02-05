@@ -21,7 +21,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class ScreenExporter {
 
-    static ByteBuffer scratch = BufferUtils.createByteBuffer(1);
+    static ByteBuffer _scratch = BufferUtils.createByteBuffer(1);
 
     public synchronized static void exportCurrentScreen(final Renderer renderer, final ScreenExportable exportable) {
         final Format format = exportable.getFormat();
@@ -30,17 +30,17 @@ public class ScreenExporter {
 
         // prepare our data buffer
         final int size = width * height * Image.getEstimatedByteSize(format);
-        if (scratch.capacity() < size) {
-            scratch = BufferUtils.createByteBuffer(size);
+        if (_scratch.capacity() < size) {
+            _scratch = BufferUtils.createByteBuffer(size);
         } else {
-            scratch.limit(size);
-            scratch.rewind();
+            _scratch.limit(size);
+            _scratch.rewind();
         }
 
         // Ask the renderer for the current scene to be stored in the buffer
-        renderer.grabScreenContents(scratch, format, 0, 0, width, height);
+        renderer.grabScreenContents(_scratch, format, 0, 0, width, height);
 
         // send the buffer to the exportable object for processing.
-        exportable.export(scratch, width, height);
+        exportable.export(_scratch, width, height);
     }
 }

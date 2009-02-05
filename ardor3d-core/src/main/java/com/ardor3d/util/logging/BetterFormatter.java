@@ -19,16 +19,16 @@ import java.util.logging.LogRecord;
 
 public class BetterFormatter extends Formatter {
 
-    Date dat = new Date();
+    private final Date _date = new Date();
     // private final static String format = "{0,date} {0,time}";
-    private final static String format = "{0,time}";
-    private MessageFormat formatter;
+    private final static String _format = "{0,time}";
+    private MessageFormat _formatter;
 
-    private final Object args[] = new Object[1];
+    private final Object _args[] = new Object[1];
 
     // Line separator string. This is the value of the line.separator
-    // property at the moment that the SimpleFormatter was created.
-    private final String lineSeparator = System.getProperty("line.separator");
+    // property at the moment that the BetterFormatter was created.
+    private final String _lineSeparator = System.getProperty("line.separator");
 
     /**
      * Format the given LogRecord.
@@ -41,13 +41,13 @@ public class BetterFormatter extends Formatter {
     public synchronized String format(final LogRecord record) {
         final StringBuffer sb = new StringBuffer();
 
-        dat.setTime(record.getMillis());
-        args[0] = dat;
+        _date.setTime(record.getMillis());
+        _args[0] = _date;
         final StringBuffer text = new StringBuffer();
-        if (formatter == null) {
-            formatter = new MessageFormat(format);
+        if (_formatter == null) {
+            _formatter = new MessageFormat(_format);
         }
-        formatter.format(args, text, null);
+        _formatter.format(_args, text, null);
         sb.append(text);
 
         sb.append(" [");
@@ -93,7 +93,7 @@ public class BetterFormatter extends Formatter {
         // visit(sb, root, 0);
 
         if (record.getThrown() != null) {
-            sb.append(lineSeparator);
+            sb.append(_lineSeparator);
             try {
                 final StringWriter sw = new StringWriter();
                 final PrintWriter pw = new PrintWriter(sw);
@@ -104,7 +104,7 @@ public class BetterFormatter extends Formatter {
             }
         }
 
-        sb.append(lineSeparator);
+        sb.append(_lineSeparator);
 
         return sb.toString();
     }
@@ -122,7 +122,7 @@ public class BetterFormatter extends Formatter {
             final Thread thread = threads[i];
 
             sb.append(thread.getName() + "[" + thread.getId() + "]");
-            sb.append(lineSeparator);
+            sb.append(_lineSeparator);
         }
 
         // Get thread subgroups of `group'

@@ -28,6 +28,8 @@ import com.ardor3d.util.export.Savable;
  */
 public abstract class Controller implements Serializable, Savable {
 
+    private static final long serialVersionUID = 1;
+
     public enum RepeatType {
         /**
          * A clamped repeat type signals that the controller should look like its final state when it's done <br>
@@ -53,30 +55,28 @@ public abstract class Controller implements Serializable, Savable {
      * Defines how this controller should repeat itself. This can be one of RT_CLAMP, RT_WRAP, RT_CYCLE, or an
      * application specific repeat flag.
      */
-    private RepeatType repeatType;
+    private RepeatType _repeatType;
 
     /**
      * The controller's minimum cycle time
      */
-    private double minTime;
+    private double _minTime;
 
     /**
      * The controller's maximum cycle time
      */
-    private double maxTime;
+    private double _maxTime;
 
     /**
      * The 'speed' of this Controller. Generically speaking, less than 1 is slower, more than 1 is faster, and 1
      * represents the base speed
      */
-    private double speed = 1;
+    private double _speed = 1;
 
     /**
      * True if this controller is active, false otherwise
      */
-    private boolean active = true;
-
-    private static final long serialVersionUID = 1;
+    private boolean _active = true;
 
     /**
      * Returns the speed of this controller. Speed is 1 by default.
@@ -84,7 +84,7 @@ public abstract class Controller implements Serializable, Savable {
      * @return
      */
     public double getSpeed() {
-        return speed;
+        return _speed;
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class Controller implements Serializable, Savable {
      *            The new speed
      */
     public void setSpeed(final double speed) {
-        this.speed = speed;
+        _speed = speed;
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class Controller implements Serializable, Savable {
      * @return This controller's maximum time.
      */
     public double getMaxTime() {
-        return maxTime;
+        return _maxTime;
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class Controller implements Serializable, Savable {
      *            The new maximum time
      */
     public void setMaxTime(final double maxTime) {
-        this.maxTime = maxTime;
+        _maxTime = maxTime;
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class Controller implements Serializable, Savable {
      * @return This controller's minimum time
      */
     public double getMinTime() {
-        return minTime;
+        return _minTime;
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class Controller implements Serializable, Savable {
      *            The new minimum time.
      */
     public void setMinTime(final double minTime) {
-        this.minTime = minTime;
+        _minTime = minTime;
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class Controller implements Serializable, Savable {
      * @return The current repeat type
      */
     public RepeatType getRepeatType() {
-        return repeatType;
+        return _repeatType;
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class Controller implements Serializable, Savable {
      *            The new repeat type.
      */
     public void setRepeatType(final RepeatType repeatType) {
-        this.repeatType = repeatType;
+        _repeatType = repeatType;
     }
 
     /**
@@ -162,7 +162,7 @@ public abstract class Controller implements Serializable, Savable {
      *            The new active state.
      */
     public void setActive(final boolean active) {
-        this.active = active;
+        _active = active;
     }
 
     /**
@@ -171,7 +171,7 @@ public abstract class Controller implements Serializable, Savable {
      * @return True if this controller is set to active, false if not.
      */
     public boolean isActive() {
-        return active;
+        return _active;
     }
 
     /**
@@ -187,20 +187,20 @@ public abstract class Controller implements Serializable, Savable {
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(repeatType, "repeatType", RepeatType.CLAMP);
-        capsule.write(minTime, "minTime", 0);
-        capsule.write(maxTime, "maxTime", 0);
-        capsule.write(speed, "speed", 1);
-        capsule.write(active, "active", true);
+        capsule.write(_repeatType, "repeatType", RepeatType.CLAMP);
+        capsule.write(_minTime, "minTime", 0);
+        capsule.write(_maxTime, "maxTime", 0);
+        capsule.write(_speed, "speed", 1);
+        capsule.write(_active, "active", true);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        repeatType = capsule.readEnum("repeatType", RepeatType.class, RepeatType.CLAMP);
-        minTime = capsule.readDouble("minTime", 0);
-        maxTime = capsule.readDouble("maxTime", 0);
-        speed = capsule.readDouble("speed", 1);
-        active = capsule.readBoolean("active", true);
+        _repeatType = capsule.readEnum("repeatType", RepeatType.class, RepeatType.CLAMP);
+        _minTime = capsule.readDouble("minTime", 0);
+        _maxTime = capsule.readDouble("maxTime", 0);
+        _speed = capsule.readDouble("speed", 1);
+        _active = capsule.readBoolean("active", true);
     }
 
     public Class<? extends Controller> getClassTag() {

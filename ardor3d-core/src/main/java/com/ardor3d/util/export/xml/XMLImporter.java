@@ -30,14 +30,14 @@ import com.ardor3d.util.export.Savable;
  */
 public class XMLImporter implements Ardor3DImporter {
 
-    private DOMInputCapsule domIn;
+    private DOMInputCapsule _domIn;
 
     public XMLImporter() {}
 
     public Savable load(final InputStream f) throws IOException {
         try {
-            domIn = new DOMInputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f), this);
-            return domIn.readSavable(null, null);
+            _domIn = new DOMInputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f), this);
+            return _domIn.readSavable(null, null);
         } catch (final SAXException e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -58,7 +58,7 @@ public class XMLImporter implements Ardor3DImporter {
     }
 
     public InputCapsule getCapsule(final Savable id) {
-        return domIn;
+        return _domIn;
     }
 
     public static XMLImporter getInstance() {

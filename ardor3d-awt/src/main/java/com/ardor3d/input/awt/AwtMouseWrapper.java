@@ -53,7 +53,6 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
-
     @Inject
     public AwtMouseWrapper(final Component component) {
         _component = checkNotNull(component, "component");

@@ -36,21 +36,21 @@ public class JoglFont {
     public static final int ITALICS = 1;
 
     // display list offset.
-    private int base;
+    private int _base;
 
     // buffer that holds the text.
-    private ByteBuffer scratch;
+    private ByteBuffer _scratch;
 
     // Color to render the font.
-    private final ColorRGBA fontColor;
+    private final ColorRGBA _fontColor;
 
     /**
      * Constructor instantiates a new JoglFont object. The initial color is set to white.
      * 
      */
     public JoglFont() {
-        fontColor = new ColorRGBA(1, 1, 1, 1);
-        scratch = BufferUtils.createByteBuffer(1);
+        _fontColor = new ColorRGBA(1, 1, 1, 1);
+        _scratch = BufferUtils.createByteBuffer(1);
         buildDisplayList();
     }
 
@@ -61,7 +61,7 @@ public class JoglFont {
     public void deleteFont() {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glDeleteLists(base, 256);
+        gl.glDeleteLists(_base, 256);
     }
 
     /**
@@ -72,7 +72,7 @@ public class JoglFont {
      *            the color to set.
      */
     public void setColor(final ColorRGBA color) {
-        fontColor.set(color);
+        _fontColor.set(color);
     }
 
     /**
@@ -111,23 +111,23 @@ public class JoglFont {
         }
         gl.glTranslated(x, y, 0);
         gl.glScaled(scale.getX(), scale.getY(), scale.getZ());
-        gl.glListBase(base - 32 + (128 * set));
+        gl.glListBase(_base - 32 + (128 * set));
 
         // Put the string into a "pointer"
-        if (text.length() > scratch.capacity()) {
-            scratch = BufferUtils.createByteBuffer(text.length());
+        if (text.length() > _scratch.capacity()) {
+            _scratch = BufferUtils.createByteBuffer(text.length());
         } else {
-            scratch.clear();
+            _scratch.clear();
         }
 
         final int charLen = text.length();
         for (int z = 0; z < charLen; z++) {
-            scratch.put((byte) text.charAt(z));
+            _scratch.put((byte) text.charAt(z));
         }
-        scratch.flip();
-        gl.glColor4f(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getAlpha());
+        _scratch.flip();
+        gl.glColor4f(_fontColor.getRed(), _fontColor.getGreen(), _fontColor.getBlue(), _fontColor.getAlpha());
         // call the list for each letter in the string.
-        gl.glCallLists(scratch.limit(), GL.GL_BYTE, scratch); // TODO Check <count> and assumed <type> GL_BYTE
+        gl.glCallLists(_scratch.limit(), GL.GL_BYTE, _scratch); // TODO Check <count> and assumed <type> GL_BYTE
         // set color back to white
         gl.glColor4f(1, 1, 1, 1);
 
@@ -149,13 +149,13 @@ public class JoglFont {
         float cx;
         float cy;
 
-        base = gl.glGenLists(256);
+        _base = gl.glGenLists(256);
 
         for (int loop = 0; loop < 256; loop++) {
             cx = (loop % 16) / 16.0f;
             cy = (loop / 16) / 16.0f;
 
-            gl.glNewList(base + loop, GL.GL_COMPILE);
+            gl.glNewList(_base + loop, GL.GL_COMPILE);
             gl.glBegin(GL.GL_QUADS);
             gl.glTexCoord2f(cx, 1 - cy - 0.0625f);
             gl.glVertex2i(0, 0);
@@ -174,7 +174,7 @@ public class JoglFont {
     @Override
     public String toString() {
         String string = super.toString();
-        string += "\nColor: " + fontColor.toString();
+        string += "\nColor: " + _fontColor.toString();
 
         return string;
     }

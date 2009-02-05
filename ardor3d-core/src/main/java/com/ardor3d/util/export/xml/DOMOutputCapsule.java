@@ -35,20 +35,20 @@ import com.ardor3d.util.export.Savable;
  */
 public class DOMOutputCapsule implements OutputCapsule {
 
-    private static final String dataAttributeName = "data";
-    private final Document doc;
-    private Element currentElement;
-    private final Ardor3DExporter exporter;
-    private final Map<Savable, Element> writtenSavables = new IdentityHashMap<Savable, Element>();
+    private static final String _dataAttributeName = "data";
+    private final Document _doc;
+    private Element _currentElement;
+    private final Ardor3DExporter _exporter;
+    private final Map<Savable, Element> _writtenSavables = new IdentityHashMap<Savable, Element>();
 
     public DOMOutputCapsule(final Document doc, final Ardor3DExporter exporter) {
-        this.doc = doc;
-        this.exporter = exporter;
-        currentElement = null;
+        _doc = doc;
+        _exporter = exporter;
+        _currentElement = null;
     }
 
     public Document getDoc() {
-        return doc;
+        return _doc;
     }
 
     /**
@@ -57,13 +57,13 @@ public class DOMOutputCapsule implements OutputCapsule {
      */
     private Element appendElement(final String name) {
         Element ret = null;
-        ret = doc.createElement(name);
-        if (currentElement == null) {
-            doc.appendChild(ret);
+        ret = _doc.createElement(name);
+        if (_currentElement == null) {
+            _doc.appendChild(ret);
         } else {
-            currentElement.appendChild(ret);
+            _currentElement.appendChild(ret);
         }
-        currentElement = ret;
+        _currentElement = ret;
         return ret;
     }
 
@@ -79,7 +79,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(byte[] value, final String name, final byte[] defVal) throws IOException {
@@ -96,8 +96,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(byte[][] value, final String name, final byte[][] defVal) throws IOException {
@@ -118,15 +118,15 @@ public class DOMOutputCapsule implements OutputCapsule {
         final Element el = appendElement(name);
         el.setAttribute("size_outer", String.valueOf(value.length));
         el.setAttribute("size_inner", String.valueOf(value[0].length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final int value, final String name, final int defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(final int[] value, final String name, final int[] defVal) throws IOException {
@@ -147,8 +147,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final int[][] value, final String name, final int[][] defVal) throws IOException {
@@ -166,14 +166,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             final int[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final float value, final String name, final float defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(float[] value, final String name, final float[] defVal) throws IOException {
@@ -190,8 +190,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final float[][] value, final String name, final float[][] defVal) throws IOException {
@@ -215,15 +215,15 @@ public class DOMOutputCapsule implements OutputCapsule {
         final Element el = appendElement(name);
         el.setAttribute("size_outer", String.valueOf(value.length));
         el.setAttribute("size_inner", String.valueOf(value[0].length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final double value, final String name, final double defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(double[] value, final String name, final double[] defVal) throws IOException {
@@ -240,8 +240,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final double[][] value, final String name, final double[][] defVal) throws IOException {
@@ -259,14 +259,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             final double[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final long value, final String name, final long defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(long[] value, final String name, final long[] defVal) throws IOException {
@@ -283,8 +283,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final long[][] value, final String name, final long[][] defVal) throws IOException {
@@ -302,14 +302,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             final long[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final short value, final String name, final short defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(short[] value, final String name, final short[] defVal) throws IOException {
@@ -326,8 +326,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final short[][] value, final String name, final short[][] defVal) throws IOException {
@@ -345,14 +345,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             final short[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final boolean value, final String name, final boolean defVal) throws IOException {
         if (value == defVal) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(boolean[] value, final String name, final boolean[] defVal) throws IOException {
@@ -369,8 +369,8 @@ public class DOMOutputCapsule implements OutputCapsule {
 
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(value.length));
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) currentElement.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final boolean[][] value, final String name, final boolean[][] defVal) throws IOException {
@@ -388,14 +388,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             final boolean[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final String value, final String name, final String defVal) throws IOException {
         if (value == null || value.equals(defVal)) {
             return;
         }
-        currentElement.setAttribute(name, encodeString(value));
+        _currentElement.setAttribute(name, encodeString(value));
     }
 
     public void write(String[] value, final String name, final String[] defVal) throws IOException {
@@ -411,10 +411,10 @@ public class DOMOutputCapsule implements OutputCapsule {
             final String b = value[i];
             appendElement("String_" + i);
             final String val = encodeString(b);
-            currentElement.setAttribute("value", val);
-            currentElement = el;
+            _currentElement.setAttribute("value", val);
+            _currentElement = el;
         }
-        currentElement = (Element) currentElement.getParentNode();
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void write(final String[][] value, final String name, final String[][] defVal) throws IOException {
@@ -432,7 +432,7 @@ public class DOMOutputCapsule implements OutputCapsule {
             final String[] array = value[i];
             write(array, "array_" + i, defVal == null ? null : defVal[i]);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final BitSet value, final String name, final BitSet defVal) throws IOException {
@@ -445,7 +445,7 @@ public class DOMOutputCapsule implements OutputCapsule {
             buf.append(" ");
         }
         buf.setLength(Math.max(0, buf.length() - 1));
-        currentElement.setAttribute(name, buf.toString());
+        _currentElement.setAttribute(name, buf.toString());
 
     }
 
@@ -457,15 +457,15 @@ public class DOMOutputCapsule implements OutputCapsule {
             return;
         }
 
-        final Element old = currentElement;
-        Element el = writtenSavables.get(object);
+        final Element old = _currentElement;
+        Element el = _writtenSavables.get(object);
 
         String className = null;
         if (!object.getClass().getName().equals(name)) {
             className = object.getClass().getName();
         }
         try {
-            doc.createElement(name);
+            _doc.createElement(name);
         } catch (final DOMException e) {
             name = "Object";
             className = object.getClass().getName();
@@ -481,14 +481,14 @@ public class DOMOutputCapsule implements OutputCapsule {
             el.setAttribute("ref", refID);
         } else {
             el = appendElement(name);
-            writtenSavables.put(object, el);
-            object.write(exporter);
+            _writtenSavables.put(object, el);
+            object.write(_exporter);
         }
         if (className != null) {
             el.setAttribute("class", className);
         }
 
-        currentElement = old;
+        _currentElement = old;
     }
 
     public void write(final Savable[] objects, final String name, final Savable[] defVal) throws IOException {
@@ -499,7 +499,7 @@ public class DOMOutputCapsule implements OutputCapsule {
             return;
         }
 
-        final Element old = currentElement;
+        final Element old = _currentElement;
         final Element el = appendElement(name);
         el.setAttribute("size", String.valueOf(objects.length));
         for (int i = 0; i < objects.length; i++) {
@@ -507,15 +507,15 @@ public class DOMOutputCapsule implements OutputCapsule {
             if (o == null) {
                 // renderStateList has special loading code, so we can leave out the null values
                 if (!name.equals("renderStateList")) {
-                    final Element before = currentElement;
+                    final Element before = _currentElement;
                     appendElement("null");
-                    currentElement = before;
+                    _currentElement = before;
                 }
             } else {
                 write(o, o.getClassTag().getName(), null);
             }
         }
-        currentElement = old;
+        _currentElement = old;
     }
 
     public void write(final Savable[][] value, final String name, final Savable[][] defVal) throws IOException {
@@ -534,7 +534,7 @@ public class DOMOutputCapsule implements OutputCapsule {
                 write(b, b.getClassTag().getSimpleName(), null);
             }
         }
-        currentElement = (Element) currentElement.getParentNode();
+        _currentElement = (Element) _currentElement.getParentNode();
     }
 
     public void writeSavableList(final List<? extends Savable> array, final String name,
@@ -545,9 +545,9 @@ public class DOMOutputCapsule implements OutputCapsule {
         if (array.equals(defVal)) {
             return;
         }
-        final Element old = currentElement;
+        final Element old = _currentElement;
         final Element el = appendElement(name);
-        currentElement = el;
+        _currentElement = el;
         el.setAttribute(XMLExporter.ATTRIBUTE_SIZE, String.valueOf(array.size()));
         for (final Object o : array) {
             if (o == null) {
@@ -559,7 +559,7 @@ public class DOMOutputCapsule implements OutputCapsule {
                 throw new ClassCastException("Not a Savable instance: " + o);
             }
         }
-        currentElement = old;
+        _currentElement = old;
     }
 
     public void writeSavableListArray(final List<? extends Savable>[] objects, final String name,
@@ -571,22 +571,22 @@ public class DOMOutputCapsule implements OutputCapsule {
             return;
         }
 
-        final Element old = currentElement;
+        final Element old = _currentElement;
         final Element el = appendElement(name);
         el.setAttribute(XMLExporter.ATTRIBUTE_SIZE, String.valueOf(objects.length));
         for (int i = 0; i < objects.length; i++) {
             final List<? extends Savable> o = objects[i];
             if (o == null) {
-                final Element before = currentElement;
+                final Element before = _currentElement;
                 appendElement("null");
-                currentElement = before;
+                _currentElement = before;
             } else {
                 final StringBuilder buf = new StringBuilder("SavableArrayList_");
                 buf.append(i);
                 writeSavableList(o, buf.toString(), null);
             }
         }
-        currentElement = old;
+        _currentElement = old;
     }
 
     public void writeSavableListArray2D(final List<? extends Savable>[][] value, final String name,
@@ -606,7 +606,7 @@ public class DOMOutputCapsule implements OutputCapsule {
             final List<? extends Savable>[] vi = value[i];
             writeSavableListArray(vi, "SavableArrayListArray_" + i, null);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void writeFloatBufferList(final List<FloatBuffer> array, final String name, final List<FloatBuffer> defVal)
@@ -622,7 +622,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         for (final FloatBuffer o : array) {
             write(o, XMLExporter.ELEMENT_FLOATBUFFER, null);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void writeSavableMap(final Map<? extends Savable, ? extends Savable> map, final String name,
@@ -642,10 +642,10 @@ public class DOMOutputCapsule implements OutputCapsule {
             write(key, XMLExporter.ELEMENT_KEY, null);
             final Savable value = map.get(key);
             write(value, XMLExporter.ELEMENT_VALUE, null);
-            currentElement = stringMap;
+            _currentElement = stringMap;
         }
 
-        currentElement = (Element) stringMap.getParentNode();
+        _currentElement = (Element) stringMap.getParentNode();
     }
 
     public void writeStringSavableMap(final Map<String, ? extends Savable> map, final String name,
@@ -665,10 +665,10 @@ public class DOMOutputCapsule implements OutputCapsule {
             mapEntry.setAttribute("key", key);
             final Savable s = map.get(key);
             write(s, "Savable", null);
-            currentElement = stringMap;
+            _currentElement = stringMap;
         }
 
-        currentElement = (Element) stringMap.getParentNode();
+        _currentElement = (Element) stringMap.getParentNode();
     }
 
     public void write(final FloatBuffer value, final String name, final FloatBuffer defVal) throws IOException {
@@ -687,8 +687,8 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         buf.setLength(Math.max(0, buf.length() - 1));
         value.position(pos);
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) el.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final IntBuffer value, final String name, final IntBuffer defVal) throws IOException {
@@ -710,8 +710,8 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) el.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final ByteBuffer value, final String name, final ByteBuffer defVal) throws IOException {
@@ -733,8 +733,8 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) el.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void write(final ShortBuffer value, final String name, final ShortBuffer defVal) throws IOException {
@@ -756,8 +756,8 @@ public class DOMOutputCapsule implements OutputCapsule {
         }
         buf.setLength(buf.length() - 1);
         value.position(pos);
-        el.setAttribute(dataAttributeName, buf.toString());
-        currentElement = (Element) el.getParentNode();
+        el.setAttribute(_dataAttributeName, buf.toString());
+        _currentElement = (Element) el.getParentNode();
     }
 
     public void writeByteBufferList(final List<ByteBuffer> array, final String name, final List<ByteBuffer> defVal)
@@ -773,7 +773,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         for (final ByteBuffer o : array) {
             write(o, "ByteBuffer", null);
         }
-        currentElement = (Element) el.getParentNode();
+        _currentElement = (Element) el.getParentNode();
 
     }
 
@@ -781,7 +781,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         if (value == defVal || value == null) {
             return;
         }
-        currentElement.setAttribute(name, String.valueOf(value));
+        _currentElement.setAttribute(name, String.valueOf(value));
     }
 
     public void write(final Enum<?>[] value, final String name) throws IOException {

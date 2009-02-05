@@ -259,7 +259,7 @@ public class BillboardNode extends Node {
      * or AxialZ. Invalid alignments will assume no billboard rotation.
      */
     public void setAlignment(final BillboardAlignment alignment) {
-        this._alignment = alignment;
+        _alignment = alignment;
     }
 
     @Override

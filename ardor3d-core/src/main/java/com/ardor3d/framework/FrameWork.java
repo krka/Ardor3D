@@ -32,7 +32,7 @@ public class FrameWork {
     /**
      * Thread synchronization of the updaters list is delegated to the CopyOnWriteArrayList.
      */
-    private final List<Updater> updaters;
+    private final List<Updater> _updaters;
 
     /**
      * Canvases is both protected by an intrinsic lock and by the fact that it is a CopyOnWriteArrayList. This is
@@ -40,14 +40,14 @@ public class FrameWork {
      * over that number of elements. See {@link #updateFrame()} for the code that does this.
      */
     @GuardedBy("this")
-    private final List<Canvas> canvases;
-    private final Timer timer;
+    private final List<Canvas> _canvases;
+    private final Timer _timer;
 
     @Inject
     public FrameWork(final Timer timer) {
-        this.timer = timer;
-        updaters = new CopyOnWriteArrayList<Updater>();
-        canvases = new CopyOnWriteArrayList<Canvas>();
+        _timer = timer;
+        _updaters = new CopyOnWriteArrayList<Updater>();
+        _canvases = new CopyOnWriteArrayList<Canvas>();
     }
 
     @MainThread
@@ -57,15 +57,15 @@ public class FrameWork {
         // update updaters
         // draw canvases
 
-        timer.update();
+        _timer.update();
 
-        final double tpf = timer.getTimePerFrame();
+        final double tpf = _timer.getTimePerFrame();
 
         // using the CopyOnWriteArrayList synchronization here, since that means
         // that we don't have to hold any locks while calling Updater.update(double),
         // and also makes the code simple. An updater that is registered after the below
         // loop has started will be updated at the next call to updateFrame().
-        for (final Updater updater : updaters) {
+        for (final Updater updater : _updaters) {
             updater.update(tpf);
         }
 
@@ -80,8 +80,8 @@ public class FrameWork {
         // means that the number of canvases read will be the same as the number of elements the iterator
         // will iterate over.
         synchronized (this) {
-            numCanvases = canvases.size();
-            iterator = canvases.iterator();
+            numCanvases = _canvases.size();
+            iterator = _canvases.iterator();
         }
 
         final CountDownLatch latch = new CountDownLatch(numCanvases);
@@ -104,28 +104,28 @@ public class FrameWork {
     }
 
     public void registerUpdater(final Updater updater) {
-        updaters.add(updater);
+        _updaters.add(updater);
     }
 
     public boolean removeUpdater(final Updater updater) {
-        return updaters.remove(updater);
+        return _updaters.remove(updater);
     }
 
     public synchronized void registerCanvas(final Canvas canvas) {
-        canvases.add(canvas);
+        _canvases.add(canvas);
     }
 
     public synchronized boolean removeCanvas(final Canvas canvas) {
-        return canvases.remove(canvas);
+        return _canvases.remove(canvas);
     }
 
     public void init() {
         // TODO: this can lead to problems with canvases and updaters added after init() has been called once...
-        for (final Canvas canvas : canvases) {
+        for (final Canvas canvas : _canvases) {
             canvas.init();
         }
 
-        for (final Updater updater : updaters) {
+        for (final Updater updater : _updaters) {
             updater.init();
         }
 

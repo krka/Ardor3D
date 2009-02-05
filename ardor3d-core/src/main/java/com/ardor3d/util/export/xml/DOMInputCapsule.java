@@ -43,16 +43,16 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class DOMInputCapsule implements InputCapsule {
 
-    private final Document doc;
-    private Element currentElem;
-    private final XMLImporter importer;
-    private boolean isAtRoot = true;
-    private final Map<String, Savable> referencedSavables = new HashMap<String, Savable>();
+    private final Document _doc;
+    private Element _currentElem;
+    private final XMLImporter _importer;
+    private boolean _isAtRoot = true;
+    private final Map<String, Savable> _referencedSavables = new HashMap<String, Savable>();
 
     public DOMInputCapsule(final Document doc, final XMLImporter importer) {
-        this.doc = doc;
-        this.importer = importer;
-        currentElem = doc.getDocumentElement();
+        _doc = doc;
+        _importer = importer;
+        _currentElem = doc.getDocumentElement();
     }
 
     private static String decodeString(String s) {
@@ -96,7 +96,7 @@ public class DOMInputCapsule implements InputCapsule {
     public byte readByte(final String name, final byte defVal) throws IOException {
         byte ret = defVal;
         try {
-            ret = Byte.parseByte(currentElem.getAttribute(name));
+            ret = Byte.parseByte(_currentElem.getAttribute(name));
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -110,9 +110,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -137,16 +137,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final byte[][] tmp = new byte[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -164,14 +164,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public int readInt(final String name, final int defVal) throws IOException {
         int ret = defVal;
         try {
-            final String s = currentElem.getAttribute(name);
+            final String s = _currentElem.getAttribute(name);
             if (s.length() > 0) {
                 ret = Integer.parseInt(s);
             }
@@ -188,9 +188,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -215,16 +215,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final int[][] tmp = new int[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -242,14 +242,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public float readFloat(final String name, final float defVal) throws IOException {
         float ret = defVal;
         try {
-            final String s = currentElem.getAttribute(name);
+            final String s = _currentElem.getAttribute(name);
             if (s.length() > 0) {
                 ret = Float.parseFloat(s);
             }
@@ -266,9 +266,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -293,9 +293,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -324,7 +324,7 @@ public class DOMInputCapsule implements InputCapsule {
     public double readDouble(final String name, final double defVal) throws IOException {
         double ret = defVal;
         try {
-            ret = Double.parseDouble(currentElem.getAttribute(name));
+            ret = Double.parseDouble(_currentElem.getAttribute(name));
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -338,9 +338,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -365,16 +365,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final double[][] tmp = new double[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -392,14 +392,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public long readLong(final String name, final long defVal) throws IOException {
         long ret = defVal;
         try {
-            ret = Long.parseLong(currentElem.getAttribute(name));
+            ret = Long.parseLong(_currentElem.getAttribute(name));
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -413,9 +413,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -440,16 +440,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final long[][] tmp = new long[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -467,14 +467,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public short readShort(final String name, final short defVal) throws IOException {
         short ret = defVal;
         try {
-            ret = Short.parseShort(currentElem.getAttribute(name));
+            ret = Short.parseShort(_currentElem.getAttribute(name));
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -488,9 +488,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -515,16 +515,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final short[][] tmp = new short[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -542,14 +542,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public boolean readBoolean(final String name, final boolean defVal) throws IOException {
         boolean ret = defVal;
         try {
-            final String s = currentElem.getAttribute(name);
+            final String s = _currentElem.getAttribute(name);
             if (s.length() > 0) {
                 ret = Boolean.parseBoolean(s);
             }
@@ -566,9 +566,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -593,16 +593,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final boolean[][] tmp = new boolean[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -620,14 +620,14 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
     public String readString(final String name, final String defVal) throws IOException {
         String ret = defVal;
         try {
-            ret = decodeString(currentElem.getAttribute(name));
+            ret = decodeString(_currentElem.getAttribute(name));
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -641,16 +641,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final String[] tmp = new String[size];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -668,7 +668,7 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
@@ -677,16 +677,16 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final String[][] tmp = new String[size][];
-            final NodeList nodes = currentElem.getChildNodes();
+            final NodeList nodes = _currentElem.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -704,7 +704,7 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        currentElem = (Element) currentElem.getParentNode();
+        _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
@@ -712,7 +712,7 @@ public class DOMInputCapsule implements InputCapsule {
         BitSet ret = defVal;
         try {
             final BitSet set = new BitSet();
-            final String bitString = currentElem.getAttribute(name);
+            final String bitString = _currentElem.getAttribute(name);
             final String[] strings = bitString.split("\\s+");
             for (int i = 0; i < strings.length; i++) {
                 final int isSet = Integer.parseInt(strings[i]);
@@ -735,22 +735,22 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl = null;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
                 if (tmpEl == null) {
                     return defVal;
                 }
-            } else if (isAtRoot) {
-                tmpEl = doc.getDocumentElement();
-                isAtRoot = false;
+            } else if (_isAtRoot) {
+                tmpEl = _doc.getDocumentElement();
+                _isAtRoot = false;
             } else {
-                tmpEl = findFirstChildElement(currentElem);
+                tmpEl = findFirstChildElement(_currentElem);
             }
-            currentElem = tmpEl;
+            _currentElem = tmpEl;
             ret = readSavableFromCurrentElem(defVal);
-            if (currentElem.getParentNode() instanceof Element) {
-                currentElem = (Element) currentElem.getParentNode();
+            if (_currentElem.getParentNode() instanceof Element) {
+                _currentElem = (Element) _currentElem.getParentNode();
             } else {
-                currentElem = null;
+                _currentElem = null;
             }
         } catch (final Exception e) {
             final IOException ex = new IOException();
@@ -766,26 +766,26 @@ public class DOMInputCapsule implements InputCapsule {
         Savable ret = defVal;
         Savable tmp = null;
 
-        if (currentElem == null || currentElem.getNodeName().equals("null")) {
+        if (_currentElem == null || _currentElem.getNodeName().equals("null")) {
             return null;
         }
-        final String reference = currentElem.getAttribute("ref");
+        final String reference = _currentElem.getAttribute("ref");
         if (reference.length() > 0) {
-            ret = referencedSavables.get(reference);
+            ret = _referencedSavables.get(reference);
         } else {
-            String className = currentElem.getNodeName();
+            String className = _currentElem.getNodeName();
             if (defVal != null) {
                 className = defVal.getClass().getName();
-            } else if (currentElem.hasAttribute("class")) {
-                className = currentElem.getAttribute("class");
+            } else if (_currentElem.hasAttribute("class")) {
+                className = _currentElem.getAttribute("class");
             }
             tmp = (Savable) Thread.currentThread().getContextClassLoader().loadClass(className).newInstance();
-            final String refID = currentElem.getAttribute("reference_ID");
+            final String refID = _currentElem.getAttribute("reference_ID");
             if (refID.length() > 0) {
-                referencedSavables.put(refID, tmp);
+                _referencedSavables.put(refID, tmp);
             }
             if (tmp != null) {
-                tmp.read(importer);
+                tmp.read(_importer);
                 ret = tmp;
             }
         }
@@ -793,7 +793,7 @@ public class DOMInputCapsule implements InputCapsule {
     }
 
     private TextureState readTextureStateFromCurrent() {
-        final Element el = currentElem;
+        final Element el = _currentElem;
         TextureState ret = null;
         try {
             ret = (TextureState) readSavableFromCurrentElem(null);
@@ -808,7 +808,7 @@ public class DOMInputCapsule implements InputCapsule {
         } catch (final Exception e) {
             Logger.getLogger(DOMInputCapsule.class.getName()).log(Level.SEVERE, null, e);
         }
-        currentElem = el;
+        _currentElem = el;
         return ret;
     }
 
@@ -816,9 +816,9 @@ public class DOMInputCapsule implements InputCapsule {
         Savable[] ret = defVal;
         try {
             final List<RenderState> tmp = new ArrayList<RenderState>();
-            currentElem = findFirstChildElement(fromElement);
-            while (currentElem != null) {
-                final Element el = currentElem;
+            _currentElem = findFirstChildElement(fromElement);
+            while (_currentElem != null) {
+                final Element el = _currentElem;
                 RenderState rs = null;
                 if (el.getNodeName().equals("com.ardor3d.scene.state.TextureState")) {
                     rs = readTextureStateFromCurrent();
@@ -828,7 +828,7 @@ public class DOMInputCapsule implements InputCapsule {
                 if (rs != null) {
                     tmp.add(rs);
                 }
-                currentElem = findNextSiblingElement(el);
+                _currentElem = findNextSiblingElement(el);
             }
             ret = tmp.toArray(new RenderState[0]);
         } catch (final Exception e) {
@@ -841,7 +841,7 @@ public class DOMInputCapsule implements InputCapsule {
     public Savable[] readSavableArray(final String name, final Savable[] defVal) throws IOException {
         Savable[] ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -851,17 +851,17 @@ public class DOMInputCapsule implements InputCapsule {
             } else {
                 final int size = Integer.parseInt(tmpEl.getAttribute("size"));
                 final Savable[] tmp = new Savable[size];
-                currentElem = findFirstChildElement(tmpEl);
+                _currentElem = findFirstChildElement(tmpEl);
                 for (int i = 0; i < size; i++) {
                     tmp[i] = (readSavableFromCurrentElem(null));
                     if (i == size - 1) {
                         break;
                     }
-                    currentElem = findNextSiblingElement(currentElem);
+                    _currentElem = findNextSiblingElement(_currentElem);
                 }
                 ret = tmp;
             }
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -873,7 +873,7 @@ public class DOMInputCapsule implements InputCapsule {
     public Savable[][] readSavableArray2D(final String name, final Savable[][] defVal) throws IOException {
         Savable[][] ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -882,18 +882,18 @@ public class DOMInputCapsule implements InputCapsule {
             final int size_inner = Integer.parseInt(tmpEl.getAttribute("size_outer"));
 
             final Savable[][] tmp = new Savable[size_outer][size_inner];
-            currentElem = findFirstChildElement(tmpEl);
+            _currentElem = findFirstChildElement(tmpEl);
             for (int i = 0; i < size_outer; i++) {
                 for (int j = 0; j < size_inner; j++) {
                     tmp[i][j] = (readSavableFromCurrentElem(null));
                     if (i == size_outer - 1 && j == size_inner - 1) {
                         break;
                     }
-                    currentElem = findNextSiblingElement(currentElem);
+                    _currentElem = findNextSiblingElement(_currentElem);
                 }
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -906,7 +906,7 @@ public class DOMInputCapsule implements InputCapsule {
     public <E extends Savable> List<E> readSavableList(final String name, final List<E> defVal) throws IOException {
         List<E> ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -914,16 +914,16 @@ public class DOMInputCapsule implements InputCapsule {
             final String s = tmpEl.getAttribute("size");
             final int size = Integer.parseInt(s);
             final List tmp = new ArrayList();
-            currentElem = findFirstChildElement(tmpEl);
+            _currentElem = findFirstChildElement(tmpEl);
             for (int i = 0; i < size; i++) {
                 tmp.add(readSavableFromCurrentElem(null));
                 if (i == size - 1) {
                     break;
                 }
-                currentElem = findNextSiblingElement(currentElem);
+                _currentElem = findNextSiblingElement(_currentElem);
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -937,11 +937,11 @@ public class DOMInputCapsule implements InputCapsule {
             throws IOException {
         List<E>[] ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
-            currentElem = tmpEl;
+            _currentElem = tmpEl;
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final List<E>[] tmp = new ArrayList[size];
@@ -955,7 +955,7 @@ public class DOMInputCapsule implements InputCapsule {
                 }
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -969,11 +969,11 @@ public class DOMInputCapsule implements InputCapsule {
             throws IOException {
         List<E>[][] ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
-            currentElem = tmpEl;
+            _currentElem = tmpEl;
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
 
             final List[][] tmp = new ArrayList[size][];
@@ -982,7 +982,7 @@ public class DOMInputCapsule implements InputCapsule {
                 tmp[i] = arr;
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -994,23 +994,23 @@ public class DOMInputCapsule implements InputCapsule {
     public List<FloatBuffer> readFloatBufferList(final String name, final List<FloatBuffer> defVal) throws IOException {
         List<FloatBuffer> ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final List<FloatBuffer> tmp = new ArrayList<FloatBuffer>(size);
-            currentElem = findFirstChildElement(tmpEl);
+            _currentElem = findFirstChildElement(tmpEl);
             for (int i = 0; i < size; i++) {
                 tmp.add(readFloatBuffer(null, null));
                 if (i == size - 1) {
                     break;
                 }
-                currentElem = findNextSiblingElement(currentElem);
+                _currentElem = findNextSiblingElement(_currentElem);
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -1026,9 +1026,9 @@ public class DOMInputCapsule implements InputCapsule {
         Element tempEl;
 
         if (name != null) {
-            tempEl = findChildElement(currentElem, name);
+            tempEl = findChildElement(_currentElem, name);
         } else {
-            tempEl = currentElem;
+            tempEl = _currentElem;
         }
         ret = new HashMap<K, V>();
 
@@ -1037,13 +1037,13 @@ public class DOMInputCapsule implements InputCapsule {
             final Node n = nodes.item(i);
             if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
                 final Element elem = (Element) n;
-                currentElem = elem;
+                _currentElem = elem;
                 final K key = (K) readSavable(XMLExporter.ELEMENT_KEY, null);
                 final V val = (V) readSavable(XMLExporter.ELEMENT_VALUE, null);
                 ret.put(key, val);
             }
         }
-        currentElem = (Element) tempEl.getParentNode();
+        _currentElem = (Element) tempEl.getParentNode();
         return ret;
     }
 
@@ -1054,9 +1054,9 @@ public class DOMInputCapsule implements InputCapsule {
         Element tempEl;
 
         if (name != null) {
-            tempEl = findChildElement(currentElem, name);
+            tempEl = findChildElement(_currentElem, name);
         } else {
-            tempEl = currentElem;
+            tempEl = _currentElem;
         }
         if (tempEl != null) {
             ret = new HashMap<String, V>();
@@ -1066,8 +1066,8 @@ public class DOMInputCapsule implements InputCapsule {
                 final Node n = nodes.item(i);
                 if (n instanceof Element && n.getNodeName().equals("MapEntry")) {
                     final Element elem = (Element) n;
-                    currentElem = elem;
-                    final String key = currentElem.getAttribute("key");
+                    _currentElem = elem;
+                    final String key = _currentElem.getAttribute("key");
                     final V val = (V) readSavable("Savable", null);
                     ret.put(key, val);
                 }
@@ -1075,7 +1075,7 @@ public class DOMInputCapsule implements InputCapsule {
         } else {
             return defVal;
         }
-        currentElem = (Element) tempEl.getParentNode();
+        _currentElem = (Element) tempEl.getParentNode();
         return ret;
     }
 
@@ -1087,9 +1087,9 @@ public class DOMInputCapsule implements InputCapsule {
         try {
             Element tmpEl;
             if (name != null) {
-                tmpEl = findChildElement(currentElem, name);
+                tmpEl = findChildElement(_currentElem, name);
             } else {
-                tmpEl = currentElem;
+                tmpEl = _currentElem;
             }
             if (tmpEl == null) {
                 return defVal;
@@ -1113,7 +1113,7 @@ public class DOMInputCapsule implements InputCapsule {
     public IntBuffer readIntBuffer(final String name, final IntBuffer defVal) throws IOException {
         IntBuffer ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -1137,7 +1137,7 @@ public class DOMInputCapsule implements InputCapsule {
     public ByteBuffer readByteBuffer(final String name, final ByteBuffer defVal) throws IOException {
         ByteBuffer ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -1161,7 +1161,7 @@ public class DOMInputCapsule implements InputCapsule {
     public ShortBuffer readShortBuffer(final String name, final ShortBuffer defVal) throws IOException {
         ShortBuffer ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
@@ -1185,23 +1185,23 @@ public class DOMInputCapsule implements InputCapsule {
     public List<ByteBuffer> readByteBufferList(final String name, final List<ByteBuffer> defVal) throws IOException {
         List<ByteBuffer> ret = defVal;
         try {
-            final Element tmpEl = findChildElement(currentElem, name);
+            final Element tmpEl = findChildElement(_currentElem, name);
             if (tmpEl == null) {
                 return defVal;
             }
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final List<ByteBuffer> tmp = new ArrayList<ByteBuffer>(size);
-            currentElem = findFirstChildElement(tmpEl);
+            _currentElem = findFirstChildElement(tmpEl);
             for (int i = 0; i < size; i++) {
                 tmp.add(readByteBuffer(null, null));
                 if (i == size - 1) {
                     break;
                 }
-                currentElem = findNextSiblingElement(currentElem);
+                _currentElem = findNextSiblingElement(_currentElem);
             }
             ret = tmp;
-            currentElem = (Element) tmpEl.getParentNode();
+            _currentElem = (Element) tmpEl.getParentNode();
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -1214,7 +1214,7 @@ public class DOMInputCapsule implements InputCapsule {
             throws IOException {
         T ret = defVal;
         try {
-            final String eVal = currentElem.getAttribute(name);
+            final String eVal = _currentElem.getAttribute(name);
             if (eVal != null && eVal.length() > 0) {
                 ret = Enum.valueOf(enumType, eVal);
             }

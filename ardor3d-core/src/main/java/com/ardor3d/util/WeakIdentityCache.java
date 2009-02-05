@@ -37,20 +37,20 @@ import java.lang.ref.WeakReference;
  */
 public class WeakIdentityCache<K, V> {
 
-    private Entry<K, V>[] entries;
-    private int size;
-    private int threshold;
+    private Entry<K, V>[] _entries;
+    private int _size;
+    private int _threshold;
     private final static float LOAD = 0.75f;
 
-    private final ReferenceQueue<K> refqueue = new ReferenceQueue<K>();
+    private final ReferenceQueue<K> _refqueue = new ReferenceQueue<K>();
 
     /**
      * Create a new WeakIdenityCache (see main javadoc entry for this class)
      */
     @SuppressWarnings("unchecked")
     public WeakIdentityCache() {
-        threshold = 16;
-        entries = new Entry[threshold];
+        _threshold = 16;
+        _entries = new Entry[_threshold];
     }
 
     private int hash(final K x) {
@@ -65,22 +65,22 @@ public class WeakIdentityCache<K, V> {
     @SuppressWarnings("unchecked")
     private void resize(final int newsize) {
         expunge();
-        final int oldsize = entries.length;
+        final int oldsize = _entries.length;
 
-        if (size < threshold || oldsize > newsize) {
+        if (_size < _threshold || oldsize > newsize) {
             return;
         }
 
         final Entry<K, V>[] newentries = new Entry[newsize];
 
-        transfer(entries, newentries);
-        entries = newentries;
+        transfer(_entries, newentries);
+        _entries = newentries;
 
-        if (size >= threshold / 2) {
-            threshold = (int) (newsize * LOAD);
+        if (_size >= _threshold / 2) {
+            _threshold = (int) (newsize * LOAD);
         } else {
             expunge();
-            transfer(newentries, entries);
+            transfer(newentries, _entries);
         }
     }
 
@@ -93,7 +93,7 @@ public class WeakIdentityCache<K, V> {
                 if (entry.get() == null) {
                     entry.nextEntry = null;
                     entry.value = null;
-                    size--;
+                    _size--;
                 } else {
                     final int i = index(entry.hash, dest.length);
                     entry.nextEntry = dest[i];
@@ -110,8 +110,8 @@ public class WeakIdentityCache<K, V> {
     public V get(final K key) {
         expunge();
         final int hash = hash(key);
-        final int index = index(hash, entries.length);
-        Entry<K, V> entry = entries[index];
+        final int index = index(hash, _entries.length);
+        Entry<K, V> entry = _entries[index];
         while (entry != null) {
             if (entry.hash == hash && key == entry.get()) {
                 return entry.value;
@@ -128,9 +128,9 @@ public class WeakIdentityCache<K, V> {
     public V put(final K key, final V value) {
         expunge();
         final int hash = hash(key);
-        final int index = index(hash, entries.length);
+        final int index = index(hash, _entries.length);
 
-        for (Entry<K, V> entry = entries[index]; entry != null; entry = entry.nextEntry) {
+        for (Entry<K, V> entry = _entries[index]; entry != null; entry = entry.nextEntry) {
             if (hash == entry.hash && key == entry.get()) {
                 final V oldentry = entry.value;
                 if (value != oldentry) {
@@ -140,9 +140,9 @@ public class WeakIdentityCache<K, V> {
             }
         }
 
-        entries[index] = new Entry<K, V>(key, value, refqueue, hash, entries[index]);
-        if (++size >= threshold) {
-            resize(entries.length * 2);
+        _entries[index] = new Entry<K, V>(key, value, _refqueue, hash, _entries[index]);
+        if (++_size >= _threshold) {
+            resize(_entries.length * 2);
         }
         return null;
     }
@@ -153,16 +153,16 @@ public class WeakIdentityCache<K, V> {
     public V remove(final K key) {
         expunge();
         final int hash = hash(key);
-        final int index = index(hash, entries.length);
-        Entry<K, V> temp = entries[index];
+        final int index = index(hash, _entries.length);
+        Entry<K, V> temp = _entries[index];
         Entry<K, V> previous = temp;
 
         while (temp != null) {
             final Entry<K, V> next = temp.nextEntry;
             if (hash == temp.hash && key == temp.get()) {
-                size--;
+                _size--;
                 if (previous == temp) {
-                    entries[index] = next;
+                    _entries[index] = next;
                 } else {
                     previous.nextEntry = next;
                 }
@@ -179,16 +179,16 @@ public class WeakIdentityCache<K, V> {
      * Clear the cache of all entries it has.
      */
     public void clear() {
-        while (refqueue.poll() != null) {
+        while (_refqueue.poll() != null) {
             ;
         }
 
-        for (int i = 0; i < entries.length; ++i) {
-            entries[i] = null;
+        for (int i = 0; i < _entries.length; ++i) {
+            _entries[i] = null;
         }
-        size = 0;
+        _size = 0;
 
-        while (refqueue.poll() != null) {
+        while (_refqueue.poll() != null) {
             ;
         }
     }
@@ -206,22 +206,22 @@ public class WeakIdentityCache<K, V> {
     @SuppressWarnings("unchecked")
     public void expunge() {
         Entry<K, V> entry;
-        while ((entry = (Entry<K, V>) refqueue.poll()) != null) {
-            final int index = index(entry.hash, entries.length);
+        while ((entry = (Entry<K, V>) _refqueue.poll()) != null) {
+            final int index = index(entry.hash, _entries.length);
 
-            Entry<K, V> temp = entries[index];
+            Entry<K, V> temp = _entries[index];
             Entry<K, V> previous = temp;
             while (temp != null) {
                 final Entry<K, V> next = temp.nextEntry;
                 if (temp == entry) {
                     if (previous == entry) {
-                        entries[index] = next;
+                        _entries[index] = next;
                     } else {
                         previous.nextEntry = next;
                     }
                     entry.nextEntry = null;
                     entry.value = null;
-                    size--;
+                    _size--;
                     break;
                 }
                 previous = temp;

@@ -22,15 +22,11 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public class PickData {
 
-    protected Ray3 ray;
-
-    protected Mesh targetMesh;
-
-    protected List<Integer> targetTris;
-
-    protected IntersectionRecord record;
-
-    protected double closestDistance;
+    protected Ray3 _ray;
+    protected Mesh _targetMesh;
+    protected List<Integer> _targetTris;
+    protected IntersectionRecord _intersectionRecord;
+    protected double _closestDistance;
 
     public PickData(final Ray3 ray, final Mesh targetMesh, final boolean calcPoints) {
         this(ray, targetMesh, null, calcPoints);
@@ -41,13 +37,13 @@ public class PickData {
      * work.
      */
     public PickData(final Ray3 ray, final Mesh targetMesh, final List<Integer> targetTris, final boolean calcPoints) {
-        this.ray = ray;
-        this.targetMesh = targetMesh;
-        this.targetTris = targetTris;
+        _ray = ray;
+        _targetMesh = targetMesh;
+        _targetTris = targetTris;
 
         if (calcPoints) {
-            record = targetMesh.getWorldBound().intersectsWhere(ray);
-            closestDistance = record.getClosestDistance();
+            _intersectionRecord = targetMesh.getWorldBound().intersectsWhere(ray);
+            _closestDistance = _intersectionRecord.getClosestDistance();
         }
     }
 
@@ -58,7 +54,7 @@ public class PickData {
      * @return the geometry hit by the ray.
      */
     public Mesh getTargetMesh() {
-        return targetMesh;
+        return _targetMesh;
     }
 
     /**
@@ -69,14 +65,14 @@ public class PickData {
      *            the geometry hit by the ray.
      */
     public void setTargetMesh(final Mesh mesh) {
-        targetMesh = mesh;
+        _targetMesh = mesh;
     }
 
     /**
      * @return Returns the target.
      */
     public List<Integer> getTargetTris() {
-        return targetTris;
+        return _targetTris;
     }
 
     /**
@@ -84,14 +80,14 @@ public class PickData {
      *            The target to set.
      */
     public void setTargetTris(final List<Integer> target) {
-        targetTris = target;
+        _targetTris = target;
     }
 
     /**
      * @return Returns the ray.
      */
     public Ray3 getRay() {
-        return ray;
+        return _ray;
     }
 
     /**
@@ -99,14 +95,14 @@ public class PickData {
      *            The ray to set.
      */
     public void setRay(final Ray3 ray) {
-        this.ray = ray;
+        _ray = ray;
     }
 
-    public IntersectionRecord getRecord() {
-        return record;
+    public IntersectionRecord getIntersectionRecord() {
+        return _intersectionRecord;
     }
 
     public double getClosestDistance() {
-        return closestDistance;
+        return _closestDistance;
     }
 }

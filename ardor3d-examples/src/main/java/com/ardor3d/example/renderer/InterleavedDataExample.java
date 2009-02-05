@@ -36,8 +36,7 @@ public class InterleavedDataExample extends ExampleBase {
     }
 
     @Inject
-    public InterleavedDataExample(final LogicalLayer layer, final FrameWork frameWork,
-            final Timer timer) {
+    public InterleavedDataExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }
@@ -59,8 +58,8 @@ public class InterleavedDataExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, Format.Guess,
-                true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+                Format.Guess, true));
 
         final Mesh automaticMesh = createAutomaticMesh();
         automaticMesh.setRenderState(ts);
@@ -88,7 +87,7 @@ public class InterleavedDataExample extends ExampleBase {
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
         meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize * 6)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
+        final FloatBuffer textureBuffer = meshData.getTextureCoords(0)._coords;
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer(totalSize * 6);
 
         for (int y = 0; y < ySize; y++) {

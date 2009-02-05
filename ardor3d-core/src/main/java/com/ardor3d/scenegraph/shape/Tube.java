@@ -30,12 +30,12 @@ public class Tube extends Mesh implements Savable {
         return serialVersionUID;
     }
 
-    private int axisSamples;
-    private int radialSamples;
+    private int _axisSamples;
+    private int _radialSamples;
 
-    private double outerRadius;
-    private double innerRadius;
-    private double height;
+    private double _outerRadius;
+    private double _innerRadius;
+    private double _height;
 
     /**
      * Constructor meant for Savable use only.
@@ -45,11 +45,11 @@ public class Tube extends Mesh implements Savable {
     public Tube(final String name, final double outerRadius, final double innerRadius, final double height,
             final int axisSamples, final int radialSamples) {
         super(name);
-        this.outerRadius = outerRadius;
-        this.innerRadius = innerRadius;
-        this.height = height;
-        this.axisSamples = axisSamples;
-        this.radialSamples = radialSamples;
+        _outerRadius = outerRadius;
+        _innerRadius = innerRadius;
+        _height = height;
+        _axisSamples = axisSamples;
+        _radialSamples = radialSamples;
         allocateVertices();
     }
 
@@ -58,12 +58,12 @@ public class Tube extends Mesh implements Savable {
     }
 
     private void allocateVertices() {
-        final int verts = (2 * (axisSamples + 1) * (radialSamples + 1) + radialSamples * 4);
+        final int verts = (2 * (_axisSamples + 1) * (_radialSamples + 1) + _radialSamples * 4);
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
         _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
 
-        final int tris = (4 * radialSamples * (1 + axisSamples));
+        final int tris = (4 * _radialSamples * (1 + _axisSamples));
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * tris));
 
         setGeometryData();
@@ -71,128 +71,128 @@ public class Tube extends Mesh implements Savable {
     }
 
     public int getAxisSamples() {
-        return axisSamples;
+        return _axisSamples;
     }
 
     public void setAxisSamples(final int axisSamples) {
-        this.axisSamples = axisSamples;
+        _axisSamples = axisSamples;
         allocateVertices();
     }
 
     public int getRadialSamples() {
-        return radialSamples;
+        return _radialSamples;
     }
 
     public void setRadialSamples(final int radialSamples) {
-        this.radialSamples = radialSamples;
+        _radialSamples = radialSamples;
         allocateVertices();
     }
 
     public double getOuterRadius() {
-        return outerRadius;
+        return _outerRadius;
     }
 
     public void setOuterRadius(final double outerRadius) {
-        this.outerRadius = outerRadius;
+        _outerRadius = outerRadius;
         allocateVertices();
     }
 
     public double getInnerRadius() {
-        return innerRadius;
+        return _innerRadius;
     }
 
     public void setInnerRadius(final double innerRadius) {
-        this.innerRadius = innerRadius;
+        _innerRadius = innerRadius;
         allocateVertices();
     }
 
     public double getHeight() {
-        return height;
+        return _height;
     }
 
     public void setHeight(final double height) {
-        this.height = height;
+        _height = height;
         allocateVertices();
     }
 
     private void setGeometryData() {
-        final double inverseRadial = 1.0 / radialSamples;
-        final double axisStep = height / axisSamples;
-        final double axisTextureStep = 1.0 / axisSamples;
-        final double halfHeight = 0.5 * height;
-        final double innerOuterRatio = innerRadius / outerRadius;
-        final double[] sin = new double[radialSamples];
-        final double[] cos = new double[radialSamples];
+        final double inverseRadial = 1.0 / _radialSamples;
+        final double axisStep = _height / _axisSamples;
+        final double axisTextureStep = 1.0 / _axisSamples;
+        final double halfHeight = 0.5 * _height;
+        final double innerOuterRatio = _innerRadius / _outerRadius;
+        final double[] sin = new double[_radialSamples];
+        final double[] cos = new double[_radialSamples];
 
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
             cos[radialCount] = MathUtils.cos(angle);
             sin[radialCount] = MathUtils.sin(angle);
         }
 
         // outer cylinder
-        for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
-            for (int axisCount = 0; axisCount < axisSamples + 1; axisCount++) {
-                _meshData.getVertexBuffer().put((float) (cos[radialCount % radialSamples] * outerRadius)).put(
+        for (int radialCount = 0; radialCount < _radialSamples + 1; radialCount++) {
+            for (int axisCount = 0; axisCount < _axisSamples + 1; axisCount++) {
+                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _outerRadius)).put(
                         (float) (axisStep * axisCount - halfHeight)).put(
-                        (float) (sin[radialCount % radialSamples] * outerRadius));
-                _meshData.getNormalBuffer().put((float) cos[radialCount % radialSamples]).put(0).put(
-                        (float) sin[radialCount % radialSamples]);
-                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
+                        (float) (sin[radialCount % _radialSamples] * _outerRadius));
+                _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
+                        (float) sin[radialCount % _radialSamples]);
+                _meshData.getTextureCoords(0)._coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
         // inner cylinder
-        for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
-            for (int axisCount = 0; axisCount < axisSamples + 1; axisCount++) {
-                _meshData.getVertexBuffer().put((float) (cos[radialCount % radialSamples] * innerRadius)).put(
+        for (int radialCount = 0; radialCount < _radialSamples + 1; radialCount++) {
+            for (int axisCount = 0; axisCount < _axisSamples + 1; axisCount++) {
+                _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _innerRadius)).put(
                         (float) (axisStep * axisCount - halfHeight)).put(
-                        (float) (sin[radialCount % radialSamples] * innerRadius));
-                _meshData.getNormalBuffer().put((float) -cos[radialCount % radialSamples]).put(0).put(
-                        (float) -sin[radialCount % radialSamples]);
-                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
+                        (float) (sin[radialCount % _radialSamples] * _innerRadius));
+                _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
+                        (float) -sin[radialCount % _radialSamples]);
+                _meshData.getTextureCoords(0)._coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
         // bottom edge
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * outerRadius)).put((float) -halfHeight).put(
-                    (float) (sin[radialCount] * outerRadius));
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * innerRadius)).put((float) -halfHeight).put(
-                    (float) (sin[radialCount] * innerRadius));
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) -halfHeight).put(
+                    (float) (sin[radialCount] * _outerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) -halfHeight).put(
+                    (float) (sin[radialCount] * _innerRadius));
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
         // top edge
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * outerRadius)).put((float) halfHeight).put(
-                    (float) (sin[radialCount] * outerRadius));
-            _meshData.getVertexBuffer().put((float) (cos[radialCount] * innerRadius)).put((float) halfHeight).put(
-                    (float) (sin[radialCount] * innerRadius));
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _outerRadius)).put((float) halfHeight).put(
+                    (float) (sin[radialCount] * _outerRadius));
+            _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) halfHeight).put(
+                    (float) (sin[radialCount] * _innerRadius));
             _meshData.getNormalBuffer().put(0).put(1).put(0);
             _meshData.getNormalBuffer().put(0).put(1).put(0);
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
 
     }
 
     private void setIndexData() {
-        final int innerCylinder = (axisSamples + 1) * (radialSamples + 1);
+        final int innerCylinder = (_axisSamples + 1) * (_radialSamples + 1);
         final int bottomEdge = 2 * innerCylinder;
-        final int topEdge = bottomEdge + 2 * radialSamples;
+        final int topEdge = bottomEdge + 2 * _radialSamples;
         // outer cylinder
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
-            for (int axisCount = 0; axisCount < axisSamples; axisCount++) {
-                final int index0 = axisCount + (axisSamples + 1) * radialCount;
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
+            for (int axisCount = 0; axisCount < _axisSamples; axisCount++) {
+                final int index0 = axisCount + (_axisSamples + 1) * radialCount;
                 final int index1 = index0 + 1;
-                final int index2 = index0 + (axisSamples + 1);
+                final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
                 _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
                 _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
@@ -200,11 +200,11 @@ public class Tube extends Mesh implements Savable {
         }
 
         // inner cylinder
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
-            for (int axisCount = 0; axisCount < axisSamples; axisCount++) {
-                final int index0 = innerCylinder + axisCount + (axisSamples + 1) * radialCount;
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
+            for (int axisCount = 0; axisCount < _axisSamples; axisCount++) {
+                final int index0 = innerCylinder + axisCount + (_axisSamples + 1) * radialCount;
                 final int index1 = index0 + 1;
-                final int index2 = index0 + (axisSamples + 1);
+                final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
                 _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
                 _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
@@ -212,20 +212,20 @@ public class Tube extends Mesh implements Savable {
         }
 
         // bottom edge
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             final int index0 = bottomEdge + 2 * radialCount;
             final int index1 = index0 + 1;
-            final int index2 = bottomEdge + 2 * ((radialCount + 1) % radialSamples);
+            final int index2 = bottomEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
             _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
             _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
         }
 
         // top edge
-        for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+        for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             final int index0 = topEdge + 2 * radialCount;
             final int index1 = index0 + 1;
-            final int index2 = topEdge + 2 * ((radialCount + 1) % radialSamples);
+            final int index2 = topEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
             _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
             _meshData.getIndexBuffer().put(index1).put(index3).put(index2);

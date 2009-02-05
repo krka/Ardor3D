@@ -25,7 +25,7 @@ import com.ardor3d.renderer.state.FogState.Quality;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.FogStateRecord;
 
-public class LwjglFogStateUtil {
+public abstract class LwjglFogStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final FogState state) {
         // ask for the current state record

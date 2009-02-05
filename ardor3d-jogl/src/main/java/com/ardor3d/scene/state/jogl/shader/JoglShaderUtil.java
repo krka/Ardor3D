@@ -34,7 +34,7 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerShort;
 
 /** Utility class for updating shadervariables(uniforms and attributes) */
-public class JoglShaderUtil {
+public abstract class JoglShaderUtil {
     private static final Logger logger = Logger.getLogger(JoglShaderUtil.class.getName());
 
     /**

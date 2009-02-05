@@ -27,7 +27,7 @@ public abstract class ParticleInfluence implements Savable {
     /**
      * Is this influence enabled? ie, should it be used when updating particles.
      */
-    private boolean enabled = true;
+    private boolean _enabled = true;
 
     /**
      * Set this influence enabled or not.
@@ -36,7 +36,7 @@ public abstract class ParticleInfluence implements Savable {
      *            boolean
      */
     public void setEnabled(final boolean enabled) {
-        this.enabled = enabled;
+        _enabled = enabled;
     }
 
     /**
@@ -45,7 +45,7 @@ public abstract class ParticleInfluence implements Savable {
      * @return boolean
      */
     public boolean isEnabled() {
-        return enabled;
+        return _enabled;
     }
 
     /**
@@ -73,12 +73,12 @@ public abstract class ParticleInfluence implements Savable {
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(enabled, "enabled", true);
+        capsule.write(_enabled, "enabled", true);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        enabled = capsule.readBoolean("enabled", true);
+        _enabled = capsule.readBoolean("enabled", true);
     }
 
     public Class<? extends ParticleInfluence> getClassTag() {

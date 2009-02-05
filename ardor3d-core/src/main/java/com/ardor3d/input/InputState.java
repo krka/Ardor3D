@@ -56,9 +56,6 @@ public class InputState {
 
     @Override
     public String toString() {
-        return "InputState{" +
-                "keyboardState=" + keyboardState +
-                ", mouseState=" + mouseState +
-                '}';
+        return "InputState{" + "keyboardState=" + keyboardState + ", mouseState=" + mouseState + '}';
     }
 }

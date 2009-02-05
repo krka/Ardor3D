@@ -45,18 +45,18 @@ public enum SwtKey {
             SWT.END, Key.END), SWT_DOWN(SWT.ARROW_DOWN, Key.DOWN), SWT_NEXT(SWT.PAGE_DOWN, Key.NEXT), SWT_INSERT(
             SWT.INSERT, Key.INSERT), SWT_DELETE(SWT.DEL, Key.DELETE);
 
-    private final int swtCode;
-    private final Key key;
+    private final int _swtCode;
+    private final Key _key;
 
     SwtKey(final int swtCode, final Key key) {
-        this.swtCode = swtCode;
-        this.key = key;
+        _swtCode = swtCode;
+        _key = key;
     }
 
     public static Key findByCode(final int swtCode) {
         for (final SwtKey swtKey : values()) {
-            if (swtKey.swtCode == swtCode) {
-                return swtKey.key;
+            if (swtKey._swtCode == swtCode) {
+                return swtKey._key;
             }
         }
 

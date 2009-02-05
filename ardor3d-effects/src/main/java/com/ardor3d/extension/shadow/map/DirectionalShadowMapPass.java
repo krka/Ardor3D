@@ -64,80 +64,80 @@ public class DirectionalShadowMapPass extends Pass {
             0.0f, 0.5f, 0.5f, 0.5f, 1.0f); // bias from [-1, 1] to [0, 1]
 
     /** The renderer used to produce the shadow map */
-    private TextureRenderer shadowMapRenderer;
+    private TextureRenderer _shadowMapRenderer;
     /** The texture storing the shadow map */
-    private Texture2D shadowMapTexture;
+    private Texture2D _shadowMapTexture;
     /** The near plane when rendering the shadow map */
-    private final float nearPlane = 1f;
+    private final float _nearPlane = 1f;
     /**
      * The far plane when rendering the shadow map - currently tuned for the test
      */
-    private final float farPlane = 3000.0f;
+    private final float _farPlane = 3000.0f;
     /**
      * The location the shadow light source is looking at - must point at the focus of the scene
      */
-    private Vector3 shadowCameraLookAt;
+    private Vector3 _shadowCameraLookAt;
     /**
      * The effective location of the light source - derived based on the distance of casting, look at and direction
      */
-    private Vector3 shadowCameraLocation;
+    private Vector3 _shadowCameraLocation;
 
     /** The list of occluding nodes */
-    private final List<Spatial> occluderNodes = new ArrayList<Spatial>();
+    private final List<Spatial> _occluderNodes = new ArrayList<Spatial>();
 
     /** Culling front faces when rendering shadow maps */
-    private CullState cullFrontFace;
+    private CullState _cullFrontFace;
     /** Turn off textures when rendering shadow maps */
-    private TextureState noTexture;
+    private TextureState _noTexture;
     /** Turn off colors when rendering shadow maps - depth only */
-    private ColorMaskState colorDisabled;
+    private ColorMaskState _colorDisabled;
     /** Turn off lighting when rendering shadow maps - depth only */
-    private LightState noLights;
+    private LightState _noLights;
 
     /**
      * The blending to both discard the fragments that have been determined to be free of shadows and to blend into the
      * background scene
      */
-    private BlendState discardShadowFragments;
+    private BlendState _discardShadowFragments;
     /** The state applying the depth offset for the scene */
-    private OffsetState sceneOffsetState;
+    private OffsetState _sceneOffsetState;
     /** The state applying the depth offset for the shadow */
-    private OffsetState shadowOffsetState;
+    private OffsetState _shadowOffsetState;
     /** The state applying the shadow map */
-    private TextureState shadowTextureState;
+    private TextureState _shadowTextureState;
     /** The bright light used to blend the shadows version into the scene */
-    private LightState brightLights;
+    private LightState _brightLights;
     /** The dark material used to blend the shadows into the scene */
-    private MaterialState darkMaterial;
+    private MaterialState _darkMaterial;
     /** Don't perform any plane clipping when rendering the shadowed scene */
-    private ClipState noClip;
+    private ClipState _noClip;
 
     /** True once the pass has been initialized */
-    protected boolean initialised = false;
+    protected boolean _initialised = false;
     /** The direction shadows are being cast from - directional light? */
-    protected Vector3 direction;
+    protected Vector3 _direction;
     /** The size of the shadow map texture */
-    private final int shadowMapSize;
+    private final int _shadowMapSize;
     /**
      * The scaling applied to the shadow map when rendered to - lower number means higher res but less ara covered by
      * the shadow map
      */
-    protected float shadowMapScale = 0.4f;
+    protected float _shadowMapScale = 0.4f;
     /**
      * The distance we're modeling the direction light source as being away from the focal point, again the higher the
      * number the more of the scene is covered but at lower resolution
      */
-    protected float dis = 500;
+    protected float _distance = 500;
 
     /** The color of shadows cast */
-    private final ColorRGBA shadowCol = new ColorRGBA(0, 0, 0, 0.3f);
+    private final ColorRGBA _shadowCol = new ColorRGBA(0, 0, 0, 0.3f);
     /** The optional shader for smoothing */
-    private GLSLShaderObjectsState shader;
+    private GLSLShaderObjectsState _shader;
 
     /** True if we should cull occluders - if not we'll draw all occluders */
-    private boolean cullOccluders = true;
+    private boolean _cullOccluders = true;
     /** Node providing easy rendering of all occluders added to the pass */
-    private final OccludersRenderNode occludersRenderNode = new OccludersRenderNode();
+    private final OccludersRenderNode _occludersRenderNode = new OccludersRenderNode();
 
     /**
      * Create a shadow map pass casting shadows from a light with the direction given.
@@ -158,8 +158,8 @@ public class DirectionalShadowMapPass extends Pass {
      *            The direction of the light casting the shadows
      */
     public DirectionalShadowMapPass(final Vector3 direction, final int shadowMapSize) {
-        this.shadowMapSize = shadowMapSize;
-        this.direction = direction;
+        _shadowMapSize = shadowMapSize;
+        _direction = direction;
 
         setViewTarget(new Vector3(0, 0, 0));
     }
@@ -171,9 +171,9 @@ public class DirectionalShadowMapPass extends Pass {
      *            The colour of the shadows to be cast
      */
     public void setShadowAlpha(final float alpha) {
-        shadowCol.setAlpha(alpha);
-        if (darkMaterial != null) {
-            darkMaterial.setDiffuse(shadowCol);
+        _shadowCol.setAlpha(alpha);
+        if (_darkMaterial != null) {
+            _darkMaterial.setDiffuse(_shadowCol);
         }
     }
 
@@ -185,7 +185,7 @@ public class DirectionalShadowMapPass extends Pass {
      *            The distance to be used for the shadow map camera (default = 500)
      */
     public void setViewDistance(final float dis) {
-        this.dis = dis;
+        _distance = dis;
     }
 
     /**
@@ -195,7 +195,7 @@ public class DirectionalShadowMapPass extends Pass {
      *            True if occluders should be culled against shadow map frustrum
      */
     public void setCullOccluders(final boolean cullOccluders) {
-        this.cullOccluders = cullOccluders;
+        _cullOccluders = cullOccluders;
     }
 
     /**
@@ -207,7 +207,7 @@ public class DirectionalShadowMapPass extends Pass {
      *            The scale used to stretch the shadow map across the scene.
      */
     public void setShadowMapScale(final float scale) {
-        shadowMapScale = scale;
+        _shadowMapScale = scale;
     }
 
     /**
@@ -218,18 +218,18 @@ public class DirectionalShadowMapPass extends Pass {
      *            The target of the view
      */
     public void setViewTarget(final Vector3 target) {
-        if (target.equals(shadowCameraLookAt)) {
+        if (target.equals(_shadowCameraLookAt)) {
             return;
         }
 
-        shadowCameraLookAt = new Vector3().set(target);
-        final Vector3 temp = new Vector3().set(direction);
+        _shadowCameraLookAt = new Vector3().set(target);
+        final Vector3 temp = new Vector3().set(_direction);
         temp.normalizeLocal();
-        temp.multiplyLocal(-dis);
-        shadowCameraLocation = new Vector3().set(target);
-        shadowCameraLocation.addLocal(temp);
+        temp.multiplyLocal(-_distance);
+        _shadowCameraLocation = new Vector3().set(target);
+        _shadowCameraLocation.addLocal(temp);
 
-        if (shadowMapRenderer != null) {
+        if (_shadowMapRenderer != null) {
             updateShadowCamera();
         }
     }
@@ -241,7 +241,7 @@ public class DirectionalShadowMapPass extends Pass {
      *            The spatial to add as an occluder
      */
     public void addOccluder(final Spatial occluder) {
-        occluderNodes.add(occluder);
+        _occluderNodes.add(occluder);
     }
 
     /**
@@ -250,61 +250,61 @@ public class DirectionalShadowMapPass extends Pass {
      * @param r
      */
     public void init(final Renderer r) {
-        if (initialised) {
+        if (_initialised) {
             return;
         }
 
-        initialised = true; // now it's initialized
+        _initialised = true; // now it's initialized
 
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
 
         // the texture that the shadow map will be rendered into. Modulated so
         // that it can be blended over the scene.
-        shadowMapTexture = new Texture2D();
-        shadowMapTexture.setApply(Texture.ApplyMode.Modulate);
-        shadowMapTexture.setMinificationFilter(Texture.MinificationFilter.NearestNeighborNoMipMaps);
-        shadowMapTexture.setWrap(Texture.WrapMode.Clamp);
-        shadowMapTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
-        shadowMapTexture.setRenderToTextureType(Texture.RenderToTextureType.Depth);
-        shadowMapTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
+        _shadowMapTexture = new Texture2D();
+        _shadowMapTexture.setApply(Texture.ApplyMode.Modulate);
+        _shadowMapTexture.setMinificationFilter(Texture.MinificationFilter.NearestNeighborNoMipMaps);
+        _shadowMapTexture.setWrap(Texture.WrapMode.Clamp);
+        _shadowMapTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        _shadowMapTexture.setRenderToTextureType(Texture.RenderToTextureType.Depth);
+        _shadowMapTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
 
-        shadowMapTexture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
-        shadowMapTexture.setDepthCompareFunc(DepthTextureCompareFunc.GreaterThanEqual);
-        shadowMapTexture.setDepthMode(DepthTextureMode.Intensity);
+        _shadowMapTexture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
+        _shadowMapTexture.setDepthCompareFunc(DepthTextureCompareFunc.GreaterThanEqual);
+        _shadowMapTexture.setDepthMode(DepthTextureMode.Intensity);
 
         // configure the texture renderer to output to the texture
-        final DisplaySettings settings = new DisplaySettings(shadowMapSize, shadowMapSize, 0, 0, 0, 8, 0, 0, false,
+        final DisplaySettings settings = new DisplaySettings(_shadowMapSize, _shadowMapSize, 0, 0, 0, 8, 0, 0, false,
                 false);
-        shadowMapRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, caps,
+        _shadowMapRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, caps,
                 TextureRenderer.Target.Texture2D);
-        shadowMapRenderer.setupTexture(shadowMapTexture);
+        _shadowMapRenderer.setupTexture(_shadowMapTexture);
 
         // render state to apply the shadow map texture
-        shadowTextureState = new TextureState();
-        shadowTextureState.setTexture(shadowMapTexture, 0);
+        _shadowTextureState = new TextureState();
+        _shadowTextureState.setTexture(_shadowMapTexture, 0);
 
-        sceneOffsetState = new OffsetState();
-        sceneOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        sceneOffsetState.setUnits(-5);
+        _sceneOffsetState = new OffsetState();
+        _sceneOffsetState.setTypeEnabled(OffsetType.Fill, true);
+        _sceneOffsetState.setUnits(-5);
 
-        shadowOffsetState = new OffsetState();
-        shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        shadowOffsetState.setUnits(5);
+        _shadowOffsetState = new OffsetState();
+        _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
+        _shadowOffsetState.setUnits(5);
 
-        noClip = new ClipState();
-        noClip.setEnabled(false);
+        _noClip = new ClipState();
+        _noClip.setEnabled(false);
 
         // render states to use when rendering into the shadow map, no textures or colors are required since we're only
         // interested in recording depth. Also only need back faces when rendering the shadow maps
-        noTexture = new TextureState();
-        noTexture.setEnabled(false);
-        colorDisabled = new ColorMaskState();
-        colorDisabled.setAll(false);
-        cullFrontFace = new CullState();
-        cullFrontFace.setEnabled(true);
-        cullFrontFace.setCullFace(CullState.Face.Front);
-        noLights = new LightState();
-        noLights.setEnabled(false);
+        _noTexture = new TextureState();
+        _noTexture.setEnabled(false);
+        _colorDisabled = new ColorMaskState();
+        _colorDisabled.setAll(false);
+        _cullFrontFace = new CullState();
+        _cullFrontFace.setEnabled(true);
+        _cullFrontFace.setCullFace(CullState.Face.Front);
+        _noLights = new LightState();
+        _noLights.setEnabled(false);
 
         // Then rendering and comparing the shadow map with the current
         // depth the result will be set to alpha 1 if not in shadow and
@@ -312,60 +312,60 @@ public class DirectionalShadowMapPass extends Pass {
         // scene
         // so the alpha will be zero if there is no shadow at this location but
         // > 0 on shadows.
-        discardShadowFragments = new BlendState();
-        discardShadowFragments.setEnabled(true);
-        discardShadowFragments.setBlendEnabled(true);
-        discardShadowFragments.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        discardShadowFragments.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        _discardShadowFragments = new BlendState();
+        _discardShadowFragments.setEnabled(true);
+        _discardShadowFragments.setBlendEnabled(true);
+        _discardShadowFragments.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        _discardShadowFragments.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
 
         // light used to uniformly light the scene when rendering the shadows
         // themselfs
         // this is so the geometry colour can be used as the source for blending
         // - i.e.
         // transparent shadows rather than matte black
-        brightLights = new LightState();
-        brightLights.setEnabled(true);
+        _brightLights = new LightState();
+        _brightLights.setEnabled(true);
         final DirectionalLight light = new DirectionalLight();
         light.setDiffuse(new ColorRGBA(1, 1, 1, 1f));
         light.setEnabled(true);
-        brightLights.attach(light);
+        _brightLights.attach(light);
 
-        darkMaterial = new MaterialState();
-        darkMaterial.setEnabled(true);
-        darkMaterial.setDiffuse(shadowCol);
-        darkMaterial.setAmbient(new ColorRGBA(0, 0, 0, 0f));
-        darkMaterial.setShininess(0);
-        darkMaterial.setSpecular(new ColorRGBA(0, 0, 0, 0));
-        darkMaterial.setEmissive(new ColorRGBA(0, 0, 0, 0));
-        darkMaterial.setMaterialFace(MaterialState.MaterialFace.Front);
+        _darkMaterial = new MaterialState();
+        _darkMaterial.setEnabled(true);
+        _darkMaterial.setDiffuse(_shadowCol);
+        _darkMaterial.setAmbient(new ColorRGBA(0, 0, 0, 0f));
+        _darkMaterial.setShininess(0);
+        _darkMaterial.setSpecular(new ColorRGBA(0, 0, 0, 0));
+        _darkMaterial.setEmissive(new ColorRGBA(0, 0, 0, 0));
+        _darkMaterial.setMaterialFace(MaterialState.MaterialFace.Front);
 
         if (caps.isGLSLSupported()) {
-            shader = new GLSLShaderObjectsState();
+            _shader = new GLSLShaderObjectsState();
             try {
-                shader.setVertexShader(getResource("shadowMap.vert"));
-                shader.setFragmentShader(prefixStream("const float OFFSET = 0.5 / " + shadowMapSize + ".0;",
+                _shader.setVertexShader(getResource("shadowMap.vert"));
+                _shader.setFragmentShader(prefixStream("const float OFFSET = 0.5 / " + _shadowMapSize + ".0;",
                         getResource("shadowMap.frag")));
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
-            shader.setUniform("shadowMap", 0);
-            shader.setUniform("offset", 0.0002f);
-            shader.setEnabled(true);
+            _shader.setUniform("shadowMap", 0);
+            _shader.setUniform("offset", 0.0002f);
+            _shader.setEnabled(true);
         }
 
         updateShadowCamera();
 
         // Setup the states that will be enforced whenever we use the texture renderer.
-        shadowMapRenderer.enforceState(noClip);
-        shadowMapRenderer.enforceState(noTexture);
-        shadowMapRenderer.enforceState(colorDisabled);
-        shadowMapRenderer.enforceState(cullFrontFace);
-        shadowMapRenderer.enforceState(noLights);
-        shadowMapRenderer.enforceState(shadowOffsetState);
+        _shadowMapRenderer.enforceState(_noClip);
+        _shadowMapRenderer.enforceState(_noTexture);
+        _shadowMapRenderer.enforceState(_colorDisabled);
+        _shadowMapRenderer.enforceState(_cullFrontFace);
+        _shadowMapRenderer.enforceState(_noLights);
+        _shadowMapRenderer.enforceState(_shadowOffsetState);
     }
 
     public GLSLShaderObjectsState getShader() {
-        return shader;
+        return _shader;
     }
 
     private InputStream prefixStream(final String text, final InputStream in) {
@@ -398,7 +398,7 @@ public class DirectionalShadowMapPass extends Pass {
      */
     @Override
     public void doRender(final Renderer r) {
-        if (occluderNodes.size() == 0) {
+        if (_occluderNodes.size() == 0) {
             return;
         }
 
@@ -415,19 +415,19 @@ public class DirectionalShadowMapPass extends Pass {
      */
     protected void renderShadowedScene(final Renderer r) {
         _context.pushEnforcedStates();
-        _context.enforceState(shadowTextureState);
-        _context.enforceState(discardShadowFragments);
-        _context.enforceState(sceneOffsetState);
+        _context.enforceState(_shadowTextureState);
+        _context.enforceState(_discardShadowFragments);
+        _context.enforceState(_sceneOffsetState);
 
         if (_context.getCapabilities().isGLSLSupported()) {
             final ReadOnlyMatrix4 view = ContextManager.getCurrentContext().getCurrentCamera().getModelViewMatrix();
             final Matrix4 temp = Matrix4.fetchTempInstance();
-            shader.setUniform("inverseView", view.invert(temp), false);
+            _shader.setUniform("inverseView", view.invert(temp), false);
             Matrix4.releaseTempInstance(temp);
-            _context.enforceState(shader);
+            _context.enforceState(_shader);
         } else {
-            _context.enforceState(brightLights);
-            _context.enforceState(darkMaterial);
+            _context.enforceState(_brightLights);
+            _context.enforceState(_darkMaterial);
         }
 
         // draw the scene, only the shadowed bits will be drawn and blended
@@ -449,15 +449,15 @@ public class DirectionalShadowMapPass extends Pass {
     protected void updateShadowMap(final Renderer r) {
         CullHint cullModeBefore = CullHint.Never;
 
-        if (!cullOccluders) {
-            cullModeBefore = occludersRenderNode.getCullHint();
-            occluderNodes.get(0).setCullHint(CullHint.Never);
+        if (!_cullOccluders) {
+            cullModeBefore = _occludersRenderNode.getCullHint();
+            _occluderNodes.get(0).setCullHint(CullHint.Never);
         }
 
-        shadowMapRenderer.render(occludersRenderNode, shadowMapTexture, true);
+        _shadowMapRenderer.render(_occludersRenderNode, _shadowMapTexture, true);
 
-        if (!cullOccluders) {
-            occludersRenderNode.setCullHint(cullModeBefore);
+        if (!_cullOccluders) {
+            _occludersRenderNode.setCullHint(cullModeBefore);
         }
     }
 
@@ -467,22 +467,22 @@ public class DirectionalShadowMapPass extends Pass {
     protected void updateShadowCamera() {
         // render the shadow map, use the texture renderer to render anything
         // thats been added as occluder
-        final float scale = shadowMapSize * shadowMapScale;
+        final float scale = _shadowMapSize * _shadowMapScale;
 
-        shadowMapRenderer.getCamera().setLocation(shadowCameraLocation);
-        shadowMapRenderer.getCamera().setFrustum(nearPlane, farPlane, -scale, scale, -scale, scale);
-        shadowMapRenderer.getCamera().lookAt(shadowCameraLookAt, Vector3.UNIT_Y);
-        shadowMapRenderer.getCamera().setParallelProjection(true);
-        shadowMapRenderer.getCamera().update();
+        _shadowMapRenderer.getCamera().setLocation(_shadowCameraLocation);
+        _shadowMapRenderer.getCamera().setFrustum(_nearPlane, _farPlane, -scale, scale, -scale, scale);
+        _shadowMapRenderer.getCamera().lookAt(_shadowCameraLookAt, Vector3.UNIT_Y);
+        _shadowMapRenderer.getCamera().setParallelProjection(true);
+        _shadowMapRenderer.getCamera().update();
 
         final Matrix4 proj = new Matrix4();
         final Matrix4 view = new Matrix4();
-        proj.set(shadowMapRenderer.getCamera().getProjectionMatrix());
-        view.set(shadowMapRenderer.getCamera().getModelViewMatrix());
+        proj.set(_shadowMapRenderer.getCamera().getProjectionMatrix());
+        view.set(_shadowMapRenderer.getCamera().getModelViewMatrix());
 
         final Matrix4 transform = Matrix4.fetchTempInstance().set(view.multiplyLocal(proj).multiplyLocal(biasMatrix))
                 .transposeLocal();
-        shadowMapTexture.setTextureMatrix(transform);
+        _shadowMapTexture.setTextureMatrix(transform);
         Matrix4.releaseTempInstance(transform);
     }
 
@@ -493,8 +493,8 @@ public class DirectionalShadowMapPass extends Pass {
     public void cleanUp() {
         super.cleanUp();
 
-        if (shadowMapRenderer != null) {
-            shadowMapRenderer.cleanup();
+        if (_shadowMapRenderer != null) {
+            _shadowMapRenderer.cleanup();
         }
     }
 
@@ -502,7 +502,7 @@ public class DirectionalShadowMapPass extends Pass {
      * Remove the contents of the pass
      */
     public void clear() {
-        occluderNodes.clear();
+        _occluderNodes.clear();
         _spatials.clear();
     }
 
@@ -515,8 +515,8 @@ public class DirectionalShadowMapPass extends Pass {
         @Override
         public void draw(final Renderer r) {
             Spatial child;
-            for (int i = 0, cSize = occluderNodes.size(); i < cSize; i++) {
-                child = occluderNodes.get(i);
+            for (int i = 0, cSize = _occluderNodes.size(); i < cSize; i++) {
+                child = _occluderNodes.get(i);
                 if (child != null) {
                     child.onDraw(r);
                 }

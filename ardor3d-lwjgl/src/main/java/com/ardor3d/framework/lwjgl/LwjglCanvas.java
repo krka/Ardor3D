@@ -36,23 +36,23 @@ import com.google.inject.Inject;
 public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     private static final Logger logger = Logger.getLogger(LwjglCanvas.class.getName());
 
-    private final LwjglCanvasRenderer canvasRenderer;
+    private final LwjglCanvasRenderer _canvasRenderer;
 
-    private final DisplaySettings settings;
-    private boolean inited = false;
+    private final DisplaySettings _settings;
+    private boolean _inited = false;
 
-    private volatile boolean focusLost = false;
+    private volatile boolean _focusLost = false;
 
     @Inject
     public LwjglCanvas(final LwjglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
-        this.canvasRenderer = canvasRenderer;
-        this.settings = settings;
+        _canvasRenderer = canvasRenderer;
+        _settings = settings;
     }
 
     public boolean getAndClearFocusLost() {
-        final boolean result = focusLost;
+        final boolean result = _focusLost;
 
-        focusLost = false;
+        _focusLost = false;
 
         return result;
     }
@@ -65,28 +65,28 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
 
     @MainThread
     protected void privateInit() {
-        if (inited) {
+        if (_inited) {
             return;
         }
 
         // create the Display.
         DisplayMode mode;
-        if (settings.isFullScreen()) {
-            mode = getValidDisplayMode(settings);
+        if (_settings.isFullScreen()) {
+            mode = getValidDisplayMode(_settings);
             if (null == mode) {
-                throw new Ardor3dException("Bad display mode (w/h/bpp/freq): " + settings.getWidth() + " / "
-                        + settings.getHeight() + " / " + settings.getColorDepth() + " / " + settings.getFrequency());
+                throw new Ardor3dException("Bad display mode (w/h/bpp/freq): " + _settings.getWidth() + " / "
+                        + _settings.getHeight() + " / " + _settings.getColorDepth() + " / " + _settings.getFrequency());
             }
         } else {
-            mode = new DisplayMode(settings.getWidth(), settings.getHeight());
+            mode = new DisplayMode(_settings.getWidth(), _settings.getHeight());
         }
 
-        final PixelFormat format = new PixelFormat(settings.getAlphaBits(), settings.getDepthBits(), settings
-                .getStencilBits()).withSamples(settings.getSamples()).withStereo(settings.isStereo());
+        final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(), _settings
+                .getStencilBits()).withSamples(_settings.getSamples()).withStereo(_settings.isStereo());
 
         try {
             Display.setDisplayMode(mode);
-            Display.setFullscreen(settings.isFullScreen());
+            Display.setFullscreen(_settings.isFullScreen());
             Display.create(format);
         } catch (final Exception e) {
             logger.severe("Cannot create window");
@@ -94,26 +94,26 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
             throw new Ardor3dException("Cannot create window: " + e.getMessage());
         }
 
-        canvasRenderer.init(settings, true); // true - do swap in renderer.
-        inited = true;
+        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+        _inited = true;
     }
 
     @MainThread
     public void draw(final CountDownLatch latch) {
-        if (!inited) {
+        if (!_inited) {
             privateInit();
         }
 
         checkFocus();
 
-        canvasRenderer.draw();
+        _canvasRenderer.draw();
         latch.countDown();
     }
 
     private void checkFocus() {
         // focusLost should be true if it is already true (hasn't been read/cleared yet), or
         // the display is presently not in focus
-        focusLost = focusLost || !(Display.isActive() && Display.isVisible());
+        _focusLost = _focusLost || !(Display.isActive() && Display.isVisible());
 
         //
         // final boolean newFocus =
@@ -130,7 +130,7 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     }
 
     public CanvasRenderer getCanvasRenderer() {
-        return canvasRenderer;
+        return _canvasRenderer;
     }
 
     /**
@@ -254,7 +254,7 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     }
 
     public void cleanup() {
-        canvasRenderer.cleanup();
+        _canvasRenderer.cleanup();
     }
 
 }

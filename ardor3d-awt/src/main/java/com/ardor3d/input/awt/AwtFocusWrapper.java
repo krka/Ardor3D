@@ -21,13 +21,13 @@ import com.google.inject.Inject;
  * Focus listener class for use with AWT.
  */
 public class AwtFocusWrapper implements FocusWrapper, FocusListener {
-    private volatile boolean focusLost = false;
+    private volatile boolean _focusLost = false;
 
-    private final Component component;
+    private final Component _component;
 
     @Inject
     public AwtFocusWrapper(final Component component) {
-        this.component = component;
+        _component = component;
     }
 
     public void focusGained(final FocusEvent e) {
@@ -35,18 +35,18 @@ public class AwtFocusWrapper implements FocusWrapper, FocusListener {
     }
 
     public void focusLost(final FocusEvent e) {
-        focusLost = true;
+        _focusLost = true;
     }
 
     public boolean getAndClearFocusLost() {
-        final boolean result = focusLost;
+        final boolean result = _focusLost;
 
-        focusLost = false;
+        _focusLost = false;
 
         return result;
     }
 
     public void init() {
-        component.addFocusListener(this);
+        _component.addFocusListener(this);
     }
 }

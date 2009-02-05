@@ -22,7 +22,7 @@ import com.ardor3d.image.Image.Format;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class LwjglTextureUpdater {
+public abstract class LwjglTextureUpdater {
     private static IntBuffer idBuff = BufferUtils.createIntBuffer(16);
     private static boolean glTexSubImage2DSupported = true;
 

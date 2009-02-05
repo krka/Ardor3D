@@ -21,26 +21,26 @@ public class TreeComparator implements Comparator<Integer> {
         X, Y, Z;
     }
 
-    private Axis axis;
+    private Axis _axis;
 
-    private Vector3 center;
+    private Vector3 _center;
 
-    private Mesh mesh;
+    private Mesh _mesh;
 
-    private final Vector3[] aCompare = new Vector3[3];
+    private final Vector3[] _aCompare = new Vector3[3];
 
-    private final Vector3[] bCompare = new Vector3[3];
+    private final Vector3[] _bCompare = new Vector3[3];
 
     public void setAxis(final Axis axis) {
-        this.axis = axis;
+        _axis = axis;
     }
 
     public void setMesh(final Mesh mesh) {
-        this.mesh = mesh;
+        _mesh = mesh;
     }
 
     public void setCenter(final Vector3 center) {
-        this.center = center;
+        _center = center;
     }
 
     public int compare(final Integer o1, final Integer o2) {
@@ -53,12 +53,12 @@ public class TreeComparator implements Comparator<Integer> {
 
         Vector3 centerA = null;
         Vector3 centerB = null;
-        PickingUtil.getTriangle(mesh, a, aCompare);
-        PickingUtil.getTriangle(mesh, b, bCompare);
-        centerA = aCompare[0].addLocal(aCompare[1].addLocal(aCompare[2])).subtractLocal(center);
-        centerB = bCompare[0].addLocal(bCompare[1].addLocal(bCompare[2])).subtractLocal(center);
+        PickingUtil.getTriangle(_mesh, a, _aCompare);
+        PickingUtil.getTriangle(_mesh, b, _bCompare);
+        centerA = _aCompare[0].addLocal(_aCompare[1].addLocal(_aCompare[2])).subtractLocal(_center);
+        centerB = _bCompare[0].addLocal(_bCompare[1].addLocal(_bCompare[2])).subtractLocal(_center);
 
-        switch (axis) {
+        switch (_axis) {
             case X:
                 if (centerA.getX() < centerB.getX()) {
                     return -1;

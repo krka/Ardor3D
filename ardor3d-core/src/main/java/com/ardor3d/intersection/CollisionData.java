@@ -20,13 +20,11 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public class CollisionData {
 
-    private Mesh targetMesh;
+    private Mesh _targetMesh;
+    private Mesh _sourceMesh;
 
-    private Mesh sourceMesh;
-
-    private List<Integer> sourceTris;
-
-    private List<Integer> targetTris;
+    private List<Integer> _sourceTris;
+    private List<Integer> _targetTris;
 
     /**
      * instantiates a new CollisionData object.
@@ -54,21 +52,21 @@ public class CollisionData {
      */
     public CollisionData(final Mesh sourceMesh, final Mesh targetMesh, final List<Integer> sourceTris,
             final List<Integer> targetTris) {
-        this.targetMesh = targetMesh;
-        this.sourceMesh = sourceMesh;
-        this.targetTris = targetTris;
-        this.sourceTris = sourceTris;
+        _targetMesh = targetMesh;
+        _sourceMesh = sourceMesh;
+        _targetTris = targetTris;
+        _sourceTris = sourceTris;
     }
 
     /**
      * @return Returns the source mesh.
      */
     public Mesh getSourceMesh() {
-        return sourceMesh;
+        return _sourceMesh;
     }
 
     public Mesh getTargetMesh() {
-        return targetMesh;
+        return _targetMesh;
     }
 
     /**
@@ -76,7 +74,7 @@ public class CollisionData {
      *            The mesh to set.
      */
     public void setSourceMesh(final Mesh mesh) {
-        sourceMesh = mesh;
+        _sourceMesh = mesh;
     }
 
     /**
@@ -86,14 +84,14 @@ public class CollisionData {
      *            the mesh that was hit by the source mesh.
      */
     public void setTargetMesh(final Mesh mesh) {
-        targetMesh = mesh;
+        _targetMesh = mesh;
     }
 
     /**
      * @return Returns the source.
      */
     public List<Integer> getSourceTris() {
-        return sourceTris;
+        return _sourceTris;
     }
 
     /**
@@ -101,14 +99,14 @@ public class CollisionData {
      *            The source to set.
      */
     public void setSourceTris(final List<Integer> source) {
-        sourceTris = source;
+        _sourceTris = source;
     }
 
     /**
      * @return Returns the target.
      */
     public List<Integer> getTargetTris() {
-        return targetTris;
+        return _targetTris;
     }
 
     /**
@@ -116,6 +114,6 @@ public class CollisionData {
      *            The target to set.
      */
     public void setTargetTris(final List<Integer> target) {
-        targetTris = target;
+        _targetTris = target;
     }
 }

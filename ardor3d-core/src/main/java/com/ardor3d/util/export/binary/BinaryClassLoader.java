@@ -21,7 +21,7 @@ import com.ardor3d.util.export.binary.modules.BinaryCameraModule;
 public class BinaryClassLoader {
 
     // list of modules maintained in the loader
-    private static HashMap<String, BinaryLoaderModule> modules = new HashMap<String, BinaryLoaderModule>();
+    private static HashMap<String, BinaryLoaderModule> _modules = new HashMap<String, BinaryLoaderModule>();
 
     {
         BinaryClassLoader.registerModule(new BinaryCameraModule());
@@ -34,7 +34,7 @@ public class BinaryClassLoader {
      *            the module to register with this loader.
      */
     public static void registerModule(final BinaryLoaderModule m) {
-        modules.put(m.getKey(), m);
+        _modules.put(m.getKey(), m);
     }
 
     /**
@@ -44,7 +44,7 @@ public class BinaryClassLoader {
      *            the module to remove from the loader.
      */
     public static void unregisterModule(final BinaryLoaderModule m) {
-        modules.remove(m.getKey());
+        _modules.remove(m.getKey());
     }
 
     /**
@@ -68,7 +68,7 @@ public class BinaryClassLoader {
     public static Savable fromName(final String className, final InputCapsule inputCapsule)
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 
-        final BinaryLoaderModule m = modules.get(className);
+        final BinaryLoaderModule m = _modules.get(className);
         if (m != null) {
             return m.load(inputCapsule);
         }

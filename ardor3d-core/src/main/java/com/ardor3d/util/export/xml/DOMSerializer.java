@@ -31,23 +31,23 @@ import org.w3c.dom.NodeList;
 public class DOMSerializer {
 
     /** Indentation to use (default is no indentation) */
-    private String indent = "";
+    private String _indent = "";
 
     /** Line separator to use (default is for Windows) */
-    private String lineSeparator = "\n";
+    private String _lineSeparator = "\n";
 
     /** Encoding for output (default is UTF-8) */
-    private String encoding = "UTF8";
+    private String _encoding = "UTF8";
 
     /** Attributes will be displayed on seperate lines */
-    private final boolean displayAttributesOnSeperateLine = true;
+    private final boolean _displayAttributesOnSeperateLine = true;
 
     public void setLineSeparator(final String lineSeparator) {
-        this.lineSeparator = lineSeparator;
+        _lineSeparator = lineSeparator;
     }
 
     public void setEncoding(final String encoding) {
-        this.encoding = encoding;
+        _encoding = encoding;
     }
 
     public void setIndent(final int numSpaces) {
@@ -55,11 +55,11 @@ public class DOMSerializer {
         for (int i = 0; i < numSpaces; i++) {
             buffer.append("\t");
         }
-        indent = buffer.toString();
+        _indent = buffer.toString();
     }
 
     public void serialize(final Document doc, final OutputStream out) throws IOException {
-        final Writer writer = new OutputStreamWriter(out, encoding);
+        final Writer writer = new OutputStreamWriter(out, _encoding);
         serialize(doc, writer);
     }
 
@@ -92,7 +92,7 @@ public class DOMSerializer {
                 }
                 writer.write("\"");
                 writer.write("?>");
-                writer.write(lineSeparator);
+                writer.write(_lineSeparator);
 
                 // recurse on each top-level node
                 final NodeList nodes = node.getChildNodes();
@@ -110,8 +110,8 @@ public class DOMSerializer {
                 for (int i = 0; i < attributes.getLength(); i++) {
                     final Node current = attributes.item(i);
                     String attributeSeperator = " ";
-                    if (displayAttributesOnSeperateLine && i != 0) {
-                        attributeSeperator = lineSeparator + indentLevel + indent;
+                    if (_displayAttributesOnSeperateLine && i != 0) {
+                        attributeSeperator = _lineSeparator + indentLevel + _indent;
                     }
                     // Double indentLevel to match parent element and then one indention to format below parent
                     final String attributeStr = attributeSeperator + current.getNodeName() + "=\"";
@@ -129,7 +129,7 @@ public class DOMSerializer {
                     }
 
                     for (int i = 0; i < children.getLength(); i++) {
-                        serializeNode(children.item(i), writer, indentLevel + indent);
+                        serializeNode(children.item(i), writer, indentLevel + _indent);
                     }
 
                     if ((children.item(0) != null)
@@ -151,11 +151,11 @@ public class DOMSerializer {
                 break;
             case Node.COMMENT_NODE:
                 writer.write(indentLevel + "<!-- " + node.getNodeValue() + " -->");
-                writer.write(lineSeparator);
+                writer.write(_lineSeparator);
                 break;
             case Node.PROCESSING_INSTRUCTION_NODE:
                 writer.write("<?" + node.getNodeName() + " " + node.getNodeValue() + "?>");
-                writer.write(lineSeparator);
+                writer.write(_lineSeparator);
                 break;
             case Node.ENTITY_REFERENCE_NODE:
                 writer.write("&" + node.getNodeName() + ";");
@@ -176,7 +176,7 @@ public class DOMSerializer {
                     writer.write(" [" + internalSubset + "]");
                 }
                 writer.write(">");
-                writer.write(lineSeparator);
+                writer.write(_lineSeparator);
                 break;
         }
     }

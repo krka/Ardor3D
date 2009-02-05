@@ -50,47 +50,47 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     private static final Logger logger = Logger.getLogger(JoglCanvas.class.getName());
 
-    private final JoglCanvasRenderer canvasRenderer;
+    private final JoglCanvasRenderer _canvasRenderer;
 
-    private final DisplaySettings settings;
-    private boolean inited = false;
+    private final DisplaySettings _settings;
+    private boolean _inited = false;
     // private Frame frame;
-    private boolean isClosing = false;
+    private boolean _isClosing = false;
 
-    private GLCanvas glCanvas;
+    private GLCanvas _glCanvas;
 
     // private PhysicalLayer physicalLayer;
     // private final boolean hasFocus = false;
 
     @Inject
     public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
-        this.canvasRenderer = canvasRenderer;
-        this.settings = settings;
+        _canvasRenderer = canvasRenderer;
+        _settings = settings;
     }
 
     @Override
     public void addKeyListener(final KeyListener l) {
-        glCanvas.addKeyListener(l);
+        _glCanvas.addKeyListener(l);
     }
 
     @Override
     public void addMouseListener(final MouseListener l) {
-        glCanvas.addMouseListener(l);
+        _glCanvas.addMouseListener(l);
     }
 
     @Override
     public void addMouseMotionListener(final MouseMotionListener l) {
-        glCanvas.addMouseMotionListener(l);
+        _glCanvas.addMouseMotionListener(l);
     }
 
     @Override
     public void addMouseWheelListener(final MouseWheelListener l) {
-        glCanvas.addMouseWheelListener(l);
+        _glCanvas.addMouseWheelListener(l);
     }
 
     @Override
     public void addFocusListener(final FocusListener l) {
-        glCanvas.addFocusListener(l); // To change body of overridden methods use File | Settings | File Templates.
+        _glCanvas.addFocusListener(l); // To change body of overridden methods use File | Settings | File Templates.
     }
 
     @MainThread
@@ -100,18 +100,19 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     @MainThread
     protected void privateInit() {
-        if (inited) {
+        if (_inited) {
             return;
         }
 
         // Validate window dimensions.
-        if (settings.getWidth() <= 0 || settings.getHeight() <= 0) {
-            throw new Ardor3dException("Invalid resolution values: " + settings.getWidth() + " " + settings.getHeight());
+        if (_settings.getWidth() <= 0 || _settings.getHeight() <= 0) {
+            throw new Ardor3dException("Invalid resolution values: " + _settings.getWidth() + " "
+                    + _settings.getHeight());
         }
 
         // Validate bit depth.
-        if ((settings.getColorDepth() != 32) && (settings.getColorDepth() != 16) && (settings.getColorDepth() != 24)) {
-            throw new Ardor3dException("Invalid pixel depth: " + settings.getColorDepth());
+        if ((_settings.getColorDepth() != 32) && (_settings.getColorDepth() != 16) && (_settings.getColorDepth() != 24)) {
+            throw new Ardor3dException("Invalid pixel depth: " + _settings.getColorDepth());
         }
 
         // Create the OpenGL canvas, and place it within a frame.
@@ -121,32 +122,32 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         final GLCapabilities caps = new GLCapabilities();
         caps.setHardwareAccelerated(true);
         caps.setDoubleBuffered(true);
-        caps.setAlphaBits(settings.getAlphaBits());
-        caps.setDepthBits(settings.getDepthBits());
-        caps.setNumSamples(settings.getSamples());
-        caps.setStereo(settings.isStereo());
+        caps.setAlphaBits(_settings.getAlphaBits());
+        caps.setDepthBits(_settings.getDepthBits());
+        caps.setNumSamples(_settings.getSamples());
+        caps.setStereo(_settings.isStereo());
 
         // Create the OpenGL canvas,
-        glCanvas = new GLCanvas(caps);
+        _glCanvas = new GLCanvas(caps);
 
-        glCanvas.setFocusable(true);
-        glCanvas.requestFocus();
-        glCanvas.setSize(settings.getWidth(), settings.getHeight());
-        glCanvas.setIgnoreRepaint(true);
-        glCanvas.setAutoSwapBufferMode(false);
+        _glCanvas.setFocusable(true);
+        _glCanvas.requestFocus();
+        _glCanvas.setSize(_settings.getWidth(), _settings.getHeight());
+        _glCanvas.setIgnoreRepaint(true);
+        _glCanvas.setAutoSwapBufferMode(false);
 
-        final GLContext glContext = glCanvas.getContext();
-        canvasRenderer.setContext(glContext);
+        final GLContext glContext = _glCanvas.getContext();
+        _canvasRenderer.setContext(glContext);
         // hack
         JoglPbufferTextureRenderer._parentContext = glContext;
 
-        this.add(glCanvas);
+        this.add(_glCanvas);
         final boolean isDisplayModeModified;
         final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         // Get the current display mode
         final DisplayMode previousDisplayMode = gd.getDisplayMode();
         // Handle full screen mode if requested.
-        if (settings.isFullScreen()) {
+        if (_settings.isFullScreen()) {
             setUndecorated(true);
             // Check if the full-screen mode is supported by the OS
             boolean isFullScreenSupported = gd.isFullScreenSupported();
@@ -170,16 +171,16 @@ public class JoglCanvas extends Frame implements NativeCanvas {
                     // that matches exactly with your parameters
                     for (int i = 0; i < displayModes.length && matchingDisplayMode == null; i++) {
                         currentDisplayMode = displayModes[i];
-                        if (currentDisplayMode.getWidth() == settings.getWidth()
-                                && currentDisplayMode.getHeight() == settings.getHeight()) {
-                            if (currentDisplayMode.getBitDepth() == settings.getColorDepth()) {
-                                if (currentDisplayMode.getRefreshRate() == settings.getFrequency()) {
+                        if (currentDisplayMode.getWidth() == _settings.getWidth()
+                                && currentDisplayMode.getHeight() == _settings.getHeight()) {
+                            if (currentDisplayMode.getBitDepth() == _settings.getColorDepth()) {
+                                if (currentDisplayMode.getRefreshRate() == _settings.getFrequency()) {
                                     matchingDisplayMode = currentDisplayMode;
                                 } else if (currentDisplayMode.getRefreshRate() == DisplayMode.REFRESH_RATE_UNKNOWN) {
                                     refreshRateUnknownDisplayMode = currentDisplayMode;
                                 }
                             } else if (currentDisplayMode.getBitDepth() == DisplayMode.BIT_DEPTH_MULTI) {
-                                if (currentDisplayMode.getRefreshRate() == settings.getFrequency()) {
+                                if (currentDisplayMode.getRefreshRate() == _settings.getFrequency()) {
                                     multiBitsDepthSupportedDisplayMode = currentDisplayMode;
                                 } else if (currentDisplayMode.getRefreshRate() == DisplayMode.REFRESH_RATE_UNKNOWN) {
                                     multiBitsDepthSupportedAndRefreshRateUnknownDisplayMode = currentDisplayMode;
@@ -212,8 +213,8 @@ public class JoglCanvas extends Frame implements NativeCanvas {
                     // Resize the canvas if the display mode cannot be changed
                     // and the screen size is not equal to the canvas size
                     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    if (screenSize.width != settings.getWidth() || screenSize.height != settings.getHeight()) {
-                        glCanvas.setSize(screenSize);
+                    if (screenSize.width != _settings.getWidth() || screenSize.height != _settings.getHeight()) {
+                        _glCanvas.setSize(screenSize);
                     }
                 }
             } else {
@@ -224,7 +225,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             if (!isFullScreenSupported) {
                 final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 // Resize the canvas
-                glCanvas.setSize(screenSize);
+                _glCanvas.setSize(screenSize);
                 // Resize the frame so that it occupies the whole screen
                 this.setSize(screenSize);
                 // Set its location at the top left corner
@@ -237,15 +238,15 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             pack();
 
             int x, y;
-            x = (Toolkit.getDefaultToolkit().getScreenSize().width - settings.getWidth()) / 2;
-            y = (Toolkit.getDefaultToolkit().getScreenSize().height - settings.getHeight()) / 2;
+            x = (Toolkit.getDefaultToolkit().getScreenSize().width - _settings.getWidth()) / 2;
+            y = (Toolkit.getDefaultToolkit().getScreenSize().height - _settings.getHeight()) / 2;
             this.setLocation(x, y);
         }
 
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                isClosing = true;
+                _isClosing = true;
                 // If required, restore the previous display mode
                 if (isDisplayModeModified) {
                     gd.setDisplayMode(previousDisplayMode);
@@ -260,18 +261,18 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         // Make the window visible to realize the OpenGL surface.
         setVisible(true);
 
-        canvasRenderer.init(settings, true); // true - do swap in renderer.
-        inited = true;
+        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+        _inited = true;
     }
 
     public void draw(final CountDownLatch latch) {
-        if (!inited) {
+        if (!_inited) {
             privateInit();
         }
 
         checkFocus();
 
-        canvasRenderer.draw();
+        _canvasRenderer.draw();
         latch.countDown();
     }
 
@@ -297,7 +298,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     public CanvasRenderer getCanvasRenderer() {
-        return canvasRenderer;
+        return _canvasRenderer;
     }
 
     public void close() {
@@ -307,7 +308,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
                 GLContext.getCurrent().release();
             }
         } catch (final GLException releaseFailure) {
-            logger.log(Level.WARNING, "Failed to release OpenGL Context: " + glCanvas, releaseFailure);
+            logger.log(Level.WARNING, "Failed to release OpenGL Context: " + _glCanvas, releaseFailure);
         }
 
         // Dispose of any window resources.
@@ -320,7 +321,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     public boolean isClosing() {
-        return isClosing;
+        return _isClosing;
     }
 
     public void moveWindowTo(final int locX, final int locY) {
@@ -339,7 +340,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     }
 
     public void cleanup() {
-        canvasRenderer.cleanup();
+        _canvasRenderer.cleanup();
     }
 
     // public void forward(final JoglCanvas canvas, final PhysicalLayer physicalLayer) {

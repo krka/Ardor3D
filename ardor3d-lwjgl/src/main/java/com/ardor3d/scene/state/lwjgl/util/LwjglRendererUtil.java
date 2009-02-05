@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.state.record.RendererRecord;
 
-public class LwjglRendererUtil {
+public abstract class LwjglRendererUtil {
 
     public static void switchMode(final RendererRecord rendRecord, final int mode) {
         if (!rendRecord.isMatrixValid() || rendRecord.getMatrixMode() != mode) {

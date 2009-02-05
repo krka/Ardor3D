@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.ZBufferStateRecord;
 
-public class JoglZBufferStateUtil {
+public abstract class JoglZBufferStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ZBufferState state) {
         // ask for the current state record

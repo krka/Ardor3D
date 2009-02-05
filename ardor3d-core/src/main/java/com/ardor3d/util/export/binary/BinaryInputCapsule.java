@@ -33,26 +33,26 @@ import com.ardor3d.util.geom.BufferUtils;
 public class BinaryInputCapsule implements InputCapsule {
     private static final Logger logger = Logger.getLogger(BinaryInputCapsule.class.getName());
 
-    protected BinaryImporter importer;
-    protected BinaryClassObject cObj;
-    protected HashMap<Byte, Object> fieldData;
+    protected BinaryImporter _importer;
+    protected BinaryClassObject _cObj;
+    protected HashMap<Byte, Object> _fieldData;
 
-    protected int index = 0;
+    protected int _index = 0;
 
     public BinaryInputCapsule(final BinaryImporter importer, final BinaryClassObject bco) {
-        this.importer = importer;
-        cObj = bco;
+        _importer = importer;
+        _cObj = bco;
     }
 
     public void setContent(final byte[] content, final int start, final int limit) {
-        fieldData = new HashMap<Byte, Object>();
-        for (index = start; index < limit;) {
-            final byte alias = content[index];
+        _fieldData = new HashMap<Byte, Object>();
+        for (_index = start; _index < limit;) {
+            final byte alias = content[_index];
 
-            index++;
+            _index++;
 
             try {
-                final byte type = cObj.aliasFields.get(alias).type;
+                final byte type = _cObj._aliasFields.get(alias)._type;
                 Object value = null;
 
                 switch (type) {
@@ -218,7 +218,7 @@ public class BinaryInputCapsule implements InputCapsule {
                         continue;
                 }
 
-                fieldData.put(alias, value);
+                _fieldData.put(alias, value);
 
             } catch (final IOException e) {
                 logger.logp(Level.SEVERE, this.getClass().toString(), "setContent(byte[] content)", "Exception", e);
@@ -227,210 +227,210 @@ public class BinaryInputCapsule implements InputCapsule {
     }
 
     public BitSet readBitSet(final String name, final BitSet defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (BitSet) fieldData.get(field.alias);
+        return (BitSet) _fieldData.get(field._alias);
     }
 
     public boolean readBoolean(final String name, final boolean defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Boolean) fieldData.get(field.alias)).booleanValue();
+        return ((Boolean) _fieldData.get(field._alias)).booleanValue();
     }
 
     public boolean[] readBooleanArray(final String name, final boolean[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (boolean[]) fieldData.get(field.alias);
+        return (boolean[]) _fieldData.get(field._alias);
     }
 
     public boolean[][] readBooleanArray2D(final String name, final boolean[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (boolean[][]) fieldData.get(field.alias);
+        return (boolean[][]) _fieldData.get(field._alias);
     }
 
     public byte readByte(final String name, final byte defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Byte) fieldData.get(field.alias)).byteValue();
+        return ((Byte) _fieldData.get(field._alias)).byteValue();
     }
 
     public byte[] readByteArray(final String name, final byte[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (byte[]) fieldData.get(field.alias);
+        return (byte[]) _fieldData.get(field._alias);
     }
 
     public byte[][] readByteArray2D(final String name, final byte[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (byte[][]) fieldData.get(field.alias);
+        return (byte[][]) _fieldData.get(field._alias);
     }
 
     public ByteBuffer readByteBuffer(final String name, final ByteBuffer defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (ByteBuffer) fieldData.get(field.alias);
+        return (ByteBuffer) _fieldData.get(field._alias);
     }
 
     @SuppressWarnings("unchecked")
     public List<ByteBuffer> readByteBufferList(final String name, final List<ByteBuffer> defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (List<ByteBuffer>) fieldData.get(field.alias);
+        return (List<ByteBuffer>) _fieldData.get(field._alias);
     }
 
     public double readDouble(final String name, final double defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Double) fieldData.get(field.alias)).doubleValue();
+        return ((Double) _fieldData.get(field._alias)).doubleValue();
     }
 
     public double[] readDoubleArray(final String name, final double[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (double[]) fieldData.get(field.alias);
+        return (double[]) _fieldData.get(field._alias);
     }
 
     public double[][] readDoubleArray2D(final String name, final double[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (double[][]) fieldData.get(field.alias);
+        return (double[][]) _fieldData.get(field._alias);
     }
 
     public float readFloat(final String name, final float defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Float) fieldData.get(field.alias)).floatValue();
+        return ((Float) _fieldData.get(field._alias)).floatValue();
     }
 
     public float[] readFloatArray(final String name, final float[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (float[]) fieldData.get(field.alias);
+        return (float[]) _fieldData.get(field._alias);
     }
 
     public float[][] readFloatArray2D(final String name, final float[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (float[][]) fieldData.get(field.alias);
+        return (float[][]) _fieldData.get(field._alias);
     }
 
     public FloatBuffer readFloatBuffer(final String name, final FloatBuffer defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (FloatBuffer) fieldData.get(field.alias);
+        return (FloatBuffer) _fieldData.get(field._alias);
     }
 
     @SuppressWarnings("unchecked")
     public List<FloatBuffer> readFloatBufferList(final String name, final List<FloatBuffer> defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (List<FloatBuffer>) fieldData.get(field.alias);
+        return (List<FloatBuffer>) _fieldData.get(field._alias);
     }
 
     public int readInt(final String name, final int defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Integer) fieldData.get(field.alias)).intValue();
+        return ((Integer) _fieldData.get(field._alias)).intValue();
     }
 
     public int[] readIntArray(final String name, final int[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (int[]) fieldData.get(field.alias);
+        return (int[]) _fieldData.get(field._alias);
     }
 
     public int[][] readIntArray2D(final String name, final int[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (int[][]) fieldData.get(field.alias);
+        return (int[][]) _fieldData.get(field._alias);
     }
 
     public IntBuffer readIntBuffer(final String name, final IntBuffer defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (IntBuffer) fieldData.get(field.alias);
+        return (IntBuffer) _fieldData.get(field._alias);
     }
 
     public long readLong(final String name, final long defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Long) fieldData.get(field.alias)).longValue();
+        return ((Long) _fieldData.get(field._alias)).longValue();
     }
 
     public long[] readLongArray(final String name, final long[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (long[]) fieldData.get(field.alias);
+        return (long[]) _fieldData.get(field._alias);
     }
 
     public long[][] readLongArray2D(final String name, final long[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (long[][]) fieldData.get(field.alias);
+        return (long[][]) _fieldData.get(field._alias);
     }
 
     public Savable readSavable(final String name, final Savable defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value == null) {
             return null;
         } else if (value instanceof ID) {
-            value = importer.readObject(((ID) value).id);
-            fieldData.put(field.alias, value);
+            value = _importer.readObject(((ID) value).id);
+            _fieldData.put(field._alias, value);
             return (Savable) value;
         } else {
             return defVal;
@@ -438,14 +438,14 @@ public class BinaryInputCapsule implements InputCapsule {
     }
 
     public Savable[] readSavableArray(final String name, final Savable[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object[] values = (Object[]) fieldData.get(field.alias);
+        Object[] values = (Object[]) _fieldData.get(field._alias);
         if (values instanceof ID[]) {
             values = resolveIDs(values);
-            fieldData.put(field.alias, values);
+            _fieldData.put(field._alias, values);
             return (Savable[]) values;
         } else {
             return defVal;
@@ -457,7 +457,7 @@ public class BinaryInputCapsule implements InputCapsule {
             final Savable[] savables = new Savable[values.length];
             for (int i = 0; i < values.length; i++) {
                 final ID id = (ID) values[i];
-                savables[i] = id != null ? importer.readObject(id.id) : null;
+                savables[i] = id != null ? _importer.readObject(id.id) : null;
             }
             return savables;
         } else {
@@ -466,11 +466,11 @@ public class BinaryInputCapsule implements InputCapsule {
     }
 
     public Savable[][] readSavableArray2D(final String name, final Savable[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object[][] values = (Object[][]) fieldData.get(field.alias);
+        Object[][] values = (Object[][]) _fieldData.get(field._alias);
         if (values instanceof ID[][]) {
             final Savable[][] savables = new Savable[values.length][];
             for (int i = 0; i < values.length; i++) {
@@ -481,17 +481,17 @@ public class BinaryInputCapsule implements InputCapsule {
                 }
             }
             values = savables;
-            fieldData.put(field.alias, values);
+            _fieldData.put(field._alias, values);
         }
         return (Savable[][]) values;
     }
 
     public Savable[][][] readSavableArray3D(final String name, final Savable[][][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        final Object[][][] values = (Object[][][]) fieldData.get(field.alias);
+        final Object[][][] values = (Object[][][]) _fieldData.get(field._alias);
         if (values instanceof ID[][][]) {
             final Savable[][][] savables = new Savable[values.length][][];
             for (int i = 0; i < values.length; i++) {
@@ -504,7 +504,7 @@ public class BinaryInputCapsule implements InputCapsule {
                     savables[i] = null;
                 }
             }
-            fieldData.put(field.alias, savables);
+            _fieldData.put(field._alias, savables);
             return savables;
         } else {
             return defVal;
@@ -549,16 +549,16 @@ public class BinaryInputCapsule implements InputCapsule {
 
     @SuppressWarnings("unchecked")
     public <E extends Savable> List<E> readSavableList(final String name, final List<E> defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value instanceof ID[]) {
             // read Savable array and convert to ArrayList
             final Savable[] savables = readSavableArray(name, null);
             value = savableArrayListFromArray(savables);
-            fieldData.put(field.alias, value);
+            _fieldData.put(field._alias, value);
         }
         return (List<E>) value;
     }
@@ -566,11 +566,11 @@ public class BinaryInputCapsule implements InputCapsule {
     @SuppressWarnings("unchecked")
     public <E extends Savable> List<E>[] readSavableListArray(final String name, final List<E>[] defVal)
             throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value instanceof ID[][]) {
             // read 2D Savable array and convert to ArrayList array
             final Savable[][] savables = readSavableArray2D(name, null);
@@ -583,7 +583,7 @@ public class BinaryInputCapsule implements InputCapsule {
             } else {
                 value = defVal;
             }
-            fieldData.put(field.alias, value);
+            _fieldData.put(field._alias, value);
         }
         return (List<E>[]) value;
     }
@@ -591,11 +591,11 @@ public class BinaryInputCapsule implements InputCapsule {
     @SuppressWarnings("unchecked")
     public <E extends Savable> List<E>[][] readSavableListArray2D(final String name, final List<E>[][] defVal)
             throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value instanceof ID[][][]) {
             // read 3D Savable array and convert to 2D ArrayList array
             final Savable[][][] savables = readSavableArray3D(name, null);
@@ -611,7 +611,7 @@ public class BinaryInputCapsule implements InputCapsule {
             } else {
                 value = defVal;
             }
-            fieldData.put(field.alias, value);
+            _fieldData.put(field._alias, value);
         }
         return (List<E>[][]) value;
     }
@@ -619,16 +619,16 @@ public class BinaryInputCapsule implements InputCapsule {
     @SuppressWarnings("unchecked")
     public <K extends Savable, V extends Savable> Map<K, V> readSavableMap(final String name, final Map<K, V> defVal)
             throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value instanceof ID[][]) {
             // read Savable array and convert to Map
             final Savable[][] savables = readSavableArray2D(name, null);
             value = savableMapFrom2DArray(savables);
-            fieldData.put(field.alias, value);
+            _fieldData.put(field._alias, value);
         }
         return (Map<K, V>) value;
     }
@@ -636,82 +636,82 @@ public class BinaryInputCapsule implements InputCapsule {
     @SuppressWarnings("unchecked")
     public <V extends Savable> Map<String, V> readStringSavableMap(final String name, final Map<String, V> defVal)
             throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        Object value = fieldData.get(field.alias);
+        Object value = _fieldData.get(field._alias);
         if (value instanceof StringIDMap) {
             // read Savable array and convert to Map values
             final StringIDMap in = (StringIDMap) value;
             final Savable[] values = resolveIDs(in.values);
             value = stringSavableMapFromKV(in.keys, values);
-            fieldData.put(field.alias, value);
+            _fieldData.put(field._alias, value);
         }
         return (Map<String, V>) value;
     }
 
     public short readShort(final String name, final short defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return ((Short) fieldData.get(field.alias)).shortValue();
+        return ((Short) _fieldData.get(field._alias)).shortValue();
     }
 
     public short[] readShortArray(final String name, final short[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (short[]) fieldData.get(field.alias);
+        return (short[]) _fieldData.get(field._alias);
     }
 
     public short[][] readShortArray2D(final String name, final short[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (short[][]) fieldData.get(field.alias);
+        return (short[][]) _fieldData.get(field._alias);
     }
 
     public ShortBuffer readShortBuffer(final String name, final ShortBuffer defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (ShortBuffer) fieldData.get(field.alias);
+        return (ShortBuffer) _fieldData.get(field._alias);
     }
 
     public String readString(final String name, final String defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (String) fieldData.get(field.alias);
+        return (String) _fieldData.get(field._alias);
     }
 
     public String[] readStringArray(final String name, final String[] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (String[]) fieldData.get(field.alias);
+        return (String[]) _fieldData.get(field._alias);
     }
 
     public String[][] readStringArray2D(final String name, final String[][] defVal) throws IOException {
-        final BinaryClassField field = cObj.nameFields.get(name);
-        if (field == null || !fieldData.containsKey(field.alias)) {
+        final BinaryClassField field = _cObj._nameFields.get(name);
+        if (field == null || !_fieldData.containsKey(field._alias)) {
             return defVal;
         }
-        return (String[][]) fieldData.get(field.alias);
+        return (String[][]) _fieldData.get(field._alias);
     }
 
     // byte primitive
 
     protected byte readByte(final byte[] content) throws IOException {
-        final byte value = content[index];
-        index++;
+        final byte value = content[_index];
+        _index++;
         return value;
     }
 
@@ -742,12 +742,12 @@ public class BinaryInputCapsule implements InputCapsule {
     // int primitive
 
     protected int readInt(final byte[] content) throws IOException {
-        byte[] bytes = inflateFrom(content, index);
-        index += 1 + bytes.length;
+        byte[] bytes = inflateFrom(content, _index);
+        _index += 1 + bytes.length;
         bytes = ByteUtils.rightAlignBytes(bytes, 4);
         final int value = ByteUtils.convertIntFromBytes(bytes);
         if (value == BinaryOutputCapsule.NULL_OBJECT || value == BinaryOutputCapsule.DEFAULT_OBJECT) {
-            index -= 4;
+            _index -= 4;
         }
         return value;
     }
@@ -779,8 +779,8 @@ public class BinaryInputCapsule implements InputCapsule {
     // float primitive
 
     protected float readFloat(final byte[] content) throws IOException {
-        final float value = ByteUtils.convertFloatFromBytes(content, index);
-        index += 4;
+        final float value = ByteUtils.convertFloatFromBytes(content, _index);
+        _index += 4;
         return value;
     }
 
@@ -811,8 +811,8 @@ public class BinaryInputCapsule implements InputCapsule {
     // double primitive
 
     protected double readDouble(final byte[] content) throws IOException {
-        final double value = ByteUtils.convertDoubleFromBytes(content, index);
-        index += 8;
+        final double value = ByteUtils.convertDoubleFromBytes(content, _index);
+        _index += 8;
         return value;
     }
 
@@ -843,8 +843,8 @@ public class BinaryInputCapsule implements InputCapsule {
     // long primitive
 
     protected long readLong(final byte[] content) throws IOException {
-        byte[] bytes = inflateFrom(content, index);
-        index += 1 + bytes.length;
+        byte[] bytes = inflateFrom(content, _index);
+        _index += 1 + bytes.length;
         bytes = ByteUtils.rightAlignBytes(bytes, 8);
         final long value = ByteUtils.convertLongFromBytes(bytes);
         return value;
@@ -877,8 +877,8 @@ public class BinaryInputCapsule implements InputCapsule {
     // short primitive
 
     protected short readShort(final byte[] content) throws IOException {
-        final short value = ByteUtils.convertShortFromBytes(content, index);
-        index += 2;
+        final short value = ByteUtils.convertShortFromBytes(content, _index);
+        _index += 2;
         return value;
     }
 
@@ -909,8 +909,8 @@ public class BinaryInputCapsule implements InputCapsule {
     // boolean primitive
 
     protected boolean readBoolean(final byte[] content) throws IOException {
-        final boolean value = ByteUtils.convertBooleanFromBytes(content, index);
-        index += 1;
+        final boolean value = ByteUtils.convertBooleanFromBytes(content, _index);
+        _index += 1;
         return value;
     }
 
@@ -1000,7 +1000,7 @@ public class BinaryInputCapsule implements InputCapsule {
         int utf8State = UTF8_START;
         int b;
         for (int x = 0; x < length; x++) {
-            bytes[x] = content[index++];
+            bytes[x] = content[_index++];
             b = bytes[x] & 0xFF; // unsign our byte
 
             switch (utf8State) {

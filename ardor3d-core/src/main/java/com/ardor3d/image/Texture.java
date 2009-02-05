@@ -106,14 +106,14 @@ public abstract class Texture implements Savable {
          */
         Trilinear(true);
 
-        private boolean usesMipMapLevels;
+        private boolean _usesMipMapLevels;
 
         private MinificationFilter(final boolean usesMipMapLevels) {
-            this.usesMipMapLevels = usesMipMapLevels;
+            _usesMipMapLevels = usesMipMapLevels;
         }
 
         public boolean usesMipMapLevels() {
-            return usesMipMapLevels;
+            return _usesMipMapLevels;
         }
     }
 
@@ -481,58 +481,58 @@ public abstract class Texture implements Savable {
     }
 
     // Optional String to point to where this texture is located
-    private String imageLocation = null;
+    private String _imageLocation = null;
 
     // texture attributes.
-    private Image image = null;
+    private Image _image = null;
     private final ColorRGBA _blendColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
     private final ColorRGBA _borderColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
 
     private final Matrix4 _texMatrix = new Matrix4();
 
-    private float anisotropicFilterPercent = 0.0f;
+    private float _anisotropicFilterPercent = 0.0f;
 
-    private transient int textureId;
-    private ApplyMode apply = ApplyMode.Modulate;
-    private MinificationFilter minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
-    private MagnificationFilter magnificationFilter = MagnificationFilter.Bilinear;
-    private EnvironmentalMapMode envMapMode = EnvironmentalMapMode.None;
-    private RenderToTextureType rttSource = RenderToTextureType.RGBA;
+    private transient int _textureId;
+    private ApplyMode _apply = ApplyMode.Modulate;
+    private MinificationFilter _minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
+    private MagnificationFilter _magnificationFilter = MagnificationFilter.Bilinear;
+    private EnvironmentalMapMode _envMapMode = EnvironmentalMapMode.None;
+    private RenderToTextureType _rttSource = RenderToTextureType.RGBA;
 
-    private int memReq = 0;
-    private boolean hasBorder = false;
+    private int _memReq = 0;
+    private boolean _hasBorder = false;
 
     // The following will only used if apply is set to ApplyMode.Combine
-    private CombinerFunctionRGB combineFuncRGB = CombinerFunctionRGB.Modulate;
-    private CombinerSource combineSrc0RGB = CombinerSource.CurrentTexture;
-    private CombinerSource combineSrc1RGB = CombinerSource.Previous;
-    private CombinerSource combineSrc2RGB = CombinerSource.Constant;
-    private CombinerOperandRGB combineOp0RGB = CombinerOperandRGB.SourceColor;
-    private CombinerOperandRGB combineOp1RGB = CombinerOperandRGB.SourceColor;
-    private CombinerOperandRGB combineOp2RGB = CombinerOperandRGB.SourceAlpha;
-    private CombinerScale combineScaleRGB = CombinerScale.One;
+    private CombinerFunctionRGB _combineFuncRGB = CombinerFunctionRGB.Modulate;
+    private CombinerSource _combineSrc0RGB = CombinerSource.CurrentTexture;
+    private CombinerSource _combineSrc1RGB = CombinerSource.Previous;
+    private CombinerSource _combineSrc2RGB = CombinerSource.Constant;
+    private CombinerOperandRGB _combineOp0RGB = CombinerOperandRGB.SourceColor;
+    private CombinerOperandRGB _combineOp1RGB = CombinerOperandRGB.SourceColor;
+    private CombinerOperandRGB _combineOp2RGB = CombinerOperandRGB.SourceAlpha;
+    private CombinerScale _combineScaleRGB = CombinerScale.One;
 
-    private CombinerFunctionAlpha combineFuncAlpha = CombinerFunctionAlpha.Modulate;
-    private CombinerSource combineSrc0Alpha = CombinerSource.CurrentTexture;
-    private CombinerSource combineSrc1Alpha = CombinerSource.Previous;
-    private CombinerSource combineSrc2Alpha = CombinerSource.Constant;
-    private CombinerOperandAlpha combineOp0Alpha = CombinerOperandAlpha.SourceAlpha;
-    private CombinerOperandAlpha combineOp1Alpha = CombinerOperandAlpha.SourceAlpha;
-    private CombinerOperandAlpha combineOp2Alpha = CombinerOperandAlpha.SourceAlpha;
-    private CombinerScale combineScaleAlpha = CombinerScale.One;
+    private CombinerFunctionAlpha _combineFuncAlpha = CombinerFunctionAlpha.Modulate;
+    private CombinerSource _combineSrc0Alpha = CombinerSource.CurrentTexture;
+    private CombinerSource _combineSrc1Alpha = CombinerSource.Previous;
+    private CombinerSource _combineSrc2Alpha = CombinerSource.Constant;
+    private CombinerOperandAlpha _combineOp0Alpha = CombinerOperandAlpha.SourceAlpha;
+    private CombinerOperandAlpha _combineOp1Alpha = CombinerOperandAlpha.SourceAlpha;
+    private CombinerOperandAlpha _combineOp2Alpha = CombinerOperandAlpha.SourceAlpha;
+    private CombinerScale _combineScaleAlpha = CombinerScale.One;
 
-    private TextureKey key = null;
-    private transient boolean storeTexture = DEFAULT_STORE_TEXTURE;
+    private TextureKey _key = null;
+    private transient boolean _storeTexture = DEFAULT_STORE_TEXTURE;
 
-    private DepthTextureCompareMode depthCompareMode = DepthTextureCompareMode.None;
-    private DepthTextureCompareFunc depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
-    private DepthTextureMode depthMode = DepthTextureMode.Intensity;
+    private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
+    private DepthTextureCompareFunc _depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
+    private DepthTextureMode _depthMode = DepthTextureMode.Intensity;
 
     /**
      * Constructor instantiates a new <code>Texture</code> object with default attributes.
      */
     public Texture() {
-        memReq = 0;
+        _memReq = 0;
     }
 
     /**
@@ -559,7 +559,7 @@ public abstract class Texture implements Savable {
      * @return the MinificationFilterMode of this texture.
      */
     public MinificationFilter getMinificationFilter() {
-        return minificationFilter;
+        return _minificationFilter;
     }
 
     /**
@@ -572,14 +572,14 @@ public abstract class Texture implements Savable {
         if (minificationFilter == null) {
             throw new IllegalArgumentException("minificationFilter can not be null.");
         }
-        this.minificationFilter = minificationFilter;
+        _minificationFilter = minificationFilter;
     }
 
     /**
      * @return the MagnificationFilterMode of this texture.
      */
     public MagnificationFilter getMagnificationFilter() {
-        return magnificationFilter;
+        return _magnificationFilter;
     }
 
     /**
@@ -592,7 +592,7 @@ public abstract class Texture implements Savable {
         if (magnificationFilter == null) {
             throw new IllegalArgumentException("magnificationFilter can not be null.");
         }
-        this.magnificationFilter = magnificationFilter;
+        _magnificationFilter = magnificationFilter;
     }
 
     /**
@@ -607,7 +607,7 @@ public abstract class Texture implements Savable {
         if (apply == null) {
             throw new IllegalArgumentException("apply can not be null.");
         }
-        this.apply = apply;
+        _apply = apply;
     }
 
     /**
@@ -617,7 +617,7 @@ public abstract class Texture implements Savable {
      *            the image that defines the texture.
      */
     public void setImage(final Image image) {
-        this.image = image;
+        _image = image;
         updateMemoryReq();
     }
 
@@ -629,7 +629,7 @@ public abstract class Texture implements Savable {
      * @return the id of the texture.
      */
     public int getTextureId() {
-        return textureId;
+        return _textureId;
     }
 
     /**
@@ -639,7 +639,7 @@ public abstract class Texture implements Savable {
      *            the texture id of this texture.
      */
     public void setTextureId(final int textureId) {
-        this.textureId = textureId;
+        _textureId = textureId;
     }
 
     /**
@@ -649,7 +649,7 @@ public abstract class Texture implements Savable {
      * @return the image data that makes up the texture.
      */
     public Image getImage() {
-        return image;
+        return _image;
     }
 
     /**
@@ -658,7 +658,7 @@ public abstract class Texture implements Savable {
      * @return the apply mode of the texture.
      */
     public ApplyMode getApply() {
-        return apply;
+        return _apply;
     }
 
     /**
@@ -719,7 +719,7 @@ public abstract class Texture implements Savable {
      * @return Returns the combineFuncRGB.
      */
     public CombinerFunctionRGB getCombineFuncRGB() {
-        return combineFuncRGB;
+        return _combineFuncRGB;
     }
 
     /**
@@ -732,14 +732,14 @@ public abstract class Texture implements Savable {
         if (combineFuncRGB == null) {
             throw new IllegalArgumentException("invalid CombinerFunctionRGB: null");
         }
-        this.combineFuncRGB = combineFuncRGB;
+        _combineFuncRGB = combineFuncRGB;
     }
 
     /**
      * @return Returns the combineOp0Alpha.
      */
     public CombinerOperandAlpha getCombineOp0Alpha() {
-        return combineOp0Alpha;
+        return _combineOp0Alpha;
     }
 
     /**
@@ -753,14 +753,14 @@ public abstract class Texture implements Savable {
             throw new IllegalArgumentException("invalid CombinerOperandAlpha: null");
         }
 
-        this.combineOp0Alpha = combineOp0Alpha;
+        _combineOp0Alpha = combineOp0Alpha;
     }
 
     /**
      * @return Returns the combineOp0RGB.
      */
     public CombinerOperandRGB getCombineOp0RGB() {
-        return combineOp0RGB;
+        return _combineOp0RGB;
     }
 
     /**
@@ -773,14 +773,14 @@ public abstract class Texture implements Savable {
         if (combineOp0RGB == null) {
             throw new IllegalArgumentException("invalid CombinerOperandRGB: null");
         }
-        this.combineOp0RGB = combineOp0RGB;
+        _combineOp0RGB = combineOp0RGB;
     }
 
     /**
      * @return Returns the combineOp1Alpha.
      */
     public CombinerOperandAlpha getCombineOp1Alpha() {
-        return combineOp1Alpha;
+        return _combineOp1Alpha;
     }
 
     /**
@@ -793,14 +793,14 @@ public abstract class Texture implements Savable {
         if (combineOp1Alpha == null) {
             throw new IllegalArgumentException("invalid CombinerOperandAlpha: null");
         }
-        this.combineOp1Alpha = combineOp1Alpha;
+        _combineOp1Alpha = combineOp1Alpha;
     }
 
     /**
      * @return Returns the combineOp1RGB.
      */
     public CombinerOperandRGB getCombineOp1RGB() {
-        return combineOp1RGB;
+        return _combineOp1RGB;
     }
 
     /**
@@ -813,14 +813,14 @@ public abstract class Texture implements Savable {
         if (combineOp1RGB == null) {
             throw new IllegalArgumentException("invalid CombinerOperandRGB: null");
         }
-        this.combineOp1RGB = combineOp1RGB;
+        _combineOp1RGB = combineOp1RGB;
     }
 
     /**
      * @return Returns the combineOp2Alpha.
      */
     public CombinerOperandAlpha getCombineOp2Alpha() {
-        return combineOp2Alpha;
+        return _combineOp2Alpha;
     }
 
     /**
@@ -833,14 +833,14 @@ public abstract class Texture implements Savable {
         if (combineOp2Alpha == null) {
             throw new IllegalArgumentException("invalid CombinerOperandAlpha: null");
         }
-        this.combineOp2Alpha = combineOp2Alpha;
+        _combineOp2Alpha = combineOp2Alpha;
     }
 
     /**
      * @return Returns the combineOp2RGB.
      */
     public CombinerOperandRGB getCombineOp2RGB() {
-        return combineOp2RGB;
+        return _combineOp2RGB;
     }
 
     /**
@@ -853,14 +853,14 @@ public abstract class Texture implements Savable {
         if (combineOp2RGB == null) {
             throw new IllegalArgumentException("invalid CombinerOperandRGB: null");
         }
-        this.combineOp2RGB = combineOp2RGB;
+        _combineOp2RGB = combineOp2RGB;
     }
 
     /**
      * @return Returns the combineScaleAlpha.
      */
     public CombinerScale getCombineScaleAlpha() {
-        return combineScaleAlpha;
+        return _combineScaleAlpha;
     }
 
     /**
@@ -873,14 +873,14 @@ public abstract class Texture implements Savable {
         if (combineScaleAlpha == null) {
             throw new IllegalArgumentException("invalid CombinerScale: null");
         }
-        this.combineScaleAlpha = combineScaleAlpha;
+        _combineScaleAlpha = combineScaleAlpha;
     }
 
     /**
      * @return Returns the combineScaleRGB.
      */
     public CombinerScale getCombineScaleRGB() {
-        return combineScaleRGB;
+        return _combineScaleRGB;
     }
 
     /**
@@ -893,14 +893,14 @@ public abstract class Texture implements Savable {
         if (combineScaleRGB == null) {
             throw new IllegalArgumentException("invalid CombinerScale: null");
         }
-        this.combineScaleRGB = combineScaleRGB;
+        _combineScaleRGB = combineScaleRGB;
     }
 
     /**
      * @return Returns the combineSrc0Alpha.
      */
     public CombinerSource getCombineSrc0Alpha() {
-        return combineSrc0Alpha;
+        return _combineSrc0Alpha;
     }
 
     /**
@@ -913,14 +913,14 @@ public abstract class Texture implements Savable {
         if (combineSrc0Alpha == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc0Alpha = combineSrc0Alpha;
+        _combineSrc0Alpha = combineSrc0Alpha;
     }
 
     /**
      * @return Returns the combineSrc0RGB.
      */
     public CombinerSource getCombineSrc0RGB() {
-        return combineSrc0RGB;
+        return _combineSrc0RGB;
     }
 
     /**
@@ -933,14 +933,14 @@ public abstract class Texture implements Savable {
         if (combineSrc0RGB == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc0RGB = combineSrc0RGB;
+        _combineSrc0RGB = combineSrc0RGB;
     }
 
     /**
      * @return Returns the combineSrc1Alpha.
      */
     public CombinerSource getCombineSrc1Alpha() {
-        return combineSrc1Alpha;
+        return _combineSrc1Alpha;
     }
 
     /**
@@ -953,14 +953,14 @@ public abstract class Texture implements Savable {
         if (combineSrc1Alpha == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc1Alpha = combineSrc1Alpha;
+        _combineSrc1Alpha = combineSrc1Alpha;
     }
 
     /**
      * @return Returns the combineSrc1RGB.
      */
     public CombinerSource getCombineSrc1RGB() {
-        return combineSrc1RGB;
+        return _combineSrc1RGB;
     }
 
     /**
@@ -973,14 +973,14 @@ public abstract class Texture implements Savable {
         if (combineSrc1RGB == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc1RGB = combineSrc1RGB;
+        _combineSrc1RGB = combineSrc1RGB;
     }
 
     /**
      * @return Returns the combineSrc2Alpha.
      */
     public CombinerSource getCombineSrc2Alpha() {
-        return combineSrc2Alpha;
+        return _combineSrc2Alpha;
     }
 
     /**
@@ -993,14 +993,14 @@ public abstract class Texture implements Savable {
         if (combineSrc2Alpha == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc2Alpha = combineSrc2Alpha;
+        _combineSrc2Alpha = combineSrc2Alpha;
     }
 
     /**
      * @return Returns the combineSrc2RGB.
      */
     public CombinerSource getCombineSrc2RGB() {
-        return combineSrc2RGB;
+        return _combineSrc2RGB;
     }
 
     /**
@@ -1013,14 +1013,14 @@ public abstract class Texture implements Savable {
         if (combineSrc2RGB == null) {
             throw new IllegalArgumentException("invalid CombinerSource: null");
         }
-        this.combineSrc2RGB = combineSrc2RGB;
+        _combineSrc2RGB = combineSrc2RGB;
     }
 
     /**
      * @return Returns the combineFuncAlpha.
      */
     public CombinerFunctionAlpha getCombineFuncAlpha() {
-        return combineFuncAlpha;
+        return _combineFuncAlpha;
     }
 
     /**
@@ -1033,7 +1033,7 @@ public abstract class Texture implements Savable {
         if (combineFuncAlpha == null) {
             throw new IllegalArgumentException("invalid CombinerFunctionAlpha: null");
         }
-        this.combineFuncAlpha = combineFuncAlpha;
+        _combineFuncAlpha = combineFuncAlpha;
     }
 
     /**
@@ -1045,26 +1045,26 @@ public abstract class Texture implements Savable {
         if (envMapMode == null) {
             throw new IllegalArgumentException("invalid EnvironmentalMapMode: null");
         }
-        this.envMapMode = envMapMode;
+        _envMapMode = envMapMode;
     }
 
     public EnvironmentalMapMode getEnvironmentalMapMode() {
-        return envMapMode;
+        return _envMapMode;
     }
 
     public String getImageLocation() {
-        return imageLocation;
+        return _imageLocation;
     }
 
     public void setImageLocation(final String imageLocation) {
-        this.imageLocation = imageLocation;
+        _imageLocation = imageLocation;
     }
 
     /**
      * @return the anisotropic filtering level for this texture as a percentage (0.0 - 1.0)
      */
     public float getAnisotropicFilterPercent() {
-        return anisotropicFilterPercent;
+        return _anisotropicFilterPercent;
     }
 
     /**
@@ -1077,7 +1077,7 @@ public abstract class Texture implements Savable {
         } else if (percent < 0.0f) {
             percent = 0.0f;
         }
-        anisotropicFilterPercent = percent;
+        _anisotropicFilterPercent = percent;
     }
 
     @Override
@@ -1090,10 +1090,10 @@ public abstract class Texture implements Savable {
         }
 
         final Texture that = (Texture) other;
-        if (textureId != that.textureId) {
+        if (_textureId != that._textureId) {
             return false;
         }
-        if (textureId == 0) {
+        if (_textureId == 0) {
             if (getImage() != null && !getImage().equals(that.getImage())) {
                 return false;
             }
@@ -1175,32 +1175,32 @@ public abstract class Texture implements Savable {
      * @return Texture
      */
     public Texture createSimpleClone(final Texture rVal) {
-        rVal.setApply(apply);
-        rVal.setCombineFuncAlpha(combineFuncAlpha);
-        rVal.setCombineFuncRGB(combineFuncRGB);
-        rVal.setCombineOp0Alpha(combineOp0Alpha);
-        rVal.setCombineOp0RGB(combineOp0RGB);
-        rVal.setCombineOp1Alpha(combineOp1Alpha);
-        rVal.setCombineOp1RGB(combineOp1RGB);
-        rVal.setCombineOp2Alpha(combineOp2Alpha);
-        rVal.setCombineOp2RGB(combineOp2RGB);
-        rVal.setCombineScaleAlpha(combineScaleAlpha);
-        rVal.setCombineScaleRGB(combineScaleRGB);
-        rVal.setCombineSrc0Alpha(combineSrc0Alpha);
-        rVal.setCombineSrc0RGB(combineSrc0RGB);
-        rVal.setCombineSrc1Alpha(combineSrc1Alpha);
-        rVal.setCombineSrc1RGB(combineSrc1RGB);
-        rVal.setCombineSrc2Alpha(combineSrc2Alpha);
-        rVal.setCombineSrc2RGB(combineSrc2RGB);
-        rVal.setEnvironmentalMapMode(envMapMode);
-        rVal.setMinificationFilter(minificationFilter);
-        rVal.setMagnificationFilter(magnificationFilter);
-        rVal.setHasBorder(hasBorder);
-        rVal.setAnisotropicFilterPercent(anisotropicFilterPercent);
-        rVal.setImage(image); // NOT CLONED.
-        rVal.memReq = memReq;
-        rVal.setImageLocation(imageLocation);
-        rVal.setTextureId(textureId);
+        rVal.setApply(_apply);
+        rVal.setCombineFuncAlpha(_combineFuncAlpha);
+        rVal.setCombineFuncRGB(_combineFuncRGB);
+        rVal.setCombineOp0Alpha(_combineOp0Alpha);
+        rVal.setCombineOp0RGB(_combineOp0RGB);
+        rVal.setCombineOp1Alpha(_combineOp1Alpha);
+        rVal.setCombineOp1RGB(_combineOp1RGB);
+        rVal.setCombineOp2Alpha(_combineOp2Alpha);
+        rVal.setCombineOp2RGB(_combineOp2RGB);
+        rVal.setCombineScaleAlpha(_combineScaleAlpha);
+        rVal.setCombineScaleRGB(_combineScaleRGB);
+        rVal.setCombineSrc0Alpha(_combineSrc0Alpha);
+        rVal.setCombineSrc0RGB(_combineSrc0RGB);
+        rVal.setCombineSrc1Alpha(_combineSrc1Alpha);
+        rVal.setCombineSrc1RGB(_combineSrc1RGB);
+        rVal.setCombineSrc2Alpha(_combineSrc2Alpha);
+        rVal.setCombineSrc2RGB(_combineSrc2RGB);
+        rVal.setEnvironmentalMapMode(_envMapMode);
+        rVal.setMinificationFilter(_minificationFilter);
+        rVal.setMagnificationFilter(_magnificationFilter);
+        rVal.setHasBorder(_hasBorder);
+        rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
+        rVal.setImage(_image); // NOT CLONED.
+        rVal._memReq = _memReq;
+        rVal.setImageLocation(_imageLocation);
+        rVal.setTextureId(_textureId);
         rVal.setBlendColor(_blendColor != null ? _blendColor.clone() : null);
         rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
@@ -1221,7 +1221,7 @@ public abstract class Texture implements Savable {
      * @return Returns the rttSource.
      */
     public RenderToTextureType getRTTSource() {
-        return rttSource;
+        return _rttSource;
     }
 
     /**
@@ -1234,27 +1234,27 @@ public abstract class Texture implements Savable {
         if (rttSource == null) {
             throw new IllegalArgumentException("invalid RenderToTextureType: null");
         }
-        this.rttSource = rttSource;
+        _rttSource = rttSource;
     }
 
     /**
      * @return the estimated footprint of this texture in bytes
      */
     public int getMemoryReq() {
-        return memReq;
+        return _memReq;
     }
 
     public void updateMemoryReq() {
-        if (image != null) {
-            final int width = image.getWidth(), height = image.getHeight();
-            memReq = width * height;
-            final int bpp = Image.getEstimatedByteSize(image.getFormat());
-            memReq *= bpp;
-            if (getMinificationFilter().usesMipMapLevels() || image.hasMipmaps()) {
-                if (MathUtils.isPowerOfTwo(image.getWidth()) && MathUtils.isPowerOfTwo(image.getHeight())) {
-                    memReq *= 1.33333f;
+        if (_image != null) {
+            final int width = _image.getWidth(), height = _image.getHeight();
+            _memReq = width * height;
+            final int bpp = Image.getEstimatedByteSize(_image.getFormat());
+            _memReq *= bpp;
+            if (getMinificationFilter().usesMipMapLevels() || _image.hasMipmaps()) {
+                if (MathUtils.isPowerOfTwo(_image.getWidth()) && MathUtils.isPowerOfTwo(_image.getHeight())) {
+                    _memReq *= 1.33333f;
                 } else {
-                    memReq *= 2.0f; // XXX: Is this right?
+                    _memReq *= 2.0f; // XXX: Is this right?
                 }
             }
         }
@@ -1263,86 +1263,86 @@ public abstract class Texture implements Savable {
     public void write(final Ardor3DExporter e) throws IOException {
 
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(imageLocation, "imageLocation", null);
-        if (storeTexture) {
-            capsule.write(image, "image", null);
+        capsule.write(_imageLocation, "imageLocation", null);
+        if (_storeTexture) {
+            capsule.write(_image, "image", null);
         }
         capsule.write(_blendColor, "blendColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
         capsule.write(_borderColor, "borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
         capsule.write(_texMatrix, "texMatrix", new Matrix4(Matrix4.IDENTITY));
-        capsule.write(hasBorder, "hasBorder", false);
-        capsule.write(anisotropicFilterPercent, "anisotropicFilterPercent", 0.0f);
-        capsule.write(minificationFilter, "minificationFilter", MinificationFilter.NearestNeighborNoMipMaps);
-        capsule.write(magnificationFilter, "magnificationFilter", MagnificationFilter.Bilinear);
-        capsule.write(apply, "apply", ApplyMode.Modulate);
-        capsule.write(envMapMode, "envMapMode", EnvironmentalMapMode.None);
-        capsule.write(rttSource, "rttSource", RenderToTextureType.RGBA);
-        capsule.write(memReq, "memReq", 0);
-        capsule.write(combineFuncRGB, "combineFuncRGB", CombinerFunctionRGB.Replace);
-        capsule.write(combineFuncAlpha, "combineFuncAlpha", CombinerFunctionAlpha.Replace);
-        capsule.write(combineSrc0RGB, "combineSrc0RGB", CombinerSource.CurrentTexture);
-        capsule.write(combineSrc1RGB, "combineSrc1RGB", CombinerSource.Previous);
-        capsule.write(combineSrc2RGB, "combineSrc2RGB", CombinerSource.Constant);
-        capsule.write(combineSrc0Alpha, "combineSrc0Alpha", CombinerSource.CurrentTexture);
-        capsule.write(combineSrc1Alpha, "combineSrc1Alpha", CombinerSource.Previous);
-        capsule.write(combineSrc2Alpha, "combineSrc2Alpha", CombinerSource.Constant);
-        capsule.write(combineOp0RGB, "combineOp0RGB", CombinerOperandRGB.SourceColor);
-        capsule.write(combineOp1RGB, "combineOp1RGB", CombinerOperandRGB.SourceColor);
-        capsule.write(combineOp2RGB, "combineOp2RGB", CombinerOperandRGB.SourceAlpha);
-        capsule.write(combineOp0Alpha, "combineOp0Alpha", CombinerOperandAlpha.SourceAlpha);
-        capsule.write(combineOp1Alpha, "combineOp1Alpha", CombinerOperandAlpha.SourceAlpha);
-        capsule.write(combineOp2Alpha, "combineOp2Alpha", CombinerOperandAlpha.SourceAlpha);
-        capsule.write(combineScaleRGB, "combineScaleRGB", CombinerScale.One);
-        capsule.write(combineScaleAlpha, "combineScaleAlpha", CombinerScale.One);
-        if (!storeTexture) {
-            capsule.write(key, "textureKey", null);
+        capsule.write(_hasBorder, "hasBorder", false);
+        capsule.write(_anisotropicFilterPercent, "anisotropicFilterPercent", 0.0f);
+        capsule.write(_minificationFilter, "minificationFilter", MinificationFilter.NearestNeighborNoMipMaps);
+        capsule.write(_magnificationFilter, "magnificationFilter", MagnificationFilter.Bilinear);
+        capsule.write(_apply, "apply", ApplyMode.Modulate);
+        capsule.write(_envMapMode, "envMapMode", EnvironmentalMapMode.None);
+        capsule.write(_rttSource, "rttSource", RenderToTextureType.RGBA);
+        capsule.write(_memReq, "memReq", 0);
+        capsule.write(_combineFuncRGB, "combineFuncRGB", CombinerFunctionRGB.Replace);
+        capsule.write(_combineFuncAlpha, "combineFuncAlpha", CombinerFunctionAlpha.Replace);
+        capsule.write(_combineSrc0RGB, "combineSrc0RGB", CombinerSource.CurrentTexture);
+        capsule.write(_combineSrc1RGB, "combineSrc1RGB", CombinerSource.Previous);
+        capsule.write(_combineSrc2RGB, "combineSrc2RGB", CombinerSource.Constant);
+        capsule.write(_combineSrc0Alpha, "combineSrc0Alpha", CombinerSource.CurrentTexture);
+        capsule.write(_combineSrc1Alpha, "combineSrc1Alpha", CombinerSource.Previous);
+        capsule.write(_combineSrc2Alpha, "combineSrc2Alpha", CombinerSource.Constant);
+        capsule.write(_combineOp0RGB, "combineOp0RGB", CombinerOperandRGB.SourceColor);
+        capsule.write(_combineOp1RGB, "combineOp1RGB", CombinerOperandRGB.SourceColor);
+        capsule.write(_combineOp2RGB, "combineOp2RGB", CombinerOperandRGB.SourceAlpha);
+        capsule.write(_combineOp0Alpha, "combineOp0Alpha", CombinerOperandAlpha.SourceAlpha);
+        capsule.write(_combineOp1Alpha, "combineOp1Alpha", CombinerOperandAlpha.SourceAlpha);
+        capsule.write(_combineOp2Alpha, "combineOp2Alpha", CombinerOperandAlpha.SourceAlpha);
+        capsule.write(_combineScaleRGB, "combineScaleRGB", CombinerScale.One);
+        capsule.write(_combineScaleAlpha, "combineScaleAlpha", CombinerScale.One);
+        if (!_storeTexture) {
+            capsule.write(_key, "textureKey", null);
         }
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        imageLocation = capsule.readString("imageLocation", null);
-        minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
+        _imageLocation = capsule.readString("imageLocation", null);
+        _minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
                 MinificationFilter.NearestNeighborNoMipMaps);
-        image = (Image) capsule.readSavable("image", null);
-        if (image == null) {
-            key = (TextureKey) capsule.readSavable("textureKey", null);
-            if (key != null && key.getLocation() != null) {
-                key.setMinificationFilter(minificationFilter);
-                TextureManager.loadFromKey(key, null, this);
+        _image = (Image) capsule.readSavable("image", null);
+        if (_image == null) {
+            _key = (TextureKey) capsule.readSavable("textureKey", null);
+            if (_key != null && _key.getLocation() != null) {
+                _key.setMinificationFilter(_minificationFilter);
+                TextureManager.loadFromKey(_key, null, this);
             }
         }
         _blendColor.set((ColorRGBA) capsule.readSavable("blendColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _borderColor.set((ColorRGBA) capsule.readSavable("borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _texMatrix.set((Matrix4) capsule.readSavable("texMatrix", new Matrix4(Matrix4.IDENTITY)));
-        hasBorder = capsule.readBoolean("hasBorder", false);
-        anisotropicFilterPercent = capsule.readFloat("anisotropicFilterPercent", 0.0f);
-        magnificationFilter = capsule.readEnum("magnificationFilter", MagnificationFilter.class,
+        _hasBorder = capsule.readBoolean("hasBorder", false);
+        _anisotropicFilterPercent = capsule.readFloat("anisotropicFilterPercent", 0.0f);
+        _magnificationFilter = capsule.readEnum("magnificationFilter", MagnificationFilter.class,
                 MagnificationFilter.Bilinear);
-        apply = capsule.readEnum("apply", ApplyMode.class, ApplyMode.Modulate);
-        envMapMode = capsule.readEnum("envMapMode", EnvironmentalMapMode.class, EnvironmentalMapMode.None);
-        rttSource = capsule.readEnum("rttSource", RenderToTextureType.class, RenderToTextureType.RGBA);
-        memReq = capsule.readInt("memReq", 0);
-        combineFuncRGB = capsule.readEnum("combineFuncRGB", CombinerFunctionRGB.class, CombinerFunctionRGB.Replace);
-        combineFuncAlpha = capsule.readEnum("combineFuncAlpha", CombinerFunctionAlpha.class,
+        _apply = capsule.readEnum("apply", ApplyMode.class, ApplyMode.Modulate);
+        _envMapMode = capsule.readEnum("envMapMode", EnvironmentalMapMode.class, EnvironmentalMapMode.None);
+        _rttSource = capsule.readEnum("rttSource", RenderToTextureType.class, RenderToTextureType.RGBA);
+        _memReq = capsule.readInt("memReq", 0);
+        _combineFuncRGB = capsule.readEnum("combineFuncRGB", CombinerFunctionRGB.class, CombinerFunctionRGB.Replace);
+        _combineFuncAlpha = capsule.readEnum("combineFuncAlpha", CombinerFunctionAlpha.class,
                 CombinerFunctionAlpha.Replace);
-        combineSrc0RGB = capsule.readEnum("combineSrc0RGB", CombinerSource.class, CombinerSource.CurrentTexture);
-        combineSrc1RGB = capsule.readEnum("combineSrc1RGB", CombinerSource.class, CombinerSource.Previous);
-        combineSrc2RGB = capsule.readEnum("combineSrc2RGB", CombinerSource.class, CombinerSource.Constant);
-        combineSrc0Alpha = capsule.readEnum("combineSrc0Alpha", CombinerSource.class, CombinerSource.CurrentTexture);
-        combineSrc1Alpha = capsule.readEnum("combineSrc1Alpha", CombinerSource.class, CombinerSource.Previous);
-        combineSrc2Alpha = capsule.readEnum("combineSrc2Alpha", CombinerSource.class, CombinerSource.Constant);
-        combineOp0RGB = capsule.readEnum("combineOp0RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceColor);
-        combineOp1RGB = capsule.readEnum("combineOp1RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceColor);
-        combineOp2RGB = capsule.readEnum("combineOp2RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceAlpha);
-        combineOp0Alpha = capsule.readEnum("combineOp0Alpha", CombinerOperandAlpha.class,
+        _combineSrc0RGB = capsule.readEnum("combineSrc0RGB", CombinerSource.class, CombinerSource.CurrentTexture);
+        _combineSrc1RGB = capsule.readEnum("combineSrc1RGB", CombinerSource.class, CombinerSource.Previous);
+        _combineSrc2RGB = capsule.readEnum("combineSrc2RGB", CombinerSource.class, CombinerSource.Constant);
+        _combineSrc0Alpha = capsule.readEnum("combineSrc0Alpha", CombinerSource.class, CombinerSource.CurrentTexture);
+        _combineSrc1Alpha = capsule.readEnum("combineSrc1Alpha", CombinerSource.class, CombinerSource.Previous);
+        _combineSrc2Alpha = capsule.readEnum("combineSrc2Alpha", CombinerSource.class, CombinerSource.Constant);
+        _combineOp0RGB = capsule.readEnum("combineOp0RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceColor);
+        _combineOp1RGB = capsule.readEnum("combineOp1RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceColor);
+        _combineOp2RGB = capsule.readEnum("combineOp2RGB", CombinerOperandRGB.class, CombinerOperandRGB.SourceAlpha);
+        _combineOp0Alpha = capsule.readEnum("combineOp0Alpha", CombinerOperandAlpha.class,
                 CombinerOperandAlpha.SourceAlpha);
-        combineOp1Alpha = capsule.readEnum("combineOp1Alpha", CombinerOperandAlpha.class,
+        _combineOp1Alpha = capsule.readEnum("combineOp1Alpha", CombinerOperandAlpha.class,
                 CombinerOperandAlpha.SourceAlpha);
-        combineOp2Alpha = capsule.readEnum("combineOp2Alpha", CombinerOperandAlpha.class,
+        _combineOp2Alpha = capsule.readEnum("combineOp2Alpha", CombinerOperandAlpha.class,
                 CombinerOperandAlpha.SourceAlpha);
-        combineScaleRGB = capsule.readEnum("combineScaleRGB", CombinerScale.class, CombinerScale.One);
-        combineScaleAlpha = capsule.readEnum("combineScaleAlpha", CombinerScale.class, CombinerScale.One);
+        _combineScaleRGB = capsule.readEnum("combineScaleRGB", CombinerScale.class, CombinerScale.One);
+        _combineScaleAlpha = capsule.readEnum("combineScaleAlpha", CombinerScale.class, CombinerScale.One);
     }
 
     public Class<? extends Texture> getClassTag() {
@@ -1350,27 +1350,27 @@ public abstract class Texture implements Savable {
     }
 
     public void setTextureKey(final TextureKey tkey) {
-        key = tkey;
+        _key = tkey;
     }
 
     public TextureKey getTextureKey() {
-        return key;
+        return _key;
     }
 
     public boolean isStoreTexture() {
-        return storeTexture;
+        return _storeTexture;
     }
 
     public void setStoreTexture(final boolean storeTexture) {
-        this.storeTexture = storeTexture;
+        _storeTexture = storeTexture;
     }
 
     public boolean hasBorder() {
-        return hasBorder;
+        return _hasBorder;
     }
 
     public void setHasBorder(final boolean hasBorder) {
-        this.hasBorder = hasBorder;
+        _hasBorder = hasBorder;
     }
 
     /**
@@ -1379,7 +1379,7 @@ public abstract class Texture implements Savable {
      * @return The depth texture compare function
      */
     public DepthTextureCompareFunc getDepthCompareFunc() {
-        return depthCompareFunc;
+        return _depthCompareFunc;
     }
 
     /**
@@ -1388,7 +1388,7 @@ public abstract class Texture implements Savable {
      * param depthCompareFunc The depth texture compare function
      */
     public void setDepthCompareFunc(final DepthTextureCompareFunc depthCompareFunc) {
-        this.depthCompareFunc = depthCompareFunc;
+        _depthCompareFunc = depthCompareFunc;
     }
 
     /**
@@ -1397,7 +1397,7 @@ public abstract class Texture implements Savable {
      * @return The depth texture apply mode
      */
     public DepthTextureMode getDepthMode() {
-        return depthMode;
+        return _depthMode;
     }
 
     /**
@@ -1406,7 +1406,7 @@ public abstract class Texture implements Savable {
      * param depthMode The depth texture apply mode
      */
     public void setDepthMode(final DepthTextureMode depthMode) {
-        this.depthMode = depthMode;
+        _depthMode = depthMode;
     }
 
     /**
@@ -1415,7 +1415,7 @@ public abstract class Texture implements Savable {
      * @return The depth texture compare mode
      */
     public DepthTextureCompareMode getDepthCompareMode() {
-        return depthCompareMode;
+        return _depthCompareMode;
     }
 
     /**
@@ -1425,6 +1425,6 @@ public abstract class Texture implements Savable {
      *            The depth texture compare mode
      */
     public void setDepthCompareMode(final DepthTextureCompareMode depthCompareMode) {
-        this.depthCompareMode = depthCompareMode;
+        _depthCompareMode = depthCompareMode;
     }
 }

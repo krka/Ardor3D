@@ -31,7 +31,7 @@ import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.BlendStateRecord;
 
-public class LwjglBlendStateUtil {
+public abstract class LwjglBlendStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final BlendState state) {
         // ask for the current state record

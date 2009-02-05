@@ -34,8 +34,8 @@ public class ParticleMesh extends ParticleSystem {
 
     private static final long serialVersionUID = 2L;
 
-    private boolean useMeshTexCoords = true;
-    private boolean useTriangleNormalEmit = true;
+    private boolean _useMeshTexCoords = true;
+    private boolean _useTriangleNormalEmit = true;
 
     public ParticleMesh() {}
 
@@ -147,12 +147,12 @@ public class ParticleMesh extends ParticleSystem {
             _particles[k].setStartIndex(k * verts);
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
-                if (_particleType == ParticleSystem.ParticleType.GeomMesh && useMeshTexCoords) {
+                if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
                     final int index = _psGeom.getMeshData().getIndexBuffer().get(ind);
-                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).coords, index);
-                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).coords, ind);
+                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0)._coords, index);
+                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0)._coords, ind);
                 } else {
-                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0).coords, ind);
+                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0)._coords, ind);
                 }
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
@@ -187,7 +187,7 @@ public class ParticleMesh extends ParticleSystem {
 
     @Override
     public void resetParticleVelocity(final int i) {
-        if (_particleType == ParticleSystem.ParticleType.GeomMesh && useTriangleNormalEmit) {
+        if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useTriangleNormalEmit) {
             _particles[i].getVelocity().set(_particles[i].getTriangleModel().getNormal());
             _particles[i].getVelocity().multiplyLocal(_emissionDirection);
             _particles[i].getVelocity().multiplyLocal(getInitialVelocity());
@@ -197,35 +197,35 @@ public class ParticleMesh extends ParticleSystem {
     }
 
     public boolean isUseMeshTexCoords() {
-        return useMeshTexCoords;
+        return _useMeshTexCoords;
     }
 
     public void setUseMeshTexCoords(final boolean useMeshTexCoords) {
-        this.useMeshTexCoords = useMeshTexCoords;
+        _useMeshTexCoords = useMeshTexCoords;
     }
 
     public boolean isUseTriangleNormalEmit() {
-        return useTriangleNormalEmit;
+        return _useTriangleNormalEmit;
     }
 
     public void setUseTriangleNormalEmit(final boolean useTriangleNormalEmit) {
-        this.useTriangleNormalEmit = useTriangleNormalEmit;
+        _useTriangleNormalEmit = useTriangleNormalEmit;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(useMeshTexCoords, "useMeshTexCoords", true);
-        capsule.write(useTriangleNormalEmit, "useTriangleNormalEmit", true);
+        capsule.write(_useMeshTexCoords, "useMeshTexCoords", true);
+        capsule.write(_useTriangleNormalEmit, "useTriangleNormalEmit", true);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        useMeshTexCoords = capsule.readBoolean("useMeshTexCoords", true);
-        useTriangleNormalEmit = capsule.readBoolean("useTriangleNormalEmit", true);
+        _useMeshTexCoords = capsule.readBoolean("useMeshTexCoords", true);
+        _useTriangleNormalEmit = capsule.readBoolean("useTriangleNormalEmit", true);
     }
 
     @Override

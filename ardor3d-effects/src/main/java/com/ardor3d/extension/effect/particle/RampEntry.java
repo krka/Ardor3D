@@ -32,11 +32,11 @@ public class RampEntry implements Savable {
     public static final double DEFAULT_MASS = Float.MAX_VALUE; // special case -> no mass change
     public static final ColorRGBA DEFAULT_COLOR = null; // special case -> no color change
 
-    protected double offset = DEFAULT_OFFSET;
-    protected ColorRGBA color = DEFAULT_COLOR; // no color change at this entry
-    protected double size = DEFAULT_SIZE;
-    protected double spin = DEFAULT_SPIN;
-    protected double mass = DEFAULT_MASS;
+    protected double _offset = DEFAULT_OFFSET;
+    protected ColorRGBA _color = DEFAULT_COLOR; // no color change at this entry
+    protected double _size = DEFAULT_SIZE;
+    protected double _spin = DEFAULT_SPIN;
+    protected double _mass = DEFAULT_MASS;
 
     public RampEntry() {}
 
@@ -51,59 +51,59 @@ public class RampEntry implements Savable {
     }
 
     public ColorRGBA getColor() {
-        return color;
+        return _color;
     }
 
     public void setColor(final ColorRGBA color) {
-        this.color = color;
+        _color = color;
     }
 
     public boolean hasColorSet() {
-        return color != DEFAULT_COLOR;
+        return _color != DEFAULT_COLOR;
     }
 
     public double getSize() {
-        return size;
+        return _size;
     }
 
     public void setSize(final double size) {
-        this.size = size;
+        _size = size;
     }
 
     public boolean hasSizeSet() {
-        return size != DEFAULT_SIZE;
+        return _size != DEFAULT_SIZE;
     }
 
     public double getSpin() {
-        return spin;
+        return _spin;
     }
 
     public void setSpin(final double spin) {
-        this.spin = spin;
+        _spin = spin;
     }
 
     public boolean hasSpinSet() {
-        return spin != DEFAULT_SPIN;
+        return _spin != DEFAULT_SPIN;
     }
 
     public double getMass() {
-        return mass;
+        return _mass;
     }
 
     public void setMass(final double mass) {
-        this.mass = mass;
+        _mass = mass;
     }
 
     public boolean hasMassSet() {
-        return mass != DEFAULT_MASS;
+        return _mass != DEFAULT_MASS;
     }
 
     public double getOffset() {
-        return offset;
+        return _offset;
     }
 
     public void setOffset(final double offset) {
-        this.offset = offset;
+        _offset = offset;
     }
 
     public Class<? extends RampEntry> getClassTag() {
@@ -112,20 +112,20 @@ public class RampEntry implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule capsule = im.getCapsule(this);
-        offset = capsule.readDouble("offsetMS", DEFAULT_OFFSET);
-        size = capsule.readDouble("size", DEFAULT_SIZE);
-        spin = capsule.readDouble("spin", DEFAULT_SPIN);
-        mass = capsule.readDouble("mass", DEFAULT_MASS);
-        color = (ColorRGBA) capsule.readSavable("color", DEFAULT_COLOR);
+        _offset = capsule.readDouble("offsetMS", DEFAULT_OFFSET);
+        _size = capsule.readDouble("size", DEFAULT_SIZE);
+        _spin = capsule.readDouble("spin", DEFAULT_SPIN);
+        _mass = capsule.readDouble("mass", DEFAULT_MASS);
+        _color = (ColorRGBA) capsule.readSavable("color", DEFAULT_COLOR);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule capsule = ex.getCapsule(this);
-        capsule.write(offset, "offsetMS", DEFAULT_OFFSET);
-        capsule.write(size, "size", DEFAULT_SIZE);
-        capsule.write(spin, "spin", DEFAULT_SPIN);
-        capsule.write(mass, "mass", DEFAULT_MASS);
-        capsule.write(color, "color", DEFAULT_COLOR);
+        capsule.write(_offset, "offsetMS", DEFAULT_OFFSET);
+        capsule.write(_size, "size", DEFAULT_SIZE);
+        capsule.write(_spin, "spin", DEFAULT_SPIN);
+        capsule.write(_mass, "mass", DEFAULT_MASS);
+        capsule.write(_color, "color", DEFAULT_COLOR);
     }
 
     private static String convColorToHex(final ColorRGBA color) {
@@ -151,29 +151,29 @@ public class RampEntry implements Savable {
     public String toString() {
 
         final StringBuilder builder = new StringBuilder();
-        if (offset > 0) {
+        if (_offset > 0) {
             builder.append("prev+");
-            builder.append((int) (offset * 100));
+            builder.append((int) (_offset * 100));
             builder.append("% age...");
         }
-        if (color != DEFAULT_COLOR) {
+        if (_color != DEFAULT_COLOR) {
             builder.append("  color:");
-            builder.append(convColorToHex(color).toUpperCase());
+            builder.append(convColorToHex(_color).toUpperCase());
             builder.append(" a: ");
-            builder.append((int) (color.getAlpha() * 100));
+            builder.append((int) (_color.getAlpha() * 100));
             builder.append("%");
         }
 
-        if (size != DEFAULT_SIZE) {
-            builder.append("  size: " + size);
+        if (_size != DEFAULT_SIZE) {
+            builder.append("  size: " + _size);
         }
 
-        if (mass != DEFAULT_MASS) {
-            builder.append("  mass: " + spin);
+        if (_mass != DEFAULT_MASS) {
+            builder.append("  mass: " + _spin);
         }
 
-        if (spin != DEFAULT_SPIN) {
-            builder.append("  spin: " + spin);
+        if (_spin != DEFAULT_SPIN) {
+            builder.append("  spin: " + _spin);
         }
 
         return builder.toString();

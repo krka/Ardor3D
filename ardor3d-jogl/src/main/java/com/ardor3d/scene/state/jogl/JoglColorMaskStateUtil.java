@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ColorMaskStateRecord;
 
-public class JoglColorMaskStateUtil {
+public abstract class JoglColorMaskStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ColorMaskState state) {
         final GL gl = GLU.getCurrentGL();

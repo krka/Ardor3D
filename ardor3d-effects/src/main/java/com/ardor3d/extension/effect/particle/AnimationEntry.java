@@ -19,38 +19,38 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 public class AnimationEntry implements Savable {
-    protected double offset = 0.05; // 5% of life from previous entry
-    protected double rate = 0.2; // 5 fps
-    protected int[] frames = new int[1];
+    protected double _offset = 0.05; // 5% of life from previous entry
+    protected double _rate = 0.2; // 5 fps
+    protected int[] _frames = new int[1];
 
     public AnimationEntry() {}
 
     public AnimationEntry(final double offset) {
-        this.offset = offset;
+        _offset = offset;
     }
 
     public int[] getFrames() {
-        return frames;
+        return _frames;
     }
 
     public void setFrames(final int[] frames) {
-        this.frames = frames;
+        _frames = frames;
     }
 
     public double getOffset() {
-        return offset;
+        return _offset;
     }
 
     public void setOffset(final double offset) {
-        this.offset = offset;
+        _offset = offset;
     }
 
     public double getRate() {
-        return rate;
+        return _rate;
     }
 
     public void setRate(final double rate) {
-        this.rate = rate;
+        _rate = rate;
     }
 
     public Class<? extends AnimationEntry> getClassTag() {
@@ -59,16 +59,16 @@ public class AnimationEntry implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule capsule = im.getCapsule(this);
-        offset = capsule.readDouble("offsetMS", 0.05);
-        rate = capsule.readDouble("rate", 0.2);
-        frames = capsule.readIntArray("frames", null);
+        _offset = capsule.readDouble("offsetMS", 0.05);
+        _rate = capsule.readDouble("rate", 0.2);
+        _frames = capsule.readIntArray("frames", null);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule capsule = ex.getCapsule(this);
-        capsule.write(offset, "offsetMS", 0.05);
-        capsule.write(rate, "rate", 0.2);
-        capsule.write(frames, "frames", null);
+        capsule.write(_offset, "offsetMS", 0.05);
+        capsule.write(_rate, "rate", 0.2);
+        capsule.write(_frames, "frames", null);
     }
 
     private static String makeText(final int[] frames) {
@@ -90,12 +90,12 @@ public class AnimationEntry implements Savable {
         final StringBuilder builder = new StringBuilder();
 
         builder.append("prev+");
-        builder.append((int) (offset * 100));
+        builder.append((int) (_offset * 100));
         builder.append("% age...");
 
-        builder.append("  rate: " + rate);
+        builder.append("  rate: " + _rate);
 
-        builder.append("  sequence: " + makeText(frames));
+        builder.append("  sequence: " + makeText(_frames));
 
         return builder.toString();
     }

@@ -57,31 +57,31 @@ public class CollisionTree implements Serializable {
     }
 
     // Default tree is axis-aligned
-    private Type type = Type.AABB;
+    private Type _type = Type.AABB;
 
     // children trees
-    private CollisionTree left;
-    private CollisionTree right;
+    private CollisionTree _left;
+    private CollisionTree _right;
 
     // bounding volumes that contain the triangles that the node is
     // handling
-    private BoundingVolume bounds;
-    private BoundingVolume worldBounds;
+    private BoundingVolume _bounds;
+    private BoundingVolume _worldBounds;
 
     // the list of triangle indices that compose the tree. This list
     // contains all the triangles of the mesh and is shared between
     // all nodes of this tree.
-    private int[] triIndex;
+    private int[] _triIndex;
 
     // Defines the pointers into the triIndex array that this node is
     // directly responsible for.
-    private int start, end;
+    private int _start, _end;
 
     // Required Spatial information
-    protected Mesh mesh;
+    protected Mesh _mesh;
 
     // Comparator used to sort triangle indices
-    protected transient final TreeComparator comparator = new TreeComparator();
+    protected transient final TreeComparator _comparator = new TreeComparator();
 
     /**
      * Constructor creates a new instance of CollisionTree.
@@ -91,7 +91,7 @@ public class CollisionTree implements Serializable {
      * @see Type
      */
     public CollisionTree(final Type type) {
-        this.type = type;
+        _type = type;
     }
 
     /**
@@ -108,9 +108,9 @@ public class CollisionTree implements Serializable {
 
         final Spatial spat = parent.getChild(childIndex);
         if (spat instanceof Mesh) {
-            mesh = (Mesh) spat;
-            triIndex = PickingUtil.getTriangleIndices(mesh, triIndex);
-            createTree(0, triIndex.length, doSort);
+            _mesh = (Mesh) spat;
+            _triIndex = PickingUtil.getTriangleIndices(_mesh, _triIndex);
+            createTree(0, _triIndex.length, doSort);
         }
     }
 
@@ -123,9 +123,9 @@ public class CollisionTree implements Serializable {
      *            true to sort triangles during creation, false otherwise
      */
     public void construct(final Mesh mesh, final boolean doSort) {
-        this.mesh = mesh;
-        triIndex = PickingUtil.getTriangleIndices(mesh, triIndex);
-        createTree(0, triIndex.length, doSort);
+        _mesh = mesh;
+        _triIndex = PickingUtil.getTriangleIndices(mesh, _triIndex);
+        createTree(0, _triIndex.length, doSort);
     }
 
     /**
@@ -140,10 +140,10 @@ public class CollisionTree implements Serializable {
      *            True if the triangles should be sorted at each level, false otherwise.
      */
     public void createTree(final int start, final int end, final boolean doSort) {
-        this.start = start;
-        this.end = end;
+        _start = start;
+        _end = end;
 
-        if (triIndex == null) {
+        if (_triIndex == null) {
             return;
         }
 
@@ -151,7 +151,7 @@ public class CollisionTree implements Serializable {
 
         // the bounds at this level should contain all the triangles this level
         // is reponsible for.
-        bounds.computeFromTris(triIndex, mesh, start, end);
+        _bounds.computeFromTris(_triIndex, _mesh, start, end);
 
         // check to see if we are a leaf, if the number of triangles we
         // reference is less than or equal to the maximum defined by the
@@ -170,21 +170,21 @@ public class CollisionTree implements Serializable {
         }
 
         // create the left child
-        if (left == null) {
-            left = new CollisionTree(type);
+        if (_left == null) {
+            _left = new CollisionTree(_type);
         }
 
-        left.triIndex = triIndex;
-        left.mesh = mesh;
-        left.createTree(start, (start + end) / 2, doSort);
+        _left._triIndex = _triIndex;
+        _left._mesh = _mesh;
+        _left.createTree(start, (start + end) / 2, doSort);
 
         // create the right child
-        if (right == null) {
-            right = new CollisionTree(type);
+        if (_right == null) {
+            _right = new CollisionTree(_type);
         }
-        right.triIndex = triIndex;
-        right.mesh = mesh;
-        right.createTree((start + end) / 2, end, doSort);
+        _right._triIndex = _triIndex;
+        _right._mesh = _mesh;
+        _right.createTree((start + end) / 2, end, doSort);
     }
 
     /**
@@ -198,11 +198,11 @@ public class CollisionTree implements Serializable {
     public boolean intersectsBounding(final BoundingVolume volume) {
         switch (volume.getType()) {
             case AABB:
-                return worldBounds.intersectsBoundingBox((BoundingBox) volume);
+                return _worldBounds.intersectsBoundingBox((BoundingBox) volume);
             case OBB:
-                return worldBounds.intersectsOrientedBoundingBox((OrientedBoundingBox) volume);
+                return _worldBounds.intersectsOrientedBoundingBox((OrientedBoundingBox) volume);
             case Sphere:
-                return worldBounds.intersectsSphere((BoundingSphere) volume);
+                return _worldBounds.intersectsSphere((BoundingSphere) volume);
             default:
                 return false;
         }
@@ -223,52 +223,52 @@ public class CollisionTree implements Serializable {
         }
 
         {
-            final ReadOnlyMatrix3 rotation = collisionTree.mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = collisionTree.mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = collisionTree.mesh.getWorldScale();
+            final ReadOnlyMatrix3 rotation = collisionTree._mesh.getWorldRotation();
+            final ReadOnlyVector3 translation = collisionTree._mesh.getWorldTranslation();
+            final ReadOnlyVector3 scale = collisionTree._mesh.getWorldScale();
 
-            collisionTree.worldBounds = collisionTree.bounds.transform(rotation, translation, scale,
-                    collisionTree.worldBounds);
+            collisionTree._worldBounds = collisionTree._bounds.transform(rotation, translation, scale,
+                    collisionTree._worldBounds);
         }
 
         // our two collision bounds do not intersect, therefore, our triangles
         // must
         // not intersect. Return false.
-        if (!intersectsBounding(collisionTree.worldBounds)) {
+        if (!intersectsBounding(collisionTree._worldBounds)) {
             return false;
         }
 
         // check children
-        if (left != null) { // This is not a leaf
-            if (collisionTree.intersect(left)) {
+        if (_left != null) { // This is not a leaf
+            if (collisionTree.intersect(_left)) {
                 return true;
             }
-            if (collisionTree.intersect(right)) {
+            if (collisionTree.intersect(_right)) {
                 return true;
             }
             return false;
         }
 
         // This is a leaf
-        if (collisionTree.left != null) {
+        if (collisionTree._left != null) {
             // but collision isn't
-            if (intersect(collisionTree.left)) {
+            if (intersect(collisionTree._left)) {
                 return true;
             }
-            if (intersect(collisionTree.right)) {
+            if (intersect(collisionTree._right)) {
                 return true;
             }
             return false;
         }
 
         // both are leaves
-        final ReadOnlyMatrix3 roti = mesh.getWorldRotation();
-        final ReadOnlyVector3 scalei = mesh.getWorldScale();
-        final ReadOnlyVector3 transi = mesh.getWorldTranslation();
+        final ReadOnlyMatrix3 roti = _mesh.getWorldRotation();
+        final ReadOnlyVector3 scalei = _mesh.getWorldScale();
+        final ReadOnlyVector3 transi = _mesh.getWorldTranslation();
 
-        final ReadOnlyMatrix3 rotj = collisionTree.mesh.getWorldRotation();
-        final ReadOnlyVector3 scalej = collisionTree.mesh.getWorldScale();
-        final ReadOnlyVector3 transj = collisionTree.mesh.getWorldTranslation();
+        final ReadOnlyMatrix3 rotj = collisionTree._mesh.getWorldRotation();
+        final ReadOnlyVector3 scalej = collisionTree._mesh.getWorldScale();
+        final ReadOnlyVector3 transj = collisionTree._mesh.getWorldTranslation();
 
         final Vector3 tempVa = Vector3.fetchTempInstance();
         final Vector3 tempVb = Vector3.fetchTempInstance();
@@ -283,13 +283,13 @@ public class CollisionTree implements Serializable {
         // for every triangle to compare, put them into world space and check
         // for intersections
         boolean result = false;
-        outer: for (int i = start; i < end; i++) {
-            PickingUtil.getTriangle(mesh, triIndex[i], verts);
+        outer: for (int i = _start; i < _end; i++) {
+            PickingUtil.getTriangle(_mesh, _triIndex[i], verts);
             roti.applyPost(tempVa.set(verts[0]).multiplyLocal(scalei), tempVa).addLocal(transi);
             roti.applyPost(tempVb.set(verts[1]).multiplyLocal(scalei), tempVb).addLocal(transi);
             roti.applyPost(tempVc.set(verts[2]).multiplyLocal(scalei), tempVc).addLocal(transi);
-            for (int j = collisionTree.start; j < collisionTree.end; j++) {
-                PickingUtil.getTriangle(collisionTree.mesh, collisionTree.triIndex[j], target);
+            for (int j = collisionTree._start; j < collisionTree._end; j++) {
+                PickingUtil.getTriangle(collisionTree._mesh, collisionTree._triIndex[j], target);
                 rotj.applyPost(tempVd.set(target[0]).multiplyLocal(scalej), tempVd).addLocal(transj);
                 rotj.applyPost(tempVe.set(target[1]).multiplyLocal(scalej), tempVe).addLocal(transj);
                 rotj.applyPost(tempVf.set(target[2]).multiplyLocal(scalej), tempVf).addLocal(transj);
@@ -338,46 +338,46 @@ public class CollisionTree implements Serializable {
         }
 
         {
-            final ReadOnlyMatrix3 rotation = collisionTree.mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = collisionTree.mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = collisionTree.mesh.getWorldScale();
+            final ReadOnlyMatrix3 rotation = collisionTree._mesh.getWorldRotation();
+            final ReadOnlyVector3 translation = collisionTree._mesh.getWorldTranslation();
+            final ReadOnlyVector3 scale = collisionTree._mesh.getWorldScale();
 
-            collisionTree.worldBounds = collisionTree.bounds.transform(rotation, translation, scale,
-                    collisionTree.worldBounds);
+            collisionTree._worldBounds = collisionTree._bounds.transform(rotation, translation, scale,
+                    collisionTree._worldBounds);
         }
 
         // our two collision bounds do not intersect, therefore, our triangles
         // must not intersect. Return false.
-        if (!intersectsBounding(collisionTree.worldBounds)) {
+        if (!intersectsBounding(collisionTree._worldBounds)) {
             return false;
         }
 
         // if our node is not a leaf send the children (both left and right) to
         // the test tree.
-        if (left != null) { // This is not a leaf
-            boolean test = collisionTree.intersect(left, bList, aList);
-            test = collisionTree.intersect(right, bList, aList) || test;
+        if (_left != null) { // This is not a leaf
+            boolean test = collisionTree.intersect(_left, bList, aList);
+            test = collisionTree.intersect(_right, bList, aList) || test;
             return test;
         }
 
         // This node is a leaf, but the testing tree node is not. Therefore,
         // continue processing the testing tree until we find its leaves.
-        if (collisionTree.left != null) {
-            boolean test = intersect(collisionTree.left, aList, bList);
-            test = intersect(collisionTree.right, aList, bList) || test;
+        if (collisionTree._left != null) {
+            boolean test = intersect(collisionTree._left, aList, bList);
+            test = intersect(collisionTree._right, aList, bList) || test;
             return test;
         }
 
         // both this node and the testing node are leaves. Therefore, we can
         // switch to checking the contained triangles with each other. Any
         // that are found to intersect are placed in the appropriate list.
-        final ReadOnlyMatrix3 roti = mesh.getWorldRotation();
-        final ReadOnlyVector3 scalei = mesh.getWorldScale();
-        final ReadOnlyVector3 transi = mesh.getWorldTranslation();
+        final ReadOnlyMatrix3 roti = _mesh.getWorldRotation();
+        final ReadOnlyVector3 scalei = _mesh.getWorldScale();
+        final ReadOnlyVector3 transi = _mesh.getWorldTranslation();
 
-        final ReadOnlyMatrix3 rotj = collisionTree.mesh.getWorldRotation();
-        final ReadOnlyVector3 scalej = collisionTree.mesh.getWorldScale();
-        final ReadOnlyVector3 transj = collisionTree.mesh.getWorldTranslation();
+        final ReadOnlyMatrix3 rotj = collisionTree._mesh.getWorldRotation();
+        final ReadOnlyVector3 scalej = collisionTree._mesh.getWorldScale();
+        final ReadOnlyVector3 transj = collisionTree._mesh.getWorldTranslation();
 
         boolean test = false;
 
@@ -391,20 +391,20 @@ public class CollisionTree implements Serializable {
         final Vector3[] target = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(),
                 Vector3.fetchTempInstance() };
 
-        for (int i = start; i < end; i++) {
-            PickingUtil.getTriangle(mesh, triIndex[i], verts);
+        for (int i = _start; i < _end; i++) {
+            PickingUtil.getTriangle(_mesh, _triIndex[i], verts);
             roti.applyPost(tempVa.set(verts[0]).multiplyLocal(scalei), tempVa).addLocal(transi);
             roti.applyPost(tempVb.set(verts[1]).multiplyLocal(scalei), tempVb).addLocal(transi);
             roti.applyPost(tempVc.set(verts[2]).multiplyLocal(scalei), tempVc).addLocal(transi);
-            for (int j = collisionTree.start; j < collisionTree.end; j++) {
-                PickingUtil.getTriangle(collisionTree.mesh, collisionTree.triIndex[j], target);
+            for (int j = collisionTree._start; j < collisionTree._end; j++) {
+                PickingUtil.getTriangle(collisionTree._mesh, collisionTree._triIndex[j], target);
                 rotj.applyPost(tempVd.set(target[0]).multiplyLocal(scalej), tempVd).addLocal(transj);
                 rotj.applyPost(tempVe.set(target[1]).multiplyLocal(scalej), tempVe).addLocal(transj);
                 rotj.applyPost(tempVf.set(target[2]).multiplyLocal(scalej), tempVf).addLocal(transj);
                 if (Intersection.intersection(tempVa, tempVb, tempVc, tempVd, tempVe, tempVf)) {
                     test = true;
-                    aList.add(triIndex[i]);
-                    bList.add(collisionTree.triIndex[j]);
+                    aList.add(_triIndex[i]);
+                    bList.add(collisionTree._triIndex[j]);
                 }
             }
         }
@@ -439,42 +439,42 @@ public class CollisionTree implements Serializable {
     public void intersect(final Ray3 ray, final List<Integer> triList) {
 
         // if our ray doesn't hit the bounds, then it must not hit a triangle.
-        if (!worldBounds.intersects(ray)) {
+        if (!_worldBounds.intersects(ray)) {
             return;
         }
 
         // This is not a leaf node, therefore, check each child (left/right) for
         // intersection with the ray.
-        if (left != null) {
-            final ReadOnlyMatrix3 rotation = mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = mesh.getWorldScale();
+        if (_left != null) {
+            final ReadOnlyMatrix3 rotation = _mesh.getWorldRotation();
+            final ReadOnlyVector3 translation = _mesh.getWorldTranslation();
+            final ReadOnlyVector3 scale = _mesh.getWorldScale();
 
-            left.worldBounds = left.bounds.transform(rotation, translation, scale, left.worldBounds);
-            left.intersect(ray, triList);
+            _left._worldBounds = _left._bounds.transform(rotation, translation, scale, _left._worldBounds);
+            _left.intersect(ray, triList);
         }
 
-        if (right != null) {
-            final ReadOnlyMatrix3 rotation = mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = mesh.getWorldScale();
+        if (_right != null) {
+            final ReadOnlyMatrix3 rotation = _mesh.getWorldRotation();
+            final ReadOnlyVector3 translation = _mesh.getWorldTranslation();
+            final ReadOnlyVector3 scale = _mesh.getWorldScale();
 
-            right.worldBounds = right.bounds.transform(rotation, translation, scale, right.worldBounds);
+            _right._worldBounds = _right._bounds.transform(rotation, translation, scale, _right._worldBounds);
 
-            right.intersect(ray, triList);
-        } else if (left == null) {
+            _right.intersect(ray, triList);
+        } else if (_left == null) {
             // This is a leaf node. We can therfore, check each triangle this
             // node contains. If an intersection occurs, place it in the
             // list.
 
             final Vector3[] points = new Vector3[3];
-            for (int i = start; i < end; i++) {
-                PickingUtil.getTriangle(mesh, triIndex[i], points);
-                mesh.localToWorld(points[0], points[0]);
-                mesh.localToWorld(points[1], points[1]);
-                mesh.localToWorld(points[2], points[2]);
+            for (int i = _start; i < _end; i++) {
+                PickingUtil.getTriangle(_mesh, _triIndex[i], points);
+                _mesh.localToWorld(points[0], points[0]);
+                _mesh.localToWorld(points[1], points[1]);
+                _mesh.localToWorld(points[2], points[2]);
                 if (ray.intersects(points[0], points[1], points[2], null, true)) {
-                    triList.add(triIndex[i]);
+                    triList.add(_triIndex[i]);
                 }
             }
         }
@@ -486,7 +486,7 @@ public class CollisionTree implements Serializable {
      * @return the bounding volume for this tree node in local space.
      */
     public BoundingVolume getBounds() {
-        return bounds;
+        return _bounds;
     }
 
     /**
@@ -495,25 +495,25 @@ public class CollisionTree implements Serializable {
      * @return the bounding volume for this tree node in world space.
      */
     public BoundingVolume getWorldBounds() {
-        return worldBounds;
+        return _worldBounds;
     }
 
     /**
      * creates the appropriate bounding volume based on the type set during construction.
      */
     private void createBounds() {
-        switch (type) {
+        switch (_type) {
             case AABB:
-                bounds = new BoundingBox();
-                worldBounds = new BoundingBox();
+                _bounds = new BoundingBox();
+                _worldBounds = new BoundingBox();
                 break;
             case OBB:
-                bounds = new OrientedBoundingBox();
-                worldBounds = new OrientedBoundingBox();
+                _bounds = new OrientedBoundingBox();
+                _worldBounds = new OrientedBoundingBox();
                 break;
             case Sphere:
-                bounds = new BoundingSphere();
-                worldBounds = new BoundingSphere();
+                _bounds = new BoundingSphere();
+                _worldBounds = new BoundingSphere();
                 break;
             default:
                 break;
@@ -526,22 +526,22 @@ public class CollisionTree implements Serializable {
      * the subsection of the array is sorted.
      */
     public void sortTris() {
-        switch (type) {
+        switch (_type) {
             case AABB:
                 // determine the longest length of the box, this axis will be
                 // best
                 // for sorting.
-                if (((BoundingBox) bounds).getXExtent() > ((BoundingBox) bounds).getYExtent()) {
-                    if (((BoundingBox) bounds).getXExtent() > ((BoundingBox) bounds).getZExtent()) {
-                        comparator.setAxis(TreeComparator.Axis.X);
+                if (((BoundingBox) _bounds).getXExtent() > ((BoundingBox) _bounds).getYExtent()) {
+                    if (((BoundingBox) _bounds).getXExtent() > ((BoundingBox) _bounds).getZExtent()) {
+                        _comparator.setAxis(TreeComparator.Axis.X);
                     } else {
-                        comparator.setAxis(TreeComparator.Axis.Z);
+                        _comparator.setAxis(TreeComparator.Axis.Z);
                     }
                 } else {
-                    if (((BoundingBox) bounds).getYExtent() > ((BoundingBox) bounds).getZExtent()) {
-                        comparator.setAxis(TreeComparator.Axis.Y);
+                    if (((BoundingBox) _bounds).getYExtent() > ((BoundingBox) _bounds).getZExtent()) {
+                        _comparator.setAxis(TreeComparator.Axis.Y);
                     } else {
-                        comparator.setAxis(TreeComparator.Axis.Z);
+                        _comparator.setAxis(TreeComparator.Axis.Z);
                     }
                 }
                 break;
@@ -549,31 +549,31 @@ public class CollisionTree implements Serializable {
                 // determine the longest length of the box, this axis will be
                 // best
                 // for sorting.
-                if (((OrientedBoundingBox) bounds).extent.getX() > ((OrientedBoundingBox) bounds).extent.getY()) {
-                    if (((OrientedBoundingBox) bounds).extent.getX() > ((OrientedBoundingBox) bounds).extent.getZ()) {
-                        comparator.setAxis(TreeComparator.Axis.X);
+                if (((OrientedBoundingBox) _bounds)._extent.getX() > ((OrientedBoundingBox) _bounds)._extent.getY()) {
+                    if (((OrientedBoundingBox) _bounds)._extent.getX() > ((OrientedBoundingBox) _bounds)._extent.getZ()) {
+                        _comparator.setAxis(TreeComparator.Axis.X);
                     } else {
-                        comparator.setAxis(TreeComparator.Axis.Z);
+                        _comparator.setAxis(TreeComparator.Axis.Z);
                     }
                 } else {
-                    if (((OrientedBoundingBox) bounds).extent.getY() > ((OrientedBoundingBox) bounds).extent.getZ()) {
-                        comparator.setAxis(TreeComparator.Axis.Y);
+                    if (((OrientedBoundingBox) _bounds)._extent.getY() > ((OrientedBoundingBox) _bounds)._extent.getZ()) {
+                        _comparator.setAxis(TreeComparator.Axis.Y);
                     } else {
-                        comparator.setAxis(TreeComparator.Axis.Z);
+                        _comparator.setAxis(TreeComparator.Axis.Z);
                     }
                 }
                 break;
             case Sphere:
                 // sort any axis, X is fine.
-                comparator.setAxis(TreeComparator.Axis.X);
+                _comparator.setAxis(TreeComparator.Axis.X);
                 break;
             default:
                 break;
         }
 
-        comparator.setCenter(bounds.center);
-        comparator.setMesh(mesh);
-        SortUtil.qsort(triIndex, start, end - 1, comparator);
+        _comparator.setCenter(_bounds._center);
+        _comparator.setMesh(_mesh);
+        SortUtil.qsort(_triIndex, _start, _end - 1, _comparator);
     }
 
     /**
@@ -593,31 +593,31 @@ public class CollisionTree implements Serializable {
         int i = 0;
         currentLevel++;
 
-        if (left == null && right == null) {
+        if (_left == null && _right == null) {
             // is a leaf, get rid of any matching indexes and rebuild
             boolean alreadyRebuilt = false;
             while (i < triangleIndices.size()) {
-                if (triangleIndices.get(i).intValue() >= start && triangleIndices.get(i).intValue() < end) {
+                if (triangleIndices.get(i).intValue() >= _start && triangleIndices.get(i).intValue() < _end) {
                     triangleIndices.remove(i);
                     if (alreadyRebuilt == false) {
                         alreadyRebuilt = true;
-                        bounds.computeFromTris(triIndex, mesh, start, end);
+                        _bounds.computeFromTris(_triIndex, _mesh, _start, _end);
                     }
                 } else {
                     i++;
                 }
             }
         } else if (containsAnyLeaf(triangleIndices)) {
-            if (left != null) {
-                left.rebuildLeaves(triangleIndices, startLevel, currentLevel);
+            if (_left != null) {
+                _left.rebuildLeaves(triangleIndices, startLevel, currentLevel);
             }
 
-            if (right != null) {
-                right.rebuildLeaves(triangleIndices, startLevel, currentLevel);
+            if (_right != null) {
+                _right.rebuildLeaves(triangleIndices, startLevel, currentLevel);
             }
 
             if (currentLevel > startLevel) {
-                bounds.computeFromTris(triIndex, mesh, start, end);
+                _bounds.computeFromTris(_triIndex, _mesh, _start, _end);
             }
         }
     }
@@ -633,7 +633,7 @@ public class CollisionTree implements Serializable {
         boolean rtnVal = false;
 
         for (int i = 0; i < triangleIndices.size(); i++) {
-            if (triangleIndices.get(i).intValue() >= start && triangleIndices.get(i).intValue() < end) {
+            if (triangleIndices.get(i).intValue() >= _start && triangleIndices.get(i).intValue() < _end) {
                 rtnVal = true;
                 break;
             }

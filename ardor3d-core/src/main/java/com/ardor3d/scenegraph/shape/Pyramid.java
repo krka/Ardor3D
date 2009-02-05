@@ -30,9 +30,9 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Pyramid extends Mesh {
     private static final long serialVersionUID = 1L;
 
-    private double height;
+    private double _height;
 
-    private double width;
+    private double _width;
 
     public Pyramid() {}
 
@@ -48,8 +48,8 @@ public class Pyramid extends Mesh {
      */
     public Pyramid(final String name, final double width, final double height) {
         super(name);
-        this.width = width;
-        this.height = height;
+        _width = width;
+        _height = height;
 
         setVertexData();
         setNormalData();
@@ -62,11 +62,11 @@ public class Pyramid extends Mesh {
      * the base and height are set during construction.
      */
     private void setVertexData() {
-        final Vector3 peak = new Vector3(0, height / 2, 0);
-        final Vector3 vert0 = new Vector3(-width / 2, -height / 2, -width / 2);
-        final Vector3 vert1 = new Vector3(width / 2, -height / 2, -width / 2);
-        final Vector3 vert2 = new Vector3(width / 2, -height / 2, width / 2);
-        final Vector3 vert3 = new Vector3(-width / 2, -height / 2, width / 2);
+        final Vector3 peak = new Vector3(0, _height / 2, 0);
+        final Vector3 vert0 = new Vector3(-_width / 2, -_height / 2, -_width / 2);
+        final Vector3 vert1 = new Vector3(_width / 2, -_height / 2, -_width / 2);
+        final Vector3 vert2 = new Vector3(_width / 2, -_height / 2, _width / 2);
+        final Vector3 vert3 = new Vector3(-_width / 2, -_height / 2, _width / 2);
 
         final FloatBuffer verts = BufferUtils.createVector3Buffer(16);
 
@@ -189,8 +189,8 @@ public class Pyramid extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(height, "height", 0);
-        capsule.write(width, "width", 0);
+        capsule.write(_height, "height", 0);
+        capsule.write(_width, "width", 0);
 
     }
 
@@ -198,8 +198,8 @@ public class Pyramid extends Mesh {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        height = capsule.readDouble("height", 0);
-        width = capsule.readDouble("width", 0);
+        _height = capsule.readDouble("height", 0);
+        _width = capsule.readDouble("width", 0);
 
     }
 }

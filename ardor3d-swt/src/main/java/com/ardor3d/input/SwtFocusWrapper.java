@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Control;
  * Focus Listener wrapper class for use with SWT.
  */
 public class SwtFocusWrapper implements FocusWrapper, FocusListener {
-    private volatile boolean focusLost = false;
+    private volatile boolean _focusLost = false;
 
     private final Control _control;
 
@@ -33,13 +33,13 @@ public class SwtFocusWrapper implements FocusWrapper, FocusListener {
     }
 
     public void focusLost(final FocusEvent focusEvent) {
-        focusLost = true;
+        _focusLost = true;
     }
 
     public boolean getAndClearFocusLost() {
-        final boolean result = focusLost;
+        final boolean result = _focusLost;
 
-        focusLost = false;
+        _focusLost = false;
 
         return result;
     }

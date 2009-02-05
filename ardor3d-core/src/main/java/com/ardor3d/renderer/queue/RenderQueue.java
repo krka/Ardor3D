@@ -17,21 +17,21 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
 public class RenderQueue {
-    private final Renderer renderer;
+    private final Renderer _renderer;
 
     private final EnumMap<RenderBucketType, RenderBucket> renderBuckets = new EnumMap<RenderBucketType, RenderBucket>(
             RenderBucketType.class);
 
     public RenderQueue(final Renderer r) {
-        renderer = r;
+        _renderer = r;
 
         setupDefaultBuckets();
     }
 
     private void setupDefaultBuckets() {
-        renderBuckets.put(RenderBucketType.Opaque, new OpaqueRenderBucket(renderer));
-        renderBuckets.put(RenderBucketType.Transparent, new TransparentRenderBucket(renderer));
-        renderBuckets.put(RenderBucketType.Ortho, new OrthoRenderBucket(renderer));
+        renderBuckets.put(RenderBucketType.Opaque, new OpaqueRenderBucket(_renderer));
+        renderBuckets.put(RenderBucketType.Transparent, new TransparentRenderBucket(_renderer));
+        renderBuckets.put(RenderBucketType.Ortho, new OrthoRenderBucket(_renderer));
     }
 
     public void setRenderBucket(final RenderBucketType type, final RenderBucket renderBucket) {

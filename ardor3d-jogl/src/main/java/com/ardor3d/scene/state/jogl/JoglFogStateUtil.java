@@ -25,7 +25,7 @@ import com.ardor3d.renderer.state.FogState.Quality;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.FogStateRecord;
 
-public class JoglFogStateUtil {
+public abstract class JoglFogStateUtil {
 
     public static void apply(final JoglRenderer renderer, final FogState state) {
         final GL gl = GLU.getCurrentGL();

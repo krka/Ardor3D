@@ -25,15 +25,15 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public abstract class PickResults {
 
-    private final List<PickData> nodeList;
-    private boolean checkDistance;
-    private DistanceComparator distanceCompare;
+    private final List<PickData> _nodeList;
+    private boolean _checkDistance;
+    private DistanceComparator _distanceCompare;
 
     /**
      * Constructor instantiates a new <code>PickResults</code> object.
      */
     public PickResults() {
-        nodeList = new ArrayList<PickData>();
+        _nodeList = new ArrayList<PickData>();
     }
 
     /**
@@ -48,7 +48,7 @@ public abstract class PickResults {
      *            the PickData to be placed in the results list.
      */
     public void addPickData(final PickData data) {
-        nodeList.add(data);
+        _nodeList.add(data);
         modified = true;
     }
 
@@ -58,7 +58,7 @@ public abstract class PickResults {
      * @return the number of Mesh objects in the list.
      */
     public int getNumber() {
-        return nodeList.size();
+        return _nodeList.size();
     }
 
     /**
@@ -70,19 +70,19 @@ public abstract class PickResults {
      */
     public PickData getPickData(final int i) {
         if (modified) {
-            if (checkDistance) {
-                Collections.sort(nodeList, distanceCompare);
+            if (_checkDistance) {
+                Collections.sort(_nodeList, _distanceCompare);
             }
             modified = false;
         }
-        return nodeList.get(i);
+        return _nodeList.get(i);
     }
 
     /**
      * <code>clear</code> clears the list of all Mesh objects.
      */
     public void clear() {
-        nodeList.clear();
+        _nodeList.clear();
     }
 
     /**
@@ -109,7 +109,7 @@ public abstract class PickResults {
      * @return true if objects will be ordered by distance, false otherwise.
      */
     public boolean willCheckDistance() {
-        return checkDistance;
+        return _checkDistance;
     }
 
     /**
@@ -119,9 +119,9 @@ public abstract class PickResults {
      *            true if objects will be ordered by distance, false otherwise.
      */
     public void setCheckDistance(final boolean checkDistance) {
-        this.checkDistance = checkDistance;
+        _checkDistance = checkDistance;
         if (checkDistance) {
-            distanceCompare = new DistanceComparator();
+            _distanceCompare = new DistanceComparator();
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class PickResults {
     private class DistanceComparator implements Comparator<PickData> {
 
         public int compare(final PickData o1, final PickData o2) {
-            if (o1.getRecord().getClosestDistance() <= o2.getRecord().getClosestDistance()) {
+            if (o1.getIntersectionRecord().getClosestDistance() <= o2.getIntersectionRecord().getClosestDistance()) {
                 return -1;
             }
 

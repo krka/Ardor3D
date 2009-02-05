@@ -24,85 +24,85 @@ import com.ardor3d.util.export.OutputCapsule;
 public final class SimpleParticleInfluenceFactory {
 
     public static class BasicWind extends ParticleInfluence {
-        private double strength;
-        private Vector3 windDirection;
-        private boolean random, rotateWithScene;
-        private final Vector3 vector = new Vector3();
+        private double _strength;
+        private Vector3 _windDirection;
+        private boolean _random, _rotateWithScene;
+        private final Vector3 _vector = new Vector3();
 
         public BasicWind() {}
 
         public BasicWind(final double windStr, final Vector3 windDir, final boolean addRandom,
                 final boolean rotateWithScene) {
-            strength = windStr;
-            windDirection = windDir;
-            random = addRandom;
-            this.rotateWithScene = rotateWithScene;
+            _strength = windStr;
+            _windDirection = windDir;
+            _random = addRandom;
+            _rotateWithScene = rotateWithScene;
         }
 
         public double getStrength() {
-            return strength;
+            return _strength;
         }
 
         public void setStrength(final double windStr) {
-            strength = windStr;
+            _strength = windStr;
         }
 
         public Vector3 getWindDirection() {
-            return windDirection;
+            return _windDirection;
         }
 
         public void setWindDirection(final Vector3 windDir) {
-            windDirection = windDir;
+            _windDirection = windDir;
         }
 
         public boolean isRandom() {
-            return random;
+            return _random;
         }
 
         public void setRandom(final boolean addRandom) {
-            random = addRandom;
+            _random = addRandom;
         }
 
         public boolean isRotateWithScene() {
-            return rotateWithScene;
+            return _rotateWithScene;
         }
 
         public void setRotateWithScene(final boolean rotateWithScene) {
-            this.rotateWithScene = rotateWithScene;
+            _rotateWithScene = rotateWithScene;
         }
 
         @Override
         public void prepare(final ParticleSystem system) {
-            vector.set(windDirection);
-            if (rotateWithScene) {
-                system.getEmitterTransform().applyForwardVector(vector);
+            _vector.set(_windDirection);
+            if (_rotateWithScene) {
+                system.getEmitterTransform().applyForwardVector(_vector);
             }
         }
 
         @Override
         public void apply(final double dt, final Particle p, final int index) {
-            final double tStr = (random ? MathUtils.nextRandomFloat() * strength : strength);
-            vector.scaleAdd(tStr * dt, p.getVelocity(), p.getVelocity());
+            final double tStr = (_random ? MathUtils.nextRandomFloat() * _strength : _strength);
+            _vector.scaleAdd(tStr * dt, p.getVelocity(), p.getVelocity());
         }
 
         @Override
         public void write(final Ardor3DExporter e) throws IOException {
             super.write(e);
             final OutputCapsule capsule = e.getCapsule(this);
-            capsule.write(strength, "strength", 1f);
-            capsule.write(windDirection, "windDirection", new Vector3(Vector3.UNIT_X));
-            capsule.write(random, "random", false);
-            capsule.write(rotateWithScene, "rotateWithScene", true);
+            capsule.write(_strength, "strength", 1f);
+            capsule.write(_windDirection, "windDirection", new Vector3(Vector3.UNIT_X));
+            capsule.write(_random, "random", false);
+            capsule.write(_rotateWithScene, "rotateWithScene", true);
         }
 
         @Override
         public void read(final Ardor3DImporter e) throws IOException {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
-            strength = capsule.readFloat("strength", 1f);
-            windDirection = (Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X));
-            random = capsule.readBoolean("random", false);
-            rotateWithScene = capsule.readBoolean("rotateWithScene", true);
+            _strength = capsule.readFloat("strength", 1f);
+            _windDirection = (Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X));
+            _random = capsule.readBoolean("random", false);
+            _rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
 
         @Override
@@ -224,134 +224,134 @@ public final class SimpleParticleInfluenceFactory {
         public static final int VT_CYLINDER = 0;
         public static final int VT_TORUS = 1;
 
-        private int type = VT_CYLINDER;
-        private double strength, divergence, height, radius;
-        private Line3 axis;
-        private boolean random, transformWithScene;
-        private final Vector3 v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
-        private final Quaternion rot = new Quaternion();
-        private final Line3 line = new Line3();
+        private int _type = VT_CYLINDER;
+        private double _strength, _divergence, _height, _radius;
+        private Line3 _axis;
+        private boolean _random, _transformWithScene;
+        private final Vector3 _v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
+        private final Quaternion _rot = new Quaternion();
+        private final Line3 _line = new Line3();
 
         public BasicVortex() {}
 
         public BasicVortex(final double strength, final double divergence, final Line3 axis, final boolean random,
                 final boolean transformWithScene) {
-            this.strength = strength;
-            this.divergence = divergence;
-            this.axis = axis;
-            height = 0f;
-            radius = 1f;
-            this.random = random;
-            this.transformWithScene = transformWithScene;
+            _strength = strength;
+            _divergence = divergence;
+            _axis = axis;
+            _height = 0f;
+            _radius = 1f;
+            _random = random;
+            _transformWithScene = transformWithScene;
         }
 
         public int getType() {
-            return type;
+            return _type;
         }
 
         public void setType(final int type) {
-            this.type = type;
+            _type = type;
         }
 
         public double getStrength() {
-            return strength;
+            return _strength;
         }
 
         public void setStrength(final double strength) {
-            this.strength = strength;
+            _strength = strength;
         }
 
         public double getDivergence() {
-            return divergence;
+            return _divergence;
         }
 
         public void setDivergence(final double divergence) {
-            this.divergence = divergence;
+            _divergence = divergence;
         }
 
         public Line3 getAxis() {
-            return axis;
+            return _axis;
         }
 
         public void setAxis(final Line3 axis) {
-            this.axis = axis;
+            _axis = axis;
         }
 
         public double getHeight() {
-            return height;
+            return _height;
         }
 
         public void setHeight(final double height) {
-            this.height = height;
+            _height = height;
         }
 
         public double getRadius() {
-            return radius;
+            return _radius;
         }
 
         public void setRadius(final double radius) {
-            this.radius = radius;
+            _radius = radius;
         }
 
         public boolean isRandom() {
-            return random;
+            return _random;
         }
 
         public void setRandom(final boolean random) {
-            this.random = random;
+            _random = random;
         }
 
         public boolean isTransformWithScene() {
-            return transformWithScene;
+            return _transformWithScene;
         }
 
         public void setTransformWithScene(final boolean transformWithScene) {
-            this.transformWithScene = transformWithScene;
+            _transformWithScene = transformWithScene;
         }
 
         @Override
         public void prepare(final ParticleSystem system) {
-            line.setOrigin(axis.getOrigin());
-            line.setDirection(axis.getDirection());
-            if (transformWithScene) {
+            _line.setOrigin(_axis.getOrigin());
+            _line.setDirection(_axis.getDirection());
+            if (_transformWithScene) {
                 final Vector3 temp = Vector3.fetchTempInstance();
-                system.getEmitterTransform().applyForward(line.getOrigin(), temp);
-                line.setOrigin(temp);
-                system.getEmitterTransform().applyForwardVector(line.getDirection(), temp);
-                line.setDirection(temp);
+                system.getEmitterTransform().applyForward(_line.getOrigin(), temp);
+                _line.setOrigin(temp);
+                system.getEmitterTransform().applyForwardVector(_line.getDirection(), temp);
+                _line.setDirection(temp);
                 Vector3.releaseTempInstance(temp);
             }
-            if (type == VT_CYLINDER) {
-                rot.fromAngleAxis(-divergence, line.getDirection());
+            if (_type == VT_CYLINDER) {
+                _rot.fromAngleAxis(-_divergence, _line.getDirection());
             }
         }
 
         @Override
         public void apply(final double dt, final Particle p, final int index) {
-            final double dtStr = dt * strength * (random ? MathUtils.nextRandomFloat() : 1f);
-            p.getPosition().subtract(line.getOrigin(), v1);
-            line.getDirection().cross(v1, v2);
+            final double dtStr = dt * _strength * (_random ? MathUtils.nextRandomFloat() : 1f);
+            p.getPosition().subtract(_line.getOrigin(), _v1);
+            _line.getDirection().cross(_v1, v2);
             if (v2.length() == 0) { // particle is on the axis
                 return;
             }
             v2.normalizeLocal();
-            if (type == VT_CYLINDER) {
-                rot.apply(v2, v2);
+            if (_type == VT_CYLINDER) {
+                _rot.apply(v2, v2);
                 v2.scaleAdd(dtStr, p.getVelocity(), p.getVelocity());
                 return;
             }
-            v2.cross(line.getDirection(), v1);
-            v1.multiplyLocal(radius);
-            line.getDirection().scaleAdd(height, v1, v1);
-            v1.addLocal(line.getOrigin());
-            v1.subtractLocal(p.getPosition());
-            if (v1.length() == 0) { // particle is on the ring
+            v2.cross(_line.getDirection(), _v1);
+            _v1.multiplyLocal(_radius);
+            _line.getDirection().scaleAdd(_height, _v1, _v1);
+            _v1.addLocal(_line.getOrigin());
+            _v1.subtractLocal(p.getPosition());
+            if (_v1.length() == 0) { // particle is on the ring
                 return;
             }
-            v1.normalizeLocal();
-            v1.cross(v2, v3);
-            rot.fromAngleAxis(-divergence, v2);
-            rot.apply(v3, v3);
+            _v1.normalizeLocal();
+            _v1.cross(v2, v3);
+            _rot.fromAngleAxis(-_divergence, v2);
+            _rot.apply(v3, v3);
             v3.scaleAdd(dtStr, p.getVelocity(), p.getVelocity());
         }
 
@@ -359,28 +359,28 @@ public final class SimpleParticleInfluenceFactory {
         public void write(final Ardor3DExporter e) throws IOException {
             super.write(e);
             final OutputCapsule capsule = e.getCapsule(this);
-            capsule.write(type, "type", VT_CYLINDER);
-            capsule.write(strength, "strength", 1f);
-            capsule.write(divergence, "divergence", 0f);
-            capsule.write(axis, "axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
-            capsule.write(height, "height", 0f);
-            capsule.write(radius, "radius", 1f);
-            capsule.write(random, "random", false);
-            capsule.write(transformWithScene, "transformWithScene", true);
+            capsule.write(_type, "type", VT_CYLINDER);
+            capsule.write(_strength, "strength", 1f);
+            capsule.write(_divergence, "divergence", 0f);
+            capsule.write(_axis, "axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
+            capsule.write(_height, "height", 0f);
+            capsule.write(_radius, "radius", 1f);
+            capsule.write(_random, "random", false);
+            capsule.write(_transformWithScene, "transformWithScene", true);
         }
 
         @Override
         public void read(final Ardor3DImporter e) throws IOException {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
-            type = capsule.readInt("type", VT_CYLINDER);
-            strength = capsule.readFloat("strength", 1f);
-            divergence = capsule.readFloat("divergence", 0f);
-            axis = (Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
-            height = capsule.readFloat("height", 0f);
-            radius = capsule.readFloat("radius", 1f);
-            random = capsule.readBoolean("random", false);
-            transformWithScene = capsule.readBoolean("transformWithScene", true);
+            _type = capsule.readInt("type", VT_CYLINDER);
+            _strength = capsule.readFloat("strength", 1f);
+            _divergence = capsule.readFloat("divergence", 0f);
+            _axis = (Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
+            _height = capsule.readFloat("height", 0f);
+            _radius = capsule.readFloat("radius", 1f);
+            _random = capsule.readBoolean("random", false);
+            _transformWithScene = capsule.readBoolean("transformWithScene", true);
         }
 
         @Override

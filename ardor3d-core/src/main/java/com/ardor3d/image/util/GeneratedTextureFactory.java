@@ -17,7 +17,7 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.renderer.state.TextureState;
 
-public class GeneratedTextureFactory {
+public abstract class GeneratedTextureFactory {
 
     /**
      * Generates a checkboard pattern with transparent and opaque alternating blocks. A useful blend state for use with

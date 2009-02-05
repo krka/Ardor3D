@@ -26,7 +26,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.VertexProgramStateRecord;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class JoglVertexProgramStateUtil {
+public abstract class JoglVertexProgramStateUtil {
     private static final Logger logger = Logger.getLogger(JoglVertexProgramStateUtil.class.getName());
 
     /**

@@ -29,10 +29,10 @@ public class Line extends Mesh {
 
     private static final long serialVersionUID = 1L;
 
-    private float lineWidth = 1.0f;
-    private short stipplePattern = (short) 0xFFFF;
-    private int stippleFactor = 1;
-    private boolean antialiased = false;
+    private float _lineWidth = 1.0f;
+    private short _stipplePattern = (short) 0xFFFF;
+    private int _stippleFactor = 1;
+    private boolean _antialiased = false;
 
     public Line() {
         this("line");
@@ -158,7 +158,7 @@ public class Line extends Mesh {
      * @return true if points are to be drawn antialiased
      */
     public boolean isAntialiased() {
-        return antialiased;
+        return _antialiased;
     }
 
     /**
@@ -170,14 +170,14 @@ public class Line extends Mesh {
      *            true if the line should be antialiased.
      */
     public void setAntialiased(final boolean antialiased) {
-        this.antialiased = antialiased;
+        _antialiased = antialiased;
     }
 
     /**
      * @return the width of this line.
      */
     public float getLineWidth() {
-        return lineWidth;
+        return _lineWidth;
     }
 
     /**
@@ -188,14 +188,14 @@ public class Line extends Mesh {
      *            The lineWidth to set.
      */
     public void setLineWidth(final float lineWidth) {
-        this.lineWidth = lineWidth;
+        _lineWidth = lineWidth;
     }
 
     /**
      * @return the set stipplePattern. 0xFFFF means no stipple.
      */
     public short getStipplePattern() {
-        return stipplePattern;
+        return _stipplePattern;
     }
 
     /**
@@ -205,14 +205,14 @@ public class Line extends Mesh {
      *            a 16bit short whose bits describe the pattern to use when drawing this line
      */
     public void setStipplePattern(final short stipplePattern) {
-        this.stipplePattern = stipplePattern;
+        _stipplePattern = stipplePattern;
     }
 
     /**
      * @return the set stippleFactor.
      */
     public int getStippleFactor() {
-        return stippleFactor;
+        return _stippleFactor;
     }
 
     /**
@@ -220,25 +220,25 @@ public class Line extends Mesh {
      *            magnification factor to apply to the stipple pattern.
      */
     public void setStippleFactor(final int stippleFactor) {
-        this.stippleFactor = stippleFactor;
+        _stippleFactor = stippleFactor;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(lineWidth, "lineWidth", 1);
-        capsule.write(stipplePattern, "stipplePattern", (short) 0xFFFF);
-        capsule.write(antialiased, "antialiased", false);
+        capsule.write(_lineWidth, "lineWidth", 1);
+        capsule.write(_stipplePattern, "stipplePattern", (short) 0xFFFF);
+        capsule.write(_antialiased, "antialiased", false);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        lineWidth = capsule.readFloat("lineWidth", 1);
-        stipplePattern = capsule.readShort("stipplePattern", (short) 0xFFFF);
-        antialiased = capsule.readBoolean("antialiased", false);
+        _lineWidth = capsule.readFloat("lineWidth", 1);
+        _stipplePattern = capsule.readShort("stipplePattern", (short) 0xFFFF);
+        _antialiased = capsule.readBoolean("antialiased", false);
     }
 
     @Override

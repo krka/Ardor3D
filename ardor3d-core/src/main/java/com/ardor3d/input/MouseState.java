@@ -98,10 +98,10 @@ public class MouseState {
     }
 
     /**
-     * Returns the current state for the supplied button, or UP if no state for that button is
-     * registered.
-     *
-     * @param button the mouse button to check
+     * Returns the current state for the supplied button, or UP if no state for that button is registered.
+     * 
+     * @param button
+     *            the mouse button to check
      * @return the button's state, or {@link ButtonState#UP} if no button state registered.
      */
     public ButtonState getButtonState(final MouseButton button) {
@@ -156,20 +156,21 @@ public class MouseState {
      * Returns the click count of a mouse button as of this frame. Click counts are non-zero only for frames when the
      * mouse button is released. A double-click sequence, for instance, could show up like this:
      * <nl>
-     *  <li>Frame 1, mouse button pressed - click count == 0</li>
-     *  <li>Frame 2, mouse button down - click count == 0</li>
-     *  <li>Frame 3, mouse button released  - click count == 1</li>
-     *  <li>Frame 4, mouse button up - click count == 0</li>
-     *  <li>Frame 5, mouse button pressed - click count == 0</li>
-     *  <li>Frame 6, mouse button down - click count == 0</li>
-     *  <li>Frame 7, mouse button released  - click count == 2</li>
+     * <li>Frame 1, mouse button pressed - click count == 0</li>
+     * <li>Frame 2, mouse button down - click count == 0</li>
+     * <li>Frame 3, mouse button released - click count == 1</li>
+     * <li>Frame 4, mouse button up - click count == 0</li>
+     * <li>Frame 5, mouse button pressed - click count == 0</li>
+     * <li>Frame 6, mouse button down - click count == 0</li>
+     * <li>Frame 7, mouse button released - click count == 2</li>
      * </nl>
-     *
+     * 
      * Whether or not a mouse press/release sequence counts as a click (or double-click) depends on the time passed
      * between them. See {@link #CLICK_TIME_MS}.
-     *
      * 
-     * @param button the button to check for clicks
+     * 
+     * @param button
+     *            the button to check for clicks
      * @return the click count in this frame
      */
     public int getClickCount(final MouseButton button) {
@@ -178,7 +179,7 @@ public class MouseState {
 
     /**
      * Returns a new EnumSet of all buttons that were clicked this frame.
-     *
+     * 
      * @return every mouse button whose click count this frame is > 0
      */
     public EnumSet<MouseButton> getButtonsClicked() {

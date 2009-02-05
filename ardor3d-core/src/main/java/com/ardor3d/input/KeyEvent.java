@@ -17,19 +17,19 @@ import com.ardor3d.annotation.Immutable;
  */
 @Immutable
 public class KeyEvent {
-    private final Key key;
-    private final KeyState state;
+    private final Key _key;
+    private final KeyState _state;
 
     public KeyEvent(final Key key, final KeyState state) {
-        this.key = key;
-        this.state = state;
+        _key = key;
+        _state = state;
     }
 
     public Key getKey() {
-        return key;
+        return _key;
     }
 
     public KeyState getState() {
-        return state;
+        return _state;
     }
 }

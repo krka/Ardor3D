@@ -88,9 +88,8 @@ public abstract class RenderState implements Savable {
         _quickCompare.add(StateType.Offset);
     }
 
-    private boolean enabled = true;
-
-    private boolean needsRefresh = false;
+    private boolean _enabled = true;
+    private boolean _needsRefresh = false;
 
     /**
      * Constructs a new RenderState. The state is enabled by default.
@@ -109,7 +108,7 @@ public abstract class RenderState implements Savable {
      * @return True if this state is enabled.
      */
     public boolean isEnabled() {
-        return enabled;
+        return _enabled;
     }
 
     /**
@@ -119,7 +118,7 @@ public abstract class RenderState implements Savable {
      *            False if the state is to be disabled, true otherwise.
      */
     public void setEnabled(final boolean value) {
-        enabled = value;
+        _enabled = value;
         setNeedsRefresh(true);
     }
 
@@ -142,12 +141,12 @@ public abstract class RenderState implements Savable {
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(enabled, "enabled", true);
+        capsule.write(_enabled, "enabled", true);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        enabled = capsule.readBoolean("enabled", true);
+        _enabled = capsule.readBoolean("enabled", true);
     }
 
     public Class<? extends RenderState> getClassTag() {
@@ -161,7 +160,7 @@ public abstract class RenderState implements Savable {
      *         context. Is reset to false after apply is finished.
      */
     public boolean needsRefresh() {
-        return needsRefresh;
+        return _needsRefresh;
     }
 
     /**
@@ -172,7 +171,7 @@ public abstract class RenderState implements Savable {
      *            context.
      */
     public void setNeedsRefresh(final boolean refresh) {
-        needsRefresh = refresh;
+        _needsRefresh = refresh;
     }
 
     /**

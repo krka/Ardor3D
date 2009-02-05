@@ -22,8 +22,8 @@ import java.util.Arrays;
  */
 public class MultiFormatResourceLocator extends SimpleResourceLocator {
 
-    private final String[] extensions;
-    private boolean trySpecifiedFormatFirst = false;
+    private final String[] _extensions;
+    private boolean _trySpecifiedFormatFirst = false;
 
     public MultiFormatResourceLocator(final URI baseDir) {
         this(baseDir, ".dds", ".tga", ".png", ".jpg", ".gif");
@@ -39,7 +39,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
         if (extensions == null) {
             throw new NullPointerException("extensions can not be null.");
         }
-        this.extensions = extensions;
+        _extensions = extensions;
     }
 
     public MultiFormatResourceLocator(final URL baseDir, final String... extensions) throws URISyntaxException {
@@ -48,7 +48,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
 
     @Override
     public URL locateResource(final String resourceName) {
-        if (trySpecifiedFormatFirst) {
+        if (_trySpecifiedFormatFirst) {
             final URL u = super.locateResource(resourceName);
             if (u != null) {
                 return u;
@@ -56,14 +56,14 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
         }
 
         final String baseFileName = getBaseFileName(resourceName);
-        for (final String extension : extensions) {
+        for (final String extension : _extensions) {
             final URL u = super.locateResource(baseFileName + extension);
             if (u != null) {
                 return u;
             }
         }
 
-        if (!trySpecifiedFormatFirst) {
+        if (!_trySpecifiedFormatFirst) {
             // If all else fails, just try the original name.
             return super.locateResource(resourceName);
         } else {
@@ -83,18 +83,18 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
     }
 
     public boolean isTrySpecifiedFormatFirst() {
-        return trySpecifiedFormatFirst;
+        return _trySpecifiedFormatFirst;
     }
 
     public void setTrySpecifiedFormatFirst(final boolean trySpecifiedFormatFirst) {
-        this.trySpecifiedFormatFirst = trySpecifiedFormatFirst;
+        _trySpecifiedFormatFirst = trySpecifiedFormatFirst;
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof MultiFormatResourceLocator) {
-            return baseDir.equals(((MultiFormatResourceLocator) obj).baseDir)
-                    && Arrays.equals(extensions, ((MultiFormatResourceLocator) obj).extensions);
+            return _baseDir.equals(((MultiFormatResourceLocator) obj)._baseDir)
+                    && Arrays.equals(_extensions, ((MultiFormatResourceLocator) obj)._extensions);
         }
         return super.equals(obj);
     }

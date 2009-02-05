@@ -40,20 +40,19 @@ import com.google.common.collect.PeekingIterator;
 @ThreadSafe
 public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveListener, MouseWheelListener {
     @GuardedBy("this")
-    private final LinkedList<MouseState> upcomingEvents = new LinkedList<MouseState>();
+    private final LinkedList<MouseState> _upcomingEvents = new LinkedList<MouseState>();
 
     private final Control _control;
 
     @GuardedBy("this")
-    private SwtMouseIterator currentIterator = null;
+    private SwtMouseIterator _currentIterator = null;
 
     @GuardedBy("this")
-    private MouseState lastState = null;
+    private MouseState _lastState = null;
 
     private final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
-
 
     public SwtMouseWrapper(final Control control) {
         _control = checkNotNull(control, "control");
@@ -71,11 +70,11 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     public synchronized PeekingIterator<MouseState> getEvents() {
         expireClickEvents();
 
-        if (currentIterator == null || !currentIterator.hasNext()) {
-            currentIterator = new SwtMouseIterator();
+        if (_currentIterator == null || !_currentIterator.hasNext()) {
+            _currentIterator = new SwtMouseIterator();
         }
 
-        return currentIterator;
+        return _currentIterator;
     }
 
     private void expireClickEvents() {
@@ -102,7 +101,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
 
         initState(e);
 
-        final EnumMap<MouseButton, ButtonState> buttons = lastState.getButtonStates();
+        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
 
         setStateForButton(e, buttons, ButtonState.DOWN);
 
@@ -112,7 +111,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     public synchronized void mouseUp(final MouseEvent e) {
         initState(e);
 
-        final EnumMap<MouseButton, ButtonState> buttons = lastState.getButtonStates();
+        final EnumMap<MouseButton, ButtonState> buttons = _lastState.getButtonStates();
 
         setStateForButton(e, buttons, ButtonState.UP);
 
@@ -159,18 +158,18 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
 
         initState(mouseEvent);
 
-        addNewState(mouseEvent, 0, lastState.getButtonStates(), null);
+        addNewState(mouseEvent, 0, _lastState.getButtonStates(), null);
     }
 
     public synchronized void mouseScrolled(final MouseEvent mouseEvent) {
         initState(mouseEvent);
 
-        addNewState(mouseEvent, mouseEvent.count, lastState.getButtonStates(), null);
+        addNewState(mouseEvent, mouseEvent.count, _lastState.getButtonStates(), null);
     }
 
     private void initState(final MouseEvent mouseEvent) {
-        if (lastState == null) {
-            lastState = new MouseState(mouseEvent.x, _control.getSize().y - mouseEvent.y, 0, 0, 0, null, null);
+        if (_lastState == null) {
+            _lastState = new MouseState(mouseEvent.x, _control.getSize().y - mouseEvent.y, 0, 0, 0, null, null);
         }
     }
 
@@ -180,23 +179,22 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         // changing the y value, since for SWT, y = 0 at the top of the screen
         final int fixedY = _control.getSize().y - mouseEvent.y;
 
-        final MouseState newState = new MouseState(mouseEvent.x, fixedY, mouseEvent.x - lastState.getX(), fixedY
-                - lastState.getY(), wheelDX, buttons, clicks);
+        final MouseState newState = new MouseState(mouseEvent.x, fixedY, mouseEvent.x - _lastState.getX(), fixedY
+                - _lastState.getY(), wheelDX, buttons, clicks);
 
-        upcomingEvents.add(newState);
-        lastState = newState;
+        _upcomingEvents.add(newState);
+        _lastState = newState;
     }
-
 
     private class SwtMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {
         @Override
         protected MouseState computeNext() {
             synchronized (SwtMouseWrapper.this) {
-                if (upcomingEvents.isEmpty()) {
+                if (_upcomingEvents.isEmpty()) {
                     return endOfData();
                 }
 
-                return upcomingEvents.poll();
+                return _upcomingEvents.poll();
             }
         }
     }

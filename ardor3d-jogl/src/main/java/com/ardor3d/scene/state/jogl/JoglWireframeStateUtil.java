@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
 
-public class JoglWireframeStateUtil {
+public abstract class JoglWireframeStateUtil {
 
     public static void apply(final JoglRenderer renderer, final WireframeState state) {
         // ask for the current state record

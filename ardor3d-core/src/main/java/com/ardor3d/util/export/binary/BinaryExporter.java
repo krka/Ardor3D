@@ -115,19 +115,19 @@ public class BinaryExporter implements Ardor3DExporter {
 
     public static int COMPRESSION = Deflater.BEST_COMPRESSION;
 
-    protected int aliasCount = 1;
-    protected int idCount = 1;
+    protected int _aliasCount = 1;
+    protected int _idCount = 1;
 
-    protected IdentityHashMap<Savable, BinaryIdContentPair> contentTable;
+    protected IdentityHashMap<Savable, BinaryIdContentPair> _contentTable;
 
-    protected HashMap<Integer, Integer> locationTable;
+    protected HashMap<Integer, Integer> _locationTable;
 
     // key - class name, value = bco
-    private HashMap<String, BinaryClassObject> classes;
+    private HashMap<String, BinaryClassObject> _classes;
 
-    private final List<Savable> contentKeys = new ArrayList<Savable>();
+    private final List<Savable> _contentKeys = new ArrayList<Savable>();
 
-    public static boolean debug = false;
+    public static boolean _debug = false;
 
     public BinaryExporter() {}
 
@@ -136,9 +136,9 @@ public class BinaryExporter implements Ardor3DExporter {
     }
 
     public boolean save(final Savable object, final OutputStream os) throws IOException {
-        classes = new HashMap<String, BinaryClassObject>();
-        contentTable = new IdentityHashMap<Savable, BinaryIdContentPair>();
-        locationTable = new HashMap<Integer, Integer>();
+        _classes = new HashMap<String, BinaryClassObject>();
+        _contentTable = new IdentityHashMap<Savable, BinaryIdContentPair>();
+        _locationTable = new HashMap<Integer, Integer>();
         GZIPOutputStream zos = new GZIPOutputStream(os) {
             {
                 def.setLevel(COMPRESSION);
@@ -148,16 +148,16 @@ public class BinaryExporter implements Ardor3DExporter {
 
         // write out tag table
         int ttbytes = 0;
-        final int classNum = classes.keySet().size();
+        final int classNum = _classes.keySet().size();
         final int aliasWidth = ((int) MathUtils.log(classNum, 256) + 1); // make all
         // aliases a
         // fixed width
         zos.write(ByteUtils.convertToBytes(classNum));
-        for (final String key : classes.keySet()) {
-            final BinaryClassObject bco = classes.get(key);
+        for (final String key : _classes.keySet()) {
+            final BinaryClassObject bco = _classes.get(key);
 
             // write alias
-            final byte[] aliasBytes = fixClassAlias(bco.alias, aliasWidth);
+            final byte[] aliasBytes = fixClassAlias(bco._alias, aliasWidth);
             zos.write(aliasBytes);
             ttbytes += aliasWidth;
 
@@ -167,12 +167,12 @@ public class BinaryExporter implements Ardor3DExporter {
             zos.write(classBytes);
             ttbytes += 4 + classBytes.length;
 
-            zos.write(ByteUtils.convertToBytes(bco.nameFields.size()));
+            zos.write(ByteUtils.convertToBytes(bco._nameFields.size()));
 
-            for (final String fieldName : bco.nameFields.keySet()) {
-                final BinaryClassField bcf = bco.nameFields.get(fieldName);
-                zos.write(bcf.alias);
-                zos.write(bcf.type);
+            for (final String fieldName : bco._nameFields.keySet()) {
+                final BinaryClassField bcf = bco._nameFields.get(fieldName);
+                zos.write(bcf._alias);
+                zos.write(bcf._type);
 
                 // write classname size & classname
                 final byte[] fNameBytes = fieldName.getBytes();
@@ -187,42 +187,42 @@ public class BinaryExporter implements Ardor3DExporter {
         int location = 0;
         // keep track of location for each piece
         final HashMap<String, List<BinaryIdContentPair>> alreadySaved = new HashMap<String, List<BinaryIdContentPair>>(
-                contentTable.size());
-        for (final Savable savable : contentKeys) {
+                _contentTable.size());
+        for (final Savable savable : _contentKeys) {
             // look back at previous written data for matches
             final String savableName = savable.getClassTag().getName();
-            final BinaryIdContentPair pair = contentTable.get(savable);
+            final BinaryIdContentPair pair = _contentTable.get(savable);
             List<BinaryIdContentPair> bucket = alreadySaved.get(savableName + getChunk(pair));
             final int prevLoc = findPrevMatch(pair, bucket);
             if (prevLoc != -1) {
-                locationTable.put(pair.getId(), prevLoc);
+                _locationTable.put(pair.getId(), prevLoc);
                 continue;
             }
 
-            locationTable.put(pair.getId(), location);
+            _locationTable.put(pair.getId(), location);
             if (bucket == null) {
                 bucket = new ArrayList<BinaryIdContentPair>();
                 alreadySaved.put(savableName + getChunk(pair), bucket);
             }
             bucket.add(pair);
-            final byte[] aliasBytes = fixClassAlias(classes.get(savableName).alias, aliasWidth);
+            final byte[] aliasBytes = fixClassAlias(_classes.get(savableName)._alias, aliasWidth);
             out.write(aliasBytes);
             location += aliasWidth;
-            final BinaryOutputCapsule cap = contentTable.get(savable).getContent();
-            out.write(ByteUtils.convertToBytes(cap.bytes.length));
+            final BinaryOutputCapsule cap = _contentTable.get(savable).getContent();
+            out.write(ByteUtils.convertToBytes(cap._bytes.length));
             location += 4; // length of bytes
-            out.write(cap.bytes);
-            location += cap.bytes.length;
+            out.write(cap._bytes);
+            location += cap._bytes.length;
         }
 
         // write out location table
         // tag/location
-        final int locNum = locationTable.keySet().size();
+        final int locNum = _locationTable.keySet().size();
         zos.write(ByteUtils.convertToBytes(locNum));
         int locbytes = 0;
-        for (final Integer key : locationTable.keySet()) {
+        for (final Integer key : _locationTable.keySet()) {
             zos.write(ByteUtils.convertToBytes(key));
-            zos.write(ByteUtils.convertToBytes(locationTable.get(key)));
+            zos.write(ByteUtils.convertToBytes(_locationTable.get(key)));
             locbytes += 8;
         }
 
@@ -240,7 +240,7 @@ public class BinaryExporter implements Ardor3DExporter {
         out = null;
         zos = null;
 
-        if (debug) {
+        if (_debug) {
             logger.info("Stats:");
             logger.info("classes: " + classNum);
             logger.info("class table: " + ttbytes + " bytes");
@@ -253,7 +253,7 @@ public class BinaryExporter implements Ardor3DExporter {
     }
 
     protected String getChunk(final BinaryIdContentPair pair) {
-        return new String(pair.getContent().bytes, 0, Math.min(64, pair.getContent().bytes.length));
+        return new String(pair.getContent()._bytes, 0, Math.min(64, pair.getContent()._bytes.length));
     }
 
     protected int findPrevMatch(final BinaryIdContentPair oldPair, final List<BinaryIdContentPair> bucket) {
@@ -263,7 +263,7 @@ public class BinaryExporter implements Ardor3DExporter {
         for (int x = bucket.size(); --x >= 0;) {
             final BinaryIdContentPair pair = bucket.get(x);
             if (pair.getContent().equals(oldPair.getContent())) {
-                return locationTable.get(pair.getId());
+                return _locationTable.get(pair.getId());
             }
         }
         return -1;
@@ -293,30 +293,30 @@ public class BinaryExporter implements Ardor3DExporter {
     }
 
     public BinaryOutputCapsule getCapsule(final Savable object) {
-        return contentTable.get(object).getContent();
+        return _contentTable.get(object).getContent();
     }
 
     public int processBinarySavable(final Savable object) throws IOException {
         if (object == null) {
             return -1;
         }
-        BinaryClassObject bco = classes.get(object.getClassTag().getName());
+        BinaryClassObject bco = _classes.get(object.getClassTag().getName());
         // is this class been looked at before? in tagTable?
         if (bco == null) {
             bco = new BinaryClassObject();
-            bco.alias = generateTag();
-            bco.nameFields = new HashMap<String, BinaryClassField>();
-            classes.put(object.getClassTag().getName(), bco);
+            bco._alias = generateTag();
+            bco._nameFields = new HashMap<String, BinaryClassField>();
+            _classes.put(object.getClassTag().getName(), bco);
         }
 
         // is object in contentTable?
-        if (contentTable.get(object) != null) {
-            return (contentTable.get(object).getId());
+        if (_contentTable.get(object) != null) {
+            return (_contentTable.get(object).getId());
         }
         final BinaryIdContentPair newPair = generateIdContentPair(bco);
-        final BinaryIdContentPair old = contentTable.put(object, newPair);
+        final BinaryIdContentPair old = _contentTable.put(object, newPair);
         if (old == null) {
-            contentKeys.add(object);
+            _contentKeys.add(object);
         }
         object.write(this);
         newPair.getContent().finish();
@@ -325,9 +325,9 @@ public class BinaryExporter implements Ardor3DExporter {
     }
 
     protected byte[] generateTag() {
-        final int width = ((int) MathUtils.log(aliasCount, 256) + 1);
-        int count = aliasCount;
-        aliasCount++;
+        final int width = ((int) MathUtils.log(_aliasCount, 256) + 1);
+        int count = _aliasCount;
+        _aliasCount++;
         final byte[] bytes = new byte[width];
         for (int x = width - 1; x >= 0; x--) {
             final int pow = (int) Math.pow(256, x);
@@ -339,7 +339,7 @@ public class BinaryExporter implements Ardor3DExporter {
     }
 
     protected BinaryIdContentPair generateIdContentPair(final BinaryClassObject bco) {
-        final BinaryIdContentPair pair = new BinaryIdContentPair(idCount++, new BinaryOutputCapsule(this, bco));
+        final BinaryIdContentPair pair = new BinaryIdContentPair(_idCount++, new BinaryOutputCapsule(this, bco));
         return pair;
     }
 }

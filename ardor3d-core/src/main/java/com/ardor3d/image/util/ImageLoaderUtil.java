@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.image.Image;
 import com.ardor3d.renderer.state.TextureState;
 
-public class ImageLoaderUtil {
+public abstract class ImageLoaderUtil {
     private static final Logger logger = Logger.getLogger(ImageLoaderUtil.class.getName());
 
     private static HashMap<String, ImageLoader> loaders = new HashMap<String, ImageLoader>();
@@ -29,7 +30,7 @@ public class ImageLoaderUtil {
         registerHandler(".TGA", new TgaLoader());
     }
 
-    public static com.ardor3d.image.Image loadImage(final URL file, final boolean flipped) {
+    public static Image loadImage(final URL file, final boolean flipped) {
         if (file == null) {
             logger.warning("loadImage(URL file, boolean flipped): file is null, defaultTexture used.");
             return TextureState.getDefaultTextureImage();
@@ -60,10 +61,9 @@ public class ImageLoaderUtil {
         }
     }
 
-    public static com.ardor3d.image.Image loadImage(final String fileExt, final InputStream stream,
-            final boolean flipped) {
+    public static Image loadImage(final String fileExt, final InputStream stream, final boolean flipped) {
 
-        com.ardor3d.image.Image imageData = null;
+        Image imageData = null;
         try {
             final ImageLoader loader = loaders.get(fileExt.toLowerCase());
             if (loader != null) {

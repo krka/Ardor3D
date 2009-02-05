@@ -34,7 +34,7 @@ public class Octahedron extends Mesh {
 
     private static final int NUM_TRIS = 8;
 
-    private double sideLength;
+    private double _sideLength;
 
     public Octahedron() {}
 
@@ -48,7 +48,7 @@ public class Octahedron extends Mesh {
      */
     public Octahedron(final String name, final double sideLength) {
         super(name);
-        this.sideLength = sideLength;
+        _sideLength = sideLength;
 
         // allocate vertices
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
@@ -90,13 +90,13 @@ public class Octahedron extends Mesh {
         final Vector3 vert = new Vector3();
         for (int i = 0; i < NUM_POINTS; i++) {
             BufferUtils.populateFromBuffer(vert, _meshData.getVertexBuffer(), i);
-            if (Math.abs(vert.getZ()) < sideLength) {
+            if (Math.abs(vert.getZ()) < _sideLength) {
                 tex.setX(0.5 * (1.0 + Math.atan2(vert.getY(), vert.getX()) * MathUtils.INV_PI));
             } else {
                 tex.setX(0.5);
             }
             tex.setY(Math.acos(vert.getZ()) * MathUtils.INV_PI);
-            _meshData.getTextureCoords(0).coords.put((float) tex.getX()).put((float) tex.getY());
+            _meshData.getTextureCoords(0)._coords.put((float) tex.getX()).put((float) tex.getY());
         }
     }
 
@@ -110,7 +110,7 @@ public class Octahedron extends Mesh {
     }
 
     private void setVertexData() {
-        final float floatSideLength = (float) sideLength;
+        final float floatSideLength = (float) _sideLength;
 
         _meshData.getVertexBuffer().put(floatSideLength).put(0.0f).put(0.0f);
         _meshData.getVertexBuffer().put(-floatSideLength).put(0.0f).put(0.0f);
@@ -124,7 +124,7 @@ public class Octahedron extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(sideLength, "sideLength", 0);
+        capsule.write(_sideLength, "sideLength", 0);
 
     }
 
@@ -132,7 +132,7 @@ public class Octahedron extends Mesh {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        sideLength = capsule.readInt("sideLength", 0);
+        _sideLength = capsule.readInt("sideLength", 0);
 
     }
 }

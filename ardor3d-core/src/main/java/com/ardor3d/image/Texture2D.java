@@ -19,8 +19,8 @@ import com.ardor3d.util.export.OutputCapsule;
 
 public class Texture2D extends Texture {
 
-    private WrapMode wrapS = WrapMode.Repeat;
-    private WrapMode wrapT = WrapMode.Repeat;
+    private WrapMode _wrapS = WrapMode.Repeat;
+    private WrapMode _wrapT = WrapMode.Repeat;
 
     @Override
     public Texture createSimpleClone() {
@@ -29,8 +29,8 @@ public class Texture2D extends Texture {
 
     @Override
     public Texture createSimpleClone(final Texture rVal) {
-        rVal.setWrap(WrapAxis.S, wrapS);
-        rVal.setWrap(WrapAxis.T, wrapT);
+        rVal.setWrap(WrapAxis.S, _wrapS);
+        rVal.setWrap(WrapAxis.T, _wrapT);
         return super.createSimpleClone(rVal);
     }
 
@@ -53,10 +53,10 @@ public class Texture2D extends Texture {
         }
         switch (axis) {
             case S:
-                wrapS = mode;
+                _wrapS = mode;
                 break;
             case T:
-                wrapT = mode;
+                _wrapT = mode;
                 break;
         }
     }
@@ -74,8 +74,8 @@ public class Texture2D extends Texture {
         if (mode == null) {
             throw new IllegalArgumentException("mode can not be null.");
         }
-        wrapS = mode;
-        wrapT = mode;
+        _wrapS = mode;
+        _wrapT = mode;
     }
 
     /**
@@ -91,9 +91,9 @@ public class Texture2D extends Texture {
     public WrapMode getWrap(final WrapAxis axis) {
         switch (axis) {
             case S:
-                return wrapS;
+                return _wrapS;
             case T:
-                return wrapT;
+                return _wrapT;
         }
         throw new IllegalArgumentException("invalid WrapAxis: " + axis);
     }
@@ -122,15 +122,15 @@ public class Texture2D extends Texture {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(wrapS, "wrapS", WrapMode.EdgeClamp);
-        capsule.write(wrapT, "wrapT", WrapMode.EdgeClamp);
+        capsule.write(_wrapS, "wrapS", WrapMode.EdgeClamp);
+        capsule.write(_wrapT, "wrapT", WrapMode.EdgeClamp);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        wrapS = capsule.readEnum("wrapS", WrapMode.class, WrapMode.EdgeClamp);
-        wrapT = capsule.readEnum("wrapT", WrapMode.class, WrapMode.EdgeClamp);
+        _wrapS = capsule.readEnum("wrapS", WrapMode.class, WrapMode.EdgeClamp);
+        _wrapT = capsule.readEnum("wrapT", WrapMode.class, WrapMode.EdgeClamp);
     }
 }

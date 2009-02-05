@@ -17,7 +17,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 
-public class AWTTextureUtil {
+public abstract class AWTTextureUtil {
 
     public static Texture loadTexture(final BufferedImage image, final Texture.MinificationFilter minFilter,
             final Image.Format imageFormat, final boolean flipped) {

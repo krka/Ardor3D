@@ -14,35 +14,35 @@ import com.ardor3d.scenegraph.Mesh;
 
 public class VertMap {
 
-    private int[] lookupTable;
+    private int[] _lookupTable;
 
     public VertMap(final Mesh mesh) {
         setupTable(mesh);
     }
 
     private void setupTable(final Mesh mesh) {
-        lookupTable = new int[mesh.getMeshData().getVertexCount()];
-        for (int x = 0; x < lookupTable.length; x++) {
-            lookupTable[x] = x;
+        _lookupTable = new int[mesh.getMeshData().getVertexCount()];
+        for (int x = 0; x < _lookupTable.length; x++) {
+            _lookupTable[x] = x;
         }
     }
 
     public int getNewIndex(final int oldIndex) {
-        return lookupTable[oldIndex];
+        return _lookupTable[oldIndex];
     }
 
     public void replaceIndex(final int oldIndex, final int newIndex) {
-        for (int x = 0; x < lookupTable.length; x++) {
-            if (lookupTable[x] == oldIndex) {
-                lookupTable[x] = newIndex;
+        for (int x = 0; x < _lookupTable.length; x++) {
+            if (_lookupTable[x] == oldIndex) {
+                _lookupTable[x] = newIndex;
             }
         }
     }
 
     public void decrementIndices(final int above) {
-        for (int x = lookupTable.length; --x >= 0;) {
-            if (lookupTable[x] >= above) {
-                lookupTable[x]--;
+        for (int x = _lookupTable.length; --x >= 0;) {
+            if (_lookupTable[x] >= above) {
+                _lookupTable[x]--;
             }
         }
     }

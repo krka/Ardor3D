@@ -19,7 +19,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
 
-public class LwjglWireframeStateUtil {
+public abstract class LwjglWireframeStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final WireframeState state) {
         // ask for the current state record

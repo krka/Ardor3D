@@ -252,12 +252,13 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         bpr.setCheckDistance(true);
         PickingUtil.findPick(_root, pickRay, bpr);
         int i = 0;
-        while (bpr.getNumber() > 0 && bpr.getPickData(i).getRecord().getNumberOfIntersection() == 0
+        while (bpr.getNumber() > 0 && bpr.getPickData(i).getIntersectionRecord().getNumberOfIntersection() == 0
                 && ++i < bpr.getNumber()) {
         }
         if (bpr.getNumber() > i) {
             final PickData pick = bpr.getPickData(i);
-            System.err.println("picked: " + pick.getTargetMesh() + " at " + pick.getRecord().getIntersectionPoint(0));
+            System.err.println("picked: " + pick.getTargetMesh() + " at "
+                    + pick.getIntersectionRecord().getIntersectionPoint(0));
         } else {
             System.err.println("picked: nothing");
         }
@@ -455,9 +456,9 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             }
         }));
 
-        final Predicate<TwoInputStates> clickLeftOrRight = Predicates.or(new MouseButtonClickedCondition(MouseButton.LEFT),
-                new MouseButtonClickedCondition(MouseButton.RIGHT));
-        
+        final Predicate<TwoInputStates> clickLeftOrRight = Predicates.or(new MouseButtonClickedCondition(
+                MouseButton.LEFT), new MouseButtonClickedCondition(MouseButton.RIGHT));
+
         _logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, new TriggerAction() {
             public void perform(final Canvas source, final InputState inputState, final double tpf) {
                 System.err.println("clicked: " + inputState.getMouseState().getClickCounts());

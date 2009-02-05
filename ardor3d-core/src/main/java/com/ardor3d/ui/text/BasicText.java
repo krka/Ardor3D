@@ -31,18 +31,16 @@ import com.ardor3d.util.export.OutputCapsule;
 
 public class BasicText extends Mesh {
 
+    private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(BasicText.class.getName());
+
     /**
      * A default font contained in the ardor3d library.
      */
     public static final String DEFAULT_FONT = "com/ardor3d/ui/text/defaultfont.tga";
 
-    private static final Logger logger = Logger.getLogger(BasicText.class.getName());
-
-    private static final long serialVersionUID = 1L;
-
-    private StringBuffer text;
-
-    private ColorRGBA textColor = new ColorRGBA();
+    private StringBuffer _text;
+    private ColorRGBA _textColor = new ColorRGBA();
 
     public BasicText() {}
 
@@ -58,7 +56,7 @@ public class BasicText extends Mesh {
     public BasicText(final String name, final String text) {
         super(name);
         setCullHint(Spatial.CullHint.Never);
-        this.text = new StringBuffer(text);
+        _text = new StringBuffer(text);
         setRenderBucketType(RenderBucketType.Ortho);
     }
 
@@ -70,7 +68,7 @@ public class BasicText extends Mesh {
      *            the text to display.
      */
     public void print(final String text) {
-        this.text.replace(0, this.text.length(), text);
+        _text.replace(0, _text.length(), text);
     }
 
     /**
@@ -80,8 +78,8 @@ public class BasicText extends Mesh {
      *            The text to display.
      */
     public void print(final StringBuffer text) {
-        this.text.setLength(0);
-        this.text.append(text);
+        _text.setLength(0);
+        _text.append(text);
     }
 
     /**
@@ -91,7 +89,7 @@ public class BasicText extends Mesh {
      * @return the text string of this object.
      */
     public StringBuffer getText() {
-        return text;
+        return _text;
     }
 
     @Override
@@ -112,7 +110,7 @@ public class BasicText extends Mesh {
      *            Color to set.
      */
     public void setTextColor(final ColorRGBA color) {
-        textColor = color;
+        _textColor = color;
     }
 
     /**
@@ -121,11 +119,11 @@ public class BasicText extends Mesh {
      * @return Current text color.
      */
     public ColorRGBA getTextColor() {
-        return textColor;
+        return _textColor;
     }
 
     public double getWidth() {
-        return 10 * text.length() * getWorldTransform().getScale().getX();
+        return 10 * _text.length() * getWorldTransform().getScale().getX();
     }
 
     public double getHeight() {
@@ -203,16 +201,16 @@ public class BasicText extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(text.toString(), "textString", "");
-        capsule.write(textColor, "textColor", new ColorRGBA());
+        capsule.write(_text.toString(), "textString", "");
+        capsule.write(_textColor, "textColor", new ColorRGBA());
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        text = new StringBuffer(capsule.readString("textString", ""));
-        textColor = (ColorRGBA) capsule.readSavable("textColor", new ColorRGBA());
+        _text = new StringBuffer(capsule.readString("textString", ""));
+        _textColor = (ColorRGBA) capsule.readSavable("textColor", new ColorRGBA());
 
     }
 }

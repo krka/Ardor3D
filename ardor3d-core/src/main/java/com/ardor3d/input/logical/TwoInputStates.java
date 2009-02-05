@@ -10,9 +10,10 @@
 
 package com.ardor3d.input.logical;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.input.InputState;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Wrapper class to make it possible to use {@link com.google.common.base.Predicate}-based conditions for triggering
@@ -20,30 +21,31 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Immutable
 public final class TwoInputStates {
-    private final InputState previous;
-    private final InputState current;
+    private final InputState _previous;
+    private final InputState _current;
 
     /**
-     * Instantiates a new TwoInputStates. It is safe for both
-     * parameters to point to the same instance, but they cannot be null.
+     * Instantiates a new TwoInputStates. It is safe for both parameters to point to the same instance, but they cannot
+     * be null.
      * 
      * @param previous
      *            the previous input state
      * @param current
      *            the current input state
-     *
-     * @throws NullPointerException if either parameter is null
+     * 
+     * @throws NullPointerException
+     *             if either parameter is null
      */
     public TwoInputStates(final InputState previous, final InputState current) {
-        this.previous = checkNotNull(previous, "previous");
-        this.current = checkNotNull(current, "current");
+        _previous = checkNotNull(previous, "previous");
+        _current = checkNotNull(current, "current");
     }
 
     public InputState getPrevious() {
-        return previous;
+        return _previous;
     }
 
     public InputState getCurrent() {
-        return current;
+        return _current;
     }
 }

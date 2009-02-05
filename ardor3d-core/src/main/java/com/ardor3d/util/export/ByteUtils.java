@@ -18,7 +18,7 @@ import java.io.OutputStream;
 /**
  * <code>ByteUtils</code> is a helper class for converting numeric primitives to and from byte representations.
  */
-public class ByteUtils {
+public abstract class ByteUtils {
 
     /**
      * Takes an InputStream and returns the complete byte content of it

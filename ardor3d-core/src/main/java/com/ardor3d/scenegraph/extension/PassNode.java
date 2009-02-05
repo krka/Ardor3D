@@ -27,7 +27,7 @@ import com.ardor3d.util.export.OutputCapsule;
 public class PassNode extends Node {
     private static final long serialVersionUID = 1L;
 
-    private List<PassNodeState> passNodeStates = new ArrayList<PassNodeState>();
+    private List<PassNodeState> _passNodeStates = new ArrayList<PassNodeState>();
 
     public PassNode(final String name) {
         super(name);
@@ -45,7 +45,7 @@ public class PassNode extends Node {
 
         final RenderContext context = ContextManager.getCurrentContext();
         r.getQueue().pushBuckets();
-        for (final PassNodeState pass : passNodeStates) {
+        for (final PassNodeState pass : _passNodeStates) {
             if (!pass.isEnabled()) {
                 continue;
             }
@@ -67,44 +67,44 @@ public class PassNode extends Node {
     }
 
     public void addPass(final PassNodeState toAdd) {
-        passNodeStates.add(toAdd);
+        _passNodeStates.add(toAdd);
     }
 
     public void insertPass(final PassNodeState toAdd, final int index) {
-        passNodeStates.add(index, toAdd);
+        _passNodeStates.add(index, toAdd);
     }
 
     public boolean containsPass(final PassNodeState s) {
-        return passNodeStates.contains(s);
+        return _passNodeStates.contains(s);
     }
 
     public boolean removePass(final PassNodeState toRemove) {
-        return passNodeStates.remove(toRemove);
+        return _passNodeStates.remove(toRemove);
     }
 
     public PassNodeState getPass(final int index) {
-        return passNodeStates.get(index);
+        return _passNodeStates.get(index);
     }
 
     public int nrPasses() {
-        return passNodeStates.size();
+        return _passNodeStates.size();
     }
 
     public void clearAll() {
-        passNodeStates.clear();
+        _passNodeStates.clear();
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.writeSavableList(passNodeStates, "passNodeStates", null);
+        capsule.writeSavableList(_passNodeStates, "passNodeStates", null);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        passNodeStates = capsule.readSavableList("passNodeStates", null);
+        _passNodeStates = capsule.readSavableList("passNodeStates", null);
     }
 }

@@ -30,11 +30,11 @@ public class PQTorus extends Mesh {
 
     private static final long serialVersionUID = 1L;
 
-    private double p, q;
+    private double _p, _q;
 
-    private double radius, width;
+    private double _radius, _width;
 
-    private int steps, radialSamples;
+    private int _steps, _radialSamples;
 
     public PQTorus() {}
 
@@ -60,24 +60,24 @@ public class PQTorus extends Mesh {
             final int steps, final int radialSamples) {
         super(name);
 
-        this.p = p;
-        this.q = q;
-        this.radius = radius;
-        this.width = width;
-        this.steps = steps;
-        this.radialSamples = radialSamples;
+        _p = p;
+        _q = q;
+        _radius = radius;
+        _width = width;
+        _steps = steps;
+        _radialSamples = radialSamples;
 
         setGeometryData();
         setIndexData();
     }
 
     private void setGeometryData() {
-        final double THETA_STEP = (MathUtils.TWO_PI / steps);
-        final double BETA_STEP = (MathUtils.TWO_PI / radialSamples);
+        final double THETA_STEP = (MathUtils.TWO_PI / _steps);
+        final double BETA_STEP = (MathUtils.TWO_PI / _radialSamples);
 
-        final Vector3[] toruspoints = new Vector3[steps];
+        final Vector3[] toruspoints = new Vector3[_steps];
         // allocate vertices
-        final int verts = radialSamples * steps;
+        final int verts = _radialSamples * _steps;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
 
         // allocate normals if requested
@@ -93,22 +93,22 @@ public class PQTorus extends Mesh {
         int nvertex = 0;
 
         // Move along the length of the pq torus
-        for (int i = 0; i < steps; i++) {
+        for (int i = 0; i < _steps; i++) {
             theta += THETA_STEP;
-            final double circleFraction = ((double) i) / (double) steps;
+            final double circleFraction = ((double) i) / (double) _steps;
 
             // Find the point on the torus
-            r = (0.5f * (2.0f + MathUtils.sin(q * theta)) * radius);
-            x = (r * MathUtils.cos(p * theta) * radius);
-            y = (r * MathUtils.sin(p * theta) * radius);
-            z = (r * MathUtils.cos(q * theta) * radius);
+            r = (0.5f * (2.0f + MathUtils.sin(_q * theta)) * _radius);
+            x = (r * MathUtils.cos(_p * theta) * _radius);
+            y = (r * MathUtils.sin(_p * theta) * _radius);
+            z = (r * MathUtils.cos(_q * theta) * _radius);
             toruspoints[i] = new Vector3(x, y, z);
 
             // Now find a point slightly farther along the torus
-            r = (0.5f * (2.0f + MathUtils.sin(q * (theta + 0.01f))) * radius);
-            x = (r * MathUtils.cos(p * (theta + 0.01f)) * radius);
-            y = (r * MathUtils.sin(p * (theta + 0.01f)) * radius);
-            z = (r * MathUtils.cos(q * (theta + 0.01f)) * radius);
+            r = (0.5f * (2.0f + MathUtils.sin(_q * (theta + 0.01f))) * _radius);
+            x = (r * MathUtils.cos(_p * (theta + 0.01f)) * _radius);
+            y = (r * MathUtils.sin(_p * (theta + 0.01f)) * _radius);
+            z = (r * MathUtils.cos(_q * (theta + 0.01f)) * _radius);
             pointB.set(x, y, z);
 
             // Approximate the Frenet Frame
@@ -123,11 +123,11 @@ public class PQTorus extends Mesh {
 
             // Create a circle oriented by these new vectors
             beta = 0.0f;
-            for (int j = 0; j < radialSamples; j++) {
+            for (int j = 0; j < _radialSamples; j++) {
                 beta += BETA_STEP;
-                final double cx = MathUtils.cos(beta) * width;
-                final double cy = MathUtils.sin(beta) * width;
-                final double radialFraction = ((double) j) / radialSamples;
+                final double cx = MathUtils.cos(beta) * _width;
+                final double cy = MathUtils.sin(beta) * _width;
+                final double radialFraction = ((double) j) / _radialSamples;
                 tempNorm.setX((cx * N.getX() + cy * B.getX()));
                 tempNorm.setY((cx * N.getY() + cy * B.getY()));
                 tempNorm.setZ((cx * N.getZ() + cy * B.getZ()));
@@ -139,7 +139,7 @@ public class PQTorus extends Mesh {
                 _meshData.getVertexBuffer().put((float) tempNorm.getX()).put((float) tempNorm.getY()).put(
                         (float) tempNorm.getZ());
 
-                _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
+                _meshData.getTextureCoords(0)._coords.put((float) radialFraction).put((float) circleFraction);
 
                 nvertex++;
             }
@@ -151,12 +151,12 @@ public class PQTorus extends Mesh {
 
         for (int i = 0; i < _meshData.getVertexCount(); i++) {
             indices.put(i);
-            indices.put(i - radialSamples);
+            indices.put(i - _radialSamples);
             indices.put(i + 1);
 
             indices.put(i + 1);
-            indices.put(i - radialSamples);
-            indices.put(i - radialSamples + 1);
+            indices.put(i - _radialSamples);
+            indices.put(i - _radialSamples + 1);
         }
 
         for (int i = 0, len = indices.capacity(); i < len; i++) {
@@ -179,12 +179,12 @@ public class PQTorus extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(p, "p", 0);
-        capsule.write(q, "q", 0);
-        capsule.write(radius, "radius", 0);
-        capsule.write(width, "width", 0);
-        capsule.write(steps, "steps", 0);
-        capsule.write(radialSamples, "radialSamples", 0);
+        capsule.write(_p, "p", 0);
+        capsule.write(_q, "q", 0);
+        capsule.write(_radius, "radius", 0);
+        capsule.write(_width, "width", 0);
+        capsule.write(_steps, "steps", 0);
+        capsule.write(_radialSamples, "radialSamples", 0);
 
     }
 
@@ -192,12 +192,12 @@ public class PQTorus extends Mesh {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        p = capsule.readDouble("p", 0);
-        q = capsule.readDouble("q", 0);
-        radius = capsule.readDouble("radius", 0);
-        width = capsule.readDouble("width", 0);
-        steps = capsule.readInt("steps", 0);
-        radialSamples = capsule.readInt("radialSamples", 0);
+        _p = capsule.readDouble("p", 0);
+        _q = capsule.readDouble("q", 0);
+        _radius = capsule.readDouble("radius", 0);
+        _width = capsule.readDouble("width", 0);
+        _steps = capsule.readInt("steps", 0);
+        _radialSamples = capsule.readInt("radialSamples", 0);
 
     }
 }

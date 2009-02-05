@@ -24,7 +24,7 @@ import com.ardor3d.scenegraph.TexCoords;
 /**
  * Note: Does not work with geometry using texcoords other than 2d coords.
  */
-public class GeometryTool {
+public abstract class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
 
     public static final int MV_SAME_NORMALS = 1;
@@ -56,7 +56,7 @@ public class GeometryTool {
             final Vector2[][] tex = new Vector2[mesh.getMeshData().getNumberOfUnits()][];
             for (int x = 0; x < tex.length; x++) {
                 if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x).coords);
+                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x)._coords);
                 }
             }
 

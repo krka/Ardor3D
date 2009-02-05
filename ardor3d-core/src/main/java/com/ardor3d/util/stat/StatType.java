@@ -31,14 +31,14 @@ public class StatType implements Comparable<StatType> {
     public static final StatType STAT_UPDATE_TIMER = new StatType("_timedUpdates");
     public static final StatType STAT_DISPLAYSWAP_TIMER = new StatType("_timedSwap");
 
-    private String statName = "-unknown-";
+    private String _statName = "-unknown-";
 
     public StatType(final String name) {
-        statName = name;
+        _statName = name;
     }
 
     public String getStatName() {
-        return statName;
+        return _statName;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class StatType implements Comparable<StatType> {
             return false;
         }
         final StatType other = (StatType) obj;
-        if (!statName.equals(other.statName)) {
+        if (!_statName.equals(other._statName)) {
             return false;
         }
 
@@ -56,12 +56,12 @@ public class StatType implements Comparable<StatType> {
 
     @Override
     public int hashCode() {
-        final int hash = statName.hashCode();
+        final int hash = _statName.hashCode();
         return hash;
     }
 
     public int compareTo(final StatType obj) {
         final StatType other = obj;
-        return statName.compareTo(other.statName);
+        return _statName.compareTo(other._statName);
     }
 }

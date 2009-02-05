@@ -25,7 +25,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.Spatial.PickingHint;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class PickingUtil {
+public abstract class PickingUtil {
     public static void findPick(final Spatial spatial, final Ray3 ray, final PickResults results) {
         if (!spatial.isPickingHintEnabled(PickingHint.Pickable)) {
             return;

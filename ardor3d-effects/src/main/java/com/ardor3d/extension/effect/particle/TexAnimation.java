@@ -23,30 +23,30 @@ import com.ardor3d.util.export.Savable;
 
 public class TexAnimation implements Savable {
 
-    protected List<AnimationEntry> entries = new ArrayList<AnimationEntry>();
+    protected List<AnimationEntry> _entries = new ArrayList<AnimationEntry>();
 
     public void addEntry(final AnimationEntry entry) {
-        entries.add(entry);
+        _entries.add(entry);
     }
 
     public void addEntry(final int index, final AnimationEntry entry) {
-        entries.add(index, entry);
+        _entries.add(index, entry);
     }
 
     public void clearEntries() {
-        entries.clear();
+        _entries.clear();
     }
 
     public Iterator<AnimationEntry> getEntries() {
-        return entries.iterator();
+        return _entries.iterator();
     }
 
     public void removeEntry(final AnimationEntry entry) {
-        entries.remove(entry);
+        _entries.remove(entry);
     }
 
     public void removeEntry(final int index) {
-        entries.remove(index);
+        _entries.remove(index);
     }
 
     public int getTexIndexAtAge(double age, double maxAge, final ParticleSystem particles) {
@@ -55,8 +55,8 @@ public class TexAnimation implements Savable {
         AnimationEntry latest = null;
         maxAge /= 1000f;
         age /= 1000f;
-        for (int i = 0; i < entries.size(); i++) {
-            final AnimationEntry entry = entries.get(i);
+        for (int i = 0; i < _entries.size(); i++) {
+            final AnimationEntry entry = _entries.get(i);
             trAge += (entry.getOffset() * maxAge);
             if (trAge <= age) {
                 latest = entry;
@@ -69,9 +69,9 @@ public class TexAnimation implements Savable {
         if (latest == null) {
             return particles.getStartTexIndex();
         } else {
-            int index = (int) ((age - lastAge) / latest.rate);
-            index %= latest.frames.length;
-            return latest.frames[index];
+            int index = (int) ((age - lastAge) / latest._rate);
+            index %= latest._frames.length;
+            return latest._frames[index];
         }
     }
 
@@ -81,15 +81,15 @@ public class TexAnimation implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule capsule = im.getCapsule(this);
-        entries = capsule.readSavableList("entries", null);
-        if (entries == null) {
-            entries = new ArrayList<AnimationEntry>();
+        _entries = capsule.readSavableList("entries", null);
+        if (_entries == null) {
+            _entries = new ArrayList<AnimationEntry>();
         }
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule capsule = ex.getCapsule(this);
-        capsule.writeSavableList(entries, "entries", null);
+        capsule.writeSavableList(_entries, "entries", null);
     }
 
 }

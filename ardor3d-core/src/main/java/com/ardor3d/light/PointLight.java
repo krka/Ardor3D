@@ -26,8 +26,9 @@ import com.ardor3d.util.export.OutputCapsule;
  */
 public class PointLight extends Light {
     private static final long serialVersionUID = 1L;
+
     // Position of the light.
-    private Vector3 location;
+    private Vector3 _location;
 
     /**
      * Constructor instantiates a new <code>PointLight</code> object. The initial position of the light is (0,0,0) and
@@ -36,7 +37,7 @@ public class PointLight extends Light {
      */
     public PointLight() {
         super();
-        location = new Vector3();
+        _location = new Vector3();
     }
 
     /**
@@ -45,7 +46,7 @@ public class PointLight extends Light {
      * @return the position of the light.
      */
     public ReadOnlyVector3 getLocation() {
-        return location;
+        return _location;
     }
 
     /**
@@ -55,7 +56,7 @@ public class PointLight extends Light {
      *            the position of the light.
      */
     public void setLocation(final ReadOnlyVector3 location) {
-        this.location.set(location);
+        _location.set(location);
     }
 
     /**
@@ -69,7 +70,7 @@ public class PointLight extends Light {
      *            the z position of the light.
      */
     public void setLocation(final double x, final double y, final double z) {
-        location.set(x, y, z);
+        _location.set(x, y, z);
     }
 
     /**
@@ -86,7 +87,7 @@ public class PointLight extends Light {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(location, "location", new Vector3(Vector3.ZERO));
+        capsule.write(_location, "location", new Vector3(Vector3.ZERO));
 
     }
 
@@ -94,7 +95,7 @@ public class PointLight extends Light {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        location = (Vector3) capsule.readSavable("location", new Vector3(Vector3.ZERO));
+        _location = (Vector3) capsule.readSavable("location", new Vector3(Vector3.ZERO));
 
     }
 

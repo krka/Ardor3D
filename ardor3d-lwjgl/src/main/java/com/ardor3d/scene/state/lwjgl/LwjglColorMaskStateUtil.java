@@ -19,7 +19,7 @@ import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ColorMaskStateRecord;
 
-public class LwjglColorMaskStateUtil {
+public abstract class LwjglColorMaskStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final ColorMaskState state) {
         // ask for the current state record

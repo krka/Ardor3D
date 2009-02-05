@@ -28,8 +28,8 @@ import com.ardor3d.util.export.OutputCapsule;
 public class Arrow extends Node {
     private static final long serialVersionUID = 1L;
 
-    protected double length = 1;
-    protected double width = .25;
+    protected double _length = 1;
+    protected double _width = .25;
 
     protected static final Quaternion rotator = new Quaternion();
 
@@ -41,23 +41,23 @@ public class Arrow extends Node {
 
     public Arrow(final String name, final double length, final double width) {
         super(name);
-        this.length = length;
-        this.width = width;
+        _length = length;
+        _width = width;
 
         buildArrow();
     }
 
     protected void buildArrow() {
         // Start with cylinders:
-        final Cylinder base = new Cylinder("base", 4, 16, width * .75, length);
+        final Cylinder base = new Cylinder("base", 4, 16, _width * .75, _length);
         rotator.fromAngles(90 * MathUtils.DEG_TO_RAD, 0, 0);
         base.getMeshData().rotatePoints(rotator);
         base.getMeshData().rotateNormals(rotator);
         attachChild(base);
         base.updateModelBound();
 
-        final Pyramid tip = new Pyramid("tip", 2 * width, length / 2f);
-        tip.getMeshData().translatePoints(0, length * .75, 0);
+        final Pyramid tip = new Pyramid("tip", 2 * _width, _length / 2f);
+        tip.getMeshData().translatePoints(0, _length * .75, 0);
         attachChild(tip);
         tip.updateModelBound();
     }
@@ -66,33 +66,33 @@ public class Arrow extends Node {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(length, "length", 1);
-        capsule.write(width, "width", .25);
+        capsule.write(_length, "length", 1);
+        capsule.write(_width, "width", .25);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        length = capsule.readDouble("length", 1);
-        width = capsule.readDouble("width", .25);
+        _length = capsule.readDouble("length", 1);
+        _width = capsule.readDouble("width", .25);
 
     }
 
     public double getLength() {
-        return length;
+        return _length;
     }
 
     public void setLength(final double length) {
-        this.length = length;
+        _length = length;
     }
 
     public double getWidth() {
-        return width;
+        return _width;
     }
 
     public void setWidth(final double width) {
-        this.width = width;
+        _width = width;
     }
 
     public void setSolidColor(final ColorRGBA color) {

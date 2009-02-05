@@ -62,7 +62,7 @@ public class AxisRods extends Node {
     }
 
     protected void buildAxis() {
-        xAxis = new Arrow("xAxis", length, width);
+        xAxis = new Arrow("_xAxis", length, width);
         xAxis.setSolidColor(xAxisColor);
         xAxis.setRotation(new Matrix3().fromAngles(0, 0, -90 * MathUtils.DEG_TO_RAD));
         xAxis.setTranslation(length * .5, 0, 0);

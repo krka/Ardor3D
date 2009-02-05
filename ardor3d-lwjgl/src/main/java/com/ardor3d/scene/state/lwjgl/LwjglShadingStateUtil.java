@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.renderer.state.record.ShadingStateRecord;
 
-public class LwjglShadingStateUtil {
+public abstract class LwjglShadingStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final ShadingState state) {
         // ask for the current state record

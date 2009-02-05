@@ -67,18 +67,18 @@ public enum AwtKey {
             KeyEvent.VK_DELETE, Key.DELETE), AWT_KEY_LMENU(KeyEvent.VK_ALT, Key.LMENU), AWT_KEY_RMENU(KeyEvent.VK_ALT,
             Key.RMENU);
 
-    private final int awtCode;
-    private final Key key;
+    private final int _awtCode;
+    private final Key _key;
 
     private AwtKey(final int awtCode, final Key key) {
-        this.awtCode = awtCode;
-        this.key = key;
+        _awtCode = awtCode;
+        _key = key;
     }
 
     public static Key findByCode(final int awtCode) {
         for (final AwtKey ak : values()) {
-            if (ak.awtCode == awtCode) {
-                return ak.key;
+            if (ak._awtCode == awtCode) {
+                return ak._key;
             }
         }
 
@@ -86,6 +86,6 @@ public enum AwtKey {
     }
 
     public int getAwtCode() {
-        return awtCode;
+        return _awtCode;
     }
 }

@@ -25,30 +25,30 @@ import com.ardor3d.util.export.Savable;
 
 public class ParticleAppearanceRamp implements Savable {
 
-    protected List<RampEntry> entries = new ArrayList<RampEntry>();
+    protected List<RampEntry> _entries = new ArrayList<RampEntry>();
 
     public void addEntry(final RampEntry entry) {
-        entries.add(entry);
+        _entries.add(entry);
     }
 
     public void addEntry(final int index, final RampEntry entry) {
-        entries.add(index, entry);
+        _entries.add(index, entry);
     }
 
     public void clearEntries() {
-        entries.clear();
+        _entries.clear();
     }
 
     public Iterator<RampEntry> getEntries() {
-        return entries.iterator();
+        return _entries.iterator();
     }
 
     public void removeEntry(final RampEntry entry) {
-        entries.remove(entry);
+        _entries.remove(entry);
     }
 
     public void removeEntry(final int index) {
-        entries.remove(index);
+        _entries.remove(index);
     }
 
     public void getValuesAtAge(final double age, final double maxAge, final ColorRGBA store, final double[] fStore,
@@ -58,8 +58,8 @@ public class ParticleAppearanceRamp implements Savable {
         double trAge = 0;
         RampEntry prevCEntry = null, prevMEntry = null, prevSiEntry = null, prevSpEntry = null;
         RampEntry nextCEntry = null, nextMEntry = null, nextSiEntry = null, nextSpEntry = null;
-        for (int i = 0; i < entries.size(); i++) {
-            final RampEntry entry = entries.get(i);
+        for (int i = 0; i < _entries.size(); i++) {
+            final RampEntry entry = _entries.get(i);
             trAge += entry.getOffset() * maxAge;
             // Color
             if (nextCEntry == null) {
@@ -162,15 +162,15 @@ public class ParticleAppearanceRamp implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule capsule = im.getCapsule(this);
-        entries = capsule.readSavableList("entries", null);
-        if (entries == null) {
-            entries = new ArrayList<RampEntry>();
+        _entries = capsule.readSavableList("entries", null);
+        if (_entries == null) {
+            _entries = new ArrayList<RampEntry>();
         }
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule capsule = ex.getCapsule(this);
-        capsule.writeSavableList(entries, "entries", null);
+        capsule.writeSavableList(_entries, "entries", null);
     }
 
 }

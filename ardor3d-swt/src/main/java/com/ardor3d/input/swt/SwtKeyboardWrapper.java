@@ -31,17 +31,17 @@ import com.google.common.collect.PeekingIterator;
 @ThreadSafe
 public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     @GuardedBy("this")
-    private final LinkedList<KeyEvent> upcomingEvents;
+    private final LinkedList<KeyEvent> _upcomingEvents;
 
     private final Control _control;
 
     @GuardedBy("this")
-    private SwtKeyboardIterator currentIterator = null;
+    private SwtKeyboardIterator _currentIterator = null;
     @GuardedBy("this")
-    private int lastKeyPressedCode = -1;
+    private int _lastKeyPressedCode = -1;
 
     public SwtKeyboardWrapper(final Control control) {
-        upcomingEvents = new LinkedList<KeyEvent>();
+        _upcomingEvents = new LinkedList<KeyEvent>();
         _control = checkNotNull(control, "control");
     }
 
@@ -50,38 +50,38 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized PeekingIterator<KeyEvent> getEvents() {
-        if (currentIterator == null || !currentIterator.hasNext()) {
-            currentIterator = new SwtKeyboardIterator();
+        if (_currentIterator == null || !_currentIterator.hasNext()) {
+            _currentIterator = new SwtKeyboardIterator();
         }
 
-        return currentIterator;
+        return _currentIterator;
     }
 
     public synchronized void keyPressed(final org.eclipse.swt.events.KeyEvent event) {
         // System.out.println("keyPressed(" + SwtKey.findByCode(event.keyCode) + ")");
-        if (event.keyCode == lastKeyPressedCode) {
+        if (event.keyCode == _lastKeyPressedCode) {
             // ignore if this is a repeat event
             return;
         }
 
-        if (lastKeyPressedCode != -1) {
+        if (_lastKeyPressedCode != -1) {
             // if this is a different key to the last key that was pressed, then
             // add an 'up' even for the previous one - SWT doesn't send an 'up' event for the
             // first key in the below scenario:
             // 1. key 1 down
             // 2. key 2 down
             // 3. key 1 up
-            upcomingEvents.add(new KeyEvent(SwtKey.findByCode(lastKeyPressedCode), KeyState.UP));
+            _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(_lastKeyPressedCode), KeyState.UP));
         }
 
-        lastKeyPressedCode = event.keyCode;
-        upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.DOWN));
+        _lastKeyPressedCode = event.keyCode;
+        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.DOWN));
     }
 
     public synchronized void keyReleased(final org.eclipse.swt.events.KeyEvent event) {
         // System.out.println("keyReleased(" + SwtKey.findByCode(event.keyCode) + ")");
-        upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.UP));
-        lastKeyPressedCode = -1;
+        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.UP));
+        _lastKeyPressedCode = -1;
     }
 
     private class SwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
@@ -89,11 +89,11 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
         @Override
         protected KeyEvent computeNext() {
             synchronized (SwtKeyboardWrapper.this) {
-                if (upcomingEvents.isEmpty()) {
+                if (_upcomingEvents.isEmpty()) {
                     return endOfData();
                 }
 
-                return upcomingEvents.poll();
+                return _upcomingEvents.poll();
             }
         }
     }

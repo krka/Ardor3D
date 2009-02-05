@@ -35,7 +35,7 @@ import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
-public class LwjglTextureUtil {
+public abstract class LwjglTextureUtil {
     public static boolean isCompressedType(final Format format) {
         switch (format) {
             case NativeDXT1:

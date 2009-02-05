@@ -33,9 +33,9 @@ public class FirstPersonControl {
     private double _mouseRotateSpeed = .005;
     private double _moveSpeed = 25;
     private double _keyRotateSpeed = 2.25;
-    private final Matrix3 workerMatrix = new Matrix3();
-    private final Vector3 workerStoreA = new Vector3();
-    private final Vector3 workerStoreB = new Vector3();
+    private final Matrix3 _workerMatrix = new Matrix3();
+    private final Vector3 _workerStoreA = new Vector3();
+    private final Vector3 _workerStoreB = new Vector3();
 
     public FirstPersonControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -89,12 +89,12 @@ public class FirstPersonControl {
             strafeLR -= 1;
         }
 
-        final Vector3 loc = workerStoreA.set(camera.getLocation());
+        final Vector3 loc = _workerStoreA.set(camera.getLocation());
         if (moveFB != 0) {
-            loc.addLocal(workerStoreB.set(camera.getDirection()).multiplyLocal(moveFB * _moveSpeed * tpf));
+            loc.addLocal(_workerStoreB.set(camera.getDirection()).multiplyLocal(moveFB * _moveSpeed * tpf));
         }
         if (strafeLR != 0) {
-            loc.addLocal(workerStoreB.set(camera.getLeft()).multiplyLocal(strafeLR * _moveSpeed * tpf));
+            loc.addLocal(_workerStoreB.set(camera.getLeft()).multiplyLocal(strafeLR * _moveSpeed * tpf));
         }
         camera.setLocation(loc);
 
@@ -121,23 +121,23 @@ public class FirstPersonControl {
     protected void rotate(final Camera camera, final double dx, final double dy) {
 
         if (dx != 0) {
-            workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-            workerMatrix.applyPost(camera.getLeft(), workerStoreA);
-            camera.setLeft(workerStoreA);
-            workerMatrix.applyPost(camera.getDirection(), workerStoreA);
-            camera.setDirection(workerStoreA);
-            workerMatrix.applyPost(camera.getUp(), workerStoreA);
-            camera.setUp(workerStoreA);
+            _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
+            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
+            camera.setLeft(_workerStoreA);
+            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
+            camera.setDirection(_workerStoreA);
+            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
+            camera.setUp(_workerStoreA);
         }
 
         if (dy != 0) {
-            workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
-            workerMatrix.applyPost(camera.getLeft(), workerStoreA);
-            camera.setLeft(workerStoreA);
-            workerMatrix.applyPost(camera.getDirection(), workerStoreA);
-            camera.setDirection(workerStoreA);
-            workerMatrix.applyPost(camera.getUp(), workerStoreA);
-            camera.setUp(workerStoreA);
+            _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
+            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
+            camera.setLeft(_workerStoreA);
+            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
+            camera.setDirection(_workerStoreA);
+            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
+            camera.setUp(_workerStoreA);
         }
 
         camera.normalize();

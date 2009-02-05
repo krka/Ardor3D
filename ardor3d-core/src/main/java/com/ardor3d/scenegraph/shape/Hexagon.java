@@ -31,7 +31,7 @@ public class Hexagon extends Mesh {
 
     private static final int NUM_TRIS = 6;
 
-    private float sideLength;
+    private float _sideLength;
 
     public Hexagon() {}
 
@@ -46,7 +46,7 @@ public class Hexagon extends Mesh {
      */
     public Hexagon(final String name, final float sideLength) {
         super(name);
-        this.sideLength = sideLength;
+        _sideLength = sideLength;
         // allocate vertices
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
@@ -67,12 +67,12 @@ public class Hexagon extends Mesh {
      * equalateral triangle with all side = sideLength which is .866
      */
     private void setVertexData() {
-        _meshData.getVertexBuffer().put(-(sideLength / 2)).put(sideLength * 0.866f).put(0.0f);
-        _meshData.getVertexBuffer().put(sideLength / 2).put(sideLength * 0.866f).put(0.0f);
-        _meshData.getVertexBuffer().put(sideLength).put(0.0f).put(0.0f);
-        _meshData.getVertexBuffer().put(sideLength / 2).put(-sideLength * 0.866f).put(0.0f);
-        _meshData.getVertexBuffer().put(-(sideLength / 2)).put(-sideLength * 0.866f).put(0.0f);
-        _meshData.getVertexBuffer().put(-sideLength).put(0.0f).put(0.0f);
+        _meshData.getVertexBuffer().put(-(_sideLength / 2)).put(_sideLength * 0.866f).put(0.0f);
+        _meshData.getVertexBuffer().put(_sideLength / 2).put(_sideLength * 0.866f).put(0.0f);
+        _meshData.getVertexBuffer().put(_sideLength).put(0.0f).put(0.0f);
+        _meshData.getVertexBuffer().put(_sideLength / 2).put(-_sideLength * 0.866f).put(0.0f);
+        _meshData.getVertexBuffer().put(-(_sideLength / 2)).put(-_sideLength * 0.866f).put(0.0f);
+        _meshData.getVertexBuffer().put(-_sideLength).put(0.0f).put(0.0f);
         _meshData.getVertexBuffer().put(0.0f).put(0.0f).put(0.0f);
     }
 
@@ -110,13 +110,13 @@ public class Hexagon extends Mesh {
     }
 
     private void setTextureData() {
-        _meshData.getTextureCoords(0).coords.put(0.25f).put(0);
-        _meshData.getTextureCoords(0).coords.put(0.75f).put(0);
-        _meshData.getTextureCoords(0).coords.put(1.0f).put(0.5f);
-        _meshData.getTextureCoords(0).coords.put(0.75f).put(1.0f);
-        _meshData.getTextureCoords(0).coords.put(0.25f).put(1.0f);
-        _meshData.getTextureCoords(0).coords.put(0.0f).put(0.5f);
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(0.5f);
+        _meshData.getTextureCoords(0)._coords.put(0.25f).put(0);
+        _meshData.getTextureCoords(0)._coords.put(0.75f).put(0);
+        _meshData.getTextureCoords(0)._coords.put(1.0f).put(0.5f);
+        _meshData.getTextureCoords(0)._coords.put(0.75f).put(1.0f);
+        _meshData.getTextureCoords(0)._coords.put(0.25f).put(1.0f);
+        _meshData.getTextureCoords(0)._coords.put(0.0f).put(0.5f);
+        _meshData.getTextureCoords(0)._coords.put(0.5f).put(0.5f);
     }
 
     /**
@@ -133,7 +133,7 @@ public class Hexagon extends Mesh {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(sideLength, "sideLength", 0);
+        capsule.write(_sideLength, "sideLength", 0);
 
     }
 
@@ -141,7 +141,7 @@ public class Hexagon extends Mesh {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        sideLength = capsule.readInt("sideLength", 0);
+        _sideLength = capsule.readInt("sideLength", 0);
 
     }
 }

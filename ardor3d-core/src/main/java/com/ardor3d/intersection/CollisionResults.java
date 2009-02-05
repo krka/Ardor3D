@@ -20,13 +20,13 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public abstract class CollisionResults {
 
-    private final List<CollisionData> nodeList;
+    private final List<CollisionData> _nodeList;
 
     /**
      * Constructor instantiates a new <code>PickResults</code> object.
      */
     public CollisionResults() {
-        nodeList = new ArrayList<CollisionData>();
+        _nodeList = new ArrayList<CollisionData>();
     }
 
     /**
@@ -36,7 +36,7 @@ public abstract class CollisionResults {
      *            The collision data to be placed in the results list.
      */
     public void addCollisionData(final CollisionData col) {
-        nodeList.add(col);
+        _nodeList.add(col);
     }
 
     /**
@@ -45,7 +45,7 @@ public abstract class CollisionResults {
      * @return the number of collisions in the list.
      */
     public int getNumber() {
-        return nodeList.size();
+        return _nodeList.size();
     }
 
     /**
@@ -56,14 +56,14 @@ public abstract class CollisionResults {
      * @return the CollisionData at the specified index.
      */
     public CollisionData getCollisionData(final int i) {
-        return nodeList.get(i);
+        return _nodeList.get(i);
     }
 
     /**
      * <code>clear</code> clears the list of all CollisionData.
      */
     public void clear() {
-        nodeList.clear();
+        _nodeList.clear();
     }
 
     /**

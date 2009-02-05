@@ -39,8 +39,7 @@ public class ParticleSystemExample extends ExampleBase {
     }
 
     @Inject
-    public ParticleSystemExample(final LogicalLayer layer, final FrameWork frameWork,
-            final Timer timer) {
+    public ParticleSystemExample(final LogicalLayer layer, final FrameWork frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }

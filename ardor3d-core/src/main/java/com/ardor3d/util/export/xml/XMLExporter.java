@@ -31,7 +31,7 @@ public class XMLExporter implements Ardor3DExporter {
     public static final String ELEMENT_FLOATBUFFER = "FloatBuffer";
     public static final String ATTRIBUTE_SIZE = "size";
 
-    private DOMOutputCapsule domOut;
+    private DOMOutputCapsule _domOut;
 
     public XMLExporter() {
 
@@ -40,9 +40,10 @@ public class XMLExporter implements Ardor3DExporter {
     public boolean save(final Savable object, final OutputStream f) throws IOException {
         try {
             // Initialize Document when saving so we don't retain state of previous exports
-            domOut = new DOMOutputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument(), this);
-            domOut.write(object, object.getClass().getName(), null);
-            DOM_PrettyPrint.serialize(domOut.getDoc(), f);
+            _domOut = new DOMOutputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument(),
+                    this);
+            _domOut.write(object, object.getClass().getName(), null);
+            DOM_PrettyPrint.serialize(_domOut.getDoc(), f);
             f.flush();
             return true;
         } catch (final Exception ex) {
@@ -57,7 +58,7 @@ public class XMLExporter implements Ardor3DExporter {
     }
 
     public OutputCapsule getCapsule(final Savable object) {
-        return domOut;
+        return _domOut;
     }
 
     public static XMLExporter getInstance() {

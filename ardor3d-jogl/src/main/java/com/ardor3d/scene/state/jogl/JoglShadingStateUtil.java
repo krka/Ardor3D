@@ -21,7 +21,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.renderer.state.record.ShadingStateRecord;
 
-public class JoglShadingStateUtil {
+public abstract class JoglShadingStateUtil {
 
     public static void apply(final JoglRenderer renderer, final ShadingState state) {
         final GL gl = GLU.getCurrentGL();

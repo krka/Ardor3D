@@ -24,7 +24,7 @@ import com.ardor3d.renderer.state.StencilState.StencilFunction;
 import com.ardor3d.renderer.state.StencilState.StencilOperation;
 import com.ardor3d.renderer.state.record.StencilStateRecord;
 
-public class LwjglStencilStateUtil {
+public abstract class LwjglStencilStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final StencilState state) {
         // ask for the current state record

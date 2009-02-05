@@ -20,7 +20,7 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.OffsetStateRecord;
 
-public class LwjglOffsetStateUtil {
+public abstract class LwjglOffsetStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final OffsetState state) {
         // ask for the current state record

@@ -82,23 +82,29 @@ public class StencilState extends RenderState {
         Invert;
     }
 
-    private boolean useTwoSided = false;
+    private boolean _useTwoSided = false;
 
-    private StencilFunction stencilFunctionFront = StencilFunction.Always;
-    private int stencilReferenceFront = 0;
-    private int stencilFuncMaskFront = ~0;
-    private int stencilWriteMaskFront = ~0;
-    private StencilOperation stencilOpFailFront = StencilOperation.Keep;
-    private StencilOperation stencilOpZFailFront = StencilOperation.Keep;
-    private StencilOperation stencilOpZPassFront = StencilOperation.Keep;
+    // Front
+    private StencilFunction _stencilFunctionFront = StencilFunction.Always;
 
-    private StencilFunction stencilFunctionBack = StencilFunction.Always;
-    private int stencilReferenceBack = 0;
-    private int stencilFuncMaskBack = ~0;
-    private int stencilWriteMaskBack = ~0;
-    private StencilOperation stencilOpFailBack = StencilOperation.Keep;
-    private StencilOperation stencilOpZFailBack = StencilOperation.Keep;
-    private StencilOperation stencilOpZPassBack = StencilOperation.Keep;
+    private int _stencilReferenceFront = 0;
+    private int _stencilFuncMaskFront = ~0;
+    private int _stencilWriteMaskFront = ~0;
+
+    private StencilOperation _stencilOpFailFront = StencilOperation.Keep;
+    private StencilOperation _stencilOpZFailFront = StencilOperation.Keep;
+    private StencilOperation _stencilOpZPassFront = StencilOperation.Keep;
+
+    // Back
+    private StencilFunction _stencilFunctionBack = StencilFunction.Always;
+
+    private int _stencilReferenceBack = 0;
+    private int _stencilFuncMaskBack = ~0;
+    private int _stencilWriteMaskBack = ~0;
+
+    private StencilOperation _stencilOpFailBack = StencilOperation.Keep;
+    private StencilOperation _stencilOpZFailBack = StencilOperation.Keep;
+    private StencilOperation _stencilOpZPassBack = StencilOperation.Keep;
 
     @Override
     public StateType getType() {
@@ -214,7 +220,7 @@ public class StencilState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        stencilFunctionFront = function;
+        _stencilFunctionFront = function;
         setNeedsRefresh(true);
     }
 
@@ -222,7 +228,7 @@ public class StencilState extends RenderState {
      * @return The current stencil function for front faces. Default is StencilFunction.Always
      */
     public StencilFunction getStencilFunctionFront() {
-        return stencilFunctionFront;
+        return _stencilFunctionFront;
     }
 
     /**
@@ -232,7 +238,7 @@ public class StencilState extends RenderState {
      *            The new stencil reference for front faces.
      */
     public void setStencilReferenceFront(final int reference) {
-        stencilReferenceFront = reference;
+        _stencilReferenceFront = reference;
         setNeedsRefresh(true);
     }
 
@@ -240,7 +246,7 @@ public class StencilState extends RenderState {
      * @return The current stencil reference for front faces. Default is 0
      */
     public int getStencilReferenceFront() {
-        return stencilReferenceFront;
+        return _stencilReferenceFront;
     }
 
     /**
@@ -261,7 +267,7 @@ public class StencilState extends RenderState {
      *            The new stencil write mask for front faces.
      */
     public void setStencilWriteMaskFront(final int mask) {
-        stencilWriteMaskFront = mask;
+        _stencilWriteMaskFront = mask;
         setNeedsRefresh(true);
     }
 
@@ -269,7 +275,7 @@ public class StencilState extends RenderState {
      * @return The current stencil write mask for front faces. Default is all 1's (~0)
      */
     public int getStencilWriteMaskFront() {
-        return stencilWriteMaskFront;
+        return _stencilWriteMaskFront;
     }
 
     /**
@@ -279,7 +285,7 @@ public class StencilState extends RenderState {
      *            The new stencil function mask for front faces.
      */
     public void setStencilFuncMaskFront(final int mask) {
-        stencilFuncMaskFront = mask;
+        _stencilFuncMaskFront = mask;
         setNeedsRefresh(true);
     }
 
@@ -287,7 +293,7 @@ public class StencilState extends RenderState {
      * @return The current stencil function mask for front faces. Default is all 1's (~0)
      */
     public int getStencilFuncMaskFront() {
-        return stencilFuncMaskFront;
+        return _stencilFuncMaskFront;
     }
 
     /**
@@ -302,7 +308,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpFailFront = operation;
+        _stencilOpFailFront = operation;
         setNeedsRefresh(true);
     }
 
@@ -310,7 +316,7 @@ public class StencilState extends RenderState {
      * @return The current stencil operation for front faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpFailFront() {
-        return stencilOpFailFront;
+        return _stencilOpFailFront;
     }
 
     /**
@@ -325,7 +331,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpZFailFront = operation;
+        _stencilOpZFailFront = operation;
         setNeedsRefresh(true);
     }
 
@@ -333,7 +339,7 @@ public class StencilState extends RenderState {
      * @return The current Z op fail function for front faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpZFailFront() {
-        return stencilOpZFailFront;
+        return _stencilOpZFailFront;
     }
 
     /**
@@ -349,7 +355,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpZPassFront = operation;
+        _stencilOpZPassFront = operation;
         setNeedsRefresh(true);
     }
 
@@ -357,7 +363,7 @@ public class StencilState extends RenderState {
      * @return The current Z op pass function for front faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpZPassFront() {
-        return stencilOpZPassFront;
+        return _stencilOpZPassFront;
     }
 
     /**
@@ -372,7 +378,7 @@ public class StencilState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        stencilFunctionBack = function;
+        _stencilFunctionBack = function;
         setNeedsRefresh(true);
     }
 
@@ -380,7 +386,7 @@ public class StencilState extends RenderState {
      * @return The current stencil function for back faces. Default is StencilFunction.Always
      */
     public StencilFunction getStencilFunctionBack() {
-        return stencilFunctionBack;
+        return _stencilFunctionBack;
     }
 
     /**
@@ -390,7 +396,7 @@ public class StencilState extends RenderState {
      *            The new stencil reference for back faces.
      */
     public void setStencilReferenceBack(final int reference) {
-        stencilReferenceBack = reference;
+        _stencilReferenceBack = reference;
         setNeedsRefresh(true);
     }
 
@@ -398,7 +404,7 @@ public class StencilState extends RenderState {
      * @return The current stencil reference for back faces. Default is 0
      */
     public int getStencilReferenceBack() {
-        return stencilReferenceBack;
+        return _stencilReferenceBack;
     }
 
     /**
@@ -419,7 +425,7 @@ public class StencilState extends RenderState {
      *            The new stencil write mask for back faces.
      */
     public void setStencilWriteMaskBack(final int mask) {
-        stencilWriteMaskBack = mask;
+        _stencilWriteMaskBack = mask;
         setNeedsRefresh(true);
     }
 
@@ -427,7 +433,7 @@ public class StencilState extends RenderState {
      * @return The current stencil write mask for back faces. Default is all 1's (~0)
      */
     public int getStencilWriteMaskBack() {
-        return stencilWriteMaskBack;
+        return _stencilWriteMaskBack;
     }
 
     /**
@@ -437,7 +443,7 @@ public class StencilState extends RenderState {
      *            The new stencil function mask for back faces.
      */
     public void setStencilFuncMaskBack(final int mask) {
-        stencilFuncMaskBack = mask;
+        _stencilFuncMaskBack = mask;
         setNeedsRefresh(true);
     }
 
@@ -445,7 +451,7 @@ public class StencilState extends RenderState {
      * @return The current stencil function mask for back faces. Default is all 1's (~0)
      */
     public int getStencilFuncMaskBack() {
-        return stencilFuncMaskBack;
+        return _stencilFuncMaskBack;
     }
 
     /**
@@ -460,7 +466,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpFailBack = operation;
+        _stencilOpFailBack = operation;
         setNeedsRefresh(true);
     }
 
@@ -468,7 +474,7 @@ public class StencilState extends RenderState {
      * @return The current stencil operation for back faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpFailBack() {
-        return stencilOpFailBack;
+        return _stencilOpFailBack;
     }
 
     /**
@@ -483,7 +489,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpZFailBack = operation;
+        _stencilOpZFailBack = operation;
         setNeedsRefresh(true);
     }
 
@@ -491,7 +497,7 @@ public class StencilState extends RenderState {
      * @return The current Z op fail function for back faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpZFailBack() {
-        return stencilOpZFailBack;
+        return _stencilOpZFailBack;
     }
 
     /**
@@ -507,7 +513,7 @@ public class StencilState extends RenderState {
         if (operation == null) {
             throw new IllegalArgumentException("operation can not be null.");
         }
-        stencilOpZPassBack = operation;
+        _stencilOpZPassBack = operation;
         setNeedsRefresh(true);
     }
 
@@ -515,59 +521,59 @@ public class StencilState extends RenderState {
      * @return The current Z op pass function for back faces. Default is StencilOperation.Keep
      */
     public StencilOperation getStencilOpZPassBack() {
-        return stencilOpZPassBack;
+        return _stencilOpZPassBack;
     }
 
     public boolean isUseTwoSided() {
-        return useTwoSided;
+        return _useTwoSided;
     }
 
     public void setUseTwoSided(final boolean useTwoSided) {
-        this.useTwoSided = useTwoSided;
+        _useTwoSided = useTwoSided;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(useTwoSided, "useTwoSided", false);
-        capsule.write(stencilFunctionFront, "stencilFuncFront", StencilFunction.Always);
-        capsule.write(stencilReferenceFront, "stencilRefFront", 0);
-        capsule.write(stencilWriteMaskFront, "stencilWriteMaskFront", ~0);
-        capsule.write(stencilFuncMaskFront, "stencilFuncMaskFront", ~0);
-        capsule.write(stencilOpFailFront, "stencilOpFailFront", StencilOperation.Keep);
-        capsule.write(stencilOpZFailFront, "stencilOpZFailFront", StencilOperation.Keep);
-        capsule.write(stencilOpZPassFront, "stencilOpZPassFront", StencilOperation.Keep);
+        capsule.write(_useTwoSided, "useTwoSided", false);
+        capsule.write(_stencilFunctionFront, "stencilFuncFront", StencilFunction.Always);
+        capsule.write(_stencilReferenceFront, "stencilRefFront", 0);
+        capsule.write(_stencilWriteMaskFront, "stencilWriteMaskFront", ~0);
+        capsule.write(_stencilFuncMaskFront, "stencilFuncMaskFront", ~0);
+        capsule.write(_stencilOpFailFront, "stencilOpFailFront", StencilOperation.Keep);
+        capsule.write(_stencilOpZFailFront, "stencilOpZFailFront", StencilOperation.Keep);
+        capsule.write(_stencilOpZPassFront, "stencilOpZPassFront", StencilOperation.Keep);
 
-        capsule.write(stencilFunctionBack, "stencilFuncBack", StencilFunction.Always);
-        capsule.write(stencilReferenceBack, "stencilRefBack", 0);
-        capsule.write(stencilWriteMaskBack, "stencilWriteMaskBack", ~0);
-        capsule.write(stencilFuncMaskBack, "stencilFuncMaskBack", ~0);
-        capsule.write(stencilOpFailBack, "stencilOpFailBack", StencilOperation.Keep);
-        capsule.write(stencilOpZFailBack, "stencilOpZFailBack", StencilOperation.Keep);
-        capsule.write(stencilOpZPassBack, "stencilOpZPassBack", StencilOperation.Keep);
+        capsule.write(_stencilFunctionBack, "stencilFuncBack", StencilFunction.Always);
+        capsule.write(_stencilReferenceBack, "stencilRefBack", 0);
+        capsule.write(_stencilWriteMaskBack, "stencilWriteMaskBack", ~0);
+        capsule.write(_stencilFuncMaskBack, "stencilFuncMaskBack", ~0);
+        capsule.write(_stencilOpFailBack, "stencilOpFailBack", StencilOperation.Keep);
+        capsule.write(_stencilOpZFailBack, "stencilOpZFailBack", StencilOperation.Keep);
+        capsule.write(_stencilOpZPassBack, "stencilOpZPassBack", StencilOperation.Keep);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        useTwoSided = capsule.readBoolean("useTwoSided", false);
-        stencilFunctionFront = capsule.readEnum("stencilFuncFront", StencilFunction.class, StencilFunction.Always);
-        stencilReferenceFront = capsule.readInt("stencilRefFront", 0);
-        stencilWriteMaskFront = capsule.readInt("stencilWriteMaskFront", ~0);
-        stencilFuncMaskFront = capsule.readInt("stencilFuncMaskFront", ~0);
-        stencilOpFailFront = capsule.readEnum("stencilOpFailFront", StencilOperation.class, StencilOperation.Keep);
-        stencilOpZFailFront = capsule.readEnum("stencilOpZFailFront", StencilOperation.class, StencilOperation.Keep);
-        stencilOpZPassFront = capsule.readEnum("stencilOpZPassFront", StencilOperation.class, StencilOperation.Keep);
+        _useTwoSided = capsule.readBoolean("useTwoSided", false);
+        _stencilFunctionFront = capsule.readEnum("stencilFuncFront", StencilFunction.class, StencilFunction.Always);
+        _stencilReferenceFront = capsule.readInt("stencilRefFront", 0);
+        _stencilWriteMaskFront = capsule.readInt("stencilWriteMaskFront", ~0);
+        _stencilFuncMaskFront = capsule.readInt("stencilFuncMaskFront", ~0);
+        _stencilOpFailFront = capsule.readEnum("stencilOpFailFront", StencilOperation.class, StencilOperation.Keep);
+        _stencilOpZFailFront = capsule.readEnum("stencilOpZFailFront", StencilOperation.class, StencilOperation.Keep);
+        _stencilOpZPassFront = capsule.readEnum("stencilOpZPassFront", StencilOperation.class, StencilOperation.Keep);
 
-        stencilFunctionBack = capsule.readEnum("stencilFuncBack", StencilFunction.class, StencilFunction.Always);
-        stencilReferenceBack = capsule.readInt("stencilRefBack", 0);
-        stencilWriteMaskBack = capsule.readInt("stencilWriteMaskBack", ~0);
-        stencilFuncMaskBack = capsule.readInt("stencilFuncMaskBack", ~0);
-        stencilOpFailBack = capsule.readEnum("stencilOpFailBack", StencilOperation.class, StencilOperation.Keep);
-        stencilOpZFailBack = capsule.readEnum("stencilOpZFailBack", StencilOperation.class, StencilOperation.Keep);
-        stencilOpZPassBack = capsule.readEnum("stencilOpZPassBack", StencilOperation.class, StencilOperation.Keep);
+        _stencilFunctionBack = capsule.readEnum("stencilFuncBack", StencilFunction.class, StencilFunction.Always);
+        _stencilReferenceBack = capsule.readInt("stencilRefBack", 0);
+        _stencilWriteMaskBack = capsule.readInt("stencilWriteMaskBack", ~0);
+        _stencilFuncMaskBack = capsule.readInt("stencilFuncMaskBack", ~0);
+        _stencilOpFailBack = capsule.readEnum("stencilOpFailBack", StencilOperation.class, StencilOperation.Keep);
+        _stencilOpZFailBack = capsule.readEnum("stencilOpZFailBack", StencilOperation.class, StencilOperation.Keep);
+        _stencilOpZPassBack = capsule.readEnum("stencilOpZPassBack", StencilOperation.class, StencilOperation.Keep);
     }
 
     @Override

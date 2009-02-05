@@ -208,7 +208,7 @@ public class Dome extends Mesh {
                             (float) -kNormal.getZ());
                 }
 
-                _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put((float) fYFraction);
+                _meshData.getTextureCoords(0)._coords.put((float) fRadialFraction).put((float) fYFraction);
 
                 i++;
             }
@@ -216,7 +216,7 @@ public class Dome extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-            _meshData.getTextureCoords(0).coords.put(1.0f).put((float) fYFraction);
+            _meshData.getTextureCoords(0)._coords.put(1.0f).put((float) fYFraction);
 
             i++;
         }
@@ -231,7 +231,7 @@ public class Dome extends Mesh {
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
         }
 
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(1.0f);
+        _meshData.getTextureCoords(0)._coords.put(0.5f).put(1.0f);
 
         Vector3.releaseTempInstance(tempVa);
         Vector3.releaseTempInstance(tempVb);

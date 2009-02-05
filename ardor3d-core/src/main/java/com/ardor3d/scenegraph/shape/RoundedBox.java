@@ -134,7 +134,7 @@ public class RoundedBox extends Mesh implements Savable {
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
             _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(48)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
+            final FloatBuffer tex = _meshData.getTextureCoords(0)._coords;
 
             final double[][] ratio = new double[][] {
                     { 0.5 * _border.getX() / (_extent.getX() + _slope.getX()),

@@ -37,7 +37,7 @@ public class ShadingState extends RenderState {
     }
 
     // shade mode.
-    protected ShadingMode shadeMode = ShadingMode.Smooth;
+    protected ShadingMode _shadeMode = ShadingMode.Smooth;
 
     /**
      * Constructor instantiates a new <code>ShadeState</code> object with the default mode being smooth.
@@ -50,7 +50,7 @@ public class ShadingState extends RenderState {
      * @return the current shading mode.
      */
     public ShadingMode getShadingMode() {
-        return shadeMode;
+        return _shadeMode;
     }
 
     /**
@@ -65,7 +65,7 @@ public class ShadingState extends RenderState {
         if (shadeMode == null) {
             throw new IllegalArgumentException("shadeMode can not be null.");
         }
-        this.shadeMode = shadeMode;
+        _shadeMode = shadeMode;
         setNeedsRefresh(true);
     }
 
@@ -78,14 +78,14 @@ public class ShadingState extends RenderState {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(shadeMode, "shadeMode", ShadingMode.Smooth);
+        capsule.write(_shadeMode, "shadeMode", ShadingMode.Smooth);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        shadeMode = capsule.readEnum("shadeMode", ShadingMode.class, ShadingMode.Smooth);
+        _shadeMode = capsule.readEnum("shadeMode", ShadingMode.class, ShadingMode.Smooth);
     }
 
     @Override

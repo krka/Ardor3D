@@ -267,16 +267,16 @@ public class Image implements Serializable, Savable {
     }
 
     // image attributes
-    protected Format format;
-    protected int width, height, depth;
-    protected int[] mipMapSizes;
-    protected transient List<ByteBuffer> data;
+    protected Format _format;
+    protected int _width, _height, _depth;
+    protected int[] _mipMapSizes;
+    protected transient List<ByteBuffer> _data;
 
     /**
      * Constructor instantiates a new <code>Image</code> object. All values are undefined.
      */
     public Image() {
-        data = new ArrayList<ByteBuffer>(1);
+        _data = new ArrayList<ByteBuffer>(1);
     }
 
     /**
@@ -302,11 +302,11 @@ public class Image implements Serializable, Savable {
         }
 
         setFormat(format);
-        this.width = width;
-        this.height = height;
-        this.data = data;
-        this.depth = depth;
-        this.mipMapSizes = mipMapSizes;
+        _width = width;
+        _height = height;
+        _data = data;
+        _depth = depth;
+        _mipMapSizes = mipMapSizes;
     }
 
     /**
@@ -331,11 +331,11 @@ public class Image implements Serializable, Savable {
         }
 
         setFormat(format);
-        this.width = width;
-        this.height = height;
-        this.data = new ArrayList<ByteBuffer>(1);
-        this.data.add(data);
-        this.mipMapSizes = mipMapSizes;
+        _width = width;
+        _height = height;
+        _data = new ArrayList<ByteBuffer>(1);
+        _data.add(data);
+        _mipMapSizes = mipMapSizes;
     }
 
     /**
@@ -380,7 +380,7 @@ public class Image implements Serializable, Savable {
      *            the data that contains the image information.
      */
     public void setData(final List<ByteBuffer> data) {
-        this.data = data;
+        _data = data;
     }
 
     /**
@@ -391,23 +391,23 @@ public class Image implements Serializable, Savable {
      *            the data that contains the image information.
      */
     public void setData(final ByteBuffer data) {
-        this.data = new ArrayList<ByteBuffer>(1);
-        this.data.add(data);
+        _data = new ArrayList<ByteBuffer>(1);
+        _data.add(data);
     }
 
     public void addData(final ByteBuffer data) {
-        if (this.data == null) {
-            this.data = new ArrayList<ByteBuffer>(1);
+        if (_data == null) {
+            _data = new ArrayList<ByteBuffer>(1);
         }
-        this.data.add(data);
+        _data.add(data);
     }
 
     public void setData(final int index, final ByteBuffer data) {
         if (index >= 0) {
-            while (this.data.size() <= index) {
-                this.data.add(null);
+            while (_data.size() <= index) {
+                _data.add(null);
             }
-            this.data.set(index, data);
+            _data.set(index, data);
         } else {
             throw new IllegalArgumentException("index must be greater than or equal to 0.");
         }
@@ -426,7 +426,7 @@ public class Image implements Serializable, Savable {
             mipMapSizes = null;
         }
 
-        this.mipMapSizes = mipMapSizes;
+        _mipMapSizes = mipMapSizes;
     }
 
     /**
@@ -437,7 +437,7 @@ public class Image implements Serializable, Savable {
      *            the height of the image.
      */
     public void setHeight(final int height) {
-        this.height = height;
+        _height = height;
     }
 
     /**
@@ -448,7 +448,7 @@ public class Image implements Serializable, Savable {
      *            the depth of the image.
      */
     public void setDepth(final int depth) {
-        this.depth = depth;
+        _depth = depth;
     }
 
     /**
@@ -459,7 +459,7 @@ public class Image implements Serializable, Savable {
      *            the width of the image.
      */
     public void setWidth(final int width) {
-        this.width = width;
+        _width = width;
     }
 
     /**
@@ -476,7 +476,7 @@ public class Image implements Serializable, Savable {
             throw new NullPointerException("format may not be null.");
         }
 
-        this.format = format;
+        _format = format;
     }
 
     /**
@@ -486,7 +486,7 @@ public class Image implements Serializable, Savable {
      * @see Format
      */
     public Format getFormat() {
-        return format;
+        return _format;
     }
 
     /**
@@ -495,7 +495,7 @@ public class Image implements Serializable, Savable {
      * @return the width of this image.
      */
     public int getWidth() {
-        return width;
+        return _width;
     }
 
     /**
@@ -504,7 +504,7 @@ public class Image implements Serializable, Savable {
      * @return the height of this image.
      */
     public int getHeight() {
-        return height;
+        return _height;
     }
 
     /**
@@ -513,7 +513,7 @@ public class Image implements Serializable, Savable {
      * @return the depth of this image.
      */
     public int getDepth() {
-        return depth;
+        return _depth;
     }
 
     /**
@@ -522,7 +522,7 @@ public class Image implements Serializable, Savable {
      * @return the data for this image.
      */
     public List<ByteBuffer> getData() {
-        return data;
+        return _data;
     }
 
     /**
@@ -531,8 +531,8 @@ public class Image implements Serializable, Savable {
      * @return the data for this image.
      */
     public ByteBuffer getData(final int index) {
-        if (data.size() > index) {
-            return data.get(index);
+        if (_data.size() > index) {
+            return _data.get(index);
         } else {
             return null;
         }
@@ -544,7 +544,7 @@ public class Image implements Serializable, Savable {
      * @return true if the image data contains mipmaps, false if not.
      */
     public boolean hasMipmaps() {
-        return mipMapSizes != null;
+        return _mipMapSizes != null;
     }
 
     /**
@@ -553,7 +553,7 @@ public class Image implements Serializable, Savable {
      * @return the mipmap sizes for this image.
      */
     public int[] getMipMapSizes() {
-        return mipMapSizes;
+        return _mipMapSizes;
     }
 
     @Override
@@ -592,22 +592,22 @@ public class Image implements Serializable, Savable {
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(format, "format", Format.RGBA8);
-        capsule.write(width, "width", 0);
-        capsule.write(height, "height", 0);
-        capsule.write(depth, "depth", 0);
-        capsule.write(mipMapSizes, "mipMapSizes", null);
-        capsule.writeByteBufferList(data, "data", null);
+        capsule.write(_format, "format", Format.RGBA8);
+        capsule.write(_width, "width", 0);
+        capsule.write(_height, "height", 0);
+        capsule.write(_depth, "depth", 0);
+        capsule.write(_mipMapSizes, "mipMapSizes", null);
+        capsule.writeByteBufferList(_data, "data", null);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        format = capsule.readEnum("format", Format.class, Format.RGBA8);
-        width = capsule.readInt("width", 0);
-        height = capsule.readInt("height", 0);
-        depth = capsule.readInt("depth", 0);
-        mipMapSizes = capsule.readIntArray("mipMapSizes", null);
-        data = capsule.readByteBufferList("data", null);
+        _format = capsule.readEnum("format", Format.class, Format.RGBA8);
+        _width = capsule.readInt("width", 0);
+        _height = capsule.readInt("height", 0);
+        _depth = capsule.readInt("depth", 0);
+        _mipMapSizes = capsule.readIntArray("mipMapSizes", null);
+        _data = capsule.readByteBufferList("data", null);
     }
 
     public Class<? extends Image> getClassTag() {

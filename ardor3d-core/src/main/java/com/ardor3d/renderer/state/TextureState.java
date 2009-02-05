@@ -43,7 +43,7 @@ public class TextureState extends RenderState {
 
     public static final int MAX_TEXTURES = 32;
 
-    protected static Texture defaultTexture = null;
+    protected static Texture _defaultTexture = null;
 
     public enum CorrectionType {
         /**
@@ -58,18 +58,18 @@ public class TextureState extends RenderState {
     }
 
     /** The texture(s). */
-    protected List<Texture> texture = new ArrayList<Texture>();
+    protected List<Texture> _texture = new ArrayList<Texture>();
 
     /**
      * Perspective correction to use for the object rendered with this texture state. Default is
      * CorrectionType.Perspective.
      */
-    private CorrectionType correctionType = CorrectionType.Perspective;
+    private CorrectionType _correctionType = CorrectionType.Perspective;
 
     /**
      * offset is used to denote where to begin access of texture coordinates. 0 default
      */
-    protected int offset = 0;
+    protected int _offset = 0;
 
     public transient int[] _idCache = new int[MAX_TEXTURES];
 
@@ -77,9 +77,9 @@ public class TextureState extends RenderState {
      * Constructor instantiates a new <code>TextureState</code> object.
      */
     public TextureState() {
-        if (defaultTexture == null) {
+        if (_defaultTexture == null) {
             try {
-                defaultTexture = TextureManager.load(TextureState.class.getResource("notloaded.tga"),
+                _defaultTexture = TextureManager.load(TextureState.class.getResource("notloaded.tga"),
                         Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true);
             } catch (final Exception e) {
                 logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
@@ -99,10 +99,10 @@ public class TextureState extends RenderState {
      *            the texture to set.
      */
     public void setTexture(final Texture texture) {
-        if (this.texture.size() == 0) {
-            this.texture.add(texture);
+        if (_texture.size() == 0) {
+            _texture.add(texture);
         } else {
-            this.texture.set(0, texture);
+            _texture.set(0, texture);
         }
         setNeedsRefresh(true);
     }
@@ -113,8 +113,8 @@ public class TextureState extends RenderState {
      * @return the texture in the first texture unit.
      */
     public Texture getTexture() {
-        if (texture.size() > 0) {
-            return texture.get(0);
+        if (_texture.size() > 0) {
+            return _texture.get(0);
         } else {
             return null;
         }
@@ -132,10 +132,10 @@ public class TextureState extends RenderState {
      */
     public void setTexture(final Texture texture, final int textureUnit) {
         if (textureUnit >= 0 && textureUnit < MAX_TEXTURES) {
-            while (textureUnit >= this.texture.size()) {
-                this.texture.add(null);
+            while (textureUnit >= _texture.size()) {
+                _texture.add(null);
             }
-            this.texture.set(textureUnit, texture);
+            _texture.set(textureUnit, texture);
         }
         setNeedsRefresh(true);
     }
@@ -148,8 +148,8 @@ public class TextureState extends RenderState {
      * @return the texture being used by the state. If the texture unit is invalid, null is returned.
      */
     public Texture getTexture(final int textureUnit) {
-        if (textureUnit < texture.size() && textureUnit >= 0) {
-            return texture.get(textureUnit);
+        if (textureUnit < _texture.size() && textureUnit >= 0) {
+            return _texture.get(textureUnit);
         }
 
         return null;
@@ -157,27 +157,27 @@ public class TextureState extends RenderState {
 
     public boolean removeTexture(final Texture tex) {
 
-        final int index = texture.indexOf(tex);
+        final int index = _texture.indexOf(tex);
         if (index == -1) {
             return false;
         }
 
-        texture.set(index, null);
+        _texture.set(index, null);
         _idCache[index] = 0;
         return true;
     }
 
     public boolean removeTexture(final int textureUnit) {
-        if (textureUnit < 0 || textureUnit >= MAX_TEXTURES || textureUnit >= texture.size()) {
+        if (textureUnit < 0 || textureUnit >= MAX_TEXTURES || textureUnit >= _texture.size()) {
             return false;
         }
 
-        final Texture t = texture.get(textureUnit);
+        final Texture t = _texture.get(textureUnit);
         if (t == null) {
             return false;
         }
 
-        texture.set(textureUnit, null);
+        _texture.set(textureUnit, null);
         _idCache[textureUnit] = 0;
         return true;
 
@@ -187,7 +187,7 @@ public class TextureState extends RenderState {
      * Removes all textures in this texture state. Does not delete them from the graphics card.
      */
     public void clearTextures() {
-        for (int i = texture.size(); --i >= 0;) {
+        for (int i = _texture.size(); --i >= 0;) {
             removeTexture(i);
         }
     }
@@ -204,7 +204,7 @@ public class TextureState extends RenderState {
         if (type == null) {
             throw new IllegalArgumentException("type can not be null.");
         }
-        correctionType = type;
+        _correctionType = type;
         setNeedsRefresh(true);
     }
 
@@ -214,7 +214,7 @@ public class TextureState extends RenderState {
      * @return the correction type for the texture state.
      */
     public CorrectionType getCorrectionType() {
-        return correctionType;
+        return _correctionType;
     }
 
     /**
@@ -223,7 +223,7 @@ public class TextureState extends RenderState {
      * @return the number of textures.
      */
     public int getNumberOfSetTextures() {
-        return texture.size();
+        return _texture.size();
     }
 
     /**
@@ -252,7 +252,7 @@ public class TextureState extends RenderState {
      *            the offset (default 0).
      */
     public void setTextureCoordinateOffset(final int offset) {
-        this.offset = offset;
+        _offset = offset;
         setNeedsRefresh(true);
     }
 
@@ -263,16 +263,16 @@ public class TextureState extends RenderState {
      * @return the offset (default 0).
      */
     public int getTextureCoordinateOffset() {
-        return offset;
+        return _offset;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.writeSavableList(texture, "texture", new ArrayList<Texture>(1));
-        capsule.write(offset, "offset", 0);
-        capsule.write(correctionType, "correctionType", CorrectionType.Perspective);
+        capsule.writeSavableList(_texture, "texture", new ArrayList<Texture>(1));
+        capsule.write(_offset, "offset", 0);
+        capsule.write(_correctionType, "correctionType", CorrectionType.Perspective);
 
     }
 
@@ -280,17 +280,17 @@ public class TextureState extends RenderState {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
-        offset = capsule.readInt("offset", 0);
-        correctionType = capsule.readEnum("correctionType", CorrectionType.class, CorrectionType.Perspective);
+        _texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
+        _offset = capsule.readInt("offset", 0);
+        _correctionType = capsule.readEnum("correctionType", CorrectionType.class, CorrectionType.Perspective);
     }
 
     public static Image getDefaultTextureImage() {
-        return defaultTexture != null ? defaultTexture.getImage() : null;
+        return _defaultTexture != null ? _defaultTexture.getImage() : null;
     }
 
     public static Texture getDefaultTexture() {
-        return defaultTexture;
+        return _defaultTexture;
     }
 
     @Override

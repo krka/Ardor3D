@@ -30,7 +30,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LightRecord;
 import com.ardor3d.renderer.state.record.LightStateRecord;
 
-public class JoglLightStateUtil {
+public abstract class JoglLightStateUtil {
 
     public static void apply(final JoglRenderer renderer, final LightState state) {
         final RenderContext context = ContextManager.getCurrentContext();

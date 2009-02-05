@@ -30,7 +30,7 @@ import com.google.common.collect.PeekingIterator;
  * Wrapper over the {@link org.lwjgl.input.Mouse} mouse interface class.
  */
 public class LwjglMouseWrapper implements MouseWrapper {
-    private LwjglMouseIterator currentIterator = null;
+    private LwjglMouseIterator _currentIterator = null;
 
     private static final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
     private static final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
@@ -55,11 +55,11 @@ public class LwjglMouseWrapper implements MouseWrapper {
 
     public PeekingIterator<MouseState> getEvents() {
         // only create a new iterator if there isn't an existing, valid, one.
-        if (currentIterator == null || !currentIterator.hasNext()) {
-            currentIterator = new LwjglMouseIterator();
+        if (_currentIterator == null || !_currentIterator.hasNext()) {
+            _currentIterator = new LwjglMouseIterator();
         }
 
-        return currentIterator;
+        return _currentIterator;
     }
 
     private static class LwjglMouseIterator extends AbstractIterator<MouseState> implements PeekingIterator<MouseState> {

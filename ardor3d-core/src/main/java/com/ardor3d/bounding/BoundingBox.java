@@ -54,7 +54,7 @@ public class BoundingBox extends BoundingVolume {
      * Constructor instantiates a new <code>BoundingBox</code> object with given values.
      */
     public BoundingBox(final Vector3 c, final double x, final double y, final double z) {
-        center.set(c);
+        _center.set(c);
         setXExtent(x);
         setYExtent(y);
         setZExtent(z);
@@ -100,9 +100,9 @@ public class BoundingBox extends BoundingVolume {
             box = (BoundingBox) store;
         }
 
-        center.multiply(scale, box.center);
-        rotate.applyPost(box.center, box.center);
-        box.center.addLocal(translate);
+        _center.multiply(scale, box._center);
+        rotate.applyPost(box._center, box._center);
+        box._center.addLocal(translate);
 
         final Vector3 compVect1 = Vector3.fetchTempInstance();
 
@@ -169,12 +169,12 @@ public class BoundingBox extends BoundingVolume {
             checkMinMax(min, max, tris[i].getC());
         }
 
-        center.set(min.addLocal(max));
-        center.multiplyLocal(0.5);
+        _center.set(min.addLocal(max));
+        _center.multiplyLocal(0.5);
 
-        setXExtent(max.getX() - center.getX());
-        setYExtent(max.getY() - center.getY());
-        setZExtent(max.getZ() - center.getZ());
+        setXExtent(max.getX() - _center.getX());
+        setYExtent(max.getY() - _center.getY());
+        setZExtent(max.getZ() - _center.getZ());
 
         Vector3.releaseTempInstance(min);
         Vector3.releaseTempInstance(max);
@@ -199,12 +199,12 @@ public class BoundingBox extends BoundingVolume {
             checkMinMax(min, max, verts[2]);
         }
 
-        center.set(min.addLocal(max));
-        center.multiplyLocal(0.5);
+        _center.set(min.addLocal(max));
+        _center.multiplyLocal(0.5);
 
-        setXExtent(max.getX() - center.getX());
-        setYExtent(max.getY() - center.getY());
-        setZExtent(max.getZ() - center.getZ());
+        setXExtent(max.getX() - _center.getX());
+        setYExtent(max.getY() - _center.getY());
+        setZExtent(max.getZ() - _center.getZ());
 
         Vector3.releaseTempInstance(min);
         Vector3.releaseTempInstance(max);
@@ -276,12 +276,12 @@ public class BoundingBox extends BoundingVolume {
         }
         Vector3.releaseTempInstance(compVect);
 
-        center.set(minX + maxX, minY + maxY, minZ + maxZ);
-        center.multiplyLocal(0.5f);
+        _center.set(minX + maxX, minY + maxY, minZ + maxZ);
+        _center.multiplyLocal(0.5f);
 
-        setXExtent(maxX - center.getX());
-        setYExtent(maxY - center.getY());
-        setZExtent(maxZ - center.getZ());
+        setXExtent(maxX - _center.getX());
+        setYExtent(maxY - _center.getY());
+        setZExtent(maxZ - _center.getZ());
     }
 
     /**
@@ -308,9 +308,9 @@ public class BoundingBox extends BoundingVolume {
             box = (BoundingBox) store;
         }
 
-        center.multiply(scale, box.center);
-        rotate.apply(box.center, box.center);
-        box.center.addLocal(translate);
+        _center.multiply(scale, box._center);
+        rotate.apply(box._center, box._center);
+        box._center.addLocal(translate);
 
         final Vector3 compVect1 = Vector3.fetchTempInstance();
         final Vector3 compVect2 = Vector3.fetchTempInstance();
@@ -355,7 +355,7 @@ public class BoundingBox extends BoundingVolume {
         final double radius = Math.abs(getXExtent() * normal.getX()) + Math.abs(getYExtent() * normal.getY())
                 + Math.abs(getZExtent() * normal.getZ());
 
-        final double distance = plane.pseudoDistance(center);
+        final double distance = plane.pseudoDistance(_center);
 
         if (distance < -radius) {
             return Plane.Side.Inside;
@@ -383,13 +383,13 @@ public class BoundingBox extends BoundingVolume {
         switch (volume.getType()) {
             case AABB: {
                 final BoundingBox vBox = (BoundingBox) volume;
-                return merge(vBox.center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), new BoundingBox(
+                return merge(vBox._center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), new BoundingBox(
                         new Vector3(0, 0, 0), 0, 0, 0));
             }
 
             case Sphere: {
                 final BoundingSphere vSphere = (BoundingSphere) volume;
-                return merge(vSphere.center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(),
+                return merge(vSphere._center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(),
                         new BoundingBox(new Vector3(0, 0, 0), 0, 0, 0));
             }
 
@@ -421,12 +421,12 @@ public class BoundingBox extends BoundingVolume {
         switch (volume.getType()) {
             case AABB: {
                 final BoundingBox vBox = (BoundingBox) volume;
-                return merge(vBox.center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), this);
+                return merge(vBox._center, vBox.getXExtent(), vBox.getYExtent(), vBox.getZExtent(), this);
             }
 
             case Sphere: {
                 final BoundingSphere vSphere = (BoundingSphere) volume;
-                return merge(vSphere.center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(), this);
+                return merge(vSphere._center, vSphere.getRadius(), vSphere.getRadius(), vSphere.getRadius(), this);
             }
 
             case OBB: {
@@ -453,16 +453,16 @@ public class BoundingBox extends BoundingVolume {
         double minX, minY, minZ;
         double maxX, maxY, maxZ;
 
-        minX = center.getX() - getXExtent();
-        minY = center.getY() - getYExtent();
-        minZ = center.getZ() - getZExtent();
+        minX = _center.getX() - getXExtent();
+        minY = _center.getY() - getYExtent();
+        minZ = _center.getZ() - getZExtent();
 
-        maxX = center.getX() + getXExtent();
-        maxY = center.getY() + getYExtent();
-        maxZ = center.getZ() + getZExtent();
+        maxX = _center.getX() + getXExtent();
+        maxY = _center.getY() + getYExtent();
+        maxZ = _center.getZ() + getZExtent();
 
-        for (int i = 1; i < volume.vectorStore.length; i++) {
-            final Vector3 temp = volume.vectorStore[i];
+        for (int i = 1; i < volume._vectorStore.length; i++) {
+            final Vector3 temp = volume._vectorStore[i];
             if (temp.getX() < minX) {
                 minX = temp.getX();
             } else if (temp.getX() > maxX) {
@@ -482,12 +482,12 @@ public class BoundingBox extends BoundingVolume {
             }
         }
 
-        center.set(minX + maxX, minY + maxY, minZ + maxZ);
-        center.multiplyLocal(0.5);
+        _center.set(minX + maxX, minY + maxY, minZ + maxZ);
+        _center.multiplyLocal(0.5);
 
-        setXExtent(maxX - center.getX());
-        setYExtent(maxY - center.getY());
-        setZExtent(maxZ - center.getZ());
+        setXExtent(maxX - _center.getX());
+        setYExtent(maxY - _center.getY());
+        setZExtent(maxZ - _center.getZ());
         return this;
     }
 
@@ -511,37 +511,37 @@ public class BoundingBox extends BoundingVolume {
         final Vector3 compVect1 = Vector3.fetchTempInstance();
         final Vector3 compVect2 = Vector3.fetchTempInstance();
 
-        compVect1.setX(center.getX() - getXExtent());
+        compVect1.setX(_center.getX() - getXExtent());
         if (compVect1.getX() > boxCenter.getX() - boxX) {
             compVect1.setX(boxCenter.getX() - boxX);
         }
-        compVect1.setY(center.getY() - getYExtent());
+        compVect1.setY(_center.getY() - getYExtent());
         if (compVect1.getY() > boxCenter.getY() - boxY) {
             compVect1.setY(boxCenter.getY() - boxY);
         }
-        compVect1.setZ(center.getZ() - getZExtent());
+        compVect1.setZ(_center.getZ() - getZExtent());
         if (compVect1.getZ() > boxCenter.getZ() - boxZ) {
             compVect1.setZ(boxCenter.getZ() - boxZ);
         }
 
-        compVect2.setX(center.getX() + getXExtent());
+        compVect2.setX(_center.getX() + getXExtent());
         if (compVect2.getX() < boxCenter.getX() + boxX) {
             compVect2.setX(boxCenter.getX() + boxX);
         }
-        compVect2.setY(center.getY() + getYExtent());
+        compVect2.setY(_center.getY() + getYExtent());
         if (compVect2.getY() < boxCenter.getY() + boxY) {
             compVect2.setY(boxCenter.getY() + boxY);
         }
-        compVect2.setZ(center.getZ() + getZExtent());
+        compVect2.setZ(_center.getZ() + getZExtent());
         if (compVect2.getZ() < boxCenter.getZ() + boxZ) {
             compVect2.setZ(boxCenter.getZ() + boxZ);
         }
 
-        center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5f);
+        _center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5f);
 
-        setXExtent(compVect2.getX() - center.getX());
-        setYExtent(compVect2.getY() - center.getY());
-        setZExtent(compVect2.getZ() - center.getZ());
+        setXExtent(compVect2.getX() - _center.getX());
+        setYExtent(compVect2.getY() - _center.getY());
+        setZExtent(compVect2.getZ() - _center.getZ());
 
         Vector3.releaseTempInstance(compVect1);
         Vector3.releaseTempInstance(compVect2);
@@ -560,15 +560,15 @@ public class BoundingBox extends BoundingVolume {
     public BoundingVolume clone(final BoundingVolume store) {
         if (store != null && store.getType() == Type.AABB) {
             final BoundingBox rVal = (BoundingBox) store;
-            rVal.center.set(center);
+            rVal._center.set(_center);
             rVal.setXExtent(_xExtent);
             rVal.setYExtent(_yExtent);
             rVal.setZExtent(_zExtent);
-            rVal.checkPlane = checkPlane;
+            rVal._checkPlane = _checkPlane;
             return rVal;
         }
 
-        final BoundingBox rVal = new BoundingBox(center, getXExtent(), getYExtent(), getZExtent());
+        final BoundingBox rVal = new BoundingBox(_center, getXExtent(), getYExtent(), getZExtent());
         return rVal;
     }
 
@@ -580,7 +580,7 @@ public class BoundingBox extends BoundingVolume {
      */
     @Override
     public String toString() {
-        return "com.ardor3d.scene.BoundingBox [Center: " + center + "  xExtent: " + getXExtent() + "  yExtent: "
+        return "com.ardor3d.scene.BoundingBox [Center: " + _center + "  xExtent: " + getXExtent() + "  yExtent: "
                 + getYExtent() + "  zExtent: " + getZExtent() + "]";
     }
 
@@ -606,13 +606,13 @@ public class BoundingBox extends BoundingVolume {
      */
     @Override
     public boolean intersectsSphere(final BoundingSphere bs) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bs.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
             return false;
         }
 
-        if (Math.abs(center.getX() - bs.getCenter().getX()) < bs.getRadius() + getXExtent()
-                && Math.abs(center.getY() - bs.getCenter().getY()) < bs.getRadius() + getYExtent()
-                && Math.abs(center.getZ() - bs.getCenter().getZ()) < bs.getRadius() + getZExtent()) {
+        if (Math.abs(_center.getX() - bs.getCenter().getX()) < bs.getRadius() + getXExtent()
+                && Math.abs(_center.getY() - bs.getCenter().getY()) < bs.getRadius() + getYExtent()
+                && Math.abs(_center.getZ() - bs.getCenter().getZ()) < bs.getRadius() + getZExtent()) {
             return true;
         }
 
@@ -627,18 +627,18 @@ public class BoundingBox extends BoundingVolume {
      */
     @Override
     public boolean intersectsBoundingBox(final BoundingBox bb) {
-        if (!Vector3.isValid(center) || !Vector3.isValid(bb.center)) {
+        if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
             return false;
         }
 
-        if (center.getX() + getXExtent() < bb.center.getX() - bb.getXExtent()
-                || center.getX() - getXExtent() > bb.center.getX() + bb.getXExtent()) {
+        if (_center.getX() + getXExtent() < bb._center.getX() - bb.getXExtent()
+                || _center.getX() - getXExtent() > bb._center.getX() + bb.getXExtent()) {
             return false;
-        } else if (center.getY() + getYExtent() < bb.center.getY() - bb.getYExtent()
-                || center.getY() - getYExtent() > bb.center.getY() + bb.getYExtent()) {
+        } else if (_center.getY() + getYExtent() < bb._center.getY() - bb.getYExtent()
+                || _center.getY() - getYExtent() > bb._center.getY() + bb.getYExtent()) {
             return false;
-        } else if (center.getZ() + getZExtent() < bb.center.getZ() - bb.getZExtent()
-                || center.getZ() - getZExtent() > bb.center.getZ() + bb.getZExtent()) {
+        } else if (_center.getZ() + getZExtent() < bb._center.getZ() - bb.getZExtent()
+                || _center.getZ() - getZExtent() > bb._center.getZ() + bb.getZExtent()) {
             return false;
         } else {
             return true;
@@ -663,7 +663,7 @@ public class BoundingBox extends BoundingVolume {
      */
     @Override
     public boolean intersects(final ReadOnlyRay3 ray) {
-        if (!Vector3.isValid(center)) {
+        if (!Vector3.isValid(_center)) {
             return false;
         }
 
@@ -732,7 +732,7 @@ public class BoundingBox extends BoundingVolume {
         final Vector3 compVect1 = Vector3.fetchTempInstance();
         final Vector3 compVect2 = Vector3.fetchTempInstance();
 
-        final Vector3 diff = ray.getOrigin().subtract(center, compVect1);
+        final Vector3 diff = ray.getOrigin().subtract(_center, compVect1);
 
         final ReadOnlyVector3 direction = ray.getDirection();
 
@@ -774,15 +774,15 @@ public class BoundingBox extends BoundingVolume {
 
     @Override
     public boolean contains(final ReadOnlyVector3 point) {
-        return Math.abs(center.getX() - point.getX()) < getXExtent()
-                && Math.abs(center.getY() - point.getY()) < getYExtent()
-                && Math.abs(center.getZ() - point.getZ()) < getZExtent();
+        return Math.abs(_center.getX() - point.getX()) < getXExtent()
+                && Math.abs(_center.getY() - point.getY()) < getYExtent()
+                && Math.abs(_center.getZ() - point.getZ()) < getZExtent();
     }
 
     @Override
     public double distanceToEdge(final ReadOnlyVector3 point) {
         // compute coordinates of point in box coordinate system
-        final Vector3 closest = point.subtract(center, Vector3.fetchTempInstance());
+        final Vector3 closest = point.subtract(_center, Vector3.fetchTempInstance());
 
         // project test point onto box
         double sqrDistance = 0.0;

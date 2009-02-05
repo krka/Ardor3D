@@ -34,16 +34,16 @@ public class Sphere extends Mesh {
     // Spherical projection mode, donated by Ogli
     public static final int TEX_PROJECTED = 1;
 
-    protected int zSamples;
+    protected int _zSamples;
 
-    protected int radialSamples;
+    protected int _radialSamples;
 
     /** the distance from the center point each point falls on */
-    public double radius;
+    public double _radius;
     /** the center of the sphere */
-    public final Vector3 center = new Vector3();
+    public final Vector3 _center = new Vector3();
 
-    protected int textureMode = TEX_ORIGINAL;
+    protected int _textureMode = TEX_ORIGINAL;
 
     public Sphere() {}
 
@@ -108,10 +108,10 @@ public class Sphere extends Mesh {
      *            The new radius of the sphere.
      */
     public void setData(final ReadOnlyVector3 center, final int zSamples, final int radialSamples, final double radius) {
-        this.center.set(center);
-        this.zSamples = zSamples;
-        this.radialSamples = radialSamples;
-        this.radius = radius;
+        _center.set(center);
+        _zSamples = zSamples;
+        _radialSamples = radialSamples;
+        _radius = radius;
 
         setGeometryData();
         setIndexData();
@@ -122,7 +122,7 @@ public class Sphere extends Mesh {
      */
     private void setGeometryData() {
         // allocate vertices
-        final int verts = (zSamples - 2) * (radialSamples + 1) + 2;
+        final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
 
         // allocate normals if requested
@@ -132,41 +132,41 @@ public class Sphere extends Mesh {
         _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
 
         // generate geometry
-        final double fInvRS = 1.0 / radialSamples;
-        final double fZFactor = 2.0 / (zSamples - 1);
+        final double fInvRS = 1.0 / _radialSamples;
+        final double fZFactor = 2.0 / (_zSamples - 1);
 
         // Generate points on the unit circle to be used in computing the mesh
         // points on a sphere slice.
-        final double[] afSin = new double[(radialSamples + 1)];
-        final double[] afCos = new double[(radialSamples + 1)];
-        for (int iR = 0; iR < radialSamples; iR++) {
+        final double[] afSin = new double[(_radialSamples + 1)];
+        final double[] afCos = new double[(_radialSamples + 1)];
+        for (int iR = 0; iR < _radialSamples; iR++) {
             final double fAngle = MathUtils.TWO_PI * fInvRS * iR;
             afCos[iR] = MathUtils.cos(fAngle);
             afSin[iR] = MathUtils.sin(fAngle);
         }
-        afSin[radialSamples] = afSin[0];
-        afCos[radialSamples] = afCos[0];
+        afSin[_radialSamples] = afSin[0];
+        afCos[_radialSamples] = afCos[0];
 
         // generate the sphere itself
         int i = 0;
         final Vector3 tempVa = Vector3.fetchTempInstance();
         final Vector3 tempVb = Vector3.fetchTempInstance();
         final Vector3 tempVc = Vector3.fetchTempInstance();
-        for (int iZ = 1; iZ < (zSamples - 1); iZ++) {
+        for (int iZ = 1; iZ < (_zSamples - 1); iZ++) {
             final double fZFraction = -1.0 + fZFactor * iZ; // in (-1,1)
-            final double fZ = radius * fZFraction;
+            final double fZ = _radius * fZFraction;
 
             // compute center of slice
-            final Vector3 kSliceCenter = tempVb.set(center);
+            final Vector3 kSliceCenter = tempVb.set(_center);
             kSliceCenter.setZ(kSliceCenter.getZ() + fZ);
 
             // compute radius of slice
-            final double fSliceRadius = Math.sqrt(Math.abs(radius * radius - fZ * fZ));
+            final double fSliceRadius = Math.sqrt(Math.abs(_radius * _radius - fZ * fZ));
 
             // compute slice vertices with duplication at end point
             Vector3 kNormal;
             final int iSave = i;
-            for (int iR = 0; iR < radialSamples; iR++) {
+            for (int iR = 0; iR < _radialSamples; iR++) {
                 final double fRadialFraction = iR * fInvRS; // in [0,1)
                 final Vector3 kRadial = tempVc.set(afCos[iR], afSin[iR], 0);
                 kRadial.multiply(fSliceRadius, tempVa);
@@ -175,7 +175,7 @@ public class Sphere extends Mesh {
                         (float) (kSliceCenter.getZ() + tempVa.getZ()));
 
                 BufferUtils.populateFromBuffer(tempVa, _meshData.getVertexBuffer(), i);
-                kNormal = tempVa.subtractLocal(center);
+                kNormal = tempVa.subtractLocal(_center);
                 kNormal.normalizeLocal();
                 if (true) {
                     _meshData.getNormalBuffer().put(kNormal.getXf()).put(kNormal.getYf()).put(kNormal.getZf());
@@ -183,11 +183,11 @@ public class Sphere extends Mesh {
                     _meshData.getNormalBuffer().put(-kNormal.getXf()).put(-kNormal.getYf()).put(-kNormal.getZf());
                 }
 
-                if (textureMode == TEX_ORIGINAL) {
-                    _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put(
+                if (_textureMode == TEX_ORIGINAL) {
+                    _meshData.getTextureCoords(0)._coords.put((float) fRadialFraction).put(
                             (float) (0.5 * (fZFraction + 1.0)));
-                } else if (textureMode == TEX_PROJECTED) {
-                    _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put(
+                } else if (_textureMode == TEX_PROJECTED) {
+                    _meshData.getTextureCoords(0)._coords.put((float) fRadialFraction).put(
                             (float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
                 }
 
@@ -197,10 +197,10 @@ public class Sphere extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-            if (textureMode == TEX_ORIGINAL) {
-                _meshData.getTextureCoords(0).coords.put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
-            } else if (textureMode == TEX_PROJECTED) {
-                _meshData.getTextureCoords(0).coords.put(1.0f).put(
+            if (_textureMode == TEX_ORIGINAL) {
+                _meshData.getTextureCoords(0)._coords.put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
+            } else if (_textureMode == TEX_PROJECTED) {
+                _meshData.getTextureCoords(0)._coords.put(1.0f).put(
                         (float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
             }
 
@@ -209,7 +209,7 @@ public class Sphere extends Mesh {
 
         // south pole
         _meshData.getVertexBuffer().position(i * 3);
-        _meshData.getVertexBuffer().put(center.getXf()).put(center.getYf()).put((float) (center.getZ() - radius));
+        _meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() - _radius));
 
         _meshData.getNormalBuffer().position(i * 3);
         if (true) {
@@ -219,13 +219,13 @@ public class Sphere extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
         }
 
-        _meshData.getTextureCoords(0).coords.position(i * 2);
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(0);
+        _meshData.getTextureCoords(0)._coords.position(i * 2);
+        _meshData.getTextureCoords(0)._coords.put(0.5f).put(0);
 
         i++;
 
         // north pole
-        _meshData.getVertexBuffer().put(center.getXf()).put(center.getYf()).put((float) (center.getZ() + radius));
+        _meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() + _radius));
 
         if (true) {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
@@ -233,7 +233,7 @@ public class Sphere extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(-1);
         }
 
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(1);
+        _meshData.getTextureCoords(0)._coords.put(0.5f).put(1);
         Vector3.releaseTempInstance(tempVa);
         Vector3.releaseTempInstance(tempVb);
         Vector3.releaseTempInstance(tempVc);
@@ -244,18 +244,18 @@ public class Sphere extends Mesh {
      */
     private void setIndexData() {
         // allocate connectivity
-        final int tris = 2 * (zSamples - 2) * radialSamples;
+        final int tris = 2 * (_zSamples - 2) * _radialSamples;
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
 
         // generate connectivity
         int index = 0;
-        for (int iZ = 0, iZStart = 0; iZ < (zSamples - 3); iZ++) {
+        for (int iZ = 0, iZStart = 0; iZ < (_zSamples - 3); iZ++) {
             int i0 = iZStart;
             int i1 = i0 + 1;
-            iZStart += (radialSamples + 1);
+            iZStart += (_radialSamples + 1);
             int i2 = iZStart;
             int i3 = i2 + 1;
-            for (int i = 0; i < radialSamples; i++, index += 6) {
+            for (int i = 0; i < _radialSamples; i++, index += 6) {
                 if (true) {
                     _meshData.getIndexBuffer().put(i0++);
                     _meshData.getIndexBuffer().put(i1);
@@ -276,7 +276,7 @@ public class Sphere extends Mesh {
         }
 
         // south pole triangles
-        for (int i = 0; i < radialSamples; i++, index += 3) {
+        for (int i = 0; i < _radialSamples; i++, index += 3) {
             if (true) {
                 _meshData.getIndexBuffer().put(i);
                 _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 2);
@@ -290,8 +290,8 @@ public class Sphere extends Mesh {
         }
 
         // north pole triangles
-        final int iOffset = (zSamples - 3) * (radialSamples + 1);
-        for (int i = 0; i < radialSamples; i++, index += 3) {
+        final int iOffset = (_zSamples - 3) * (_radialSamples + 1);
+        for (int i = 0; i < _radialSamples; i++, index += 3) {
             if (true) {
                 _meshData.getIndexBuffer().put(i + iOffset);
                 _meshData.getIndexBuffer().put(i + 1 + iOffset);
@@ -311,7 +311,7 @@ public class Sphere extends Mesh {
      * @return The sphere's center.
      */
     public Vector3 getCenter() {
-        return center;
+        return _center;
     }
 
     /**
@@ -323,14 +323,14 @@ public class Sphere extends Mesh {
      * @see #setData
      */
     public void setCenter(final Vector3 aCenter) {
-        center.set(aCenter);
+        _center.set(aCenter);
     }
 
     /**
      * @return Returns the textureMode.
      */
     public int getTextureMode() {
-        return textureMode;
+        return _textureMode;
     }
 
     /**
@@ -338,33 +338,33 @@ public class Sphere extends Mesh {
      *            The textureMode to set.
      */
     public void setTextureMode(final int textureMode) {
-        this.textureMode = textureMode;
+        _textureMode = textureMode;
         setGeometryData();
     }
 
     public double getRadius() {
-        return radius;
+        return _radius;
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(zSamples, "zSamples", 0);
-        capsule.write(radialSamples, "radialSamples", 0);
-        capsule.write(radius, "radius", 0);
-        capsule.write(center, "center", new Vector3(Vector3.ZERO));
-        capsule.write(textureMode, "textureMode", TEX_ORIGINAL);
+        capsule.write(_zSamples, "zSamples", 0);
+        capsule.write(_radialSamples, "radialSamples", 0);
+        capsule.write(_radius, "radius", 0);
+        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
+        capsule.write(_textureMode, "textureMode", TEX_ORIGINAL);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        zSamples = capsule.readInt("zSamples", 0);
-        radialSamples = capsule.readInt("radialSamples", 0);
-        radius = capsule.readDouble("radius", 0);
-        center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
-        textureMode = capsule.readInt("textureMode", TEX_ORIGINAL);
+        _zSamples = capsule.readInt("zSamples", 0);
+        _radialSamples = capsule.readInt("radialSamples", 0);
+        _radius = capsule.readDouble("radius", 0);
+        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
+        _textureMode = capsule.readInt("textureMode", TEX_ORIGINAL);
     }
 }

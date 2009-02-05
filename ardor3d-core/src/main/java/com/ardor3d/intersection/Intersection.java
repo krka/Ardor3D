@@ -20,7 +20,7 @@ import com.ardor3d.scenegraph.Mesh;
  * to handle the actual work. By providing checks to just <code>BoundingVolume</code> the client application need not
  * worry about what type of bounding volume is being used.
  */
-public class Intersection {
+public abstract class Intersection {
 
     /**
      * EPSILON represents the error buffer used to denote a hit.

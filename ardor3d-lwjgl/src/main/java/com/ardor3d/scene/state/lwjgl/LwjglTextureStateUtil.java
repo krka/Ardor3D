@@ -67,7 +67,7 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
-public class LwjglTextureStateUtil {
+public abstract class LwjglTextureStateUtil {
     private static final Logger logger = Logger.getLogger(LwjglTextureStateUtil.class.getName());
 
     private static final long serialVersionUID = 1L;

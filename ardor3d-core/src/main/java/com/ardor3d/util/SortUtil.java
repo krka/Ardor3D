@@ -17,7 +17,7 @@ import java.util.Comparator;
  * Quick and merge sort implementations that create no garbage, unlike {@link Arrays#sort}. The merge sort is stable,
  * the quick sort is not.
  */
-public class SortUtil {
+public abstract class SortUtil {
     /**
      * Quick sorts the supplied array using the specified comparator.
      */

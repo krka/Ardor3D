@@ -52,11 +52,11 @@ public class Skybox extends Node {
         Down;
     }
 
-    private float xExtent;
-    private float yExtent;
-    private float zExtent;
+    private float _xExtent;
+    private float _yExtent;
+    private float _zExtent;
 
-    private Quad[] skyboxQuads;
+    private Quad[] _skyboxQuads;
 
     public Skybox() {}
 
@@ -75,9 +75,9 @@ public class Skybox extends Node {
     public Skybox(final String name, final float xExtent, final float yExtent, final float zExtent) {
         super(name);
 
-        this.xExtent = xExtent;
-        this.yExtent = yExtent;
-        this.zExtent = zExtent;
+        _xExtent = xExtent;
+        _yExtent = yExtent;
+        _zExtent = zExtent;
 
         initialize();
     }
@@ -97,7 +97,7 @@ public class Skybox extends Node {
             throw new IllegalArgumentException("Face can not be null.");
         }
 
-        skyboxQuads[face.ordinal()].clearRenderState(RenderState.StateType.Texture);
+        _skyboxQuads[face.ordinal()].clearRenderState(RenderState.StateType.Texture);
         setTexture(face, texture, 0);
     }
 
@@ -118,7 +118,8 @@ public class Skybox extends Node {
             throw new IllegalArgumentException("Face can not be null.");
         }
 
-        TextureState ts = (TextureState) skyboxQuads[face.ordinal()].getLocalRenderState(RenderState.StateType.Texture);
+        TextureState ts = (TextureState) _skyboxQuads[face.ordinal()]
+                .getLocalRenderState(RenderState.StateType.Texture);
         if (ts == null) {
             ts = new TextureState();
         }
@@ -128,7 +129,7 @@ public class Skybox extends Node {
         ts.setEnabled(true);
 
         // Set the texture to the quad
-        skyboxQuads[face.ordinal()].setRenderState(ts);
+        _skyboxQuads[face.ordinal()].setRenderState(ts);
 
         return;
     }
@@ -137,35 +138,35 @@ public class Skybox extends Node {
         if (face == null) {
             throw new IllegalArgumentException("Face can not be null.");
         }
-        return ((TextureState) skyboxQuads[face.ordinal()].getLocalRenderState(RenderState.StateType.Texture))
+        return ((TextureState) _skyboxQuads[face.ordinal()].getLocalRenderState(RenderState.StateType.Texture))
                 .getTexture();
     }
 
     public void initialize() {
 
         // Skybox consists of 6 sides
-        skyboxQuads = new Quad[6];
+        _skyboxQuads = new Quad[6];
 
         // Create each of the quads
-        skyboxQuads[Face.North.ordinal()] = new Quad("north", xExtent * 2, yExtent * 2);
-        skyboxQuads[Face.North.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(180), 0));
-        skyboxQuads[Face.North.ordinal()].setTranslation(new Vector3(0, 0, zExtent));
-        skyboxQuads[Face.South.ordinal()] = new Quad("south", xExtent * 2, yExtent * 2);
-        skyboxQuads[Face.South.ordinal()].setTranslation(new Vector3(0, 0, -zExtent));
-        skyboxQuads[Face.East.ordinal()] = new Quad("east", zExtent * 2, yExtent * 2);
-        skyboxQuads[Face.East.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(90), 0));
-        skyboxQuads[Face.East.ordinal()].setTranslation(new Vector3(-xExtent, 0, 0));
-        skyboxQuads[Face.West.ordinal()] = new Quad("west", zExtent * 2, yExtent * 2);
-        skyboxQuads[Face.West.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(270), 0));
-        skyboxQuads[Face.West.ordinal()].setTranslation(new Vector3(xExtent, 0, 0));
-        skyboxQuads[Face.Up.ordinal()] = new Quad("up", xExtent * 2, zExtent * 2);
-        skyboxQuads[Face.Up.ordinal()]
-                .setRotation(new Matrix3().fromAngles(Math.toRadians(90), Math.toRadians(270), 0));
-        skyboxQuads[Face.Up.ordinal()].setTranslation(new Vector3(0, yExtent, 0));
-        skyboxQuads[Face.Down.ordinal()] = new Quad("down", xExtent * 2, zExtent * 2);
-        skyboxQuads[Face.Down.ordinal()].setRotation(new Matrix3().fromAngles(Math.toRadians(270), Math.toRadians(270),
-                0));
-        skyboxQuads[Face.Down.ordinal()].setTranslation(new Vector3(0, -yExtent, 0));
+        _skyboxQuads[Face.North.ordinal()] = new Quad("north", _xExtent * 2, _yExtent * 2);
+        _skyboxQuads[Face.North.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(180), 0));
+        _skyboxQuads[Face.North.ordinal()].setTranslation(new Vector3(0, 0, _zExtent));
+        _skyboxQuads[Face.South.ordinal()] = new Quad("south", _xExtent * 2, _yExtent * 2);
+        _skyboxQuads[Face.South.ordinal()].setTranslation(new Vector3(0, 0, -_zExtent));
+        _skyboxQuads[Face.East.ordinal()] = new Quad("east", _zExtent * 2, _yExtent * 2);
+        _skyboxQuads[Face.East.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(90), 0));
+        _skyboxQuads[Face.East.ordinal()].setTranslation(new Vector3(-_xExtent, 0, 0));
+        _skyboxQuads[Face.West.ordinal()] = new Quad("west", _zExtent * 2, _yExtent * 2);
+        _skyboxQuads[Face.West.ordinal()].setRotation(new Matrix3().fromAngles(0, Math.toRadians(270), 0));
+        _skyboxQuads[Face.West.ordinal()].setTranslation(new Vector3(_xExtent, 0, 0));
+        _skyboxQuads[Face.Up.ordinal()] = new Quad("up", _xExtent * 2, _zExtent * 2);
+        _skyboxQuads[Face.Up.ordinal()].setRotation(new Matrix3()
+                .fromAngles(Math.toRadians(90), Math.toRadians(270), 0));
+        _skyboxQuads[Face.Up.ordinal()].setTranslation(new Vector3(0, _yExtent, 0));
+        _skyboxQuads[Face.Down.ordinal()] = new Quad("down", _xExtent * 2, _zExtent * 2);
+        _skyboxQuads[Face.Down.ordinal()].setRotation(new Matrix3().fromAngles(Math.toRadians(270),
+                Math.toRadians(270), 0));
+        _skyboxQuads[Face.Down.ordinal()].setTranslation(new Vector3(0, -_yExtent, 0));
 
         // We don't want the light to effect our skybox
         setLightCombineMode(Spatial.LightCombineMode.Off);
@@ -183,23 +184,23 @@ public class Skybox extends Node {
 
         for (int i = 0; i < 6; i++) {
             // Make sure texture is only what is set.
-            skyboxQuads[i].setTextureCombineMode(TextureCombineMode.Replace);
+            _skyboxQuads[i].setTextureCombineMode(TextureCombineMode.Replace);
 
             // Make sure no lighting on the skybox
-            skyboxQuads[i].setLightCombineMode(Spatial.LightCombineMode.Off);
+            _skyboxQuads[i].setLightCombineMode(Spatial.LightCombineMode.Off);
 
             // Make sure the quad is viewable
-            skyboxQuads[i].setCullHint(Spatial.CullHint.Never);
+            _skyboxQuads[i].setCullHint(Spatial.CullHint.Never);
 
             // Set a bounding volume
-            skyboxQuads[i].setModelBound(new BoundingBox());
-            skyboxQuads[i].updateModelBound();
+            _skyboxQuads[i].setModelBound(new BoundingBox());
+            _skyboxQuads[i].updateModelBound();
 
-            skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
-            skyboxQuads[i].setVBOInfo(null);
+            _skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
+            _skyboxQuads[i].setVBOInfo(null);
 
             // And attach the skybox as a child
-            attachChild(skyboxQuads[i]);
+            attachChild(_skyboxQuads[i]);
         }
     }
 
@@ -211,11 +212,11 @@ public class Skybox extends Node {
      * @return The Quad that makes up that side of the Skybox.
      */
     public Quad getFace(final Face face) {
-        return skyboxQuads[face.ordinal()];
+        return _skyboxQuads[face.ordinal()];
     }
 
     public void preloadTexture(final Face face, final Renderer r) {
-        final TextureState ts = (TextureState) skyboxQuads[face.ordinal()]
+        final TextureState ts = (TextureState) _skyboxQuads[face.ordinal()]
                 .getLocalRenderState(RenderState.StateType.Texture);
         if (ts != null) {
             r.applyState(ts);
@@ -227,7 +228,7 @@ public class Skybox extends Node {
      */
     public void preloadTextures(final Renderer r) {
         for (int x = 0; x < 6; x++) {
-            final TextureState ts = (TextureState) skyboxQuads[x].getLocalRenderState(RenderState.StateType.Texture);
+            final TextureState ts = (TextureState) _skyboxQuads[x].getLocalRenderState(RenderState.StateType.Texture);
             if (ts != null) {
                 r.applyState(ts);
             }
@@ -239,24 +240,24 @@ public class Skybox extends Node {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(xExtent, "xExtent", 0);
-        capsule.write(yExtent, "yExtent", 0);
-        capsule.write(zExtent, "zExtent", 0);
-        capsule.write(skyboxQuads, "skyboxQuads", null);
+        capsule.write(_xExtent, "xExtent", 0);
+        capsule.write(_yExtent, "yExtent", 0);
+        capsule.write(_zExtent, "zExtent", 0);
+        capsule.write(_skyboxQuads, "skyboxQuads", null);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        xExtent = capsule.readFloat("xExtent", 0);
-        yExtent = capsule.readFloat("yExtent", 0);
-        zExtent = capsule.readFloat("zExtent", 0);
+        _xExtent = capsule.readFloat("xExtent", 0);
+        _yExtent = capsule.readFloat("yExtent", 0);
+        _zExtent = capsule.readFloat("zExtent", 0);
         final Savable[] savs = capsule.readSavableArray("skyboxQuads", null);
         if (savs != null) {
-            skyboxQuads = new Quad[savs.length];
+            _skyboxQuads = new Quad[savs.length];
             for (int x = 0; x < savs.length; x++) {
-                skyboxQuads[x] = (Quad) savs[x];
+                _skyboxQuads[x] = (Quad) savs[x];
             }
         }
 

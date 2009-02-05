@@ -63,9 +63,9 @@ public class ZBufferState extends RenderState {
     }
 
     /** Depth function. */
-    protected TestFunction function = TestFunction.LessThan;
+    protected TestFunction _function = TestFunction.LessThan;
     /** Depth mask is writable or not. */
-    protected boolean writable = true;
+    protected boolean _writable = true;
 
     /**
      * Constructor instantiates a new <code>ZBufferState</code> object. The initial values are TestFunction.LessThan and
@@ -79,7 +79,7 @@ public class ZBufferState extends RenderState {
      * @return the depth function currently used.
      */
     public TestFunction getFunction() {
-        return function;
+        return _function;
     }
 
     /**
@@ -94,7 +94,7 @@ public class ZBufferState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        this.function = function;
+        _function = function;
         setNeedsRefresh(true);
     }
 
@@ -104,7 +104,7 @@ public class ZBufferState extends RenderState {
      * @return true if the depth mask is writable, false otherwise.
      */
     public boolean isWritable() {
-        return writable;
+        return _writable;
     }
 
     /**
@@ -114,7 +114,7 @@ public class ZBufferState extends RenderState {
      *            true to turn on depth writing, false otherwise.
      */
     public void setWritable(final boolean writable) {
-        this.writable = writable;
+        _writable = writable;
         setNeedsRefresh(true);
     }
 
@@ -127,16 +127,16 @@ public class ZBufferState extends RenderState {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(function, "function", TestFunction.LessThan);
-        capsule.write(writable, "writable", true);
+        capsule.write(_function, "function", TestFunction.LessThan);
+        capsule.write(_writable, "writable", true);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        function = capsule.readEnum("function", TestFunction.class, TestFunction.LessThan);
-        writable = capsule.readBoolean("writable", true);
+        _function = capsule.readEnum("function", TestFunction.class, TestFunction.LessThan);
+        _writable = capsule.readBoolean("writable", true);
     }
 
     @Override

@@ -24,7 +24,7 @@ import com.google.common.collect.PeekingIterator;
  * Wraps the {@link org.lwjgl.input.Keyboard} class.
  */
 public class LwjglKeyboardWrapper implements KeyboardWrapper {
-    private LwjglKeyEventIterator currentIterator = null;
+    private LwjglKeyEventIterator _currentIterator = null;
 
     public void init() {
         try {
@@ -35,11 +35,11 @@ public class LwjglKeyboardWrapper implements KeyboardWrapper {
     }
 
     public PeekingIterator<KeyEvent> getEvents() {
-        if (currentIterator == null || !currentIterator.hasNext()) {
-            currentIterator = new LwjglKeyEventIterator();
+        if (_currentIterator == null || !_currentIterator.hasNext()) {
+            _currentIterator = new LwjglKeyEventIterator();
         }
 
-        return currentIterator;
+        return _currentIterator;
     }
 
     private static class LwjglKeyEventIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
