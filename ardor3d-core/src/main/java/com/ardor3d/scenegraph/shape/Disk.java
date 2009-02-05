@@ -84,7 +84,7 @@ public class Disk extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
         }
 
-        _meshData.getTextureCoords(0)._coords.put(.5f).put(.5f);
+        _meshData.getTextureCoords(0).coords.put(.5f).put(.5f);
 
         final double inverseShellLess = 1.0 / shellLess;
         final double inverseRadial = 1.0 / _radialSamples;
@@ -102,7 +102,7 @@ public class Disk extends Mesh {
                 final int i = shellCount + shellLess * radialCount;
                 texCoord.setX(0.5 * (1.0 + radialFraction.getX()));
                 texCoord.setY(0.5 * (1.0 + radialFraction.getY()));
-                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0)._coords, i);
+                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).coords, i);
 
                 radialFraction.multiplyLocal(_radius);
                 BufferUtils.setInBuffer(radialFraction, _meshData.getVertexBuffer(), i);

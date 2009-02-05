@@ -104,7 +104,7 @@ public class GeoSphere extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
         final TexCoords textureCoords = _meshData.getTextureCoords(0);
         _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector3Buffer(
-                textureCoords != null ? textureCoords._coords : null, verts)), 0);
+                textureCoords != null ? textureCoords.coords : null, verts)), 0);
 
         int pos = 0;
 
@@ -308,7 +308,7 @@ public class GeoSphere extends Mesh {
         final double zNorm = vec.getZ() / length;
         normBuf.put((float) zNorm);
 
-        final FloatBuffer texBuf = _meshData.getTextureCoords(0)._coords;
+        final FloatBuffer texBuf = _meshData.getTextureCoords(0).coords;
         if (vec.getX() > 0.0 && vec.getY() == 0.0) {
             if (begining) {
                 texBuf.put(0);

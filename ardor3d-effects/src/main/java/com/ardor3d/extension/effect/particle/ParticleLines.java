@@ -82,7 +82,7 @@ public class ParticleLines extends ParticleSystem {
             _particles[k].setStartIndex(k * verts);
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
-                BufferUtils.setInBuffer(sharedTextureData[a], line.getMeshData().getTextureCoords(0)._coords, ind);
+                BufferUtils.setInBuffer(sharedTextureData[a], line.getMeshData().getTextureCoords(0).coords, ind);
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 

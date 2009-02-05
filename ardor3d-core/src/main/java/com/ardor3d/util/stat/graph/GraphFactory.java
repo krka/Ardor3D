@@ -142,7 +142,7 @@ public abstract class GraphFactory {
         quad.setRenderBucketType(RenderBucketType.Ortho);
         quad.setZOrder(-1);
 
-        final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0)._coords;
+        final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0).coords;
         tbuf.clear();
         tbuf.put(0).put(maxV);
         tbuf.put(0).put(0);

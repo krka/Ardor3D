@@ -110,13 +110,13 @@ public class Hexagon extends Mesh {
     }
 
     private void setTextureData() {
-        _meshData.getTextureCoords(0)._coords.put(0.25f).put(0);
-        _meshData.getTextureCoords(0)._coords.put(0.75f).put(0);
-        _meshData.getTextureCoords(0)._coords.put(1.0f).put(0.5f);
-        _meshData.getTextureCoords(0)._coords.put(0.75f).put(1.0f);
-        _meshData.getTextureCoords(0)._coords.put(0.25f).put(1.0f);
-        _meshData.getTextureCoords(0)._coords.put(0.0f).put(0.5f);
-        _meshData.getTextureCoords(0)._coords.put(0.5f).put(0.5f);
+        _meshData.getTextureCoords(0).coords.put(0.25f).put(0);
+        _meshData.getTextureCoords(0).coords.put(0.75f).put(0);
+        _meshData.getTextureCoords(0).coords.put(1.0f).put(0.5f);
+        _meshData.getTextureCoords(0).coords.put(0.75f).put(1.0f);
+        _meshData.getTextureCoords(0).coords.put(0.25f).put(1.0f);
+        _meshData.getTextureCoords(0).coords.put(0.0f).put(0.5f);
+        _meshData.getTextureCoords(0).coords.put(0.5f).put(0.5f);
     }
 
     /**

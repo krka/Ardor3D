@@ -114,10 +114,10 @@ public class OrientedBox extends Mesh {
             _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
 
             for (int x = 0; x < 6; x++) {
-                _meshData.getTextureCoords(0)._coords.put(_texTopRight.getXf()).put(_texTopRight.getYf());
-                _meshData.getTextureCoords(0)._coords.put(_texTopLeft.getXf()).put(_texTopLeft.getYf());
-                _meshData.getTextureCoords(0)._coords.put(_texBotLeft.getXf()).put(_texBotLeft.getYf());
-                _meshData.getTextureCoords(0)._coords.put(_texBotRight.getXf()).put(_texBotRight.getYf());
+                _meshData.getTextureCoords(0).coords.put(_texTopRight.getXf()).put(_texTopRight.getYf());
+                _meshData.getTextureCoords(0).coords.put(_texTopLeft.getXf()).put(_texTopLeft.getYf());
+                _meshData.getTextureCoords(0).coords.put(_texBotLeft.getXf()).put(_texBotLeft.getYf());
+                _meshData.getTextureCoords(0).coords.put(_texBotRight.getXf()).put(_texBotRight.getYf());
             }
         }
     }

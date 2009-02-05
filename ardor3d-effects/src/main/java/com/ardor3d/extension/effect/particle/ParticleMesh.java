@@ -149,10 +149,10 @@ public class ParticleMesh extends ParticleSystem {
                 final int ind = (k * verts) + a;
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
                     final int index = _psGeom.getMeshData().getIndexBuffer().get(ind);
-                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0)._coords, index);
-                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0)._coords, ind);
+                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).coords, index);
+                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).coords, ind);
                 } else {
-                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0)._coords, ind);
+                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0).coords, ind);
                 }
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }

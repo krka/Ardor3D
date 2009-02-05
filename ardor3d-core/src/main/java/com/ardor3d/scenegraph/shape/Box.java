@@ -230,7 +230,7 @@ public class Box extends Mesh implements Savable {
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
             _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0)._coords;
+            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
 
             for (int i = 0; i < 6; i++) {
                 tex.put(1).put(0);

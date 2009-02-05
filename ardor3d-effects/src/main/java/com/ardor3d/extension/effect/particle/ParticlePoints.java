@@ -72,7 +72,7 @@ public class ParticlePoints extends ParticleSystem {
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
                 BufferUtils.setInBuffer(sharedTextureData[a],
-                        getParticleGeometry().getMeshData().getTextureCoords(0)._coords, ind);
+                        getParticleGeometry().getMeshData().getTextureCoords(0).coords, ind);
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 

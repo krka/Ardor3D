@@ -138,7 +138,7 @@ public class Tube extends Mesh implements Savable {
                         (float) (sin[radialCount % _radialSamples] * _outerRadius));
                 _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
                         (float) sin[radialCount % _radialSamples]);
-                _meshData.getTextureCoords(0)._coords.put((float) (radialCount * inverseRadial)).put(
+                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
@@ -150,7 +150,7 @@ public class Tube extends Mesh implements Savable {
                         (float) (sin[radialCount % _radialSamples] * _innerRadius));
                 _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
                         (float) -sin[radialCount % _radialSamples]);
-                _meshData.getTextureCoords(0)._coords.put((float) (radialCount * inverseRadial)).put(
+                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
@@ -162,9 +162,9 @@ public class Tube extends Mesh implements Savable {
                     (float) (sin[radialCount] * _innerRadius));
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
-            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
         // top edge
@@ -175,9 +175,9 @@ public class Tube extends Mesh implements Savable {
                     (float) (sin[radialCount] * _innerRadius));
             _meshData.getNormalBuffer().put(0).put(1).put(0);
             _meshData.getNormalBuffer().put(0).put(1).put(0);
-            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0)._coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
 

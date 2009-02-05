@@ -56,7 +56,7 @@ public abstract class GeometryTool {
             final Vector2[][] tex = new Vector2[mesh.getMeshData().getNumberOfUnits()][];
             for (int x = 0; x < tex.length; x++) {
                 if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x)._coords);
+                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x).coords);
                 }
             }
 

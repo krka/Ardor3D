@@ -184,7 +184,7 @@ public class StripBox extends Mesh implements Savable {
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
             _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0)._coords;
+            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
             tex.put(1).put(0); // 0
             tex.put(0).put(0); // 1
             tex.put(0).put(1); // 2

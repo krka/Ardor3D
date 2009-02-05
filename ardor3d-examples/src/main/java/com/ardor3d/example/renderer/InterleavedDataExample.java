@@ -87,7 +87,7 @@ public class InterleavedDataExample extends ExampleBase {
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
         meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize * 6)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0)._coords;
+        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer(totalSize * 6);
 
         for (int y = 0; y < ySize; y++) {

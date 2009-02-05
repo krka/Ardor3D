@@ -139,7 +139,7 @@ public class PQTorus extends Mesh {
                 _meshData.getVertexBuffer().put((float) tempNorm.getX()).put((float) tempNorm.getY()).put(
                         (float) tempNorm.getZ());
 
-                _meshData.getTextureCoords(0)._coords.put((float) radialFraction).put((float) circleFraction);
+                _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
 
                 nvertex++;
             }

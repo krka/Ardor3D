@@ -299,7 +299,7 @@ public class Cylinder extends Mesh {
                 tempNormal.multiplyLocal((_radius - _radius2) * axisFraction + _radius2).addLocal(sliceCenter);
                 _meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 
-                _meshData.getTextureCoords(0)._coords.put((float) (_inverted ? 1 - radialFraction : radialFraction))
+                _meshData.getTextureCoords(0).coords.put((float) (_inverted ? 1 - radialFraction : radialFraction))
                         .put((float) axisFractionTexture);
                 i++;
             }
@@ -307,7 +307,7 @@ public class Cylinder extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), save, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), save, i);
 
-            _meshData.getTextureCoords(0)._coords.put((_inverted ? 0.0f : 1.0f)).put((float) axisFractionTexture);
+            _meshData.getTextureCoords(0).coords.put((_inverted ? 0.0f : 1.0f)).put((float) axisFractionTexture);
 
             i++;
         }
@@ -315,10 +315,10 @@ public class Cylinder extends Mesh {
         if (_closed) {
             _meshData.getVertexBuffer().put(0).put(0).put((float) -halfHeight); // bottom center
             _meshData.getNormalBuffer().put(0).put(0).put(-1 * (_inverted ? -1 : 1));
-            _meshData.getTextureCoords(0)._coords.put(0.5f).put(0);
+            _meshData.getTextureCoords(0).coords.put(0.5f).put(0);
             _meshData.getVertexBuffer().put(0).put(0).put((float) halfHeight); // top center
             _meshData.getNormalBuffer().put(0).put(0).put(1 * (_inverted ? -1 : 1));
-            _meshData.getTextureCoords(0)._coords.put(0.5f).put(1);
+            _meshData.getTextureCoords(0).coords.put(0.5f).put(1);
         }
     }
 

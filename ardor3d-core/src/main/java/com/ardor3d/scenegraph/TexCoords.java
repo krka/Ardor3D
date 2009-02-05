@@ -28,8 +28,8 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 public class TexCoords implements Savable {
 
-    public FloatBuffer _coords;
-    public int _perVert;
+    public FloatBuffer coords;
+    public int perVert;
 
     public TexCoords() {}
 
@@ -38,8 +38,8 @@ public class TexCoords implements Savable {
     }
 
     public TexCoords(final FloatBuffer coords, final int coordsPerVert) {
-        _coords = coords;
-        _perVert = coordsPerVert;
+        this.coords = coords;
+        perVert = coordsPerVert;
     }
 
     public static TexCoords makeNew(final Vector2[] coords) {
@@ -79,14 +79,14 @@ public class TexCoords implements Savable {
             return new TexCoords(BufferUtils.createFloatBuffer(vertexCount * perVert), perVert);
         }
 
-        if (tc._coords.limit() == perVert * vertexCount && tc._perVert == perVert) {
-            tc._coords.rewind();
+        if (tc.coords.limit() == perVert * vertexCount && tc.perVert == perVert) {
+            tc.coords.rewind();
             return tc;
-        } else if (tc._coords.limit() == perVert * vertexCount) {
-            tc._perVert = perVert;
+        } else if (tc.coords.limit() == perVert * vertexCount) {
+            tc.perVert = perVert;
         } else {
-            tc._coords = BufferUtils.createFloatBuffer(vertexCount * perVert);
-            tc._perVert = perVert;
+            tc.coords = BufferUtils.createFloatBuffer(vertexCount * perVert);
+            tc.perVert = perVert;
         }
 
         return tc;
@@ -98,13 +98,13 @@ public class TexCoords implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule cap = im.getCapsule(this);
-        _coords = cap.readFloatBuffer("coords", null);
-        _perVert = cap.readInt("perVert", 0);
+        coords = cap.readFloatBuffer("coords", null);
+        perVert = cap.readInt("perVert", 0);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule cap = ex.getCapsule(this);
-        cap.write(_coords, "coords", null);
-        cap.write(_perVert, "perVert", 0);
+        cap.write(coords, "coords", null);
+        cap.write(perVert, "perVert", 0);
     }
 }

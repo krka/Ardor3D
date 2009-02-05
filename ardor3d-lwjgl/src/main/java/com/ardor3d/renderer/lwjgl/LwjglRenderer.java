@@ -748,20 +748,20 @@ public class LwjglRenderer extends Renderer {
                 if ((caps.isVBOSupported() && vbo != null && vbo.getVBOTextureID(i) > 0)) {
                     GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                     LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOTextureID(i));
-                    GL11.glTexCoordPointer(texC._perVert, GL11.GL_FLOAT, 0, 0);
+                    GL11.glTexCoordPointer(texC.perVert, GL11.GL_FLOAT, 0, 0);
                 } else if (texC == null) {
                     GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != texC._coords) {
+                } else if (_oldTextureBuffers[i] != texC.coords) {
                     GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                     if (caps.isVBOSupported()) {
                         LwjglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
-                    texC._coords.rewind();
-                    GL11.glTexCoordPointer(texC._perVert, 0, texC._coords);
+                    texC.coords.rewind();
+                    GL11.glTexCoordPointer(texC.perVert, 0, texC.coords);
                 } else {
                     GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                 }
-                _oldTextureBuffers[i] = texC != null ? texC._coords : null;
+                _oldTextureBuffers[i] = texC != null ? texC.coords : null;
             }
 
             if (ts.getNumberOfSetTextures() < _prevTextureNumber) {

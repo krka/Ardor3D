@@ -171,7 +171,7 @@ public class MeshData implements Cloneable, Savable {
         if (_textureCoords.size() <= index) {
             return null;
         }
-        return _textureCoords.get(index)._coords;
+        return _textureCoords.get(index).coords;
     }
 
     /**
@@ -249,18 +249,18 @@ public class MeshData implements Cloneable, Savable {
 
         TexCoords dest = _textureCoords.get(toIndex);
         final TexCoords src = _textureCoords.get(fromIndex);
-        if (dest == null || dest._coords.capacity() != src._coords.limit()) {
-            dest = new TexCoords(BufferUtils.createFloatBuffer(src._coords.capacity()), src._perVert);
+        if (dest == null || dest.coords.capacity() != src.coords.limit()) {
+            dest = new TexCoords(BufferUtils.createFloatBuffer(src.coords.capacity()), src.perVert);
             _textureCoords.set(toIndex, dest);
         }
-        dest._coords.clear();
-        final int oldLimit = src._coords.limit();
-        src._coords.clear();
-        for (int i = 0, len = dest._coords.capacity(); i < len; i++) {
-            dest._coords.put(factor * src._coords.get());
+        dest.coords.clear();
+        final int oldLimit = src.coords.limit();
+        src.coords.clear();
+        for (int i = 0, len = dest.coords.capacity(); i < len; i++) {
+            dest.coords.put(factor * src.coords.get());
         }
-        src._coords.limit(oldLimit);
-        dest._coords.limit(oldLimit);
+        src.coords.limit(oldLimit);
+        dest.coords.limit(oldLimit);
     }
 
     /**

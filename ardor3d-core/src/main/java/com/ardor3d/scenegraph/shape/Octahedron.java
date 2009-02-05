@@ -96,7 +96,7 @@ public class Octahedron extends Mesh {
                 tex.setX(0.5);
             }
             tex.setY(Math.acos(vert.getZ()) * MathUtils.INV_PI);
-            _meshData.getTextureCoords(0)._coords.put((float) tex.getX()).put((float) tex.getY());
+            _meshData.getTextureCoords(0).coords.put((float) tex.getX()).put((float) tex.getY());
         }
     }
 

@@ -112,7 +112,7 @@ public class NormalGenerator {
             _sourceColors = null;
         }
         if (mesh.getMeshData().getTextureCoords(0) != null) {
-            _sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0)._coords);
+            _sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0).coords);
         } else {
             _sourceTexCoords = null;
         }
@@ -205,7 +205,7 @@ public class NormalGenerator {
         // Tex coord buffer:
         FloatBuffer texCoords = null;
         if (_splitTexCoords != null) {
-            texCoords = mesh.getMeshData().getTextureCoords(0)._coords;
+            texCoords = mesh.getMeshData().getTextureCoords(0).coords;
             if (texCoords.capacity() < _splitTexCoords.length * 2) {
                 texCoords = BufferUtils.createFloatBuffer(_splitTexCoords);
             } else {
