@@ -238,5 +238,18 @@
       <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
+
+  <distributionManagement>
+    <repository>
+      <id>Ardor3D-releases</id>
+      <name>Ardor3D releases</name>
+      <url>http://ardor3d.com:8081/nexus/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>Ardor3D-snapshots</id>
+      <name>Ardor3D snapshots</name>
+      <url>http://ardor3d.com:8081/nexus/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
 
