@@ -20,8 +20,6 @@
     <module>ardor3d-effects</module>
   </modules>
 
-  <!-- This repository is needed because of lwjgl, jogl and jinput
-Ardor3D should host it's own repository-->
   <repositories>
     <repository>
       <id>maven2-repository.dev.java.net</id>
@@ -29,6 +27,7 @@ Ardor3D should host it's own repository-->
       <url>http://download.java.net/maven/2</url>
       <layout>default</layout>
     </repository>
+    <!-- Ardor3D internal repository -->
     <repository>
       <id>ardor3d</id>
       <url>http://ardor3d.com:8081/nexus/content/repositories/thirdparty</url>
@@ -55,107 +54,189 @@ Ardor3D should host it's own repository-->
             <encoding>UTF-8</encoding>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
 
   <profiles>
-    <!-- This profile activated by specifying -Denv=ci on command line -->
+    <!-- This profile activated by specifying -Phudson on command line -->
     <profile>
       <id>hudson</id>
-      <activation>
-        <property>
-          <name>env</name>
-          <value>ci</value>
-        </property>
-      </activation>
       <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                <showDeprecation>true</showDeprecation>
-                <showWarnings>true</showWarnings>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>cobertura-maven-plugin</artifactId>
-              <version>2.2</version>
-              <configuration>
-                <formats>
-                  <format>xml</format>
-                </formats>
-              </configuration>
-              <executions>
-                <execution>
-                  <phase>package</phase>
-                  <goals>
-                    <goal>cobertura</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <showDeprecation>true</showDeprecation>
+              <showWarnings>true</showWarnings>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>cobertura-maven-plugin</artifactId>
+            <configuration>
+              <formats>
+                <format>xml</format>
+              </formats>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>cobertura</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+                <configuration>
+                  <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]></bottom>
+                  <links>
+                    <link>http://java.sun.com/javase/6/docs/api</link>
+                  </links>
+                  <linksource>true</linksource>
+                  <quiet>true</quiet>
+                  <show>private</show>
+                  <sourcepath>${basedir}/src/main/java</sourcepath>
+                  <encoding>UTF-8</encoding>
+                  <aggregate>true</aggregate>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- http://mojo.codehaus.org/findbugs-maven-plugin/usage.html -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <configuration>
+              <threshold>Normal</threshold>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
 
 
+  <properties>
+    <lwjgl.version>ardor3d-2.0.1</lwjgl.version>
+    <swt.version>ardor3d-3448</swt.version>
+  </properties>
+  <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
+  <!-- modules. This only specifies version, and doesn't mean that modules actually use them -->
+  <!-- To inherit actual usage of artifacts, use the dependencies section below. -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>aopalliance</groupId>
+        <artifactId>aopalliance</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.guice</groupId>
+        <artifactId>guice</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.google-collections</groupId>
+        <artifactId>google-collect</artifactId>
+        <version>snapshot-20080530</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.5</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>2.4</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>net.java.dev.jogl</groupId>
+        <artifactId>jogl</artifactId>
+        <version>ardor3d-1.1.2-pre-20080523</version>
+      </dependency>
+      <dependency>
+        <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
+        <artifactId>gluegen-rt</artifactId>
+        <version>1.0b06</version>
+      </dependency>
+      <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl</artifactId>
+        <version>${lwjgl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl_util</artifactId>
+        <version>${lwjgl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.gtk.linux</groupId>
+        <artifactId>x86</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.gtk.linux</groupId>
+        <artifactId>x86_64</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.gtk.solaris</groupId>
+        <artifactId>sparc</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.carbon</groupId>
+        <artifactId>macosx</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.win32.win32</groupId>
+        <artifactId>x86</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.swt.win32.win32</groupId>
+        <artifactId>x86_64</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- this section specifies dependencies that are inherited by all sub-modules -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymockclassextension</artifactId>
-      <version>2.4</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <bottom><![CDATA[<i>Copyright &copy; {inceptionYear}-{currentYear} Ardor Labs.  All Rights Reserved.</i>]]></bottom>
-          <links>
-            <link>http://java.sun.com/javase/6/docs/api</link>
-          </links>
-          <linksource>true</linksource>
-          <quiet>true</quiet>
-          <show>private</show>
-          <sourcepath>${basedir}/src/main/java</sourcepath>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>        
-      </plugin>
-      <!-- http://mojo.codehaus.org/cobertura-maven-plugin/usage.html -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-      </plugin>
-      <!-- http://mojo.codehaus.org/findbugs-maven-plugin/usage.html -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-        <configuration>
-          <threshold>Normal</threshold>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
 

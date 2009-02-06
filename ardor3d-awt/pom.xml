@@ -1,52 +1,35 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.ardor3d</groupId>
-        <artifactId>ardor3d</artifactId>
-        <version>0.4-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.ardor3d</groupId>
+    <artifactId>ardor3d</artifactId>
+    <version>0.4-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-    <artifactId>ardor3d-awt</artifactId>
-    <packaging>jar</packaging>
-    <name>Ardor 3D AWT</name>
+  <artifactId>ardor3d-awt</artifactId>
+  <packaging>jar</packaging>
+  <name>Ardor 3D AWT</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ardor3d-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-<!-- TODO: is it really right/necessary for AWT to depend on LWJGL? It's due to the Canvas class, I think / Petter -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ardor3d-lwjgl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
-    <!-- If we are running in hudson use cobertura. -->
-    <profiles>
-        <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>BUILD_NUMBER</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ardor3d-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- TODO: is it really right/necessary for AWT to depend on LWJGL? It's due to the Canvas class, I think / Petter -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ardor3d-lwjgl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+  </dependencies>
 </project>

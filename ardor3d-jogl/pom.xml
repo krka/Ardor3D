@@ -1,56 +1,33 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.ardor3d</groupId>
-        <artifactId>ardor3d</artifactId>
-        <relativePath>../pom.xml</relativePath>
-        <version>0.4-SNAPSHOT</version>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.ardor3d</groupId>
+    <artifactId>ardor3d</artifactId>
+    <relativePath>../pom.xml</relativePath>
+    <version>0.4-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>ardor3d-jogl</artifactId>
-    <packaging>jar</packaging>
-    <name>Ardor 3D JOGL</name>
+  <artifactId>ardor3d-jogl</artifactId>
+  <packaging>jar</packaging>
+  <name>Ardor 3D JOGL</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ardor3d-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency> 
-            <groupId>net.java.dev.jogl</groupId>
-            <artifactId>jogl</artifactId>
-            <version>ardor3d-1.1.2-pre-20080523</version>
-        </dependency>
-        <dependency>
-            <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
-            <artifactId>gluegen-rt</artifactId>
-            <version>1.0b06</version>
-        </dependency>
-    </dependencies>
-
-    <!-- If we are running in hudson use cobertura. -->
-    <profiles>
-        <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>BUILD_NUMBER</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ardor3d-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jogl</groupId>
+      <artifactId>jogl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
+      <artifactId>gluegen-rt</artifactId>
+    </dependency>
+  </dependencies>
 </project>
