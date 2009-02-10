@@ -53,7 +53,6 @@ public class FrameHandler {
     @MainThread
     public void updateFrame() {
         // calculate tpf
-        // update input systems
         // update updaters
         // draw canvases
 

@@ -26,6 +26,6 @@ public class Debug {
 
     public static final boolean trackDirectMemory = (System.getProperty("ardor3d.trackDirect") != null);
 
-    public static final boolean useMathPools = (System.getProperty("ardor3d.useMathPools") == null);
+    public static final boolean useMathPools = (System.getProperty("ardor3d.noMathPools") == null);
 
 }
