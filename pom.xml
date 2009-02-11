@@ -59,6 +59,11 @@
           <artifactId>cobertura-maven-plugin</artifactId>
           <version>2.2</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>1.2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -129,13 +134,26 @@
             </executions>
           </plugin>
           <!-- http://mojo.codehaus.org/findbugs-maven-plugin/usage.html -->
-          <plugin>
+
+          <!-- It would be great to execute the check goal as part of the hudson build, but it is -->
+          <!-- only available via a snapshot version, so I don't want to use that. / Petter 090211 -->
+          <!-- plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>findbugs-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>findbugs-check</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+
             <configuration>
               <threshold>Normal</threshold>
             </configuration>
-          </plugin>
+          </plugin -->
         </plugins>
       </build>
     </profile>
@@ -251,5 +269,24 @@
       <url>http://ardor3d.com:8081/nexus/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <configuration>
+          <threshold>Normal</threshold>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
 

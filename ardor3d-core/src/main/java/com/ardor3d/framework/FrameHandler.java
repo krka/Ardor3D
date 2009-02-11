@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 /**
  * Does the work needed in a given frame.
  */
-public class FrameHandler {
+public final class FrameHandler {
     private static final Logger logger = Logger.getLogger(FrameHandler.class.toString());
 
     /**
@@ -72,7 +72,8 @@ public class FrameHandler {
         Iterator<Canvas> iterator;
 
         // make sure that there is no race condition with registerCanvas - getting the iterator and
-        // the number of canvases currently in the list in a synchronized section means that they will
+        // the number of canvases currently in the list in a synchronized section, and ensuring that
+        // the registerCanvas() method is also synchronized on this, means that they will
         // both remain valid outside the section later, when we call the probably long-running, alien
         // draw() methods. Since 'canvases' is a CopyOnWriteArrayList, the iterator is guaranteed to
         // be valid outside the synchronized section, and getting them both inside the synchronized section
@@ -90,6 +91,12 @@ public class FrameHandler {
         }
 
         try {
+            // wait for all canvases to be drawn - the reason for using the latch is that
+            // in some cases (AWT, for instance), the thread that calls canvas.draw() is not the
+            // one that holds the OpenGL context, which means that drawing is simply queued.
+            // When the actual OpenGL rendering has been done, the OpenGL thread will countdown
+            // on the latch, and once all the canvases have finished rendering, this method
+            // will return.
             final boolean success = latch.await(5, TimeUnit.SECONDS);
 
             if (!success) {
@@ -98,6 +105,7 @@ public class FrameHandler {
                 // FIXME: should probably reset update flag in canvases?
             }
         } catch (final InterruptedException e) {
+            // restore updated status
             Thread.currentThread().interrupt();
         }
     }
