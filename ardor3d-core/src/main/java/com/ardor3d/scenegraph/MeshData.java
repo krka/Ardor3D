@@ -106,12 +106,19 @@ public class MeshData implements Cloneable, Savable {
      * @param vertices
      */
     public void setVertexBuffer(final FloatBuffer vertexBuffer) {
-        if (vertexBuffer == null) {
+        _vertexBuffer = vertexBuffer;
+        updateVertexCount();
+    }
+
+    /**
+     * Update the vertex count based on the current limit of the vertex buffer.
+     */
+    public void updateVertexCount() {
+        if (_vertexBuffer == null) {
             _vertexCount = 0;
         } else {
-            _vertexCount = vertexBuffer.limit() / 3;
+            _vertexCount = _vertexBuffer.limit() / 3;
         }
-        _vertexBuffer = vertexBuffer;
     }
 
     /**
