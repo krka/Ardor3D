@@ -1034,6 +1034,29 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
+     * Modifies this matrix to equal the rotation required to point the z-axis at 'direction' and the y-axis to 'up'.
+     * 
+     * @param direction
+     *            where to 'look' at
+     * @param up
+     *            a vector indicating the local up direction.
+     */
+    public void lookAt(final ReadOnlyVector3 direction, final Vector3 up) {
+        final Vector3 xAxis = Vector3.fetchTempInstance();
+        final Vector3 yAxis = Vector3.fetchTempInstance();
+        final Vector3 zAxis = Vector3.fetchTempInstance();
+        direction.normalize(zAxis);
+        up.normalize(xAxis).crossLocal(zAxis);
+        zAxis.cross(xAxis, yAxis);
+
+        fromAxes(xAxis, yAxis, zAxis);
+
+        Vector3.releaseTempInstance(xAxis);
+        Vector3.releaseTempInstance(yAxis);
+        Vector3.releaseTempInstance(zAxis);
+    }
+
+    /**
      * Check a matrix... if it is null or its doubles are NaN or infinite, return false. Else return true.
      * 
      * @param matrix
