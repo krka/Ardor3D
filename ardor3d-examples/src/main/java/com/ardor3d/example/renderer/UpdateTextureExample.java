@@ -99,7 +99,7 @@ public class UpdateTextureExample extends ExampleBase {
     @Override
     protected void updateExample(final double tpf) {
         if (tpf < 1) {
-            angle = angle + tpf * 0;
+            angle = angle + tpf * 20;
             if (angle > 360) {
                 angle = 0;
             }
