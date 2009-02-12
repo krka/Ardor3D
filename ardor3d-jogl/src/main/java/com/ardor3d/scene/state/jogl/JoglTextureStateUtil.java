@@ -79,16 +79,22 @@ public class JoglTextureStateUtil {
             checkAndSetUnit(unit, record, caps);
         }
 
-        // Create the texture
+        // Create the texture...
         if (texture.getTextureKey() != null) {
-            texture.getTextureKey().setContextRep(context.getGlContextRep());
-            Texture cached = TextureManager.findCachedTexture(texture.getTextureKey());
 
-            // If not there, and supplied context is null, try with the current context.
-            if (cached == null && texture.getTextureKey().getContextRep() == null) {
-                texture.getTextureKey().setContextRep(ContextManager.getCurrentContext().getGlContextRep());
-                cached = TextureManager.findCachedTexture(texture.getTextureKey());
+            // First, check if we've already created this texture for our gl context (already on the card)
+
+            // if texture key has a context already, and it is not ours, complain.
+            if (texture.getTextureKey().getContextRep() != null
+                    && texture.getTextureKey().getContextRep() != context.getGlContextRep()) {
+                logger.warning("Texture key is morphing contexts: " + texture.getTextureKey());
             }
+
+            // make sure our context is set.
+            texture.getTextureKey().setContextRep(context.getGlContextRep());
+
+            // Look for a texture in the cache just like ours, also in the same context.
+            final Texture cached = TextureManager.findCachedTexture(texture.getTextureKey());
 
             if (cached == null) {
                 TextureManager.addToCache(texture);
