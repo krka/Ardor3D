@@ -21,15 +21,14 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.nativeloader.NativeLoader;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.nativeloader.NativeLoader;
 import com.google.inject.Inject;
-
 
 public class LwjglCanvasRenderer implements CanvasRenderer {
     protected Scene _scene;
@@ -39,11 +38,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     // ensure availability of LWJGL natives
     {
-        final String[] libraryPaths = LwjglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System.getProperty("os.arch"));
+        final String[] libraryPaths = LwjglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
+                .getProperty("os.arch"));
 
-        NativeLoader.makeLibrariesAvailable(libraryPaths);
+        try {
+            NativeLoader.makeLibrariesAvailable(libraryPaths);
+        } catch (final Exception e) {
+            ; // ignore
+        }
     }
-
 
     @Inject
     public LwjglCanvasRenderer(final Scene scene) {

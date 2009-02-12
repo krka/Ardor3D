@@ -23,23 +23,28 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.nativeloader.NativeLoader;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.ardor3d.nativeloader.NativeLoader;
 import com.google.inject.Inject;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
     private static final Logger logger = Logger.getLogger(JoglCanvasRenderer.class.getName());
 
-    // ensure availability of LWJGL natives
+    // ensure availability of JOGL natives
     {
-        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System.getProperty("os.arch"));
+        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
+                .getProperty("os.arch"));
 
-        NativeLoader.makeLibrariesAvailable(libraryPaths);
+        try {
+            NativeLoader.makeLibrariesAvailable(libraryPaths);
+        } catch (final Exception e) {
+            ; // ignore
+        }
     }
 
     protected final Scene _scene;
