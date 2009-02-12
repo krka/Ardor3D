@@ -102,11 +102,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         _renderer.clearBuffers();
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(_doSwap);
-        try {
-            GLContext.useContext(null);
-        } catch (final LWJGLException e) {
-            throw new RuntimeException(e);
-        }
         return drew;
     }
 

@@ -346,7 +346,6 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     }
 
     private void giveBackContext() {
-        _context.release();
         _parentContext.makeCurrent();
         ContextManager.switchContext(_oldContext.getContextHolder());
     }

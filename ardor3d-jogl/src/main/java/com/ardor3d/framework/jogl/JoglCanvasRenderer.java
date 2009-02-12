@@ -107,16 +107,14 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         // set up context for rendering this canvas
         ContextManager.switchContext(_context);
 
-        while (GLContext.getCurrent() != null) {
-            GLContext.getCurrent().release();
-        }
-
-        while (_context.makeCurrent() == GLContext.CONTEXT_NOT_CURRENT) {
-            try {
-                logger.info("Waiting for the GLContext to initialize...");
-                Thread.sleep(500);
-            } catch (final InterruptedException e1) {
-                e1.printStackTrace();
+        if (!_context.equals(GLContext.getCurrent())) {
+            while (_context.makeCurrent() == GLContext.CONTEXT_NOT_CURRENT) {
+                try {
+                    logger.info("Waiting for the GLContext to initialize...");
+                    Thread.sleep(500);
+                } catch (final InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
 
@@ -125,11 +123,11 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             ContextManager.getCurrentContext().setCurrentCamera(_camera);
             _camera.update();
         }
+
         _camera.apply(_renderer);
         _renderer.clearBuffers();
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(_doSwap);
-        _context.release();
         return drew;
     }
 
