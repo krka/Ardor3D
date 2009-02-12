@@ -5,14 +5,17 @@
 
 package com.ardor3d.nativeloader;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.io.*;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 
 /**
  * TODO: document this class!
- *
+ * 
  */
 public class NativeLoader {
     private static final Logger logger = Logger.getLogger(NativeLoader.class.toString());
@@ -20,15 +23,14 @@ public class NativeLoader {
     private static final String PATH_SEPARATOR = "path.separator";
     private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
-    public static void makeLibrariesAvailable(String[] libraryPaths) {
+    public static void makeLibrariesAvailable(final String[] libraryPaths) {
         boolean fail = false;
-        for (String s : libraryPaths) {
+        for (final String s : libraryPaths) {
             try {
                 makeLibraryAvailable(s);
-            }
-            catch (IOException e) {
+            } catch (final IOException e) {
                 fail = true;
-                logger.log(Level.SEVERE, "Fail", e);
+                // logger.log(Level.SEVERE, "Fail", e);
             }
         }
 
@@ -37,10 +39,10 @@ public class NativeLoader {
         }
     }
 
-    private static void makeLibraryAvailable(String libraryPath) throws IOException {
-        logger.info("Making library: " + libraryPath + " available");
+    private static void makeLibraryAvailable(final String libraryPath) throws IOException {
+        // logger.info("Making library: " + libraryPath + " available");
 
-        URL resourceURL = NativeLoader.class.getResource(libraryPath);
+        final URL resourceURL = NativeLoader.class.getResource(libraryPath);
 
         if (resourceURL == null) {
             throw new IOException("Unable to locate library resource '" + libraryPath + "' in classpath");
@@ -49,15 +51,15 @@ public class NativeLoader {
         final File a3DNativeDirectory = getA3DNativeDirectory();
         final File outFile = createFileFor(a3DNativeDirectory, libraryPath);
 
-        InputStream in = resourceURL.openStream();
-        OutputStream out = new FileOutputStream(outFile);
+        final InputStream in = resourceURL.openStream();
+        final OutputStream out = new FileOutputStream(outFile);
 
-        byte[] buffer = new byte[65536];
+        final byte[] buffer = new byte[65536];
 
         int totalBytesRead = 0;
 
         while (true) {
-            int bytesRead = in.read(buffer);
+            final int bytesRead = in.read(buffer);
 
             if (bytesRead < 0) {
                 break;
@@ -65,32 +67,33 @@ public class NativeLoader {
 
             out.write(buffer, 0, bytesRead);
 
-            totalBytesRead =+ bytesRead;
+            totalBytesRead = +bytesRead;
         }
 
         in.close();
         out.close();
 
-        logger.info("Copied " + totalBytesRead + " bytes into file: " + outFile);
+        // logger.info("Copied " + totalBytesRead + " bytes into file: " + outFile);
 
-//        addToLibraryPath(a3DNativeDirectory);
+        // addToLibraryPath(a3DNativeDirectory);
     }
 
-    private static void addToLibraryPath(File a3DNativeDirectory) {
-        String currentPath = System.getProperty(JAVA_LIBRARY_PATH);
+    private static void addToLibraryPath(final File a3DNativeDirectory) {
+        final String currentPath = System.getProperty(JAVA_LIBRARY_PATH);
 
         if (currentPath.contains(a3DNativeDirectory.toString())) {
-            logger.fine("a3d directory already included in " + JAVA_LIBRARY_PATH + ": " + currentPath);
+            // logger.fine("a3d directory already included in " + JAVA_LIBRARY_PATH + ": " + currentPath);
             return;
         }
 
-        System.setProperty(JAVA_LIBRARY_PATH, currentPath + System.getProperty(PATH_SEPARATOR) + a3DNativeDirectory.toString());
-        logger.info("Library path now: '" + System.getProperty(JAVA_LIBRARY_PATH));
+        System.setProperty(JAVA_LIBRARY_PATH, currentPath + System.getProperty(PATH_SEPARATOR)
+                + a3DNativeDirectory.toString());
+        // logger.info("Library path now: '" + System.getProperty(JAVA_LIBRARY_PATH));
     }
 
-    private static File createFileFor(File a3dNativeDirectory, String libraryPath) throws IOException {
-//        File result = new File(a3dNativeDirectory, getFilePart(libraryPath));
-        File result = new File((File) null, getFilePart(libraryPath));
+    private static File createFileFor(final File a3dNativeDirectory, final String libraryPath) throws IOException {
+        // File result = new File(a3dNativeDirectory, getFilePart(libraryPath));
+        final File result = new File((File) null, getFilePart(libraryPath));
 
         if (result.exists()) {
             if (!result.delete()) {
@@ -110,13 +113,14 @@ public class NativeLoader {
     }
 
     private static File getA3DNativeDirectory() throws IOException {
-        File tempDir = new File(System.getProperty(JAVA_IO_TMPDIR));
+        final File tempDir = new File(System.getProperty(JAVA_IO_TMPDIR));
 
         if (!(tempDir.exists() && tempDir.isDirectory())) {
-            throw new IllegalStateException("Temporary directory: " + tempDir.toString() + " doesn't exist or isn't a directory");
+            throw new IllegalStateException("Temporary directory: " + tempDir.toString()
+                    + " doesn't exist or isn't a directory");
         }
 
-        File a3dnativeDirectory = new File(tempDir, "a3dnatives");
+        final File a3dnativeDirectory = new File(tempDir, "a3dnatives");
 
         if (!a3dnativeDirectory.exists()) {
             if (!a3dnativeDirectory.mkdir()) {
@@ -126,8 +130,8 @@ public class NativeLoader {
         return a3dnativeDirectory;
     }
 
-    private static String getFilePart(String libraryPath) {
-        String[] parts = libraryPath.split("/");
+    private static String getFilePart(final String libraryPath) {
+        final String[] parts = libraryPath.split("/");
 
         return parts[parts.length - 1];
     }
