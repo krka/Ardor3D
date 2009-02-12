@@ -27,13 +27,23 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
+import com.ardor3d.nativeloader.NativeLoader;
 import com.google.inject.Inject;
+
 
 public class LwjglCanvasRenderer implements CanvasRenderer {
     protected Scene _scene;
     protected Camera _camera;
     protected boolean _doSwap;
     protected LwjglRenderer _renderer;
+
+    // ensure availability of LWJGL natives
+    {
+        final String[] libraryPaths = LwjglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System.getProperty("os.arch"));
+
+        NativeLoader.makeLibrariesAvailable(libraryPaths);
+    }
+
 
     @Inject
     public LwjglCanvasRenderer(final Scene scene) {
@@ -123,4 +133,5 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -202,6 +202,11 @@
         <version>ardor3d-1.1.2-pre-20080523</version>
       </dependency>
       <dependency>
+        <groupId>net.java.dev.jogl</groupId>
+        <artifactId>jogl-natives</artifactId>
+        <version>ardor3d-1.1.2-pre-20080523</version>
+      </dependency>
+      <dependency>
         <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
         <artifactId>gluegen-rt</artifactId>
         <version>1.0b06</version>
@@ -209,6 +214,11 @@
       <dependency>
         <groupId>org.lwjgl</groupId>
         <artifactId>lwjgl</artifactId>
+        <version>${lwjgl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl-natives</artifactId>
         <version>${lwjgl.version}</version>
       </dependency>
       <dependency>

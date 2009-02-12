@@ -29,5 +29,9 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl_util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-natives</artifactId>
+    </dependency>
   </dependencies>
 </project>

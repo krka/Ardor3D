@@ -105,9 +105,12 @@ public class LwjglAwtExample {
 
     private static void addCanvas(final JFrame frame, final ExampleScene scene, final LogicalLayer logicalLayer,
             final FrameHandler frameWork) throws Exception {
+        // creating the canvasRenderer before anything else in LWJGL to trigger native loading
+        final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(scene);
+
         final AwtCanvas theCanvas = new AwtCanvas();
 
-        theCanvas.setCanvasRenderer(new LwjglCanvasRenderer(scene));
+        theCanvas.setCanvasRenderer(canvasRenderer);
         frame.add(theCanvas);
 
         theCanvas.setSize(new Dimension(400, 300));

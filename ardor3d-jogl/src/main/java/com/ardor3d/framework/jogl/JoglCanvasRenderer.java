@@ -29,10 +29,25 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
+import com.ardor3d.nativeloader.NativeLoader;
 import com.google.inject.Inject;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
     private static final Logger logger = Logger.getLogger(JoglCanvasRenderer.class.getName());
+
+    // ensure availability of LWJGL natives
+    {
+        NativeLoader.makeLibrariesAvailable(getLibraryPaths());
+    }
+
+    private static String[] getLibraryPaths() {
+        return new String[] {
+                "/macosx/libgluegen-rt.jnilib",
+                "/macosx/libjogl.jnilib",
+                "/macosx/libjogl_awt.jnilib",
+                "/macosx/libjogl_cg.jnilib",
+        };
+    }
 
     protected final Scene _scene;
     protected Camera _camera;

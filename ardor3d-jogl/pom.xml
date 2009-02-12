@@ -26,6 +26,10 @@
       <artifactId>jogl</artifactId>
     </dependency>
     <dependency>
+      <groupId>net.java.dev.jogl</groupId>
+      <artifactId>jogl-natives</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.projectdarkstar.ext.net.java.dev.gluegen</groupId>
       <artifactId>gluegen-rt</artifactId>
     </dependency>
