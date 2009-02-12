@@ -3,52 +3,39 @@
  * All rights reserved. Unauthorized disclosure or distribution is prohibited.
  */
 
-package com.ardor3d.framework.lwjgl;
+package com.ardor3d.framework.jogl;
 
 /**
  * TODO: document this class!
  *
  */
-public enum LwjglLibraryPaths {
+public enum JoglLibraryPaths {
     MACOSX("Mac OS X", null, new String[] {
-            "/macosx/libjinput-osx.jnilib",
-            "/macosx/liblwjgl.jnilib",
-            "/macosx/openal.dylib",
-    }),
-    LINUX_32("TODO", null, new String[] {
-            "/linux/libjinput-linux.so",
-            "/linux/liblwjgl.so",
-            "/linux/libopenal.so",
-    }),
-    LINUX_64("TODO", null, new String[] {
-            "/linux/libjinput-linux64.so",
-            "/linux/liblwjgl64.so",
-            "/linux/libopenal64.so",
-    }),
-    SOLARIS("TODO", null, new String[] {
-            "/solaris/liblwjgl.so",
-            "/solaris/libopenal.so",
+            "/macosx/libgluegen-rt.jnilib",
+            "/macosx/libjogl.jnilib",
+            "/macosx/libjogl_awt.jnilib",
+            "/macosx/libjogl_cg.jnilib",
     }),
     WINDOWS_XP("Windows XP", null, new String[] {
-            "/win32/jinput-dx8.dll",
-            "/win32/jinput-raw.dll",
-            "/win32/lwjgl.dll",
-            "/win32/OpenAL32.dll",
+            "/win32/gluegen-rt.dll",
+            "/win32/jogl.dll",
+            "/win32/jogl_awt.dll",
+            "/win32/jogl_cg.dll",
     });
-    
+
     private final String _operatingSystem;
     private final String _architecture;
     private final String[] _libraryPaths;
 
 
-    LwjglLibraryPaths(String operatingSystem, String architecture, String[] libraryPaths) {
+    JoglLibraryPaths(String operatingSystem, String architecture, String[] libraryPaths) {
         _operatingSystem = operatingSystem;
         _architecture = architecture;
         _libraryPaths = libraryPaths;
     }
 
     public static String[] getLibraryPaths(String operatingSystem, String architecture) {
-        for (LwjglLibraryPaths libraryPath : values()) {
+        for (JoglLibraryPaths libraryPath : JoglLibraryPaths.values()) {
             if (operatingSystem.equals(libraryPath._operatingSystem) &&
                     (libraryPath._architecture == null || architecture.equals(libraryPath._architecture))) {
                 return libraryPath._libraryPaths;

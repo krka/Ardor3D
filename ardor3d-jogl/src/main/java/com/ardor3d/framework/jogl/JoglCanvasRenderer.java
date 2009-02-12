@@ -37,16 +37,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     // ensure availability of LWJGL natives
     {
-        NativeLoader.makeLibrariesAvailable(getLibraryPaths());
-    }
+        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System.getProperty("os.arch"));
 
-    private static String[] getLibraryPaths() {
-        return new String[] {
-                "/macosx/libgluegen-rt.jnilib",
-                "/macosx/libjogl.jnilib",
-                "/macosx/libjogl_awt.jnilib",
-                "/macosx/libjogl_cg.jnilib",
-        };
+        NativeLoader.makeLibrariesAvailable(libraryPaths);
     }
 
     protected final Scene _scene;
