@@ -27,6 +27,7 @@ import javax.media.opengl.glu.GLU;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
@@ -130,6 +131,8 @@ public class JoglRenderer extends Renderer {
     private final Matrix4 _transformMatrix = new Matrix4();
 
     private final IntBuffer _idBuff = BufferUtils.createIntBuffer(16);
+
+    private boolean glTexSubImage2DSupported = true;
 
     /** List of default rendering states for this specific renderer type */
     protected static final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(
@@ -492,8 +495,19 @@ public class JoglRenderer extends Renderer {
     }
 
     @Override
-    public void updateTextureSubImage(final Texture dstTexture, final int dstX, final int dstY, final Image srcImage,
-            final int srcX, final int srcY, final int width, final int height) throws Ardor3dException {
+    public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
+            final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
+            UnsupportedOperationException {
+        final ByteBuffer data = srcImage.getData(0);
+        data.rewind();
+        updateTextureSubImage(dstTexture, data, srcX, srcY, srcImage.getWidth(), srcImage.getHeight(), dstX, dstY,
+                dstWidth, dstHeight, srcImage.getFormat());
+    }
+
+    @Override
+    public void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
+            final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
+            final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException {
         final GL gl = GLU.getCurrentGL();
 
         // Check that the texture type is supported.
@@ -513,7 +527,7 @@ public class JoglRenderer extends Renderer {
 
         final int alignment = 1;
         int rowLength;
-        if (srcImage.getWidth() == width) {
+        if (srcWidth == dstWidth) {
             // When the row length is zero, then the width parameter is used.
             // We use zero in these cases in the hope that we can avoid two
             // unnecessary calls to glPixelStorei.
@@ -521,12 +535,11 @@ public class JoglRenderer extends Renderer {
         } else {
             // The number of pixels in a row is different than the number of
             // pixels in the region to be uploaded to the texture.
-            rowLength = srcImage.getWidth();
+            rowLength = srcWidth;
         }
         // Consider moving these conversion methods.
-        final int pixelFormat = JoglTextureUtil.getGLPixelFormat(srcImage.getFormat());
-        final ByteBuffer data = srcImage.getData(0);
-        data.rewind();
+        final int dataFormat = JoglTextureUtil.getGLDataFormat(format);
+        final int pixelFormat = JoglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
         if (origTexBinding[0] != dstTexture.getTextureId()) {
@@ -546,7 +559,20 @@ public class JoglRenderer extends Renderer {
         }
 
         // Upload the image region into the texture.
-        gl.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, dstX, dstY, width, height, pixelFormat, GL.GL_UNSIGNED_BYTE, data);
+        if (glTexSubImage2DSupported) {
+            gl.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, dstX, dstY, dstWidth, dstHeight, pixelFormat, GL.GL_UNSIGNED_BYTE,
+                    data);
+
+            final int errorCode = gl.glGetError();
+            if (errorCode != GL.GL_NO_ERROR) {
+                glTexSubImage2DSupported = false;
+                updateTextureSubImage(dstTexture, data, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth,
+                        dstHeight, format);
+            }
+        } else {
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, dataFormat, dstWidth, dstHeight, 0, pixelFormat, GL.GL_UNSIGNED_BYTE,
+                    data);
+        }
 
         // Restore the texture configuration (when necessary).
         // Restore the texture binding.

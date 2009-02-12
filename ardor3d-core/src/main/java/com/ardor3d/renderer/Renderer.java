@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -289,8 +290,14 @@ public abstract class Renderer {
      *      int, int, int, int)
      * @since 2.0
      */
-    public abstract void updateTextureSubImage(Texture dstTexture, int dstX, int dstY, Image srcImage, int srcX,
-            int srcY, int width, int height) throws Ardor3dException, UnsupportedOperationException;
+    public abstract void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX,
+            final int srcY, final int dstX, final int dstY, final int dstWidth, final int dstHeight)
+            throws Ardor3dException, UnsupportedOperationException;
+
+    public abstract void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX,
+            final int srcY, final int srcWidth, final int srcHeight, final int dstX, final int dstY,
+            final int dstWidth, final int dstHeight, final Format format) throws Ardor3dException,
+            UnsupportedOperationException;
 
     /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.

@@ -27,9 +27,11 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.OpenGLException;
+import org.lwjgl.opengl.Util;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
@@ -133,6 +135,8 @@ public class LwjglRenderer extends Renderer {
     private final Matrix4 _transformMatrix = new Matrix4();
 
     private final IntBuffer _idBuff = BufferUtils.createIntBuffer(16);
+
+    private boolean glTexSubImage2DSupported = true;
 
     /** List of default rendering states for this specific renderer type */
     protected static final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(
@@ -468,9 +472,19 @@ public class LwjglRenderer extends Renderer {
     }
 
     @Override
-    public void updateTextureSubImage(final Texture dstTexture, final int dstX, final int dstY, final Image srcImage,
-            final int srcX, final int srcY, final int width, final int height) throws Ardor3dException,
+    public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
+            final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
             UnsupportedOperationException {
+        final ByteBuffer data = srcImage.getData(0);
+        data.rewind();
+        updateTextureSubImage(dstTexture, data, srcX, srcY, srcImage.getWidth(), srcImage.getHeight(), dstX, dstY,
+                dstWidth, dstHeight, srcImage.getFormat());
+    }
+
+    @Override
+    public void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
+            final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
+            final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException {
         // Check that the texture type is supported.
         if (dstTexture.getType() != Texture.Type.TwoDimensional) {
             throw new UnsupportedOperationException("Unsupported Texture Type: " + dstTexture.getType());
@@ -478,18 +492,17 @@ public class LwjglRenderer extends Renderer {
 
         // Determine the original texture configuration, so that this method can
         // restore the texture configuration to its original state.
-        final IntBuffer intBuf = BufferUtils.createIntBuffer(16);
-        GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D, intBuf);
-        final int origTexBinding = intBuf.get(0);
-        GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, intBuf);
-        final int origAlignment = intBuf.get(0);
+        GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D, _idBuff);
+        final int origTexBinding = _idBuff.get(0);
+        GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, _idBuff);
+        final int origAlignment = _idBuff.get(0);
         final int origRowLength = 0;
         final int origSkipPixels = 0;
         final int origSkipRows = 0;
 
         final int alignment = 1;
         int rowLength;
-        if (srcImage.getWidth() == width) {
+        if (srcWidth == dstWidth) {
             // When the row length is zero, then the width parameter is used.
             // We use zero in these cases in the hope that we can avoid two
             // unnecessary calls to glPixelStorei.
@@ -497,12 +510,11 @@ public class LwjglRenderer extends Renderer {
         } else {
             // The number of pixels in a row is different than the number of
             // pixels in the region to be uploaded to the texture.
-            rowLength = srcImage.getWidth();
+            rowLength = srcWidth;
         }
         // Consider moving these conversion methods.
-        final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(srcImage.getFormat());
-        final ByteBuffer data = srcImage.getData(0);
-        data.rewind();
+        final int dataFormat = LwjglTextureUtil.getGLDataFormat(format);
+        final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
         if (origTexBinding != dstTexture.getTextureId()) {
@@ -522,9 +534,21 @@ public class LwjglRenderer extends Renderer {
         }
 
         // Upload the image region into the texture.
-        GL11
-                .glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstX, dstY, width, height, pixelFormat, GL11.GL_UNSIGNED_BYTE,
-                        data);
+        if (glTexSubImage2DSupported) {
+            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstX, dstY, dstWidth, dstHeight, pixelFormat,
+                    GL11.GL_UNSIGNED_BYTE, data);
+
+            try {
+                Util.checkGLError();
+            } catch (final OpenGLException e) {
+                glTexSubImage2DSupported = false;
+                updateTextureSubImage(dstTexture, data, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth,
+                        dstHeight, format);
+            }
+        } else {
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, dataFormat, dstWidth, dstHeight, 0, pixelFormat,
+                    GL11.GL_UNSIGNED_BYTE, data);
+        }
 
         // Restore the texture configuration (when necessary).
         // Restore the texture binding.
