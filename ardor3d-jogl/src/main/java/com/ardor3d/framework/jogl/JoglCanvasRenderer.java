@@ -33,6 +33,12 @@ import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.google.inject.Inject;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
+
+    /**
+     * Set to true to be safe when rendering in multiple canvases. Set to false for a faster, single canvas mode.
+     */
+    public static boolean MULTI_CANVAS_MODE = true;
+
     private static final Logger logger = Logger.getLogger(JoglCanvasRenderer.class.getName());
 
     // ensure availability of JOGL natives
@@ -95,7 +101,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
         /** Move our camera to a correct place and orientation. */
         _camera.setFrame(loc, left, up, dir);
-
     }
 
     public GLContext getContext() {
@@ -111,8 +116,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // set up context for rendering this canvas
         ContextManager.switchContext(_context);
-
-        if (!_context.equals(GLContext.getCurrent())) {
+        if (MULTI_CANVAS_MODE && !_context.equals(GLContext.getCurrent())) {
             while (_context.makeCurrent() == GLContext.CONTEXT_NOT_CURRENT) {
                 try {
                     logger.info("Waiting for the GLContext to initialize...");
@@ -131,8 +135,12 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         _camera.apply(_renderer);
         _renderer.clearBuffers();
+
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(_doSwap);
+        if (MULTI_CANVAS_MODE) {
+            _context.release();
+        }
         return drew;
     }
 

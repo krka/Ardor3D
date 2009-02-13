@@ -26,6 +26,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.FocusWrapper;
@@ -289,6 +290,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if ("JOGL".equalsIgnoreCase(prefs.getRenderer())) {
             systemModule = new JoglModule();
+            // We are in single screen mode.
+            JoglCanvasRenderer.MULTI_CANVAS_MODE = false;
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
         final Module exampleModule = new AbstractModule() {
