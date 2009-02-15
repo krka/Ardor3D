@@ -119,6 +119,10 @@ public class MeshData implements Cloneable, Savable {
         } else {
             _vertexCount = _vertexBuffer.limit() / 3;
         }
+        // update primitive count if we are using arrays
+        if (_indexBuffer == null) {
+            updatePrimitiveCounts();
+        }
     }
 
     /**
@@ -544,49 +548,46 @@ public class MeshData implements Cloneable, Savable {
     }
 
     private void updatePrimitiveCounts() {
-        if (_indexBuffer == null) {
-            _primitiveCounts = new int[0];
-        } else {
-            if (_primitiveCounts.length != _indexModes.length) {
-                _primitiveCounts = new int[_indexModes.length];
+        final int maxIndex = _indexBuffer != null ? _indexBuffer.limit() : _vertexCount;
+        if (_primitiveCounts.length != _indexModes.length) {
+            _primitiveCounts = new int[_indexModes.length];
+        }
+        for (int i = 0; i < _indexModes.length; i++) {
+            // XXX: warning? Force _indexLengths to be right?
+            final int size = _indexLengths != null ? _indexLengths[i] : maxIndex;
+            int count = 0;
+            switch (_indexModes[i]) {
+                case Triangles:
+                    count = size / 3;
+                    break;
+                case TriangleFan:
+                case TriangleStrip:
+                    count = size - 2;
+                    break;
+                case Quads:
+                    count = size / 4;
+                    break;
+                case QuadStrip:
+                    count = size / 2 - 1;
+                    break;
+                case Lines:
+                    count = size / 2;
+                    break;
+                case LineStrip:
+                    count = size - 1;
+                    break;
+                case LineLoop:
+                    count = size;
+                    break;
+                case Points:
+                    count = size;
+                    break;
+                case Polygon:
+                default:
+                    logger.warning("unimplemented index mode: " + _indexModes[0]);
             }
-            for (int i = 0; i < _indexModes.length; i++) {
-                // XXX: warning? Force _indexLengths to be right?
-                final int size = _indexLengths != null ? _indexLengths[i] : _indexBuffer.limit();
-                int count = 0;
-                switch (_indexModes[i]) {
-                    case Triangles:
-                        count = size / 3;
-                        break;
-                    case TriangleFan:
-                    case TriangleStrip:
-                        count = size - 2;
-                        break;
-                    case Quads:
-                        count = size / 4;
-                        break;
-                    case QuadStrip:
-                        count = size / 2 - 1;
-                        break;
-                    case Lines:
-                        count = size / 2;
-                        break;
-                    case LineStrip:
-                        count = size - 1;
-                        break;
-                    case LineLoop:
-                        count = size;
-                        break;
-                    case Points:
-                        count = size;
-                        break;
-                    case Polygon:
-                    default:
-                        logger.warning("unimplemented index mode: " + _indexModes[0]);
-                }
 
-                _primitiveCounts[i] = count;
-            }
+            _primitiveCounts[i] = count;
         }
 
     }

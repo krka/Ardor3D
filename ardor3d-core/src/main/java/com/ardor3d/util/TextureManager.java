@@ -179,6 +179,7 @@ final public class TextureManager {
             result.setImageLocation(tkey._location.toString());
         }
 
+        // Cache the no-context version
         addToCache(result);
         return result;
     }
