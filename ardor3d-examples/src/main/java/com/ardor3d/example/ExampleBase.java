@@ -88,7 +88,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected final Node _root = new Node();
 
-    protected final FrameHandler _frameWork;
+    protected final FrameHandler _frameHandler;
 
     protected LightState _lightState;
 
@@ -109,18 +109,18 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     protected ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
 
     @Inject
-    public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
+    public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
         _logicalLayer = logicalLayer;
-        _frameWork = frameWork;
+        _frameHandler = frameHandler;
     }
 
     @Override
     public void run() {
         try {
-            _frameWork.init();
+            _frameHandler.init();
 
             while (!exit) {
-                _frameWork.updateFrame();
+                _frameHandler.updateFrame();
             }
             // grab the graphics context so cleanup will work out.
             _canvas.getCanvasRenderer().setCurrentContext();
