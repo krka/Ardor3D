@@ -67,7 +67,7 @@ public class NativeLoader {
 
             out.write(buffer, 0, bytesRead);
 
-            totalBytesRead = +bytesRead;
+            totalBytesRead += bytesRead;
         }
 
         in.close();
