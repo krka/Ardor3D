@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jibx/jibx-bind.jar"/>
+	<classpathentry kind="lib" path="lib/jibx/jibx-run.jar"/>
+	<classpathentry kind="lib" path="lib/jibx/stax-api.jar"/>
+	<classpathentry kind="lib" path="lib/jibx/jibx-extras.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-core"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
