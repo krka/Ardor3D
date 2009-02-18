@@ -491,6 +491,7 @@ public abstract class Texture implements Savable {
     private final Matrix4 _texMatrix = new Matrix4();
 
     private float _anisotropicFilterPercent = 0.0f;
+    private float _lodBias = 0.0f;
 
     private transient int _textureId;
     private ApplyMode _apply = ApplyMode.Modulate;
@@ -1080,6 +1081,21 @@ public abstract class Texture implements Savable {
         _anisotropicFilterPercent = percent;
     }
 
+    /**
+     * @return the lodBias for this texture
+     */
+    public float getLodBias() {
+        return _lodBias;
+    }
+
+    /**
+     * @param bias
+     *            the load bias level for this texture. The default is 0.
+     */
+    public void setLodBias(final float bias) {
+        _lodBias = bias;
+    }
+
     @Override
     public boolean equals(final Object other) {
         if (other == this) {
@@ -1197,6 +1213,7 @@ public abstract class Texture implements Savable {
         rVal.setMagnificationFilter(_magnificationFilter);
         rVal.setHasBorder(_hasBorder);
         rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
+        rVal.setLodBias(_lodBias);
         rVal.setImage(_image); // NOT CLONED.
         rVal._memReq = _memReq;
         rVal.setImageLocation(_imageLocation);
@@ -1272,6 +1289,7 @@ public abstract class Texture implements Savable {
         capsule.write(_texMatrix, "texMatrix", new Matrix4(Matrix4.IDENTITY));
         capsule.write(_hasBorder, "hasBorder", false);
         capsule.write(_anisotropicFilterPercent, "anisotropicFilterPercent", 0.0f);
+        capsule.write(_lodBias, "lodBias", 0.0f);
         capsule.write(_minificationFilter, "minificationFilter", MinificationFilter.NearestNeighborNoMipMaps);
         capsule.write(_magnificationFilter, "magnificationFilter", MagnificationFilter.Bilinear);
         capsule.write(_apply, "apply", ApplyMode.Modulate);
@@ -1317,6 +1335,7 @@ public abstract class Texture implements Savable {
         _texMatrix.set((Matrix4) capsule.readSavable("texMatrix", new Matrix4(Matrix4.IDENTITY)));
         _hasBorder = capsule.readBoolean("hasBorder", false);
         _anisotropicFilterPercent = capsule.readFloat("anisotropicFilterPercent", 0.0f);
+        _lodBias = capsule.readFloat("lodBias", 0.0f);
         _magnificationFilter = capsule.readEnum("magnificationFilter", MagnificationFilter.class,
                 MagnificationFilter.Bilinear);
         _apply = capsule.readEnum("apply", ApplyMode.class, ApplyMode.Modulate);

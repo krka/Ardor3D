@@ -25,6 +25,9 @@ public class ContextCapabilities {
 
     protected boolean _supportsFogCoords = false;
 
+    protected boolean _supportsTextureLodBias = false;
+    protected float _maxTextureLodBias = 0f;
+
     protected boolean _supportsFragmentProgram = false;
     protected boolean _supportsVertexProgram = false;
 
@@ -170,6 +173,20 @@ public class ContextCapabilities {
      */
     public boolean isFogCoordinatesSupported() {
         return _supportsFogCoords;
+    }
+
+    /**
+     * @return true if texture lod bias is supported
+     */
+    public boolean isTextureLodBiasSupported() {
+        return _supportsTextureLodBias;
+    }
+
+    /**
+     * @return the max amount of texture lod bias that this context supports.
+     */
+    public float getMaxLodBias() {
+        return _maxTextureLodBias;
     }
 
     /**

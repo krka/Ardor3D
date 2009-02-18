@@ -46,6 +46,14 @@ public final class JoglContextCapabilities extends ContextCapabilities {
         _supportsFragmentProgram = gl.isExtensionAvailable("GL_ARB_fragment_program");
         _supportsVertexProgram = gl.isExtensionAvailable("GL_ARB_vertex_program");
 
+        _supportsTextureLodBias = gl.isExtensionAvailable("GL_EXT_texture_lod_bias");
+        if (_supportsTextureLodBias) {
+            gl.glGetIntegerv(GL.GL_MAX_TEXTURE_LOD_BIAS_EXT, buf);
+            _maxTextureLodBias = buf.get(0);
+        } else {
+            _maxTextureLodBias = 0f;
+        }
+
         _glslSupported = gl.isExtensionAvailable("GL_ARB_shader_objects")
                 && gl.isExtensionAvailable("GL_ARB_fragment_shader") && gl.isExtensionAvailable("GL_ARB_vertex_shader")
                 && gl.isExtensionAvailable("GL_ARB_shading_language_100");

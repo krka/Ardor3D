@@ -167,7 +167,7 @@ public abstract class Renderer {
     public abstract void grabScreenContents(ByteBuffer buff, Image.Format format, int x, int y, int w, int h);
 
     /**
-     * <code>draw</code> renders a scene. As it recieves a base class of <code>Spatial</code> the renderer hands off
+     * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
      * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached.
      * 
      * @param s

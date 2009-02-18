@@ -18,6 +18,7 @@ import org.lwjgl.opengl.ARBMultitexture;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
+import org.lwjgl.opengl.EXTTextureLODBias;
 import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextCapabilities;
@@ -41,6 +42,14 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _supportsFogCoords = caps.GL_EXT_fog_coord;
         _supportsFragmentProgram = caps.GL_ARB_fragment_program;
         _supportsVertexProgram = caps.GL_ARB_vertex_program;
+
+        _supportsTextureLodBias = caps.GL_EXT_texture_lod_bias;
+        if (_supportsTextureLodBias) {
+            GL11.glGetInteger(EXTTextureLODBias.GL_MAX_TEXTURE_LOD_BIAS_EXT, buf);
+            _maxTextureLodBias = buf.get(0);
+        } else {
+            _maxTextureLodBias = 0f;
+        }
 
         _glslSupported = caps.GL_ARB_shader_objects && caps.GL_ARB_fragment_shader && caps.GL_ARB_vertex_shader
                 && caps.GL_ARB_shading_language_100;

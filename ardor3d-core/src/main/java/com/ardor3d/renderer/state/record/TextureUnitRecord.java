@@ -43,6 +43,7 @@ public class TextureUnitRecord extends StateRecord {
     public CombinerSource combSrcAlpha0 = null, combSrcAlpha1 = null, combSrcAlpha2 = null;
     public CombinerOperandAlpha combOpAlpha0 = null, combOpAlpha1 = null, combOpAlpha2 = null;
     public boolean identityMatrix = true;
+    public float lodBias = 0f;
 
     public boolean textureGenQ = false, textureGenR = false, textureGenS = false, textureGenT = false;
     public int textureGenQMode = -1, textureGenRMode = -1, textureGenSMode = -1, textureGenTMode = -1;
@@ -57,6 +58,7 @@ public class TextureUnitRecord extends StateRecord {
         texMatrix.setIdentity();
         texScale.zero();
         boundTexture = -1;
+        lodBias = 0;
         envMode = null;
         envRGBScale = null;
         envAlphaScale = null;

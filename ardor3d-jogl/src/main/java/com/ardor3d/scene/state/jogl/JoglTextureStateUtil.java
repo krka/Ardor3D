@@ -631,6 +631,8 @@ public class JoglTextureStateUtil {
                     // generation.
                     applyTexCoordGeneration(texture, unitRecord, i, record, caps);
 
+                    // Set our texture lod bias, if needed.
+                    applyLodBias(texture, unitRecord, i, record, caps);
                 }
 
             }
@@ -963,6 +965,21 @@ public class JoglTextureStateUtil {
             TextureRecord.colorBuffer.rewind();
             gl.glTexEnvfv(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_COLOR, TextureRecord.colorBuffer);
             unitRecord.blendColor.set(texBlend);
+        }
+    }
+
+    public static void applyLodBias(final Texture texture, final TextureUnitRecord unitRecord, final int unit,
+            final TextureStateRecord record, final ContextCapabilities caps) {
+        final GL gl = GLU.getCurrentGL();
+
+        if (caps.isTextureLodBiasSupported()) {
+            final float bias = texture.getLodBias() < caps.getMaxLodBias() ? texture.getLodBias() : caps
+                    .getMaxLodBias();
+            if (!unitRecord.isValid() || unitRecord.lodBias != bias) {
+                checkAndSetUnit(unit, record, caps);
+                gl.glTexEnvf(GL.GL_TEXTURE_FILTER_CONTROL_EXT, GL.GL_TEXTURE_LOD_BIAS_EXT, bias);
+                unitRecord.lodBias = bias;
+            }
         }
     }
 

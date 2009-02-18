@@ -23,6 +23,7 @@ import org.lwjgl.opengl.ARBTextureCubeMap;
 import org.lwjgl.opengl.ARBTextureEnvCombine;
 import org.lwjgl.opengl.ARBTextureMirroredRepeat;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
+import org.lwjgl.opengl.EXTTextureLODBias;
 import org.lwjgl.opengl.EXTTextureMirrorClamp;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -696,6 +697,8 @@ public abstract class LwjglTextureStateUtil {
                     // generation.
                     applyTexCoordGeneration(texture, unitRecord, i, record, caps);
 
+                    // Set our texture lod bias, if needed.
+                    applyLodBias(texture, unitRecord, i, record, caps);
                 }
 
             }
@@ -1032,6 +1035,20 @@ public abstract class LwjglTextureStateUtil {
             TextureRecord.colorBuffer.rewind();
             GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, TextureRecord.colorBuffer);
             unitRecord.blendColor.set(texBlend);
+        }
+    }
+
+    public static void applyLodBias(final Texture texture, final TextureUnitRecord unitRecord, final int unit,
+            final TextureStateRecord record, final ContextCapabilities caps) {
+        if (caps.isTextureLodBiasSupported()) {
+            final float bias = texture.getLodBias() < caps.getMaxLodBias() ? texture.getLodBias() : caps
+                    .getMaxLodBias();
+            if (!unitRecord.isValid() || unitRecord.lodBias != bias) {
+                checkAndSetUnit(unit, record, caps);
+                GL11.glTexEnvf(EXTTextureLODBias.GL_TEXTURE_FILTER_CONTROL_EXT,
+                        EXTTextureLODBias.GL_TEXTURE_LOD_BIAS_EXT, bias);
+                unitRecord.lodBias = bias;
+            }
         }
     }
 
