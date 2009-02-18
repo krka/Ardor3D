@@ -39,7 +39,7 @@ public class Node extends Spatial {
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 
     /** This node's children. */
-    protected List<Spatial> _children;
+    protected final List<Spatial> _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
 
     /**
      * Constructs a new Spatial.
@@ -75,9 +75,6 @@ public class Node extends Spatial {
                     child.getParent().detachChild(child);
                 }
                 child.setParent(this);
-                if (_children == null) {
-                    _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
-                }
                 _children.add(child);
                 child.markDirty(DirtyType.Attached);
                 if (logger.isLoggable(Level.FINE)) {
@@ -86,9 +83,6 @@ public class Node extends Spatial {
             }
         }
 
-        if (_children == null) {
-            return 0;
-        }
         return _children.size();
     }
 
@@ -109,9 +103,6 @@ public class Node extends Spatial {
                     child.getParent().detachChild(child);
                 }
                 child.setParent(this);
-                if (_children == null) {
-                    _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
-                }
                 _children.add(index, child);
                 child.markDirty(DirtyType.Attached);
                 if (logger.isLoggable(Level.FINE)) {
@@ -120,9 +111,6 @@ public class Node extends Spatial {
             }
         }
 
-        if (_children == null) {
-            return 0;
-        }
         return _children.size();
     }
 
@@ -134,9 +122,6 @@ public class Node extends Spatial {
      * @return the index the child was at. -1 if the child was not in the list.
      */
     public int detachChild(final Spatial child) {
-        if (_children == null) {
-            return -1;
-        }
         if (child == null) {
             return -1;
         }
@@ -160,9 +145,6 @@ public class Node extends Spatial {
      * @return the index the child was at. -1 if the child was not in the list.
      */
     public int detachChildNamed(final String childName) {
-        if (_children == null) {
-            return -1;
-        }
         if (childName == null) {
             return -1;
         }
@@ -185,9 +167,6 @@ public class Node extends Spatial {
      * @return the child at the supplied index.
      */
     public Spatial detachChildAt(final int index) {
-        if (_children == null) {
-            return null;
-        }
         final Spatial child = _children.remove(index);
         if (child != null) {
             child.setParent(null);
@@ -207,12 +186,10 @@ public class Node extends Spatial {
      * <code>detachAllChildren</code> removes all children attached to this node.
      */
     public void detachAllChildren() {
-        if (_children != null) {
-            for (int i = _children.size() - 1; i >= 0; i--) {
-                detachChildAt(i);
-            }
-            logger.fine("All children removed.");
+        for (int i = _children.size() - 1; i >= 0; i--) {
+            detachChildAt(i);
         }
+        logger.fine("All children removed.");
     }
 
     /**
@@ -223,9 +200,6 @@ public class Node extends Spatial {
      * @return the index
      */
     public int getChildIndex(final Spatial sp) {
-        if (_children == null) {
-            return -1;
-        }
         return _children.indexOf(sp);
     }
 
@@ -271,9 +245,6 @@ public class Node extends Spatial {
      * @return the child at a specified index.
      */
     public Spatial getChild(final int i) {
-        if (_children == null) {
-            return null;
-        }
         return _children.get(i);
     }
 
@@ -310,9 +281,6 @@ public class Node extends Spatial {
      * @return true if the object is contained, false otherwise.
      */
     public boolean hasChild(final Spatial spat) {
-        if (_children == null) {
-            return false;
-        }
         if (_children.contains(spat)) {
             return true;
         }
@@ -334,10 +302,6 @@ public class Node extends Spatial {
      * @return the number of children this node maintains.
      */
     public int getNumberOfChildren() {
-        if (_children == null) {
-            return 0;
-        }
-
         return _children.size();
     }
 
@@ -384,9 +348,6 @@ public class Node extends Spatial {
      */
     @Override
     public void draw(final Renderer r) {
-        if (_children == null) {
-            return;
-        }
         Spatial child;
         for (int i = 0, cSize = _children.size(); i < cSize; i++) {
             child = _children.get(i);
@@ -404,9 +365,6 @@ public class Node extends Spatial {
      */
     @Override
     public void updateWorldBound(final boolean recurse) {
-        if (_children == null) {
-            return;
-        }
         BoundingVolume worldBound = null;
         for (int i = 0, cSize = _children.size(); i < cSize; i++) {
             final Spatial child = _children.get(i);
@@ -436,9 +394,6 @@ public class Node extends Spatial {
             visitor.visit(this);
         }
 
-        if (_children == null) {
-            return;
-        }
         Spatial child;
         for (int i = 0, cSize = _children.size(); i < cSize; i++) {
             child = _children.get(i);
@@ -452,30 +407,8 @@ public class Node extends Spatial {
         }
     }
 
-    /**
-     * Applies the stack of render states to each child by calling updateRenderState(states) on each child.
-     * 
-     * @param states
-     *            The Stack[] of render states to apply to each child.
-     */
-    // @Override
-    // protected void applyRenderState(final Stack<? extends RenderState>[] states) {
-    // if (_children == null) {
-    // return;
-    // }
-    // for (int i = 0, cSize = _children.size(); i < cSize; i++) {
-    // final Spatial pkChild = getChild(i);
-    // if (pkChild != null) {
-    // pkChild.updateRenderState(states);
-    // }
-    // }
-    // }
     @Override
     public void sortLights() {
-        if (_children == null) {
-            return;
-        }
-
         for (int i = 0, cSize = _children.size(); i < cSize; i++) {
             final Spatial pkChild = getChild(i);
             if (pkChild != null) {
@@ -490,11 +423,7 @@ public class Node extends Spatial {
 
     @Override
     public Node clone() {
-        // try {
         return (Node) super.clone();
-        // } catch (final CloneNotSupportedException e) {
-        // throw new AssertionError(); // can not happen
-        // }
     }
 
     // /////////////////
@@ -509,29 +438,22 @@ public class Node extends Spatial {
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
-        if (_children == null) {
-            e.getCapsule(this).writeSavableList(null, "children", null);
-        } else {
-            e.getCapsule(this).writeSavableList(new ArrayList<Spatial>(_children), "children", null);
-        }
+        e.getCapsule(this).writeSavableList(new ArrayList<Spatial>(_children), "children", null);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final List<Spatial> cList = e.getCapsule(this).readSavableList("children", null);
-        if (cList == null) {
-            _children = null;
-        } else {
-            _children = Collections.synchronizedList(cList);
+        _children.clear();
+        if (cList != null) {
+            _children.addAll(cList);
         }
 
         // go through children and set parent to this node
-        if (_children != null) {
-            for (int x = 0, cSize = _children.size(); x < cSize; x++) {
-                final Spatial child = _children.get(x);
-                child._parent = this;
-            }
+        for (int x = 0, cSize = _children.size(); x < cSize; x++) {
+            final Spatial child = _children.get(x);
+            child._parent = this;
         }
     }
 
