@@ -39,13 +39,14 @@ public class Node extends Spatial {
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 
     /** This node's children. */
-    protected final List<Spatial> _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
+    protected final List<Spatial> _children;
 
     /**
      * Constructs a new Spatial.
      */
     public Node() {
         super();
+        _children = Collections.synchronizedList(new ArrayList<Spatial>(1));
     }
 
     /**
@@ -55,7 +56,20 @@ public class Node extends Spatial {
      *            the name of the node. This is required for identification purposes.
      */
     public Node(final String name) {
+        this(name, Collections.synchronizedList(new ArrayList<Spatial>(1)));
+    }
+
+    /**
+     * Constructs a new <code>Node</code> with a given name.
+     * 
+     * @param name
+     *            the name of the node. This is required for identification purposes.
+     * @param childrenList
+     *            the list to use for storing children. Defaults to a synchronized ArrayList.
+     */
+    public Node(final String name, final List<Spatial> children) {
         super(name);
+        _children = children;
     }
 
     /**
