@@ -447,6 +447,7 @@
 	    <collection field="nodes" usage="optional" pre-set="postsetSpecifiedInAbstract">
 	        <structure type="com.ardor3d.extension.model.collada.binding.core.DaeNode" usage="optional"/>
 	    </collection>
+	    <structure name="extra" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeLookat" abstract="true" pre-set="postsetSpecifiedInAbstract">
