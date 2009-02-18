@@ -15,6 +15,7 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 public class DaeTechnique extends DaeTreeNode {
     private DaeBlinnPhong blinn;
     private DaeBlinnPhong phong;
+    private DaeBlinnPhong lambert;
 
     public DaeBlinnPhong getBlinn() {
         return blinn;
@@ -22,6 +23,10 @@ public class DaeTechnique extends DaeTreeNode {
 
     public DaeBlinnPhong getPhong() {
         return phong;
+    }
+
+    public DaeBlinnPhong getLambert() {
+        return lambert;
     }
 
     @Override

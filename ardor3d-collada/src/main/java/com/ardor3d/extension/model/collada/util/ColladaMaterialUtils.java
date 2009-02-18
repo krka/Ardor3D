@@ -60,9 +60,9 @@ public class ColladaMaterialUtils {
                     final DaeEffect effect = (DaeEffect) effectNode;
                     // XXX: For now, just grab the common technique:
                     final DaeTechnique technique = effect.getProfileCommon().getTechnique();
-                    if (technique.getBlinn() != null || technique.getPhong() != null) {
+                    if (technique.getBlinn() != null || technique.getPhong() != null || technique.getLambert() != null) {
                         final DaeBlinnPhong blinnPhong = technique.getBlinn() != null ? technique.getBlinn()
-                                : technique.getPhong();
+                                : technique.getPhong() != null ? technique.getPhong() : technique.getLambert();
                         final MaterialState mState = new MaterialState();
                         // XXX: It seems this is generally wrong?
                         // if (blinnPhong.getAmbientColor() != null) {

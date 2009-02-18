@@ -159,6 +159,8 @@
         <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
         <structure name="blinn" field="blinn" type="com.ardor3d.extension.model.collada.binding.fx.DaeBlinnPhong" usage="optional"/>
         <structure name="phong" field="phong" type="com.ardor3d.extension.model.collada.binding.fx.DaeBlinnPhong" usage="optional"/>
+        <structure name="lambert" field="lambert" type="com.ardor3d.extension.model.collada.binding.fx.DaeBlinnPhong" usage="optional"/>
+        <structure name="extra" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeBlinnPhong" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -229,6 +231,7 @@
         <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
         <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
         <structure name="mesh" field="mesh" usage="optional" type="com.ardor3d.extension.model.collada.binding.core.DaeMesh"/>
+        <structure name="extra" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeMesh" abstract="true" pre-set="postsetSpecifiedInAbstract">
