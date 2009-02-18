@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.model.collada;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
@@ -28,21 +27,29 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class ColladaImporter {
 
+    /**
+     * Reads a Collada scene from the given resource and returns it as an Ardor3D Node.
+     * 
+     * @param resource
+     *            the name of the resource to find. ResourceLocatorTool will be used with TYPE_MODEL to find the
+     *            resource.
+     * @return a Node containing the Collada scene.
+     * @throws Exception
+     */
     public static Node readColladaScene(final String resource) throws Exception {
         final IBindingFactory bindingFactory = BindingDirectory.getFactory(Collada.class);
 
         final IUnmarshallingContext context = bindingFactory.createUnmarshallingContext();
 
-        final URL url = ColladaImporter.class.getResource(resource);
-        final InputStream in = url.openStream();
+        final URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
 
-        if (in == null) {
+        if (url == null) {
             throw new Error("Unable to locate '" + resource + "' on the classpath");
         }
 
         final SimpleResourceLocator srl = new SimpleResourceLocator(url);
         ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-        final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(in));
+        final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(url.openStream()));
 
         // Collada may or may not have a scene.
         // FIXME: We should eventually return the libraries too since you could have those without a scene.
