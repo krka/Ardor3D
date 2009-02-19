@@ -10,9 +10,12 @@
 
 package com.ardor3d.extension.model.collada.binding.core;
 
+import com.ardor3d.extension.model.collada.binding.DaeList;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
+import com.ardor3d.extension.model.collada.binding.physics.DaeInstancePhysicsScene;
 
 public class DaeScene extends DaeTreeNode {
+    private DaeList<DaeInstancePhysicsScene> instancePhysicsScenes;
     private DaeInstanceVisualScene instanceVisualScene;
 
     public DaeInstanceVisualScene getInstanceVisualScene() {

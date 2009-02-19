@@ -414,6 +414,7 @@
         <collection field="nodes" pre-set="postsetSpecifiedInAbstract">
             <structure type="com.ardor3d.extension.model.collada.binding.core.DaeNode"/>
         </collection>
+	    <structure name="extra" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeNode" name="node" pre-set="postsetSpecifiedInAbstract">
@@ -493,10 +494,15 @@
         <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
         <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
         <value name="url" field="url" style="attribute"/>
-        <collection field="skeletons">
-        	<structure name="skeleton"/>
+        <collection field="skeletons" usage="optional">
+        	<structure name="skeleton" type="com.ardor3d.extension.model.collada.binding.core.DaeSkeleton"/>
         </collection>
         <structure name="bind_material" field="bindMaterial" usage="optional"/>
+        <structure name="extra" usage="optional"/>
+    </mapping>
+
+    <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeSkeleton" abstract="true">
+        <value field="name" style="text"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeInstanceLight" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -529,7 +535,13 @@
         <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
         <value name="target" field="target" style="attribute"/>
         <value name="symbol" field="symbol" style="attribute"/>
-        <structure name="bind_vertex_input" usage="optional"/>
+        <collection field="bindVertexInputs" item-type="com.ardor3d.extension.model.collada.binding.fx.DaeBindVertexInput" pre-set="postsetSpecifiedInAbstract"/>
+    </mapping>
+
+    <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeBindVertexInput" name="bind_vertex_input" post-set="postset">
+        <value name="semantic" field="semantic" style="attribute"/>
+        <value name="input_semantic" field="inputSemantic" style="attribute"/>
+        <value name="input_set" field="inputSet" style="attribute" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeInstanceNode" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -539,8 +551,17 @@
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeScene" abstract="true" pre-set="postsetSpecifiedInAbstract">
+        <collection field="instancePhysicsScenes" item-type="com.ardor3d.extension.model.collada.binding.physics.DaeInstancePhysicsScene" pre-set="postsetSpecifiedInAbstract"/>
         <structure name="instance_visual_scene" field="instanceVisualScene"
                    type="com.ardor3d.extension.model.collada.binding.core.DaeInstanceVisualScene"/>
+        <structure name="extra" usage="optional"/>
+    </mapping>
+
+    <mapping class="com.ardor3d.extension.model.collada.binding.physics.DaeInstancePhysicsScene" name="instance_physics_scene" post-set="postset">
+        <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
+        <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
+        <value name="url" field="url" style="attribute"/>
+        <structure name="extra" usage="optional"/>
     </mapping>
 
     <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeInstanceVisualScene" abstract="true" post-set="postsetSpecifiedInAbstract">

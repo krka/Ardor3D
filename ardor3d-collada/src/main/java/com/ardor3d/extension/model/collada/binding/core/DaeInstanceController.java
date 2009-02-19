@@ -17,7 +17,7 @@ import com.ardor3d.extension.model.collada.binding.fx.DaeBindMaterial;
 
 public class DaeInstanceController extends DaeTreeNode {
     private String url;
-    private LinkedList<String> skeletons;
+    private LinkedList<DaeSkeleton> skeletons;
     private DaeBindMaterial bindMaterial;
 
     public String getUrl() {
@@ -27,7 +27,7 @@ public class DaeInstanceController extends DaeTreeNode {
     /**
      * @return the skeleton
      */
-    public LinkedList<String> getSkeletons() {
+    public LinkedList<DaeSkeleton> getSkeletons() {
         return skeletons;
     }
 

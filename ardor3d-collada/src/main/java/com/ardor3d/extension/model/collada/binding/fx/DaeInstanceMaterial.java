@@ -10,15 +10,14 @@
 
 package com.ardor3d.extension.model.collada.binding.fx;
 
-import java.util.ArrayList;
-
+import com.ardor3d.extension.model.collada.binding.DaeList;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaeInstanceMaterial extends DaeTreeNode {
     private String target;
     private String symbol;
-    private ArrayList<DaeBind> binds;
-    private ArrayList<DaeBindVertexInput> bindVertexInputs;
+    private DaeList<DaeBind> binds;
+    private DaeList<DaeBindVertexInput> bindVertexInputs;
 
     /**
      * @return the target
@@ -37,14 +36,14 @@ public class DaeInstanceMaterial extends DaeTreeNode {
     /**
      * @return the binds
      */
-    public ArrayList<DaeBind> getBinds() {
+    public DaeList<DaeBind> getBinds() {
         return binds;
     }
 
     /**
      * @return the bindVertexInputs
      */
-    public ArrayList<DaeBindVertexInput> getBindVertexInputs() {
+    public DaeList<DaeBindVertexInput> getBindVertexInputs() {
         return bindVertexInputs;
     }
 }
