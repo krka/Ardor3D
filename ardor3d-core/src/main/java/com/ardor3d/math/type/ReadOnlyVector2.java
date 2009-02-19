@@ -11,7 +11,6 @@
 package com.ardor3d.math.type;
 
 import com.ardor3d.math.Vector2;
-import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyVector2 {
 
@@ -68,14 +67,6 @@ public interface ReadOnlyVector2 {
     public double dot(final double x, final double y);
 
     public double dot(final ReadOnlyVector2 vec);
-
-    public Vector3 cross(final double x, final double y, final Vector3 store);
-
-    public Vector3 cross(final ReadOnlyVector2 vec, final Vector3 store);
-
-    public double determinant(final double x, final double y);
-
-    public double determinant(final ReadOnlyVector2 vec);
 
     public double getPolarAngle();
 

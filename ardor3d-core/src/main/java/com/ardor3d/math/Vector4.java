@@ -40,25 +40,29 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static ReadOnlyVector4 ZERO = new Vector4(0, 0, 0, 0);
 
     /**
+     * 1, 1, 1, 1
+     */
+    public final static ReadOnlyVector4 ONE = new Vector4(1, 1, 1, 1);
+
+    /**
      * 1, 0, 0, 0
      */
     public final static ReadOnlyVector4 UNIT_X = new Vector4(1, 0, 0, 0);
+
     /**
      * 0, 1, 0, 0
      */
     public final static ReadOnlyVector4 UNIT_Y = new Vector4(0, 1, 0, 0);
+
     /**
      * 0, 0, 1, 0
      */
     public final static ReadOnlyVector4 UNIT_Z = new Vector4(0, 0, 1, 0);
+
     /**
      * 0, 0, 0, 1
      */
     public final static ReadOnlyVector4 UNIT_W = new Vector4(0, 0, 0, 1);
-    /**
-     * 1, 1, 1, 1
-     */
-    public final static ReadOnlyVector4 UNIT_XYZ = new Vector4(1, 1, 1, 1);
 
     protected double _x = 0;
     protected double _y = 0;

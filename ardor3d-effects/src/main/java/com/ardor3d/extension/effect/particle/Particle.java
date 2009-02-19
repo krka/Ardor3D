@@ -479,7 +479,7 @@ public class Particle implements Savable {
         capsule.write(lifeSpan, "lifeSpan", 0);
         capsule.write(currentAge, "currentAge", 0);
         capsule.write(parent, "parent", null);
-        capsule.write(_velocity, "velocity", new Vector3(Vector3.XYZ_ONE));
+        capsule.write(_velocity, "velocity", new Vector3());
         capsule.write(type, "type", ParticleSystem.ParticleType.Quad);
     }
 
@@ -491,7 +491,7 @@ public class Particle implements Savable {
         lifeSpan = capsule.readFloat("lifeSpan", 0);
         currentAge = capsule.readInt("currentAge", 0);
         parent = (ParticleSystem) capsule.readSavable("parent", null);
-        _velocity.set((Vector3) capsule.readSavable("velocity", new Vector3(Vector3.XYZ_ONE)));
+        _velocity.set((Vector3) capsule.readSavable("velocity", new Vector3()));
         type = capsule.readEnum("type", ParticleSystem.ParticleType.class, ParticleSystem.ParticleType.Quad);
     }
 

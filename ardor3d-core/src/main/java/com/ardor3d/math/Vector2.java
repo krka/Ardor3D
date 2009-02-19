@@ -40,17 +40,19 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static ReadOnlyVector2 ZERO = new Vector2(0, 0);
 
     /**
+     * 1, 1
+     */
+    public final static ReadOnlyVector2 ONE = new Vector2(1, 1);
+
+    /**
      * 1, 0
      */
     public final static ReadOnlyVector2 UNIT_X = new Vector2(1, 0);
+
     /**
      * 0, 1
      */
     public final static ReadOnlyVector2 UNIT_Y = new Vector2(0, 1);
-    /**
-     * 1, 1
-     */
-    public final static ReadOnlyVector2 UNIT_XY = new Vector2(1, 1);
 
     protected double _x = 0;
     protected double _y = 0;
@@ -732,53 +734,6 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      */
     public double dot(final ReadOnlyVector2 vec) {
         return dot(vec.getX(), vec.getY());
-    }
-
-    /**
-     * @param x
-     * @param y
-     * @param store
-     *            the vector to store the result in for return. If null, a new vector object is created and returned.
-     * @return the cross product of this vector with the given x, y values.
-     */
-    public Vector3 cross(final double x, final double y, final Vector3 store) {
-        Vector3 result = store;
-        if (result == null) {
-            result = new Vector3();
-        }
-
-        return result.set(0, 0, determinant(x, y));
-    }
-
-    /**
-     * @param vec
-     * @param store
-     *            the vector to store the result in for return. If null, a new vector object is created and returned.
-     * @return the cross product of this vector with the x, y values of the given vector.
-     * @throws NullPointerException
-     *             if vec is null.
-     */
-    public Vector3 cross(final ReadOnlyVector2 vec, final Vector3 store) {
-        return cross(vec.getX(), vec.getY(), store);
-    }
-
-    /**
-     * @param x
-     * @param y
-     * @return the determinate of this vector with the given x, y values.
-     */
-    public double determinant(final double x, final double y) {
-        return (getX() * x) - (getY() * y);
-    }
-
-    /**
-     * @param vec
-     * @return the determinate of this vector with the x, y values of the given vector.
-     * @throws NullPointerException
-     *             if destination is null.
-     */
-    public double determinant(final ReadOnlyVector2 vec) {
-        return determinant(vec.getX(), vec.getY());
     }
 
     /**

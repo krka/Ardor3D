@@ -44,12 +44,12 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     /**
      * Identity transform.
      */
-    public static final ReadOnlyTransform IDENTITY = new Transform(Matrix3.IDENTITY, Vector3.XYZ_ONE, Vector3.ZERO,
-            true, true, true);
+    public static final ReadOnlyTransform IDENTITY = new Transform(Matrix3.IDENTITY, Vector3.ONE, Vector3.ZERO, true,
+            true, true);
 
     protected final Matrix3 _matrix = new Matrix3(Matrix3.IDENTITY);
     protected final Vector3 _translation = new Vector3(Vector3.ZERO);
-    protected final Vector3 _scale = new Vector3(Vector3.XYZ_ONE);
+    protected final Vector3 _scale = new Vector3(Vector3.ONE);
 
     /**
      * true if this transform is guaranteed to be the identity matrix.
@@ -155,7 +155,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      */
     public void setIdentity() {
         _matrix.set(Matrix3.IDENTITY);
-        _scale.set(Vector3.XYZ_ONE);
+        _scale.set(Vector3.ONE);
         _translation.set(Vector3.ZERO);
         _identity = true;
         _rotationMatrix = true;
@@ -905,7 +905,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_matrix, "rotation", new Matrix3(Matrix3.IDENTITY));
-        capsule.write(_scale, "scale", new Vector3(Vector3.XYZ_ONE));
+        capsule.write(_scale, "scale", new Vector3(Vector3.ONE));
         capsule.write(_translation, "translation", new Vector3(Vector3.ZERO));
         capsule.write(_identity, "identity", true);
         capsule.write(_rotationMatrix, "rotationMatrix", true);
@@ -915,7 +915,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
         _matrix.set((Matrix3) capsule.readSavable("rotation", new Matrix3(Matrix3.IDENTITY)));
-        _scale.set((Vector3) capsule.readSavable("scale", new Vector3(Vector3.XYZ_ONE)));
+        _scale.set((Vector3) capsule.readSavable("scale", new Vector3(Vector3.ONE)));
         _translation.set((Vector3) capsule.readSavable("translation", new Vector3(Vector3.ZERO)));
         _identity = capsule.readBoolean("identity", true);
         _rotationMatrix = capsule.readBoolean("rotationMatrix", true);
