@@ -15,7 +15,7 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaeTristrips extends DaeTreeNode {
     private DaeList<DaeInputShared> inputs;
-    private DaeList<DaeIntegerArray> pEntries;
+    private DaeList<DaeSimpleIntegerArray> pEntries;
     private int count;
     private String material;
 
@@ -23,7 +23,7 @@ public class DaeTristrips extends DaeTreeNode {
         return inputs;
     }
 
-    public DaeList<DaeIntegerArray> getPEntries() {
+    public DaeList<DaeSimpleIntegerArray> getPEntries() {
         return pEntries;
     }
 

@@ -21,4 +21,11 @@ public class DaeScene extends DaeTreeNode {
     public DaeInstanceVisualScene getInstanceVisualScene() {
         return instanceVisualScene;
     }
+
+    /**
+     * @return the instancePhysicsScenes
+     */
+    public DaeList<DaeInstancePhysicsScene> getInstancePhysicsScenes() {
+        return instancePhysicsScenes;
+    }
 }

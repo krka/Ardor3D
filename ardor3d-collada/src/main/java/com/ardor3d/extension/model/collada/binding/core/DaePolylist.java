@@ -15,8 +15,8 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaePolylist extends DaeTreeNode {
     private DaeList<DaeInputShared> inputs;
-    private DaeIntegerArray pEntry;
-    private DaeIntegerArray vCount;
+    private DaeSimpleIntegerArray pEntry;
+    private DaeSimpleIntegerArray vCount;
     private int count;
     private String material;
 
@@ -24,11 +24,11 @@ public class DaePolylist extends DaeTreeNode {
         return inputs;
     }
 
-    public DaeIntegerArray getPEntry() {
+    public DaeSimpleIntegerArray getPEntry() {
         return pEntry;
     }
 
-    public DaeIntegerArray getVCount() {
+    public DaeSimpleIntegerArray getVCount() {
         return vCount;
     }
 

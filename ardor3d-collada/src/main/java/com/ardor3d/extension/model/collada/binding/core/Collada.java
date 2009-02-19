@@ -32,6 +32,7 @@ public class Collada extends DaeTreeNode {
     private DaeList<DaeLibraries<DaeMaterial>> libraryMaterials;
     private DaeList<DaeLibraries<DaeGeometry>> libraryGeometries;
     private DaeList<DaeLibraries<DaeVisualScene>> libraryVisualScenes;
+    private DaeList<DaeLibraries<DaeController>> libraryControllers;
     private DaeList<DaeLibraries<DaeNode>> libraryNodes;
     private DaeScene scene;
 
@@ -77,6 +78,13 @@ public class Collada extends DaeTreeNode {
      */
     public DaeList<DaeLibraries<DaeVisualScene>> getLibraryVisualScenes() {
         return libraryVisualScenes;
+    }
+
+    /**
+     * @return the libraryControllers
+     */
+    public DaeList<DaeLibraries<DaeController>> getLibraryControllers() {
+        return libraryControllers;
     }
 
     /**

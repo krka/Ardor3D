@@ -12,7 +12,11 @@ package com.ardor3d.extension.model.collada.util;
 
 import java.util.logging.Logger;
 
+import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
+import com.ardor3d.extension.model.collada.binding.core.DaeController;
+import com.ardor3d.extension.model.collada.binding.core.DaeGeometry;
+import com.ardor3d.extension.model.collada.binding.core.DaeInstanceController;
 import com.ardor3d.extension.model.collada.binding.core.DaeInstanceGeometry;
 import com.ardor3d.extension.model.collada.binding.core.DaeInstanceNode;
 import com.ardor3d.extension.model.collada.binding.core.DaeLookat;
@@ -130,6 +134,35 @@ public class ColladaNodeUtils {
                 }
 
                 ColladaMaterialUtils.unbindMaterials(ig.getBindMaterial(), root);
+            }
+        }
+
+        // process any instance geometries
+        if (dNode.getInstanceControllers() != null) {
+            final Collada root = dNode.getRootNode();
+            for (final DaeInstanceController ic : dNode.getInstanceControllers()) {
+                ColladaMaterialUtils.bindMaterials(ic.getBindMaterial(), root);
+
+                final String id = ic.getUrl().substring(1);
+
+                final DaeController controller = (DaeController) Collada.findLibraryEntry(id, root
+                        .getLibraryControllers());
+
+                if (controller != null && controller.getSkin() != null) {
+                    // For now, just grab the associated skin mesh and add to the scene.
+                    final String skinSource = controller.getSkin().getSource();
+                    final DaeTreeNode skinNode = root.resolveUrl(skinSource);
+                    Spatial mesh = null;
+                    if (skinNode instanceof DaeGeometry) {
+                        mesh = ColladaMeshUtils.buildMesh((DaeGeometry) skinNode);
+                    }
+
+                    if (mesh != null) {
+                        node.attachChild(mesh);
+                    }
+                }
+
+                ColladaMaterialUtils.unbindMaterials(ic.getBindMaterial(), root);
             }
         }
 

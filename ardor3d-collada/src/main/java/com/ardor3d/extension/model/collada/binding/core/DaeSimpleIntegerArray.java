@@ -13,7 +13,7 @@ package com.ardor3d.extension.model.collada.binding.core;
 import com.ardor3d.extension.model.collada.binding.ColladaException;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
-public class DaeIntegerArray extends DaeTreeNode {
+public class DaeSimpleIntegerArray extends DaeTreeNode {
     private int[] data;
 
     public void setTextData(final String textData) {

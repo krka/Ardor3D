@@ -15,7 +15,7 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaeTriangles extends DaeTreeNode {
     private DaeList<DaeInputShared> inputs;
-    private DaeIntegerArray pEntry;
+    private DaeSimpleIntegerArray pEntry;
     private int count;
     private String material;
 
@@ -23,7 +23,7 @@ public class DaeTriangles extends DaeTreeNode {
         return inputs;
     }
 
-    public DaeIntegerArray getPEntry() {
+    public DaeSimpleIntegerArray getPEntry() {
         return pEntry;
     }
 

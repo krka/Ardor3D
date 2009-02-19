@@ -13,15 +13,20 @@ package com.ardor3d.extension.model.collada.binding.core;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaeSource extends DaeTreeNode {
+    private DaeNameArray nameArray;
     private DaeFloatArray floatArray;
-    private DaeIntegerArray intArray;
+    private DaeSimpleIntegerArray intArray;
     private DaeAccessor commonAccessor;
+
+    public DaeNameArray getNameArray() {
+        return nameArray;
+    }
 
     public DaeFloatArray getFloatArray() {
         return floatArray;
     }
 
-    public DaeIntegerArray getIntArray() {
+    public DaeSimpleIntegerArray getIntArray() {
         return intArray;
     }
 

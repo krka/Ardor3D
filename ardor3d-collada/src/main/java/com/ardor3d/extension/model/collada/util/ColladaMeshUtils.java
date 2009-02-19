@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
 import com.ardor3d.extension.model.collada.binding.core.DaeGeometry;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputShared;
-import com.ardor3d.extension.model.collada.binding.core.DaeIntegerArray;
+import com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray;
 import com.ardor3d.extension.model.collada.binding.core.DaeMesh;
 import com.ardor3d.extension.model.collada.binding.core.DaePolygons;
 import com.ardor3d.extension.model.collada.binding.core.DaePolylist;
@@ -169,7 +169,7 @@ public class ColladaMeshUtils {
         // use interval & sum of sizes of p entries to determine buffer sizes.
         int numEntries = 0;
         int indices = 0;
-        for (final DaeIntegerArray vals : polys.getPEntries()) {
+        for (final DaeSimpleIntegerArray vals : polys.getPEntries()) {
             final int length = vals.getData().length;
             numEntries += length;
             indices += ((length / interval) - 2) * 3;
@@ -188,7 +188,7 @@ public class ColladaMeshUtils {
         // go through the polygon entries
         int firstIndex = 0;
         final int[] currentVal = new int[interval];
-        for (final DaeIntegerArray dia : polys.getPEntries()) {
+        for (final DaeSimpleIntegerArray dia : polys.getPEntries()) {
             // for each p, iterate using max offset
             final int[] vals = dia.getData();
 
