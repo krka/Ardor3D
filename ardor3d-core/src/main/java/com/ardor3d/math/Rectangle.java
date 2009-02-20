@@ -107,7 +107,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
      * 
      * @return the third point of the rectangle.
      */
-    public Vector3 getC() {
+    public ReadOnlyVector3 getC() {
         return _c;
     }
 

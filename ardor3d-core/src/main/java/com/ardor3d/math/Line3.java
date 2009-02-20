@@ -40,6 +40,15 @@ public class Line3 extends Line3Base implements ReadOnlyLine3 {
     }
 
     /**
+     * Constructs a new line using the supplied source line
+     * 
+     * @param source
+     */
+    public Line3(final ReadOnlyLine3 source) {
+        super(source.getOrigin(), source.getDirection());
+    }
+
+    /**
      * Copies the values of the given source line into this line.
      * 
      * @param source

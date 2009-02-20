@@ -74,6 +74,20 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane 
     }
 
     /**
+     * Sets the value of this plane to the constant and normal values of the provided source plane.
+     * 
+     * @param source
+     * @return this plane for chaining
+     * @throws NullPointerException
+     *             if source is null.
+     */
+    public Plane set(final ReadOnlyPlane source) {
+        setConstant(source.getConstant());
+        setNormal(source.getNormal());
+        return this;
+    }
+
+    /**
      * Sets the constant value of this plane to the given double value.
      * 
      * @param constant
