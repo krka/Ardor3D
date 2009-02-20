@@ -165,7 +165,7 @@ public class ParticleMesh extends ParticleSystem {
 
     @Override
     public void draw(final Renderer r) {
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         for (int i = 0; i < _particles.length; i++) {
             final Particle particle = _particles[i];
             if (particle.getStatus() == Particle.Status.Alive) {

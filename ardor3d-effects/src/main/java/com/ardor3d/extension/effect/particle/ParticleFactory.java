@@ -21,9 +21,8 @@ public class ParticleFactory {
 
     public static ParticleSystem buildParticles(final String name, final int number,
             final ParticleSystem.ParticleType particleType) {
-        if (particleType != ParticleSystem.ParticleType.Triangle && particleType != ParticleSystem.ParticleType.Quad) {
-            throw new IllegalArgumentException(
-                    "particleType should be either ParticleSystem.ParticleType.TRIANGLE or ParticleSystem.ParticleType.QUAD");
+        if (particleType == ParticleSystem.ParticleType.GeomMesh) {
+            throw new IllegalArgumentException("particleType can not be GeomMesh");
         }
         ParticleSystem system;
         if (particleType == ParticleType.Point) {

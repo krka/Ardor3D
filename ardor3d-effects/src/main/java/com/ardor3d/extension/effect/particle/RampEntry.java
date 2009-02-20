@@ -56,10 +56,14 @@ public class RampEntry implements Savable {
     }
 
     public void setColor(final ReadOnlyColorRGBA color) {
-        if (_color != null) {
-            _color.set(color);
+        if (color != null) {
+            if (_color != null) {
+                _color.set(color);
+            } else {
+                _color = new ColorRGBA(color);
+            }
         } else {
-            _color = new ColorRGBA(color);
+            _color = null;
         }
     }
 
