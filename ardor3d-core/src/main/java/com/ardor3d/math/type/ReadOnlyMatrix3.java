@@ -40,6 +40,8 @@ public interface ReadOnlyMatrix3 {
 
     public double[] toArray(final double[] store, final boolean rowMajor);
 
+    public double[] toAngles(final double[] store);
+
     public Matrix3 multiply(final ReadOnlyMatrix3 matrix, final Matrix3 store);
 
     public Vector3 applyPre(final ReadOnlyVector3 vec, final Vector3 store);

@@ -160,10 +160,13 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing {
 
         final Vector3 b1 = Vector3.fetchTempInstance();
         final Vector3 b2 = Vector3.fetchTempInstance();
+
         // compute a random radius according to the ring area distribution
-        final double inner2 = _innerRadius * _innerRadius, outer2 = _outerRadius * _outerRadius, r = Math.sqrt(inner2
-                + MathUtils.nextRandomFloat() * (outer2 - inner2)), theta = MathUtils.nextRandomFloat()
-                * MathUtils.TWO_PI;
+        final double inner2 = _innerRadius * _innerRadius;
+        final double outer2 = _outerRadius * _outerRadius;
+        final double r = Math.sqrt(inner2 + MathUtils.nextRandomFloat() * (outer2 - inner2));
+        final double theta = MathUtils.nextRandomFloat() * MathUtils.TWO_PI;
+
         _up.cross(Vector3.UNIT_X, b1);
         if (b1.lengthSquared() < MathUtils.EPSILON) {
             _up.cross(Vector3.UNIT_Y, b1);
@@ -171,7 +174,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing {
         b1.normalizeLocal();
         _up.cross(b1, b2);
         result.set(b1).multiplyLocal(r * MathUtils.cos(theta)).addLocal(_center);
-        result.scaleAdd(r * MathUtils.sin(theta), b2, result);
+        b2.scaleAdd(r * MathUtils.sin(theta), result, result);
 
         Vector3.releaseTempInstance(b1);
         Vector3.releaseTempInstance(b2);

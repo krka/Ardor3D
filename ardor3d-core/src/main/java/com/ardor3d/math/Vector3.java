@@ -543,7 +543,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
         result.setX(_x * scale + add.getX());
         result.setY(_y * scale + add.getY());
-        result.setY(_z * scale + add.getZ());
+        result.setZ(_z * scale + add.getZ());
         return result;
     }
 

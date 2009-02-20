@@ -579,6 +579,45 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
+     * converts this matrix to Euler rotation angles (yaw, roll, pitch). See
+     * http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToEuler/index.htm
+     * 
+     * @param store
+     *            the double[] array to store the computed angles in. If null, a new double[] will be created
+     * @return the double[] array.
+     * @throws IllegalArgumentException
+     *             if non-null store is not at least length 3
+     */
+    public double[] toAngles(final double[] store) {
+        double[] result = store;
+        if (result == null) {
+            result = new double[3];
+        } else if (result.length < 3) {
+            throw new IllegalArgumentException("store array must have at least three elements");
+        }
+
+        double heading, attitude, bank;
+        if (_data[1][0] > 0.998) { // singularity at north pole
+            heading = Math.atan2(_data[0][2], _data[2][2]);
+            attitude = Math.PI / 2;
+            bank = 0;
+        } else if (_data[1][0] < -0.998) { // singularity at south pole
+            heading = Math.atan2(_data[0][2], _data[2][2]);
+            attitude = -Math.PI / 2;
+            bank = 0;
+        } else {
+            heading = Math.atan2(-_data[2][0], _data[0][0]);
+            bank = Math.atan2(-_data[1][2], _data[1][1]);
+            attitude = Math.asin(_data[1][0]);
+        }
+        result[0] = heading;
+        result[1] = attitude;
+        result[2] = bank;
+
+        return result;
+    }
+
+    /**
      * @param matrix
      * @return This matrix for chaining, modified internally to reflect multiplication against the given matrix
      * @throws NullPointerException
@@ -1036,10 +1075,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Modifies this matrix to equal the rotation required to point the z-axis at 'direction' and the y-axis to 'up'.
      * 
-     * @param direction
-     *            where to 'look' at
-     * @param up
-     *            a vector indicating the local up direction.
+     * @param direction where to 'look' at
+     * @param up a vector indicating the local up direction.
      */
     public void lookAt(final ReadOnlyVector3 direction, final Vector3 up) {
         final Vector3 xAxis = Vector3.fetchTempInstance();
@@ -1059,8 +1096,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Check a matrix... if it is null or its doubles are NaN or infinite, return false. Else return true.
      * 
-     * @param matrix
-     *            the vector to check
+     * @param matrix the vector to check
      * @return true or false as stated above.
      */
     public static boolean isValid(final ReadOnlyMatrix3 matrix) {
@@ -1115,8 +1151,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
-     * @param o
-     *            the object to compare for equality
+     * @param o the object to compare for equality
      * @return true if this matrix and the provided matrix have the same double values.
      */
     @Override
@@ -1187,8 +1222,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Used with serialization. Not to be called manually.
      * 
-     * @param in
-     *            ObjectInput
+     * @param in ObjectInput
      * @throws IOException
      * @throws ClassNotFoundException
      */
@@ -1203,8 +1237,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Used with serialization. Not to be called manually.
      * 
-     * @param out
-     *            ObjectOutput
+     * @param out ObjectOutput
      * @throws IOException
      */
     public void writeExternal(final ObjectOutput out) throws IOException {
@@ -1235,8 +1268,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * Releases a Matrix3 back to be used by a future call to fetchTempInstance. TAKE CARE: this Matrix3 object should
      * no longer have other classes referencing it or "Bad Things" will happen.
      * 
-     * @param mat
-     *            the Matrix3 to release.
+     * @param mat the Matrix3 to release.
      */
     public final static void releaseTempInstance(final Matrix3 mat) {
         if (Debug.useMathPools) {
