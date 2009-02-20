@@ -115,7 +115,7 @@ public class SwarmInfluence extends ParticleInfluence {
         _swarmRangeSQ = swarmRange * swarmRange;
     }
 
-    public Vector3 getSwarmOffset() {
+    public ReadOnlyVector3 getSwarmOffset() {
         return _swarmOffset;
     }
 

@@ -13,6 +13,8 @@ package com.ardor3d.extension.effect.particle;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyPlane;
+import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class FloorInfluence extends ParticleInfluence {
 
@@ -25,14 +27,14 @@ public class FloorInfluence extends ParticleInfluence {
     /**
      * The normal vector of the floor. Same semantics as in math.Plane.
      */
-    private Vector3 _normal;
+    private final Vector3 _normal = new Vector3();
 
     /**
      * The position vector for the (imaginary) center of the floor.
      */
-    private Vector3 _pos;
+    private final Vector3 _pos = new Vector3();
 
-    private Plane _floor;
+    private final Plane _floor;
 
     /**
      * @param pos
@@ -43,10 +45,10 @@ public class FloorInfluence extends ParticleInfluence {
      *            is the factor of multiplication when bouncing off the floor. A bouncyness factor of 1 means the ball
      *            leaves the floor with the same velocity as it hit the floor, much like a rubber ball.
      */
-    public FloorInfluence(final Vector3 pos, final Vector3 normal, final double bouncyness) {
+    public FloorInfluence(final ReadOnlyVector3 pos, final ReadOnlyVector3 normal, final double bouncyness) {
         _bouncyness = bouncyness;
-        _normal = normal;
-        _pos = pos;
+        _normal.set(normal);
+        _pos.set(pos);
         _floor = new Plane(normal, normal.dot(pos));
     }
 
@@ -88,13 +90,13 @@ public class FloorInfluence extends ParticleInfluence {
         _bouncyness = bouncyness;
     }
 
-    public Plane getFloor() {
+    public ReadOnlyPlane getFloor() {
         return _floor;
     }
 
-    public void setFloor(final Plane floor) {
+    public void setFloor(final ReadOnlyPlane floor) {
 
-        _floor = floor;
+        _floor.set(floor);
     }
 
     public Vector3 getNormal() {
@@ -102,8 +104,8 @@ public class FloorInfluence extends ParticleInfluence {
     }
 
     public void setNormal(final Vector3 normal) {
-        _normal = normal;
-        _floor = new Plane(normal, normal.dot(_pos));
+        _normal.set(normal);
+        _floor.set(new Plane(normal, normal.dot(_pos)));
     }
 
     public Vector3 getPos() {
@@ -111,8 +113,8 @@ public class FloorInfluence extends ParticleInfluence {
     }
 
     public void setPos(final Vector3 pos) {
-        _pos = pos;
-        _floor = new Plane(_normal, _normal.dot(pos));
+        _pos.set(pos);
+        _floor.set(new Plane(_normal, _normal.dot(pos)));
     }
 
     @Override

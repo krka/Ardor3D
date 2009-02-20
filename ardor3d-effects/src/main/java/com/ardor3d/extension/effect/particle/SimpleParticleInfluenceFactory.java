@@ -16,6 +16,8 @@ import com.ardor3d.math.Line3;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyLine3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -25,16 +27,16 @@ public final class SimpleParticleInfluenceFactory {
 
     public static class BasicWind extends ParticleInfluence {
         private double _strength;
-        private Vector3 _windDirection;
+        private final Vector3 _windDirection = new Vector3();
         private boolean _random, _rotateWithScene;
         private final Vector3 _vector = new Vector3();
 
         public BasicWind() {}
 
-        public BasicWind(final double windStr, final Vector3 windDir, final boolean addRandom,
+        public BasicWind(final double windStr, final ReadOnlyVector3 windDir, final boolean addRandom,
                 final boolean rotateWithScene) {
             _strength = windStr;
-            _windDirection = windDir;
+            _windDirection.set(windDir);
             _random = addRandom;
             _rotateWithScene = rotateWithScene;
         }
@@ -47,12 +49,12 @@ public final class SimpleParticleInfluenceFactory {
             _strength = windStr;
         }
 
-        public Vector3 getWindDirection() {
+        public ReadOnlyVector3 getWindDirection() {
             return _windDirection;
         }
 
-        public void setWindDirection(final Vector3 windDir) {
-            _windDirection = windDir;
+        public void setWindDirection(final ReadOnlyVector3 windDir) {
+            _windDirection.set(windDir);
         }
 
         public boolean isRandom() {
@@ -100,7 +102,7 @@ public final class SimpleParticleInfluenceFactory {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
             _strength = capsule.readFloat("strength", 1f);
-            _windDirection = (Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X));
+            _windDirection.set((Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X)));
             _random = capsule.readBoolean("random", false);
             _rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
@@ -112,23 +114,23 @@ public final class SimpleParticleInfluenceFactory {
     }
 
     public static class BasicGravity extends ParticleInfluence {
-        private Vector3 gravity;
+        private final Vector3 gravity = new Vector3();
         private boolean rotateWithScene;
         private final Vector3 vector = new Vector3();
 
         public BasicGravity() {}
 
-        public BasicGravity(final Vector3 gravForce, final boolean rotateWithScene) {
-            gravity = new Vector3(gravForce);
+        public BasicGravity(final ReadOnlyVector3 gravForce, final boolean rotateWithScene) {
+            gravity.set(gravForce);
             this.rotateWithScene = rotateWithScene;
         }
 
-        public Vector3 getGravityForce() {
+        public ReadOnlyVector3 getGravityForce() {
             return gravity;
         }
 
-        public void setGravityForce(final Vector3 gravForce) {
-            gravity = gravForce;
+        public void setGravityForce(final ReadOnlyVector3 gravForce) {
+            gravity.set(gravForce);
         }
 
         public boolean isRotateWithScene() {
@@ -164,7 +166,7 @@ public final class SimpleParticleInfluenceFactory {
         public void read(final Ardor3DImporter e) throws IOException {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
-            gravity = (Vector3) capsule.readSavable("gravity", new Vector3(Vector3.ZERO));
+            gravity.set((Vector3) capsule.readSavable("gravity", new Vector3(Vector3.ZERO)));
             rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
 
@@ -226,7 +228,7 @@ public final class SimpleParticleInfluenceFactory {
 
         private int _type = VT_CYLINDER;
         private double _strength, _divergence, _height, _radius;
-        private Line3 _axis;
+        private final Line3 _axis = new Line3();
         private boolean _random, _transformWithScene;
         private final Vector3 _v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
         private final Quaternion _rot = new Quaternion();
@@ -234,11 +236,11 @@ public final class SimpleParticleInfluenceFactory {
 
         public BasicVortex() {}
 
-        public BasicVortex(final double strength, final double divergence, final Line3 axis, final boolean random,
-                final boolean transformWithScene) {
+        public BasicVortex(final double strength, final double divergence, final ReadOnlyLine3 axis,
+                final boolean random, final boolean transformWithScene) {
             _strength = strength;
             _divergence = divergence;
-            _axis = axis;
+            _axis.set(axis);
             _height = 0f;
             _radius = 1f;
             _random = random;
@@ -269,12 +271,12 @@ public final class SimpleParticleInfluenceFactory {
             _divergence = divergence;
         }
 
-        public Line3 getAxis() {
+        public ReadOnlyLine3 getAxis() {
             return _axis;
         }
 
-        public void setAxis(final Line3 axis) {
-            _axis = axis;
+        public void setAxis(final ReadOnlyLine3 axis) {
+            _axis.set(axis);
         }
 
         public double getHeight() {
@@ -376,7 +378,7 @@ public final class SimpleParticleInfluenceFactory {
             _type = capsule.readInt("type", VT_CYLINDER);
             _strength = capsule.readFloat("strength", 1f);
             _divergence = capsule.readFloat("divergence", 0f);
-            _axis = (Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
+            _axis.set((Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y))));
             _height = capsule.readFloat("height", 0f);
             _radius = capsule.readFloat("radius", 1f);
             _random = capsule.readBoolean("random", false);
@@ -407,7 +409,7 @@ public final class SimpleParticleInfluenceFactory {
      *            rotate the wind direction with the particle system
      * @return ParticleInfluence
      */
-    public static ParticleInfluence createBasicWind(final double windStr, final Vector3 windDir,
+    public static ParticleInfluence createBasicWind(final double windStr, final ReadOnlyVector3 windDir,
             final boolean addRandom, final boolean rotateWithScene) {
         return new BasicWind(windStr, windDir, addRandom, rotateWithScene);
     }
@@ -419,7 +421,7 @@ public final class SimpleParticleInfluenceFactory {
      *            rotate the gravity vector with the particle system
      * @return ParticleInfluence
      */
-    public static ParticleInfluence createBasicGravity(final Vector3 gravForce, final boolean rotateWithScene) {
+    public static ParticleInfluence createBasicGravity(final ReadOnlyVector3 gravForce, final boolean rotateWithScene) {
         return new BasicGravity(gravForce, rotateWithScene);
     }
 
@@ -450,8 +452,8 @@ public final class SimpleParticleInfluenceFactory {
      *            transform the axis with the particle system
      * @return ParticleInfluence
      */
-    public static ParticleInfluence createBasicVortex(final double strength, final double divergence, final Line3 axis,
-            final boolean random, final boolean transformWithScene) {
+    public static ParticleInfluence createBasicVortex(final double strength, final double divergence,
+            final ReadOnlyLine3 axis, final boolean random, final boolean transformWithScene) {
         return new BasicVortex(strength, divergence, axis, random, transformWithScene);
     }
 }

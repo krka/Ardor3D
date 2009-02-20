@@ -13,6 +13,7 @@ package com.ardor3d.extension.effect.particle;
 import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -50,16 +51,20 @@ public class RampEntry implements Savable {
         setOffset(offset);
     }
 
-    public ColorRGBA getColor() {
+    public ReadOnlyColorRGBA getColor() {
         return _color;
     }
 
-    public void setColor(final ColorRGBA color) {
-        _color = color;
+    public void setColor(final ReadOnlyColorRGBA color) {
+        if (_color != null) {
+            _color.set(color);
+        } else {
+            _color = new ColorRGBA(color);
+        }
     }
 
     public boolean hasColorSet() {
-        return _color != DEFAULT_COLOR;
+        return _color != null; // DEFAULT_COLOR is null
     }
 
     public double getSize() {

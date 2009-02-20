@@ -10,24 +10,32 @@
 
 package com.ardor3d.extension.effect.particle;
 
+import com.ardor3d.extension.effect.particle.ParticleSystem.ParticleType;
 import com.ardor3d.scenegraph.Mesh;
 
 public class ParticleFactory {
 
-    public static ParticleMesh buildParticles(final String name, final int number) {
+    public static ParticleSystem buildParticles(final String name, final int number) {
         return buildParticles(name, number, ParticleSystem.ParticleType.Quad);
     }
 
-    public static ParticleMesh buildParticles(final String name, final int number,
+    public static ParticleSystem buildParticles(final String name, final int number,
             final ParticleSystem.ParticleType particleType) {
         if (particleType != ParticleSystem.ParticleType.Triangle && particleType != ParticleSystem.ParticleType.Quad) {
             throw new IllegalArgumentException(
                     "particleType should be either ParticleSystem.ParticleType.TRIANGLE or ParticleSystem.ParticleType.QUAD");
         }
-        final ParticleMesh particleMesh = new ParticleMesh(name, number, particleType);
-        final ParticleController particleController = new ParticleController(particleMesh);
-        particleMesh.addController(particleController);
-        return particleMesh;
+        ParticleSystem system;
+        if (particleType == ParticleType.Point) {
+            system = new ParticlePoints(name, number);
+        } else if (particleType == ParticleType.Line) {
+            system = new ParticleLines(name, number);
+        } else {
+            system = new ParticleMesh(name, number, particleType);
+        }
+        final ParticleController particleController = new ParticleController(system);
+        system.addController(particleController);
+        return system;
     }
 
     public static ParticleMesh buildMeshParticles(final String name, final Mesh mesh) {
