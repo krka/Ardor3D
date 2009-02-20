@@ -21,6 +21,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
@@ -278,8 +279,7 @@ public abstract class LwjglLightStateUtil {
         // call to glLightfv(GL_LIGHT_POSITION,...).
 
         // XXX: This is a hack until we get a better lighting model up
-        final ReadOnlyMatrix4 modelViewMatrix = ContextManager.getCurrentContext().getCurrentCamera()
-                .getModelViewMatrix();
+        final ReadOnlyMatrix4 modelViewMatrix = Camera.getCurrentCamera().getModelViewMatrix();
 
         if (!record.isValid() || Float.compare(lr.position.getXf(), positionX) != 0
                 || Float.compare(lr.position.getYf(), positionY) != 0

@@ -31,6 +31,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
@@ -420,7 +421,7 @@ public class DirectionalShadowMapPass extends Pass {
         _context.enforceState(_sceneOffsetState);
 
         if (_context.getCapabilities().isGLSLSupported()) {
-            final ReadOnlyMatrix4 view = ContextManager.getCurrentContext().getCurrentCamera().getModelViewMatrix();
+            final ReadOnlyMatrix4 view = Camera.getCurrentCamera().getModelViewMatrix();
             final Matrix4 temp = Matrix4.fetchTempInstance();
             _shader.setUniform("inverseView", view.invert(temp), false);
             Matrix4.releaseTempInstance(temp);

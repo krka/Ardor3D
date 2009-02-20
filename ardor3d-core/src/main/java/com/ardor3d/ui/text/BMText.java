@@ -271,7 +271,7 @@ public class BMText extends Mesh {
     // -----------------------------------------------------
     public synchronized void draw(final Renderer r) {
         if (_textString.length() > 0) {
-            final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+            final Camera cam = Camera.getCurrentCamera();
 
             if (!(_autoScale == AutoScale.Off && _autoFade == AutoFade.Off)) {
                 updateScaleAndAlpha(cam, r);

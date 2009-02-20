@@ -174,7 +174,7 @@ public class QuadImposterNode extends Node {
             init(r);
         }
         if (_cam == null) {
-            _cam = ContextManager.getCurrentContext().getCurrentCamera();
+            _cam = Camera.getCurrentCamera();
 
             _tRenderer.getCamera().setFrustum(_cam.getFrustumNear(), _cam.getFrustumFar(), _cam.getFrustumLeft(),
                     _cam.getFrustumRight(), _cam.getFrustumTop(), _cam.getFrustumBottom());

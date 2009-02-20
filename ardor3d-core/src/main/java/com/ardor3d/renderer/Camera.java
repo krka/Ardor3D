@@ -1396,4 +1396,11 @@ public class Camera implements Savable, Externalizable, Cloneable {
     public Class<? extends Camera> getClassTag() {
         return getClass();
     }
+
+    public static Camera getCurrentCamera() {
+        if (ContextManager.getCurrentContext() == null) {
+            return null;
+        }
+        return ContextManager.getCurrentContext().getCurrentCamera();
+    }
 }

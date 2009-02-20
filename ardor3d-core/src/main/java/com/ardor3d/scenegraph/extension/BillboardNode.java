@@ -130,7 +130,7 @@ public class BillboardNode extends Node {
      *            Camera
      */
     private void rotateCameraAligned() {
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         _look.set(camera.getLocation()).subtractLocal(_worldTransform.getTranslation());
         // coopt left for our own purposes.
         final Vector3 xzp = _left;
@@ -171,7 +171,7 @@ public class BillboardNode extends Node {
      *            Camera
      */
     private void rotateScreenAligned() {
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         // coopt diff for our in direction:
         _look.set(camera.getDirection()).negateLocal();
         // coopt loc for our left direction:
@@ -187,7 +187,7 @@ public class BillboardNode extends Node {
      *            Camera
      */
     private void rotateAxial(final Vector3 axis) {
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         // Compute the additional rotation required for the billboard to face
         // the camera. To do this, the camera must be inverse-transformed into
         // the model space of the billboard.

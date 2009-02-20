@@ -188,7 +188,7 @@ public class LwjglRenderer extends Renderer {
     @Override
     public void clearStencilBuffer() {
         // grab our camera to get width and height info.
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
 
         // Clear the stencil buffer
         GL11.glClearStencil(0);
@@ -213,7 +213,7 @@ public class LwjglRenderer extends Renderer {
     @Override
     public void clearStrictBuffers() {
         // grab our camera to get width and height info.
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
 
         GL11.glDisable(GL11.GL_DITHER);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
@@ -270,7 +270,7 @@ public class LwjglRenderer extends Renderer {
         LwjglRendererUtil.switchMode(matRecord, GL11.GL_PROJECTION);
         GL11.glPushMatrix();
         GL11.glLoadIdentity();
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         final double viewportWidth = camera.getWidth() * (camera.getViewPortRight() - camera.getViewPortLeft());
         final double viewportHeight = camera.getHeight() * (camera.getViewPortTop() - camera.getViewPortBottom());
         GL11.glOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);

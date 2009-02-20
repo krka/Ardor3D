@@ -107,7 +107,7 @@ public final class Debugger {
         }
 
         if (se.getWorldBound() != null && se.getCullHint() != Spatial.CullHint.Always) {
-            final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+            final Camera cam = Camera.getCurrentCamera();
             final int state = cam.getPlaneState();
             if (cam.contains(se.getWorldBound()) != Camera.FrustumIntersect.Outside) {
                 drawBounds(se.getWorldBound(), r);
@@ -221,7 +221,7 @@ public final class Debugger {
             return;
         }
 
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
         final int state = cam.getPlaneState();
         if (element.getWorldBound() != null && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
             cam.setPlaneState(state);
@@ -335,7 +335,7 @@ public final class Debugger {
             return;
         }
 
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
         final int state = cam.getPlaneState();
         if (element.getWorldBound() != null && cam.contains(element.getWorldBound()) == Camera.FrustumIntersect.Outside) {
             cam.setPlaneState(state);
@@ -522,13 +522,13 @@ public final class Debugger {
     }
 
     public static void drawBuffer(final Texture.RenderToTextureType rttSource, final int location, final Renderer r) {
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
         drawBuffer(rttSource, location, r, cam.getWidth() / 6.25);
     }
 
     public static void drawBuffer(final Texture.RenderToTextureType rttSource, final int location, final Renderer r,
             final double size) {
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
         r.flushGraphics();
         double locationX = cam.getWidth(), locationY = cam.getHeight();
         bQuad.resize(size, (cam.getHeight() / (double) cam.getWidth()) * size);

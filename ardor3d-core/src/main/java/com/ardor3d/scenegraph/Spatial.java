@@ -527,7 +527,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
             return;
         }
 
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         final int state = camera.getPlaneState();
 
         // check to see if we can cull this node

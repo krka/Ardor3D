@@ -164,7 +164,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected void switchCameraIn(final boolean doClear) {
         // grab non-rtt settings
-        _oldCamera = ContextManager.getCurrentContext().getCurrentCamera();
+        _oldCamera = Camera.getCurrentCamera();
 
         // swap to rtt settings
         _parentRenderer.getQueue().pushBuckets();

@@ -113,7 +113,7 @@ public class AbstractRenderBucket implements RenderBucket {
         // return spat.queueDistance;
         // }
 
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
 
         // spat.queueDistance = 0;
 

@@ -25,7 +25,7 @@ public class ScreenExporter {
 
     public synchronized static void exportCurrentScreen(final Renderer renderer, final ScreenExportable exportable) {
         final Format format = exportable.getFormat();
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         final int width = camera.getWidth(), height = camera.getHeight();
 
         // prepare our data buffer

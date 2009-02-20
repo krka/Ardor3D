@@ -191,7 +191,7 @@ public class JoglRenderer extends Renderer {
         final GL gl = GLU.getCurrentGL();
 
         // grab our camera to get width and height info.
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
 
         // Clear the stencil buffer
         gl.glClearStencil(0);
@@ -220,7 +220,7 @@ public class JoglRenderer extends Renderer {
         final GL gl = GLU.getCurrentGL();
 
         // grab our camera to get width and height info.
-        final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera cam = Camera.getCurrentCamera();
 
         gl.glDisable(GL.GL_DITHER);
         gl.glEnable(GL.GL_SCISSOR_TEST);
@@ -283,7 +283,7 @@ public class JoglRenderer extends Renderer {
         JoglRendererUtil.switchMode(matRecord, GL.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         final double viewportWidth = camera.getWidth() * (camera.getViewPortRight() - camera.getViewPortLeft());
         final double viewportHeight = camera.getHeight() * (camera.getViewPortTop() - camera.getViewPortBottom());
         gl.glOrtho(0, viewportWidth, 0, viewportHeight, -1, 1);

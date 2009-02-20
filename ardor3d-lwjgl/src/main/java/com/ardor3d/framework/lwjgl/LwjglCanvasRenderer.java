@@ -97,7 +97,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         setCurrentContext();
 
         // render stuff
-        if (ContextManager.getCurrentContext().getCurrentCamera() != _camera) {
+        if (Camera.getCurrentCamera() != _camera) {
             ContextManager.getCurrentContext().setCurrentCamera(_camera);
             _camera.update();
         }

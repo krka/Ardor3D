@@ -52,8 +52,8 @@ public class ViewportExample extends ExampleBase {
     @Override
     protected void updateExample(final double tpf) {
         // Test getScreenCoordinates by centering our Quad on box2.
-        if (ContextManager.getCurrentContext() != null && ContextManager.getCurrentContext().getCurrentCamera() != null) {
-            final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        if (ContextManager.getCurrentContext() != null && Camera.getCurrentCamera() != null) {
+            final Camera camera = Camera.getCurrentCamera();
             final Vector3 vec3 = Vector3.fetchTempInstance();
             camera.getScreenCoordinates(box2.getWorldTranslation(), vec3);
             quad.setTranslation(vec3);
@@ -117,7 +117,7 @@ public class ViewportExample extends ExampleBase {
         final double vpBottom = full ? 0 : 0.25;
         final double vpTop = full ? 1 : 0.75;
 
-        final Camera camera = ContextManager.getCurrentContext().getCurrentCamera();
+        final Camera camera = Camera.getCurrentCamera();
         camera.setViewPort(vpLeft, vpRight, vpBottom, vpTop);
         camera.update();
 
