@@ -13,7 +13,7 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
-import com.ardor3d.extension.effect.particle.ParticleMesh;
+import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.RampEntry;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -44,7 +44,7 @@ public class ParticleRampExample extends ExampleBase {
         _canvas.setTitle("Particle System - Example");
         _lightState.setEnabled(false);
 
-        final ParticleMesh particles = ParticleFactory.buildParticles("particles", 1);
+        final ParticleSystem particles = ParticleFactory.buildParticles("particles", 1);
         particles.setEmissionDirection(new Vector3(0, 1, 0));
         particles.setInitialVelocity(0);
         particles.setMinimumLifeTime(2500);
