@@ -15,7 +15,6 @@ import java.nio.ByteBuffer;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
 
