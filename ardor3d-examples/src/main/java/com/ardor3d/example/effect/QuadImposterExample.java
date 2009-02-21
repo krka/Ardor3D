@@ -116,7 +116,7 @@ public class QuadImposterExample extends ExampleBase {
                     _root.attachChild(imposter1);
                     _root.attachChild(imposter2);
 
-                    keyText.print("[SPACE] Switch imposters off");
+                    keyText.setText("[SPACE] Switch imposters off");
                 } else {
                     _root.detachChild(imposter0);
                     _root.detachChild(imposter1);
@@ -125,7 +125,7 @@ public class QuadImposterExample extends ExampleBase {
                     _root.attachChild(scene2);
                     _root.attachChild(scene3);
 
-                    keyText.print("[SPACE] Switch imposters on");
+                    keyText.setText("[SPACE] Switch imposters on");
                 }
             }
         }));

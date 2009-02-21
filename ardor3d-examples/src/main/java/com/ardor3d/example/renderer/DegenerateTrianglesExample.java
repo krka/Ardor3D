@@ -108,11 +108,11 @@ public class DegenerateTrianglesExample extends ExampleBase {
             public void perform(final Canvas source, final InputState inputState, final double tpf) {
                 showDegenerateMesh = !showDegenerateMesh;
                 if (showDegenerateMesh) {
-                    t.print("[SPACE] Degenerate Mesh");
+                    t.setText("[SPACE] Degenerate Mesh");
                     multiStripMesh.setCullHint(CullHint.Always);
                     degenerateStripMesh.setCullHint(CullHint.Inherit);
                 } else {
-                    t.print("[SPACE] MultiStrip Mesh");
+                    t.setText("[SPACE] MultiStrip Mesh");
                     multiStripMesh.setCullHint(CullHint.Inherit);
                     degenerateStripMesh.setCullHint(CullHint.Always);
                 }

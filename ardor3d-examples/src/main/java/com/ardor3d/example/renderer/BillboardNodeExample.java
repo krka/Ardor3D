@@ -74,7 +74,7 @@ public class BillboardNodeExample extends ExampleBase {
                     ordinal = 0;
                 }
                 billboard.setAlignment(BillboardAlignment.values()[ordinal]);
-                t.print("[SPACE] " + billboard.getAlignment());
+                t.setText("[SPACE] " + billboard.getAlignment());
             }
         }));
     }

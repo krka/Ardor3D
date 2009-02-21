@@ -125,7 +125,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 // Update text value
                 final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val._average
                         : val._val;
-                entry.text.print(getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()) + " "
+                entry.text.setText(getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()) + " "
                         + stripVal(value, type));
 
                 // Set font scale

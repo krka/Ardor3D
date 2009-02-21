@@ -90,7 +90,6 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.VBOInfo;
-import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Debug;
 import com.ardor3d.util.WeakIdentityCache;
@@ -105,8 +104,6 @@ import com.ardor3d.util.stat.StatType;
  */
 public class LwjglRenderer extends Renderer {
     private static final Logger logger = Logger.getLogger(LwjglRenderer.class.getName());
-
-    private LwjglFont _font;
 
     private boolean _inOrthoMode;
 
@@ -306,25 +303,6 @@ public class LwjglRenderer extends Renderer {
     public void draw(final Spatial s) {
         if (s != null) {
             s.onDraw(this);
-        }
-    }
-
-    @Override
-    public void draw(final BasicText t) {
-        if (_font == null) {
-            _font = new LwjglFont();
-        }
-        _font.setColor(t.getTextColor());
-        applyStates(t._getWorldRenderStates());
-        if (Debug.stats) {
-            StatCollector.startStat(StatType.STAT_RENDER_TIMER);
-        }
-
-        final ReadOnlyVector3 scale = t.getWorldScale();
-        _font.print(this, t.getTranslation().getX(), t.getTranslation().getY(), scale, t.getText(), 0);
-
-        if (Debug.stats) {
-            StatCollector.endStat(StatType.STAT_RENDER_TIMER);
         }
     }
 
@@ -587,10 +565,6 @@ public class LwjglRenderer extends Renderer {
         // clear vbos
         final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
         cleanupVBOs(rendRecord);
-        if (_font != null) {
-            _font.deleteFont();
-            _font = null;
-        }
     }
 
     @Override

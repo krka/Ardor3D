@@ -203,6 +203,9 @@ public class BMFont {
             _pageTexture = TextureManager.loadFromKey(tkey, null, null);
             _pageTexture.setMagnificationFilter(magFilter);
 
+            // Add a touch higher mipmap selection.
+            _pageTexture.setLodBias(-1);
+
             if (_useMipMaps) {
                 _pageTexture.setAnisotropicFilterPercent(1.0f);
             }

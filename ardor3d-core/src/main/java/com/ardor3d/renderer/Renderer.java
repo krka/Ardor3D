@@ -31,7 +31,6 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.VBOInfo;
-import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.Ardor3dException;
 
 /**
@@ -174,15 +173,6 @@ public abstract class Renderer {
      *            the scene to render.
      */
     public abstract void draw(Spatial s);
-
-    /**
-     * 
-     * <code>draw</code> renders text to the back buffer.
-     * 
-     * @param t
-     *            the text object to be rendered.
-     */
-    public abstract void draw(BasicText t);
 
     /**
      * <code>flush</code> tells the graphics hardware to send through all currently waiting commands in the buffer.

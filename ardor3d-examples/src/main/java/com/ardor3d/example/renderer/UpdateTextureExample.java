@@ -139,9 +139,9 @@ public class UpdateTextureExample extends ExampleBase {
             public void perform(final Canvas source, final InputState inputState, final double tpf) {
                 updateTexture = !updateTexture;
                 if (updateTexture) {
-                    keyText.print("[SPACE] Updating texture...");
+                    keyText.setText("[SPACE] Updating texture...");
                 } else {
-                    keyText.print("[SPACE] Recreating texture...");
+                    keyText.setText("[SPACE] Recreating texture...");
                 }
             }
         }));

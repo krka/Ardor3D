@@ -61,9 +61,9 @@ public class ManyCollisionsExample extends ExampleBase {
     protected void updateExample(final double tpf) {
         final boolean hasCollision = PickingUtil.hasCollision(n1, n2, false);
         if (hasCollision) {
-            t.print("Collision!");
+            t.setText("Collision!");
         } else {
-            t.print("No Collision!");
+            t.setText("No Collision!");
         }
 
         final double time = _timer.getTimeInSeconds() * 0.2;
