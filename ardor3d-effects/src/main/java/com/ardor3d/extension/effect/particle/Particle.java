@@ -488,7 +488,7 @@ public class Particle implements Savable {
         startIndex = capsule.readInt("startIndex", 0);
         _position.set((Vector3) capsule.readSavable("position", new Vector3(Vector3.ZERO)));
         status = capsule.readEnum("status", Status.class, Status.Available);
-        lifeSpan = capsule.readFloat("lifeSpan", 0);
+        lifeSpan = capsule.readDouble("lifeSpan", 0);
         currentAge = capsule.readInt("currentAge", 0);
         parent = (ParticleSystem) capsule.readSavable("parent", null);
         _velocity.set((Vector3) capsule.readSavable("velocity", new Vector3()));

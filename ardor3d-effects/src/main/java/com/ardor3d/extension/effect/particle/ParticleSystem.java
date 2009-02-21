@@ -1036,10 +1036,12 @@ public abstract class ParticleSystem extends Node {
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_emitType, "emitType", EmitType.Point);
         capsule.write(_particleType, "particleType", ParticleType.Quad);
+
         capsule.write(_psSegment, "psSegment", null);
         capsule.write(_psRect, "psRect", null);
         capsule.write(_psRing, "psRing", null);
         capsule.write(_psGeom, "psGeom", null);
+
         capsule.write(_startSize, "startSize", DEFAULT_START_SIZE);
         capsule.write(_endSize, "endSize", DEFAULT_END_SIZE);
         capsule.write(_startColor, "startColor", new ColorRGBA(DEFAULT_START_COLOR));
@@ -1082,10 +1084,12 @@ public abstract class ParticleSystem extends Node {
         final InputCapsule capsule = e.getCapsule(this);
         _emitType = capsule.readEnum("emitType", EmitType.class, EmitType.Point);
         _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
+
         _psSegment = (LineSegment3) capsule.readSavable("psSegment", null);
         _psRect = (Rectangle) capsule.readSavable("psRect", null);
         _psRing = (Ring) capsule.readSavable("psRing", null);
         _psGeom = (Mesh) capsule.readSavable("psGeom", null);
+
         _startSize = capsule.readDouble("startSize", DEFAULT_START_SIZE);
         _endSize = capsule.readDouble("endSize", DEFAULT_END_SIZE);
         _startColor.set((ColorRGBA) capsule.readSavable("startColor", new ColorRGBA(DEFAULT_START_COLOR)));

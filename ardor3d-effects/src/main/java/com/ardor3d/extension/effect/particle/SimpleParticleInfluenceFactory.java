@@ -101,7 +101,7 @@ public final class SimpleParticleInfluenceFactory {
         public void read(final Ardor3DImporter e) throws IOException {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
-            _strength = capsule.readFloat("strength", 1f);
+            _strength = capsule.readDouble("strength", 1.0);
             _windDirection.set((Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X)));
             _random = capsule.readBoolean("random", false);
             _rotateWithScene = capsule.readBoolean("rotateWithScene", true);
@@ -205,14 +205,14 @@ public final class SimpleParticleInfluenceFactory {
         public void write(final Ardor3DExporter e) throws IOException {
             super.write(e);
             final OutputCapsule capsule = e.getCapsule(this);
-            capsule.write(dragCoefficient, "dragCoefficient", 1f);
+            capsule.write(dragCoefficient, "dragCoefficient", 1.0);
         }
 
         @Override
         public void read(final Ardor3DImporter e) throws IOException {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
-            dragCoefficient = capsule.readFloat("dragCoefficient", 1f);
+            dragCoefficient = capsule.readDouble("dragCoefficient", 1.0);
         }
 
         @Override
@@ -362,11 +362,11 @@ public final class SimpleParticleInfluenceFactory {
             super.write(e);
             final OutputCapsule capsule = e.getCapsule(this);
             capsule.write(_type, "type", VT_CYLINDER);
-            capsule.write(_strength, "strength", 1f);
-            capsule.write(_divergence, "divergence", 0f);
+            capsule.write(_strength, "strength", 1.0);
+            capsule.write(_divergence, "divergence", 0.0);
             capsule.write(_axis, "axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y)));
-            capsule.write(_height, "height", 0f);
-            capsule.write(_radius, "radius", 1f);
+            capsule.write(_height, "height", 0.0);
+            capsule.write(_radius, "radius", 1.0);
             capsule.write(_random, "random", false);
             capsule.write(_transformWithScene, "transformWithScene", true);
         }
@@ -376,11 +376,11 @@ public final class SimpleParticleInfluenceFactory {
             super.read(e);
             final InputCapsule capsule = e.getCapsule(this);
             _type = capsule.readInt("type", VT_CYLINDER);
-            _strength = capsule.readFloat("strength", 1f);
-            _divergence = capsule.readFloat("divergence", 0f);
+            _strength = capsule.readDouble("strength", 1.0);
+            _divergence = capsule.readDouble("divergence", 0.0);
             _axis.set((Line3) capsule.readSavable("axis", new Line3(new Vector3(), new Vector3(Vector3.UNIT_Y))));
-            _height = capsule.readFloat("height", 0f);
-            _radius = capsule.readFloat("radius", 1f);
+            _height = capsule.readDouble("height", 0.0);
+            _radius = capsule.readDouble("radius", 1.0);
             _random = capsule.readBoolean("random", false);
             _transformWithScene = capsule.readBoolean("transformWithScene", true);
         }

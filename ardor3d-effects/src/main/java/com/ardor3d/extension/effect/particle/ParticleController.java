@@ -510,8 +510,8 @@ public class ParticleController extends Controller {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
         _particles = (ParticleSystem) capsule.readSavable("particleMesh", null);
-        _releaseVariance = capsule.readFloat("releaseVariance", 0);
-        _precision = capsule.readFloat("precision", 0);
+        _releaseVariance = capsule.readDouble("releaseVariance", 0);
+        _precision = capsule.readDouble("precision", 0);
         _controlFlow = capsule.readBoolean("controlFlow", false);
         _updateOnlyInView = capsule.readBoolean("updateOnlyInView", false);
         iterations = capsule.readInt("iterations", 0);
