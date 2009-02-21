@@ -10,9 +10,17 @@
 
 package com.ardor3d.math;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Debug;
+import com.ardor3d.util.export.Ardor3DExporter;
+import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.pool.ObjectPool;
 
 public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3 {
@@ -217,6 +225,55 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3 {
     @Override
     public LineSegment3 clone() {
         return (LineSegment3) super.clone();
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public void write(final Ardor3DExporter e) throws IOException {
+        super.write(e);
+        final OutputCapsule capsule = e.getCapsule(this);
+        capsule.write(_extent, "extent", 0.0);
+    }
+
+    @Override
+    public void read(final Ardor3DImporter i) throws IOException {
+        super.read(i);
+        final InputCapsule capsule = i.getCapsule(this);
+        _extent = capsule.readDouble("extent", 0.0);
+    }
+
+    // /////////////////
+    // Methods for Externalizable
+    // /////////////////
+
+    /**
+     * Used with serialization. Not to be called manually.
+     * 
+     * @param in
+     *            ObjectInput
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    @Override
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        _extent = in.readDouble();
+    }
+
+    /**
+     * Used with serialization. Not to be called manually.
+     * 
+     * @param out
+     *            ObjectOutput
+     * @throws IOException
+     */
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeDouble(_extent);
     }
 
     // /////////////////
