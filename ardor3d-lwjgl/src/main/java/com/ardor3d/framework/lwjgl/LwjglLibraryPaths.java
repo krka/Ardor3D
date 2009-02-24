@@ -15,15 +15,22 @@ public enum LwjglLibraryPaths {
             "/macosx/liblwjgl.jnilib",
             "/macosx/openal.dylib",
     }),
-    LINUX_32("TODO", null, new String[] {
+    LINUX_AMD64("Linux", "amd64", new String[] {
+            "/linux/libjinput-linux64.so",
+            "/linux/liblwjgl64.so",
+            "/linux/libopenal64.so",
+    }),
+    LINUX_I386("Linux", "i386", new String[] {
             "/linux/libjinput-linux.so",
             "/linux/liblwjgl.so",
             "/linux/libopenal.so",
     }),
-    LINUX_64("TODO", null, new String[] {
-            "/linux/libjinput-linux64.so",
-            "/linux/liblwjgl64.so",
-            "/linux/libopenal64.so",
+    // NOTE: the order of the elements in this array is significant, so the catchall has to come last,
+    // or it will shadow more specific alternatives
+    LINUX_CATCHALL("Linux", null, new String[] {
+            "/linux/libjinput-linux.so",
+            "/linux/liblwjgl.so",
+            "/linux/libopenal.so",
     }),
     SOLARIS("TODO", null, new String[] {
             "/solaris/liblwjgl.so",
