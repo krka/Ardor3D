@@ -882,6 +882,9 @@ public class JoglRenderer extends Renderer {
             } else {
                 gl.glDrawElements(glIndexMode, indices.limit(), GL.GL_UNSIGNED_INT, 0);
             }
+            if (Debug.stats) {
+                addStats(indexModes[0], indices.limit());
+            }
         } else {
             int offset = 0;
             int indexModeCounter = 0;
@@ -896,6 +899,9 @@ public class JoglRenderer extends Renderer {
                     gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, indices);
                 } else {
                     gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, offset);
+                }
+                if (Debug.stats) {
+                    addStats(indexModes[indexModeCounter], count);
                 }
 
                 offset += count;
@@ -915,6 +921,10 @@ public class JoglRenderer extends Renderer {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
             gl.glDrawArrays(glIndexMode, 0, vertexBuffer.limit() / 3);
+
+            if (Debug.stats) {
+                addStats(indexModes[0], vertexBuffer.limit() / 3);
+            }
         } else {
             int offset = 0;
             int indexModeCounter = 0;
@@ -925,12 +935,38 @@ public class JoglRenderer extends Renderer {
 
                 gl.glDrawArrays(glIndexMode, offset, count);
 
+                if (Debug.stats) {
+                    addStats(indexModes[indexModeCounter], count);
+                }
+
                 offset += count;
 
                 if (indexModeCounter < indexModes.length - 1) {
                     indexModeCounter++;
                 }
             }
+        }
+    }
+
+    private void addStats(final IndexMode indexMode, final int count) {
+        switch (indexMode) {
+            case Triangles:
+            case TriangleFan:
+            case TriangleStrip:
+                StatCollector.addStat(StatType.STAT_TRIANGLE_COUNT, count);
+                break;
+            case Lines:
+            case LineLoop:
+            case LineStrip:
+                StatCollector.addStat(StatType.STAT_LINE_COUNT, count);
+                break;
+            case Points:
+                StatCollector.addStat(StatType.STAT_POINT_COUNT, count);
+                break;
+            case Quads:
+            case QuadStrip:
+                StatCollector.addStat(StatType.STAT_QUAD_COUNT, count);
+                break;
         }
     }
 

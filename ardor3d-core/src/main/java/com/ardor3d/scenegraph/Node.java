@@ -242,6 +242,7 @@ public class Node extends Spatial {
 
     @Override
     protected void updateChildren(final double time) {
+        // FIXME: Not thread safe.
         for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
             final Spatial pkChild = getChild(i);
             if (pkChild != null) {
