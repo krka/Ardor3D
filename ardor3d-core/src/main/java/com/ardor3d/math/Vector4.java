@@ -594,9 +594,9 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return a new unit vector (or 0, 0, 0, 0 if this unit is 0 length)
      */
     public Vector4 normalize(final Vector4 store) {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divide(length, store);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiply(MathUtils.inverseSqrt(lengthSq), store);
         }
 
         return store != null ? store.set(ZERO) : new Vector4(ZERO);
@@ -609,9 +609,9 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return this vector for chaining
      */
     public Vector4 normalizeLocal() {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divideLocal(length);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiplyLocal(MathUtils.inverseSqrt(lengthSq));
         }
 
         return this;
@@ -721,7 +721,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *         z, w). Effectively the square root of the value returned by {@link #lengthSquared()}.
      */
     public double length() {
-        return Math.sqrt(lengthSquared());
+        return MathUtils.sqrt(lengthSquared());
     }
 
     /**
@@ -769,7 +769,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return the distance between the point described by this vector and the given x, y, z, w point.
      */
     public double distance(final double x, final double y, final double z, final double w) {
-        return Math.sqrt(distanceSquared(x, y, z, w));
+        return MathUtils.sqrt(distanceSquared(x, y, z, w));
     }
 
     /**
@@ -779,7 +779,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *             if destination is null.
      */
     public double distance(final ReadOnlyVector4 destination) {
-        return Math.sqrt(distanceSquared(destination));
+        return MathUtils.sqrt(distanceSquared(destination));
     }
 
     /**

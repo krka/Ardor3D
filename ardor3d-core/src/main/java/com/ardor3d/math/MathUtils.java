@@ -13,6 +13,7 @@ package com.ardor3d.math;
 import java.util.Random;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.Debug;
 
 public class MathUtils {
 
@@ -27,6 +28,9 @@ public class MathUtils {
     /** The value PI as a double. (180 degrees) */
     public static final double PI = Math.PI;
 
+    /** The value PI^2 as a double. */
+    public final static double SQUARED_PI = PI * PI;
+
     /** The value 2PI as a double. (360 degrees) */
     public static final double TWO_PI = 2.0 * PI;
 
@@ -35,6 +39,9 @@ public class MathUtils {
 
     /** The value PI/4 as a double. (45 degrees) */
     public static final double QUARTER_PI = 0.25 * PI;
+
+    /** The value 3/4 PI as a double. (135 degrees) */
+    public final static double THREE_PI_HALVES = TWO_PI - HALF_PI;
 
     /** The value 1/PI as a double. */
     public static final double INV_PI = 1.0 / PI;
@@ -83,10 +90,10 @@ public class MathUtils {
     public static double sin(double dValue) {
         dValue = reduceSinAngle(dValue); // limits angle to between -PI/2 and +PI/2
         if (Math.abs(dValue) <= QUARTER_PI) {
-            return Math.sin(dValue);
+            return Debug.useFastMath ? FastMath.sin(dValue) : Math.sin(dValue);
         }
 
-        return Math.cos(HALF_PI - dValue);
+        return Debug.useFastMath ? FastMath.cos(HALF_PI - dValue) : Math.cos(HALF_PI - dValue);
     }
 
     /**
@@ -99,6 +106,30 @@ public class MathUtils {
      */
     public static double cos(final double dValue) {
         return sin(dValue + HALF_PI);
+    }
+
+    public static double sqrt(final double dValue) {
+        return Debug.useFastMath ? FastMath.sqrt(dValue) : Math.sqrt(dValue);
+    }
+
+    public static double inverseSqrt(final double dValue) {
+        return Debug.useFastMath ? FastMath.inverseSqrt(dValue) : 1 / Math.sqrt(dValue);
+    }
+
+    public static double atan(final double dValue) {
+        return Debug.useFastMath ? FastMath.atan(dValue) : Math.atan(dValue);
+    }
+
+    public static double asin(final double dValue) {
+        return Debug.useFastMath ? FastMath.asin(dValue) : Math.asin(dValue);
+    }
+
+    public static double tan(final double dValue) {
+        return Debug.useFastMath ? FastMath.tan(dValue) : Math.tan(dValue);
+    }
+
+    public static double acos(final double dValue) {
+        return Debug.useFastMath ? FastMath.acos(dValue) : Math.acos(dValue);
     }
 
     /**
@@ -123,9 +154,9 @@ public class MathUtils {
         final double cartY = cartCoords.getY();
         final double cartZ = cartCoords.getZ();
 
-        final double x = Math.sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
-        final double y = Math.atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
-        final double z = Math.asin(cartY / x);
+        final double x = sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
+        final double y = atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
+        final double z = asin(cartY / x);
         return store.set(x, y, z);
     }
 
@@ -151,9 +182,9 @@ public class MathUtils {
         final double cartY = cartCoords.getY();
         final double cartZ = cartCoords.getZ();
 
-        final double x = Math.sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
-        final double y = Math.asin(cartY / x);
-        final double z = Math.atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
+        final double x = sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
+        final double y = asin(cartY / x);
+        final double z = atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
         return store.set(x, y, z);
     }
 
@@ -310,7 +341,7 @@ public class MathUtils {
      */
     public static void matrixPerspective(final double fovY, final double aspect, final double zNear, final double zFar,
             final Matrix4 store) {
-        final double height = zNear * Math.tan(fovY * 0.5 * DEG_TO_RAD);
+        final double height = zNear * tan(fovY * 0.5 * DEG_TO_RAD);
         final double width = height * aspect;
 
         matrixFrustum(-width, width, -height, height, zNear, zFar, store);

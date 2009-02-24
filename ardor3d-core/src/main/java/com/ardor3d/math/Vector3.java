@@ -572,9 +572,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return a new unit vector (or 0, 0, 0 if this unit is 0 length)
      */
     public Vector3 normalize(final Vector3 store) {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divide(length, store);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiply(MathUtils.inverseSqrt(lengthSq), store);
         }
 
         return store != null ? store.set(ZERO) : new Vector3(ZERO);
@@ -587,9 +587,9 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return this vector for chaining
      */
     public Vector3 normalizeLocal() {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divideLocal(length);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiplyLocal(MathUtils.inverseSqrt(lengthSq));
         }
 
         return this;
@@ -692,7 +692,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *         Effectively the square root of the value returned by {@link #lengthSquared()}.
      */
     public double length() {
-        return Math.sqrt(lengthSquared());
+        return MathUtils.sqrt(lengthSquared());
     }
 
     /**
@@ -737,7 +737,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return the distance between the point described by this vector and the given x, y, z point.
      */
     public double distance(final double x, final double y, final double z) {
-        return Math.sqrt(distanceSquared(x, y, z));
+        return MathUtils.sqrt(distanceSquared(x, y, z));
     }
 
     /**
@@ -747,7 +747,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *             if destination is null.
      */
     public double distance(final ReadOnlyVector3 destination) {
-        return Math.sqrt(distanceSquared(destination));
+        return MathUtils.sqrt(distanceSquared(destination));
     }
 
     /**
@@ -855,7 +855,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *             if otherVector is null.
      */
     public double smallestAngleBetween(final ReadOnlyVector3 otherVector) {
-        return Math.acos(dot(otherVector));
+        return MathUtils.acos(dot(otherVector));
     }
 
     /**

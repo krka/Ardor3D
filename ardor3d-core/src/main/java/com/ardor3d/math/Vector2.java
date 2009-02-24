@@ -505,9 +505,9 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return a new unit vector (or 0, 0 if this unit is 0 length)
      */
     public Vector2 normalize(final Vector2 store) {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divide(length, store);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiply(MathUtils.inverseSqrt(lengthSq), store);
         }
 
         return clone();
@@ -520,9 +520,9 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return this vector for chaining
      */
     public Vector2 normalizeLocal() {
-        final double length = length();
-        if (Math.abs(length) > MathUtils.EPSILON) {
-            return divideLocal(length);
+        final double lengthSq = lengthSquared();
+        if (Math.abs(lengthSq) > MathUtils.EPSILON) {
+            return multiplyLocal(MathUtils.inverseSqrt(lengthSq));
         }
 
         return this;
@@ -663,7 +663,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *         square root of the value returned by {@link #lengthSquared()}.
      */
     public double length() {
-        return Math.sqrt(lengthSquared());
+        return MathUtils.sqrt(lengthSquared());
     }
 
     /**
@@ -704,7 +704,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      * @return the distance between the point described by this vector and the given x, y point.
      */
     public double distance(final double x, final double y) {
-        return Math.sqrt(distanceSquared(x, y));
+        return MathUtils.sqrt(distanceSquared(x, y));
     }
 
     /**
@@ -714,7 +714,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *             if destination is null.
      */
     public double distance(final ReadOnlyVector2 destination) {
-        return Math.sqrt(distanceSquared(destination));
+        return MathUtils.sqrt(distanceSquared(destination));
     }
 
     /**
@@ -768,7 +768,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      */
     public double smallestAngleBetween(final ReadOnlyVector2 otherVector) {
         final double dotProduct = dot(otherVector);
-        return Math.acos(dotProduct);
+        return MathUtils.acos(dotProduct);
     }
 
     /**

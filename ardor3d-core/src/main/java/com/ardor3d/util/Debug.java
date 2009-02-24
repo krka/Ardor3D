@@ -28,4 +28,5 @@ public class Debug {
 
     public static final boolean useMathPools = (System.getProperty("ardor3d.noMathPools") == null);
 
+    public static final boolean useFastMath = (System.getProperty("ardor3d.useFastMath") != null);
 }
