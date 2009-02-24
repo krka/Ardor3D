@@ -80,7 +80,7 @@
     <lwjgl.version>ardor3d-2.0.1</lwjgl.version>
     <swt.version>ardor3d-3448</swt.version>
   </properties>
-  
+
   <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
   <!-- modules. This only specifies version, and doesn't mean that modules actually use them -->
   <!-- To inherit actual usage of artifacts, use the dependencies section below. -->
@@ -180,7 +180,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <profiles>
     <!-- This profile activated by specifying -Phudson on command line -->
     <profile>

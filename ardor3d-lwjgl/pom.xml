@@ -29,9 +29,15 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl_util</artifactId>
     </dependency>
-    <dependency>
+
+    <!--
+     NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
+     and since it is at the moment more work than it is worth to get it ready. Later on, when
+     we have solved some more fundamental problems, it is probably time to revisit this.
+    -->
+    <!-- dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-natives</artifactId>
-    </dependency>
+    </dependency -->
   </dependencies>
 </project>

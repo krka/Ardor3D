@@ -23,7 +23,6 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.nativeloader.NativeLoader;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -41,17 +40,21 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     private static final Logger logger = Logger.getLogger(JoglCanvasRenderer.class.getName());
 
-    // ensure availability of JOGL natives
-    {
-        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
-                .getProperty("os.arch"));
+    // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
+    // and since it is at the moment more work than it is worth to get it ready. Later on, when
+    // we have solved some more fundamental problems, it is probably time to revisit this.
 
-        try {
-            NativeLoader.makeLibrariesAvailable(libraryPaths);
-        } catch (final Exception e) {
-            ; // ignore
-        }
-    }
+    // ensure availability of JOGL natives
+//    {
+//        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
+//                .getProperty("os.arch"));
+//
+//        try {
+//            NativeLoader.makeLibrariesAvailable(libraryPaths);
+//        } catch (final Exception e) {
+//            ; // ignore
+//        }
+//    }
 
     protected final Scene _scene;
     protected Camera _camera;
