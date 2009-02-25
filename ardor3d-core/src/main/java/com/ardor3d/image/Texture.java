@@ -55,7 +55,13 @@ public abstract class Texture implements Savable {
         /**
          * A set of 6 TwoDimensional textures arranged as faces of a cube facing inwards.
          */
-        CubeMap;
+        CubeMap,
+        /**
+         * A non-power of 2 texture. Does not support mipmapping. Only supports {@link WrapMode#Clamp},
+         * {@link WrapMode#EdgeClamp}, and {@link WrapMode#BorderClamp} wrap modes. Texture coordinates are not
+         * normalized [0, 1] but rather [0,w] and [0,h] for u and v respectively.
+         */
+        Rectangle;
     }
 
     public enum MinificationFilter {
