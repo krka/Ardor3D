@@ -1,0 +1,13 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>ardor3d</artifactId>
+    <groupId>com.ardor3d</groupId>
+    <version>0.4-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.ardor3d</groupId>
+  <artifactId>ardor3d-archetype</artifactId>
+  <name>Archetype - ardor3d-archetype</name>
+  <url>http://maven.apache.org</url>
+  <!-- TODO: make sure natives are included in copied project! -->
+</project>
