@@ -112,7 +112,6 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
 
         getCamera().update();
         getCamera().apply(_parentRenderer);
-        ContextManager.getCurrentContext().setCurrentCamera(getCamera());
     }
 
     protected abstract void clearBuffers();

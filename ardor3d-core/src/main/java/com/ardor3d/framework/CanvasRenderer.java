@@ -35,6 +35,14 @@ public interface CanvasRenderer {
     public Camera getCamera();
 
     /**
+     * Replaces the camera being used by this canvas renderer.
+     * 
+     * @param camera
+     *            the camera to use
+     */
+    public void setCamera(Camera camera);
+
+    /**
      * Returns the scene being used by this canvas renderer.
      * 
      * @return the camera used by this canvas renderer

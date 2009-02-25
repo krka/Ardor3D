@@ -136,7 +136,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         // render stuff
         if (Camera.getCurrentCamera() != _camera) {
-            ContextManager.getCurrentContext().setCurrentCamera(_camera);
             _camera.update();
         }
 
@@ -165,5 +164,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public Renderer getRenderer() {
         return _renderer;
+    }
+
+    public void setCamera(final Camera camera) {
+        _camera = camera;
     }
 }

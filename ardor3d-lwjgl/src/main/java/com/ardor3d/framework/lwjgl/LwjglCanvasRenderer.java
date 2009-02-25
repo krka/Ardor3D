@@ -98,7 +98,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         // render stuff
         if (Camera.getCurrentCamera() != _camera) {
-            ContextManager.getCurrentContext().setCurrentCamera(_camera);
             _camera.update();
         }
         _camera.apply(_renderer);
@@ -138,5 +137,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         } catch (final LWJGLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setCamera(final Camera camera) {
+        _camera = camera;
     }
 }
