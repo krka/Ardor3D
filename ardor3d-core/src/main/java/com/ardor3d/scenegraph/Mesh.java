@@ -208,9 +208,10 @@ public class Mesh extends Spatial implements Renderable {
             glsl.setMeshData(_meshData);
         }
 
-        final boolean transformed = renderer.doTransforms(_worldTransform);
-
+        // We apply renderstates before transforming because of lighting.
         renderer.applyStates(_states);
+
+        final boolean transformed = renderer.doTransforms(_worldTransform);
 
         if (getDisplayListID() != -1) {
             renderer.renderDisplayList(getDisplayListID());
