@@ -111,27 +111,17 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param source
      */
     public Matrix4(final ReadOnlyMatrix4 source) {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                _data[i][j] = source.getValue(i, j);
-            }
-        }
+        set(source);
     }
 
     /**
      * @param row
      * @param column
      * @return the value stored in this matrix at row, column.
-     * @throws IllegalArgumentException
+     * @throws ArrayIndexOutOfBoundsException
      *             if row and column are not in bounds [0, 3]
      */
     public double getValue(final int row, final int column) {
-        if (row < 0 || row > 3) {
-            throw new IllegalArgumentException("Illegal row number: " + row);
-        }
-        if (column < 0 || column > 3) {
-            throw new IllegalArgumentException("Illegal column number: " + column);
-        }
         return _data[row][column];
     }
 
@@ -139,7 +129,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param row
      * @param column
      * @return the value stored in this matrix at row, column, pre-cast to a float for convenience.
-     * @throws IllegalArgumentException
+     * @throws ArrayIndexOutOfBoundsException
      *             if row and column are not in bounds [0, 2]
      */
     public float getValuef(final int row, final int column) {
@@ -231,12 +221,27 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      *             if source is null.
      */
     public Matrix4 set(final ReadOnlyMatrix4 source) {
+        // Unrolled for better performance.
+        _data[0][0] = source.getValue(0, 0);
+        _data[1][0] = source.getValue(1, 0);
+        _data[2][0] = source.getValue(2, 0);
+        _data[3][0] = source.getValue(3, 0);
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                _data[i][j] = source.getValue(i, j);
-            }
-        }
+        _data[0][1] = source.getValue(0, 1);
+        _data[1][1] = source.getValue(1, 1);
+        _data[2][1] = source.getValue(2, 1);
+        _data[3][1] = source.getValue(3, 1);
+
+        _data[0][2] = source.getValue(0, 2);
+        _data[1][2] = source.getValue(1, 2);
+        _data[2][2] = source.getValue(2, 2);
+        _data[3][2] = source.getValue(3, 2);
+
+        _data[0][3] = source.getValue(0, 3);
+        _data[1][3] = source.getValue(1, 3);
+        _data[2][3] = source.getValue(2, 3);
+        _data[3][3] = source.getValue(3, 3);
+
         return this;
     }
 
@@ -777,7 +782,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
         result.set(temp00, temp01, temp02, temp03, temp10, temp11, temp12, temp13, temp20, temp21, temp22, temp23,
                 temp30, temp31, temp32, temp33);
 
-        return store;
+        return result;
     }
 
     /**

@@ -92,27 +92,17 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param source
      */
     public Matrix3(final ReadOnlyMatrix3 source) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                _data[i][j] = source.getValue(i, j);
-            }
-        }
+        set(source);
     }
 
     /**
      * @param row
      * @param column
      * @return the value stored in this matrix at row, column.
-     * @throws IllegalArgumentException
+     * @throws ArrayIndexOutOfBoundsException
      *             if row and column are not in bounds [0, 2]
      */
     public double getValue(final int row, final int column) {
-        if (row < 0 || row > 2) {
-            throw new IllegalArgumentException("Illegal row number: " + row);
-        }
-        if (column < 0 || column > 2) {
-            throw new IllegalArgumentException("Illegal column number: " + column);
-        }
         return _data[row][column];
     }
 
@@ -120,7 +110,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param row
      * @param column
      * @return the value stored in this matrix at row, column, pre-cast to a float for convenience.
-     * @throws IllegalArgumentException
+     * @throws ArrayIndexOutOfBoundsException
      *             if row and column are not in bounds [0, 2]
      */
     public float getValuef(final int row, final int column) {
@@ -197,11 +187,19 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      *             if source is null.
      */
     public Matrix3 set(final ReadOnlyMatrix3 source) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                _data[i][j] = source.getValue(i, j);
-            }
-        }
+        // Unrolled for better performance.
+        _data[0][0] = source.getValue(0, 0);
+        _data[1][0] = source.getValue(1, 0);
+        _data[2][0] = source.getValue(2, 0);
+
+        _data[0][1] = source.getValue(0, 1);
+        _data[1][1] = source.getValue(1, 1);
+        _data[2][1] = source.getValue(2, 1);
+
+        _data[0][2] = source.getValue(0, 2);
+        _data[1][2] = source.getValue(1, 2);
+        _data[2][2] = source.getValue(2, 2);
+
         return this;
     }
 
@@ -662,7 +660,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
         result.set(temp00, temp01, temp02, temp10, temp11, temp12, temp20, temp21, temp22);
 
-        return store;
+        return result;
     }
 
     /**
