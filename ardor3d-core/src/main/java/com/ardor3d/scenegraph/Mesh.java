@@ -24,6 +24,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
@@ -200,9 +201,16 @@ public class Mesh extends Spatial implements Renderable {
     }
 
     public void render(final Renderer renderer) {
-        renderer.applyStates(_states);
+        // Set up MeshData in GLSLShaderObjectsState if necessary
+        // XXX: considered a hack until we settle on our shader model.
+        final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) _states.get(RenderState.StateType.GLSLShader);
+        if (glsl != null) {
+            glsl.setMeshData(_meshData);
+        }
 
         final boolean transformed = renderer.doTransforms(_worldTransform);
+
+        renderer.applyStates(_states);
 
         if (getDisplayListID() != -1) {
             renderer.renderDisplayList(getDisplayListID());
