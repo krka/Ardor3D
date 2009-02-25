@@ -52,4 +52,9 @@ public interface CanvasRenderer {
      * Have the CanvasRenderer claim the graphics context.
      */
     public void setCurrentContext();
+
+    /**
+     * Have the CanvasRenderer release the graphics context.
+     */
+    public void releaseCurrentContext();
 }

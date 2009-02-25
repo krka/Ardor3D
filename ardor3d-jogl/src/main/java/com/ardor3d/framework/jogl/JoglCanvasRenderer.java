@@ -45,16 +45,16 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     // we have solved some more fundamental problems, it is probably time to revisit this.
 
     // ensure availability of JOGL natives
-//    {
-//        final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
-//                .getProperty("os.arch"));
-//
-//        try {
-//            NativeLoader.makeLibrariesAvailable(libraryPaths);
-//        } catch (final Exception e) {
-//            ; // ignore
-//        }
-//    }
+    // {
+    // final String[] libraryPaths = JoglLibraryPaths.getLibraryPaths(System.getProperty("os.name"), System
+    // .getProperty("os.arch"));
+    //
+    // try {
+    // NativeLoader.makeLibrariesAvailable(libraryPaths);
+    // } catch (final Exception e) {
+    // ; // ignore
+    // }
+    // }
 
     protected final Scene _scene;
     protected Camera _camera;
@@ -69,6 +69,10 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public void setCurrentContext() {
         _context.makeCurrent();
+    }
+
+    public void releaseCurrentContext() {
+        _context.release();
     }
 
     @MainThread
