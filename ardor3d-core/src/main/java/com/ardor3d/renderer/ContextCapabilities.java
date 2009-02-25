@@ -42,6 +42,9 @@ public class ContextCapabilities {
     protected boolean _twoSidedStencilSupport = false;
     protected boolean _stencilWrapSupport = false;
 
+    /** The total number of available auxiliary draw buffers. */
+    protected int _numAuxDrawBuffers = -1;
+
     /** The total number of supported texture units. */
     protected int _numTotalTexUnits = -1;
 
@@ -222,6 +225,16 @@ public class ContextCapabilities {
      */
     public boolean isStencilWrapSupported() {
         return _stencilWrapSupport;
+    }
+
+    /**
+     * <code>getNumberOfAuxiliaryDrawBuffers</code> returns the total number of available auxiliary draw buffers this
+     * context supports.
+     * 
+     * @return the number of available auxiliary draw buffers supported by the context.
+     */
+    public int getNumberOfAuxiliaryDrawBuffers() {
+        return _numAuxDrawBuffers;
     }
 
     /**

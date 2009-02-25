@@ -14,20 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.renderer.DrawBufferTarget;
 
 public class RendererRecord extends StateRecord {
-    private int matrixMode = -1;
-    private int currentElementVboId = -1, currentVboId = -1;
-    private boolean matrixValid;
-    private boolean vboValid;
-    private boolean elementVboValid;
-    private transient final ColorRGBA tempColor = new ColorRGBA();
-    private final List<Integer> vboCleanupCache = new ArrayList<Integer>();
+    private int _matrixMode = -1;
+    private int _currentElementVboId = -1, _currentVboId = -1;
+    private boolean _matrixValid;
+    private boolean _vboValid;
+    private boolean _elementVboValid;
+    private transient final ColorRGBA _tempColor = new ColorRGBA();
+    private final List<Integer> _vboCleanupCache = new ArrayList<Integer>();
+    private DrawBufferTarget _drawBufferTarget = null;
 
     @Override
     public void invalidate() {
         invalidateMatrix();
         invalidateVBO();
+        _drawBufferTarget = null;
     }
 
     @Override
@@ -36,69 +39,77 @@ public class RendererRecord extends StateRecord {
     }
 
     public void invalidateMatrix() {
-        matrixValid = false;
-        matrixMode = -1;
+        _matrixValid = false;
+        _matrixMode = -1;
     }
 
     public void invalidateVBO() {
-        vboValid = false;
-        elementVboValid = false;
-        currentElementVboId = currentVboId = -1;
+        _vboValid = false;
+        _elementVboValid = false;
+        _currentElementVboId = _currentVboId = -1;
     }
 
     public int getMatrixMode() {
-        return matrixMode;
+        return _matrixMode;
     }
 
     public void setMatrixMode(final int matrixMode) {
-        this.matrixMode = matrixMode;
+        _matrixMode = matrixMode;
     }
 
     public int getCurrentElementVboId() {
-        return currentElementVboId;
+        return _currentElementVboId;
     }
 
     public void setCurrentElementVboId(final int currentElementVboId) {
-        this.currentElementVboId = currentElementVboId;
+        _currentElementVboId = currentElementVboId;
     }
 
     public int getCurrentVboId() {
-        return currentVboId;
+        return _currentVboId;
     }
 
     public void setCurrentVboId(final int currentVboId) {
-        this.currentVboId = currentVboId;
+        _currentVboId = currentVboId;
     }
 
     public boolean isMatrixValid() {
-        return matrixValid;
+        return _matrixValid;
     }
 
     public void setMatrixValid(final boolean matrixValid) {
-        this.matrixValid = matrixValid;
+        _matrixValid = matrixValid;
     }
 
     public boolean isVboValid() {
-        return vboValid;
+        return _vboValid;
     }
 
     public void setVboValid(final boolean vboValid) {
-        this.vboValid = vboValid;
+        _vboValid = vboValid;
     }
 
     public boolean isElementVboValid() {
-        return elementVboValid;
+        return _elementVboValid;
     }
 
     public void setElementVboValid(final boolean elementVboValid) {
-        this.elementVboValid = elementVboValid;
+        _elementVboValid = elementVboValid;
     }
 
     public ColorRGBA getTempColor() {
-        return tempColor;
+        return _tempColor;
     }
 
     public List<Integer> getVboCleanupCache() {
-        return vboCleanupCache;
+        return _vboCleanupCache;
+    }
+
+    public DrawBufferTarget getDrawBufferTarget() {
+        return _drawBufferTarget;
+    }
+
+    public void setDrawBufferTarget(final DrawBufferTarget target) {
+        _drawBufferTarget = target;
     }
 }

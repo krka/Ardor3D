@@ -36,6 +36,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.InterleavedFormat;
 import com.ardor3d.renderer.NormalsMode;
@@ -1117,6 +1118,57 @@ public class JoglRenderer extends Renderer {
     @Override
     public void setDepthRange(final double depthRangeNear, final double depthRangeFar) {
         GLU.getCurrentGL().glDepthRange(depthRangeNear, depthRangeFar);
+    }
+
+    @Override
+    public void setDrawBuffer(final DrawBufferTarget target) {
+        final RendererRecord record = ContextManager.getCurrentContext().getRendererRecord();
+        if (record.getDrawBufferTarget() != target) {
+            int buffer = GL.GL_BACK;
+            switch (target) {
+                case Back:
+                    break;
+                case Front:
+                    buffer = GL.GL_FRONT;
+                    break;
+                case BackLeft:
+                    buffer = GL.GL_BACK_LEFT;
+                    break;
+                case BackRight:
+                    buffer = GL.GL_BACK_RIGHT;
+                    break;
+                case FrontLeft:
+                    buffer = GL.GL_FRONT_LEFT;
+                    break;
+                case FrontRight:
+                    buffer = GL.GL_FRONT_RIGHT;
+                    break;
+                case FrontAndBack:
+                    buffer = GL.GL_FRONT_AND_BACK;
+                    break;
+                case Left:
+                    buffer = GL.GL_LEFT;
+                    break;
+                case Right:
+                    buffer = GL.GL_RIGHT;
+                    break;
+                case Aux0:
+                    buffer = GL.GL_AUX0;
+                    break;
+                case Aux1:
+                    buffer = GL.GL_AUX1;
+                    break;
+                case Aux2:
+                    buffer = GL.GL_AUX2;
+                    break;
+                case Aux3:
+                    buffer = GL.GL_AUX3;
+                    break;
+            }
+
+            GLU.getCurrentGL().glDrawBuffer(buffer);
+            record.setDrawBufferTarget(target);
+        }
     }
 
     @Override

@@ -78,6 +78,10 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _twoSidedStencilSupport = caps.GL_EXT_stencil_two_side;
         _stencilWrapSupport = caps.GL_EXT_stencil_wrap;
 
+        // number of available auxiliary draw buffers
+        GL11.glGetInteger(GL11.GL_AUX_BUFFERS, buf);
+        _numAuxDrawBuffers = buf.get(0);
+
         // max texture size.
         GL11.glGetInteger(GL11.GL_MAX_TEXTURE_SIZE, buf);
         _maxTextureSize = buf.get(0);

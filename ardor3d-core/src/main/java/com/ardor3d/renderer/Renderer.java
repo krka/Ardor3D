@@ -239,7 +239,7 @@ public abstract class Renderer {
 
     /**
      * Removes the mapping between this Buffer and it's VBO-id. Does not actually delete the VBO. <br>
-     * This method is usefull if you want to use the same Buffer to create several VBOs. After a VBO is created for this
+     * This method is useful if you want to use the same Buffer to create several VBOs. After a VBO is created for this
      * Buffer, update the Buffer and remove it from the VBO cache. You can now reuse the same buffer with another Mesh
      * object. <br>
      * If no association is found, this method does nothing.
@@ -369,6 +369,13 @@ public abstract class Renderer {
     public abstract void setViewport(int x, int y, int width, int height);
 
     public abstract void setDepthRange(double depthRangeNear, double depthRangeFar);
+
+    /**
+     * Specify which color buffers are to be drawn into.
+     * 
+     * @param target
+     */
+    public abstract void setDrawBuffer(DrawBufferTarget target);
 
     /**
      * This is a workaround until we make shared abstract Record classes, or open up lower level opengl calls abstracted

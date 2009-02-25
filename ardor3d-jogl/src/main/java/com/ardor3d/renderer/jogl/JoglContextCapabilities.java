@@ -82,6 +82,10 @@ public final class JoglContextCapabilities extends ContextCapabilities {
         _twoSidedStencilSupport = gl.isExtensionAvailable("GL_EXT_stencil_two_side");
         _stencilWrapSupport = gl.isExtensionAvailable("GL_EXT_stencil_wrap");
 
+        // number of available auxiliary draw buffers
+        gl.glGetIntegerv(GL.GL_AUX_BUFFERS, buf);
+        _numAuxDrawBuffers = buf.get(0);
+
         // max texture size.
         gl.glGetIntegerv(GL.GL_MAX_TEXTURE_SIZE, buf);
         _maxTextureSize = buf.get(0);
