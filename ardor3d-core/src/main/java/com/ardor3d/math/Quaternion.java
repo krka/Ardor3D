@@ -613,6 +613,30 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
+     * Sets this quaternion to that which will rotate vector "from" into vector "to". from and to do not have to be the
+     * same length.
+     * 
+     * @param from
+     *            the source vector to rotate
+     * @param to
+     *            the destination vector into which to rotate the source vector
+     * @return this quaternion for chaining
+     */
+    public Quaternion fromVectorToVector(final Vector3 from, final Vector3 to) {
+        final Vector3 axis = from.cross(to, Vector3.fetchTempInstance());
+        if (axis.lengthSquared() < MathUtils.EPSILON) {
+            return setIdentity();
+        }
+        double dotp = from.dot(to);
+        final double denom = from.length() * to.length();
+        if (denom < MathUtils.EPSILON) {
+            return setIdentity();
+        }
+        dotp /= denom;
+        return fromAngleAxis(Math.acos(dotp), axis);
+    }
+
+    /**
      * @param store
      *            the Quaternion to store the result in. if null, a new one is created.
      * @return a new quaternion that represents a unit length version of this Quaternion.
