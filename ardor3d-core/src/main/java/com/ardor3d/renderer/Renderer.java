@@ -12,7 +12,6 @@ package com.ardor3d.renderer;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.EnumMap;
@@ -34,18 +33,11 @@ import com.ardor3d.scenegraph.VBOInfo;
 import com.ardor3d.util.Ardor3dException;
 
 /**
- * <code>Renderer</code> defines an abstract class that handles displaying of graphics data to the context. Creation of
- * this object is typically handled via a call to a <code>DisplaySystem</code> subclass.
+ * <code>Renderer</code> defines an interface for classes that handle displaying of graphics data to a render context.
  * 
- * All rendering state and tasks can be handled through this class.
+ * All rendering state and tasks should be handled through this class.
  */
-public abstract class Renderer {
-    // clear color
-    protected final ColorRGBA _backgroundColor = new ColorRGBA(ColorRGBA.BLACK);
-
-    protected boolean _processingQueue;
-
-    protected RenderQueue _queue;
+public interface Renderer {
 
     /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set
@@ -54,48 +46,46 @@ public abstract class Renderer {
      * @param c
      *            the color to set the background to.
      */
-    public abstract void setBackgroundColor(ReadOnlyColorRGBA c);
+    void setBackgroundColor(ReadOnlyColorRGBA c);
 
     /**
      * <code>getBackgroundColor</code> retrieves the clear color of the current OpenGL context.
      * 
      * @return the current clear color.
      */
-    public ReadOnlyColorRGBA getBackgroundColor() {
-        return _backgroundColor;
-    }
+    ReadOnlyColorRGBA getBackgroundColor();
 
     /**
      * <code>clearZBuffer</code> clears the depth buffer of the renderer. The Z buffer allows sorting of pixels by depth
      * or distance from the view port. Clearing this buffer prepares it for the next frame.
      * 
      */
-    public abstract void clearZBuffer();
+    void clearZBuffer();
 
     /**
      * <code>clearBackBuffer</code> clears the back buffer of the renderer. The backbuffer is the buffer being rendered
      * to before it is displayed to the screen. Clearing this buffer frees it for rendering the next frame.
      * 
      */
-    public abstract void clearColorBuffer();
+    void clearColorBuffer();
 
     /**
      * <code>clearStencilBuffer</code> clears the stencil buffer of the renderer.
      */
-    public abstract void clearStencilBuffer();
+    void clearStencilBuffer();
 
     /**
      * <code>clearBuffers</code> clears both the depth buffer and the back buffer.
      * 
      */
-    public abstract void clearBuffers();
+    void clearBuffers();
 
     /**
      * <code>clearStrictBuffers</code> clears both the depth buffer and the back buffer restricting the clear to the
      * rectangle defined by the width and height of the renderer.
      * 
      */
-    public abstract void clearStrictBuffers();
+    void clearStrictBuffers();
 
     /**
      * <code>flushFrame</code> handles rendering any items still remaining in the render buckets and optionally swaps
@@ -106,7 +96,7 @@ public abstract class Renderer {
      *            buffer. Usually this will be true, unless you are in a windowing toolkit that handles doing this for
      *            you.
      */
-    public abstract void flushFrame(boolean doSwap);
+    void flushFrame(boolean doSwap);
 
     /**
      * 
@@ -114,7 +104,7 @@ public abstract class Renderer {
      * orthographic mode a <code>Ardor3dException</code> is thrown. The origin (0,0) is the bottom left of the screen.
      * 
      */
-    public abstract void setOrtho();
+    void setOrtho();
 
     /**
      * 
@@ -123,28 +113,22 @@ public abstract class Renderer {
      * 
      * 
      */
-    public abstract void unsetOrtho();
+    void unsetOrtho();
 
     /**
      * @return true if the renderer is currently in ortho mode.
      */
-    public abstract boolean isInOrthoMode();
+    boolean isInOrthoMode();
 
     /**
      * render queue if needed
      */
-    public void renderBuckets() {
-        _processingQueue = true;
-        _queue.renderBuckets();
-        _processingQueue = false;
-    }
+    void renderBuckets();
 
     /**
      * clear the render queue
      */
-    public void clearQueue() {
-        _queue.clearBuckets();
-    }
+    void clearQueue();
 
     /**
      * <code>grabScreenContents</code> reads a block of data as bytes from the current framebuffer. The format
@@ -163,7 +147,7 @@ public abstract class Renderer {
      * @param h
      *            - height of block
      */
-    public abstract void grabScreenContents(ByteBuffer buff, Image.Format format, int x, int y, int w, int h);
+    void grabScreenContents(ByteBuffer buff, Image.Format format, int x, int y, int w, int h);
 
     /**
      * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
@@ -172,36 +156,32 @@ public abstract class Renderer {
      * @param s
      *            the scene to render.
      */
-    public abstract void draw(Spatial s);
+    void draw(Spatial s);
 
     /**
      * <code>flush</code> tells the graphics hardware to send through all currently waiting commands in the buffer.
      */
-    public abstract void flushGraphics();
+    void flushGraphics();
 
     /**
      * <code>finish</code> is similar to flush, however it blocks until all waiting hardware graphics commands have been
      * finished.
      */
-    public abstract void finishGraphics();
+    void finishGraphics();
 
     /**
      * Get the render queue associated with this Renderer.
      * 
      * @return RenderQueue
      */
-    public RenderQueue getQueue() {
-        return _queue;
-    }
+    RenderQueue getQueue();
 
     /**
      * Return true if this renderer is in the middle of processing its RenderQueue.
      * 
      * @return boolean
      */
-    public boolean isProcessingQueue() {
-        return _processingQueue;
-    }
+    boolean isProcessingQueue();
 
     /**
      * Check a given Spatial to see if it should be queued. return true if it was queued.
@@ -210,7 +190,7 @@ public abstract class Renderer {
      *            Spatial to check
      * @return true if it was queued.
      */
-    public abstract boolean checkAndAdd(Spatial s);
+    boolean checkAndAdd(Spatial s);
 
     /**
      * Checks the VBO cache to see if this Buffer is mapped to a VBO-id. If it does the mapping will be removed from the
@@ -221,21 +201,21 @@ public abstract class Renderer {
      * @param buffer
      *            The Buffer who's associated VBO should be deleted.
      */
-    public abstract void deleteVBO(Buffer buffer);
+    void deleteVBO(Buffer buffer);
 
     /**
      * Attempts to delete the VBO with this VBO id. Ignores ids < 1.
      * 
      * @param vboid
      */
-    public abstract void deleteVBO(int vboid);
+    void deleteVBO(int vboid);
 
     /**
      * Clears all entries from the VBO cache. Does not actually delete any VBO buffer, only all mappings between Buffers
      * and VBO-ids.
      * 
      */
-    public abstract void clearVBOCache();
+    void clearVBOCache();
 
     /**
      * Removes the mapping between this Buffer and it's VBO-id. Does not actually delete the VBO. <br>
@@ -249,7 +229,7 @@ public abstract class Renderer {
      * @return An int wrapped in an Integer object that's the VBO-id of the VBO previously mapped to this Buffer, or
      *         null is no mapping existed.
      */
-    public abstract Integer removeFromVBOCache(Buffer buffer);
+    Integer removeFromVBOCache(Buffer buffer);
 
     /**
      * Updates a region of the content area of the provided texture using the specified region of the given data.
@@ -280,14 +260,13 @@ public abstract class Renderer {
      *      int, int, int, int)
      * @since 2.0
      */
-    public abstract void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX,
-            final int srcY, final int dstX, final int dstY, final int dstWidth, final int dstHeight)
-            throws Ardor3dException, UnsupportedOperationException;
-
-    public abstract void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX,
-            final int srcY, final int srcWidth, final int srcHeight, final int dstX, final int dstY,
-            final int dstWidth, final int dstHeight, final Format format) throws Ardor3dException,
+    void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
+            final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
             UnsupportedOperationException;
+
+    void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
+            final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
+            final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException;
 
     /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.
@@ -295,12 +274,12 @@ public abstract class Renderer {
      * @throws Ardor3dException
      *             if an error is found.
      */
-    public abstract void checkCardError() throws Ardor3dException;
+    void checkCardError() throws Ardor3dException;
 
     /**
      * Perform any necessary cleanup operations such as deleting VBOs, etc.
      */
-    public abstract void cleanup();
+    void cleanup();
 
     /**
      * <code>draw</code> renders the renderable to the back buffer.
@@ -308,7 +287,7 @@ public abstract class Renderer {
      * @param renderable
      *            the text object to be rendered.
      */
-    public abstract void draw(final Renderable renderable);
+    void draw(final Renderable renderable);
 
     /**
      * <code>applyStates</code> applies the sent in renderstates.
@@ -316,7 +295,7 @@ public abstract class Renderer {
      * @param states
      *            states to apply.
      */
-    public abstract void applyStates(final EnumMap<StateType, RenderState> states);
+    void applyStates(final EnumMap<StateType, RenderState> states);
 
     /**
      * <code>doTransforms</code> sets the current transform.
@@ -324,7 +303,7 @@ public abstract class Renderer {
      * @param transform
      *            transform to apply.
      */
-    public abstract boolean doTransforms(final Transform transform);
+    boolean doTransforms(final Transform transform);
 
     /**
      * <code>undoTransforms</code> reverts the latest transform.
@@ -332,7 +311,7 @@ public abstract class Renderer {
      * @param transform
      *            transform to revert.
      */
-    public abstract void undoTransforms(final Transform transform);
+    void undoTransforms(final Transform transform);
 
     /**
      * <code>setupVertexData</code> sets up the buffers for vertex data.
@@ -340,72 +319,68 @@ public abstract class Renderer {
      * @param vertices
      *            transform to apply.
      */
-    public abstract void setupVertexData(final FloatBuffer vertexBuffer, final VBOInfo vbo);
+    void setupVertexData(final FloatBuffer vertexBuffer, final VBOInfo vbo);
 
-    public abstract void setupNormalData(final FloatBuffer normalBuffer, final NormalsMode normalMode,
-            final Transform worldTransform, final VBOInfo vbo);
-
-    public abstract void setupColorData(final FloatBuffer colorBuffer, final VBOInfo vbo, final ColorRGBA defaultColor);
-
-    public abstract void setupFogData(final FloatBuffer fogBuffer, final VBOInfo vbo);
-
-    public abstract void setupTextureData(final List<TexCoords> textureCoords, final VBOInfo vbo);
-
-    public abstract void setupInterleavedData(final FloatBuffer interleavedBuffer, InterleavedFormat format,
+    void setupNormalData(final FloatBuffer normalBuffer, final NormalsMode normalMode, final Transform worldTransform,
             final VBOInfo vbo);
 
-    public abstract void drawElements(final IntBuffer indices, final VBOInfo vbo, final int[] indexLengths,
-            final IndexMode[] indexModes);
+    void setupColorData(final FloatBuffer colorBuffer, final VBOInfo vbo, final ColorRGBA defaultColor);
 
-    public abstract void drawArrays(final FloatBuffer vertexBuffer, final int[] indexLengths,
-            final IndexMode[] indexModes);
+    void setupFogData(final FloatBuffer fogBuffer, final VBOInfo vbo);
 
-    public abstract void renderDisplayList(final int displayListID);
+    void setupTextureData(final List<TexCoords> textureCoords, final VBOInfo vbo);
 
-    public abstract void setProjectionMatrix(DoubleBuffer matrix);
+    void setupInterleavedData(final FloatBuffer interleavedBuffer, InterleavedFormat format, final VBOInfo vbo);
 
-    public abstract void setModelViewMatrix(DoubleBuffer matrix);
+    void drawElements(final IntBuffer indices, final VBOInfo vbo, final int[] indexLengths, final IndexMode[] indexModes);
 
-    public abstract void setViewport(int x, int y, int width, int height);
+    void drawArrays(final FloatBuffer vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes);
 
-    public abstract void setDepthRange(double depthRangeNear, double depthRangeFar);
+    void renderDisplayList(final int displayListID);
+
+    void setProjectionMatrix(Buffer matrix);
+
+    void setModelViewMatrix(Buffer matrix);
+
+    void setViewport(int x, int y, int width, int height);
+
+    void setDepthRange(double depthRangeNear, double depthRangeFar);
 
     /**
      * Specify which color buffers are to be drawn into.
      * 
      * @param target
      */
-    public abstract void setDrawBuffer(DrawBufferTarget target);
+    void setDrawBuffer(DrawBufferTarget target);
 
     /**
-     * This is a workaround until we make shared abstract Record classes, or open up lower level opengl calls abstracted
-     * from lwjgl/jogl.
+     * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
+     * lwjgl/jogl.
      * 
      * @param lineWidth
      * @param stippleFactor
      * @param stipplePattern
      * @param antialiased
      */
-    public abstract void setupLineParameters(float lineWidth, int stippleFactor, short stipplePattern,
-            boolean antialiased);
+    void setupLineParameters(float lineWidth, int stippleFactor, short stipplePattern, boolean antialiased);
 
     /**
-     * This is a workaround until we make shared abstract Record classes, or open up lower level opengl calls abstracted
-     * from lwjgl/jogl.
+     * This is a workaround until we make shared Record classes, or open up lower level opengl calls abstracted from
+     * lwjgl/jogl.
      * 
      * @param pointSize
      * @param antialiased
      */
-    public abstract void setupPointParameters(float pointSize, boolean antialiased);
+    void setupPointParameters(float pointSize, boolean antialiased);
 
     /**
      * Apply the given state to the current RenderContext using this Renderer.
      * 
      * @param state
      */
-    public abstract void applyState(RenderState state);
+    void applyState(RenderState state);
 
-    public abstract void loadTexture(Texture texture, int unit);
+    void loadTexture(Texture texture, int unit);
 
-    public abstract void deleteTextureId(int textureId);
+    void deleteTextureId(int textureId);
 }

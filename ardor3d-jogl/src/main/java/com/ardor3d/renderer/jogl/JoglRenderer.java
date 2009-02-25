@@ -33,6 +33,7 @@ import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.AbstractRenderer;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -41,7 +42,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.InterleavedFormat;
 import com.ardor3d.renderer.NormalsMode;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.BlendState;
@@ -99,10 +99,8 @@ import com.ardor3d.util.stat.StatType;
  * 
  * @see com.ardor3d.renderer.Renderer
  */
-public class JoglRenderer extends Renderer {
+public class JoglRenderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(JoglRenderer.class.getName());
-
-    private boolean _inOrthoMode;
 
     private FloatBuffer _oldVertexBuffer;
 
@@ -158,7 +156,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void setBackgroundColor(final ReadOnlyColorRGBA c) {
         final GL gl = GLU.getCurrentGL();
 
@@ -167,7 +164,22 @@ public class JoglRenderer extends Renderer {
                 _backgroundColor.getAlpha());
     }
 
-    @Override
+    /**
+     * render queue if needed
+     */
+    public void renderBuckets() {
+        _processingQueue = true;
+        _queue.renderBuckets();
+        _processingQueue = false;
+    }
+
+    /**
+     * clear the render queue
+     */
+    public void clearQueue() {
+        _queue.clearBuckets();
+    }
+
     public void clearZBuffer() {
         final GL gl = GLU.getCurrentGL();
 
@@ -177,14 +189,12 @@ public class JoglRenderer extends Renderer {
         gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
     }
 
-    @Override
     public void clearColorBuffer() {
         final GL gl = GLU.getCurrentGL();
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
     }
 
-    @Override
     public void clearStencilBuffer() {
         final GL gl = GLU.getCurrentGL();
 
@@ -201,7 +211,6 @@ public class JoglRenderer extends Renderer {
         gl.glDisable(GL.GL_SCISSOR_TEST);
     }
 
-    @Override
     public void clearBuffers() {
         final GL gl = GLU.getCurrentGL();
 
@@ -213,7 +222,6 @@ public class JoglRenderer extends Renderer {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     }
 
-    @Override
     public void clearStrictBuffers() {
         final GL gl = GLU.getCurrentGL();
 
@@ -228,7 +236,6 @@ public class JoglRenderer extends Renderer {
         gl.glEnable(GL.GL_DITHER);
     }
 
-    @Override
     public void flushFrame(final boolean doSwap) {
         final GL gl = GLU.getCurrentGL();
 
@@ -264,12 +271,6 @@ public class JoglRenderer extends Renderer {
         Arrays.fill(_oldTextureBuffers, null);
     }
 
-    @Override
-    public boolean isInOrthoMode() {
-        return _inOrthoMode;
-    }
-
-    @Override
     public void setOrtho() {
         final GL gl = GLU.getCurrentGL();
 
@@ -291,7 +292,6 @@ public class JoglRenderer extends Renderer {
         _inOrthoMode = true;
     }
 
-    @Override
     public void unsetOrtho() {
         final GL gl = GLU.getCurrentGL();
 
@@ -308,7 +308,6 @@ public class JoglRenderer extends Renderer {
         _inOrthoMode = false;
     }
 
-    @Override
     public void grabScreenContents(final ByteBuffer buff, final Image.Format format, final int x, final int y,
             final int w, final int h) {
         final GL gl = GLU.getCurrentGL();
@@ -317,14 +316,12 @@ public class JoglRenderer extends Renderer {
         gl.glReadPixels(x, y, w, h, pixFormat, GL.GL_UNSIGNED_BYTE, buff);
     }
 
-    @Override
     public void draw(final Spatial s) {
         if (s != null) {
             s.onDraw(this);
         }
     }
 
-    @Override
     public boolean checkAndAdd(final Spatial s) {
         final RenderBucketType rqMode = s.getRenderBucketType();
         if (rqMode != RenderBucketType.Skip) {
@@ -341,14 +338,12 @@ public class JoglRenderer extends Renderer {
     // Nothing to do here yet
     }
 
-    @Override
     public void flushGraphics() {
         final GL gl = GLU.getCurrentGL();
 
         gl.glFlush();
     }
 
-    @Override
     public void finishGraphics() {
         final GL gl = GLU.getCurrentGL();
 
@@ -410,7 +405,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void deleteVBO(final Buffer buffer) {
         final Integer i = removeFromVBOCache(buffer);
         if (i != null) {
@@ -418,7 +412,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void deleteVBO(final int vboid) {
         if (vboid < 1) {
             return;
@@ -427,18 +420,15 @@ public class JoglRenderer extends Renderer {
         deleteVBOId(rendRecord, vboid);
     }
 
-    @Override
     public void clearVBOCache() {
         _vboMap.clear();
     }
 
-    @Override
     public Integer removeFromVBOCache(final Buffer buffer) {
         return _vboMap.remove(buffer);
 
     }
 
-    @Override
     public void applyStates(final EnumMap<StateType, RenderState> states) {
         if (Debug.stats) {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
@@ -473,7 +463,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
             final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
             UnsupportedOperationException {
@@ -483,7 +472,6 @@ public class JoglRenderer extends Renderer {
                 dstWidth, dstHeight, srcImage.getFormat());
     }
 
-    @Override
     public void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
             final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
             final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException {
@@ -576,7 +564,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void checkCardError() throws Ardor3dException {
         final GL gl = GLU.getCurrentGL();
         final GLU glu = new GLU();
@@ -591,19 +578,16 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void cleanup() {
         // clear vbos
         final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
         cleanupVBOs(rendRecord);
     }
 
-    @Override
     public void draw(final Renderable renderable) {
         renderable.render(this);
     }
 
-    @Override
     public void setupVertexData(final FloatBuffer vertexBuffer, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
 
@@ -647,7 +631,6 @@ public class JoglRenderer extends Renderer {
         _oldVertexBuffer = vertexBuffer;
     }
 
-    @Override
     public void setupNormalData(final FloatBuffer normalBuffer, final NormalsMode normalMode,
             final Transform worldTransform, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
@@ -687,7 +670,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void setupColorData(final FloatBuffer colorBuffer, final VBOInfo vbo, final ColorRGBA defaultColor) {
         final GL gl = GLU.getCurrentGL();
 
@@ -720,7 +702,6 @@ public class JoglRenderer extends Renderer {
         _oldColorBuffer = colorBuffer;
     }
 
-    @Override
     public void setupInterleavedData(final FloatBuffer interleavedBuffer, final InterleavedFormat format,
             final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
@@ -735,7 +716,6 @@ public class JoglRenderer extends Renderer {
         _oldInterleavedBuffer = interleavedBuffer;
     }
 
-    @Override
     public void setupFogData(final FloatBuffer fogBuffer, final VBOInfo vbo) {
     // final RenderContext context = ContextManager.getCurrentContext();
     // final RendererRecord rendRecord = (RendererRecord) context.getRendererRecord();
@@ -772,7 +752,6 @@ public class JoglRenderer extends Renderer {
     // }
     }
 
-    @Override
     public void setupTextureData(final List<TexCoords> textureCoords, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
 
@@ -829,7 +808,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public boolean doTransforms(final Transform transform) {
         final GL gl = GLU.getCurrentGL();
 
@@ -848,7 +826,6 @@ public class JoglRenderer extends Renderer {
         return false;
     }
 
-    @Override
     public void undoTransforms(final Transform transform) {
         final GL gl = GLU.getCurrentGL();
 
@@ -857,7 +834,6 @@ public class JoglRenderer extends Renderer {
         gl.glPopMatrix();
     }
 
-    @Override
     public void drawElements(final IntBuffer indices, final VBOInfo vbo, final int[] indexLengths,
             final IndexMode[] indexModes) {
         final RenderContext context = ContextManager.getCurrentContext();
@@ -914,7 +890,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void drawArrays(final FloatBuffer vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes) {
         final GL gl = GLU.getCurrentGL();
 
@@ -998,7 +973,6 @@ public class JoglRenderer extends Renderer {
         vboCleanupCache.clear();
     }
 
-    @Override
     public void renderDisplayList(final int displayListID) {
         final GL gl = GLU.getCurrentGL();
 
@@ -1094,33 +1068,36 @@ public class JoglRenderer extends Renderer {
         return glInterleavedFormat;
     }
 
-    @Override
-    public void setModelViewMatrix(final DoubleBuffer matrix) {
+    public void setModelViewMatrix(final Buffer matrix) {
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GL.GL_MODELVIEW);
 
-        GLU.getCurrentGL().glLoadMatrixd(matrix);
+        loadMatrix(matrix);
     }
 
-    @Override
-    public void setProjectionMatrix(final DoubleBuffer matrix) {
+    public void setProjectionMatrix(final Buffer matrix) {
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         JoglRendererUtil.switchMode(matRecord, GL.GL_PROJECTION);
 
-        GLU.getCurrentGL().glLoadMatrixd(matrix);
+        loadMatrix(matrix);
     }
 
-    @Override
+    private void loadMatrix(final Buffer matrix) {
+        if (matrix instanceof DoubleBuffer) {
+            GLU.getCurrentGL().glLoadMatrixd((DoubleBuffer) matrix);
+        } else if (matrix instanceof FloatBuffer) {
+            GLU.getCurrentGL().glLoadMatrixf((FloatBuffer) matrix);
+        }
+    }
+
     public void setViewport(final int x, final int y, final int width, final int height) {
         GLU.getCurrentGL().glViewport(x, y, width, height);
     }
 
-    @Override
     public void setDepthRange(final double depthRangeNear, final double depthRangeFar) {
         GLU.getCurrentGL().glDepthRange(depthRangeNear, depthRangeFar);
     }
 
-    @Override
     public void setDrawBuffer(final DrawBufferTarget target) {
         final RendererRecord record = ContextManager.getCurrentContext().getRendererRecord();
         if (record.getDrawBufferTarget() != target) {
@@ -1171,7 +1148,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void setupLineParameters(final float lineWidth, final int stippleFactor, final short stipplePattern,
             final boolean antialiased) {
         final GL gl = GLU.getCurrentGL();
@@ -1219,7 +1195,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void setupPointParameters(final float pointSize, final boolean antialiased) {
         final GL gl = GLU.getCurrentGL();
 
@@ -1231,7 +1206,6 @@ public class JoglRenderer extends Renderer {
         }
     }
 
-    @Override
     public void applyState(final RenderState state) {
         if (state == null) {
             logger.warning("tried to apply a null state.");
@@ -1290,12 +1264,10 @@ public class JoglRenderer extends Renderer {
         throw new IllegalArgumentException("Unknown state: " + state);
     }
 
-    @Override
     public void deleteTextureId(final int textureId) {
         JoglTextureStateUtil.deleteTextureId(textureId);
     }
 
-    @Override
     public void loadTexture(final Texture texture, final int unit) {
         JoglTextureStateUtil.load(texture, unit);
     }
