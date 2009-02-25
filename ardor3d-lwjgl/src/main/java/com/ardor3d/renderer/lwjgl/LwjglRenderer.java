@@ -16,7 +16,6 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -65,7 +64,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LineRecord;
 import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scene.state.lwjgl.LwjglBlendStateUtil;
@@ -136,10 +134,6 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private boolean glTexSubImage2DSupported = true;
 
-    /** List of default rendering states for this specific renderer type */
-    protected static final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(
-            RenderState.StateType.class);
-
     /**
      * Constructor instantiates a new <code>LwjglRenderer</code> object.
      */
@@ -150,17 +144,6 @@ public class LwjglRenderer extends AbstractRenderer {
         _queue = new RenderQueue(this);
 
         _oldTextureBuffers = new FloatBuffer[TextureState.MAX_TEXTURES];
-
-        // Create our defaults as needed.
-        synchronized (defaultStateList) {
-            if (defaultStateList.size() == 0) {
-                for (final RenderState.StateType type : RenderState.StateType.values()) {
-                    final RenderState state = RenderState.createState(type);
-                    state.setEnabled(false);
-                    defaultStateList.put(type, state);
-                }
-            }
-        }
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA color) {
@@ -406,40 +389,6 @@ public class LwjglRenderer extends AbstractRenderer {
     public Integer removeFromVBOCache(final Buffer buffer) {
         return _vboMap.remove(buffer);
 
-    }
-
-    public void applyStates(final EnumMap<StateType, RenderState> states) {
-        if (Debug.stats) {
-            StatCollector.startStat(StatType.STAT_STATES_TIMER);
-        }
-
-        final RenderContext context = ContextManager.getCurrentContext();
-
-        RenderState tempState = null;
-        for (final StateType type : StateType.values) {
-            // first look up in enforced states
-            tempState = context.getEnforcedState(type);
-
-            // Not there? Look in the states we receive
-            if (tempState == null) {
-                tempState = states.get(type);
-            }
-
-            // Still missing? Use our default states.
-            if (tempState == null) {
-                tempState = defaultStateList.get(type);
-            }
-
-            if (!RenderState._quickCompare.contains(type) || tempState.needsRefresh()
-                    || tempState != context.getCurrentState(type)) {
-                applyState(tempState);
-                tempState.setNeedsRefresh(false);
-            }
-        }
-
-        if (Debug.stats) {
-            StatCollector.endStat(StatType.STAT_STATES_TIMER);
-        }
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -1040,6 +989,44 @@ public class LwjglRenderer extends AbstractRenderer {
         } else if (matrix instanceof FloatBuffer) {
             GL11.glLoadMatrix((FloatBuffer) matrix);
         }
+    }
+
+    public Buffer getModelViewMatrix(final Buffer store) {
+        if (store == null || store instanceof DoubleBuffer) {
+            return getMatrix(GL11.GL_MODELVIEW_MATRIX, (DoubleBuffer) store);
+        } else if (store instanceof FloatBuffer) {
+            return getMatrix(GL11.GL_MODELVIEW_MATRIX, (FloatBuffer) store);
+        } else {
+            return null;
+        }
+    }
+
+    public Buffer getProjectionMatrix(final Buffer store) {
+        if (store == null || store instanceof DoubleBuffer) {
+            return getMatrix(GL11.GL_PROJECTION_MATRIX, (DoubleBuffer) store);
+        } else if (store instanceof FloatBuffer) {
+            return getMatrix(GL11.GL_PROJECTION_MATRIX, (FloatBuffer) store);
+        } else {
+            return null;
+        }
+    }
+
+    private DoubleBuffer getMatrix(final int matrixType, final DoubleBuffer store) {
+        DoubleBuffer result = store;
+        if (result == null || result.remaining() < 16) {
+            result = BufferUtils.createDoubleBuffer(16);
+        }
+        GL11.glGetDouble(matrixType, store);
+        return result;
+    }
+
+    private FloatBuffer getMatrix(final int matrixType, final FloatBuffer store) {
+        FloatBuffer result = store;
+        if (result.remaining() < 16) {
+            result = BufferUtils.createFloatBuffer(16);
+        }
+        GL11.glGetFloat(matrixType, store);
+        return result;
     }
 
     public void setViewport(final int x, final int y, final int width, final int height) {

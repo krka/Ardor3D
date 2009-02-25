@@ -24,6 +24,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
+import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Renderable;
@@ -290,12 +291,16 @@ public interface Renderer {
     void draw(final Renderable renderable);
 
     /**
-     * <code>applyStates</code> applies the sent in renderstates.
-     * 
      * @param states
-     *            states to apply.
+     *            states to apply. Any LightState will be ignored.
      */
-    void applyStates(final EnumMap<StateType, RenderState> states);
+    void applyNonLightStates(final EnumMap<StateType, RenderState> states);
+
+    /**
+     * @param state
+     *            the LightState to apply.
+     */
+    void applyLightState(LightState state);
 
     /**
      * <code>doTransforms</code> sets the current transform.
@@ -340,7 +345,27 @@ public interface Renderer {
 
     void setProjectionMatrix(Buffer matrix);
 
+    /**
+     * Gets the current projection matrix in row major order
+     * 
+     * @param store
+     *            The buffer to store in. Must be a FloatBuffer or DoubleBuffer or null. If null or remaining is < 16, a
+     *            new Buffer (DoubleBuffer for null) will be created and returned.
+     * @return
+     */
+    Buffer getProjectionMatrix(Buffer store);
+
     void setModelViewMatrix(Buffer matrix);
+
+    /**
+     * Gets the current modelview matrix in row major order
+     * 
+     * @param store
+     *            The buffer to store in. Must be a FloatBuffer or DoubleBuffer or null. If null or remaining is < 16, a
+     *            new Buffer (DoubleBuffer for null) will be created and returned.
+     * @return
+     */
+    Buffer getModelViewMatrix(Buffer store);
 
     void setViewport(int x, int y, int width, int height);
 
