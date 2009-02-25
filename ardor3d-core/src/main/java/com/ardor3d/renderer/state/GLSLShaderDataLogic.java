@@ -10,19 +10,22 @@
 
 package com.ardor3d.renderer.state;
 
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.MeshData;
 
 /**
- * Logic responsible for transfering data from a geometry to a shader before rendering
+ * Logic responsible for transferring data from a geometry to a shader before rendering
  */
 public interface GLSLShaderDataLogic {
     /**
-     * Responsible for transfering data from a Mesh object to a shader before rendering
+     * Responsible for transferring data from a Mesh object to a shader before rendering
      * 
      * @param shader
      *            Shader to update with new data(setUniform/setAttribute)
-     * @param geom
-     *            Mesh to retrieve data from
+     * @param meshData
+     *            MeshData to retrieve data from
+     * @param renderer
+     *            Current renderer
      */
-    void applyData(GLSLShaderObjectsState shader, MeshData meshData);
+    void applyData(GLSLShaderObjectsState shader, MeshData meshData, Renderer renderer);
 }

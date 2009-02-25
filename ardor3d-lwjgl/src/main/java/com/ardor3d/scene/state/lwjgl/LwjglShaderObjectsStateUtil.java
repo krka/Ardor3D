@@ -161,7 +161,7 @@ public abstract class LwjglShaderObjectsStateUtil {
                 }
 
                 if (state._shaderDataLogic != null) {
-                    state._shaderDataLogic.applyData(state, state._meshData);
+                    state._shaderDataLogic.applyData(state, state._meshData, renderer);
                 }
             }
 

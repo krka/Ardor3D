@@ -45,6 +45,7 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat4;
+import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloatArray;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt3;
@@ -89,6 +90,9 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /** OpenGL id for the attached fragment shader. */
     public int _fragmentShaderID = -1;
+
+    private int _numWarnings;
+    private static final int MAX_NUM_WARNINGS = 10;
 
     /**
      * Gets the currently loaded vertex shader.
@@ -148,6 +152,22 @@ public class GLSLShaderObjectsState extends RenderState {
 
     public void setFragmentShader(final ByteBuffer shader) {
         fragShader = shader;
+    }
+
+    public void setVertexShader(final String shader) {
+        vertShader = stringToByteBuffer(shader);
+    }
+
+    public void setFragmentShader(final String shader) {
+        fragShader = stringToByteBuffer(shader);
+    }
+
+    private ByteBuffer stringToByteBuffer(final String str) {
+        final byte[] bytes = str.getBytes();
+        final ByteBuffer buf = BufferUtils.createByteBuffer(bytes.length);
+        buf.put(bytes);
+        buf.rewind();
+        return buf;
     }
 
     /**
@@ -215,6 +235,10 @@ public class GLSLShaderObjectsState extends RenderState {
      */
     public void setShaderDataLogic(final GLSLShaderDataLogic shaderDataLogic) {
         _shaderDataLogic = shaderDataLogic;
+    }
+
+    public GLSLShaderDataLogic getShaderDataLogic() {
+        return _shaderDataLogic;
     }
 
     /**
@@ -461,6 +485,21 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
+    public void setUniform(final String name, final float[] value) {
+        final ShaderVariableFloatArray shaderUniform = getShaderUniform(name, ShaderVariableFloatArray.class);
+        shaderUniform.value = value;
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform variable to change
+     * @param value
+     *            the new value
+     */
     public void setUniform(final String name, final Vector2 value) {
         final ShaderVariableFloat2 shaderUniform = getShaderUniform(name, ShaderVariableFloat2.class);
         shaderUniform.value1 = (float) value.getX();
@@ -589,6 +628,26 @@ public class GLSLShaderObjectsState extends RenderState {
         shaderUniform.matrixBuffer.rewind();
         shaderUniform.rowMajor = rowMajor;
 
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform Matrix4 variable to change
+     * @param value
+     *            the new value, assumed row major
+     */
+    public void setUniformMatrix4(final String name, final FloatBuffer value) {
+        final ShaderVariableMatrix4 shaderUniform = getShaderUniform(name, ShaderVariableMatrix4.class);
+        // prepare buffer for writing
+        shaderUniform.matrixBuffer.rewind();
+        shaderUniform.matrixBuffer.put(value);
+        // prepare buffer for reading
+        shaderUniform.matrixBuffer.rewind();
+        value.rewind();
+        shaderUniform.rowMajor = true;
         setNeedsRefresh(true);
     }
 
@@ -837,7 +896,11 @@ public class GLSLShaderObjectsState extends RenderState {
             logger.severe("Too many shader attributes(standard+defined): " + shaderAttributes.size() + " maximum: "
                     + caps.getMaxGLSLVertexAttributes());
         } else if (shaderAttributes.size() + 16 > caps.getMaxGLSLVertexAttributes()) {
-            logger.warning("User defined attributes might overwrite default OpenGL attributes");
+            // XXX: Keep us from spamming this message in legitimate uses.
+            if (_numWarnings < MAX_NUM_WARNINGS) {
+                ++_numWarnings;
+                logger.warning("User defined attributes might overwrite default OpenGL attributes");
+            }
         }
     }
 
