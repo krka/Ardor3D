@@ -152,7 +152,13 @@ public class FirstPersonControl {
             final boolean dragOnly) {
 
         final FirstPersonControl control = new FirstPersonControl(upAxis);
+        control.setupMouseTriggers(layer, dragOnly, control.setupKeyboardTriggers(layer));
+        return control;
+    }
 
+    public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly,
+            final Predicate<TwoInputStates> keysHeld) {
+        final FirstPersonControl control = this;
         // Mouse look
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
                 .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
@@ -167,6 +173,11 @@ public class FirstPersonControl {
             }
         };
         layer.registerTrigger(new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction));
+    }
+
+    public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
+
+        final FirstPersonControl control = this;
 
         // WASD control
         final Predicate<TwoInputStates> keysHeld = new Predicate<TwoInputStates>() {
@@ -188,6 +199,6 @@ public class FirstPersonControl {
             }
         };
         layer.registerTrigger(new InputTrigger(keysHeld, moveAction));
-        return control;
+        return keysHeld;
     }
 }
