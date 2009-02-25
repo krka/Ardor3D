@@ -10,6 +10,7 @@
 
 package com.ardor3d.bounding;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 
@@ -32,5 +33,5 @@ public interface CollisionTreeController {
      * @param desiredSize
      *            the desiredSize of the final cache.
      */
-    void clean(Map<Mesh, CollisionTree> cache, List<Mesh> protectedList, int desiredSize);
+    void clean(Map<Mesh, WeakReference<CollisionTree>> cache, List<Mesh> protectedList, int desiredSize);
 }

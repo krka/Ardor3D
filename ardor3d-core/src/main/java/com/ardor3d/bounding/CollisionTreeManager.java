@@ -10,6 +10,7 @@
 
 package com.ardor3d.bounding;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -61,7 +62,7 @@ public class CollisionTreeManager {
     private static CollisionTreeManager _instance = new CollisionTreeManager();
 
     // the cache and protected list for storing trees.
-    private final Map<Mesh, CollisionTree> _cache;
+    private final Map<Mesh, WeakReference<CollisionTree>> _cache;
     private List<Mesh> _protectedList;
 
     private boolean _generateTrees = true;
@@ -78,7 +79,7 @@ public class CollisionTreeManager {
      * private constructor for the Singleton. Initializes the cache.
      */
     private CollisionTreeManager() {
-        _cache = Collections.synchronizedMap(new LinkedHashMap<Mesh, CollisionTree>(1));
+        _cache = Collections.synchronizedMap(new LinkedHashMap<Mesh, WeakReference<CollisionTree>>(1));
         setCollisionTreeController(new UsageTreeController());
     }
 
@@ -89,6 +90,19 @@ public class CollisionTreeManager {
      */
     public static CollisionTreeManager getInstance() {
         return _instance;
+    }
+
+    private CollisionTree cacheGet(final Mesh mesh) {
+        final WeakReference<CollisionTree> ref = _cache.get(mesh);
+        return ref == null ? null : ref.get();
+    }
+
+    private void cacheRemove(final Mesh mesh) {
+        _cache.remove(mesh);
+    }
+
+    private void cachePut(final Mesh mesh, final CollisionTree tree) {
+        _cache.put(mesh, new WeakReference<CollisionTree>(tree));
     }
 
     /**
@@ -112,7 +126,7 @@ public class CollisionTreeManager {
     public synchronized CollisionTree getCollisionTree(final Mesh mesh) {
         CollisionTree toReturn = null;
 
-        toReturn = _cache.get(mesh);
+        toReturn = cacheGet(mesh);
 
         // we didn't have it in the cache, create it if possible.
         if (toReturn == null) {
@@ -124,8 +138,8 @@ public class CollisionTreeManager {
         } else {
             // we had it in the cache, to keep the keyset in order, reinsert
             // this element
-            _cache.remove(mesh);
-            _cache.put(mesh, toReturn);
+            cacheRemove(mesh);
+            cachePut(mesh, toReturn);
             return toReturn;
         }
     }
@@ -196,7 +210,7 @@ public class CollisionTreeManager {
     public CollisionTree generateCollisionTree(final CollisionTree tree, final Mesh mesh, final boolean protect) {
         if (tree != null) {
             tree.construct(mesh, _doSort);
-            _cache.put(mesh, tree);
+            cachePut(mesh, tree);
             // This mesh has been added by outside sources and labeled
             // as protected. Therefore, put it in the protected list
             // so it is not removed by a controller.
@@ -222,7 +236,7 @@ public class CollisionTreeManager {
      *            the mesh to remove the corresponding collision tree.
      */
     public void removeCollisionTree(final Mesh mesh) {
-        _cache.remove(mesh);
+        cacheRemove(mesh);
     }
 
     /**
@@ -250,7 +264,7 @@ public class CollisionTreeManager {
      *            the mesh key for the tree to update.
      */
     public void updateCollisionTree(final Mesh mesh) {
-        final CollisionTree ct = _cache.get(mesh);
+        final CollisionTree ct = cacheGet(mesh);
         if (ct != null) {
             generateCollisionTree(ct, mesh, _protectedList != null && _protectedList.contains(mesh));
         }
