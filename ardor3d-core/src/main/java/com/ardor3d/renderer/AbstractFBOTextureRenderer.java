@@ -46,10 +46,13 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     protected final Renderer _parentRenderer;
     protected final Target _target;
 
+    protected int _samples = 0;
+
     public AbstractFBOTextureRenderer(final DisplaySettings settings, final Target target,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         _parentRenderer = parentRenderer;
         _target = target;
+        _samples = settings.getSamples();
 
         int width = settings.getWidth();
         int height = settings.getHeight();
@@ -134,7 +137,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
      */
     public void render(final Spatial toDraw, final Texture tex, final boolean doClear) {
         try {
-            activate();
+            ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
             setupForSingleTexDraw(tex, doClear);
 
@@ -142,7 +145,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
             takedownForSingleTexDraw(tex);
 
-            deactivate();
+            ContextManager.getCurrentContext().popFBOTextureRenderer();
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
         }
@@ -176,7 +179,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
         getCamera().update();
         getCamera().apply(_parentRenderer);
-        ContextManager.getCurrentContext().setCurrentCamera(getCamera());
     }
 
     protected abstract void clearBuffers();
@@ -187,7 +189,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         // reset previous camera
         _oldCamera.update();
         _oldCamera.apply(_parentRenderer);
-        ContextManager.getCurrentContext().setCurrentCamera(_oldCamera);
 
         // back to the non rtt settings
         _parentRenderer.getQueue().popBuckets();
@@ -217,6 +218,14 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public int getHeight() {
         return _height;
+    }
+
+    public int getSamples() {
+        return _samples;
+    }
+
+    public Renderer getParentRenderer() {
+        return _parentRenderer;
     }
 
     public void setMultipleTargets(final boolean multi) {

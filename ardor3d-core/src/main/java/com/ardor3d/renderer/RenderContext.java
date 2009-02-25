@@ -31,6 +31,8 @@ public class RenderContext {
 
     protected final Stack<EnumMap<StateType, RenderState>> _enforcedBackStack = new Stack<EnumMap<StateType, RenderState>>();
 
+    protected final Stack<AbstractFBOTextureRenderer> _textureRenderers = new Stack<AbstractFBOTextureRenderer>();
+
     /** RenderStates a Spatial contains during rendering. */
     protected final EnumMap<RenderState.StateType, RenderState> _currentStates = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
@@ -195,5 +197,22 @@ public class RenderContext {
     public void popEnforcedStates() {
         _enforcedStates.clear();
         _enforcedStates.putAll(_enforcedBackStack.pop());
+    }
+
+    public void pushFBOTextureRenderer(final AbstractFBOTextureRenderer top) {
+        if (_textureRenderers.size() > 0) {
+            _textureRenderers.peek().deactivate();
+        }
+        _textureRenderers.push(top);
+        top.activate();
+    }
+
+    public void popFBOTextureRenderer() {
+        AbstractFBOTextureRenderer top = _textureRenderers.pop();
+        top.deactivate();
+        if (_textureRenderers.size() > 0) {
+            top = _textureRenderers.peek();
+            top.activate();
+        }
     }
 }
