@@ -276,6 +276,50 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _logger.fine("Camera created. W: " + width + "  H: " + height);
     }
 
+    public Camera(final Camera source) {
+        _width = source.getWidth();
+        _height = source.getHeight();
+
+        _location = new Vector3(source.getLocation());
+        _left = new Vector3(source.getLeft());
+        _up = new Vector3(source.getUp());
+        _direction = new Vector3(source.getDirection());
+
+        _depthRangeNear = source.getDepthRangeNear();
+        _depthRangeFar = source.getDepthRangeFar();
+        _depthRangeDirty = true;
+
+        _frustumNear = source.getFrustumNear();
+        _frustumFar = source.getFrustumFar();
+        _frustumLeft = source.getFrustumLeft();
+        _frustumRight = source.getFrustumRight();
+        _frustumTop = source.getFrustumTop();
+        _frustumBottom = source.getFrustumBottom();
+
+        _coeffLeft = new double[2];
+        _coeffRight = new double[2];
+        _coeffBottom = new double[2];
+        _coeffTop = new double[2];
+
+        _viewPortLeft = source.getViewPortLeft();
+        _viewPortRight = source.getViewPortRight();
+        _viewPortTop = source.getViewPortTop();
+        _viewPortBottom = source.getViewPortBottom();
+
+        _planeQuantity = 6;
+
+        _worldPlane = new Plane[MAX_WORLD_PLANES];
+        for (int i = 0; i < MAX_WORLD_PLANES; i++) {
+            _worldPlane[i] = new Plane();
+        }
+
+        onFrustumChange();
+        onViewPortChange();
+        onFrameChange();
+
+        _logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
+    }
+
     public double getDepthRangeFar() {
         return _depthRangeFar;
     }
@@ -913,17 +957,33 @@ public class Camera implements Savable, Externalizable, Cloneable {
             _coeffTop[0] = -_frustumNear * inverseLength;
             _coeffTop[1] = _frustumTop * inverseLength;
         } else {
-            _coeffLeft[0] = 1;
-            _coeffLeft[1] = 0;
+            if (_frustumRight > _frustumLeft) {
+                _coeffLeft[0] = -1;
+                _coeffLeft[1] = 0;
 
-            _coeffRight[0] = -1;
-            _coeffRight[1] = 0;
+                _coeffRight[0] = 1;
+                _coeffRight[1] = 0;
+            } else {
+                _coeffLeft[0] = 1;
+                _coeffLeft[1] = 0;
 
-            _coeffBottom[0] = 1;
-            _coeffBottom[1] = 0;
+                _coeffRight[0] = -1;
+                _coeffRight[1] = 0;
+            }
 
-            _coeffTop[0] = -1;
-            _coeffTop[1] = 0;
+            if (_frustumBottom > _frustumTop) {
+                _coeffBottom[0] = -1;
+                _coeffBottom[1] = 0;
+
+                _coeffTop[0] = 1;
+                _coeffTop[1] = 0;
+            } else {
+                _coeffBottom[0] = 1;
+                _coeffBottom[1] = 0;
+
+                _coeffTop[0] = -1;
+                _coeffTop[1] = 0;
+            }
         }
 
         _updatePMatrix = true;
@@ -982,10 +1042,21 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _worldPlane[TOP_PLANE].setConstant(_location.dot(planeNormal));
 
         if (isParallelProjection()) {
-            _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() + _frustumLeft);
-            _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() - _frustumRight);
-            _worldPlane[TOP_PLANE].setConstant(_worldPlane[TOP_PLANE].getConstant() + _frustumTop);
-            _worldPlane[BOTTOM_PLANE].setConstant(_worldPlane[BOTTOM_PLANE].getConstant() - _frustumBottom);
+            if (_frustumRight > _frustumLeft) {
+                _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() + _frustumLeft);
+                _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() - _frustumRight);
+            } else {
+                _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() - _frustumLeft);
+                _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() + _frustumRight);
+            }
+
+            if (_frustumBottom > _frustumTop) {
+                _worldPlane[TOP_PLANE].setConstant(_worldPlane[TOP_PLANE].getConstant() + _frustumTop);
+                _worldPlane[BOTTOM_PLANE].setConstant(_worldPlane[BOTTOM_PLANE].getConstant() - _frustumBottom);
+            } else {
+                _worldPlane[TOP_PLANE].setConstant(_worldPlane[TOP_PLANE].getConstant() - _frustumTop);
+                _worldPlane[BOTTOM_PLANE].setConstant(_worldPlane[BOTTOM_PLANE].getConstant() + _frustumBottom);
+            }
         }
 
         // far plane
@@ -1232,6 +1303,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     public void apply(final Renderer r) {
+        ContextManager.getCurrentContext().setCurrentCamera(this);
         if (_depthRangeDirty) {
             r.setDepthRange(_depthRangeNear, _depthRangeFar);
         }
