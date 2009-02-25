@@ -13,7 +13,9 @@ package com.ardor3d.image.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +25,7 @@ import com.ardor3d.renderer.state.TextureState;
 public abstract class ImageLoaderUtil {
     private static final Logger logger = Logger.getLogger(ImageLoaderUtil.class.getName());
 
-    private static HashMap<String, ImageLoader> loaders = new HashMap<String, ImageLoader>();
+    private static Map<String, ImageLoader> loaders = Collections.synchronizedMap(new HashMap<String, ImageLoader>());
 
     static {
         registerHandler(".DDS", new DdsLoader());
@@ -47,6 +49,7 @@ public abstract class ImageLoaderUtil {
         InputStream is = null;
         try {
             is = file.openStream();
+            logger.finer("loadImage(URL file, boolean flipped) opened URL: " + file);
             return loadImage(fileExt, is, flipped);
         } catch (final IOException e) {
             logger.log(Level.WARNING, "loadImage(URL file, boolean flipped): defaultTexture used", e);
