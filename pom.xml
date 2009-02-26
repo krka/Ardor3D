@@ -19,6 +19,7 @@
     <module>ardor3d-examples</module>
     <module>ardor3d-effects</module>
     <module>ardor3d-collada</module>
+    <module>ardor3d-archetype</module>
   </modules>
 
   <repositories>
