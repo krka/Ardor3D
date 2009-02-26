@@ -54,10 +54,10 @@ public class StereoExample extends ExampleBase {
     /**
      * Change this to true to use anaglyph style (red/green) 3d. False will do hardware based 3d.
      */
-    private static final boolean _useAnaglyph = false;
+    private static final boolean _useAnaglyph = true;
 
     public static void main(final String[] args) {
-        _stereo = !_sideBySide;
+        _stereo = !_sideBySide && !_useAnaglyph;
         start(StereoExample.class);
     }
 
@@ -105,7 +105,7 @@ public class StereoExample extends ExampleBase {
 
             @Override
             public void update(final double time, final Spatial caller) {
-                _angle = _angle + (time * 25);
+                _angle = _angle + (time * 45);
                 if (_angle > 360) {
                     _angle = 0;
                 }
@@ -113,7 +113,7 @@ public class StereoExample extends ExampleBase {
                 _rotate.fromAngleNormalAxis(_angle * MathUtils.DEG_TO_RAD, _axis);
                 caller.setRotation(_rotate);
 
-                currentTime += time * 0.2;
+                currentTime += time * 0.5;
                 final ReadOnlyVector3 ttranslate = _mesh.getTranslation();
                 caller.setTranslation(ttranslate.getX(), ttranslate.getY(), Math.sin(currentTime) * 10.0 - 15);
             }
@@ -143,9 +143,11 @@ public class StereoExample extends ExampleBase {
 
         // Right Eye
         {
-            if (!_sideBySide) {
+            if (!_sideBySide && !_useAnaglyph) {
                 // Set right back buffer
                 renderer.setDrawBuffer(DrawBufferTarget.BackRight);
+                renderer.clearBuffers();
+            } else if (_useAnaglyph) {
                 renderer.clearBuffers();
             }
 
@@ -163,10 +165,12 @@ public class StereoExample extends ExampleBase {
 
         // Left Eye
         {
-            if (!_sideBySide) {
+            if (!_sideBySide && !_useAnaglyph) {
                 // Set left back buffer
                 renderer.setDrawBuffer(DrawBufferTarget.BackLeft);
                 renderer.clearBuffers();
+            } else if (_useAnaglyph) {
+                renderer.clearZBuffer();
             }
 
             // Set left cam
