@@ -13,6 +13,7 @@ package com.ardor3d.input.awt;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -48,6 +49,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     private MouseState _lastState = null;
 
     private final Component _component;
+    private final Frame _frame;
 
     private final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
@@ -55,7 +57,12 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     @Inject
     public AwtMouseWrapper(final Component component) {
-        _component = checkNotNull(component, "component");
+        if (component instanceof Frame) {
+            _frame = (Frame) (_component = component);
+        } else {
+            _component = checkNotNull(component, "component");
+            _frame = null;
+        }
         for (final MouseButton mb : MouseButton.values()) {
             _lastClickTime.put(mb, 0L);
         }
@@ -157,15 +164,18 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     private void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
-            _lastState = new MouseState(mouseEvent.getX(), _component.getHeight() - mouseEvent.getY(), 0, 0, 0, null,
-                    null);
+            final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
+                    : _component.getHeight();
+            _lastState = new MouseState(mouseEvent.getX(), height - mouseEvent.getY(), 0, 0, 0, null, null);
         }
     }
 
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
         // changing the y value, since for AWT, y = 0 at the top of the screen
-        final int fixedY = _component.getHeight() - mouseEvent.getY();
+        final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
+                : _component.getHeight();
+        final int fixedY = height - mouseEvent.getY();
 
         final MouseState newState = new MouseState(mouseEvent.getX(), fixedY, mouseEvent.getX() - _lastState.getX(),
                 fixedY - _lastState.getY(), (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent)

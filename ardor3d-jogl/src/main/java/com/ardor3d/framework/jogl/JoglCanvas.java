@@ -54,13 +54,9 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     private final DisplaySettings _settings;
     private boolean _inited = false;
-    // private Frame frame;
     private boolean _isClosing = false;
 
     private GLCanvas _glCanvas;
-
-    // private PhysicalLayer physicalLayer;
-    // private final boolean hasFocus = false;
 
     @Inject
     public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
@@ -342,8 +338,4 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     public void cleanup() {
         _canvasRenderer.cleanup();
     }
-
-    // public void forward(final JoglCanvas canvas, final PhysicalLayer physicalLayer) {
-    // this.physicalLayer = physicalLayer;
-    // }
 }
