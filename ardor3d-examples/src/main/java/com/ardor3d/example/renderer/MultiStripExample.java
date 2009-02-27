@@ -80,7 +80,7 @@ public class MultiStripExample extends ExampleBase {
 
         // Triangles
         indexBuffer.put(12).put(13).put(15);
-        indexBuffer.put(13).put(15).put(14);
+        indexBuffer.put(13).put(14).put(15);
 
         meshData.setIndexBuffer(indexBuffer);
 
