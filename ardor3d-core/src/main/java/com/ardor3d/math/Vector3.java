@@ -920,11 +920,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
             return false;
         }
         final ReadOnlyVector3 comp = (ReadOnlyVector3) o;
-        if (Double.compare(getX(), comp.getX()) == 0 && Double.compare(getY(), comp.getY()) == 0
-                && Double.compare(getZ(), comp.getZ()) == 0) {
-            return true;
-        }
-        return false;
+        return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ();
     }
 
     // /////////////////

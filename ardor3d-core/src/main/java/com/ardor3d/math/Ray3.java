@@ -54,6 +54,18 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3 {
         return this;
     }
 
+    public boolean intersects(final Vector3[] polygonVertices, final Vector3 locationStore) {
+        if (polygonVertices.length == 3) {
+            // TRIANGLE
+            return intersects(polygonVertices[0], polygonVertices[1], polygonVertices[2], locationStore, true);
+        } else if (polygonVertices.length == 4) {
+            // QUAD
+            return intersects(polygonVertices[0], polygonVertices[1], polygonVertices[3], locationStore, false);
+        }
+        // TODO: Add support for line and point
+        return false;
+    }
+
     /**
      * @param pointA
      * @param pointB

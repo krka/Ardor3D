@@ -1249,12 +1249,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
             return false;
         }
         final ReadOnlyQuaternion comp = (ReadOnlyQuaternion) o;
-        if (Double.compare(getX(), comp.getX()) == 0 && Double.compare(getY(), comp.getY()) == 0
-                && Double.compare(getZ(), comp.getZ()) == 0 && Double.compare(getW(), comp.getW()) == 0) {
-            return true;
-        }
+        return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ() && getW() == comp.getW();
 
-        return false;
     }
 
     // /////////////////

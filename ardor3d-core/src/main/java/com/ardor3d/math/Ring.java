@@ -247,12 +247,9 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing {
             return false;
         }
         final ReadOnlyRing comp = (ReadOnlyRing) o;
-        if (Double.compare(getInnerRadius(), comp.getInnerRadius()) == 0
-                && Double.compare(getOuterRadius(), comp.getOuterRadius()) == 0 && _up.equals(comp.getUp())
-                && _center.equals(comp.getCenter())) {
-            return true;
-        }
-        return false;
+        return getInnerRadius() == comp.getInnerRadius() && getOuterRadius() == comp.getOuterRadius()
+                && _up.equals(comp.getUp()) && _center.equals(comp.getCenter());
+
     }
 
     // /////////////////

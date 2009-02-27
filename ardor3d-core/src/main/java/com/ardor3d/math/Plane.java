@@ -211,10 +211,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane 
             return false;
         }
         final ReadOnlyPlane comp = (ReadOnlyPlane) o;
-        if (Double.compare(getConstant(), comp.getConstant()) == 0 && _normal.equals(comp.getNormal())) {
-            return true;
-        }
-        return false;
+        return getConstant() == comp.getConstant() && _normal.equals(comp.getNormal());
     }
 
     // /////////////////

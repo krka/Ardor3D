@@ -1201,7 +1201,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
         final ReadOnlyMatrix4 comp = (ReadOnlyMatrix4) o;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (Double.compare(_data[i][j], comp.getValue(i, j)) != 0) {
+                if (getValue(i, j) != comp.getValue(i, j)) {
                     return false;
                 }
             }

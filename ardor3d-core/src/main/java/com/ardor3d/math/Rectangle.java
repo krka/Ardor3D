@@ -184,10 +184,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
             return false;
         }
         final ReadOnlyRectangle comp = (ReadOnlyRectangle) o;
-        if (_a.equals(comp.getA()) && _b.equals(comp.getB()) && _c.equals(comp.getC())) {
-            return true;
-        }
-        return false;
+        return _a.equals(comp.getA()) && _b.equals(comp.getB()) && _c.equals(comp.getC());
     }
 
     // /////////////////

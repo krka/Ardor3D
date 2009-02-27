@@ -830,10 +830,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
             return false;
         }
         final ReadOnlyVector2 comp = (ReadOnlyVector2) o;
-        if (Double.compare(getX(), comp.getX()) == 0 && Double.compare(getY(), comp.getY()) == 0) {
-            return true;
-        }
-        return false;
+        return getX() == comp.getX() && getY() == comp.getY();
     }
 
     // /////////////////

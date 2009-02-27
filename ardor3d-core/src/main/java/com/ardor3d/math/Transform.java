@@ -873,8 +873,8 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
             return false;
         }
         final ReadOnlyTransform comp = (ReadOnlyTransform) o;
-        return (_matrix.equals(comp.getMatrix()) && _scale.equals(comp.getScale()) && _translation.equals(comp
-                .getTranslation()));
+        return _matrix.equals(comp.getMatrix()) && _scale.equals(comp.getScale())
+                && _translation.equals(comp.getTranslation());
     }
 
     // /////////////////

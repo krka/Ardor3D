@@ -891,11 +891,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
             return false;
         }
         final ReadOnlyVector4 comp = (ReadOnlyVector4) o;
-        if (Double.compare(getX(), comp.getX()) == 0 && Double.compare(getY(), comp.getY()) == 0
-                && Double.compare(getZ(), comp.getZ()) == 0 && Double.compare(getW(), comp.getW()) == 0) {
-            return true;
-        }
-        return false;
+        return getX() == comp.getX() && getY() == comp.getY() && getZ() == comp.getZ() && getW() == comp.getW();
     }
 
     // /////////////////

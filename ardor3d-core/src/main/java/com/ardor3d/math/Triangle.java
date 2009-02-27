@@ -282,11 +282,8 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
             return false;
         }
         final ReadOnlyTriangle comp = (ReadOnlyTriangle) o;
-        if (_index == comp.getIndex() && _pointA.equals(comp.getA()) && _pointB.equals(comp.getB())
-                && _pointC.equals(comp.getC())) {
-            return true;
-        }
-        return false;
+        return _index == comp.getIndex() && _pointA.equals(comp.getA()) && _pointB.equals(comp.getB())
+                && _pointC.equals(comp.getC());
     }
 
     // /////////////////

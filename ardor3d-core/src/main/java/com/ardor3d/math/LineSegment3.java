@@ -215,7 +215,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3 {
         }
         final ReadOnlyLineSegment3 comp = (ReadOnlyLineSegment3) o;
         return _origin.equals(comp.getOrigin()) && _direction.equals(comp.getDirection())
-                && (Double.compare(_extent, comp.getExtent()) == 0);
+                && _extent == comp.getExtent();
     }
 
     // /////////////////

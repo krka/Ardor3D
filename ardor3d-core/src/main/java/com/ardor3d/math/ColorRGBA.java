@@ -318,29 +318,30 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
 
         result.set(this);
 
-        if (Float.compare(result._r, 0f) < 0) {
+        if (result._r < 0.0f) {
             result._r = 0.0f;
-        } else if (Float.compare(result._r, 1f) > 0) {
+        } else if (result._r > 1.0f) {
             result._r = 1.0f;
         }
 
-        if (Float.compare(result._g, 0f) < 0) {
+        if (result._g < 0.0f) {
             result._g = 0.0f;
-        } else if (Float.compare(result._g, 1f) > 0) {
+        } else if (result._g > 1.0f) {
             result._g = 1.0f;
         }
 
-        if (Float.compare(result._b, 0f) < 0) {
+        if (result._b < 0.0f) {
             result._b = 0.0f;
-        } else if (Float.compare(result._b, 1f) > 0) {
+        } else if (result._b > 1.0f) {
             result._b = 1.0f;
         }
 
-        if (Float.compare(result._a, 0f) < 0) {
+        if (result._a < 0.0f) {
             result._a = 0.0f;
-        } else if (Float.compare(result._a, 1f) > 0) {
+        } else if (result._a > 1.0f) {
             result._a = 1.0f;
         }
+
         return result;
     }
 
@@ -349,27 +350,27 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
      * with the appropriate end of the range.
      */
     public void clampLocal() {
-        if (Float.compare(_r, 0f) < 0) {
+        if (_r < 0.0f) {
             _r = 0.0f;
-        } else if (Float.compare(_r, 1f) > 0) {
+        } else if (_r > 1.0f) {
             _r = 1.0f;
         }
 
-        if (Float.compare(_g, 0f) < 0) {
+        if (_g < 0.0f) {
             _g = 0.0f;
-        } else if (Float.compare(_g, 1f) > 0) {
+        } else if (_g > 1.0f) {
             _g = 1.0f;
         }
 
-        if (Float.compare(_b, 0f) < 0) {
+        if (_b < 0.0f) {
             _b = 0.0f;
-        } else if (Float.compare(_b, 1f) > 0) {
+        } else if (_b > 1.0f) {
             _b = 1.0f;
         }
 
-        if (Float.compare(_a, 0f) < 0) {
+        if (_a < 0.0f) {
             _a = 0.0f;
-        } else if (Float.compare(_a, 1f) > 0) {
+        } else if (_a > 1.0f) {
             _a = 1.0f;
         }
     }
@@ -839,11 +840,8 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
             return false;
         }
         final ReadOnlyColorRGBA comp = (ReadOnlyColorRGBA) o;
-        if (Float.compare(getRed(), comp.getRed()) == 0 && Float.compare(getGreen(), comp.getGreen()) == 0
-                && Float.compare(getBlue(), comp.getBlue()) == 0 && Float.compare(getAlpha(), comp.getAlpha()) == 0) {
-            return true;
-        }
-        return false;
+        return getRed() == comp.getRed() && getGreen() == comp.getGreen() && getBlue() == comp.getBlue()
+                && getAlpha() == comp.getAlpha();
     }
 
     // /////////////////

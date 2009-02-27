@@ -1163,7 +1163,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
         final ReadOnlyMatrix3 comp = (ReadOnlyMatrix3) o;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (Double.compare(_data[i][j], comp.getValue(i, j)) != 0) {
+                if (getValue(i, j) != comp.getValue(i, j)) {
                     return false;
                 }
             }
