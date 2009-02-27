@@ -281,10 +281,9 @@ public abstract class LwjglLightStateUtil {
         // XXX: This is a hack until we get a better lighting model up
         final ReadOnlyMatrix4 modelViewMatrix = Camera.getCurrentCamera().getModelViewMatrix();
 
-        if (!record.isValid() || Float.compare(lr.position.getXf(), positionX) != 0
-                || Float.compare(lr.position.getYf(), positionY) != 0
-                || Float.compare(lr.position.getZf(), positionZ) != 0
-                || Float.compare(lr.position.getWf(), positionW) != 0 || !lr.modelViewMatrix.equals(modelViewMatrix)) {
+        if (!record.isValid() || lr.position.getXf() != positionX || lr.position.getYf() != positionY
+                || lr.position.getZf() != positionZ || lr.position.getWf() != positionW
+                || !lr.modelViewMatrix.equals(modelViewMatrix)) {
 
             record.lightBuffer.clear();
             record.lightBuffer.put(positionX);

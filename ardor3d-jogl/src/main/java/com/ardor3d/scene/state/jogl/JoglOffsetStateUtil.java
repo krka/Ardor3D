@@ -69,7 +69,7 @@ public abstract class JoglOffsetStateUtil {
     private static void setOffset(final float factor, final float units, final OffsetStateRecord record) {
         final GL gl = GLU.getCurrentGL();
 
-        if (!record.isValid() || Float.compare(record.factor, factor) != 0 || Float.compare(record.units, units) != 0) {
+        if (!record.isValid() || record.factor != factor || record.units != units) {
             gl.glPolygonOffset(factor, units);
             record.factor = factor;
             record.units = units;
