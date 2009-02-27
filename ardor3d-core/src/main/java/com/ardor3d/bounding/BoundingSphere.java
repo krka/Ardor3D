@@ -16,7 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
@@ -24,10 +23,9 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
-import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.geom.BufferUtils;
@@ -119,61 +117,29 @@ public class BoundingSphere extends BoundingVolume {
         calcWelzl(points);
     }
 
-    /**
-     * <code>computeFromTris</code> creates a new Bounding Box from a given set of triangles. It is used in OBBTree
-     * calculations.
-     * 
-     * @param tris
-     * @param start
-     * @param end
-     */
     @Override
-    public void computeFromTris(final ReadOnlyTriangle[] tris, final int start, final int end) {
+    public void computeFromPrimitives(final MeshData data, final int section, final int[] indices, final int start,
+            final int end) {
         if (end - start <= 0) {
             return;
         }
 
-        final Vector3[] vertList = new Vector3[(end - start) * 3];
+        final int vertsPerPrimitive = data.getIndexMode(section).getVertexCount();
+        final Vector3[] vertList = new Vector3[(end - start) * vertsPerPrimitive];
+        Vector3[] store = new Vector3[vertsPerPrimitive];
 
         int count = 0;
         for (int i = start; i < end; i++) {
-            vertList[count++] = new Vector3(tris[i].getA());
-            vertList[count++] = new Vector3(tris[i].getB());
-            vertList[count++] = new Vector3(tris[i].getC());
-        }
-        averagePoints(vertList);
-        for (final Vector3 vert : vertList) {
-            Vector3.releaseTempInstance(vert);
-        }
-    }
-
-    /**
-     * <code>computeFromTris</code> creates a new Bounding Box from a given set of triangles. It is used in OBBTree
-     * calculations.
-     * 
-     * @param indices
-     * @param mesh
-     * @param start
-     * @param end
-     */
-    @Override
-    public void computeFromTris(final int[] indices, final Mesh mesh, final int start, final int end) {
-        if (end - start <= 0) {
-            return;
-        }
-
-        final Vector3[] vertList = new Vector3[(end - start) * 3];
-        final Vector3[] verts = new Vector3[3];
-
-        int count = 0;
-        for (int i = start; i < end; i++) {
-            PickingUtil.getTriangle(mesh, indices[i], verts);
-            vertList[count++] = new Vector3().set(verts[0]);
-            vertList[count++] = new Vector3().set(verts[1]);
-            vertList[count++] = new Vector3().set(verts[2]);
+            store = data.getPrimitive(indices[i], section, store);
+            for (int j = 0; j < vertsPerPrimitive; j++) {
+                vertList[count++] = Vector3.fetchTempInstance().set(store[0]);
+            }
         }
 
         averagePoints(vertList);
+        for (int i = 0; i < vertList.length; i++) {
+            Vector3.releaseTempInstance(vertList[i]);
+        }
     }
 
     /**

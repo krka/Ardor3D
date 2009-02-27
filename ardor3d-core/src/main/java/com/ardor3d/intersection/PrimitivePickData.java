@@ -19,18 +19,16 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.scenegraph.Mesh;
 
 /**
- * Pick data for triangle accuracy picking including sort by distance to intersection point.
+ * Pick data for primitive accurate picking including sort by distance to intersection point.
  */
-public class TrianglePickData extends PickData {
+public class PrimitivePickData extends PickData {
 
-    private static final Logger logger = Logger.getLogger(TrianglePickData.class.getName());
+    private static final Logger logger = Logger.getLogger(PrimitivePickData.class.getName());
+    private Vector3[] _vertices;
 
-    private final Vector3[] _worldTriangle = new Vector3[] { new Vector3(), new Vector3(), new Vector3() };
-    private final Vector3[] _vertices = new Vector3[] { new Vector3(), new Vector3(), new Vector3() };
-
-    public TrianglePickData(final Ray3 ray, final Mesh targetMesh, final List<Integer> targetTris,
+    public PrimitivePickData(final Ray3 ray, final Mesh targetMesh, final List<PrimitiveKey> targetPrimitives,
             final boolean calcPoints) {
-        super(ray, targetMesh, targetTris, false); // hard coded to false
+        super(ray, targetMesh, targetPrimitives, false); // hard coded to false
 
         if (calcPoints) {
             _intersectionRecord = calculateIntersectionPoints();
@@ -39,7 +37,7 @@ public class TrianglePickData extends PickData {
     }
 
     protected IntersectionRecord calculateIntersectionPoints() {
-        final List<Integer> tris = getTargetTris();
+        final List<PrimitiveKey> tris = getTargetPrimitives();
         if (tris.isEmpty()) {
             _intersectionRecord = new IntersectionRecord(new double[0], new Vector3[0]);
             _closestDistance = Double.MAX_VALUE;
@@ -48,9 +46,9 @@ public class TrianglePickData extends PickData {
 
         final double[] distances = new double[tris.size()];
         for (int i = 0; i < tris.size(); i++) {
-            final int triIndex = tris.get(i);
-            PickingUtil.getTriangle(_targetMesh, triIndex, _vertices);
-            final double triDistanceSq = getDistanceToTriangle(_vertices, _targetMesh.getWorldTransform());
+            final PrimitiveKey key = tris.get(i);
+            _vertices = _targetMesh.getMeshData().getPrimitive(key.getPrimitiveIndex(), key.getSection(), _vertices);
+            final double triDistanceSq = getDistanceToPrimitive(_vertices, _targetMesh.getWorldTransform());
             distances[i] = triDistanceSq;
         }
 
@@ -67,7 +65,7 @@ public class TrianglePickData extends PickData {
                     distances[sort] = temp;
 
                     // swap tris too
-                    final int temp2 = tris.get(sort + 1);
+                    final PrimitiveKey temp2 = tris.get(sort + 1);
                     tris.set(sort + 1, tris.get(sort));
                     tris.set(sort, temp2);
                 }
@@ -83,16 +81,16 @@ public class TrianglePickData extends PickData {
         return _intersectionRecord;
     }
 
-    private double getDistanceToTriangle(final Vector3[] triangle, final ReadOnlyTransform worldTransform) {
+    private double getDistanceToPrimitive(final Vector3[] vertices, final ReadOnlyTransform worldTransform) {
         // Transform triangle to world space
         for (int i = 0; i < 3; i++) {
-            worldTransform.applyForward(triangle[i], _worldTriangle[i]);
+            worldTransform.applyForward(vertices[i]);
         }
         // Intersection test
         final Ray3 ray = getRay();
         final Vector3 intersect = Vector3.fetchTempInstance();
         try {
-            if (ray.intersects(_worldTriangle[0], _worldTriangle[1], _worldTriangle[2], intersect, true)) {
+            if (ray.intersects(vertices, intersect)) {
                 return ray.getOrigin().distance(intersect);
             }
         } finally {

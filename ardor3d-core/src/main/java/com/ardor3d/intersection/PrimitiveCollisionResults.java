@@ -16,14 +16,14 @@ import java.util.List;
 import com.ardor3d.scenegraph.Mesh;
 
 /**
- * TriangleCollisionResults creates a CollisionResults object that calculates collisions to the triangle accuracy.
- * CollisionData objects are added to the collision list as they happen, these data objects only refer to the two
- * meshes, not their triangle lists. While TriangleCollisionResults defines a processCollisions method, it is empty and
- * should be further defined by the user if so desired.
+ * PrimitiveCollisionResults creates a CollisionResults object that calculates collisions to the primitive (quad,
+ * triangle, etc.) accuracy. CollisionData objects are added to the collision list as they happen, these data objects
+ * only refer to the two meshes, not their primitive lists. While PrimitiveCollisionResults defines a processCollisions
+ * method, it is empty and should be further defined by the user if so desired.
  * 
- * NOTE: Only Mesh objects may obtain triangle accuracy, all others will result in Bounding accuracy.
+ * NOTE: Only Mesh objects may obtain primitive accuracy, all others will result in Bounding accuracy.
  */
-public class TriangleCollisionResults extends CollisionResults {
+public class PrimitiveCollisionResults extends CollisionResults {
     /*
      * (non-Javadoc)
      * 
@@ -38,9 +38,9 @@ public class TriangleCollisionResults extends CollisionResults {
             final CollisionData data = new CollisionData(s, t);
             addCollisionData(data);
         } else {
-            final List<Integer> a = new ArrayList<Integer>();
-            final List<Integer> b = new ArrayList<Integer>();
-            PickingUtil.findTriangleCollision(s, t, a, b);
+            final List<PrimitiveKey> a = new ArrayList<PrimitiveKey>();
+            final List<PrimitiveKey> b = new ArrayList<PrimitiveKey>();
+            PickingUtil.findPrimitiveCollision(s, t, a, b);
             final CollisionData data = new CollisionData(s, t, a, b);
             addCollisionData(data);
         }

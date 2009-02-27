@@ -332,8 +332,27 @@ public class MeshData implements Cloneable, Savable {
         return _indexModes;
     }
 
+    public IndexMode getIndexMode(final int sectionIndex) {
+        return _indexModes[sectionIndex];
+    }
+
+    /**
+     * Note: Also updates primitive counts.
+     * 
+     * @param indexModes
+     *            the index modes to use for this MeshData.
+     */
     public void setIndexModes(final IndexMode[] indexModes) {
         _indexModes = indexModes;
+        updatePrimitiveCounts();
+    }
+
+    /**
+     * 
+     * @return the number of sections (lengths, indexModes, etc.) this MeshData contains.
+     */
+    public int getSectionCount() {
+        return _indexLengths != null ? _indexLengths.length : 1;
     }
 
     /**
@@ -355,11 +374,72 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Returns the vertex indices of a specified primitive.
+     * 
+     * @param primitiveIndex
+     *            which triangle, quad, etc
+     * @param section
+     *            which section to pull from (corresponds to array position in indexmodes and lengths)
+     * @param store
+     *            an int array to store the results in. if null, or the length < the size of the primitive, a new array
+     *            is created and returned.
+     * @return the primitive's vertex indices as an array
+     * @throws IndexOutOfBoundsException
+     *             if primitiveIndex is outside of range [0, count-1] where count is the number of primitives in the
+     *             given section.
+     * @throws ArrayIndexOutOfBoundsException
+     *             if section is out of range [0, N-1] where N is the number of sections in this MeshData object.
+     */
+    public int[] getPrimitive(final int primitiveIndex, final int section, final int[] store) {
+        final int count = getPrimitiveCount(section);
+        if (primitiveIndex >= count || primitiveIndex < 0) {
+            throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is " + count);
+        }
+
+        final IndexMode mode = _indexModes[section];
+        final int rSize = mode.getVertexCount();
+        int[] result = store;
+        if (result == null || result.length < rSize) {
+            result = new int[rSize];
+        }
+
+        for (int i = 0; i < rSize; i++) {
+            result[i] = getIndexBuffer().get(getVertexIndex(primitiveIndex, i, section));
+        }
+
+        return result;
+    }
+
+    public Vector3[] getPrimitive(final int primitiveIndex, final int section, final Vector3[] store) {
+        final int count = getPrimitiveCount(section);
+        if (primitiveIndex >= count || primitiveIndex < 0) {
+            throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is " + count);
+        }
+
+        final IndexMode mode = _indexModes[section];
+        final int rSize = mode.getVertexCount();
+        Vector3[] result = store;
+        if (result == null || result.length < rSize) {
+            result = new Vector3[rSize];
+        }
+
+        for (int i = 0; i < rSize; i++) {
+            if (result[i] == null) {
+                result[i] = new Vector3();
+            }
+            BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndexBuffer().get(
+                    getVertexIndex(primitiveIndex, i, section)));
+        }
+
+        return result;
+    }
+
+    /**
      * 
      * @param primitiveIndex
      *            which triangle, quad, etc.
      * @param point
-     *            which point on the triangle, quad, etc. (triangle has three points, so this would be 0-3, etc.)
+     *            which point on the triangle, quad, etc. (triangle has three points, so this would be 0-2, etc.)
      * @param section
      *            which section to pull from (corresponds to array position in indexmodes and lengths)
      * @return the position you would expect to find the given point in the index buffer
@@ -367,8 +447,8 @@ public class MeshData implements Cloneable, Savable {
     public int getVertexIndex(final int primitiveIndex, final int point, final int section) {
         int index = 0;
         // move our offset up to the beginning of our section
-        for (int i = 1; i < _primitiveCounts.length; i++) {
-            index += _primitiveCounts[i];
+        for (int i = 0; i < section; i++) {
+            index += _indexLengths[i];
         }
 
         // Ok, now pull primitive index based on indexmode.
@@ -582,7 +662,6 @@ public class MeshData implements Cloneable, Savable {
                 case Points:
                     count = size;
                     break;
-                case Polygon:
                 default:
                     logger.warning("unimplemented index mode: " + _indexModes[0]);
             }

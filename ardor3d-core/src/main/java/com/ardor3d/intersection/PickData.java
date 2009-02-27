@@ -24,7 +24,7 @@ public class PickData {
 
     protected Ray3 _ray;
     protected Mesh _targetMesh;
-    protected List<Integer> _targetTris;
+    protected final List<PrimitiveKey> _targetPrimitives;
     protected IntersectionRecord _intersectionRecord;
     protected double _closestDistance;
 
@@ -36,10 +36,11 @@ public class PickData {
      * instantiates a new PickData object. Note: subclasses may want to make calc points null to prevent this extra
      * work.
      */
-    public PickData(final Ray3 ray, final Mesh targetMesh, final List<Integer> targetTris, final boolean calcPoints) {
+    public PickData(final Ray3 ray, final Mesh targetMesh, final List<PrimitiveKey> targetPrimitives,
+            final boolean calcPoints) {
         _ray = ray;
         _targetMesh = targetMesh;
-        _targetTris = targetTris;
+        _targetPrimitives = targetPrimitives;
 
         if (calcPoints) {
             _intersectionRecord = targetMesh.getWorldBound().intersectsWhere(ray);
@@ -69,18 +70,10 @@ public class PickData {
     }
 
     /**
-     * @return Returns the target.
+     * @return Returns the target primitives.
      */
-    public List<Integer> getTargetTris() {
-        return _targetTris;
-    }
-
-    /**
-     * @param target
-     *            The target to set.
-     */
-    public void setTargetTris(final List<Integer> target) {
-        _targetTris = target;
+    public List<PrimitiveKey> getTargetPrimitives() {
+        return _targetPrimitives;
     }
 
     /**

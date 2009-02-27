@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
@@ -22,10 +21,9 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
-import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -144,16 +142,9 @@ public class BoundingBox extends BoundingVolume {
         containAABB(points);
     }
 
-    /**
-     * <code>computeFromTris</code> creates a new Bounding Box from a given set of triangles. It is used in OBBTree
-     * calculations.
-     * 
-     * @param tris
-     * @param start
-     * @param end
-     */
     @Override
-    public void computeFromTris(final ReadOnlyTriangle[] tris, final int start, final int end) {
+    public void computeFromPrimitives(final MeshData data, final int section, final int[] indices, final int start,
+            final int end) {
         if (end - start <= 0) {
             return;
         }
@@ -163,10 +154,14 @@ public class BoundingBox extends BoundingVolume {
         final Vector3 max = Vector3.fetchTempInstance().set(
                 new Vector3(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
 
+        final int vertsPerPrimitive = data.getIndexMode(section).getVertexCount();
+        Vector3[] store = new Vector3[vertsPerPrimitive];
+
         for (int i = start; i < end; i++) {
-            checkMinMax(min, max, tris[i].getA());
-            checkMinMax(min, max, tris[i].getB());
-            checkMinMax(min, max, tris[i].getC());
+            store = data.getPrimitive(indices[i], section, store);
+            for (int j = 0; j < store.length; j++) {
+                checkMinMax(min, max, store[j]);
+            }
         }
 
         _center.set(min.addLocal(max));
@@ -178,39 +173,6 @@ public class BoundingBox extends BoundingVolume {
 
         Vector3.releaseTempInstance(min);
         Vector3.releaseTempInstance(max);
-    }
-
-    @Override
-    public void computeFromTris(final int[] indices, final Mesh mesh, final int start, final int end) {
-        if (end - start <= 0) {
-            return;
-        }
-
-        final Vector3 min = Vector3.fetchTempInstance().set(
-                new Vector3(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
-        final Vector3 max = Vector3.fetchTempInstance().set(
-                new Vector3(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
-
-        final Vector3[] verts = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(), Vector3.fetchTempInstance() };
-        for (int i = start; i < end; i++) {
-            PickingUtil.getTriangle(mesh, indices[i], verts);
-            checkMinMax(min, max, verts[0]);
-            checkMinMax(min, max, verts[1]);
-            checkMinMax(min, max, verts[2]);
-        }
-
-        _center.set(min.addLocal(max));
-        _center.multiplyLocal(0.5);
-
-        setXExtent(max.getX() - _center.getX());
-        setYExtent(max.getY() - _center.getY());
-        setZExtent(max.getZ() - _center.getZ());
-
-        Vector3.releaseTempInstance(min);
-        Vector3.releaseTempInstance(max);
-        for (final Vector3 vec : verts) {
-            Vector3.releaseTempInstance(vec);
-        }
     }
 
     private void checkMinMax(final Vector3 min, final Vector3 max, final ReadOnlyVector3 point) {

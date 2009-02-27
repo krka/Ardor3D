@@ -21,9 +21,8 @@ import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
-import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.Savable;
@@ -66,23 +65,6 @@ public abstract class BoundingVolume implements Serializable, Savable {
      * getType returns the type of bounding volume this is.
      */
     public abstract Type getType();
-
-    /**
-     * 
-     * <code>transform</code> alters the location of the bounding volume by a rotation, translation and a scalar.
-     * 
-     * @param rotate
-     *            the rotation to affect the bound.
-     * @param translate
-     *            the translation to affect the bound.
-     * @param scale
-     *            the scale to resize the bound.
-     * @return the new bounding volume.
-     */
-    public final BoundingVolume transform(final ReadOnlyQuaternion rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale) {
-        return transform(rotate, translate, scale, null);
-    }
 
     /**
      * 
@@ -301,9 +283,7 @@ public abstract class BoundingVolume implements Serializable, Savable {
         return this.getClass();
     }
 
-    public abstract void computeFromTris(int[] triIndex, Mesh mesh, int start, int end);
-
-    public abstract void computeFromTris(ReadOnlyTriangle[] tris, int start, int end);
+    public abstract void computeFromPrimitives(MeshData data, int section, final int[] indices, int start, int end);
 
     public abstract double getVolume();
 }

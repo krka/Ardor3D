@@ -10,20 +10,17 @@
 
 package com.ardor3d.intersection;
 
-import java.nio.IntBuffer;
 import java.util.List;
 
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.Spatial.PickingHint;
-import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class PickingUtil {
     public static void findPick(final Spatial spatial, final Ray3 ray, final PickResults results) {
@@ -50,8 +47,8 @@ public abstract class PickingUtil {
                 return;
             }
             if (mesh.getWorldBound().intersects(ray)) {
-                // find the triangle that is being hit.
-                // add this node and the triangle to the PickResults list.
+                // find the primitive that is being hit.
+                // add this node and the primitive to the PickResults list.
                 results.addPick(ray, mesh);
             }
         }
@@ -89,7 +86,7 @@ public abstract class PickingUtil {
         }
     }
 
-    public static void findTrianglePick(final Mesh mesh, final Ray3 toTest, final List<Integer> results) {
+    public static void findTrianglePick(final Mesh mesh, final Ray3 toTest, final List<PrimitiveKey> results) {
         if (mesh.getWorldBound() == null || !mesh.isPickingHintEnabled(PickingHint.Pickable)) {
             return;
         }
@@ -97,11 +94,7 @@ public abstract class PickingUtil {
         if (mesh.getWorldBound().intersects(toTest)) {
             final CollisionTree ct = CollisionTreeManager.getInstance().getCollisionTree(mesh);
             if (ct != null) {
-                final ReadOnlyMatrix3 worldRotation = mesh.getWorldRotation();
-                final ReadOnlyVector3 worldTranslation = mesh.getWorldTranslation();
-                final ReadOnlyVector3 worldScale = mesh.getWorldScale();
-
-                ct.getBounds().transform(worldRotation, worldTranslation, worldScale, ct.getWorldBounds());
+                ct.getBounds().transform(mesh.getWorldTransform(), ct.getWorldBounds());
                 ct.intersect(toTest, results);
             }
         }
@@ -147,8 +140,8 @@ public abstract class PickingUtil {
      * @param otherIndex
      *            The array of triangle indexes intersecting in the given mesh.
      */
-    public static void findTriangleCollision(final Mesh testMesh, final Mesh toCheck, final List<Integer> testIndex,
-            final List<Integer> otherIndex) {
+    public static void findPrimitiveCollision(final Mesh testMesh, final Mesh toCheck,
+            final List<PrimitiveKey> testIndex, final List<PrimitiveKey> otherIndex) {
         if (!testMesh.isPickingHintEnabled(PickingHint.Collidable)
                 || !toCheck.isPickingHintEnabled(PickingHint.Collidable)) {
             return;
@@ -161,16 +154,12 @@ public abstract class PickingUtil {
             return;
         }
 
-        final ReadOnlyMatrix3 worldRotation = testMesh.getWorldRotation();
-        final ReadOnlyVector3 worldTranslation = testMesh.getWorldTranslation();
-        final ReadOnlyVector3 worldScale = testMesh.getWorldScale();
-
-        myTree.getBounds().transform(worldRotation, worldTranslation, worldScale, myTree.getWorldBounds());
+        myTree.getBounds().transform(testMesh.getWorldTransform(), myTree.getWorldBounds());
 
         myTree.intersect(otherTree, testIndex, otherIndex);
     }
 
-    public static boolean hasCollision(final Spatial spatial, final Spatial scene, final boolean checkTriangles) {
+    public static boolean hasCollision(final Spatial spatial, final Spatial scene, final boolean checkPrimitives) {
         if (spatial == scene || spatial.getWorldBound() == null
                 || !spatial.isPickingHintEnabled(PickingHint.Collidable)
                 || !scene.isPickingHintEnabled(PickingHint.Collidable)) {
@@ -181,12 +170,12 @@ public abstract class PickingUtil {
             final Node node = (Node) spatial;
 
             if (node.getWorldBound().intersects(scene.getWorldBound())) {
-                if (node.getNumberOfChildren() == 0 && !checkTriangles) {
+                if (node.getNumberOfChildren() == 0 && !checkPrimitives) {
                     return true;
                 }
                 // further checking needed.
                 for (int i = 0; i < node.getNumberOfChildren(); i++) {
-                    if (PickingUtil.hasCollision(node.getChild(i), scene, checkTriangles)) {
+                    if (PickingUtil.hasCollision(node.getChild(i), scene, checkPrimitives)) {
                         return true;
                     }
                 }
@@ -198,7 +187,7 @@ public abstract class PickingUtil {
                 if (scene instanceof Node) {
                     final Node parent = (Node) scene;
                     for (int i = 0; i < parent.getNumberOfChildren(); i++) {
-                        if (PickingUtil.hasCollision(mesh, parent.getChild(i), checkTriangles)) {
+                        if (PickingUtil.hasCollision(mesh, parent.getChild(i), checkPrimitives)) {
                             return true;
                         }
                     }
@@ -206,7 +195,7 @@ public abstract class PickingUtil {
                     return false;
                 }
 
-                if (!checkTriangles) {
+                if (!checkPrimitives) {
                     return true;
                 }
 
@@ -218,58 +207,5 @@ public abstract class PickingUtil {
         }
 
         return false;
-    }
-
-    /**
-     * Stores in the <code>storage</code> array the indices of triangle <code>i</code>. If <code>i</code> is an invalid
-     * index, or if <code>storage.length < 3</code>, then nothing happens
-     * 
-     * @param index
-     *            The index of the triangle to get.
-     * @param storage
-     *            The array that will hold the i's indexes.
-     */
-    public static void getTriangle(final Mesh mesh, final int index, final int[] storage) {
-        // FIXME: hard coded section 0
-        if (index < mesh.getMeshData().getPrimitiveCount(0) && storage.length >= 3) {
-            final IntBuffer indices = mesh.getMeshData().getIndexBuffer();
-            storage[0] = indices.get(mesh.getMeshData().getVertexIndex(index, 0, 0));
-            storage[1] = indices.get(mesh.getMeshData().getVertexIndex(index, 1, 0));
-            storage[2] = indices.get(mesh.getMeshData().getVertexIndex(index, 2, 0));
-        }
-    }
-
-    /**
-     * Stores in the <code>vertices</code> array the vertex values of triangle <code>i</code>. If <code>i</code> is an
-     * invalid triangle index, nothing happens.
-     * 
-     * @param index
-     * @param vertices
-     */
-    public static void getTriangle(final Mesh mesh, final int index, final Vector3[] store) {
-        // FIXME: hard coded section 0
-        if (index < mesh.getMeshData().getPrimitiveCount(0) && index >= 0) {
-            for (int x = 0; x < 3; x++) {
-                if (store[x] == null) {
-                    store[x] = new Vector3();
-                }
-
-                BufferUtils.populateFromBuffer(store[x], mesh.getMeshData().getVertexBuffer(), mesh.getMeshData()
-                        .getIndexBuffer().get(mesh.getMeshData().getVertexIndex(index, x, 0)));
-            }
-        }
-    }
-
-    public static int[] getTriangleIndices(final Mesh mesh, int[] store) {
-        // FIXME: hard coded section 0
-        final int maxCount = mesh.getMeshData().getPrimitiveCount(0);
-        if (store == null || store.length != maxCount) {
-            store = new int[maxCount];
-        }
-
-        for (int i = 0, tLength = maxCount; i < tLength; i++) {
-            store[i] = i;
-        }
-        return store;
     }
 }

@@ -20,11 +20,11 @@ import com.ardor3d.scenegraph.Mesh;
  */
 public class CollisionData {
 
-    private Mesh _targetMesh;
-    private Mesh _sourceMesh;
+    private final Mesh _targetMesh;
+    private final Mesh _sourceMesh;
 
-    private List<Integer> _sourceTris;
-    private List<Integer> _targetTris;
+    private final List<PrimitiveKey> _sourcePrimitives;
+    private final List<PrimitiveKey> _targetPrimitives;
 
     /**
      * instantiates a new CollisionData object.
@@ -32,7 +32,7 @@ public class CollisionData {
      * @param sourceMesh
      *            the relevant Geometry
      * @param targetMesh
-     *            the mesh the relevant Mesh collided with.
+     *            the mesh the source Mesh collided with.
      */
     public CollisionData(final Mesh sourceMesh, final Mesh targetMesh) {
         this(sourceMesh, targetMesh, null, null);
@@ -42,78 +42,35 @@ public class CollisionData {
      * instantiates a new CollisionData object.
      * 
      * @param sourceMesh
-     *            the relevant Geometry
+     *            the relevant Mesh
      * @param targetMesh
-     *            the mesh the relevant Mesh collided with.
-     * @param sourceTris
-     *            the triangles of the relevant Mesh that made contact.
-     * @param targetTris
-     *            the triangles of the second mesh that made contact.
+     *            the mesh the source Mesh collided with.
+     * @param sourcePrimitives
+     *            the primitives of the source Mesh that made contact.
+     * @param targetPrimitives
+     *            the primitives of the second mesh that made contact.
      */
-    public CollisionData(final Mesh sourceMesh, final Mesh targetMesh, final List<Integer> sourceTris,
-            final List<Integer> targetTris) {
+    public CollisionData(final Mesh sourceMesh, final Mesh targetMesh, final List<PrimitiveKey> sourcePrimitives,
+            final List<PrimitiveKey> targetPrimitives) {
         _targetMesh = targetMesh;
         _sourceMesh = sourceMesh;
-        _targetTris = targetTris;
-        _sourceTris = sourceTris;
-    }
-
-    /**
-     * @return Returns the source mesh.
-     */
-    public Mesh getSourceMesh() {
-        return _sourceMesh;
+        _targetPrimitives = targetPrimitives;
+        _sourcePrimitives = sourcePrimitives;
     }
 
     public Mesh getTargetMesh() {
         return _targetMesh;
     }
 
-    /**
-     * @param mesh
-     *            The mesh to set.
-     */
-    public void setSourceMesh(final Mesh mesh) {
-        _sourceMesh = mesh;
+    public Mesh getSourceMesh() {
+        return _sourceMesh;
     }
 
-    /**
-     * <code>setTargetMesh</code> sets the mesh that is hit by the source mesh.
-     * 
-     * @param mesh
-     *            the mesh that was hit by the source mesh.
-     */
-    public void setTargetMesh(final Mesh mesh) {
-        _targetMesh = mesh;
+    public List<PrimitiveKey> getSourcePrimitives() {
+        return _sourcePrimitives;
     }
 
-    /**
-     * @return Returns the source.
-     */
-    public List<Integer> getSourceTris() {
-        return _sourceTris;
-    }
-
-    /**
-     * @param source
-     *            The source to set.
-     */
-    public void setSourceTris(final List<Integer> source) {
-        _sourceTris = source;
-    }
-
-    /**
-     * @return Returns the target.
-     */
-    public List<Integer> getTargetTris() {
-        return _targetTris;
-    }
-
-    /**
-     * @param target
-     *            The target to set.
-     */
-    public void setTargetTris(final List<Integer> target) {
-        _targetTris = target;
+    public List<PrimitiveKey> getTargetPrimitives() {
+        return _targetPrimitives;
     }
 }

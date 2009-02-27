@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.intersection.IntersectionRecord;
-import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
@@ -23,10 +22,9 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
-import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
-import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -484,147 +482,40 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     @Override
-    public void computeFromTris(final int[] indices, final Mesh mesh, final int start, final int end) {
+    public void computeFromPrimitives(final MeshData data, final int section, final int[] indices, final int start,
+            final int end) {
         if (end - start <= 0) {
             return;
         }
-        final Vector3[] verts = new Vector3[3];
+
+        final int vertsPerPrimitive = data.getIndexMode(section).getVertexCount();
+        Vector3[] store = new Vector3[vertsPerPrimitive];
+
         final Vector3 min = Vector3.fetchTempInstance().set(
                 new Vector3(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
         final Vector3 max = Vector3.fetchTempInstance().set(
                 new Vector3(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
+
         Vector3 point;
         for (int i = start; i < end; i++) {
-            PickingUtil.getTriangle(mesh, indices[i], verts);
-            point = verts[0];
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
-            }
-
-            point = verts[1];
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
-            }
-
-            point = verts[2];
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
-            }
-        }
-
-        _center.set(min.addLocal(max));
-        _center.multiplyLocal(0.5);
-
-        _extent.set(max.getX() - _center.getX(), max.getY() - _center.getY(), max.getZ() - _center.getZ());
-
-        _xAxis.set(1, 0, 0);
-        _yAxis.set(0, 1, 0);
-        _zAxis.set(0, 0, 1);
-
-        Vector3.releaseTempInstance(min);
-        Vector3.releaseTempInstance(max);
-
-        correctCorners = false;
-    }
-
-    @Override
-    public void computeFromTris(final ReadOnlyTriangle[] tris, final int start, final int end) {
-        if (end - start <= 0) {
-            return;
-        }
-
-        final Vector3 min = Vector3.fetchTempInstance().set(tris[start].getA());
-        final Vector3 max = Vector3.fetchTempInstance().set(min);
-        ReadOnlyVector3 point;
-        for (int i = start; i < end; i++) {
-
-            point = tris[i].getA();
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
-            }
-
-            point = tris[i].getB();
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
-            }
-
-            point = tris[i].getC();
-            if (point.getX() < min.getX()) {
-                min.setX(point.getX());
-            } else if (point.getX() > max.getX()) {
-                max.setX(point.getX());
-            }
-            if (point.getY() < min.getY()) {
-                min.setY(point.getY());
-            } else if (point.getY() > max.getY()) {
-                max.setY(point.getY());
-            }
-            if (point.getZ() < min.getZ()) {
-                min.setZ(point.getZ());
-            } else if (point.getZ() > max.getZ()) {
-                max.setZ(point.getZ());
+            store = data.getPrimitive(indices[i], section, store);
+            for (int j = 0; j < vertsPerPrimitive; j++) {
+                point = store[j];
+                if (point.getX() < min.getX()) {
+                    min.setX(point.getX());
+                } else if (point.getX() > max.getX()) {
+                    max.setX(point.getX());
+                }
+                if (point.getY() < min.getY()) {
+                    min.setY(point.getY());
+                } else if (point.getY() > max.getY()) {
+                    max.setY(point.getY());
+                }
+                if (point.getZ() < min.getZ()) {
+                    min.setZ(point.getZ());
+                } else if (point.getZ() > max.getZ()) {
+                    max.setZ(point.getZ());
+                }
             }
         }
 
@@ -644,11 +535,8 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     public boolean intersection(final OrientedBoundingBox box1) {
-        // Cutoff for cosine of angles between box axes. This is used to catch
-        // the cases when at least one pair of axes are parallel. If this
-        // happens,
-        // there is no need to test for separation along the Cross(A[i],B[j])
-        // directions.
+        // Cutoff for cosine of angles between box axes. This is used to catch the cases when at least one pair of axes
+        // are parallel. If this happens, there is no need to test for separation along the Cross(A[i],B[j]) directions.
         final OrientedBoundingBox box0 = this;
         final double cutoff = 0.999999;
         boolean parallelPairExists = false;

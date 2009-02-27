@@ -11,15 +11,16 @@
 package com.ardor3d.bounding;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.intersection.Intersection;
-import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyMatrix3;
-import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.SortUtil;
@@ -27,7 +28,7 @@ import com.ardor3d.util.SortUtil;
 /**
  * CollisionTree defines a well balanced red black tree used for triangle accurate collision detection. The
  * CollisionTree supports three types: Oriented Bounding Box, Axis-Aligned Bounding Box and Sphere. The tree is composed
- * of a heirarchy of nodes, all but leaf nodes have two children, a left and a right, where the children contain half of
+ * of a hierarchy of nodes, all but leaf nodes have two children, a left and a right, where the children contain half of
  * the triangles of the parent. This "half split" is executed down the tree until the node is maintaining a set maximum
  * of triangles. This node is called the leaf node. Intersection checks are handled as follows:<br>
  * 1. The bounds of the node is checked for intersection. If no intersection occurs here, no further processing is
@@ -35,6 +36,7 @@ import com.ardor3d.util.SortUtil;
  * 2a. If an intersection occurs and we have children left/right nodes, pass the intersection information to the
  * children.<br>
  * 2b. If an intersection occurs and we are a leaf node, pass each triangle individually for intersection checking.<br>
+ * <br>
  * Optionally, during creation of the collision tree, sorting can be applied. Sorting will attempt to optimize the order
  * of the triangles in such a way as to best split for left and right sub-trees. This function can lead to faster
  * intersection tests, but increases the creation time for the tree. The number of triangles a leaf node is responsible
@@ -57,28 +59,28 @@ public class CollisionTree implements Serializable {
     }
 
     // Default tree is axis-aligned
-    private Type _type = Type.AABB;
+    protected Type _type = Type.AABB;
 
     // children trees
-    private CollisionTree _left;
-    private CollisionTree _right;
+    protected CollisionTree _left;
+    protected CollisionTree _right;
 
-    // bounding volumes that contain the triangles that the node is
-    // handling
-    private BoundingVolume _bounds;
-    private BoundingVolume _worldBounds;
+    // bounding volumes that contain the triangles that the node is handling
+    protected BoundingVolume _bounds;
+    protected BoundingVolume _worldBounds;
 
-    // the list of triangle indices that compose the tree. This list
-    // contains all the triangles of the mesh and is shared between
-    // all nodes of this tree.
-    private int[] _triIndex;
+    /**
+     * the list of primitives indices that compose the tree. This list contains all the triangles of the mesh and is
+     * shared between all nodes of this tree. Stored here to allow for sorting.
+     */
+    protected int[] _primitiveIndices;
 
-    // Defines the pointers into the triIndex array that this node is
-    // directly responsible for.
-    private int _start, _end;
+    // Defines the pointers into the triIndex array that this node is directly responsible for.
+    protected int _start, _end;
 
     // Required Spatial information
     protected Mesh _mesh;
+    protected int _section;
 
     // Comparator used to sort triangle indices
     protected transient final TreeComparator _comparator = new TreeComparator();
@@ -100,17 +102,19 @@ public class CollisionTree implements Serializable {
      * @param childIndex
      *            the index of the child to generate the tree for.
      * @param parent
-     *            The Node that this OBBTree should represent.
+     *            The Node that this tree should represent.
      * @param doSort
-     *            true to sort triangles during creation, false otherwise
+     *            true to sort primitives during creation, false otherwise
      */
-    public void construct(final int childIndex, final Node parent, final boolean doSort) {
-
+    public void construct(final int childIndex, final int section, final Node parent, final boolean doSort) {
         final Spatial spat = parent.getChild(childIndex);
         if (spat instanceof Mesh) {
             _mesh = (Mesh) spat;
-            _triIndex = PickingUtil.getTriangleIndices(_mesh, _triIndex);
-            createTree(0, _triIndex.length, doSort);
+            _primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            for (int i = 0; i < _primitiveIndices.length; i++) {
+                _primitiveIndices[i] = i;
+            }
+            createTree(section, 0, _primitiveIndices.length, doSort);
         }
     }
 
@@ -118,55 +122,115 @@ public class CollisionTree implements Serializable {
      * Recreate this Collision Tree for the given mesh.
      * 
      * @param mesh
-     *            The trimesh that this OBBTree should represent.
+     *            The mesh that this tree should represent.
      * @param doSort
-     *            true to sort triangles during creation, false otherwise
+     *            true to sort primitives during creation, false otherwise
      */
     public void construct(final Mesh mesh, final boolean doSort) {
         _mesh = mesh;
-        _triIndex = PickingUtil.getTriangleIndices(mesh, _triIndex);
-        createTree(0, _triIndex.length, doSort);
+        if (_mesh.getMeshData().getSectionCount() == 1) {
+            _primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(0)];
+            for (int i = 0; i < _primitiveIndices.length; i++) {
+                _primitiveIndices[i] = i;
+            }
+            createTree(0, 0, _primitiveIndices.length, doSort);
+        } else {
+            // divide up the sections into the tree by adding intermediate nodes as needed.
+            splitMesh(mesh, 0, mesh.getMeshData().getSectionCount(), doSort);
+        }
+    }
+
+    protected void splitMesh(final Mesh mesh, final int sectionStart, final int sectionEnd, final boolean doSort) {
+        _mesh = mesh;
+
+        // Split range in half
+        final int rangeSize = sectionEnd - sectionStart;
+        final int halfRange = rangeSize / 2; // odd number will give +1 to right.
+
+        // left half:
+        // if half size == 1, create as regular CollisionTree
+        if (halfRange == 1) {
+            // compute section
+            final int section = sectionStart;
+
+            // create the left child
+            _left = new CollisionTree(_type);
+
+            _left._primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            for (int i = 0; i < _left._primitiveIndices.length; i++) {
+                _left._primitiveIndices[i] = i;
+            }
+            _left._mesh = _mesh;
+            _left.createTree(section, 0, _left._primitiveIndices.length, doSort);
+        } else {
+            // otherwise, make an empty collision tree and call split with new range
+            _left = new CollisionTree(_type);
+            _left.splitMesh(mesh, sectionStart, sectionStart + halfRange, doSort);
+        }
+
+        // right half:
+        // if rangeSize - half size == 1, create as regular CollisionTree
+        if (rangeSize - halfRange == 1) {
+            // compute section
+            final int section = sectionStart + 1;
+
+            // create the left child
+            _right = new CollisionTree(_type);
+
+            _right._primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            for (int i = 0; i < _right._primitiveIndices.length; i++) {
+                _right._primitiveIndices[i] = i;
+            }
+            _right._mesh = _mesh;
+            _right.createTree(section, 0, _right._primitiveIndices.length, doSort);
+        } else {
+            // otherwise, make an empty collision tree and call split with new range
+            _right = new CollisionTree(_type);
+            _right.splitMesh(mesh, sectionStart + halfRange, sectionEnd, doSort);
+        }
+
+        // Ok, now since we technically have no primitives, we need our bounds to be the merging of our children bounds
+        // instead:
+        _bounds = _left._bounds.clone(_bounds);
+        _bounds.mergeLocal(_right._bounds);
+        _worldBounds = _bounds.clone(_worldBounds);
     }
 
     /**
-     * Creates a Collision Tree by recursively creating children nodes, splitting the triangles this node is responsible
-     * for in half until the desired triangle count is reached.
+     * Creates a Collision Tree by recursively creating children nodes, splitting the primitives this node is
+     * responsible for in half until the desired primitive count is reached.
      * 
      * @param start
-     *            The start index of the tris array, inclusive.
+     *            The start index of the primitivesArray, inclusive.
      * @param end
-     *            The end index of the tris array, exclusive.
+     *            The end index of the primitivesArray, exclusive.
      * @param doSort
-     *            True if the triangles should be sorted at each level, false otherwise.
+     *            True if the primitives should be sorted at each level, false otherwise.
      */
-    public void createTree(final int start, final int end, final boolean doSort) {
+    public void createTree(final int section, final int start, final int end, final boolean doSort) {
+        _section = section;
         _start = start;
         _end = end;
 
-        if (_triIndex == null) {
+        if (_primitiveIndices == null) {
             return;
         }
 
         createBounds();
 
-        // the bounds at this level should contain all the triangles this level
-        // is reponsible for.
-        _bounds.computeFromTris(_triIndex, _mesh, start, end);
+        // the bounds at this level should contain all the primitives this level is responsible for.
+        _bounds.computeFromPrimitives(_mesh.getMeshData(), _section, _primitiveIndices, _start, _end);
 
-        // check to see if we are a leaf, if the number of triangles we
-        // reference is less than or equal to the maximum defined by the
-        // CollisionTreeManager we are done.
-        if (end - start + 1 <= CollisionTreeManager.getInstance().getMaxTrisPerLeaf()) {
+        // check to see if we are a leaf, if the number of primitives we reference is less than or equal to the maximum
+        // defined by the CollisionTreeManager we are done.
+        if (_end - _start + 1 <= CollisionTreeManager.getInstance().getMaxTrisPerLeaf()) {
             return;
         }
 
-        // if doSort is set we need to attempt to optimize the referenced
-        // triangles.
-        // optimizing the sorting of the triangles will help group them
-        // spatially
-        // in the left/right children better.
+        // if doSort is set we need to attempt to optimize the referenced primitives. optimizing the sorting of the
+        // primitives will help group them spatially in the left/right children better.
         if (doSort) {
-            sortTris();
+            sortPrimitives();
         }
 
         // create the left child
@@ -174,17 +238,17 @@ public class CollisionTree implements Serializable {
             _left = new CollisionTree(_type);
         }
 
-        _left._triIndex = _triIndex;
+        _left._primitiveIndices = _primitiveIndices;
         _left._mesh = _mesh;
-        _left.createTree(start, (start + end) / 2, doSort);
+        _left.createTree(_section, _start, (_start + _end) / 2, doSort);
 
         // create the right child
         if (_right == null) {
             _right = new CollisionTree(_type);
         }
-        _right._triIndex = _triIndex;
+        _right._primitiveIndices = _primitiveIndices;
         _right._mesh = _mesh;
-        _right.createTree((start + end) / 2, end, doSort);
+        _right.createTree(_section, (_start + _end) / 2, _end, doSort);
     }
 
     /**
@@ -222,18 +286,11 @@ public class CollisionTree implements Serializable {
             return false;
         }
 
-        {
-            final ReadOnlyMatrix3 rotation = collisionTree._mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = collisionTree._mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = collisionTree._mesh.getWorldScale();
+        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree._mesh.getWorldTransform(),
+                collisionTree._worldBounds);
 
-            collisionTree._worldBounds = collisionTree._bounds.transform(rotation, translation, scale,
-                    collisionTree._worldBounds);
-        }
-
-        // our two collision bounds do not intersect, therefore, our triangles
-        // must
-        // not intersect. Return false.
+        // our two collision bounds do not intersect, therefore, our primitives
+        // must not intersect. Return false.
         if (!intersectsBounding(collisionTree._worldBounds)) {
             return false;
         }
@@ -262,91 +319,62 @@ public class CollisionTree implements Serializable {
         }
 
         // both are leaves
-        final ReadOnlyMatrix3 roti = _mesh.getWorldRotation();
-        final ReadOnlyVector3 scalei = _mesh.getWorldScale();
-        final ReadOnlyVector3 transi = _mesh.getWorldTranslation();
+        final ReadOnlyTransform transformA = _mesh.getWorldTransform();
+        final ReadOnlyTransform transformB = collisionTree._mesh.getWorldTransform();
 
-        final ReadOnlyMatrix3 rotj = collisionTree._mesh.getWorldRotation();
-        final ReadOnlyVector3 scalej = collisionTree._mesh.getWorldScale();
-        final ReadOnlyVector3 transj = collisionTree._mesh.getWorldTranslation();
+        final MeshData dataA = _mesh.getMeshData();
+        final MeshData dataB = collisionTree._mesh.getMeshData();
 
-        final Vector3 tempVa = Vector3.fetchTempInstance();
-        final Vector3 tempVb = Vector3.fetchTempInstance();
-        final Vector3 tempVc = Vector3.fetchTempInstance();
-        final Vector3 tempVd = Vector3.fetchTempInstance();
-        final Vector3 tempVe = Vector3.fetchTempInstance();
-        final Vector3 tempVf = Vector3.fetchTempInstance();
-        final Vector3[] verts = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(), Vector3.fetchTempInstance() };
-        final Vector3[] target = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(),
-                Vector3.fetchTempInstance() };
+        Vector3[] storeA = null;
+        Vector3[] storeB = null;
 
-        // for every triangle to compare, put them into world space and check
-        // for intersections
-        boolean result = false;
-        outer: for (int i = _start; i < _end; i++) {
-            PickingUtil.getTriangle(_mesh, _triIndex[i], verts);
-            roti.applyPost(tempVa.set(verts[0]).multiplyLocal(scalei), tempVa).addLocal(transi);
-            roti.applyPost(tempVb.set(verts[1]).multiplyLocal(scalei), tempVb).addLocal(transi);
-            roti.applyPost(tempVc.set(verts[2]).multiplyLocal(scalei), tempVc).addLocal(transi);
+        // for every primitive to compare, put them into world space and check for intersections
+        for (int i = _start; i < _end; i++) {
+            storeA = dataA.getPrimitive(_primitiveIndices[i], _section, storeA);
+            // to world space
+            for (int t = 0; t < storeA.length; t++) {
+                transformA.applyForward(storeA[i]);
+            }
             for (int j = collisionTree._start; j < collisionTree._end; j++) {
-                PickingUtil.getTriangle(collisionTree._mesh, collisionTree._triIndex[j], target);
-                rotj.applyPost(tempVd.set(target[0]).multiplyLocal(scalej), tempVd).addLocal(transj);
-                rotj.applyPost(tempVe.set(target[1]).multiplyLocal(scalej), tempVe).addLocal(transj);
-                rotj.applyPost(tempVf.set(target[2]).multiplyLocal(scalej), tempVf).addLocal(transj);
-                if (Intersection.intersection(tempVa, tempVb, tempVc, tempVd, tempVe, tempVf)) {
-                    result = true;
-                    break outer;
+                storeB = dataB.getPrimitive(collisionTree._primitiveIndices[j], collisionTree._section, storeB);
+                // to world space
+                for (int t = 0; t < storeB.length; t++) {
+                    transformB.applyForward(storeB[i]);
+                }
+                if (Intersection.intersection(storeA, storeB)) {
+                    return true;
                 }
             }
         }
 
-        Vector3.releaseTempInstance(tempVa);
-        Vector3.releaseTempInstance(tempVb);
-        Vector3.releaseTempInstance(tempVc);
-        Vector3.releaseTempInstance(tempVd);
-        Vector3.releaseTempInstance(tempVe);
-        Vector3.releaseTempInstance(tempVf);
-
-        for (final Vector3 vec : verts) {
-            Vector3.releaseTempInstance(vec);
-        }
-        for (final Vector3 vec : target) {
-            Vector3.releaseTempInstance(vec);
-        }
-
-        return result;
+        return false;
     }
 
     /**
      * Determines if this Collision Tree intersects the given CollisionTree. If a collision occurs, true is returned,
      * otherwise false is returned. If the provided collisionTree is invalid, false is returned. All collisions that
-     * occur are stored in lists as an integer index into the mesh's triangle buffer. where aList is the triangles for
-     * this mesh and bList is the triangles for the test tree.
+     * occur are stored in lists as an integer index into the mesh's triangle buffer. where aList is the primitives for
+     * this mesh and bList is the primitives for the test tree.
      * 
      * @param collisionTree
      *            The Tree to test.
      * @param aList
-     *            a list to contain the colliding triangles of this mesh.
+     *            a list to contain the colliding primitives of this mesh.
      * @param bList
-     *            a list to contain the colliding triangles of the testing mesh.
+     *            a list to contain the colliding primitives of the testing mesh.
      * @return True if they intersect, false otherwise.
      */
-    public boolean intersect(final CollisionTree collisionTree, final List<Integer> aList, final List<Integer> bList) {
+    public boolean intersect(final CollisionTree collisionTree, final List<PrimitiveKey> aList,
+            final List<PrimitiveKey> bList) {
 
         if (collisionTree == null) {
             return false;
         }
 
-        {
-            final ReadOnlyMatrix3 rotation = collisionTree._mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = collisionTree._mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = collisionTree._mesh.getWorldScale();
+        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree._mesh.getWorldTransform(),
+                collisionTree._worldBounds);
 
-            collisionTree._worldBounds = collisionTree._bounds.transform(rotation, translation, scale,
-                    collisionTree._worldBounds);
-        }
-
-        // our two collision bounds do not intersect, therefore, our triangles
+        // our two collision bounds do not intersect, therefore, our primitives
         // must not intersect. Return false.
         if (!intersectsBounding(collisionTree._worldBounds)) {
             return false;
@@ -369,115 +397,92 @@ public class CollisionTree implements Serializable {
         }
 
         // both this node and the testing node are leaves. Therefore, we can
-        // switch to checking the contained triangles with each other. Any
+        // switch to checking the contained primitives with each other. Any
         // that are found to intersect are placed in the appropriate list.
-        final ReadOnlyMatrix3 roti = _mesh.getWorldRotation();
-        final ReadOnlyVector3 scalei = _mesh.getWorldScale();
-        final ReadOnlyVector3 transi = _mesh.getWorldTranslation();
+        final ReadOnlyTransform transformA = _mesh.getWorldTransform();
+        final ReadOnlyTransform transformB = collisionTree._mesh.getWorldTransform();
 
-        final ReadOnlyMatrix3 rotj = collisionTree._mesh.getWorldRotation();
-        final ReadOnlyVector3 scalej = collisionTree._mesh.getWorldScale();
-        final ReadOnlyVector3 transj = collisionTree._mesh.getWorldTranslation();
+        final MeshData dataA = _mesh.getMeshData();
+        final MeshData dataB = collisionTree._mesh.getMeshData();
+
+        Vector3[] storeA = null;
+        Vector3[] storeB = null;
 
         boolean test = false;
 
-        final Vector3 tempVa = Vector3.fetchTempInstance();
-        final Vector3 tempVb = Vector3.fetchTempInstance();
-        final Vector3 tempVc = Vector3.fetchTempInstance();
-        final Vector3 tempVd = Vector3.fetchTempInstance();
-        final Vector3 tempVe = Vector3.fetchTempInstance();
-        final Vector3 tempVf = Vector3.fetchTempInstance();
-        final Vector3[] verts = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(), Vector3.fetchTempInstance() };
-        final Vector3[] target = { Vector3.fetchTempInstance(), Vector3.fetchTempInstance(),
-                Vector3.fetchTempInstance() };
-
         for (int i = _start; i < _end; i++) {
-            PickingUtil.getTriangle(_mesh, _triIndex[i], verts);
-            roti.applyPost(tempVa.set(verts[0]).multiplyLocal(scalei), tempVa).addLocal(transi);
-            roti.applyPost(tempVb.set(verts[1]).multiplyLocal(scalei), tempVb).addLocal(transi);
-            roti.applyPost(tempVc.set(verts[2]).multiplyLocal(scalei), tempVc).addLocal(transi);
+            storeA = dataA.getPrimitive(_primitiveIndices[i], _section, storeA);
+            // to world space
+            for (int t = 0; t < storeA.length; t++) {
+                transformA.applyForward(storeA[t]);
+            }
             for (int j = collisionTree._start; j < collisionTree._end; j++) {
-                PickingUtil.getTriangle(collisionTree._mesh, collisionTree._triIndex[j], target);
-                rotj.applyPost(tempVd.set(target[0]).multiplyLocal(scalej), tempVd).addLocal(transj);
-                rotj.applyPost(tempVe.set(target[1]).multiplyLocal(scalej), tempVe).addLocal(transj);
-                rotj.applyPost(tempVf.set(target[2]).multiplyLocal(scalej), tempVf).addLocal(transj);
-                if (Intersection.intersection(tempVa, tempVb, tempVc, tempVd, tempVe, tempVf)) {
+                storeB = dataB.getPrimitive(collisionTree._primitiveIndices[j], collisionTree._section, storeB);
+                // to world space
+                for (int t = 0; t < storeB.length; t++) {
+                    transformB.applyForward(storeB[t]);
+                }
+                if (Intersection.intersection(storeA, storeB)) {
                     test = true;
-                    aList.add(_triIndex[i]);
-                    bList.add(collisionTree._triIndex[j]);
+                    aList.add(new PrimitiveKey(_primitiveIndices[i], _section));
+                    bList.add(new PrimitiveKey(collisionTree._primitiveIndices[j], collisionTree._section));
                 }
             }
         }
 
-        Vector3.releaseTempInstance(tempVa);
-        Vector3.releaseTempInstance(tempVb);
-        Vector3.releaseTempInstance(tempVc);
-        Vector3.releaseTempInstance(tempVd);
-        Vector3.releaseTempInstance(tempVe);
-        Vector3.releaseTempInstance(tempVf);
-
-        for (final Vector3 vec : verts) {
-            Vector3.releaseTempInstance(vec);
-        }
-        for (final Vector3 vec : target) {
-            Vector3.releaseTempInstance(vec);
-        }
-
         return test;
-
     }
 
     /**
      * intersect checks for collisions between this collision tree and a provided Ray. Any collisions are stored in a
-     * provided list. The ray is assumed to have a normalized direction for accurate calculations.
+     * provided list as primitive index values. The ray is assumed to have a normalized direction for accurate
+     * calculations.
      * 
      * @param ray
      *            the ray to test for intersections.
-     * @param triList
-     *            the list to store instersections with.
+     * @param store
+     *            a list to fill with the index values of the primitive hit. if null, a new List is created.
+     * @return the list.
      */
-    public void intersect(final Ray3 ray, final List<Integer> triList) {
-
-        // if our ray doesn't hit the bounds, then it must not hit a triangle.
-        if (!_worldBounds.intersects(ray)) {
-            return;
+    public List<PrimitiveKey> intersect(final Ray3 ray, final List<PrimitiveKey> store) {
+        List<PrimitiveKey> result = store;
+        if (result == null) {
+            result = new ArrayList<PrimitiveKey>();
         }
 
-        // This is not a leaf node, therefore, check each child (left/right) for
-        // intersection with the ray.
-        if (_left != null) {
-            final ReadOnlyMatrix3 rotation = _mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = _mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = _mesh.getWorldScale();
+        // if our ray doesn't hit the bounds, then it must not hit a primitive.
+        if (!_worldBounds.intersects(ray)) {
+            return result;
+        }
 
-            _left._worldBounds = _left._bounds.transform(rotation, translation, scale, _left._worldBounds);
-            _left.intersect(ray, triList);
+        // This is not a leaf node, therefore, check each child (left/right) for intersection with the ray.
+        if (_left != null) {
+            _left._worldBounds = _left._bounds.transform(_mesh.getWorldTransform(), _left._worldBounds);
+            _left.intersect(ray, result);
         }
 
         if (_right != null) {
-            final ReadOnlyMatrix3 rotation = _mesh.getWorldRotation();
-            final ReadOnlyVector3 translation = _mesh.getWorldTranslation();
-            final ReadOnlyVector3 scale = _mesh.getWorldScale();
-
-            _right._worldBounds = _right._bounds.transform(rotation, translation, scale, _right._worldBounds);
-
-            _right.intersect(ray, triList);
+            _right._worldBounds = _right._bounds.transform(_mesh.getWorldTransform(), _right._worldBounds);
+            _right.intersect(ray, result);
         } else if (_left == null) {
-            // This is a leaf node. We can therfore, check each triangle this
-            // node contains. If an intersection occurs, place it in the
-            // list.
+            // This is a leaf node. We can therefore check each primitive this node contains. If an intersection occurs,
+            // place it in the list.
 
-            final Vector3[] points = new Vector3[3];
+            final MeshData data = _mesh.getMeshData();
+            final ReadOnlyTransform transform = _mesh.getWorldTransform();
+
+            Vector3[] points = null;
             for (int i = _start; i < _end; i++) {
-                PickingUtil.getTriangle(_mesh, _triIndex[i], points);
-                _mesh.localToWorld(points[0], points[0]);
-                _mesh.localToWorld(points[1], points[1]);
-                _mesh.localToWorld(points[2], points[2]);
-                if (ray.intersects(points[0], points[1], points[2], null, true)) {
-                    triList.add(_triIndex[i]);
+                points = data.getPrimitive(_primitiveIndices[i], _section, points);
+                for (int t = 0; t < points.length; t++) {
+                    transform.applyForward(points[t]);
+                }
+                if (ray.intersects(points, null)) {
+                    result.add(new PrimitiveKey(_primitiveIndices[i], _section));
                 }
             }
         }
+        return result;
     }
 
     /**
@@ -521,16 +526,14 @@ public class CollisionTree implements Serializable {
     }
 
     /**
-     * sortTris attempts to optimize the ordering of the subsection of the array of triangles this node is responsible
-     * for. The sorting is based on the most efficient method along an axis. Using the TreeComparator and quick sort,
-     * the subsection of the array is sorted.
+     * sortPrimitives attempts to optimize the ordering of the subsection of the array of primitives this node is
+     * responsible for. The sorting is based on the most efficient method along an axis. Using the TreeComparator and
+     * quick sort, the subsection of the array is sorted.
      */
-    public void sortTris() {
+    public void sortPrimitives() {
         switch (_type) {
             case AABB:
-                // determine the longest length of the box, this axis will be
-                // best
-                // for sorting.
+                // determine the longest length of the box, this axis will be best for sorting.
                 if (((BoundingBox) _bounds).getXExtent() > ((BoundingBox) _bounds).getYExtent()) {
                     if (((BoundingBox) _bounds).getXExtent() > ((BoundingBox) _bounds).getZExtent()) {
                         _comparator.setAxis(TreeComparator.Axis.X);
@@ -546,9 +549,7 @@ public class CollisionTree implements Serializable {
                 }
                 break;
             case OBB:
-                // determine the longest length of the box, this axis will be
-                // best
-                // for sorting.
+                // determine the longest length of the box, this axis will be best for sorting.
                 if (((OrientedBoundingBox) _bounds)._extent.getX() > ((OrientedBoundingBox) _bounds)._extent.getY()) {
                     if (((OrientedBoundingBox) _bounds)._extent.getX() > ((OrientedBoundingBox) _bounds)._extent.getZ()) {
                         _comparator.setAxis(TreeComparator.Axis.X);
@@ -571,74 +572,7 @@ public class CollisionTree implements Serializable {
                 break;
         }
 
-        _comparator.setCenter(_bounds._center);
         _comparator.setMesh(_mesh);
-        SortUtil.qsort(_triIndex, _start, _end - 1, _comparator);
-    }
-
-    /**
-     * Rebuild all the leaves listed in triangleIndices, and any branches leading up to them.
-     * 
-     * @param triangleIndices
-     *            a list of all the leaves to rebuild
-     * @param startLevel
-     *            how many trunk levels to ignore, for none put zero (ignoring the first 2-3 levels increases speed
-     *            greatly)
-     */
-    public void rebuildLeaves(final List<Integer> triangleIndices, final int startLevel) {
-        rebuildLeaves(triangleIndices, startLevel, 0);
-    }
-
-    private void rebuildLeaves(final List<Integer> triangleIndices, final int startLevel, int currentLevel) {
-        int i = 0;
-        currentLevel++;
-
-        if (_left == null && _right == null) {
-            // is a leaf, get rid of any matching indexes and rebuild
-            boolean alreadyRebuilt = false;
-            while (i < triangleIndices.size()) {
-                if (triangleIndices.get(i).intValue() >= _start && triangleIndices.get(i).intValue() < _end) {
-                    triangleIndices.remove(i);
-                    if (alreadyRebuilt == false) {
-                        alreadyRebuilt = true;
-                        _bounds.computeFromTris(_triIndex, _mesh, _start, _end);
-                    }
-                } else {
-                    i++;
-                }
-            }
-        } else if (containsAnyLeaf(triangleIndices)) {
-            if (_left != null) {
-                _left.rebuildLeaves(triangleIndices, startLevel, currentLevel);
-            }
-
-            if (_right != null) {
-                _right.rebuildLeaves(triangleIndices, startLevel, currentLevel);
-            }
-
-            if (currentLevel > startLevel) {
-                _bounds.computeFromTris(_triIndex, _mesh, _start, _end);
-            }
-        }
-    }
-
-    /**
-     * Checks if this branch or one of its subbranches/leaves contains any of the given triangleIndices
-     * 
-     * @param triangleIndices
-     *            the indices to look for
-     * @return true if the index is contained, false otherwise
-     */
-    public boolean containsAnyLeaf(final List<Integer> triangleIndices) {
-        boolean rtnVal = false;
-
-        for (int i = 0; i < triangleIndices.size(); i++) {
-            if (triangleIndices.get(i).intValue() >= _start && triangleIndices.get(i).intValue() < _end) {
-                rtnVal = true;
-                break;
-            }
-        }
-
-        return rtnVal;
+        SortUtil.qsort(_primitiveIndices, _start, _end - 1, _comparator);
     }
 }

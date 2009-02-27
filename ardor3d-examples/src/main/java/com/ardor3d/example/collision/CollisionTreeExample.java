@@ -21,13 +21,15 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.CollisionData;
 import com.ardor3d.intersection.CollisionResults;
 import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.TriangleCollisionResults;
+import com.ardor3d.intersection.PrimitiveCollisionResults;
+import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.PQTorus;
@@ -61,7 +63,7 @@ public class CollisionTreeExample extends ExampleBase {
 
         CollisionTreeManager.getInstance().setTreeType(CollisionTree.Type.AABB);
 
-        results = new TriangleCollisionResults();
+        results = new PrimitiveCollisionResults();
         sphere = new Sphere("sphere", 10, 10, 2);
 
         sphere.setSolidColor(ColorRGBA.WHITE);
@@ -121,20 +123,23 @@ public class CollisionTreeExample extends ExampleBase {
         updateCounter = 0;
 
         final int[] indexBuffer = new int[3];
+        final MeshData sphereMD = sphere.getMeshData();
+        final MeshData torusMD = torus.getMeshData();
+        final FloatBuffer color1 = sphere.getMeshData().getColorBuffer();
+        final FloatBuffer color2 = torus.getMeshData().getColorBuffer();
+
         if (oldData != null) {
-            for (int j = 0; j < oldData.getSourceTris().size(); j++) {
-                final int triIndex = oldData.getSourceTris().get(j);
-                PickingUtil.getTriangle(sphere, triIndex, indexBuffer);
-                final FloatBuffer color1 = sphere.getMeshData().getColorBuffer();
+            for (int j = 0; j < oldData.getSourcePrimitives().size(); j++) {
+                final PrimitiveKey key = oldData.getSourcePrimitives().get(j);
+                sphereMD.getPrimitive(key.getPrimitiveIndex(), key.getSection(), indexBuffer);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[0] % 3], color1, indexBuffer[0]);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[1] % 3], color1, indexBuffer[1]);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[2] % 3], color1, indexBuffer[2]);
             }
 
-            for (int j = 0; j < oldData.getTargetTris().size(); j++) {
-                final int triIndex = oldData.getTargetTris().get(j);
-                PickingUtil.getTriangle(torus, triIndex, indexBuffer);
-                final FloatBuffer color2 = torus.getMeshData().getColorBuffer();
+            for (int j = 0; j < oldData.getTargetPrimitives().size(); j++) {
+                final PrimitiveKey key = oldData.getTargetPrimitives().get(j);
+                torusMD.getPrimitive(key.getPrimitiveIndex(), key.getSection(), indexBuffer);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[0] % 3], color2, indexBuffer[0]);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[1] % 3], color2, indexBuffer[1]);
                 BufferUtils.setInBuffer(colorSpread[indexBuffer[2] % 3], color2, indexBuffer[2]);
@@ -146,19 +151,17 @@ public class CollisionTreeExample extends ExampleBase {
 
         if (results.getNumber() > 0) {
             oldData = results.getCollisionData(0);
-            for (int i = 0; i < oldData.getSourceTris().size(); i++) {
-                final FloatBuffer color1 = sphere.getMeshData().getColorBuffer();
-                final int triIndex = oldData.getSourceTris().get(i);
-                PickingUtil.getTriangle(sphere, triIndex, indexBuffer);
+            for (int i = 0; i < oldData.getSourcePrimitives().size(); i++) {
+                final PrimitiveKey key = oldData.getSourcePrimitives().get(i);
+                sphereMD.getPrimitive(key.getPrimitiveIndex(), key.getSection(), indexBuffer);
                 BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[0]);
                 BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[1]);
                 BufferUtils.setInBuffer(ColorRGBA.RED, color1, indexBuffer[2]);
             }
 
-            for (int i = 0; i < oldData.getTargetTris().size(); i++) {
-                final int triIndex = oldData.getTargetTris().get(i);
-                final FloatBuffer color2 = torus.getMeshData().getColorBuffer();
-                PickingUtil.getTriangle(torus, triIndex, indexBuffer);
+            for (int i = 0; i < oldData.getTargetPrimitives().size(); i++) {
+                final PrimitiveKey key = oldData.getTargetPrimitives().get(i);
+                torusMD.getPrimitive(key.getPrimitiveIndex(), key.getSection(), indexBuffer);
                 BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[0]);
                 BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[1]);
                 BufferUtils.setInBuffer(ColorRGBA.BLUE, color2, indexBuffer[2]);

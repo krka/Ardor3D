@@ -12,24 +12,22 @@ package com.ardor3d.bounding;
 
 import java.util.Comparator;
 
-import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 
-public class TreeComparator implements Comparator<Integer> {
+public class TreeComparator implements Comparator<PrimitiveKey> {
     enum Axis {
         X, Y, Z;
     }
 
     private Axis _axis;
 
-    private Vector3 _center;
-
     private Mesh _mesh;
 
-    private final Vector3[] _aCompare = new Vector3[3];
+    private Vector3[] _aCompare = null;
 
-    private final Vector3[] _bCompare = new Vector3[3];
+    private Vector3[] _bCompare = null;
 
     public void setAxis(final Axis axis) {
         _axis = axis;
@@ -39,24 +37,32 @@ public class TreeComparator implements Comparator<Integer> {
         _mesh = mesh;
     }
 
-    public void setCenter(final Vector3 center) {
-        _center = center;
-    }
+    public int compare(final PrimitiveKey o1, final PrimitiveKey o2) {
 
-    public int compare(final Integer o1, final Integer o2) {
-        final int a = o1;
-        final int b = o2;
-
-        if (a == b) {
+        if (o1.equals(o2)) {
             return 0;
         }
 
         Vector3 centerA = null;
         Vector3 centerB = null;
-        PickingUtil.getTriangle(_mesh, a, _aCompare);
-        PickingUtil.getTriangle(_mesh, b, _bCompare);
-        centerA = _aCompare[0].addLocal(_aCompare[1].addLocal(_aCompare[2])).subtractLocal(_center);
-        centerB = _bCompare[0].addLocal(_bCompare[1].addLocal(_bCompare[2])).subtractLocal(_center);
+        _aCompare = _mesh.getMeshData().getPrimitive(o1.getPrimitiveIndex(), o1.getSection(), _aCompare);
+        _bCompare = _mesh.getMeshData().getPrimitive(o2.getPrimitiveIndex(), o2.getSection(), _bCompare);
+
+        for (int i = 1; i < _aCompare.length; i++) {
+            _aCompare[0].addLocal(_aCompare[i]);
+        }
+        for (int i = 1; i < _bCompare.length; i++) {
+            _bCompare[0].addLocal(_bCompare[i]);
+        }
+        if (_aCompare.length == _bCompare.length) {
+            // don't need average since lists are same size. (3X < 3Y ? X < Y)
+            centerA = _aCompare[0];
+            centerB = _bCompare[0];
+        } else {
+            // perform average since we have different size lists
+            centerA = _aCompare[0].divideLocal(_aCompare.length);
+            centerB = _bCompare[0].divideLocal(_bCompare.length);
+        }
 
         switch (_axis) {
             case X:
