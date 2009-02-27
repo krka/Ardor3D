@@ -28,14 +28,18 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.TexCoords;
 
 /**
- * A utility class to generate normals for Meshes.<br /> <br /> The generator generates the normals using a given crease
- * angle up to which the transitions between two triangles are to be smoothed. Normals will be generated for the mesh,
- * as long as it uses the default triangle mode ( <code>TRIANGLE</code>) - the modes <code>TRIANGLE_FAN</code> and
- * <code>TRIANGLE_STRIP</code> are not supported.<br /> <br /> The generator currently only supports a single set of
- * texture coordinates in a mesh. If more than one set of texture coordinates is specified in a mesh, all sets after the
- * first one will be deleted.<br /> <br /> <strong>Please note:</strong> The mesh must be <cite>manifold</cite>, i.e.
- * only 2 triangles may be connected by one edge, and the mesh has to be connected by means of edges, not vertices.
- * Otherwise, the normal generation might fail, with undefined results.
+ * A utility class to generate normals for Meshes.<br />
+ * <br />
+ * The generator generates the normals using a given crease angle up to which the transitions between two triangles are
+ * to be smoothed. Normals will be generated for the mesh, as long as it uses the default triangle mode (
+ * <code>TRIANGLE</code>) - the modes <code>TRIANGLE_FAN</code> and <code>TRIANGLE_STRIP</code> are not supported.<br />
+ * <br />
+ * The generator currently only supports a single set of texture coordinates in a mesh. If more than one set of texture
+ * coordinates is specified in a mesh, all sets after the first one will be deleted.<br />
+ * <br />
+ * <strong>Please note:</strong> The mesh must be <cite>manifold</cite>, i.e. only 2 triangles may be connected by one
+ * edge, and the mesh has to be connected by means of edges, not vertices. Otherwise, the normal generation might fail,
+ * with undefined results.
  */
 public class NormalGenerator {
 
@@ -98,6 +102,7 @@ public class NormalGenerator {
      *            The Mesh to generate the normals for
      */
     private void generateNormals(final Mesh mesh) {
+        // FIXME: only uses 1st index.
         if (mesh.getMeshData().getIndexMode() != IndexMode.Triangles) {
             logger.info("Invalid triangles mode in " + mesh);
             return;
