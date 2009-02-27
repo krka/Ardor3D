@@ -169,6 +169,8 @@ public class BMTextExample extends ExampleBase {
     // -----------------------------------------------------
     Controller createFontChanger() {
         final Controller fontChanger = new Controller() {
+            private static final long serialVersionUID = 1L;
+
             final Random rand = new Random();
             final int changeInterval = 20000;
             final List<BMFont> fonts = BMFontLoader.allFonts();
@@ -205,6 +207,8 @@ public class BMTextExample extends ExampleBase {
     // -----------------------------------------------------
     private Controller createNodeMover() {
         final Controller nodeMover = new Controller() {
+            private static final long serialVersionUID = 1L;
+
             Matrix3 rot = new Matrix3();
 
             @Override
