@@ -59,13 +59,7 @@ public enum IndexMode {
      * Identical to <i>Connected</i> except the final indexed vertex is then connected back to the initial vertex to
      * form a loop.
      */
-    Points(false),
-
-    // POLYGON
-    /**
-     * ...
-     */
-    Polygon(true);
+    Points(false);
 
     private final boolean _hasPolygons;
 
@@ -75,5 +69,24 @@ public enum IndexMode {
 
     public boolean hasPolygons() {
         return _hasPolygons;
+    }
+
+    public int getVertexCount() {
+        switch (this) {
+            case Triangles:
+            case TriangleStrip:
+            case TriangleFan:
+                return 3;
+            case Quads:
+            case QuadStrip:
+                return 4;
+            case Lines:
+            case LineStrip:
+            case LineLoop:
+                return 2;
+            case Points:
+                return 1;
+        }
+        throw new IllegalArgumentException("Unhandled type: " + this);
     }
 }

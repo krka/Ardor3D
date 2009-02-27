@@ -961,9 +961,6 @@ public class JoglRenderer extends AbstractRenderer {
             case Points:
                 glMode = GL.GL_POINTS;
                 break;
-            case Polygon:
-                glMode = GL.GL_POLYGON;
-                break;
         }
         return glMode;
     }

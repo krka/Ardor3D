@@ -915,9 +915,6 @@ public class LwjglRenderer extends AbstractRenderer {
             case Points:
                 glMode = GL11.GL_POINTS;
                 break;
-            case Polygon:
-                glMode = GL11.GL_POLYGON;
-                break;
         }
         return glMode;
     }
