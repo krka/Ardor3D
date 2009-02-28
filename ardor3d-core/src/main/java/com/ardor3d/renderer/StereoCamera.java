@@ -47,6 +47,20 @@ public class StereoCamera extends Camera {
         _rightCamera = new Camera(camera);
     }
 
+    @Override
+    public void resize(final int width, final int height) {
+        super.resize(width, height);
+        _leftCamera.resize(width, height);
+        _rightCamera.resize(width, height);
+    }
+
+    @Override
+    public void resize(final int width, final int height, final boolean force) {
+        super.resize(width, height, force);
+        _leftCamera.resize(width, height, force);
+        _rightCamera.resize(width, height, force);
+    }
+
     /**
      * @return the sideBySideMode
      * @see #setSideBySideMode(boolean)
