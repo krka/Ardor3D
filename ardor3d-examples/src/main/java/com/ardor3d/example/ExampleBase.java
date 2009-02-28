@@ -46,7 +46,7 @@ import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.TrianglePickResults;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
@@ -249,21 +249,26 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     }
 
     public PickResults doPick(final Ray3 pickRay) {
-        final TrianglePickResults bpr = new TrianglePickResults();
-        bpr.setCheckDistance(true);
-        PickingUtil.findPick(_root, pickRay, bpr);
+        final PrimitivePickResults pickResults = new PrimitivePickResults();
+        pickResults.setCheckDistance(true);
+        PickingUtil.findPick(_root, pickRay, pickResults);
+        processPicks(pickResults);
+        return pickResults;
+    }
+
+    protected void processPicks(final PrimitivePickResults pickResults) {
         int i = 0;
-        while (bpr.getNumber() > 0 && bpr.getPickData(i).getIntersectionRecord().getNumberOfIntersection() == 0
-                && ++i < bpr.getNumber()) {
+        while (pickResults.getNumber() > 0
+                && pickResults.getPickData(i).getIntersectionRecord().getNumberOfIntersection() == 0
+                && ++i < pickResults.getNumber()) {
         }
-        if (bpr.getNumber() > i) {
-            final PickData pick = bpr.getPickData(i);
-            System.err.println("picked: " + pick.getTargetMesh() + " at "
+        if (pickResults.getNumber() > i) {
+            final PickData pick = pickResults.getPickData(i);
+            System.err.println("picked: " + pick.getTargetMesh() + " at: "
                     + pick.getIntersectionRecord().getIntersectionPoint(0));
         } else {
             System.err.println("picked: nothing");
         }
-        return bpr;
     }
 
     protected void quit(final Renderer renderer) {

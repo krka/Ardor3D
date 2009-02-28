@@ -16,6 +16,8 @@ import java.nio.IntBuffer;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.intersection.PickData;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
@@ -32,6 +34,24 @@ public class MultiStripExample extends ExampleBase {
     @Inject
     public MultiStripExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
+    }
+
+    @Override
+    protected void processPicks(final PrimitivePickResults pickResults) {
+        int i = 0;
+        while (pickResults.getNumber() > 0
+                && pickResults.getPickData(i).getIntersectionRecord().getNumberOfIntersection() == 0
+                && ++i < pickResults.getNumber()) {
+        }
+        if (pickResults.getNumber() > i) {
+            final PickData pick = pickResults.getPickData(i);
+            final int section = pick.getTargetPrimitives().get(0).getSection();
+            System.err.println("picked: " + pick.getTargetMesh() + " section: " + section + " (type = "
+                    + pick.getTargetMesh().getMeshData().getIndexMode(section) + ") primitive: "
+                    + pick.getTargetPrimitives().get(0).getPrimitiveIndex());
+        } else {
+            System.err.println("picked: nothing");
+        }
     }
 
     /**
