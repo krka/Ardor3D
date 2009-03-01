@@ -22,7 +22,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.InterleavedFormat;
-import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -31,7 +30,7 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * MeshData packs all the commonly used buffers for rendering a mesh.
+ * MeshData contains all the commonly used buffers for rendering a mesh.
  */
 public class MeshData implements Cloneable, Savable {
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -304,16 +303,15 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
-     * 
-     * @return
+     * @return the IndexMode of the first section of this MeshData.
      */
     public IndexMode getIndexMode() {
-        return _indexModes[0];
+        return getIndexMode(0);
     }
 
     /**
-     * 
      * @param indexMode
+     *            the new IndexMode to use for the first section of this MeshData.
      */
     public void setIndexMode(final IndexMode indexMode) {
         _indexModes[0] = indexMode;
@@ -326,6 +324,7 @@ public class MeshData implements Cloneable, Savable {
 
     public void setIndexLengths(final int[] indexLengths) {
         _indexLengths = indexLengths;
+        updatePrimitiveCounts();
     }
 
     public IndexMode[] getIndexModes() {
@@ -333,7 +332,10 @@ public class MeshData implements Cloneable, Savable {
     }
 
     public IndexMode getIndexMode(final int sectionIndex) {
-        return _indexModes[sectionIndex];
+        if (sectionIndex < 0 || sectionIndex >= getSectionCount()) {
+            throw new IllegalArgumentException("invalid section index: " + sectionIndex);
+        }
+        return _indexModes.length > sectionIndex ? _indexModes[sectionIndex] : _indexModes[_indexModes.length - 1];
     }
 
     /**
@@ -396,7 +398,7 @@ public class MeshData implements Cloneable, Savable {
             throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is " + count);
         }
 
-        final IndexMode mode = _indexModes[section];
+        final IndexMode mode = getIndexMode(section);
         final int rSize = mode.getVertexCount();
         int[] result = store;
         if (result == null || result.length < rSize) {
@@ -416,7 +418,7 @@ public class MeshData implements Cloneable, Savable {
             throw new IndexOutOfBoundsException("Invalid primitiveIndex '" + primitiveIndex + "'.  Count is " + count);
         }
 
-        final IndexMode mode = _indexModes[section];
+        final IndexMode mode = getIndexMode(section);
         final int rSize = mode.getVertexCount();
         Vector3[] result = store;
         if (result == null || result.length < rSize) {
@@ -452,7 +454,7 @@ public class MeshData implements Cloneable, Savable {
         }
 
         // Ok, now pull primitive index based on indexmode.
-        switch (_indexModes[section]) {
+        switch (getIndexMode(section)) {
             case Triangles:
                 index += (primitiveIndex * 3) + point;
                 break;
@@ -488,7 +490,8 @@ public class MeshData implements Cloneable, Savable {
                 index += primitiveIndex + point;
                 break;
             default:
-                throw new Ardor3dException("mode is set to invalid type: " + _indexModes[0]);
+                logger.warning("unimplemented index mode: " + getIndexMode(0));
+                return -1;
         }
         return index;
     }
@@ -531,13 +534,13 @@ public class MeshData implements Cloneable, Savable {
         }
 
         // randomly pick a section (if there are more than 1)
-        final int section = (_indexModes.length == 1 ? 0 : MathUtils.nextRandomInt(0, _indexModes.length - 1));
+        final int section = MathUtils.nextRandomInt(0, getSectionCount() - 1);
 
         // randomly pick a primitive in that section
         final int primitiveIndex = MathUtils.nextRandomInt(0, getPrimitiveCount(section) - 1);
 
         // Now, based on IndexMode, pick a point on that primitive
-        final IndexMode mode = _indexModes[section];
+        final IndexMode mode = getIndexMode(section);
         switch (mode) {
             case Triangles:
             case TriangleFan:
@@ -629,14 +632,14 @@ public class MeshData implements Cloneable, Savable {
 
     private void updatePrimitiveCounts() {
         final int maxIndex = _indexBuffer != null ? _indexBuffer.limit() : _vertexCount;
-        if (_primitiveCounts.length != _indexModes.length) {
-            _primitiveCounts = new int[_indexModes.length];
+        final int maxSection = _indexLengths != null ? _indexLengths.length : 1;
+        if (_primitiveCounts.length != maxSection) {
+            _primitiveCounts = new int[maxSection];
         }
-        for (int i = 0; i < _indexModes.length; i++) {
-            // XXX: warning? Force _indexLengths to be right?
+        for (int i = 0; i < maxSection; i++) {
             final int size = _indexLengths != null ? _indexLengths[i] : maxIndex;
             int count = 0;
-            switch (_indexModes[i]) {
+            switch (getIndexMode(i)) {
                 case Triangles:
                     count = size / 3;
                     break;
@@ -663,7 +666,7 @@ public class MeshData implements Cloneable, Savable {
                     count = size;
                     break;
                 default:
-                    logger.warning("unimplemented index mode: " + _indexModes[0]);
+                    logger.warning("unimplemented index mode: " + getIndexMode(i));
             }
 
             _primitiveCounts[i] = count;
