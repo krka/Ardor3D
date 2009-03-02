@@ -17,8 +17,10 @@ import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
 import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
+import com.ardor3d.input.lwjgl.LwjglMouseManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
@@ -34,5 +36,6 @@ public class LwjglModule extends AbstractModule {
         bind(LwjglCanvas.class).in(Scopes.SINGLETON);
         bind(NativeCanvas.class).to(LwjglCanvas.class);
         bind(CanvasRenderer.class).to(LwjglCanvasRenderer.class).in(Scopes.SINGLETON);
+        bind(MouseManager.class).to(LwjglMouseManager.class).in(Scopes.SINGLETON);
     }
 }
