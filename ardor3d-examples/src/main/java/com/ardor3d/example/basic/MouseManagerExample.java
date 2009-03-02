@@ -12,32 +12,31 @@ package com.ardor3d.example.basic;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.image.Texture;
+import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
-import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.InputState;
+import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseCursor;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.InputState;
-import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseCursor;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
-import java.net.URL;
 import java.io.IOException;
 
 public class MouseManagerExample extends ExampleBase {
@@ -101,17 +100,12 @@ public class MouseManagerExample extends ExampleBase {
 
         _root.setRenderState(ts);
 
-        // TODO:
-        // init cursors with images
-        // ensure valid guice config for each window type (SWT, AWT, LWJGL)
-        // implement AWT and SWT MouseManager versions
-        // implement proper LWJGL image handling
-        // get sample cursors
+        
         AWTImageLoader awtImageLoader = new AWTImageLoader();
 
         try {
-            _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/cursor1.png");
-            _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/test.PNG");
+            _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
+            _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
 
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H),
                     new TriggerAction() {
@@ -123,6 +117,13 @@ public class MouseManagerExample extends ExampleBase {
                                 _mouseManager.setCursor(_cursor2);
                             }
                             useCursorOne = !useCursorOne;
+                        }
+                    }));
+
+            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J),
+                    new TriggerAction() {
+                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                            _mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
                         }
                     }));
 

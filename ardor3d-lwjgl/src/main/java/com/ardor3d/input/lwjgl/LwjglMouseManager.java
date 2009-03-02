@@ -10,20 +10,16 @@
 
 package com.ardor3d.input.lwjgl;
 
-import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.GrabbedState;
-import com.ardor3d.math.Vector2;
-import com.ardor3d.image.Image;
-import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.annotation.MainThread;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.input.Cursor;
+import com.ardor3d.image.Image;
+import com.ardor3d.input.GrabbedState;
+import com.ardor3d.input.MouseCursor;
+import com.ardor3d.input.MouseManager;
+import com.ardor3d.util.geom.BufferUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Cursor;
+import org.lwjgl.input.Mouse;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.logging.Level;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -54,7 +50,7 @@ public class LwjglMouseManager implements MouseManager {
         try {
             final Cursor lwjglCursor = createLwjglCursor(cursor);
 
-            if (!lwjglCursor.equals(Mouse.getNativeCursor())) {
+            if (lwjglCursor == null || !lwjglCursor.equals(Mouse.getNativeCursor())) {
                 Mouse.setNativeCursor(lwjglCursor);
             }
         } catch (LWJGLException e) {
@@ -63,6 +59,10 @@ public class LwjglMouseManager implements MouseManager {
     }
 
     private Cursor createLwjglCursor(final MouseCursor cursor) throws LWJGLException {
+        if (cursor == MouseCursor.SYSTEM_DEFAULT) {
+            return null; // setting the cursor to null in LWJGL means using the system default one
+        }
+
         boolean eightBitAlpha = (Cursor.getCapabilities() & Cursor.CURSOR_8_BIT_ALPHA) != 0;
 
         Image image = cursor.getImage();
@@ -105,10 +105,10 @@ public class LwjglMouseManager implements MouseManager {
         return new Cursor(imageWidth, imageHeight, cursor.getHotspotX(), cursor.getHotspotY(), 1, imageDataCopy, null);
     }
 
-    public void setPosition(final Vector2 position) {
+    public void setPosition(int x, int y) {
         init();
 
-        Mouse.setCursorPosition((int) position.getX(), (int) position.getY());
+        Mouse.setCursorPosition(x, y);
     }
 
     public void setGrabbed(final GrabbedState grabbedState) {
@@ -124,5 +124,13 @@ public class LwjglMouseManager implements MouseManager {
             default:
                 throw new IllegalStateException("Unhandled GrabbedState: " + grabbedState);
         }
+    }
+
+    public boolean isSetPositionSupported() {
+        return true;
+    }
+
+    public boolean isSetGrabbedSupported() {
+        return true;
     }
 }
