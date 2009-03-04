@@ -18,13 +18,17 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -124,6 +128,25 @@ public class MouseManagerExample extends ExampleBase {
                     new TriggerAction() {
                         public void perform(final Canvas source, final InputState inputState, final double tpf) {
                             _mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
+                        }
+                    }));
+            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K),
+                    new TriggerAction() {
+                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                            _mouseManager.setPosition(0, 0);
+                        }
+                    }));
+
+            _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
+                    new TriggerAction() {
+                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                        }
+                    }));
+            _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
+                    new TriggerAction() {
+                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
                         }
                     }));
 
