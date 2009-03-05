@@ -94,9 +94,9 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
             final double d1 = distanceToCam(o1);
             final double d2 = distanceToCam(o2);
             if (d1 > d2) {
-                return 1;
-            } else if (d1 < d2) {
                 return -1;
+            } else if (d1 < d2) {
+                return 1;
             } else {
                 return 0;
             }
