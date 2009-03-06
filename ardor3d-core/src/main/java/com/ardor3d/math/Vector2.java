@@ -22,17 +22,16 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Vector2 represents a point or vector in a two dimensional system. This implementation stores its data in
  * double-precision.
  */
-public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVector2 {
+public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVector2, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Vector2Pool VEC_POOL = new Vector2Pool(11);
+    private static final ObjectPool<Vector2> VEC_POOL = ObjectPool.create(Vector2.class, Debug.maxPoolSize);
 
     /**
      * 0, 0
@@ -921,17 +920,6 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static void releaseTempInstance(final Vector2 vec) {
         if (Debug.useMathPools) {
             VEC_POOL.release(vec);
-        }
-    }
-
-    static final class Vector2Pool extends ObjectPool<Vector2> {
-        public Vector2Pool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Vector2 newInstance() {
-            return new Vector2();
         }
     }
 }

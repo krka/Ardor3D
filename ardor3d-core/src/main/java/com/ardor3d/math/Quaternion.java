@@ -24,7 +24,6 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Quaternion represents a 4 value math object used in Ardor3D to describe rotations. It has the advantage of being able
@@ -33,11 +32,11 @@ import com.ardor3d.util.pool.ObjectPool;
  * Note: some algorithms in this class were ported from Eberly, Wolfram, Game Gems and others to Java by myself and
  * others, originally for jMonkeyEngine.
  */
-public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQuaternion {
+public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQuaternion, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final QuaternionPool QUAT_POOL = new QuaternionPool(11);
+    private static final ObjectPool<Quaternion> QUAT_POOL = ObjectPool.create(Quaternion.class, Debug.maxPoolSize);
 
     /**
      * x=0, y=0, z=0, w=1
@@ -1349,17 +1348,6 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     public final static void releaseTempInstance(final Quaternion mat) {
         if (Debug.useMathPools) {
             QUAT_POOL.release(mat);
-        }
-    }
-
-    static final class QuaternionPool extends ObjectPool<Quaternion> {
-        public QuaternionPool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Quaternion newInstance() {
-            return new Quaternion();
         }
     }
 }

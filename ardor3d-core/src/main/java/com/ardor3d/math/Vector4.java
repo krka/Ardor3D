@@ -22,17 +22,16 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Vector4 represents a point or vector in a four dimensional system. This implementation stores its data in
  * double-precision.
  */
-public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVector4 {
+public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVector4, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Vector4Pool VEC_POOL = new Vector4Pool(11);
+    private static final ObjectPool<Vector4> VEC_POOL = ObjectPool.create(Vector4.class, Debug.maxPoolSize);
 
     /**
      * 0, 0, 0, 0
@@ -992,16 +991,4 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
             VEC_POOL.release(vec);
         }
     }
-
-    static final class Vector4Pool extends ObjectPool<Vector4> {
-        public Vector4Pool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Vector4 newInstance() {
-            return new Vector4();
-        }
-    }
-
 }

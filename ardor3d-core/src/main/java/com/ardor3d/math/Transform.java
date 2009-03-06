@@ -27,7 +27,6 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Transform models a transformation in 3d space as: Y = M*X+T, with M being a Matrix3 and T is a Vector3. Generally M
@@ -35,11 +34,11 @@ import com.ardor3d.util.pool.ObjectPool;
  * positive scale vector. For non-uniform scales and reflections, use setMatrix, which will consider M as being a
  * general 3x3 matrix and disregard anything set in scale.
  */
-public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTransform {
+public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTransform, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final TransformPool TRANS_POOL = new TransformPool(11);
+    private static final ObjectPool<Transform> TRANS_POOL = ObjectPool.create(Transform.class, Debug.maxPoolSize);
 
     /**
      * Identity transform.
@@ -985,17 +984,6 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     public final static void releaseTempInstance(final Transform trans) {
         if (Debug.useMathPools) {
             TRANS_POOL.release(trans);
-        }
-    }
-
-    static final class TransformPool extends ObjectPool<Transform> {
-        public TransformPool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Transform newInstance() {
-            return new Transform();
         }
     }
 }

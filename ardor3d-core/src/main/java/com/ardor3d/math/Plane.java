@@ -23,18 +23,17 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * A representation of a mathematical plane using a normal vector and a plane constant (d) whose absolute value
  * represents the distance from the origin to the plane. It is generally calculated by taking a point (X) on the plane
  * and finding its dot-product with the plane's normal vector. iow: d = N dot X
  */
-public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane {
+public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final PlanePool PLANE_POOL = new PlanePool(11);
+    private static final ObjectPool<Plane> PLANE_POOL = ObjectPool.create(Plane.class, Debug.maxPoolSize);
 
     public static final ReadOnlyPlane XZ = new Plane(Vector3.UNIT_Y, 0);
     public static final ReadOnlyPlane XY = new Plane(Vector3.UNIT_Z, 0);
@@ -304,17 +303,6 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane 
     public final static void releaseTempInstance(final Plane plane) {
         if (Debug.useMathPools) {
             PLANE_POOL.release(plane);
-        }
-    }
-
-    static final class PlanePool extends ObjectPool<Plane> {
-        public PlanePool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Plane newInstance() {
-            return new Plane();
         }
     }
 }

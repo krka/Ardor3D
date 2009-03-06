@@ -23,16 +23,15 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Triangle is a math class defining a three sided polygon by three points in space.
  */
-public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTriangle {
+public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTriangle, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final TrianglePool TRI_POOL = new TrianglePool(11);
+    private static final ObjectPool<Triangle> TRI_POOL = ObjectPool.create(Triangle.class, Debug.maxPoolSize);
 
     protected final Vector3 _pointA = new Vector3();
     protected final Vector3 _pointB = new Vector3();
@@ -388,17 +387,6 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     public final static void releaseTempInstance(final Triangle tri) {
         if (Debug.useMathPools) {
             TRI_POOL.release(tri);
-        }
-    }
-
-    static final class TrianglePool extends ObjectPool<Triangle> {
-        public TrianglePool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Triangle newInstance() {
-            return new Triangle();
         }
     }
 }

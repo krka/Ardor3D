@@ -29,7 +29,6 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Matrix4 represents a double precision 4x4 matrix and contains a flag, set at object creation, indicating if the given
@@ -38,11 +37,11 @@ import com.ardor3d.util.pool.ObjectPool;
  * Note: some algorithms in this class were ported from Eberly, Wolfram, Game Gems and others to Java by myself and
  * others, originally for jMonkeyEngine.
  */
-public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatrix4 {
+public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatrix4, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Matrix4Pool MAT_POOL = new Matrix4Pool(11);
+    private static final ObjectPool<Matrix4> MAT_POOL = ObjectPool.create(Matrix4.class, Debug.maxPoolSize);
 
     /**
      * <pre>
@@ -1312,17 +1311,6 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     public final static void releaseTempInstance(final Matrix4 mat) {
         if (Debug.useMathPools) {
             MAT_POOL.release(mat);
-        }
-    }
-
-    static final class Matrix4Pool extends ObjectPool<Matrix4> {
-        public Matrix4Pool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Matrix4 newInstance() {
-            return new Matrix4();
         }
     }
 }

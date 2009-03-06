@@ -14,13 +14,12 @@ import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Debug;
-import com.ardor3d.util.pool.ObjectPool;
 
-public class Ray3 extends Line3Base implements ReadOnlyRay3 {
+public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final RayPool RAY_POOL = new RayPool(11);
+    private static final ObjectPool<Ray3> RAY_POOL = ObjectPool.create(Ray3.class, Debug.maxPoolSize);
 
     /**
      * Constructs a new ray with an origin at (0,0,0) and a direction of (0,0,1).
@@ -324,17 +323,6 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3 {
     public final static void releaseTempInstance(final Ray3 ray) {
         if (Debug.useMathPools) {
             RAY_POOL.release(ray);
-        }
-    }
-
-    static final class RayPool extends ObjectPool<Ray3> {
-        public RayPool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Ray3 newInstance() {
-            return new Ray3();
         }
     }
 }

@@ -22,17 +22,16 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * ColorRGBA is a 4 component color value (red, green, blue, alpha). The standard range for each individual component is
  * [0f, 1f].
  */
-public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyColorRGBA {
+public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyColorRGBA, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ColorRGBAPool COLOR_POOL = new ColorRGBAPool(11);
+    private static final ObjectPool<ColorRGBA> COLOR_POOL = ObjectPool.create(ColorRGBA.class, Debug.maxPoolSize);
 
     /**
      * the color black (0, 0, 0, 1).
@@ -940,17 +939,6 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
     public final static void releaseTempInstance(final ColorRGBA color) {
         if (Debug.useMathPools) {
             COLOR_POOL.release(color);
-        }
-    }
-
-    static final class ColorRGBAPool extends ObjectPool<ColorRGBA> {
-        public ColorRGBAPool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected ColorRGBA newInstance() {
-            return new ColorRGBA();
         }
     }
 }

@@ -23,18 +23,16 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
- * 
  * <code>Rectangle</code> defines a finite plane within three dimensional space that is specified via three points (A,
  * B, C). These three points define a triangle with the forth point defining the rectangle ((B + C) - A.
  */
 
-public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRectangle {
+public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRectangle, Poolable {
     private static final long serialVersionUID = 1L;
 
-    private static final RectanglePool RECTANGLE_POOL = new RectanglePool(11);
+    private static final ObjectPool<Rectangle> RECTANGLE_POOL = ObjectPool.create(Rectangle.class, Debug.maxPoolSize);
 
     private final Vector3 _a = new Vector3();
     private final Vector3 _b = new Vector3();
@@ -285,16 +283,4 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
             RECTANGLE_POOL.release(rectangle);
         }
     }
-
-    static final class RectanglePool extends ObjectPool<Rectangle> {
-        public RectanglePool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Rectangle newInstance() {
-            return new Rectangle();
-        }
-    }
-
 }

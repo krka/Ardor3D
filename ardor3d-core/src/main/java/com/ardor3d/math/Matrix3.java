@@ -27,7 +27,6 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * Matrix3 represents a double precision 3x3 matrix.
@@ -35,11 +34,11 @@ import com.ardor3d.util.pool.ObjectPool;
  * Note: some algorithms in this class were ported from Eberly, Wolfram, Game Gems and others to Java by myself and
  * others, originally for jMonkeyEngine.
  */
-public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatrix3 {
+public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatrix3, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Matrix3Pool MAT_POOL = new Matrix3Pool(11);
+    private static final ObjectPool<Matrix3> MAT_POOL = ObjectPool.create(Matrix3.class, Debug.maxPoolSize);
 
     /**
      * <pre>
@@ -1271,17 +1270,6 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     public final static void releaseTempInstance(final Matrix3 mat) {
         if (Debug.useMathPools) {
             MAT_POOL.release(mat);
-        }
-    }
-
-    static final class Matrix3Pool extends ObjectPool<Matrix3> {
-        public Matrix3Pool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Matrix3 newInstance() {
-            return new Matrix3();
         }
     }
 }

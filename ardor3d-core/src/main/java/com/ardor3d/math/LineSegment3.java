@@ -21,13 +21,13 @@ import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.pool.ObjectPool;
 
-public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3 {
+public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final LineSegment3Pool LINESEG3_POOL = new LineSegment3Pool(11);
+    private static final ObjectPool<LineSegment3> LINESEG3_POOL = ObjectPool.create(LineSegment3.class,
+            Debug.maxPoolSize);
 
     protected double _extent;
 
@@ -302,17 +302,6 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3 {
     public final static void releaseTempInstance(final LineSegment3 segment) {
         if (Debug.useMathPools) {
             LINESEG3_POOL.release(segment);
-        }
-    }
-
-    static final class LineSegment3Pool extends ObjectPool<LineSegment3> {
-        public LineSegment3Pool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected LineSegment3 newInstance() {
-            return new LineSegment3();
         }
     }
 }

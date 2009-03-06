@@ -23,17 +23,16 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.pool.ObjectPool;
 
 /**
  * <code>Ring</code> defines a flat ring or disk within three dimensional space that is specified via the ring's center
  * point, an up vector, an inner radius, and an outer radius.
  */
 
-public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing {
+public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, Poolable {
     private static final long serialVersionUID = 1L;
 
-    private static final RingPool RING_POOL = new RingPool(11);
+    private static final ObjectPool<Ring> RING_POOL = ObjectPool.create(Ring.class, Debug.maxPoolSize);
 
     private final Vector3 _center = new Vector3();
     private final Vector3 _up = new Vector3(Vector3.UNIT_Y);
@@ -351,17 +350,6 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing {
     public final static void releaseTempInstance(final Ring ring) {
         if (Debug.useMathPools) {
             RING_POOL.release(ring);
-        }
-    }
-
-    static final class RingPool extends ObjectPool<Ring> {
-        public RingPool(final int initialSize) {
-            super(initialSize);
-        }
-
-        @Override
-        protected Ring newInstance() {
-            return new Ring();
         }
     }
 }
