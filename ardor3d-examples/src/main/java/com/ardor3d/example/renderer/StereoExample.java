@@ -17,9 +17,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.Renderer;
@@ -29,11 +27,11 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Teapot;
+import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
@@ -42,7 +40,6 @@ import com.google.inject.Inject;
  */
 public class StereoExample extends ExampleBase {
 
-    private Mesh _mesh;
     private StereoCamera _camera;
     private ColorMaskState noRed, redOnly;
 
@@ -52,7 +49,7 @@ public class StereoExample extends ExampleBase {
     private static final boolean _sideBySide = false;
 
     /**
-     * Change this to true to use anaglyph style (red/green) 3d. False will do hardware based 3d.
+     * Change this to true to use anaglyph style (red/cyan) 3d. False will do hardware based 3d.
      */
     private static final boolean _useAnaglyph = true;
 
@@ -84,44 +81,34 @@ public class StereoExample extends ExampleBase {
         _canvas.getCanvasRenderer().setCamera(_camera);
 
         // Setup our left and right camera using the parameters on the stereo camera itself
-        _camera.setFocalDistance(10.0);
+        _camera.setFocalDistance(1);
         _camera.setEyeSeparation(_camera.getFocalDistance() / 30.0);
         _camera.setAperture(45.0 * MathUtils.DEG_TO_RAD);
         _camera.setSideBySideMode(_sideBySide);
         _camera.setupLeftRightCameras();
 
-        _mesh = new Teapot("Teapot");
-        _mesh.setModelBound(new BoundingBox());
-        _mesh.updateModelBound();
-        _mesh.setTranslation(new Vector3(0, 0, -15));
-        _root.attachChild(_mesh);
+        final Mesh tp = new Teapot("Teapot");
+        tp.setModelBound(new BoundingBox());
+        tp.updateModelBound();
+        tp.setTranslation(new Vector3(0, 0, -50));
+        tp.setScale(2);
+        _root.attachChild(tp);
 
-        _mesh.addController(new Controller() {
-            private static final long serialVersionUID = 1L;
-            private double currentTime;
-            private final Matrix3 _rotate = new Matrix3();
-            private final Vector3 _axis = new Vector3(1, 1, 0.5f).normalizeLocal();
-            private double _angle = 0;
+        final Mesh torus = new Torus("Torus", 16, 16, 1, 4);
+        torus.setModelBound(new BoundingBox());
+        torus.updateModelBound();
+        torus.setTranslation(new Vector3(4, 0, -10));
+        _root.attachChild(torus);
 
-            @Override
-            public void update(final double time, final Spatial caller) {
-                _angle = _angle + (time * 45);
-                if (_angle > 360) {
-                    _angle = 0;
-                }
+        final Mesh sphere = new Sphere("Sphere", 16, 16, 5);
+        sphere.setModelBound(new BoundingBox());
+        sphere.updateModelBound();
+        sphere.setTranslation(new Vector3(-8, 0, -30));
+        _root.attachChild(sphere);
 
-                _rotate.fromAngleNormalAxis(_angle * MathUtils.DEG_TO_RAD, _axis);
-                caller.setRotation(_rotate);
-
-                currentTime += time * 0.5;
-                final ReadOnlyVector3 ttranslate = _mesh.getTranslation();
-                caller.setTranslation(ttranslate.getX(), ttranslate.getY(), Math.sin(currentTime) * 10.0 - 15);
-            }
-        });
-
-        final Box box = new Box("Box", new Vector3(), 50, 50, 1);
+        final Box box = new Box("Box", new Vector3(), 50, 1, 50);
         box.setModelBound(new BoundingBox());
-        box.setTranslation(new Vector3(0, 0, -75));
+        box.setTranslation(new Vector3(0, -1, -25));
         _root.attachChild(box);
 
         final TextureState ts = new TextureState();
@@ -133,6 +120,8 @@ public class StereoExample extends ExampleBase {
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
+
+        _root.setTranslation(0, -1, 0);
     }
 
     @Override
@@ -141,28 +130,6 @@ public class StereoExample extends ExampleBase {
         // Update left and right camera frames based on current camera.
         _camera.updateLeftRightCameraFrames();
 
-        // Right Eye
-        {
-            if (!_sideBySide && !_useAnaglyph) {
-                // Set right back buffer
-                renderer.setDrawBuffer(DrawBufferTarget.BackRight);
-                renderer.clearBuffers();
-            } else if (_useAnaglyph) {
-                renderer.clearBuffers();
-            }
-
-            // Set right cam
-            _camera.switchToRightCamera(renderer);
-
-            // draw scene
-            if (_useAnaglyph) {
-                ContextManager.getCurrentContext().enforceState(redOnly);
-            }
-            renderer.draw(_root);
-            super.renderDebug(renderer);
-            renderer.renderBuckets();
-        }
-
         // Left Eye
         {
             if (!_sideBySide && !_useAnaglyph) {
@@ -170,20 +137,39 @@ public class StereoExample extends ExampleBase {
                 renderer.setDrawBuffer(DrawBufferTarget.BackLeft);
                 renderer.clearBuffers();
             } else if (_useAnaglyph) {
-                renderer.clearZBuffer();
+                renderer.clearBuffers();
+                ContextManager.getCurrentContext().enforceState(redOnly);
             }
 
             // Set left cam
             _camera.switchToLeftCamera(renderer);
 
             // Draw scene
-            if (_useAnaglyph) {
-                ContextManager.getCurrentContext().enforceState(noRed);
-            }
             renderer.draw(_root);
             super.renderDebug(renderer);
             renderer.renderBuckets();
         }
+
+        // Right Eye
+        {
+            if (!_sideBySide && !_useAnaglyph) {
+                // Set right back buffer
+                renderer.setDrawBuffer(DrawBufferTarget.BackRight);
+                renderer.clearBuffers();
+            } else if (_useAnaglyph) {
+                renderer.clearZBuffer();
+                ContextManager.getCurrentContext().enforceState(noRed);
+            }
+
+            // Set right cam
+            _camera.switchToRightCamera(renderer);
+
+            // draw scene
+            renderer.draw(_root);
+            super.renderDebug(renderer);
+            renderer.renderBuckets();
+        }
+
         if (_useAnaglyph) {
             ContextManager.getCurrentContext().clearEnforcedState(StateType.ColorMask);
         }
