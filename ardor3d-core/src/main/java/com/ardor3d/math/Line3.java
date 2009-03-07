@@ -12,13 +12,13 @@ package com.ardor3d.math;
 
 import com.ardor3d.math.type.ReadOnlyLine3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 
 public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Line3> LINE3_POOL = ObjectPool.create(Line3.class, Debug.maxPoolSize);
+    private static final ObjectPool<Line3> LINE3_POOL = ObjectPool.create(Line3.class, Constants.maxPoolSize);
 
     /**
      * Constructs a new line with an origin at (0,0,0) and a direction of (0,0,1).
@@ -149,7 +149,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
      *         the method should return instances of this class that are not currently in use.
      */
     public final static Line3 fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return LINE3_POOL.fetch();
         } else {
             return new Line3();
@@ -164,7 +164,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
      *            the Line3 to release.
      */
     public final static void releaseTempInstance(final Line3 line) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             LINE3_POOL.release(line);
         }
     }

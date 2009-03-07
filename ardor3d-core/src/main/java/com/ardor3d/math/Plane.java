@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -33,7 +33,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Plane> PLANE_POOL = ObjectPool.create(Plane.class, Debug.maxPoolSize);
+    private static final ObjectPool<Plane> PLANE_POOL = ObjectPool.create(Plane.class, Constants.maxPoolSize);
 
     public static final ReadOnlyPlane XZ = new Plane(Vector3.UNIT_Y, 0);
     public static final ReadOnlyPlane XY = new Plane(Vector3.UNIT_Z, 0);
@@ -286,7 +286,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
      *         the method should return instances of this class that are not currently in use.
      */
     public final static Plane fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return PLANE_POOL.fetch();
         } else {
             return new Plane();
@@ -301,7 +301,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
      *            the Plane to release.
      */
     public final static void releaseTempInstance(final Plane plane) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             PLANE_POOL.release(plane);
         }
     }

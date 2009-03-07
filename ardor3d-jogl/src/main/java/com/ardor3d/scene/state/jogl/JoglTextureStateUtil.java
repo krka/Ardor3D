@@ -47,7 +47,7 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.renderer.state.record.TextureUnitRecord;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
@@ -101,7 +101,7 @@ public class JoglTextureStateUtil {
             } else if (cached.getTextureId() != 0) {
                 texture.setTextureId(cached.getTextureId());
                 gl.glBindTexture(getGLType(type), cached.getTextureId());
-                if (Debug.stats) {
+                if (Constants.stats) {
                     StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
                 }
                 if (record != null) {
@@ -117,7 +117,7 @@ public class JoglTextureStateUtil {
         texture.setTextureId(id.get(0));
 
         gl.glBindTexture(getGLType(type), texture.getTextureId());
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
         }
         if (record != null) {
@@ -559,7 +559,7 @@ public class JoglTextureStateUtil {
                     if (!unitRecord.isValid() || unitRecord.boundTexture != texture.getTextureId()) {
                         checkAndSetUnit(i, record, caps);
                         gl.glBindTexture(getGLType(type), texture.getTextureId());
-                        if (Debug.stats) {
+                        if (Constants.stats) {
                             StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
                         }
                         unitRecord.boundTexture = texture.getTextureId();
@@ -1590,7 +1590,7 @@ public class JoglTextureStateUtil {
         checkAndSetUnit(unit, record, caps);
 
         gl.glBindTexture(getGLType(type), textureId);
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_TEXTURE_BINDS, 1);
         }
         if (record != null) {

@@ -30,7 +30,7 @@ import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -236,7 +236,7 @@ public class Mesh extends Spatial implements Renderable {
                 renderer
                         .drawArrays(_meshData.getVertexBuffer(), _meshData.getIndexLengths(), _meshData.getIndexModes());
             }
-            if (Debug.stats) {
+            if (Constants.stats) {
                 StatCollector.addStat(StatType.STAT_VERTEX_COUNT, _meshData.getVertexCount());
                 StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
             }

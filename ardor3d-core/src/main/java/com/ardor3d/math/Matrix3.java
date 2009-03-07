@@ -20,7 +20,7 @@ import java.nio.FloatBuffer;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -38,7 +38,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Matrix3> MAT_POOL = ObjectPool.create(Matrix3.class, Debug.maxPoolSize);
+    private static final ObjectPool<Matrix3> MAT_POOL = ObjectPool.create(Matrix3.class, Constants.maxPoolSize);
 
     /**
      * <pre>
@@ -1254,7 +1254,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      *         the method should return instances of this class that are not currently in use.
      */
     public final static Matrix3 fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return MAT_POOL.fetch();
         } else {
             return new Matrix3();
@@ -1268,7 +1268,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param mat the Matrix3 to release.
      */
     public final static void releaseTempInstance(final Matrix3 mat) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             MAT_POOL.release(mat);
         }
     }

@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyRectangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -32,7 +32,7 @@ import com.ardor3d.util.export.Savable;
 public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRectangle, Poolable {
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Rectangle> RECTANGLE_POOL = ObjectPool.create(Rectangle.class, Debug.maxPoolSize);
+    private static final ObjectPool<Rectangle> RECTANGLE_POOL = ObjectPool.create(Rectangle.class, Constants.maxPoolSize);
 
     private final Vector3 _a = new Vector3();
     private final Vector3 _b = new Vector3();
@@ -264,7 +264,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
      *         to the method should return instances of this class that are not currently in use.
      */
     public final static Rectangle fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return RECTANGLE_POOL.fetch();
         } else {
             return new Rectangle();
@@ -279,7 +279,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
      *            the Rectangle to release.
      */
     public final static void releaseTempInstance(final Rectangle rectangle) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             RECTANGLE_POOL.release(rectangle);
         }
     }

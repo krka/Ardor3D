@@ -25,7 +25,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BasicText;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.stat.MultiStatSample;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
@@ -70,7 +70,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
     }
 
     public void statsUpdated() {
-        if (!isEnabled() || !Debug.updateGraphs) {
+        if (!isEnabled() || !Constants.updateGraphs) {
             return;
         }
 
@@ -144,7 +144,7 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 if (maxY < labelHeight) {
                     maxY = labelHeight;
                 }
-                entry.text.setTranslation(colSize * col, lastY - labelHeight, 0);
+                entry.text.setTranslation(colSize * col, lastY, 0);
 
                 // Update line key as needed
                 if (_linkedGraph != null && _linkedGraph.hasConfig(type) && _linkedGraph instanceof TableLinkable) {
@@ -173,7 +173,9 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 // visited.
                 if (!entry.visited) {
                     entry.text.removeFromParent();
-                    entry.lineKey.removeFromParent();
+                    if (entry.lineKey != null) {
+                        entry.lineKey.removeFromParent();
+                    }
                     i.remove();
                 }
             }

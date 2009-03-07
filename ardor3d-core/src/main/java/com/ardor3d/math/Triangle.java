@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyTriangle;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -31,7 +31,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Triangle> TRI_POOL = ObjectPool.create(Triangle.class, Debug.maxPoolSize);
+    private static final ObjectPool<Triangle> TRI_POOL = ObjectPool.create(Triangle.class, Constants.maxPoolSize);
 
     protected final Vector3 _pointA = new Vector3();
     protected final Vector3 _pointB = new Vector3();
@@ -370,7 +370,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
      *         to the method should return instances of this class that are not currently in use.
      */
     public final static Triangle fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return TRI_POOL.fetch();
         } else {
             return new Triangle();
@@ -385,7 +385,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
      *            the Triangle to release.
      */
     public final static void releaseTempInstance(final Triangle tri) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             TRI_POOL.release(tri);
         }
     }

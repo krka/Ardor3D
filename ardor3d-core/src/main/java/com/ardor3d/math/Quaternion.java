@@ -18,7 +18,7 @@ import java.io.ObjectOutput;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -36,7 +36,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Quaternion> QUAT_POOL = ObjectPool.create(Quaternion.class, Debug.maxPoolSize);
+    private static final ObjectPool<Quaternion> QUAT_POOL = ObjectPool.create(Quaternion.class, Constants.maxPoolSize);
 
     /**
      * x=0, y=0, z=0, w=1
@@ -1331,7 +1331,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      *         to the method should return instances of this class that are not currently in use.
      */
     public final static Quaternion fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return QUAT_POOL.fetch();
         } else {
             return new Quaternion();
@@ -1346,7 +1346,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      *            the Quaternion to release.
      */
     public final static void releaseTempInstance(final Quaternion mat) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             QUAT_POOL.release(mat);
         }
     }

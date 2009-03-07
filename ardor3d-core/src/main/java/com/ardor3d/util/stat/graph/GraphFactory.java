@@ -144,10 +144,10 @@ public abstract class GraphFactory {
 
         final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0).coords;
         tbuf.clear();
-        tbuf.put(0).put(maxV);
         tbuf.put(0).put(0);
-        tbuf.put(maxU).put(0);
+        tbuf.put(0).put(maxV);
         tbuf.put(maxU).put(maxV);
+        tbuf.put(maxU).put(0);
         tbuf.rewind();
 
         final TextureState texState = new TextureState();

@@ -13,13 +13,13 @@ package com.ardor3d.math;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 
 public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Ray3> RAY_POOL = ObjectPool.create(Ray3.class, Debug.maxPoolSize);
+    private static final ObjectPool<Ray3> RAY_POOL = ObjectPool.create(Ray3.class, Constants.maxPoolSize);
 
     /**
      * Constructs a new ray with an origin at (0,0,0) and a direction of (0,0,1).
@@ -306,7 +306,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      *         method should return instances of this class that are not currently in use.
      */
     public final static Ray3 fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return RAY_POOL.fetch();
         } else {
             return new Ray3();
@@ -321,7 +321,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      *            the Ray to release.
      */
     public final static void releaseTempInstance(final Ray3 ray) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             RAY_POOL.release(ray);
         }
     }

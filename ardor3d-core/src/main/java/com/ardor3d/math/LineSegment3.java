@@ -16,7 +16,7 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -27,7 +27,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
     private static final long serialVersionUID = 1L;
 
     private static final ObjectPool<LineSegment3> LINESEG3_POOL = ObjectPool.create(LineSegment3.class,
-            Debug.maxPoolSize);
+            Constants.maxPoolSize);
 
     protected double _extent;
 
@@ -285,7 +285,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
      *         calls to the method should return instances of this class that are not currently in use.
      */
     public final static LineSegment3 fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return LINESEG3_POOL.fetch();
         } else {
             return new LineSegment3();
@@ -300,7 +300,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
      *            the LineSegment3 to release.
      */
     public final static void releaseTempInstance(final LineSegment3 segment) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             LINESEG3_POOL.release(segment);
         }
     }

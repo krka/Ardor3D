@@ -16,7 +16,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector4;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -31,7 +31,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Vector4> VEC_POOL = ObjectPool.create(Vector4.class, Debug.maxPoolSize);
+    private static final ObjectPool<Vector4> VEC_POOL = ObjectPool.create(Vector4.class, Constants.maxPoolSize);
 
     /**
      * 0, 0, 0, 0
@@ -972,7 +972,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *         the method should return instances of this class that are not currently in use.
      */
     public final static Vector4 fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return VEC_POOL.fetch();
         } else {
             return new Vector4();
@@ -987,7 +987,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *            the Vector4 to release.
      */
     public final static void releaseTempInstance(final Vector4 vec) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             VEC_POOL.release(vec);
         }
     }

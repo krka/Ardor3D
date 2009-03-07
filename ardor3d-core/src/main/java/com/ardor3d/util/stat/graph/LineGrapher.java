@@ -28,7 +28,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial.CullHint;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.MultiStatSample;
 import com.ardor3d.util.stat.StatCollector;
@@ -73,7 +73,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
     }
 
     public void statsUpdated() {
-        if (!isEnabled() || !Debug.updateGraphs) {
+        if (!isEnabled() || !Constants.updateGraphs) {
             return;
         }
 

@@ -21,7 +21,7 @@ import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -38,7 +38,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Transform> TRANS_POOL = ObjectPool.create(Transform.class, Debug.maxPoolSize);
+    private static final ObjectPool<Transform> TRANS_POOL = ObjectPool.create(Transform.class, Constants.maxPoolSize);
 
     /**
      * Identity transform.
@@ -967,7 +967,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      *         to the method should return instances of this class that are not currently in use.
      */
     public final static Transform fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return TRANS_POOL.fetch();
         } else {
             return new Transform();
@@ -982,7 +982,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      *            the Transform to release.
      */
     public final static void releaseTempInstance(final Transform trans) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             TRANS_POOL.release(trans);
         }
     }

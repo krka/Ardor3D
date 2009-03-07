@@ -13,7 +13,7 @@ package com.ardor3d.util;
 /**
  * Just a simple flag holder for runtime stripping of various ardor3d logging and debugging features.
  */
-public class Debug {
+public class Constants {
 
     public static final boolean debug = (!"FALSE".equalsIgnoreCase(System.getProperty("ardor3d.debug")));
 

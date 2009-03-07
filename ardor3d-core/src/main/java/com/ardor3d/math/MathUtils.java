@@ -13,7 +13,7 @@ package com.ardor3d.math;
 import java.util.Random;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 
 public class MathUtils {
 
@@ -90,10 +90,10 @@ public class MathUtils {
     public static double sin(double dValue) {
         dValue = reduceSinAngle(dValue); // limits angle to between -PI/2 and +PI/2
         if (Math.abs(dValue) <= QUARTER_PI) {
-            return Debug.useFastMath ? FastMath.sin(dValue) : Math.sin(dValue);
+            return Constants.useFastMath ? FastMath.sin(dValue) : Math.sin(dValue);
         }
 
-        return Debug.useFastMath ? FastMath.cos(HALF_PI - dValue) : Math.cos(HALF_PI - dValue);
+        return Constants.useFastMath ? FastMath.cos(HALF_PI - dValue) : Math.cos(HALF_PI - dValue);
     }
 
     /**
@@ -109,27 +109,27 @@ public class MathUtils {
     }
 
     public static double sqrt(final double dValue) {
-        return Debug.useFastMath ? FastMath.sqrt(dValue) : Math.sqrt(dValue);
+        return Constants.useFastMath ? FastMath.sqrt(dValue) : Math.sqrt(dValue);
     }
 
     public static double inverseSqrt(final double dValue) {
-        return Debug.useFastMath ? FastMath.inverseSqrt(dValue) : 1 / Math.sqrt(dValue);
+        return Constants.useFastMath ? FastMath.inverseSqrt(dValue) : 1 / Math.sqrt(dValue);
     }
 
     public static double atan(final double dValue) {
-        return Debug.useFastMath ? FastMath.atan(dValue) : Math.atan(dValue);
+        return Constants.useFastMath ? FastMath.atan(dValue) : Math.atan(dValue);
     }
 
     public static double asin(final double dValue) {
-        return Debug.useFastMath ? FastMath.asin(dValue) : Math.asin(dValue);
+        return Constants.useFastMath ? FastMath.asin(dValue) : Math.asin(dValue);
     }
 
     public static double tan(final double dValue) {
-        return Debug.useFastMath ? FastMath.tan(dValue) : Math.tan(dValue);
+        return Constants.useFastMath ? FastMath.tan(dValue) : Math.tan(dValue);
     }
 
     public static double acos(final double dValue) {
-        return Debug.useFastMath ? FastMath.acos(dValue) : Math.acos(dValue);
+        return Constants.useFastMath ? FastMath.acos(dValue) : Math.acos(dValue);
     }
 
     /**

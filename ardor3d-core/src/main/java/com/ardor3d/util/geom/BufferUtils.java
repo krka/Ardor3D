@@ -31,7 +31,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyVector4;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 
 /**
  * <code>BufferUtils</code> is a helper class for generating nio buffers from ardor3d data classes such as Vectors and
@@ -827,7 +827,7 @@ public final class BufferUtils {
     public static DoubleBuffer createDoubleBuffer(final int size) {
         final DoubleBuffer buf = ByteBuffer.allocateDirect(8 * size).order(ByteOrder.nativeOrder()).asDoubleBuffer();
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;
@@ -886,7 +886,7 @@ public final class BufferUtils {
     public static FloatBuffer createFloatBuffer(final int size) {
         final FloatBuffer buf = ByteBuffer.allocateDirect(4 * size).order(ByteOrder.nativeOrder()).asFloatBuffer();
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;
@@ -902,7 +902,7 @@ public final class BufferUtils {
     public static FloatBuffer createFloatBufferOnHeap(final int size) {
         final FloatBuffer buf = ByteBuffer.allocate(4 * size).order(ByteOrder.nativeOrder()).asFloatBuffer();
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;
@@ -978,7 +978,7 @@ public final class BufferUtils {
     public static IntBuffer createIntBuffer(final int size) {
         final IntBuffer buf = ByteBuffer.allocateDirect(4 * size).order(ByteOrder.nativeOrder()).asIntBuffer();
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;
@@ -1036,7 +1036,7 @@ public final class BufferUtils {
     public static ByteBuffer createByteBuffer(final int size) {
         final ByteBuffer buf = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;
@@ -1094,7 +1094,7 @@ public final class BufferUtils {
     public static ShortBuffer createShortBuffer(final int size) {
         final ShortBuffer buf = ByteBuffer.allocateDirect(2 * size).order(ByteOrder.nativeOrder()).asShortBuffer();
         buf.clear();
-        if (Debug.trackDirectMemory) {
+        if (Constants.trackDirectMemory) {
             trackingHash.put(buf, ref);
         }
         return buf;

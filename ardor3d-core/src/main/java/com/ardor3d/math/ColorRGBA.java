@@ -16,7 +16,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -31,7 +31,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
 
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<ColorRGBA> COLOR_POOL = ObjectPool.create(ColorRGBA.class, Debug.maxPoolSize);
+    private static final ObjectPool<ColorRGBA> COLOR_POOL = ObjectPool.create(ColorRGBA.class, Constants.maxPoolSize);
 
     /**
      * the color black (0, 0, 0, 1).
@@ -922,7 +922,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
      *         to the method should return instances of this class that are not currently in use.
      */
     public final static ColorRGBA fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return COLOR_POOL.fetch();
         } else {
             return new ColorRGBA();
@@ -937,7 +937,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
      *            the ColorRGBA to release.
      */
     public final static void releaseTempInstance(final ColorRGBA color) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             COLOR_POOL.release(color);
         }
     }

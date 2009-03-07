@@ -18,7 +18,7 @@ import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -64,7 +64,7 @@ public abstract class AbstractRenderer implements Renderer {
     }
 
     public void applyLightState(final LightState state) {
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
         }
 
@@ -91,13 +91,13 @@ public abstract class AbstractRenderer implements Renderer {
             tempState.setNeedsRefresh(false);
         }
 
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.endStat(StatType.STAT_STATES_TIMER);
         }
     }
 
     public void applyNonLightStates(final EnumMap<StateType, RenderState> states) {
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
         }
 
@@ -128,7 +128,7 @@ public abstract class AbstractRenderer implements Renderer {
             }
         }
 
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.endStat(StatType.STAT_STATES_TIMER);
         }
     }

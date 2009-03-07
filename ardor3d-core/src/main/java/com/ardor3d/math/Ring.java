@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyRing;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -32,7 +32,7 @@ import com.ardor3d.util.export.Savable;
 public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, Poolable {
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Ring> RING_POOL = ObjectPool.create(Ring.class, Debug.maxPoolSize);
+    private static final ObjectPool<Ring> RING_POOL = ObjectPool.create(Ring.class, Constants.maxPoolSize);
 
     private final Vector3 _center = new Vector3();
     private final Vector3 _up = new Vector3(Vector3.UNIT_Y);
@@ -333,7 +333,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
      *         the method should return instances of this class that are not currently in use.
      */
     public final static Ring fetchTempInstance() {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             return RING_POOL.fetch();
         } else {
             return new Ring();
@@ -348,7 +348,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
      *            the Ring to release.
      */
     public final static void releaseTempInstance(final Ring ring) {
-        if (Debug.useMathPools) {
+        if (Constants.useMathPools) {
             RING_POOL.release(ring);
         }
     }

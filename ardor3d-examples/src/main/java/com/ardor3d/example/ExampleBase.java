@@ -61,7 +61,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.TextureManager;
@@ -188,7 +188,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         }
 
         /** update stats, if enabled. */
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.update();
         }
 

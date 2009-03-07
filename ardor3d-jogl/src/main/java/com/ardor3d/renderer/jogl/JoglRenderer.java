@@ -86,7 +86,7 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.VBOInfo;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.Debug;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.WeakIdentityCache;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
@@ -231,19 +231,19 @@ public class JoglRenderer extends AbstractRenderer {
 
             applyState(defaultStateList.get(RenderState.StateType.ColorMask));
 
-            if (Debug.stats) {
+            if (Constants.stats) {
                 StatCollector.startStat(StatType.STAT_DISPLAYSWAP_TIMER);
             }
 
             GLContext.getCurrent().getGLDrawable().swapBuffers();
-            if (Debug.stats) {
+            if (Constants.stats) {
                 StatCollector.endStat(StatType.STAT_DISPLAYSWAP_TIMER);
             }
         }
 
         _vboMap.expunge();
 
-        if (Debug.stats) {
+        if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_FRAMES, 1);
         }
     }
@@ -808,7 +808,7 @@ public class JoglRenderer extends AbstractRenderer {
             } else {
                 gl.glDrawElements(glIndexMode, indices.limit(), GL.GL_UNSIGNED_INT, 0);
             }
-            if (Debug.stats) {
+            if (Constants.stats) {
                 addStats(indexModes[0], indices.limit());
             }
         } else {
@@ -826,7 +826,7 @@ public class JoglRenderer extends AbstractRenderer {
                 } else {
                     gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, offset);
                 }
-                if (Debug.stats) {
+                if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
 
@@ -847,7 +847,7 @@ public class JoglRenderer extends AbstractRenderer {
 
             gl.glDrawArrays(glIndexMode, 0, vertexBuffer.limit() / 3);
 
-            if (Debug.stats) {
+            if (Constants.stats) {
                 addStats(indexModes[0], vertexBuffer.limit() / 3);
             }
         } else {
@@ -860,7 +860,7 @@ public class JoglRenderer extends AbstractRenderer {
 
                 gl.glDrawArrays(glIndexMode, offset, count);
 
-                if (Debug.stats) {
+                if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
 
