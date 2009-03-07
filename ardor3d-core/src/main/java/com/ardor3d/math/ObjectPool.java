@@ -38,7 +38,7 @@ public abstract class ObjectPool<T extends Poolable> {
 
     public final T fetch() {
         final List<T> objects = _pool.get();
-        return objects.isEmpty() ? newInstance() : objects.get(objects.size() - 1);
+        return objects.isEmpty() ? newInstance() : objects.remove(objects.size() - 1);
     }
 
     public final void release(final T object) {
