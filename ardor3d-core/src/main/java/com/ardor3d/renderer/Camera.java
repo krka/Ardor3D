@@ -324,6 +324,10 @@ public class Camera implements Savable, Externalizable, Cloneable {
         return _depthRangeFar;
     }
 
+    /**
+     * @param depthRangeNear
+     *            the far clipping plane for window coordinates. Should be in the range [0, 1]. Default is 1.
+     */
     public void setDepthRangeFar(final double depthRangeFar) {
         _depthRangeFar = depthRangeFar;
         _depthRangeDirty = true;
@@ -333,6 +337,10 @@ public class Camera implements Savable, Externalizable, Cloneable {
         return _depthRangeNear;
     }
 
+    /**
+     * @param depthRangeNear
+     *            the near clipping plane for window coordinates. Should be in the range [0, 1]. Default is 0.
+     */
     public void setDepthRangeNear(final double depthRangeNear) {
         _depthRangeNear = depthRangeNear;
         _depthRangeDirty = true;
