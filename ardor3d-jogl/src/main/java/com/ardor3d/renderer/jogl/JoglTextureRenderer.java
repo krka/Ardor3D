@@ -299,7 +299,16 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         logger.fine("setup fbo tex with id " + tex.getTextureId() + ": " + _width + "," + _height);
     }
 
-    public void render(final List<? extends Spatial> toDraw, final List<Texture> texs, final boolean doClear) {
+    public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
+        render(null, spat, texs, doClear);
+    }
+
+    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final boolean doClear) {
+        render(spat, null, texs, doClear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
+            final boolean doClear) {
         final GL gl = GLU.getCurrentGL();
 
         final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
@@ -313,7 +322,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
                     setupForSingleTexDraw(tex, doClear);
 
-                    doDraw(toDraw);
+                    if (toDrawA != null) {
+                        doDraw(toDrawA);
+                    } else {
+                        doDraw(toDrawB);
+                    }
 
                     takedownForSingleTexDraw(tex);
                 }
@@ -374,7 +387,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
                 switchCameraIn(doClear);
 
-                doDraw(toDraw);
+                if (toDrawA != null) {
+                    doDraw(toDrawA);
+                } else {
+                    doDraw(toDrawB);
+                }
 
                 switchCameraOut();
             }

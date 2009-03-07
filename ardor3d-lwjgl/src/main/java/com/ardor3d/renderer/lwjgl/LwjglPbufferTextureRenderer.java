@@ -28,7 +28,6 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
-import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -107,8 +106,16 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     }
 
     public void render(final Spatial spat, final Texture tex, final boolean doClear) {
+        render(null, spat, tex, doClear);
+    }
 
-        // clear the current states since we are renderering into a new location
+    public void render(final List<? extends Spatial> spat, final Texture tex, final boolean doClear) {
+        render(spat, null, tex, doClear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Texture tex,
+            final boolean doClear) {
+        // clear the current states since we are rendering into a new location
         // and can not rely on states still being set.
         try {
             if (_pbuffer == null || _pbuffer.isBufferLost()) {
@@ -120,18 +127,18 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 initPbuffer();
             }
 
-            // Override parent's last frustum test to avoid accidental incorrect
-            // cull
-            if (spat.getParent() != null) {
-                spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
-            }
-
             if (_useDirectRender && tex.getRTTSource() != Texture.RenderToTextureType.Depth) {
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
                 activate();
                 switchCameraIn(doClear);
-                doDraw(spat);
+
+                if (toDrawA != null) {
+                    doDraw(toDrawA);
+                } else {
+                    doDraw(toDrawB);
+                }
+
                 deactivate();
                 switchCameraOut();
                 LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
@@ -140,7 +147,13 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 // render and copy to a texture
                 activate();
                 switchCameraIn(doClear);
-                doDraw(spat);
+
+                if (toDrawA != null) {
+                    doDraw(toDrawA);
+                } else {
+                    doDraw(toDrawB);
+                }
+
                 switchCameraOut();
 
                 copyToTexture(tex, _width, _height);
@@ -153,9 +166,17 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         }
     }
 
-    public void render(final List<? extends Spatial> spats, final List<Texture> texs, final boolean doClear) {
+    public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
+        render(null, spat, texs, doClear);
+    }
 
-        // clear the current states since we are renderering into a new location
+    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final boolean doClear) {
+        render(spat, null, texs, doClear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
+            final boolean doClear) {
+        // clear the current states since we are rendering into a new location
         // and can not rely on states still being set.
         try {
             if (_pbuffer == null || _pbuffer.isBufferLost()) {
@@ -173,16 +194,13 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 activate();
                 switchCameraIn(doClear);
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
-                for (int x = 0, max = spats.size(); x < max; x++) {
-                    final Spatial spat = spats.get(x);
-                    // Override parent's last frustum test to avoid accidental incorrect
-                    // cull
-                    if (spat.getParent() != null) {
-                        spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
-                    }
 
-                    doDraw(spat);
+                if (toDrawA != null) {
+                    doDraw(toDrawA);
+                } else {
+                    doDraw(toDrawB);
                 }
+
                 switchCameraOut();
 
                 deactivate();
@@ -191,16 +209,13 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 // render and copy to a texture
                 activate();
                 switchCameraIn(doClear);
-                for (int x = 0, max = spats.size(); x < max; x++) {
-                    final Spatial spat = spats.get(x);
-                    // Override parent's last frustum test to avoid accidental incorrect
-                    // cull
-                    if (spat.getParent() != null) {
-                        spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
-                    }
 
-                    doDraw(spat);
+                if (toDrawA != null) {
+                    doDraw(toDrawA);
+                } else {
+                    doDraw(toDrawB);
                 }
+
                 switchCameraOut();
 
                 for (int i = 0; i < texs.size(); i++) {

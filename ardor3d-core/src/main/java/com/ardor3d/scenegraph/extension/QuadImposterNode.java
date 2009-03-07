@@ -350,7 +350,7 @@ public class QuadImposterNode extends Node {
     }
 
     public void renderImposter() {
-        _tRenderer.render(_targetScene, _texture);
+        _tRenderer.render(_targetScene, _texture, true);
     }
 
     public Vector3 getWorldUpVector() {

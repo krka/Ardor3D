@@ -37,68 +37,56 @@ public interface TextureRenderer {
     Camera getCamera();
 
     /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached. The result
-     * of the rendering is then copied into the given texture(s). What is copied is based on the Texture object's
-     * rttSource field.
-     * 
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
      * time.
      * 
      * @param spat
      *            the scene to render.
      * @param tex
-     *            the Texture to render it to.
-     */
-    void render(Spatial spat, Texture tex);
-
-    /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached. The result
-     * of the rendering is then copied into the given texture(s). What is copied is based on the Texture object's
-     * rttSource field.
-     * 
-     * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
-     * time.
-     * 
-     * @param spat
-     *            the scene to render.
-     * @param tex
-     *            the Texture to render it to.
+     *            the Texture to render to.
+     * @param doClear
+     *            if true, we'll call a clear buffers before rendering.
      */
     void render(Spatial spat, Texture tex, boolean doClear);
 
     /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached. The result
-     * of the rendering is then copied into the given textures. What is copied is based on the Texture object's
-     * rttSource field.
-     * 
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
      * time.
      * 
-     * @param spats
-     *            an array of Spatials to render.
+     * @param spat
+     *            the scene to render.
      * @param tex
-     *            the Texture to render it to.
+     *            a list of Textures to render to.
+     * @param doClear
+     *            if true, we'll call a clear buffers before rendering.
      */
-    void render(List<? extends Spatial> spats, List<Texture> tex);
+    void render(Spatial spat, List<Texture> texs, boolean doClear);
 
     /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Geometry</code> leaf is reached. The result
-     * of the rendering is then copied into the given textures. What is copied is based on the Texture object's
-     * rttSource field.
-     * 
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
      * time.
      * 
      * @param spats
      *            an array of Spatials to render.
      * @param tex
-     *            the Texture to render it to.
+     *            the Texture to render to.
+     * @param doClear
+     *            if true, we'll call a clear buffers before rendering.
      */
-    void render(List<? extends Spatial> spats, List<Texture> tex, boolean doClear);
+    void render(final List<? extends Spatial> spats, Texture tex, final boolean doClear);
+
+    /**
+     * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
+     * time.
+     * 
+     * @param spats
+     *            an array of Spatials to render.
+     * @param tex
+     *            a list of Textures to render to.
+     * @param doClear
+     *            if true, we'll call a clear buffers before rendering.
+     */
+    void render(final List<? extends Spatial> spats, final List<Texture> texs, final boolean doClear);
 
     /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set

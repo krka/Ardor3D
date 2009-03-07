@@ -109,32 +109,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         return _backgroundColor;
     }
 
-    /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Renderable</code> leaf is reached. The result
-     * of the rendering is then copied into the given texture(s). What is copied is based on the Texture object's
-     * rttSource field.
-     * 
-     * @param toDraw
-     *            the scene to render.
-     * @param tex
-     *            the Texture(s) to render it to.
-     */
-    public void render(final Spatial toDraw, final Texture tex) {
-        render(toDraw, tex, true);
-    }
-
-    /**
-     * <code>render</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off
-     * management of the scene to spatial for it to determine when a <code>Renderable</code> leaf is reached. The result
-     * of the rendering is then copied into the given texture(s). What is copied is based on the Texture object's
-     * rttSource field.
-     * 
-     * @param toDraw
-     *            the scene to render.
-     * @param tex
-     *            the Texture(s) to render it to.
-     */
     public void render(final Spatial toDraw, final Texture tex, final boolean doClear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
@@ -151,6 +125,23 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         }
     }
 
+    public void render(final List<? extends Spatial> toDraw, final Texture tex, final boolean doClear) {
+        try {
+            ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
+
+            setupForSingleTexDraw(tex, doClear);
+
+            doDraw(toDraw);
+
+            takedownForSingleTexDraw(tex);
+
+            ContextManager.getCurrentContext().popFBOTextureRenderer();
+        } catch (final Exception e) {
+            logger.logp(Level.SEVERE, this.getClass().toString(), "render(List<Spatial>, Texture, boolean)",
+                    "Exception", e);
+        }
+    }
+
     protected abstract void activate();
 
     protected abstract void setupForSingleTexDraw(Texture tex, boolean doClear);
@@ -158,10 +149,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     protected abstract void takedownForSingleTexDraw(Texture tex);
 
     protected abstract void deactivate();
-
-    public void render(final List<? extends Spatial> toDraw, final List<Texture> texs) {
-        render(toDraw, texs, true);
-    }
 
     private Camera _oldCamera;
 

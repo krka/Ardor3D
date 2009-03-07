@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -89,14 +88,6 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
         _camera.setFrame(loc, left, up, dir);
     }
 
-    public void render(final Spatial spat, final Texture tex) {
-        render(spat, tex, true);
-    }
-
-    public void render(final List<? extends Spatial> spats, final List<Texture> texs) {
-        render(spats, texs, true);
-    }
-
     protected RenderContext _oldContext;
 
     protected void switchCameraIn(final boolean doClear) {
@@ -123,8 +114,21 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
     }
 
     protected void doDraw(final Spatial spat) {
+        // Override parent's last frustum test to avoid accidental incorrect
+        // cull
+        if (spat.getParent() != null) {
+            spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
+        }
+
         // do rtt scene render
         spat.onDraw(_parentRenderer);
+    }
+
+    protected void doDraw(final List<? extends Spatial> toDraw) {
+        for (int x = 0, max = toDraw.size(); x < max; x++) {
+            final Spatial spat = toDraw.get(x);
+            doDraw(spat);
+        }
     }
 
     /**

@@ -185,7 +185,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _graphRoot.updateGeometricState(0, true);
 
         // - Now, draw to texture via a TextureRenderer
-        _textureRenderer.render(_graphRoot, _texture);
+        _textureRenderer.render(_graphRoot, _texture, true);
 
         // Turn stat collection back on.
         StatCollector.resume();
