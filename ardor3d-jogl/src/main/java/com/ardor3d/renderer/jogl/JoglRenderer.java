@@ -718,7 +718,7 @@ public class JoglRenderer extends AbstractRenderer {
                     gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
                 }
 
-                if (i >= textureCoords.size()) {
+                if (textureCoords == null || i >= textureCoords.size()) {
                     gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     continue;
                 }

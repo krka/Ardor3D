@@ -23,6 +23,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.renderer.NormalsMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
@@ -43,6 +44,8 @@ import com.ardor3d.util.stat.StatType;
  * Mesh
  */
 public class Mesh extends Spatial implements Renderable {
+
+    public static boolean RENDER_VERTEX_ONLY = false;
 
     /** Actual buffer representation of the mesh */
     protected MeshData _meshData = new MeshData();
@@ -224,9 +227,15 @@ public class Mesh extends Spatial implements Renderable {
                         _vboInfo);
             } else {
                 renderer.setupVertexData(_meshData.getVertexBuffer(), _vboInfo);
-                renderer.setupNormalData(_meshData.getNormalBuffer(), getNormalsMode(), _worldTransform, _vboInfo);
-                renderer.setupColorData(_meshData.getColorBuffer(), _vboInfo, _defaultColor);
-                renderer.setupTextureData(_meshData.getTextureCoords(), _vboInfo);
+                if (RENDER_VERTEX_ONLY) {
+                    renderer.setupNormalData(null, NormalsMode.Off, null, null);
+                    renderer.setupColorData(null, null, null);
+                    renderer.setupTextureData(null, null);
+                } else {
+                    renderer.setupNormalData(_meshData.getNormalBuffer(), getNormalsMode(), _worldTransform, _vboInfo);
+                    renderer.setupColorData(_meshData.getColorBuffer(), _vboInfo, _defaultColor);
+                    renderer.setupTextureData(_meshData.getTextureCoords(), _vboInfo);
+                }
             }
 
             if (_meshData.getIndexBuffer() != null) {

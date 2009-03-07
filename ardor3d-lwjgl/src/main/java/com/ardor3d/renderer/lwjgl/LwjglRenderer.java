@@ -669,7 +669,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                 }
 
-                if (i >= textureCoords.size()) {
+                if (textureCoords == null || i >= textureCoords.size()) {
                     GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                     continue;
                 }
