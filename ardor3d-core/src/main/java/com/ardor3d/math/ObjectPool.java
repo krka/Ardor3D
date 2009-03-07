@@ -10,11 +10,21 @@
 
 package com.ardor3d.math;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Simple Object pool for use with our Math Library to help reduce object creation during calculations. This class uses
+ * a ThreadLocal pool of objects to allow for fast multi-threaded use.
+ * 
+ * @param <T>
+ *            the type.
+ */
 public abstract class ObjectPool<T extends Poolable> {
-    private final ThreadLocal<Stack<T>> _pool = new ThreadLocal<Stack<T>>() {
+    private final ThreadLocal<List<T>> _pool = new ThreadLocal<List<T>>() {
         @Override
-        protected synchronized Stack<T> initialValue() {
-            return new Stack<T>(_maxSize);
+        protected synchronized List<T> initialValue() {
+            return new ArrayList<T>(_maxSize);
         }
     };
 
@@ -27,14 +37,19 @@ public abstract class ObjectPool<T extends Poolable> {
     protected abstract T newInstance();
 
     public final T fetch() {
-        return _pool.get().empty() ? newInstance() : _pool.get().pop();
+        final List<T> objects = _pool.get();
+        return objects.isEmpty() ? newInstance() : objects.get(objects.size() - 1);
     }
 
-    public final void release(final T obj) {
-        if (obj != null && _pool.get().size() < _maxSize) {
-            _pool.get().push(obj);
+    public final void release(final T object) {
+        final List<T> objects = _pool.get();
+        if (objects.size() < _maxSize) {
+            reset(object);
+            objects.add(object);
         }
     }
+
+    protected void reset(final T object) {}
 
     public static <T extends Poolable> ObjectPool<T> create(final Class<T> clazz, final int maxSize) {
         return new ObjectPool<T>(maxSize) {
@@ -47,38 +62,5 @@ public abstract class ObjectPool<T extends Poolable> {
                 }
             }
         };
-    }
-
-    private static final class Stack<T> {
-        private final T[] array;
-        private int size = 0;
-
-        @SuppressWarnings("unchecked")
-        public Stack(final int maxSize) {
-            array = (T[]) new Object[maxSize];
-        }
-
-        public boolean empty() {
-            return size == 0;
-        }
-
-        public int size() {
-            return size;
-        }
-
-        public void push(final T element) {
-            array[size++] = element;
-        }
-
-        public T peek() {
-            return array[size - 1];
-        }
-
-        public T pop() {
-            final T element = array[--size];
-            array[size] = null;
-
-            return element;
-        }
     }
 }
