@@ -94,22 +94,22 @@ public class Camera implements Savable, Externalizable, Cloneable {
     /**
      * Camera's location
      */
-    protected final Vector3 _location;
+    protected final Vector3 _location = new Vector3();
 
     /**
      * Direction of camera's 'left'
      */
-    protected final Vector3 _left;
+    protected final Vector3 _left = new Vector3();
 
     /**
      * Direction of 'up' for camera.
      */
-    protected final Vector3 _up;
+    protected final Vector3 _up = new Vector3();
 
     /**
      * Direction the camera is facing.
      */
-    protected final Vector3 _direction;
+    protected final Vector3 _direction = new Vector3();
 
     /**
      * The near range for mapping depth values from normalized device coordinates to window coordinates.
@@ -236,10 +236,10 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _width = width;
         _height = height;
 
-        _location = new Vector3();
-        _left = new Vector3(1, 0, 0);
-        _up = new Vector3(0, 1, 0);
-        _direction = new Vector3(0, 0, 1);
+        _location.set(0, 0, 0);
+        _left.set(1, 0, 0);
+        _up.set(0, 1, 0);
+        _direction.set(0, 0, 1);
 
         _depthRangeNear = 0.0;
         _depthRangeFar = 1.0;
@@ -277,13 +277,25 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     public Camera(final Camera source) {
+        set(source);
+
+        _logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
+    }
+
+    /**
+     * Copy the source camera's fields to this camera
+     * 
+     * @param source
+     *            the camera to copy from
+     */
+    public void set(final Camera source) {
         _width = source.getWidth();
         _height = source.getHeight();
 
-        _location = new Vector3(source.getLocation());
-        _left = new Vector3(source.getLeft());
-        _up = new Vector3(source.getUp());
-        _direction = new Vector3(source.getDirection());
+        _location.set(source.getLocation());
+        _left.set(source.getLeft());
+        _up.set(source.getUp());
+        _direction.set(source.getDirection());
 
         _depthRangeNear = source.getDepthRangeNear();
         _depthRangeFar = source.getDepthRangeFar();
@@ -316,8 +328,6 @@ public class Camera implements Savable, Externalizable, Cloneable {
         onFrustumChange();
         onViewPortChange();
         onFrameChange();
-
-        _logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
     }
 
     public double getDepthRangeFar() {
