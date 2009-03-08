@@ -296,6 +296,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _left.set(source.getLeft());
         _up.set(source.getUp());
         _direction.set(source.getDirection());
+        _fovY = source.getFovY();
 
         _depthRangeNear = source.getDepthRangeNear();
         _depthRangeFar = source.getDepthRangeFar();
