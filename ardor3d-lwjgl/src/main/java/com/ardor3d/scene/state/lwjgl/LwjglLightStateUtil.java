@@ -37,7 +37,7 @@ public abstract class LwjglLightStateUtil {
         final LightStateRecord record = (LightStateRecord) context.getStateRecord(StateType.Light);
         context.setCurrentState(StateType.Light, state);
 
-        if (state.isEnabled() && LightState.LIGHTS_ENABLED && state.getNumberOfChildren() > 0) {
+        if (state.isEnabled() && LightState.LIGHTS_ENABLED) {
             setLightEnabled(true, record);
             setTwoSided(state.getTwoSidedLighting(), record);
             setLocalViewer(state.getLocalViewer(), record);
