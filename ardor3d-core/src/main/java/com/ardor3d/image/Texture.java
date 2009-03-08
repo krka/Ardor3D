@@ -15,8 +15,10 @@ import java.io.IOException;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
+import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -503,8 +505,14 @@ public abstract class Texture implements Savable {
     private ApplyMode _apply = ApplyMode.Modulate;
     private MinificationFilter _minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
     private MagnificationFilter _magnificationFilter = MagnificationFilter.Bilinear;
-    private EnvironmentalMapMode _envMapMode = EnvironmentalMapMode.None;
     private RenderToTextureType _rttSource = RenderToTextureType.RGBA;
+
+    private EnvironmentalMapMode _envMapMode = EnvironmentalMapMode.None;
+
+    private Vector4 _envPlaneS = null;
+    private Vector4 _envPlaneT = null;
+    private Vector4 _envPlaneR = null;
+    private Vector4 _envPlaneQ = null;
 
     private int _memReq = 0;
     private boolean _hasBorder = false;
@@ -558,7 +566,7 @@ public abstract class Texture implements Savable {
      * @param color
      *            the new border color (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
      */
-    public void setBorderColor(final ColorRGBA color) {
+    public void setBorderColor(final ReadOnlyColorRGBA color) {
         _borderColor.set(color);
     }
 
@@ -1059,6 +1067,66 @@ public abstract class Texture implements Savable {
         return _envMapMode;
     }
 
+    public ReadOnlyVector4 getEnvPlaneS() {
+        return _envPlaneS;
+    }
+
+    public void setEnvPlaneS(final ReadOnlyVector4 plane) {
+        if (plane == null) {
+            _envPlaneS = null;
+            return;
+        } else if (_envPlaneS == null) {
+            _envPlaneS = new Vector4(plane);
+        } else {
+            _envPlaneS.set(plane);
+        }
+    }
+
+    public ReadOnlyVector4 getEnvPlaneT() {
+        return _envPlaneT;
+    }
+
+    public void setEnvPlaneT(final ReadOnlyVector4 plane) {
+        if (plane == null) {
+            _envPlaneT = null;
+            return;
+        } else if (_envPlaneT == null) {
+            _envPlaneT = new Vector4(plane);
+        } else {
+            _envPlaneT.set(plane);
+        }
+    }
+
+    public ReadOnlyVector4 getEnvPlaneR() {
+        return _envPlaneR;
+    }
+
+    public void setEnvPlaneR(final ReadOnlyVector4 plane) {
+        if (plane == null) {
+            _envPlaneR = null;
+            return;
+        } else if (_envPlaneR == null) {
+            _envPlaneR = new Vector4(plane);
+        } else {
+            _envPlaneR.set(plane);
+        }
+    }
+
+    public ReadOnlyVector4 getEnvPlaneQ() {
+        return _envPlaneQ;
+    }
+
+    public void setEnvPlaneQ(final ReadOnlyVector4 plane) {
+        if (plane == null) {
+            _envPlaneQ = null;
+            return;
+        } else if (_envPlaneQ == null) {
+            _envPlaneQ = new Vector4(plane);
+        } else {
+            _envPlaneQ.set(plane);
+        }
+    }
+
     public String getImageLocation() {
         return _imageLocation;
     }
@@ -1215,6 +1283,10 @@ public abstract class Texture implements Savable {
         rVal.setCombineSrc2Alpha(_combineSrc2Alpha);
         rVal.setCombineSrc2RGB(_combineSrc2RGB);
         rVal.setEnvironmentalMapMode(_envMapMode);
+        rVal.setEnvPlaneS(_envPlaneS);
+        rVal.setEnvPlaneT(_envPlaneT);
+        rVal.setEnvPlaneR(_envPlaneR);
+        rVal.setEnvPlaneQ(_envPlaneQ);
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
         rVal.setHasBorder(_hasBorder);
@@ -1300,6 +1372,10 @@ public abstract class Texture implements Savable {
         capsule.write(_magnificationFilter, "magnificationFilter", MagnificationFilter.Bilinear);
         capsule.write(_apply, "apply", ApplyMode.Modulate);
         capsule.write(_envMapMode, "envMapMode", EnvironmentalMapMode.None);
+        capsule.write(_envPlaneS, "envPlaneS", null);
+        capsule.write(_envPlaneT, "envPlaneT", null);
+        capsule.write(_envPlaneR, "envPlaneR", null);
+        capsule.write(_envPlaneQ, "envPlaneQ", null);
         capsule.write(_rttSource, "rttSource", RenderToTextureType.RGBA);
         capsule.write(_memReq, "memReq", 0);
         capsule.write(_combineFuncRGB, "combineFuncRGB", CombinerFunctionRGB.Replace);
@@ -1346,6 +1422,10 @@ public abstract class Texture implements Savable {
                 MagnificationFilter.Bilinear);
         _apply = capsule.readEnum("apply", ApplyMode.class, ApplyMode.Modulate);
         _envMapMode = capsule.readEnum("envMapMode", EnvironmentalMapMode.class, EnvironmentalMapMode.None);
+        _envPlaneS = (Vector4) capsule.readSavable("envPlaneS", null);
+        _envPlaneT = (Vector4) capsule.readSavable("envPlaneT", null);
+        _envPlaneR = (Vector4) capsule.readSavable("envPlaneR", null);
+        _envPlaneQ = (Vector4) capsule.readSavable("envPlaneQ", null);
         _rttSource = capsule.readEnum("rttSource", RenderToTextureType.class, RenderToTextureType.RGBA);
         _memReq = capsule.readInt("memReq", 0);
         _combineFuncRGB = capsule.readEnum("combineFuncRGB", CombinerFunctionRGB.class, CombinerFunctionRGB.Replace);

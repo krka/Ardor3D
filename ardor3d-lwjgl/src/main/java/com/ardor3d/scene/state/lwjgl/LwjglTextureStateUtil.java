@@ -1263,14 +1263,14 @@ public abstract class LwjglTextureStateUtil {
                     unitRecord.textureGenTMode = GL11.GL_EYE_LINEAR;
                 }
 
-                record.eyePlaneS.rewind();
-                GL11.glTexGen(GL11.GL_S, GL11.GL_EYE_PLANE, record.eyePlaneS);
-                record.eyePlaneT.rewind();
-                GL11.glTexGen(GL11.GL_T, GL11.GL_EYE_PLANE, record.eyePlaneT);
-                record.eyePlaneR.rewind();
-                GL11.glTexGen(GL11.GL_R, GL11.GL_EYE_PLANE, record.eyePlaneR);
-                record.eyePlaneQ.rewind();
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, record.eyePlaneQ);
+                record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
+                GL11.glTexGen(GL11.GL_S, GL11.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
+                GL11.glTexGen(GL11.GL_T, GL11.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     GL11.glEnable(GL11.GL_TEXTURE_GEN_Q);
@@ -1314,14 +1314,14 @@ public abstract class LwjglTextureStateUtil {
                     unitRecord.textureGenTMode = GL11.GL_OBJECT_LINEAR;
                 }
 
-                record.eyePlaneS.rewind();
-                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, record.eyePlaneS);
-                record.eyePlaneT.rewind();
-                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, record.eyePlaneT);
-                record.eyePlaneR.rewind();
-                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, record.eyePlaneR);
-                record.eyePlaneQ.rewind();
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_OBJECT_PLANE, record.eyePlaneQ);
+                record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
+                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
+                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_OBJECT_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     GL11.glEnable(GL11.GL_TEXTURE_GEN_Q);

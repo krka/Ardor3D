@@ -17,15 +17,18 @@ import java.util.HashMap;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class TextureStateRecord extends StateRecord {
 
-    public FloatBuffer eyePlaneS = BufferUtils.createFloatBuffer(4);
-    public FloatBuffer eyePlaneT = BufferUtils.createFloatBuffer(4);
-    public FloatBuffer eyePlaneR = BufferUtils.createFloatBuffer(4);
-    public FloatBuffer eyePlaneQ = BufferUtils.createFloatBuffer(4);
+    public FloatBuffer plane = BufferUtils.createFloatBuffer(4);
+
+    public static final float[] DEFAULT_S_PLANE = { 1f, 0f, 0f, 0f };
+    public static final float[] DEFAULT_T_PLANE = { 0f, 1f, 0f, 0f };
+    public static final float[] DEFAULT_R_PLANE = { 0f, 0f, 0f, 0f };
+    public static final float[] DEFAULT_Q_PLANE = { 0f, 0f, 0f, 0f };
 
     public HashMap<Integer, TextureRecord> textures;
     public TextureUnitRecord[] units;
@@ -48,11 +51,6 @@ public class TextureStateRecord extends StateRecord {
         for (int i = 0; i < units.length; i++) {
             units[i] = new TextureUnitRecord();
         }
-
-        eyePlaneS.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
-        eyePlaneT.put(0.0f).put(1.0f).put(0.0f).put(0.0f);
-        eyePlaneR.put(0.0f).put(0.0f).put(1.0f).put(0.0f);
-        eyePlaneQ.put(0.0f).put(0.0f).put(0.0f).put(1.0f);
     }
 
     public TextureRecord getTextureRecord(final int textureId, final Texture.Type type) {
@@ -97,5 +95,17 @@ public class TextureStateRecord extends StateRecord {
         for (int i = 0; i < units.length; i++) {
             units[i].validate();
         }
+    }
+
+    public void prepPlane(final ReadOnlyVector4 planeEq, final float[] defaultVal) {
+        if (plane == null) {
+            plane.put(defaultVal);
+        } else {
+            plane.put(planeEq.getXf());
+            plane.put(planeEq.getYf());
+            plane.put(planeEq.getZf());
+            plane.put(planeEq.getWf());
+        }
+        plane.rewind();
     }
 }

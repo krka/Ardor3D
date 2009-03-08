@@ -1199,14 +1199,14 @@ public class JoglTextureStateUtil {
                     unitRecord.textureGenTMode = GL.GL_EYE_LINEAR;
                 }
 
-                record.eyePlaneS.rewind();
-                gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, record.eyePlaneS);
-                record.eyePlaneT.rewind();
-                gl.glTexGenfv(GL.GL_T, GL.GL_EYE_PLANE, record.eyePlaneT);
-                record.eyePlaneR.rewind();
-                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.eyePlaneR);
-                record.eyePlaneQ.rewind();
-                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.eyePlaneQ);
+                record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
+                gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
+                gl.glTexGenfv(GL.GL_T, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     gl.glEnable(GL.GL_TEXTURE_GEN_Q);
@@ -1250,14 +1250,14 @@ public class JoglTextureStateUtil {
                     unitRecord.textureGenTMode = GL.GL_OBJECT_LINEAR;
                 }
 
-                record.eyePlaneS.rewind();
-                gl.glTexGenfv(GL.GL_S, GL.GL_OBJECT_PLANE, record.eyePlaneS);
-                record.eyePlaneT.rewind();
-                gl.glTexGenfv(GL.GL_T, GL.GL_OBJECT_PLANE, record.eyePlaneT);
-                record.eyePlaneR.rewind();
-                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.eyePlaneR);
-                record.eyePlaneQ.rewind();
-                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.eyePlaneQ);
+                record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
+                gl.glTexGenfv(GL.GL_S, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
+                gl.glTexGenfv(GL.GL_T, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     gl.glEnable(GL.GL_TEXTURE_GEN_Q);
