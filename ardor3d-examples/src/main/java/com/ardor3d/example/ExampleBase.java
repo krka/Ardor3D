@@ -10,14 +10,6 @@
 
 package com.ardor3d.example;
 
-import java.awt.EventQueue;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
@@ -30,10 +22,12 @@ import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.FocusWrapper;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.control.FirstPersonControl;
@@ -41,6 +35,8 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonClickedCondition;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickData;
@@ -81,6 +77,14 @@ import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.Stage;
 
+import java.awt.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public abstract class ExampleBase extends Thread implements Updater, Scene, Exit {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
@@ -107,6 +111,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     protected NativeCanvas _canvas;
 
     protected ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
+
+    private MouseManager _mouseManager;
 
     @Inject
     public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
@@ -331,6 +337,10 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         final PhysicalLayer physicalLayer = new PhysicalLayer(injector.getInstance(KeyboardWrapper.class), injector
                 .getInstance(MouseWrapper.class), injector.getInstance(FocusWrapper.class));
 
+
+        // set the mouse manager member. It's a bit of a hack to do that this way.
+        gameThread._mouseManager = injector.getInstance(MouseManager.class);
+
         ll.registerInput(canvas, physicalLayer);
 
         // Register our example as an updater.
@@ -472,5 +482,25 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 System.err.println("clicked: " + inputState.getMouseState().getClickCounts());
             }
         }));
+
+
+        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
+                new TriggerAction() {
+                    public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                        }
+                    }
+                }));
+        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
+                new TriggerAction() {
+                    public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                        }
+                    }
+                }));
+
+
     }
 }

@@ -10,10 +10,6 @@
 
 package com.ardor3d.input.logical;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.annotation.ThreadSafe;
@@ -21,6 +17,10 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.PhysicalLayer;
 import com.google.inject.Inject;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Implementation of a logical layer on top of the physical one, to be able to more easily trigger certain commands for
