@@ -10,20 +10,22 @@
 
 package com.ardor3d.example;
 
-import java.awt.Component;
-
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.jogl.JoglCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.KeyboardWrapper;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
+import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+
+import java.awt.*;
 
 /**
  * Guice configuration module for use with a single Jogl window.
@@ -34,6 +36,7 @@ public class JoglModule extends AbstractModule {
         bind(FocusWrapper.class).to(AwtFocusWrapper.class).in(Scopes.SINGLETON);
         bind(KeyboardWrapper.class).to(AwtKeyboardWrapper.class).in(Scopes.SINGLETON);
         bind(MouseWrapper.class).to(AwtMouseWrapper.class).in(Scopes.SINGLETON);
+        bind(MouseManager.class).to(AwtMouseManager.class).in(Scopes.SINGLETON);
         bind(JoglCanvas.class).in(Scopes.SINGLETON);
         bind(Component.class).to(JoglCanvas.class);
         bind(NativeCanvas.class).to(JoglCanvas.class);
