@@ -27,8 +27,8 @@ public class TextureStateRecord extends StateRecord {
 
     public static final float[] DEFAULT_S_PLANE = { 1f, 0f, 0f, 0f };
     public static final float[] DEFAULT_T_PLANE = { 0f, 1f, 0f, 0f };
-    public static final float[] DEFAULT_R_PLANE = { 0f, 0f, 0f, 0f };
-    public static final float[] DEFAULT_Q_PLANE = { 0f, 0f, 0f, 0f };
+    public static final float[] DEFAULT_R_PLANE = { 0f, 0f, 1f, 0f };
+    public static final float[] DEFAULT_Q_PLANE = { 0f, 0f, 0f, 1f };
 
     public HashMap<Integer, TextureRecord> textures;
     public TextureUnitRecord[] units;
@@ -98,7 +98,7 @@ public class TextureStateRecord extends StateRecord {
     }
 
     public void prepPlane(final ReadOnlyVector4 planeEq, final float[] defaultVal) {
-        if (plane == null) {
+        if (planeEq == null) {
             plane.put(defaultVal);
         } else {
             plane.put(planeEq.getXf());
