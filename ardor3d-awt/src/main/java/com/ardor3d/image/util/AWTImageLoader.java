@@ -10,10 +10,9 @@
 
 package com.ardor3d.image.util;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
 import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,45 +67,67 @@ public class AWTImageLoader implements ImageLoader {
                 logger.warning("Problem creating buffered Image: " + e.getMessage());
                 return TextureState.getDefaultTextureImage();
             }
-            image.getWidth(null);
-            image.getHeight(null);
 
-            if (image instanceof BufferedImage) {
-                final int imageWidth = image.getWidth(null);
-                final int[] tmpData = new int[imageWidth];
-                int row = 0;
-                final BufferedImage bufferedImage = (image);
-                for (int y = image.getHeight(null) - 1; y >= 0; y--) {
-                    bufferedImage.getRGB(0, (flipImage ? row++ : y), imageWidth, 1, tmpData, 0, imageWidth);
-                    tex.setRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
-                }
-            } else {
-                AffineTransform tx = null;
-                if (flipImage) {
-                    tx = AffineTransform.getScaleInstance(1, -1);
-                    tx.translate(0, -image.getHeight(null));
-                }
-                final Graphics2D g = (Graphics2D) tex.getGraphics();
-                g.drawImage(image, tx, null);
-                g.dispose();
+            final int imageWidth = image.getWidth(null);
+            final int imageHeight = image.getHeight(null);
+            final int[] tmpData = new int[imageWidth];
+            int row = 0;
+            for (int y = imageHeight - 1; y >= 0; y--) {
+                image.getRGB(0, (flipImage ? row++ : y), imageWidth, 1, tmpData, 0, imageWidth);
+                tex.setRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
             }
 
         } else {
             tex = image;
         }
+
         // Get a pointer to the image memory
-        final byte data[] = (byte[]) tex.getRaster().getDataElements(0, 0, tex.getWidth(), tex.getHeight(), null);
+        final byte data[] = asByteArray(tex, grayscale, hasAlpha);
         final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils
                 .createByteBuffer(data.length);
         scratch.clear();
         scratch.put(data);
         scratch.flip();
         final Image ardorImage = new Image();
-        ardorImage.setFormat(grayscale ? Image.Format.Alpha8 : hasAlpha ? Image.Format.RGBA8 : Image.Format.RGB8);
+        ardorImage.setFormat(grayscale ? Image.Format.Luminance8 : hasAlpha ? Image.Format.RGBA8 : Image.Format.RGB8);
         ardorImage.setWidth(tex.getWidth());
         ardorImage.setHeight(tex.getHeight());
         ardorImage.setData(scratch);
         return ardorImage;
+    }
+
+    public static byte[] asByteArray(final BufferedImage image) {
+        return asByteArray(image, hasAlpha(image), isGreyscale(image));
+    }
+
+    public static byte[] asByteArray(final BufferedImage image, final boolean isGreyscale, final boolean hasAlpha) {
+        final int imageWidth = image.getWidth(null);
+        final int imageHeight = image.getHeight(null);
+
+        if (image.getRaster().getTransferType() == DataBuffer.TYPE_BYTE) {
+            return (byte[]) image.getRaster().getDataElements(0, 0, imageWidth, imageHeight, null);
+        }
+
+        final byte[] rVal = new byte[imageWidth * imageHeight * (isGreyscale ? 1 : (hasAlpha ? 4 : 3))];
+        final int[] tmpData = new int[imageWidth];
+        int index = 0;
+        for (int y = 0; y < imageHeight; y++) {
+            image.getRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
+            for (int i = 0; i < imageWidth; i++) {
+                final int argb = tmpData[i];
+                if (isGreyscale) {
+                    rVal[index++] = (byte) (argb & 0xFF);
+                } else {
+                    rVal[index++] = (byte) ((argb >> 16) & 0xFF);
+                    rVal[index++] = (byte) ((argb >> 8) & 0xFF);
+                    rVal[index++] = (byte) (argb & 0xFF);
+                    if (hasAlpha) {
+                        rVal[index++] = (byte) ((argb >> 24) & 0xFF);
+                    }
+                }
+            }
+        }
+        return rVal;
     }
 
     /**

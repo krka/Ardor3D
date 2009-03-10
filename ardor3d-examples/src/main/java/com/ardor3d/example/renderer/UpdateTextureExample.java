@@ -73,7 +73,7 @@ public class UpdateTextureExample extends ExampleBase {
     @Override
     protected void renderExample(final Renderer renderer) {
         if (updateTexture) {
-            final byte data[] = (byte[]) img.getRaster().getDataElements(0, 0, img.getWidth(), img.getHeight(), null);
+            final byte data[] = AWTImageLoader.asByteArray(img);
             imageBuffer.put(data);
             imageBuffer.flip();
             final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
@@ -81,7 +81,7 @@ public class UpdateTextureExample extends ExampleBase {
             renderer.updateTextureSubImage(prevTexture, imageBuffer, 0, 0, img.getWidth(), img.getHeight(), 0, 0, img
                     .getWidth(), img.getHeight(), prevTexture.getImage().getFormat());
         } else {
-            final Image nextImage = AWTImageLoader.makeArdor3dImage(img, true);
+            final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
             final Texture nextTexture = TextureManager.loadFromImage(nextImage, Texture.MinificationFilter.Trilinear,
                     Image.Format.GuessNoCompression, true);
             final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
