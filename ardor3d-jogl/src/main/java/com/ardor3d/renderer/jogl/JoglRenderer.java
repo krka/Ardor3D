@@ -167,7 +167,7 @@ public class JoglRenderer extends AbstractRenderer {
         final GL gl = GLU.getCurrentGL();
 
         if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            applyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
         }
         gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
     }
@@ -200,7 +200,7 @@ public class JoglRenderer extends AbstractRenderer {
         // make sure no funny business is going on in the z before clearing.
         if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
             defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
-            applyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
         }
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     }
@@ -229,7 +229,7 @@ public class JoglRenderer extends AbstractRenderer {
         gl.glFlush();
         if (doSwap) {
 
-            applyState(defaultStateList.get(RenderState.StateType.ColorMask));
+            doApplyState(defaultStateList.get(RenderState.StateType.ColorMask));
 
             if (Constants.stats) {
                 StatCollector.startStat(StatType.STAT_DISPLAYSWAP_TIMER);
@@ -1190,11 +1190,8 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public void applyState(final RenderState state) {
-        if (state == null) {
-            logger.warning("tried to apply a null state.");
-            return;
-        }
+    @Override
+    protected void doApplyState(final RenderState state) {
         switch (state.getType()) {
             case Texture:
                 JoglTextureStateUtil.apply(this, (TextureState) state);

@@ -211,13 +211,19 @@ public class Mesh extends Spatial implements Renderable {
             glsl.setMeshData(_meshData);
         }
 
-        // We apply the lightstate prior to transforming so lights are done in world coordinate space.
-        renderer.applyLightState(_lightState);
+        // Apply fixed function states before mesh transforms for proper function
+        for (final StateType type : StateType.values) {
+            if (type != StateType.GLSLShader && type != StateType.FragmentProgram && type != StateType.VertexProgram) {
+                renderer.applyState(type, _states.get(type));
+            }
+        }
 
         final boolean transformed = renderer.doTransforms(_worldTransform);
 
-        // We apply everything else but lights here so it can get the mesh coordinate system.
-        renderer.applyNonLightStates(_states);
+        // Apply shader states here for the ability to retrieve mesh matrices
+        renderer.applyState(StateType.GLSLShader, _states.get(StateType.GLSLShader));
+        renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
+        renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
 
         if (getDisplayListID() != -1) {
             renderer.renderDisplayList(getDisplayListID());

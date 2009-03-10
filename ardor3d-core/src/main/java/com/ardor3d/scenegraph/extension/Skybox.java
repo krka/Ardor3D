@@ -21,6 +21,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Quad;
@@ -219,7 +220,7 @@ public class Skybox extends Node {
         final TextureState ts = (TextureState) _skyboxQuads[face.ordinal()]
                 .getLocalRenderState(RenderState.StateType.Texture);
         if (ts != null) {
-            r.applyState(ts);
+            r.applyState(StateType.Texture, ts);
         }
     }
 
@@ -230,7 +231,7 @@ public class Skybox extends Node {
         for (int x = 0; x < 6; x++) {
             final TextureState ts = (TextureState) _skyboxQuads[x].getLocalRenderState(RenderState.StateType.Texture);
             if (ts != null) {
-                r.applyState(ts);
+                r.applyState(StateType.Texture, ts);
             }
         }
 

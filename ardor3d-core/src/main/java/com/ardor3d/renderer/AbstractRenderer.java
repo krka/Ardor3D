@@ -15,7 +15,6 @@ import java.util.EnumMap;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.util.Constants;
@@ -63,17 +62,15 @@ public abstract class AbstractRenderer implements Renderer {
         return _processingQueue;
     }
 
-    public void applyLightState(final LightState state) {
+    public void applyState(final StateType type, final RenderState state) {
         if (Constants.stats) {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
         }
 
         final RenderContext context = ContextManager.getCurrentContext();
 
-        RenderState tempState = null;
-        final StateType type = StateType.Light;
         // first look up in enforced states
-        tempState = context.getEnforcedState(type);
+        RenderState tempState = context.getEnforcedState(type);
 
         // Not there? Look in the states we receive
         if (tempState == null) {
@@ -87,7 +84,7 @@ public abstract class AbstractRenderer implements Renderer {
 
         if (!RenderState._quickCompare.contains(type) || tempState.needsRefresh()
                 || tempState != context.getCurrentState(type)) {
-            applyState(tempState);
+            doApplyState(tempState);
             tempState.setNeedsRefresh(false);
         }
 
@@ -96,40 +93,5 @@ public abstract class AbstractRenderer implements Renderer {
         }
     }
 
-    public void applyNonLightStates(final EnumMap<StateType, RenderState> states) {
-        if (Constants.stats) {
-            StatCollector.startStat(StatType.STAT_STATES_TIMER);
-        }
-
-        final RenderContext context = ContextManager.getCurrentContext();
-
-        RenderState tempState = null;
-        for (final StateType type : StateType.values) {
-            if (type == StateType.Light) {
-                continue;
-            }
-            // first look up in enforced states
-            tempState = context.getEnforcedState(type);
-
-            // Not there? Look in the states we receive
-            if (tempState == null) {
-                tempState = states.get(type);
-            }
-
-            // Still missing? Use our default states.
-            if (tempState == null) {
-                tempState = defaultStateList.get(type);
-            }
-
-            if (!RenderState._quickCompare.contains(type) || tempState.needsRefresh()
-                    || tempState != context.getCurrentState(type)) {
-                applyState(tempState);
-                tempState.setNeedsRefresh(false);
-            }
-        }
-
-        if (Constants.stats) {
-            StatCollector.endStat(StatType.STAT_STATES_TIMER);
-        }
-    }
+    protected abstract void doApplyState(RenderState state);
 }

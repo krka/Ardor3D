@@ -14,7 +14,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.EnumMap;
 import java.util.List;
 
 import com.ardor3d.image.Image;
@@ -24,7 +23,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
-import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Renderable;
@@ -291,18 +289,6 @@ public interface Renderer {
     void draw(final Renderable renderable);
 
     /**
-     * @param states
-     *            states to apply. Any LightState will be ignored.
-     */
-    void applyNonLightStates(final EnumMap<StateType, RenderState> states);
-
-    /**
-     * @param state
-     *            the LightState to apply.
-     */
-    void applyLightState(LightState state);
-
-    /**
      * <code>doTransforms</code> sets the current transform.
      * 
      * @param transform
@@ -401,9 +387,12 @@ public interface Renderer {
     /**
      * Apply the given state to the current RenderContext using this Renderer.
      * 
+     * @param type
+     *            the state type
      * @param state
+     *            the render state. If null, the renderer's default is applied instead.
      */
-    void applyState(RenderState state);
+    void applyState(StateType type, RenderState state);
 
     void loadTexture(Texture texture, int unit);
 

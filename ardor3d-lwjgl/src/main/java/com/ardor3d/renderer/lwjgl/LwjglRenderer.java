@@ -170,7 +170,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void clearZBuffer() {
         if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            applyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
         }
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
     }
@@ -197,7 +197,7 @@ public class LwjglRenderer extends AbstractRenderer {
         // make sure no funny business is going on in the z before clearing.
         if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
             defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
-            applyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
         }
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
@@ -221,7 +221,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         GL11.glFlush();
         if (doSwap) {
-            applyState(defaultStateList.get(RenderState.StateType.ColorMask));
+            doApplyState(defaultStateList.get(RenderState.StateType.ColorMask));
 
             if (Constants.stats) {
                 StatCollector.startStat(StatType.STAT_DISPLAYSWAP_TIMER);
@@ -1138,7 +1138,8 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void applyState(final RenderState state) {
+    @Override
+    public void doApplyState(final RenderState state) {
         if (state == null) {
             logger.warning("tried to apply a null state.");
             return;
