@@ -130,20 +130,26 @@ public class MouseManagerExample extends ExampleBase {
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K),
                     new TriggerAction() {
                         public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            _mouseManager.setPosition(0, 0);
+                            if (_mouseManager.isSetPositionSupported()) {
+                                _mouseManager.setPosition(0, 0);
+                            }
                         }
                     }));
 
             _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                     new TriggerAction() {
                         public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                            if (_mouseManager.isSetGrabbedSupported()) {
+                                _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                            }
                         }
                     }));
             _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                     new TriggerAction() {
                         public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                            if (_mouseManager.isSetGrabbedSupported()) {
+                                _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                            }
                         }
                     }));
 
