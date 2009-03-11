@@ -112,7 +112,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
 
-    private MouseManager _mouseManager;
+    protected MouseManager _mouseManager;
 
     @Inject
     public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {

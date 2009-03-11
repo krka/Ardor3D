@@ -23,7 +23,6 @@ import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseCursor;
-import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -44,7 +43,6 @@ import com.google.inject.Inject;
 import java.io.IOException;
 
 public class MouseManagerExample extends ExampleBase {
-    private final MouseManager _mouseManager;
 
     private Mesh t;
     private final Matrix3 rotate = new Matrix3();
@@ -60,9 +58,8 @@ public class MouseManagerExample extends ExampleBase {
     }
 
     @Inject
-    public MouseManagerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork, final MouseManager mouseManager) {
+    public MouseManagerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
         super(logicalLayer, frameWork);
-        _mouseManager = mouseManager;
     }
 
     @Override
