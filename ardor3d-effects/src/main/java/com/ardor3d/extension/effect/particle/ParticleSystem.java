@@ -737,8 +737,9 @@ public abstract class ParticleSystem extends Node {
             for (int x = 0; x < 3; x++) {
                 vertices[x] = new Vector3();
 
-                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(), mData.getIndexBuffer().get(
-                        mData.getVertexIndex(index, x, 0)));
+                final int vertIndex = mData.getVertexIndex(index, x, 0);
+                BufferUtils.populateFromBuffer(vertices[x], mData.getVertexBuffer(),
+                        mData.getIndexBuffer() != null ? mData.getIndexBuffer().get(vertIndex) : vertIndex);
             }
             Triangle t = p.getTriangleModel();
             if (t == null) {

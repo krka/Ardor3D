@@ -147,7 +147,8 @@ public class ParticleMesh extends ParticleSystem {
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
-                    final int index = _psGeom.getMeshData().getIndexBuffer().get(ind);
+                    final int index = _psGeom.getMeshData().getIndexBuffer() != null ? _psGeom.getMeshData()
+                            .getIndexBuffer().get(ind) : ind;
                     BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).coords, index);
                     BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).coords, ind);
                 } else {

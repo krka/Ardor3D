@@ -429,8 +429,15 @@ public class MeshData implements Cloneable, Savable {
             if (result[i] == null) {
                 result[i] = new Vector3();
             }
-            BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndexBuffer().get(
-                    getVertexIndex(primitiveIndex, i, section)));
+            if (getIndexBuffer() != null) {
+                // indexed geometry
+                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndexBuffer().get(
+                        getVertexIndex(primitiveIndex, i, section)));
+            } else {
+                // non-indexed geometry
+                BufferUtils
+                        .populateFromBuffer(result[i], getVertexBuffer(), getVertexIndex(primitiveIndex, i, section));
+            }
         }
 
         return result;
