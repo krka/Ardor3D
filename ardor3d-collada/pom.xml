@@ -18,6 +18,10 @@
   <dependencies>
     <dependency>
       <groupId>org.jibx</groupId>
+      <artifactId>jibx-run</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jibx</groupId>
       <artifactId>jibx-extras</artifactId>
     </dependency>
     <dependency>
