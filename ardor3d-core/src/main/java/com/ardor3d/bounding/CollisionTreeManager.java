@@ -32,14 +32,14 @@ import com.ardor3d.scenegraph.Spatial;
  * <p>
  * There are a number of settings that can be used to control how trees are generated. First, generateTrees denotes
  * whether the manager should be creating trees at all. This is set to true by default. doSort defines if the
- * CollisionTree triangle array should be sorted as it is built. This is false by default. Sorting is beneficial for
+ * CollisionTree primitive array should be sorted as it is built. This is false by default. Sorting is beneficial for
  * model data that is not well ordered spatially. This occurrence is rare, and sorting slows creation time. It is,
- * therefore, only to be used when model data requires it. maxTrisPerLeaf defines the number of triangles a leaf node in
- * the collision tree should maintain. The larger number of triangles maintained in a leaf node, the smaller the tree,
- * but the larger the number of triangle checks during a collision. By default, this value is set to 16. maxElements
+ * therefore, only to be used when model data requires it. maxPrimitivesPerLeaf defines the number of primitives a leaf
+ * node in the collision tree should maintain. The larger number of primitives maintained in a leaf node, the smaller
+ * the tree, but the larger the number of checks during a collision. By default, this value is set to 16. maxElements
  * defines the maximum number of trees that will be maintained before clean-up is required. A collision tree is defined
  * for each mesh that is being collided with. The user should determine the optimal number of trees to maintain (a
- * memory/performance tradeoff), based on the number of meshes, their population density and their triangle size. By
+ * memory/performance tradeoff), based on the number of meshes, their population density and their primitive size. By
  * default, this value is set to 25. The type of trees that will be generated is defined by the treeType value, where
  * valid options are define in CollisionTree as AABB_TREE, OBB_TREE and SPHERE_TREE. You can set the functionality of
  * how trees are removed from the cache by providing the manager with a CollisionTreeController implementation. By
@@ -50,18 +50,17 @@ import com.ardor3d.scenegraph.Spatial;
  * @see com.ardor3d.bounding.CollisionTree
  * @see com.ardor3d.bounding.CollisionTreeController
  */
-public class CollisionTreeManager {
+public enum CollisionTreeManager {
+    INSTANCE;
+
     /**
      * defines the default maximum number of trees to maintain.
      */
     public static final int DEFAULT_MAX_ELEMENTS = 25;
     /**
-     * defines the default maximum number of triangles in a tree leaf.
+     * defines the default maximum number of primitives in a tree leaf.
      */
-    public static final int DEFAULT_MAX_TRIS_PER_LEAF = 16;
-
-    // the singleton instance of the manager
-    private static CollisionTreeManager _instance = new CollisionTreeManager();
+    public static final int DEFAULT_MAX_PRIMITIVES_PER_LEAF = 16;
 
     // the cache and protected list for storing trees.
     private final Map<Mesh, WeakReference<CollisionTree>> _cache;
@@ -72,8 +71,8 @@ public class CollisionTreeManager {
 
     private CollisionTree.Type _treeType = CollisionTree.Type.AABB;
 
-    private int _maxTrisPerLeaf = DEFAULT_MAX_TRIS_PER_LEAF;
-    private final static int maxElements = DEFAULT_MAX_ELEMENTS;
+    private int _maxPrimitivesPerLeaf = DEFAULT_MAX_PRIMITIVES_PER_LEAF;
+    private int _maxElements = DEFAULT_MAX_ELEMENTS;
 
     private CollisionTreeController _treeRemover;
 
@@ -91,7 +90,7 @@ public class CollisionTreeManager {
      * @return the singleton instance of the manager.
      */
     public static CollisionTreeManager getInstance() {
-        return _instance;
+        return INSTANCE;
     }
 
     private CollisionTree cacheGet(final Mesh mesh) {
@@ -123,7 +122,7 @@ public class CollisionTreeManager {
      * 
      * @param mesh
      *            the mesh to use as the key for the tree to obtain.
-     * @return the tree associated with a triangle mesh
+     * @return the tree associated with a given mesh
      */
     public synchronized CollisionTree getCollisionTree(final Mesh mesh) {
         CollisionTree toReturn = null;
@@ -223,8 +222,8 @@ public class CollisionTreeManager {
         }
 
         // Are we over our max? Test
-        if (_cache.size() > maxElements && _treeRemover != null) {
-            _treeRemover.clean(_cache, _protectedList, maxElements);
+        if (_cache.size() > _maxElements && _treeRemover != null) {
+            _treeRemover.clean(_cache, _protectedList, _maxElements);
         }
     }
 
@@ -297,7 +296,7 @@ public class CollisionTreeManager {
     }
 
     /**
-     * set if this manager should have newly generated trees sort triangles.
+     * set if this manager should have newly generated trees sort primitives.
      * 
      * @param doSort
      *            true to sort trees, false otherwise.
@@ -343,54 +342,40 @@ public class CollisionTreeManager {
     }
 
     /**
-     * returns the maximum number of triangles a leaf of the collision tree will contain.
+     * returns the maximum number of primitives a leaf of the collision tree may contain.
      * 
-     * @return the maximum number of triangles a leaf will contain.
+     * @return the maximum number of primitives a leaf may contain.
      */
-    public int getMaxTrisPerLeaf() {
-        return _maxTrisPerLeaf;
+    public int getMaxPrimitivesPerLeaf() {
+        return _maxPrimitivesPerLeaf;
     }
 
     /**
-     * set the maximum number of triangles a leaf of the collision tree will contain.
+     * set the maximum number of primitives a leaf of the collision tree may contain.
      * 
-     * @param maxTrisPerLeaf
-     *            the maximum number of triangles a leaf will contain.
+     * @param maxPrimitivesPerLeaf
+     *            the maximum number of primitives a leaf may contain.
      */
-    public void setMaxTrisPerLeaf(final int maxTrisPerLeaf) {
-        _maxTrisPerLeaf = maxTrisPerLeaf;
+    public void setMaxPrimitivesPerLeaf(final int maxPrimitivesPerLeaf) {
+        _maxPrimitivesPerLeaf = maxPrimitivesPerLeaf;
     }
-    //
-    // class MeshKey {
-    // WeakReference<Mesh> _meshRef;
-    //
-    // public MeshKey(final Mesh mesh) {
-    // _meshRef = new WeakReference<Mesh>(mesh);
-    // }
-    //
-    // @Override
-    // public boolean equals(final Object o) {
-    // if (this == o) {
-    // return true;
-    // }
-    // if (!(o instanceof MeshKey)) {
-    // return false;
-    // }
-    // final MeshKey comp = (MeshKey) o;
-    // if (_meshRef.get() == null && comp._meshRef.get() != null) {
-    // return false;
-    // } else {
-    // return _meshRef.get().equals(comp._meshRef.get());
-    // }
-    // }
-    //
-    // @Override
-    // public int hashCode() {
-    // int result = 17;
-    //
-    // result += 31 * result + ((_meshRef.get() != null) ? _meshRef.get().hashCode() : 0);
-    //
-    // return result;
-    // }
-    // }
+
+    /**
+     * returns the maximum number of CollisionTree elements this manager will hold on to before starting to clear some.
+     * 
+     * @return the maximum number of CollisionTree elements.
+     */
+    public int getMaxElements() {
+        return _maxElements;
+    }
+
+    /**
+     * set the maximum number of CollisionTree elements this manager will hold on to before starting to clear some.
+     * 
+     * @param maxElements
+     *            the maximum number of CollisionTree elements.
+     */
+    public void setMaxElements(final int maxElements) {
+        _maxElements = maxElements;
+    }
 }
