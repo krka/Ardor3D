@@ -11,6 +11,7 @@
 package com.ardor3d.bounding;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class CollisionTree implements Serializable {
     protected int _start, _end;
 
     // Required Spatial information
-    protected Mesh _mesh;
+    protected WeakReference<Mesh> _mesh;
     protected int _section;
 
     // Comparator used to sort triangle indices
@@ -109,8 +110,8 @@ public class CollisionTree implements Serializable {
     public void construct(final int childIndex, final int section, final Node parent, final boolean doSort) {
         final Spatial spat = parent.getChild(childIndex);
         if (spat instanceof Mesh) {
-            _mesh = (Mesh) spat;
-            _primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            _mesh = makeRef((Mesh) spat);
+            _primitiveIndices = new int[((Mesh) spat).getMeshData().getPrimitiveCount(section)];
             for (int i = 0; i < _primitiveIndices.length; i++) {
                 _primitiveIndices[i] = i;
             }
@@ -127,9 +128,9 @@ public class CollisionTree implements Serializable {
      *            true to sort primitives during creation, false otherwise
      */
     public void construct(final Mesh mesh, final boolean doSort) {
-        _mesh = mesh;
-        if (_mesh.getMeshData().getSectionCount() == 1) {
-            _primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(0)];
+        _mesh = makeRef(mesh);
+        if (mesh.getMeshData().getSectionCount() == 1) {
+            _primitiveIndices = new int[mesh.getMeshData().getPrimitiveCount(0)];
             for (int i = 0; i < _primitiveIndices.length; i++) {
                 _primitiveIndices[i] = i;
             }
@@ -141,7 +142,7 @@ public class CollisionTree implements Serializable {
     }
 
     protected void splitMesh(final Mesh mesh, final int sectionStart, final int sectionEnd, final boolean doSort) {
-        _mesh = mesh;
+        _mesh = makeRef(mesh);
 
         // Split range in half
         final int rangeSize = sectionEnd - sectionStart;
@@ -156,7 +157,7 @@ public class CollisionTree implements Serializable {
             // create the left child
             _left = new CollisionTree(_type);
 
-            _left._primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            _left._primitiveIndices = new int[mesh.getMeshData().getPrimitiveCount(section)];
             for (int i = 0; i < _left._primitiveIndices.length; i++) {
                 _left._primitiveIndices[i] = i;
             }
@@ -177,7 +178,7 @@ public class CollisionTree implements Serializable {
             // create the left child
             _right = new CollisionTree(_type);
 
-            _right._primitiveIndices = new int[_mesh.getMeshData().getPrimitiveCount(section)];
+            _right._primitiveIndices = new int[mesh.getMeshData().getPrimitiveCount(section)];
             for (int i = 0; i < _right._primitiveIndices.length; i++) {
                 _right._primitiveIndices[i] = i;
             }
@@ -219,11 +220,11 @@ public class CollisionTree implements Serializable {
         createBounds();
 
         // the bounds at this level should contain all the primitives this level is responsible for.
-        _bounds.computeFromPrimitives(_mesh.getMeshData(), _section, _primitiveIndices, _start, _end);
+        _bounds.computeFromPrimitives(getMesh().getMeshData(), _section, _primitiveIndices, _start, _end);
 
         // check to see if we are a leaf, if the number of primitives we reference is less than or equal to the maximum
         // defined by the CollisionTreeManager we are done.
-        if (_end - _start + 1 <= CollisionTreeManager.getInstance().getMaxTrisPerLeaf()) {
+        if (_end - _start + 1 <= CollisionTreeManager.getInstance().getMaxPrimitivesPerLeaf()) {
             return;
         }
 
@@ -286,7 +287,7 @@ public class CollisionTree implements Serializable {
             return false;
         }
 
-        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree._mesh.getWorldTransform(),
+        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree.getMesh().getWorldTransform(),
                 collisionTree._worldBounds);
 
         // our two collision bounds do not intersect, therefore, our primitives
@@ -319,11 +320,11 @@ public class CollisionTree implements Serializable {
         }
 
         // both are leaves
-        final ReadOnlyTransform transformA = _mesh.getWorldTransform();
-        final ReadOnlyTransform transformB = collisionTree._mesh.getWorldTransform();
+        final ReadOnlyTransform transformA = getMesh().getWorldTransform();
+        final ReadOnlyTransform transformB = collisionTree.getMesh().getWorldTransform();
 
-        final MeshData dataA = _mesh.getMeshData();
-        final MeshData dataB = collisionTree._mesh.getMeshData();
+        final MeshData dataA = getMesh().getMeshData();
+        final MeshData dataB = collisionTree.getMesh().getMeshData();
 
         Vector3[] storeA = null;
         Vector3[] storeB = null;
@@ -371,7 +372,7 @@ public class CollisionTree implements Serializable {
             return false;
         }
 
-        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree._mesh.getWorldTransform(),
+        collisionTree._worldBounds = collisionTree._bounds.transform(collisionTree.getMesh().getWorldTransform(),
                 collisionTree._worldBounds);
 
         // our two collision bounds do not intersect, therefore, our primitives
@@ -399,11 +400,11 @@ public class CollisionTree implements Serializable {
         // both this node and the testing node are leaves. Therefore, we can
         // switch to checking the contained primitives with each other. Any
         // that are found to intersect are placed in the appropriate list.
-        final ReadOnlyTransform transformA = _mesh.getWorldTransform();
-        final ReadOnlyTransform transformB = collisionTree._mesh.getWorldTransform();
+        final ReadOnlyTransform transformA = getMesh().getWorldTransform();
+        final ReadOnlyTransform transformB = collisionTree.getMesh().getWorldTransform();
 
-        final MeshData dataA = _mesh.getMeshData();
-        final MeshData dataB = collisionTree._mesh.getMeshData();
+        final MeshData dataA = getMesh().getMeshData();
+        final MeshData dataB = collisionTree.getMesh().getMeshData();
 
         Vector3[] storeA = null;
         Vector3[] storeB = null;
@@ -457,19 +458,19 @@ public class CollisionTree implements Serializable {
 
         // This is not a leaf node, therefore, check each child (left/right) for intersection with the ray.
         if (_left != null) {
-            _left._worldBounds = _left._bounds.transform(_mesh.getWorldTransform(), _left._worldBounds);
+            _left._worldBounds = _left._bounds.transform(getMesh().getWorldTransform(), _left._worldBounds);
             _left.intersect(ray, result);
         }
 
         if (_right != null) {
-            _right._worldBounds = _right._bounds.transform(_mesh.getWorldTransform(), _right._worldBounds);
+            _right._worldBounds = _right._bounds.transform(getMesh().getWorldTransform(), _right._worldBounds);
             _right.intersect(ray, result);
         } else if (_left == null) {
             // This is a leaf node. We can therefore check each primitive this node contains. If an intersection occurs,
             // place it in the list.
 
-            final MeshData data = _mesh.getMeshData();
-            final ReadOnlyTransform transform = _mesh.getWorldTransform();
+            final MeshData data = getMesh().getMeshData();
+            final ReadOnlyTransform transform = getMesh().getWorldTransform();
 
             Vector3[] points = null;
             for (int i = _start; i < _end; i++) {
@@ -572,7 +573,23 @@ public class CollisionTree implements Serializable {
                 break;
         }
 
-        _comparator.setMesh(_mesh);
+        _comparator.setMesh(getMesh());
         SortUtil.qsort(_primitiveIndices, _start, _end - 1, _comparator);
+    }
+
+    /**
+     * @return the Mesh referenced by _mesh
+     */
+    private Mesh getMesh() {
+        return _mesh.get();
+    }
+
+    /**
+     * @param mesh
+     *            Mesh object to reference.
+     * @return a new reference to the given mesh.
+     */
+    private WeakReference<Mesh> makeRef(final Mesh mesh) {
+        return new WeakReference<Mesh>(mesh);
     }
 }
