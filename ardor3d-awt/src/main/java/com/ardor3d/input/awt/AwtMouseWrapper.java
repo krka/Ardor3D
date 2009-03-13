@@ -10,10 +10,20 @@
 
 package com.ardor3d.input.awt;
 
+import com.ardor3d.annotation.GuardedBy;
+import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseState;
+import com.ardor3d.input.MouseWrapper;
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
+import com.google.common.collect.PeekingIterator;
+import com.google.inject.Inject;
 
-import java.awt.Component;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -22,18 +32,6 @@ import java.awt.event.MouseWheelListener;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
-
-import com.ardor3d.annotation.GuardedBy;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
-import com.google.common.collect.PeekingIterator;
-import com.google.inject.Inject;
 
 /**
  * Mouse wrapper class for use with AWT.
@@ -71,6 +69,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     public void init() {
         _component.addMouseListener(this);
         _component.addMouseMotionListener(this);
+        _component.addMouseWheelListener(this);
     }
 
     public synchronized PeekingIterator<MouseState> getEvents() {
