@@ -33,8 +33,8 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Torus;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
@@ -43,7 +43,6 @@ import com.google.inject.Inject;
 public class ExportImportExample extends ExampleBase {
     private static final Logger logger = Logger.getLogger(ExportImportExample.class.getName());
 
-    private final Timer _timer;
     private final Matrix3 rotation = new Matrix3();
 
     private Node originalNode;
@@ -54,14 +53,13 @@ public class ExportImportExample extends ExampleBase {
     }
 
     @Inject
-    public ExportImportExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public ExportImportExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
-        _timer = timer;
     }
 
     @Override
-    protected void updateExample(final double tpf) {
-        final double time = _timer.getTimeInSeconds() * 0.5;
+    protected void updateExample(final ReadOnlyTimer timer) {
+        final double time = timer.getTimeInSeconds() * 0.5;
 
         originalNode.setRotation(rotation.fromAngles(time, time, time));
         importedNode.setRotation(rotation.fromAngles(time, time, time));

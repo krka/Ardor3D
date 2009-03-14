@@ -11,6 +11,7 @@
 package com.ardor3d.framework;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.util.ReadOnlyTimer;
 
 /**
  * The purpose of this class is to own the update phase and separate update logic from the view.
@@ -20,5 +21,5 @@ public interface Updater {
     public void init();
 
     @MainThread
-    public void update(final double tpf);
+    public void update(final ReadOnlyTimer _timer);
 }

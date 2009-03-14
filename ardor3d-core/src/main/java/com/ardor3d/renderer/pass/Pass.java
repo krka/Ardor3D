@@ -20,6 +20,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.ReadOnlyTimer;
 
 /**
  * <code>Pass</code> encapsulates logic necessary for rendering one or more steps in a multipass technique.
@@ -97,14 +98,14 @@ public abstract class Pass implements Serializable {
     protected abstract void doRender(Renderer r);
 
     /** if enabled, call doUpdate to update information for this pass. */
-    public final void updatePass(final double tpf) {
+    public final void updatePass(final ReadOnlyTimer timer) {
         if (!_enabled) {
             return;
         }
-        doUpdate(tpf);
+        doUpdate(timer);
     }
 
-    protected void doUpdate(final double tpf) {}
+    protected void doUpdate(final ReadOnlyTimer timer) {}
 
     public void add(final Spatial toAdd) {
         _spatials.add(toAdd);

@@ -28,6 +28,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
@@ -55,8 +56,8 @@ public class MatrixLookAtExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
-        time += tpf;
+    protected void updateExample(final ReadOnlyTimer timer) {
+        time += timer.getTimePerFrame();
 
         at.set(Math.sin(time) * 20, Math.cos(time * 1.4) * 20, 0.0);
         targetMesh.setTranslation(at);

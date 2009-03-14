@@ -38,6 +38,7 @@ import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.inject.Inject;
@@ -206,7 +207,9 @@ public class RotatingCubeGame implements Updater {
     }
 
     @MainThread
-    public void update(final double tpf) {
+    public void update(final ReadOnlyTimer timer) {
+        final double tpf = timer.getTimePerFrame();
+
         logicalLayer.checkTriggers(tpf);
 
         // rotate away

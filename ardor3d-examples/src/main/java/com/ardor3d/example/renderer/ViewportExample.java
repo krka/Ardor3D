@@ -31,6 +31,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
 public class ViewportExample extends ExampleBase {
@@ -50,7 +51,7 @@ public class ViewportExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
         // Test getScreenCoordinates by centering our Quad on box2.
         if (ContextManager.getCurrentContext() != null && Camera.getCurrentCamera() != null) {
             final Camera camera = Camera.getCurrentCamera();

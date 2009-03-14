@@ -10,6 +10,14 @@
 
 package com.ardor3d.example;
 
+import java.awt.EventQueue;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
@@ -60,6 +68,7 @@ import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -76,14 +85,6 @@ import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.Stage;
-
-import java.awt.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class ExampleBase extends Thread implements Updater, Scene, Exit {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
@@ -188,7 +189,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     protected abstract void initExample();
 
     @MainThread
-    public void update(final double tpf) {
+    public void update(final ReadOnlyTimer timer) {
         if (_canvas.isClosing()) {
             exit();
         }
@@ -200,20 +201,20 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         // check and execute any input triggers, if we are concerned with input
         if (_logicalLayer != null) {
-            _logicalLayer.checkTriggers(tpf);
+            _logicalLayer.checkTriggers(timer.getTimePerFrame());
         }
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager().getQueue(GameTaskQueue.UPDATE).execute();
 
         /** Call simpleUpdate in any derived classes of SimpleGame. */
-        updateExample(tpf);
+        updateExample(timer);
 
         /** Update controllers/render states/transforms/bounds for rootNode. */
-        _root.updateGeometricState(tpf, true);
+        _root.updateGeometricState(timer.getTimePerFrame(), true);
     }
 
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
     // does nothing
     }
 
@@ -336,7 +337,6 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         final Updater updater = injector.getInstance(Updater.class);
         final PhysicalLayer physicalLayer = new PhysicalLayer(injector.getInstance(KeyboardWrapper.class), injector
                 .getInstance(MouseWrapper.class), injector.getInstance(FocusWrapper.class));
-
 
         // set the mouse manager member. It's a bit of a hack to do that this way.
         gameThread._mouseManager = injector.getInstance(MouseManager.class);
@@ -483,7 +483,6 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             }
         }));
 
-
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                 new TriggerAction() {
                     public void perform(final Canvas source, final InputState inputState, final double tpf) {
@@ -500,7 +499,6 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                         }
                     }
                 }));
-
 
     }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.util.ReadOnlyTimer;
 
 /**
  * <code>BasicPassManager</code> controls a set of passes and sends through calls to render and update.
@@ -67,10 +68,10 @@ public class BasicPassManager {
         }
     }
 
-    public void updatePasses(final double tpf) {
+    public void updatePasses(final ReadOnlyTimer timer) {
         for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
             final Pass p = _passes.get(i);
-            p.updatePass(tpf);
+            p.updatePass(timer);
         }
     }
 

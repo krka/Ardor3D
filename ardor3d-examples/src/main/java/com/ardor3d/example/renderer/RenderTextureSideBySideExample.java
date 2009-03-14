@@ -31,8 +31,8 @@ import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
 public class RenderTextureSideBySideExample extends ExampleBase {
@@ -45,7 +45,6 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     private Texture2D fakeTex;
     private final DisplaySettings _settings;
     private boolean inited = false;
-    private final Timer _timer;
 
     public static void main(final String[] args) {
         start(RenderTextureSideBySideExample.class);
@@ -53,10 +52,9 @@ public class RenderTextureSideBySideExample extends ExampleBase {
 
     @Inject
     public RenderTextureSideBySideExample(final LogicalLayer layer, final FrameHandler frameWork,
-            final DisplaySettings settings, final Timer timer) {
+            final DisplaySettings settings) {
         super(layer, frameWork);
         _settings = settings;
-        _timer = timer;
     }
 
     @Override
@@ -72,11 +70,12 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     double counter = 0;
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
+        final double tpf = timer.getTimePerFrame();
         counter += tpf;
         if (counter > 1) {
             counter = 0;
-            System.out.printf("%7.1f FPS\n", _timer.getFrameRate());
+            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
         }
         if (tpf < 1) {
             angle = angle + (tpf * 1);

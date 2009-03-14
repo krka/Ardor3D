@@ -47,9 +47,6 @@ public class BMTextExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {}
-
-    @Override
     protected void initExample() {
         _canvas.setTitle("BMFont Text Example");
         final ColorRGBA backgroundColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 1);

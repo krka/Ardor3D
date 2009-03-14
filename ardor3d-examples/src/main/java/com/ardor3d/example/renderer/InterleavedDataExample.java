@@ -23,32 +23,30 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
 public class InterleavedDataExample extends ExampleBase {
-    private final Timer _timer;
 
     public static void main(final String[] args) {
         start(InterleavedDataExample.class);
     }
 
     @Inject
-    public InterleavedDataExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public InterleavedDataExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
-        _timer = timer;
     }
 
     double counter = 0;
 
     @Override
-    protected void updateExample(final double tpf) {
-        counter += tpf;
+    protected void updateExample(final ReadOnlyTimer timer) {
+        counter += timer.getTimePerFrame();
         if (counter > 1) {
             counter = 0;
-            System.out.printf("%7.1f FPS\n", _timer.getFrameRate());
+            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
         }
     }
 

@@ -48,9 +48,6 @@ public class ProjectedGridExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {}
-
-    @Override
     protected void initExample() {
         _canvas.setTitle("ProjectedGrid - Example");
 

@@ -10,7 +10,7 @@
 
 package com.ardor3d.util;
 
-public class Timer {
+public class Timer implements ReadOnlyTimer {
 
     private static final long TIMER_RESOLUTION = 1000000000L;
     private static final double INVERSE_TIMER_RESOLUTION = 1.0 / TIMER_RESOLUTION;

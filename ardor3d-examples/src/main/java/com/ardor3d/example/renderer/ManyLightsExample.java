@@ -24,6 +24,7 @@ import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
 public class ManyLightsExample extends ExampleBase {
@@ -41,7 +42,7 @@ public class ManyLightsExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
         _root.sortLights();
     }
 

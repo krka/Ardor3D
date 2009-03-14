@@ -24,6 +24,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
@@ -44,9 +45,9 @@ public class BoxExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
-        if (tpf < 1) {
-            angle = angle + (tpf * 25);
+    protected void updateExample(final ReadOnlyTimer timer) {
+        if (timer.getTimePerFrame() < 1) {
+            angle = angle + (timer.getTimePerFrame() * 25);
             if (angle > 360) {
                 angle = 0;
             }

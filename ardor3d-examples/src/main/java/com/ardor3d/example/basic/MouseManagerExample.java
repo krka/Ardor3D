@@ -10,13 +10,15 @@
 
 package com.ardor3d.example.basic;
 
+import java.io.IOException;
+
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
@@ -33,14 +35,13 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.MaterialState;
-import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
-
-import java.io.IOException;
 
 public class MouseManagerExample extends ExampleBase {
 
@@ -63,9 +64,9 @@ public class MouseManagerExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
-        if (tpf < 1) {
-            angle = angle + (tpf * 25);
+    protected void updateExample(final ReadOnlyTimer timer) {
+        if (timer.getTimePerFrame() < 1) {
+            angle = angle + (timer.getTimePerFrame() * 25);
             if (angle > 360) {
                 angle = 0;
             }
@@ -101,40 +102,35 @@ public class MouseManagerExample extends ExampleBase {
 
         _root.setRenderState(ts);
 
-        
-        AWTImageLoader awtImageLoader = new AWTImageLoader();
+        final AWTImageLoader awtImageLoader = new AWTImageLoader();
 
         try {
             _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
             _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
 
-            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H),
-                    new TriggerAction() {
-                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            if (useCursorOne) {
-                                _mouseManager.setCursor(_cursor1);
-                            }
-                            else {
-                                _mouseManager.setCursor(_cursor2);
-                            }
-                            useCursorOne = !useCursorOne;
-                        }
-                    }));
+            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    if (useCursorOne) {
+                        _mouseManager.setCursor(_cursor1);
+                    } else {
+                        _mouseManager.setCursor(_cursor2);
+                    }
+                    useCursorOne = !useCursorOne;
+                }
+            }));
 
-            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J),
-                    new TriggerAction() {
-                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            _mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
-                        }
-                    }));
-            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K),
-                    new TriggerAction() {
-                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                            if (_mouseManager.isSetPositionSupported()) {
-                                _mouseManager.setPosition(0, 0);
-                            }
-                        }
-                    }));
+            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    _mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
+                }
+            }));
+            _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K), new TriggerAction() {
+                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    if (_mouseManager.isSetPositionSupported()) {
+                        _mouseManager.setPosition(0, 0);
+                    }
+                }
+            }));
 
             _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                     new TriggerAction() {
@@ -153,16 +149,15 @@ public class MouseManagerExample extends ExampleBase {
                         }
                     }));
 
-
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
 
-
     }
 
-    private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName) throws IOException {
-        Image image = awtImageLoader.load(getClass().getResourceAsStream(resourceName), true);
+    private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
+            throws IOException {
+        final Image image = awtImageLoader.load(getClass().getResourceAsStream(resourceName), true);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

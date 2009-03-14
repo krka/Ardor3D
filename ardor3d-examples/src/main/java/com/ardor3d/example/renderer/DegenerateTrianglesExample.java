@@ -35,13 +35,12 @@ import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.Spatial.CullHint;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
 public class DegenerateTrianglesExample extends ExampleBase {
-    private final Timer _timer;
 
     private BasicText t;
     private boolean showDegenerateMesh = false;
@@ -55,19 +54,18 @@ public class DegenerateTrianglesExample extends ExampleBase {
     }
 
     @Inject
-    public DegenerateTrianglesExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public DegenerateTrianglesExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
-        _timer = timer;
     }
 
     private double counter = 0;
 
     @Override
-    protected void updateExample(final double tpf) {
-        counter += tpf;
+    protected void updateExample(final ReadOnlyTimer timer) {
+        counter += timer.getTimePerFrame();
         if (counter > 1) {
             counter = 0;
-            System.out.printf("%7.1f FPS\n", _timer.getFrameRate());
+            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
         }
     }
 

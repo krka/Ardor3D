@@ -31,14 +31,13 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
 import com.google.inject.Inject;
 
 public class ManyCollisionsExample extends ExampleBase {
-    private final Timer _timer;
 
     private final Matrix3 rotation = new Matrix3();
 
@@ -52,13 +51,12 @@ public class ManyCollisionsExample extends ExampleBase {
     }
 
     @Inject
-    public ManyCollisionsExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public ManyCollisionsExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
-        _timer = timer;
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
         final boolean hasCollision = PickingUtil.hasCollision(n1, n2, false);
         if (hasCollision) {
             t.setText("Collision!");
@@ -66,7 +64,7 @@ public class ManyCollisionsExample extends ExampleBase {
             t.setText("No Collision!");
         }
 
-        final double time = _timer.getTimeInSeconds() * 0.2;
+        final double time = timer.getTimeInSeconds() * 0.2;
 
         n1.setRotation(rotation.fromAngles(time, time, time));
         n1.setTranslation(Math.sin(time) * 20.0, 0, -200);

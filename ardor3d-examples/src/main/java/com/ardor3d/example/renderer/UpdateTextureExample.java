@@ -45,6 +45,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -97,7 +98,8 @@ public class UpdateTextureExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
+        final double tpf = timer.getTimePerFrame();
         if (tpf < 1) {
             angle = angle + tpf * 20;
             if (angle > 360) {

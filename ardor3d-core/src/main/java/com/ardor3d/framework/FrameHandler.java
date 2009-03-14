@@ -58,14 +58,12 @@ public final class FrameHandler {
 
         _timer.update();
 
-        final double tpf = _timer.getTimePerFrame();
-
         // using the CopyOnWriteArrayList synchronization here, since that means
         // that we don't have to hold any locks while calling Updater.update(double),
         // and also makes the code simple. An updater that is registered after the below
         // loop has started will be updated at the next call to updateFrame().
         for (final Updater updater : _updaters) {
-            updater.update(tpf);
+            updater.update(_timer);
         }
 
         int numCanvases;

@@ -24,12 +24,11 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
 public class ParticleSystemExample extends ExampleBase {
-    private final Timer _timer;
 
     private ParticleSystem particles;
     private final Vector3 currentPos = new Vector3(), newPos = new Vector3();
@@ -39,13 +38,12 @@ public class ParticleSystemExample extends ExampleBase {
     }
 
     @Inject
-    public ParticleSystemExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public ParticleSystemExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
-        _timer = timer;
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
         if ((int) currentPos.getX() == (int) newPos.getX() && (int) currentPos.getY() == (int) newPos.getY()
                 && (int) currentPos.getZ() == (int) newPos.getZ()) {
             newPos.setX(MathUtils.nextRandomDouble() * 50 - 25);
@@ -53,7 +51,7 @@ public class ParticleSystemExample extends ExampleBase {
             newPos.setZ(MathUtils.nextRandomDouble() * 50 - 150);
         }
 
-        final double frameRate = _timer.getFrameRate() / 2;
+        final double frameRate = timer.getFrameRate() / 2;
         currentPos.setX(currentPos.getX() - (currentPos.getX() - newPos.getX()) / frameRate);
         currentPos.setY(currentPos.getY() - (currentPos.getY() - newPos.getY()) / frameRate);
         currentPos.setZ(currentPos.getZ() - (currentPos.getZ() - newPos.getZ()) / frameRate);

@@ -34,6 +34,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.PQTorus;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
@@ -115,7 +116,7 @@ public class CollisionTreeExample extends ExampleBase {
     }
 
     @Override
-    protected void updateExample(final double tpf) {
+    protected void updateExample(final ReadOnlyTimer timer) {
         updateCounter++;
         if (updateCounter < 5) {
             return;
