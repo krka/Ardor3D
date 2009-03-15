@@ -326,6 +326,8 @@ public class Camera implements Savable, Externalizable, Cloneable {
             _worldPlane[i] = new Plane();
         }
 
+        _parallelProjection = source.isParallelProjection();
+
         onFrustumChange();
         onViewPortChange();
         onFrameChange();
