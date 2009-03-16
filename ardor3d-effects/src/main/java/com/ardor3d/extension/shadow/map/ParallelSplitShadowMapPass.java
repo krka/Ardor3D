@@ -144,9 +144,6 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Shader for debugging pssm shadows drawing splits in different colors. */
     private GLSLShaderObjectsState _pssmDebugShader;
 
-    /** Shader for rendering linearized depth for improved precision. */
-    private GLSLShaderObjectsState _pssmLinearDepthShader;
-
     /** Debug for stopping camera update. */
     private boolean _updateMainCamera = true;
 
@@ -249,16 +246,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
-
-            _pssmLinearDepthShader = new GLSLShaderObjectsState();
-            try {
-                _pssmLinearDepthShader.setVertexShader(ParallelSplitShadowMapPass.class.getClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/shadow/map/pssmLinearDepth.vert"));
-                _pssmLinearDepthShader.setFragmentShader(ParallelSplitShadowMapPass.class.getClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/shadow/map/pssmLinearDepth.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
         }
 
         // Setup texture renderer.
@@ -302,8 +289,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMapRenderer.enforceState(_noLights);
         _shadowMapRenderer.enforceState(_flat);
         _shadowMapRenderer.enforceState(_shadowOffsetState);
-
-        // TODO: try out linearized depth
         // _shadowMapRenderer.enforceState(_pssmLinearDepthShader);
     }
 
@@ -414,8 +399,6 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the center
      */
     private void calculateOptimalLightFrustum(final Vector3[] frustumCorners, final Vector3 center) {
-        // TODO: How to center correctly on split center?
-
         final Camera shadowCam = _shadowMapRenderer.getCamera();
 
         // Point light at split center
@@ -458,10 +441,9 @@ public class ParallelSplitShadowMapPass extends Pass {
         fMaxY = clamp(fMaxY, -1.0, 1.0);
 
         // Bias to pick up shadows from in front of the volume.
+        // TODO: fMinZ should be the closest shadow caster frustum.
         final double bias = (fMaxZ - fMinZ) / 4.0;
         fMinZ = Math.max(1.0, fMinZ - bias);
-        // XXX: Should not need to bias away from the camera, just towards.
-        // fMaxZ = fMaxZ + bias;
 
         final double width = fMinZ * (fMaxX - fMinX) * 0.5;
         final double height = fMinZ * (fMaxY - fMinY) * 0.5;
