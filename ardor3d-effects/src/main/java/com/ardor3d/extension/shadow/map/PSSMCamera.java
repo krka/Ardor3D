@@ -207,6 +207,7 @@ public class PSSMCamera extends Camera {
             position.divideLocal(position.getW());
             _corners[i].set(position.getX(), position.getY(), position.getZ());
         }
+        Vector4.releaseTempInstance(position);
 
         _center.zero();
         for (int i = 0; i < _corners.length; i++) {
