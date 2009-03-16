@@ -458,9 +458,11 @@ public class ParallelSplitShadowMapPass extends Pass {
         fMinY = clamp(fMinY, -1.0, 1.0);
         fMaxY = clamp(fMaxY, -1.0, 1.0);
 
+		// Bias to pick up shadows from in front of the volume.
         final double bias = (fMaxZ - fMinZ) / 4.0;
         fMinZ = Math.max(1.0, fMinZ - bias);
-        fMaxZ = fMaxZ + bias;
+        // XXX: Should not need to bias away from the camera, just towards.
+        // fMaxZ = fMaxZ + bias;
 
         final double width = fMinZ * (fMaxX - fMinX) / 2.0;
         final double height = fMinZ * (fMaxY - fMinY) / 2.0;
