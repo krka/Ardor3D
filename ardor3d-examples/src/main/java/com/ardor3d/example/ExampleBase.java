@@ -115,6 +115,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected MouseManager _mouseManager;
 
+    protected FirstPersonControl _controlHandle;
+
     @Inject
     public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
         _logicalLayer = logicalLayer;
@@ -419,7 +421,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             return;
         }
 
-        FirstPersonControl.setupTriggers(_logicalLayer, Vector3.UNIT_Y, true);
+        _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, Vector3.UNIT_Y, true);
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
                 new TriggerAction() {

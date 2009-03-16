@@ -44,7 +44,6 @@ import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
-import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.TextureState;
@@ -100,9 +99,6 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Turn off colors when rendering shadow maps. */
     private ColorMaskState _colorDisabled;
 
-    /** The state applying the depth offset for the scene. */
-    private OffsetState _sceneOffsetState;
-
     /** The state applying the depth offset for the shadow. */
     private OffsetState _shadowOffsetState;
 
@@ -114,9 +110,6 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** The state applying the shadow map. */
     private TextureState _shadowTextureState;
-
-    /** The dark material used to blend the shadows into the scene. */
-    private MaterialState _darkMaterial;
 
     /** Don't perform any plane clipping when rendering the shadowed scene. */
     private ClipState _noClip;
@@ -214,12 +207,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _noLights = new LightState();
         _noLights.setEnabled(false);
 
-        _sceneOffsetState = new OffsetState();
-        _sceneOffsetState.setEnabled(true);
-        _sceneOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        _sceneOffsetState.setFactor(-1.1f);
-        _sceneOffsetState.setUnits(-2.0f);
-
         _shadowOffsetState = new OffsetState();
         _shadowOffsetState.setEnabled(true);
         _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -237,20 +224,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _discardShadowFragments.setTestEnabled(true);
         _discardShadowFragments.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         _discardShadowFragments.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-
-        // light used to uniformly light the scene when rendering the shadows
-        // themselfs
-        // this is so the geometry colour can be used as the source for blending
-        // - i.e.
-        // transparent shadows rather than matte black
-        _darkMaterial = new MaterialState();
-        _darkMaterial.setEnabled(true);
-        _darkMaterial.setDiffuse(new ColorRGBA(0.0f, 0.0f, 0.0f, 0.6f));
-        _darkMaterial.setAmbient(new ColorRGBA(0, 0, 0, 0));
-        _darkMaterial.setShininess(0);
-        _darkMaterial.setSpecular(new ColorRGBA(0, 0, 0, 0));
-        _darkMaterial.setEmissive(new ColorRGBA(0, 0, 0, 0));
-        _darkMaterial.setMaterialFace(MaterialState.MaterialFace.Front);
 
         _shadowTextureState = new TextureState();
 
@@ -409,7 +382,7 @@ public class ParallelSplitShadowMapPass extends Pass {
             // Debug draw main camera frustum for current split
             if (_drawDebug) {
                 drawFrustum(r, _pssmCam, fNear, fFar, new ColorRGBA(0, 1, (float) (iSplit + 1) / _numOfSplits, 1),
-                        iSplit == 0);
+                        (short) 0xF000, iSplit == 0);
             }
 
             // Calculate the appropriate lightview and projection matrices for the current split
@@ -417,8 +390,8 @@ public class ParallelSplitShadowMapPass extends Pass {
 
             // Debug draw light frustum for current split
             if (_drawDebug) {
-                drawFrustum(r, _shadowMapRenderer.getCamera(), new ColorRGBA(1, 1, (float) (iSplit + 1) / _numOfSplits,
-                        1), true);
+                drawFrustum(r, _shadowMapRenderer.getCamera(), new ColorRGBA(1, 1, (iSplit + 1) / (float) _numOfSplits,
+                        1), (short) 0xFFFF, true);
             }
 
             // Render shadowmap from light view for current split
@@ -506,8 +479,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _context.pushEnforcedStates();
         _context.enforceState(_shadowTextureState);
         _context.enforceState(_discardShadowFragments);
-        // _context.enforceState(_darkMaterial);
-        // _context.enforceState(_sceneOffsetState);
 
         if (_pssmShader != null && _context.getCapabilities().isGLSLSupported()) {
             final double split1 = _pssmCam.getSplitDistances()[1];
@@ -556,23 +527,12 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMatrix.multiplyLocal(_shadowMapRenderer.getCamera().getModelViewProjectionMatrix()).multiplyLocal(
                 SCALE_BIAS_MATRIX);
         _shadowMapTexture[index].setTextureMatrix(_shadowMatrix);
-
-        // TODO: The shader can read env_plane settings as well but it's more instructions
-        // than just dealing with the texture matrix
-
-        // shadowMatrix.transposeLocal();
-        // final Vector4 temp = Vector4.fetchTempInstance();
-        // shadowMapTexture[index].setEnvPlaneS(shadowMatrix.getRow(0, temp));
-        // shadowMapTexture[index].setEnvPlaneT(shadowMatrix.getRow(1, temp));
-        // shadowMapTexture[index].setEnvPlaneR(shadowMatrix.getRow(2, temp));
-        // shadowMapTexture[index].setEnvPlaneQ(shadowMatrix.getRow(3, temp));
-        // Vector4.releaseTempInstance(temp);
     }
 
     /**
-     * Checks if this pass is initialised.
+     * Checks if this pass is initialized.
      * 
-     * @return true, if is initialised
+     * @return true, if is initialized
      */
     public boolean isInitialised() {
         return _initialised;
@@ -765,10 +725,10 @@ public class ParallelSplitShadowMapPass extends Pass {
     // TODO: Move to debugger
 
     /** The debug line frustum. */
-    private Line lineFrustum;
+    private static Line lineFrustum;
 
     /** The debug test cam. */
-    private final PSSMCamera testCam = new PSSMCamera();
+    private static final PSSMCamera testCam = new PSSMCamera();
 
     /**
      * Draw debug frustum.
@@ -782,9 +742,9 @@ public class ParallelSplitShadowMapPass extends Pass {
      * @param drawOriginConnector
      *            whether or not to draw a connector
      */
-    private void drawFrustum(final Renderer r, final Camera cam, final ReadOnlyColorRGBA color,
-            final boolean drawOriginConnector) {
-        drawFrustum(r, cam, cam.getFrustumNear(), cam.getFrustumFar(), color, drawOriginConnector);
+    private static void drawFrustum(final Renderer r, final Camera cam, final ReadOnlyColorRGBA color,
+            final short pattern, final boolean drawOriginConnector) {
+        drawFrustum(r, cam, cam.getFrustumNear(), cam.getFrustumFar(), color, pattern, drawOriginConnector);
     }
 
     /**
@@ -803,8 +763,8 @@ public class ParallelSplitShadowMapPass extends Pass {
      * @param drawOriginConnector
      *            whether or not to draw a connector
      */
-    private void drawFrustum(final Renderer r, final Camera cam, final double fNear, final double fFar,
-            final ReadOnlyColorRGBA color, final boolean drawOriginConnector) {
+    private static void drawFrustum(final Renderer r, final Camera cam, final double fNear, final double fFar,
+            final ReadOnlyColorRGBA color, final short pattern, final boolean drawOriginConnector) {
         if (lineFrustum == null) {
             final FloatBuffer verts = BufferUtils.createVector3Buffer(24);
             final FloatBuffer colors = BufferUtils.createColorBuffer(24);
@@ -827,6 +787,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
         lineFrustum.setDefaultColor(color);
+        lineFrustum.setStipplePattern(pattern);
 
         testCam.set(cam);
         testCam.update();
