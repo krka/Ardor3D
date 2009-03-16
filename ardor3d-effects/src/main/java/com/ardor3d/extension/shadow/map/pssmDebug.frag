@@ -17,7 +17,7 @@ uniform vec3 sampleDist;
 
 void main()
 {   
-	float shade;
+	float shade = 0.0;
 	vec3 col = vec3(0.0);
 	if (zDist < sampleDist.x) {
 		shade = shadow2DProj(shadowMap0, gl_TexCoord[0]).a;
@@ -28,8 +28,6 @@ void main()
     } else if (zDist < sampleDist.z)  {
     	shade = shadow2DProj(shadowMap2, gl_TexCoord[2]).a;
     	col.z = 0.5;
-    } else {
-    	discard;
     }
     
     gl_FragColor = vec4(col.x, col.y, col.z, shade*0.5);
