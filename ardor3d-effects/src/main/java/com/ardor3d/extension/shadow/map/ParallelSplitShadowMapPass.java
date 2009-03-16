@@ -62,7 +62,7 @@ import com.ardor3d.util.geom.BufferUtils;
 public class ParallelSplitShadowMapPass extends Pass {
 
     /** The Constant logger. */
-    private static final Logger logger = Logger.getLogger(DirectionalShadowMapPass.class.getName());
+    private static final Logger logger = Logger.getLogger(ParallelSplitShadowMapPass.class.getName());
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
@@ -461,7 +461,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         final ReadOnlyMatrix4 lightviewproj = shadowCam.getModelViewProjectionMatrix();
 
         final Vector4 position = Vector4.fetchTempInstance();
-        for (Vector3 frustumCorner : frustumCorners) {
+        for (final Vector3 frustumCorner : frustumCorners) {
             position.set(frustumCorner.getX(), frustumCorner.getY(), frustumCorner.getZ(), 1);
             lightviewproj.applyPre(position, position);
 
@@ -534,7 +534,8 @@ public class ParallelSplitShadowMapPass extends Pass {
     /**
      * Update the shadow map.
      * 
-     * @param index shadow map texture index to update
+     * @param index
+     *            shadow map texture index to update
      */
     private void updateShadowMap(final int index) {
         Mesh.RENDER_VERTEX_ONLY = true;
@@ -549,11 +550,15 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the index
      */
     private void updateTextureMatrix(final int index) {
+        // Create a matrix going from light to camera space
         final Camera cam = ContextManager.getCurrentContext().getCurrentCamera();
         _shadowMatrix.set(cam.getModelViewMatrix()).invertLocal();
         _shadowMatrix.multiplyLocal(_shadowMapRenderer.getCamera().getModelViewProjectionMatrix()).multiplyLocal(
                 SCALE_BIAS_MATRIX);
         _shadowMapTexture[index].setTextureMatrix(_shadowMatrix);
+
+        // TODO: The shader can read env_plane settings as well but it's more instructions
+        // than just dealing with the texture matrix
 
         // shadowMatrix.transposeLocal();
         // final Vector4 temp = Vector4.fetchTempInstance();
@@ -699,9 +704,13 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Simple clamp.
-     * @param val value to clamp
-     * @param from minimum value after clamping
-     * @param to maximum value after clamping
+     * 
+     * @param val
+     *            value to clamp
+     * @param from
+     *            minimum value after clamping
+     * @param to
+     *            maximum value after clamping
      * @return Math.min(to, Math.max(from, val))
      */
     private double clamp(final double val, final double from, final double to) {
@@ -770,7 +779,8 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the cam
      * @param color
      *            the color
-     * @param drawOriginConnector whether or not to draw a connector
+     * @param drawOriginConnector
+     *            whether or not to draw a connector
      */
     private void drawFrustum(final Renderer r, final Camera cam, final ReadOnlyColorRGBA color,
             final boolean drawOriginConnector) {
@@ -790,7 +800,8 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the f far
      * @param color
      *            the color
-     * @param drawOriginConnector whether or not to draw a connector
+     * @param drawOriginConnector
+     *            whether or not to draw a connector
      */
     private void drawFrustum(final Renderer r, final Camera cam, final double fNear, final double fFar,
             final ReadOnlyColorRGBA color, final boolean drawOriginConnector) {
