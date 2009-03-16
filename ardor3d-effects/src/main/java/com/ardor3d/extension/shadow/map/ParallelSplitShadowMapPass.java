@@ -210,8 +210,8 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowOffsetState = new OffsetState();
         _shadowOffsetState.setEnabled(true);
         _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        _shadowOffsetState.setFactor(-1.1f);
-        _shadowOffsetState.setUnits(-2.0f);
+        _shadowOffsetState.setFactor(1.1f);
+        _shadowOffsetState.setUnits(4.0f);
 
         _flat = new ShadingState();
         _flat.setShadingMode(ShadingMode.Flat);
@@ -458,7 +458,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         fMinY = clamp(fMinY, -1.0, 1.0);
         fMaxY = clamp(fMaxY, -1.0, 1.0);
 
-		// Bias to pick up shadows from in front of the volume.
+        // Bias to pick up shadows from in front of the volume.
         final double bias = (fMaxZ - fMinZ) / 4.0;
         fMinZ = Math.max(1.0, fMinZ - bias);
         // XXX: Should not need to bias away from the camera, just towards.
@@ -538,6 +538,14 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     public boolean isInitialised() {
         return _initialised;
+    }
+
+    /**
+     * 
+     * @return the offset state used for drawing the shadow textures.
+     */
+    public OffsetState getShadowOffsetState() {
+        return _shadowOffsetState;
     }
 
     /**
@@ -839,5 +847,4 @@ public class ParallelSplitShadowMapPass extends Pass {
 
         lineFrustum.draw(r);
     }
-
 }
