@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
 
@@ -51,6 +52,15 @@ public class BasicText extends BMText {
         final CullState cState = new CullState();
         cState.setEnabled(false);
         setRenderState(cState);
+
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(BlendState.DestinationFunction.One);
+        blend.setTestEnabled(true);
+        blend.setReference(0f);
+        blend.setTestFunction(BlendState.TestFunction.GreaterThan);
+        setRenderState(blend);
 
         setLightCombineMode(LightCombineMode.Off);
         setTextureCombineMode(TextureCombineMode.Replace);
