@@ -422,14 +422,14 @@ public class ParallelSplitShadowMapPass extends Pass {
             }
 
             // Render shadowmap from light view for current split
-            updateShadowMap(r, iSplit);
+            updateShadowMap(iSplit);
 
             // Update texture matrix for shadowmap
             updateTextureMatrix(iSplit);
         }
 
         // Render overlay scene
-        renderShadowedScene(r, 0);
+        renderShadowedScene(r);
     }
 
     /**
@@ -461,8 +461,8 @@ public class ParallelSplitShadowMapPass extends Pass {
         final ReadOnlyMatrix4 lightviewproj = shadowCam.getModelViewProjectionMatrix();
 
         final Vector4 position = Vector4.fetchTempInstance();
-        for (int i = 0; i < frustumCorners.length; i++) {
-            position.set(frustumCorners[i].getX(), frustumCorners[i].getY(), frustumCorners[i].getZ(), 1);
+        for (Vector3 frustumCorner : frustumCorners) {
+            position.set(frustumCorner.getX(), frustumCorner.getY(), frustumCorner.getZ(), 1);
             lightviewproj.applyPre(position, position);
 
             position.setX(position.getX() / position.getW());
@@ -501,10 +501,8 @@ public class ParallelSplitShadowMapPass extends Pass {
      * 
      * @param r
      *            The renderer to use
-     * @param index
-     *            the index
      */
-    private void renderShadowedScene(final Renderer r, final int index) {
+    private void renderShadowedScene(final Renderer r) {
         _context.pushEnforcedStates();
         _context.enforceState(_shadowTextureState);
         _context.enforceState(_discardShadowFragments);
@@ -536,12 +534,9 @@ public class ParallelSplitShadowMapPass extends Pass {
     /**
      * Update the shadow map.
      * 
-     * @param renderer
-     *            The renderer to being use to display this map
-     * @param index
-     *            the index
+     * @param index shadow map texture index to update
      */
-    private void updateShadowMap(final Renderer renderer, final int index) {
+    private void updateShadowMap(final int index) {
         Mesh.RENDER_VERTEX_ONLY = true;
         _shadowMapRenderer.render(_occluderNodes, _shadowMapTexture[index], true);
         Mesh.RENDER_VERTEX_ONLY = false;
@@ -672,8 +667,8 @@ public class ParallelSplitShadowMapPass extends Pass {
     /**
      * Sets the maximum distance for shadowing.
      * 
-     * @param max
-     *            distance
+     * @param maxShadowDistance
+     *            distance to set
      * @see com.ardor3d.extension.shadow.map.PSSMCamera#setMaxFarPlaneDistance(double)
      */
     public void setMaxShadowDistance(final double maxShadowDistance) {
@@ -704,6 +699,10 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * Simple clamp.
+     * @param val value to clamp
+     * @param from minimum value after clamping
+     * @param to maximum value after clamping
+     * @return Math.min(to, Math.max(from, val))
      */
     private double clamp(final double val, final double from, final double to) {
         return Math.min(to, Math.max(from, val));
@@ -771,6 +770,7 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the cam
      * @param color
      *            the color
+     * @param drawOriginConnector whether or not to draw a connector
      */
     private void drawFrustum(final Renderer r, final Camera cam, final ReadOnlyColorRGBA color,
             final boolean drawOriginConnector) {
@@ -790,6 +790,7 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the f far
      * @param color
      *            the color
+     * @param drawOriginConnector whether or not to draw a connector
      */
     private void drawFrustum(final Renderer r, final Camera cam, final double fNear, final double fFar,
             final ReadOnlyColorRGBA color, final boolean drawOriginConnector) {
