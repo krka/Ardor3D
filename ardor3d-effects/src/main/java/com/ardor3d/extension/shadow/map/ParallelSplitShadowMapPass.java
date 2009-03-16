@@ -210,8 +210,8 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowOffsetState = new OffsetState();
         _shadowOffsetState.setEnabled(true);
         _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        _shadowOffsetState.setFactor(1.1f);
-        _shadowOffsetState.setUnits(4.0f);
+        _shadowOffsetState.setFactor(-1.1f);
+        _shadowOffsetState.setUnits(-4.0f);
 
         _flat = new ShadingState();
         _flat.setShadingMode(ShadingMode.Flat);
@@ -451,7 +451,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             fMinZ = Math.min(position.getZ(), fMinZ);
             fMaxZ = Math.max(position.getZ(), fMaxZ);
         }
-        Vector4.releaseTempInstance(position);
 
         fMinX = clamp(fMinX, -1.0, 1.0);
         fMaxX = clamp(fMaxX, -1.0, 1.0);
@@ -464,11 +463,21 @@ public class ParallelSplitShadowMapPass extends Pass {
         // XXX: Should not need to bias away from the camera, just towards.
         // fMaxZ = fMaxZ + bias;
 
-        final double width = fMinZ * (fMaxX - fMinX) / 2.0;
-        final double height = fMinZ * (fMaxY - fMinY) / 2.0;
+        final double width = fMinZ * (fMaxX - fMinX) * 0.5;
+        final double height = fMinZ * (fMaxY - fMinY) * 0.5;
+
+        final Vector3 newCenter = Vector3.fetchTempInstance();
+        position.set((fMinX + fMaxX) * 0.5, (fMinY + fMaxY) * 0.5, 1.0, 1);
+        shadowCam.getModelViewProjectionInverseMatrix().applyPre(position, position);
+        position.divideLocal(position.getW());
+        newCenter.set(position.getX(), position.getY(), position.getZ());
+        shadowCam.lookAt(newCenter, Vector3.UNIT_Y);
+        Vector3.releaseTempInstance(newCenter);
 
         shadowCam.setFrustum(fMinZ, fMaxZ, -width, width, height, -height);
         shadowCam.update();
+
+        Vector4.releaseTempInstance(position);
     }
 
     /**

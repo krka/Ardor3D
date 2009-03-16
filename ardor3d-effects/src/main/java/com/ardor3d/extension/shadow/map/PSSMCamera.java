@@ -13,7 +13,6 @@ package com.ardor3d.extension.shadow.map;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
@@ -144,8 +143,6 @@ public class PSSMCamera extends Camera {
         _corners[6].addLocal(-_extents.getX(), _extents.getY(), -_extents.getZ());
         _corners[7].addLocal(-_extents.getX(), -_extents.getY(), -_extents.getZ());
 
-        // final ReadOnlyMatrix4 mvMatrix = ContextManager.getCurrentContext().getCurrentCamera()
-        // .getModelViewProjectionMatrix();
         final ReadOnlyMatrix4 mvMatrix = getModelViewProjectionMatrix();
         double optimalCameraNear = Double.MAX_VALUE;
         double optimalCameraFar = -Double.MAX_VALUE;
@@ -170,69 +167,19 @@ public class PSSMCamera extends Camera {
     }
 
     /**
-     * Calculate frustum corners. Uses Fov version if fov is set.
+     * Calculate frustum corners and center.
      * 
      * @param fNear
      *            the near distance
      * @param fFar
      *            the far distance
      */
-    public void calculateFrustum(double fNear, double fFar) {
-        if (!Double.isNaN(getFovY())) {
-            calculateFrustumFov(fNear, fFar);
-            return;
-        }
+    public void calculateFrustum(final double fNear, final double fFar) {
+        final double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5 / _frustumNear;
+        final double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5 / _frustumNear;
 
-        fNear = (fNear - _frustumNear) / (_frustumFar - _frustumNear);
-        fFar = (fFar - _frustumNear) / (_frustumFar - _frustumNear);
-
-        fNear = fNear * 2.0 - 1.0;
-        fFar = fFar * 2.0 - 1.0;
-
-        _corners[0].set(-1, -1, fNear);
-        _corners[1].set(1, -1, fNear);
-        _corners[2].set(1, 1, fNear);
-        _corners[3].set(-1, 1, fNear);
-
-        _corners[4].set(-1, -1, fFar);
-        _corners[5].set(1, -1, fFar);
-        _corners[6].set(1, 1, fFar);
-        _corners[7].set(-1, 1, fFar);
-
-        final ReadOnlyMatrix4 matrix = getModelViewProjectionInverseMatrix();
-        final Vector4 position = Vector4.fetchTempInstance();
-        for (int i = 0; i < _corners.length; i++) {
-            position.set(_corners[i].getX(), _corners[i].getY(), _corners[i].getZ(), 1);
-            matrix.applyPre(position, position);
-            position.divideLocal(position.getW());
-            _corners[i].set(position.getX(), position.getY(), position.getZ());
-        }
-        Vector4.releaseTempInstance(position);
-
-        _center.zero();
-        for (int i = 0; i < _corners.length; i++) {
-            _center.addLocal(_corners[i]);
-        }
-        _center.divideLocal(8.0);
-    }
-
-    /**
-     * Calculate frustum corners using fov.
-     * 
-     * @param fNear
-     *            the near distance
-     * @param fFar
-     *            the far distance
-     */
-    public void calculateFrustumFov(final double fNear, final double fFar) {
-        final double fAspect = getWidth() / (double) getHeight();
-        final double fFOV = getFovY();
-
-        final double fNearPlaneHeight = MathUtils.tan(MathUtils.DEG_TO_RAD * fFOV * 0.5) * fNear;
-        final double fNearPlaneWidth = fNearPlaneHeight * fAspect;
-
-        final double fFarPlaneHeight = MathUtils.tan(MathUtils.DEG_TO_RAD * fFOV * 0.5) * fFar;
-        final double fFarPlaneWidth = fFarPlaneHeight * fAspect;
+        final double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5 / _frustumNear;
+        final double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5 / _frustumNear;
 
         final Vector3 vNearPlaneCenter = Vector3.fetchTempInstance();
         final Vector3 vFarPlaneCenter = Vector3.fetchTempInstance();
@@ -259,11 +206,8 @@ public class PSSMCamera extends Camera {
         _corners[6].set(vFarPlaneCenter).addLocal(left).addLocal(up);
         _corners[7].set(vFarPlaneCenter).addLocal(left).subtractLocal(up);
 
-        _center.zero();
-        for (int i = 0; i < _corners.length; i++) {
-            _center.addLocal(_corners[i]);
-        }
-        _center.divideLocal(8.0);
+        direction.set(getDirection()).multiplyLocal((fFar + fNear) * 0.5);
+        _center.set(getLocation()).addLocal(direction);
 
         Vector3.releaseTempInstance(vNearPlaneCenter);
         Vector3.releaseTempInstance(vFarPlaneCenter);
