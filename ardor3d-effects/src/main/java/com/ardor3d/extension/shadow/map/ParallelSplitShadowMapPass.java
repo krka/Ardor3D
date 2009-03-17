@@ -126,11 +126,20 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** The size of the shadow map texture. */
     private int _shadowMapSize;
 
+    /** Minimum number of splits allowed */
+    public static final int _MIN_SPLITS = 1;
+
+    /** Maximum number of splits allowed */
+    public static final int _MAX_SPLITS = 4;
+
     /** Number of splits used. */
     protected int _numOfSplits;
 
     /** Minimum light z distance from target. */
     private double _minimumLightDistance = 1000.0;
+
+    /** Shadow color and transparency. */
+    private final ColorRGBA _shadowColor = new ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f);
 
     /** Light -> Camera transformation matrix. */
     private final Matrix4 _shadowMatrix = new Matrix4();
@@ -166,7 +175,7 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     public ParallelSplitShadowMapPass(final int shadowMapSize, final int numOfSplits) {
         _shadowMapSize = shadowMapSize;
-        _numOfSplits = numOfSplits;
+        setNumOfSplits(numOfSplits);
         _pssmCam = new PSSMCamera();
     }
 
@@ -484,14 +493,18 @@ public class ParallelSplitShadowMapPass extends Pass {
             final double split1 = _pssmCam.getSplitDistances()[1];
             final double split2 = _pssmCam.getSplitDistances().length > 2 ? _pssmCam.getSplitDistances()[2] : 0;
             final double split3 = _pssmCam.getSplitDistances().length > 3 ? _pssmCam.getSplitDistances()[3] : 0;
+            final double split4 = _pssmCam.getSplitDistances().length > 4 ? _pssmCam.getSplitDistances()[4] : 0;
 
+            GLSLShaderObjectsState currentShader = _drawShaderDebug ? _pssmDebugShader : _pssmShader;
             if (_drawShaderDebug) {
-                _pssmDebugShader.setUniform("sampleDist", (float) split1, (float) split2, (float) split3);
-                _context.enforceState(_pssmDebugShader);
-            } else {
-                _pssmShader.setUniform("sampleDist", (float) split1, (float) split2, (float) split3);
-                _context.enforceState(_pssmShader);
+                currentShader = _pssmDebugShader;
             }
+
+            currentShader.setUniform("sampleDist", (float) split1, (float) split2, (float) split3, (float) split4);
+            if (!_drawShaderDebug) {
+                currentShader.setUniform("shadowColor", _shadowColor);
+            }
+            _context.enforceState(currentShader);
         }
 
         for (final Spatial spat : _spatials) {
@@ -602,8 +615,13 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            the new number of splits
      */
     public void setNumOfSplits(final int numOfSplits) {
-        _numOfSplits = numOfSplits;
+        _numOfSplits = Math.min(Math.max(_MIN_SPLITS, numOfSplits), _MAX_SPLITS);
         _reinitSplitsDirty = true;
+
+        if (_numOfSplits != numOfSplits) {
+            logger.warning("Valid range for number of splits is " + _MIN_SPLITS + " to " + _MAX_SPLITS
+                    + ". Tried to set it to " + numOfSplits);
+        }
     }
 
     /**
@@ -665,6 +683,25 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     public void setMinimumLightDistance(final double minimumLightDistance) {
         _minimumLightDistance = minimumLightDistance;
+    }
+
+    /**
+     * Gets shadow color and transparency.
+     * 
+     * @return the shadowColor
+     */
+    public ReadOnlyColorRGBA getShadowColor() {
+        return _shadowColor;
+    }
+
+    /**
+     * Sets shadow color and transparency.
+     * 
+     * @param shadowColor
+     *            the shadowColor to set
+     */
+    public void setShadowColor(final ReadOnlyColorRGBA shadowColor) {
+        _shadowColor.set(shadowColor);
     }
 
     /**

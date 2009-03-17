@@ -11,9 +11,11 @@
 uniform sampler2DShadow shadowMap0;
 uniform sampler2DShadow shadowMap1;
 uniform sampler2DShadow shadowMap2;
+uniform sampler2DShadow shadowMap3;
 
 varying float zDist; 
-uniform vec3 sampleDist;
+uniform vec4 sampleDist;
+uniform vec4 shadowColor;
 
 void main()
 {  
@@ -24,7 +26,9 @@ void main()
     	shade = shadow2DProj(shadowMap1, gl_TexCoord[1]).a;
     } else if (zDist < sampleDist.z)  {
     	shade = shadow2DProj(shadowMap2, gl_TexCoord[2]).a;
+    } else if (zDist < sampleDist.w)  {
+    	shade = shadow2DProj(shadowMap3, gl_TexCoord[3]).a;
     }
 
-    gl_FragColor = vec4(0.0, 0.0, 0.0, shade*0.5);
+    gl_FragColor = vec4(shadowColor.rgb, shadowColor.a * shade);
 }
