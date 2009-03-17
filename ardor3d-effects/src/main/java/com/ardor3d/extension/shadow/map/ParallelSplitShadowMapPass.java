@@ -289,7 +289,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMapRenderer.enforceState(_noLights);
         _shadowMapRenderer.enforceState(_flat);
         _shadowMapRenderer.enforceState(_shadowOffsetState);
-        // _shadowMapRenderer.enforceState(_pssmLinearDepthShader);
     }
 
     /**
@@ -339,6 +338,11 @@ public class ParallelSplitShadowMapPass extends Pass {
 
         // Update receiving scene bounds to prepare for frustum packing
         updateReceiverBounds();
+
+        // Don't continue if no scene boundings exist
+        if (_receiverBounds == null) {
+            return;
+        }
 
         // If updating camera is true (can be turned off for debugging), copy from main
         // camera and pack frustum.
@@ -443,7 +447,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         // Bias to pick up shadows from in front of the volume.
         // TODO: fMinZ should be the closest shadow caster frustum.
         final double bias = (fMaxZ - fMinZ) / 4.0;
-        fMinZ = Math.max(1.0, fMinZ - bias);
+        fMinZ = Math.max(10.0, fMinZ - bias);
 
         final double width = fMinZ * (fMaxX - fMinX) * 0.5;
         final double height = fMinZ * (fMaxY - fMinY) * 0.5;

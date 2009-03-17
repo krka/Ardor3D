@@ -309,22 +309,12 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _frustumTop = source.getFrustumTop();
         _frustumBottom = source.getFrustumBottom();
 
-        _coeffLeft = new double[2];
-        _coeffRight = new double[2];
-        _coeffBottom = new double[2];
-        _coeffTop = new double[2];
-
         _viewPortLeft = source.getViewPortLeft();
         _viewPortRight = source.getViewPortRight();
         _viewPortTop = source.getViewPortTop();
         _viewPortBottom = source.getViewPortBottom();
 
         _planeQuantity = 6;
-
-        _worldPlane = new Plane[MAX_WORLD_PLANES];
-        for (int i = 0; i < MAX_WORLD_PLANES; i++) {
-            _worldPlane[i] = new Plane();
-        }
 
         _parallelProjection = source.isParallelProjection();
 
