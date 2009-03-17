@@ -190,6 +190,16 @@ public class ParallelSplitShadowMapPass extends Pass {
     }
 
     /**
+     * Remove a spatial from the list of occluders.
+     * 
+     * @param occluder
+     *            The spatial to remove from the occluderlist
+     */
+    public void removeOccluder(final Spatial occluder) {
+        _occluderNodes.remove(occluder);
+    }
+
+    /**
      * Initialize the pass render states.
      * 
      * @param r
