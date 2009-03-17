@@ -277,6 +277,17 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     public Camera(final Camera source) {
+
+        _coeffLeft = new double[2];
+        _coeffRight = new double[2];
+        _coeffBottom = new double[2];
+        _coeffTop = new double[2];
+
+        _worldPlane = new Plane[MAX_WORLD_PLANES];
+        for (int i = 0; i < MAX_WORLD_PLANES; i++) {
+            _worldPlane[i] = new Plane();
+        }
+
         set(source);
 
         _logger.fine("Camera created. W: " + getWidth() + "  H: " + getHeight());
