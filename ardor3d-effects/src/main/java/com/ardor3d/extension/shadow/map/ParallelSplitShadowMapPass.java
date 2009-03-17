@@ -129,6 +129,9 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Number of splits used. */
     protected int _numOfSplits;
 
+    /** Minimum light z distance from target. */
+    private double _minimumLightDistance = 1000.0;
+
     /** Light -> Camera transformation matrix. */
     private final Matrix4 _shadowMatrix = new Matrix4();
 
@@ -444,10 +447,10 @@ public class ParallelSplitShadowMapPass extends Pass {
         fMinY = clamp(fMinY, -1.0, 1.0);
         fMaxY = clamp(fMaxY, -1.0, 1.0);
 
-        // Bias to pick up shadows from in front of the volume.
-        // TODO: fMinZ should be the closest shadow caster frustum.
-        final double bias = (fMaxZ - fMinZ) / 4.0;
-        fMinZ = Math.max(10.0, fMinZ - bias);
+        // Make sure the minimum z is at least a specified distance from
+        // the target.
+        fMinZ = Math.min(fMinZ, distance - _minimumLightDistance);
+        fMinZ = Math.max(10.0, fMinZ);
 
         final double width = fMinZ * (fMaxX - fMinX) * 0.5;
         final double height = fMinZ * (fMaxY - fMinY) * 0.5;
@@ -643,6 +646,25 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     public void setMaxShadowDistance(final double maxShadowDistance) {
         _pssmCam.setMaxFarPlaneDistance(maxShadowDistance);
+    }
+
+    /**
+     * Gets the minimum z distance for the light.
+     * 
+     * @return the minimumLightDistance
+     */
+    public double getMinimumLightDistance() {
+        return _minimumLightDistance;
+    }
+
+    /**
+     * Sets the minimum z distance for the light.
+     * 
+     * @param minimumLightDistance
+     *            the minimumLightDistance to set
+     */
+    public void setMinimumLightDistance(final double minimumLightDistance) {
+        _minimumLightDistance = minimumLightDistance;
     }
 
     /**
