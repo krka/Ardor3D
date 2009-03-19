@@ -19,6 +19,7 @@ import java.util.WeakHashMap;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.google.common.collect.ImmutableList;
 
 /**
  * CollisionTreeManager is an automated system for handling the creation and deletion of CollisionTrees. The manager
@@ -63,7 +64,7 @@ public enum CollisionTreeManager {
 
     // the cache and protected list for storing trees.
     private final Map<Mesh, CollisionTree> _cache;
-    private List<Mesh> _protectedList;
+    private final List<Mesh> _protectedList;
 
     private boolean _generateTrees = true;
     private boolean _doSort;
@@ -80,6 +81,7 @@ public enum CollisionTreeManager {
      */
     private CollisionTreeManager() {
         _cache = Collections.synchronizedMap(new WeakHashMap<Mesh, CollisionTree>(1));
+        _protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
         setCollisionTreeController(new UsageTreeController());
     }
 
@@ -213,10 +215,7 @@ public enum CollisionTreeManager {
         // as protected. Therefore, put it in the protected list
         // so it is not removed by a controller.
         if (protect) {
-            if (_protectedList == null) {
-                _protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
-            }
-            _protectedList.add(mesh);
+            setProtected(mesh);
         }
 
         // Are we over our max? Test
@@ -233,6 +232,7 @@ public enum CollisionTreeManager {
      */
     public void removeCollisionTree(final Mesh mesh) {
         cacheRemove(mesh);
+        removeProtected(mesh);
     }
 
     /**
@@ -375,5 +375,36 @@ public enum CollisionTreeManager {
      */
     public void setMaxElements(final int maxElements) {
         _maxElements = maxElements;
+    }
+
+    /**
+     * Add the given mesh to our "protected" list. This will signal to our cleanup operation that when deciding which
+     * trees to trim in an effort to keep our cache size to a certain desired size, do not trim the tree associated with
+     * this mesh.
+     * 
+     * @param meshToProtect
+     *            the mesh whose CollisionTree we want to protect.
+     */
+    public void setProtected(final Mesh meshToProtect) {
+        if (!_protectedList.contains(meshToProtect)) {
+            _protectedList.add(meshToProtect);
+        }
+    }
+
+    /**
+     * Removes the supplied mesh from the "protected" list.
+     * 
+     * @param mesh
+     */
+    public void removeProtected(final Mesh mesh) {
+        _protectedList.remove(mesh);
+    }
+
+    /**
+     * 
+     * @return an immutable copy of the list of protected meshes.
+     */
+    public List<Mesh> getProtectedMeshes() {
+        return ImmutableList.copyOf(_protectedList);
     }
 }
