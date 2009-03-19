@@ -25,14 +25,19 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Torus extends Mesh {
     private static final long serialVersionUID = 1L;
 
-    private int _circleSamples;
+    protected int _circleSamples;
 
-    private int _radialSamples;
+    protected int _radialSamples;
 
-    private double _innerRadius;
+    protected double _tubeRadius;
 
-    private double _outerRadius;
+    protected double _centerRadius;
 
+    protected boolean _viewInside;
+
+    /**
+     * private constructor for Savable use only.
+     */
     public Torus() {
 
     }
@@ -46,19 +51,19 @@ public class Torus extends Mesh {
      *            The number of samples along the circles.
      * @param radialSamples
      *            The number of samples along the radial.
-     * @param innerRadius
-     *            The radius of the inner begining of the Torus.
-     * @param outerRadius
-     *            The radius of the outter end of the Torus.
+     * @param tubeRadius
+     *            the radius of the torus tube.
+     * @param centerRadius
+     *            The distance from the center of the torus hole to the center of the torus tube.
      */
-    public Torus(final String name, final int circleSamples, final int radialSamples, final double innerRadius,
-            final double outerRadius) {
+    public Torus(final String name, final int circleSamples, final int radialSamples, final double tubeRadius,
+            final double centerRadius) {
 
         super(name);
         _circleSamples = circleSamples;
         _radialSamples = radialSamples;
-        _innerRadius = innerRadius;
-        _outerRadius = outerRadius;
+        _tubeRadius = tubeRadius;
+        _centerRadius = centerRadius;
 
         setGeometryData();
         setIndexData();
@@ -89,7 +94,7 @@ public class Torus extends Mesh {
             final double cosTheta = MathUtils.cos(theta);
             final double sinTheta = MathUtils.sin(theta);
             radialAxis.set(cosTheta, sinTheta, 0);
-            radialAxis.multiply(_outerRadius, torusMiddle);
+            radialAxis.multiply(_centerRadius, torusMiddle);
 
             // compute slice vertices with duplication at end point
             final int iSave = i;
@@ -101,7 +106,8 @@ public class Torus extends Mesh {
                 final double sinPhi = MathUtils.sin(phi);
                 tempNormal.set(radialAxis).multiplyLocal(cosPhi);
                 tempNormal.setZ(tempNormal.getZ() + sinPhi);
-                if (true) {
+                tempNormal.normalizeLocal();
+                if (!_viewInside) {
                     _meshData.getNormalBuffer().put((float) tempNormal.getX()).put((float) tempNormal.getY()).put(
                             (float) tempNormal.getZ());
                 } else {
@@ -109,7 +115,7 @@ public class Torus extends Mesh {
                             (float) -tempNormal.getZ());
                 }
 
-                tempNormal.multiplyLocal(_innerRadius).addLocal(torusMiddle);
+                tempNormal.multiplyLocal(_tubeRadius).addLocal(torusMiddle);
                 _meshData.getVertexBuffer().put((float) tempNormal.getX()).put((float) tempNormal.getY()).put(
                         (float) tempNormal.getZ());
 
@@ -149,7 +155,7 @@ public class Torus extends Mesh {
             int i2 = connectionStart;
             int i3 = i2 + 1;
             for (i = 0; i < _radialSamples; i++, index += 6) {
-                if (true) {
+                if (!_viewInside) {
                     _meshData.getIndexBuffer().put(i0++);
                     _meshData.getIndexBuffer().put(i2);
                     _meshData.getIndexBuffer().put(i1);
@@ -168,14 +174,38 @@ public class Torus extends Mesh {
         }
     }
 
+    /**
+     * 
+     * @return true if the normals are inverted to point into the torus so that the texture is oriented for a viewer
+     *         inside the torus. false (the default) for exterior viewing.
+     */
+    public boolean isViewFromInside() {
+        return _viewInside;
+    }
+
+    /**
+     * 
+     * @param viewInside
+     *            if true, the normals are inverted to point into the torus so that the texture is oriented for a viewer
+     *            inside the torus. Default is false (for outside viewing)
+     */
+    public void setViewFromInside(final boolean viewInside) {
+        if (viewInside != _viewInside) {
+            _viewInside = viewInside;
+            setGeometryData();
+            setIndexData();
+        }
+    }
+
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_circleSamples, "circleSamples", 0);
         capsule.write(_radialSamples, "radialSamples", 0);
-        capsule.write(_innerRadius, "innerRadius", 0);
-        capsule.write(_outerRadius, "outerRadius", 0);
+        capsule.write(_tubeRadius, "tubeRadius", 0);
+        capsule.write(_centerRadius, "centerRadius", 0);
+        capsule.write(_viewInside, "viewInside", false);
     }
 
     @Override
@@ -184,8 +214,9 @@ public class Torus extends Mesh {
         final InputCapsule capsule = e.getCapsule(this);
         _circleSamples = capsule.readInt("circleSamples", 0);
         _radialSamples = capsule.readInt("radialSamples", 0);
-        _innerRadius = capsule.readDouble("innerRadius", 0);
-        _outerRadius = capsule.readDouble("outerRaidus", 0);
+        _tubeRadius = capsule.readDouble("tubeRadius", 0);
+        _centerRadius = capsule.readDouble("centerRadius", 0);
+        _viewInside = capsule.readBoolean("viewInside", false);
     }
 
 }
