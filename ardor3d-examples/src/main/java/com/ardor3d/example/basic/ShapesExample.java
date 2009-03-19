@@ -13,10 +13,21 @@ package com.ardor3d.example.basic;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
+import com.ardor3d.input.InputState;
+import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseMovedCondition;
+import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.intersection.PickData;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
+import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.BlendState;
@@ -26,6 +37,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.Spatial.CullHint;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Arrow;
 import com.ardor3d.scenegraph.shape.AxisRods;
@@ -51,6 +63,7 @@ import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.scenegraph.shape.Tube;
 import com.ardor3d.scenegraph.shape.GeoSphere.TextureMode;
+import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
@@ -58,6 +71,8 @@ import com.google.inject.Inject;
 public class ShapesExample extends ExampleBase {
     private int wrapCount;
     private int index;
+    private BasicText _text;
+    private PickResults _pickResults;
 
     public static void main(final String[] args) {
         start(ShapesExample.class);
@@ -74,7 +89,7 @@ public class ShapesExample extends ExampleBase {
 
         wrapCount = 5;
         addMesh(new Arrow("Arrow", 3, 1));
-        addMesh(new AxisRods("AxisRods", false, 3, 1));
+        addMesh(new AxisRods("AxisRods", true, 3, 0.5));
         addMesh(new Box("Box", new Vector3(), 3, 3, 3));
         addMesh(new Capsule("Capsule", 5, 5, 5, 2, 5));
         addMesh(new Cone("Cone", 8, 8, 2, 4));
@@ -82,7 +97,6 @@ public class ShapesExample extends ExampleBase {
         addMesh(new Disk("Disk", 8, 8, 3));
         addMesh(new Dodecahedron("Dodecahedron", 3));
         addMesh(new Dome("Dome", 8, 8, 3));
-        addMesh(new GeoSphere("GeoSphere", true, 3, 3, TextureMode.Original));
         addMesh(new Hexagon("Hexagon", 3));
         addMesh(new Icosahedron("Icosahedron", 3));
         addMesh(new MultiFaceBox("MultiFaceBox", new Vector3(), 3, 3, 3));
@@ -92,9 +106,10 @@ public class ShapesExample extends ExampleBase {
         addMesh(new Quad("Quad", 3, 3));
         addMesh(new RoundedBox("RoundedBox", new Vector3(3, 3, 3)));
         addMesh(new Sphere("Sphere", 16, 16, 3));
+        addMesh(new GeoSphere("GeoSphere", true, 3, 3, TextureMode.Original));
         addMesh(new StripBox("StripBox", new Vector3(), 3, 3, 3));
         addMesh(new Teapot("Teapot"));
-        addMesh(new Torus("Torus", 8, 8, 2, 2.5));
+        addMesh(new Torus("Torus", 16, 8, 1.0, 2.5));
         addMesh(new Tube("Tube", 2, 3, 4));
         addMesh(createLines());
 
@@ -110,6 +125,62 @@ public class ShapesExample extends ExampleBase {
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
+
+        // Set up a reusable pick results
+        _pickResults = new PrimitivePickResults();
+        _pickResults.setCheckDistance(true);
+
+        // Set up our pick label
+        _text = BasicText.createDefaultTextLabel("", "pick");
+        _text.setTranslation(10, 10, 0);
+        _text.setCullHint(CullHint.Always);
+        _root.attachChild(_text);
+    }
+
+    @Override
+    protected void registerInputTriggers() {
+        super.registerInputTriggers();
+
+        // Add mouse-over to show labels
+
+        _logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                // Put together a pick ray
+                final Vector2 pos = Vector2.fetchTempInstance().set(inputState.getMouseState().getX(),
+                        inputState.getMouseState().getY());
+                final Ray3 pickRay = Ray3.fetchTempInstance();
+                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
+                Vector2.releaseTempInstance(pos);
+
+                // Do the pick
+                _pickResults.clear();
+                PickingUtil.findPick(_root, pickRay, _pickResults);
+                Ray3.releaseTempInstance(pickRay);
+
+                if (_pickResults.getNumber() > 0) {
+                    // picked something, show label.
+                    _text.setCullHint(CullHint.Never);
+
+                    // set our text to the name of the ancestor of this object that is right under the _root node.
+                    final PickData pick = _pickResults.getPickData(0);
+                    final Spatial topLevel = getTopLevel(pick.getTargetMesh());
+                    _text.setText(topLevel.getName());
+                } else {
+                    // No pick, clear label.
+                    _text.setCullHint(CullHint.Always);
+                    _text.setText("");
+                }
+            }
+
+            private Spatial getTopLevel(final Spatial target) {
+                if (target.getParent() == null || target.getParent().equals(_root)) {
+                    return target;
+                } else {
+                    return getTopLevel(target.getParent());
+                }
+            }
+        }));
+
     }
 
     private Spatial createLines() {
@@ -128,7 +199,6 @@ public class ShapesExample extends ExampleBase {
     private void addMesh(final Spatial spatial) {
         spatial.setTranslation((index % wrapCount) * 8 - wrapCount * 4, (index / wrapCount) * 8 - wrapCount * 4, -50);
         if (spatial instanceof Mesh) {
-            ((Mesh) spatial).setRandomColors();
             ((Mesh) spatial).updateModelBound();
         }
         _root.attachChild(spatial);
