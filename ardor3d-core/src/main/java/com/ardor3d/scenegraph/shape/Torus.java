@@ -176,8 +176,8 @@ public class Torus extends Mesh {
 
     /**
      * 
-     * @return true if the normals are inverted to point into the torus so that the texture is oriented for a viewer
-     *         inside the torus. false (the default) for exterior viewing.
+     * @return true if the normals are inverted to point into the torus so that the face is oriented for a viewer inside
+     *         the torus. false (the default) for exterior viewing.
      */
     public boolean isViewFromInside() {
         return _viewInside;
@@ -186,7 +186,7 @@ public class Torus extends Mesh {
     /**
      * 
      * @param viewInside
-     *            if true, the normals are inverted to point into the torus so that the texture is oriented for a viewer
+     *            if true, the normals are inverted to point into the torus so that the face is oriented for a viewer
      *            inside the torus. Default is false (for outside viewing)
      */
     public void setViewFromInside(final boolean viewInside) {
