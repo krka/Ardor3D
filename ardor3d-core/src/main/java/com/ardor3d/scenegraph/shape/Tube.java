@@ -37,6 +37,8 @@ public class Tube extends Mesh implements Savable {
     private double _innerRadius;
     private double _height;
 
+    protected boolean _viewInside;
+
     /**
      * Constructor meant for Savable use only.
      */
@@ -116,6 +118,10 @@ public class Tube extends Mesh implements Savable {
     }
 
     private void setGeometryData() {
+        _meshData.getVertexBuffer().rewind();
+        _meshData.getNormalBuffer().rewind();
+        _meshData.getTextureCoords(0).coords.rewind();
+
         final double inverseRadial = 1.0 / _radialSamples;
         final double axisStep = _height / _axisSamples;
         final double axisTextureStep = 1.0 / _axisSamples;
@@ -136,8 +142,13 @@ public class Tube extends Mesh implements Savable {
                 _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _outerRadius)).put(
                         (float) (axisStep * axisCount - halfHeight)).put(
                         (float) (sin[radialCount % _radialSamples] * _outerRadius));
-                _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
-                        (float) sin[radialCount % _radialSamples]);
+                if (_viewInside) {
+                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
+                            (float) sin[radialCount % _radialSamples]);
+                } else {
+                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
+                            (float) -sin[radialCount % _radialSamples]);
+                }
                 _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
@@ -148,8 +159,13 @@ public class Tube extends Mesh implements Savable {
                 _meshData.getVertexBuffer().put((float) (cos[radialCount % _radialSamples] * _innerRadius)).put(
                         (float) (axisStep * axisCount - halfHeight)).put(
                         (float) (sin[radialCount % _radialSamples] * _innerRadius));
-                _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
-                        (float) -sin[radialCount % _radialSamples]);
+                if (_viewInside) {
+                    _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
+                            (float) -sin[radialCount % _radialSamples]);
+                } else {
+                    _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
+                            (float) sin[radialCount % _radialSamples]);
+                }
                 _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
@@ -160,8 +176,13 @@ public class Tube extends Mesh implements Savable {
                     (float) (sin[radialCount] * _outerRadius));
             _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) -halfHeight).put(
                     (float) (sin[radialCount] * _innerRadius));
-            _meshData.getNormalBuffer().put(0).put(-1).put(0);
-            _meshData.getNormalBuffer().put(0).put(-1).put(0);
+            if (_viewInside) {
+                _meshData.getNormalBuffer().put(0).put(1).put(0);
+                _meshData.getNormalBuffer().put(0).put(1).put(0);
+            } else {
+                _meshData.getNormalBuffer().put(0).put(-1).put(0);
+                _meshData.getNormalBuffer().put(0).put(-1).put(0);
+            }
             _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
             _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
@@ -173,8 +194,13 @@ public class Tube extends Mesh implements Savable {
                     (float) (sin[radialCount] * _outerRadius));
             _meshData.getVertexBuffer().put((float) (cos[radialCount] * _innerRadius)).put((float) halfHeight).put(
                     (float) (sin[radialCount] * _innerRadius));
-            _meshData.getNormalBuffer().put(0).put(1).put(0);
-            _meshData.getNormalBuffer().put(0).put(1).put(0);
+            if (_viewInside) {
+                _meshData.getNormalBuffer().put(0).put(-1).put(0);
+                _meshData.getNormalBuffer().put(0).put(-1).put(0);
+            } else {
+                _meshData.getNormalBuffer().put(0).put(1).put(0);
+                _meshData.getNormalBuffer().put(0).put(1).put(0);
+            }
             _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
             _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
@@ -184,30 +210,42 @@ public class Tube extends Mesh implements Savable {
     }
 
     private void setIndexData() {
-        final int innerCylinder = (_axisSamples + 1) * (_radialSamples + 1);
-        final int bottomEdge = 2 * innerCylinder;
+        _meshData.getIndexBuffer().rewind();
+
+        final int outerCylinder = (_axisSamples + 1) * (_radialSamples + 1);
+        final int bottomEdge = 2 * outerCylinder;
         final int topEdge = bottomEdge + 2 * _radialSamples;
-        // outer cylinder
+        // inner cylinder
         for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             for (int axisCount = 0; axisCount < _axisSamples; axisCount++) {
                 final int index0 = axisCount + (_axisSamples + 1) * radialCount;
                 final int index1 = index0 + 1;
                 final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
-                _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-                _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                if (_viewInside) {
+                    _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
+                    _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                } else {
+                    _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
+                    _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                }
             }
         }
 
-        // inner cylinder
+        // outer cylinder
         for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
             for (int axisCount = 0; axisCount < _axisSamples; axisCount++) {
-                final int index0 = innerCylinder + axisCount + (_axisSamples + 1) * radialCount;
+                final int index0 = outerCylinder + axisCount + (_axisSamples + 1) * radialCount;
                 final int index1 = index0 + 1;
                 final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
-                _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-                _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                if (_viewInside) {
+                    _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
+                    _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                } else {
+                    _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
+                    _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                }
             }
         }
 
@@ -217,8 +255,13 @@ public class Tube extends Mesh implements Savable {
             final int index1 = index0 + 1;
             final int index2 = bottomEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
-            _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-            _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+            if (_viewInside) {
+                _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
+                _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+            } else {
+                _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
+                _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+            }
         }
 
         // top edge
@@ -227,8 +270,36 @@ public class Tube extends Mesh implements Savable {
             final int index1 = index0 + 1;
             final int index2 = topEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
-            _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-            _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+            if (_viewInside) {
+                _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
+                _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+            } else {
+                _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
+                _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @return true if the normals are inverted to point into the torus so that the face is oriented for a viewer inside
+     *         the torus. false (the default) for exterior viewing.
+     */
+    public boolean isViewFromInside() {
+        return _viewInside;
+    }
+
+    /**
+     * 
+     * @param viewInside
+     *            if true, the normals are inverted to point into the torus so that the face is oriented for a viewer
+     *            inside the torus. Default is false (for outside viewing)
+     */
+    public void setViewFromInside(final boolean viewInside) {
+        if (viewInside != _viewInside) {
+            _viewInside = viewInside;
+            setGeometryData();
+            setIndexData();
         }
     }
 
@@ -241,6 +312,7 @@ public class Tube extends Mesh implements Savable {
         capsule.write(getOuterRadius(), "outerRadius", 0);
         capsule.write(getInnerRadius(), "innerRadius", 0);
         capsule.write(getHeight(), "height", 0);
+        capsule.write(_viewInside, "viewInside", false);
     }
 
     @Override
@@ -252,5 +324,6 @@ public class Tube extends Mesh implements Savable {
         setOuterRadius(capsule.readDouble("outerRadius", 0));
         setInnerRadius(capsule.readDouble("innerRadius", 0));
         setHeight(capsule.readDouble("height", 0));
+        _viewInside = capsule.readBoolean("viewInside", false);
     }
 }
