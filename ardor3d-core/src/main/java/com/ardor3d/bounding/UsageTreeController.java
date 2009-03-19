@@ -10,7 +10,6 @@
 
 package com.ardor3d.bounding;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +34,7 @@ public class UsageTreeController implements CollisionTreeController {
      * @param desiredSize
      *            the final size of the cache to attempt to reach.
      */
-    public void clean(final Map<Mesh, WeakReference<CollisionTree>> cache, final List<Mesh> protectedList,
-            final int desiredSize) {
+    public void clean(final Map<Mesh, CollisionTree> cache, final List<Mesh> protectedList, final int desiredSize) {
 
         // get the ordered keyset (this will be ordered with oldest to newest).
         final Object[] set = cache.keySet().toArray();

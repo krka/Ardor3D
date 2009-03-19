@@ -10,7 +10,6 @@
 
 package com.ardor3d.bounding;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +62,7 @@ public enum CollisionTreeManager {
     public static final int DEFAULT_MAX_PRIMITIVES_PER_LEAF = 16;
 
     // the cache and protected list for storing trees.
-    private final Map<Mesh, WeakReference<CollisionTree>> _cache;
+    private final Map<Mesh, CollisionTree> _cache;
     private List<Mesh> _protectedList;
 
     private boolean _generateTrees = true;
@@ -80,7 +79,7 @@ public enum CollisionTreeManager {
      * private constructor for the Singleton. Initializes the cache.
      */
     private CollisionTreeManager() {
-        _cache = Collections.synchronizedMap(new WeakHashMap<Mesh, WeakReference<CollisionTree>>(1));
+        _cache = Collections.synchronizedMap(new WeakHashMap<Mesh, CollisionTree>(1));
         setCollisionTreeController(new UsageTreeController());
     }
 
@@ -94,8 +93,7 @@ public enum CollisionTreeManager {
     }
 
     private CollisionTree cacheGet(final Mesh mesh) {
-        final WeakReference<CollisionTree> ref = _cache.get(mesh);
-        return ref == null ? null : ref.get();
+        return _cache.get(mesh);
     }
 
     private void cacheRemove(final Mesh mesh) {
@@ -103,7 +101,7 @@ public enum CollisionTreeManager {
     }
 
     private void cachePut(final Mesh mesh, final CollisionTree tree) {
-        _cache.put(mesh, new WeakReference<CollisionTree>(tree));
+        _cache.put(mesh, tree);
     }
 
     /**
