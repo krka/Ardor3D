@@ -86,10 +86,11 @@ public class PQTorus extends Mesh {
         // allocate texture coordinates
         _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
 
-        final Vector3 pointB = new Vector3();
-        final Vector3 T = new Vector3(), N = new Vector3(), B = new Vector3();
-        final Vector3 tempNorm = new Vector3();
-        double r, x, y, z, theta = 0.0f, beta = 0.0f;
+        final Vector3 pointB = Vector3.fetchTempInstance();
+        final Vector3 T = Vector3.fetchTempInstance(), N = Vector3.fetchTempInstance(), B = Vector3.fetchTempInstance();
+        final Vector3 tempNormA = Vector3.fetchTempInstance();
+        final Vector3 tempNormB = Vector3.fetchTempInstance();
+        double r, x, y, z, theta = 0.0, beta = 0.0;
         int nvertex = 0;
 
         // Move along the length of the pq torus
@@ -98,17 +99,17 @@ public class PQTorus extends Mesh {
             final double circleFraction = ((double) i) / (double) _steps;
 
             // Find the point on the torus
-            r = (0.5f * (2.0f + MathUtils.sin(_q * theta)) * _radius);
+            r = (0.5 * (2.0 + MathUtils.sin(_q * theta)) * _radius);
             x = (r * MathUtils.cos(_p * theta) * _radius);
             y = (r * MathUtils.sin(_p * theta) * _radius);
             z = (r * MathUtils.cos(_q * theta) * _radius);
             toruspoints[i] = new Vector3(x, y, z);
 
             // Now find a point slightly farther along the torus
-            r = (0.5f * (2.0f + MathUtils.sin(_q * (theta + 0.01f))) * _radius);
-            x = (r * MathUtils.cos(_p * (theta + 0.01f)) * _radius);
-            y = (r * MathUtils.sin(_p * (theta + 0.01f)) * _radius);
-            z = (r * MathUtils.cos(_q * (theta + 0.01f)) * _radius);
+            r = (0.5 * (2.0 + MathUtils.sin(_q * (theta + 0.01))) * _radius);
+            x = (r * MathUtils.cos(_p * (theta + 0.01)) * _radius);
+            y = (r * MathUtils.sin(_p * (theta + 0.01)) * _radius);
+            z = (r * MathUtils.cos(_q * (theta + 0.01)) * _radius);
             pointB.set(x, y, z);
 
             // Approximate the Frenet Frame
@@ -122,28 +123,31 @@ public class PQTorus extends Mesh {
             B.normalizeLocal();
 
             // Create a circle oriented by these new vectors
-            beta = 0.0f;
+            beta = 0.0;
             for (int j = 0; j < _radialSamples; j++) {
                 beta += BETA_STEP;
                 final double cx = MathUtils.cos(beta) * _width;
                 final double cy = MathUtils.sin(beta) * _width;
                 final double radialFraction = ((double) j) / _radialSamples;
-                tempNorm.setX((cx * N.getX() + cy * B.getX()));
-                tempNorm.setY((cx * N.getY() + cy * B.getY()));
-                tempNorm.setZ((cx * N.getZ() + cy * B.getZ()));
+                tempNormA.setX((cx * N.getX() + cy * B.getX()));
+                tempNormA.setY((cx * N.getY() + cy * B.getY()));
+                tempNormA.setZ((cx * N.getZ() + cy * B.getZ()));
+                tempNormA.normalize(tempNormB);
+                tempNormA.addLocal(toruspoints[i]);
 
-                _meshData.getNormalBuffer().put((float) tempNorm.getX()).put((float) tempNorm.getY()).put(
-                        (float) tempNorm.getZ());
-
-                tempNorm.addLocal(toruspoints[i]);
-                _meshData.getVertexBuffer().put((float) tempNorm.getX()).put((float) tempNorm.getY()).put(
-                        (float) tempNorm.getZ());
-
+                _meshData.getVertexBuffer().put(tempNormA.getXf()).put(tempNormA.getYf()).put(tempNormA.getZf());
+                _meshData.getNormalBuffer().put(tempNormB.getXf()).put(tempNormB.getYf()).put(tempNormB.getZf());
                 _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
 
                 nvertex++;
             }
         }
+        Vector3.releaseTempInstance(tempNormA);
+        Vector3.releaseTempInstance(tempNormB);
+        Vector3.releaseTempInstance(T);
+        Vector3.releaseTempInstance(N);
+        Vector3.releaseTempInstance(B);
+        Vector3.releaseTempInstance(pointB);
     }
 
     private void setIndexData() {
