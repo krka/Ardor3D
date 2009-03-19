@@ -146,14 +146,14 @@ public class StripBox extends Mesh implements Savable {
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), 8));
         final Vector3[] vert = computeVertices(); // returns 8
         _meshData.getVertexBuffer().clear();
-        _meshData.getVertexBuffer().put((float) vert[0].getX()).put((float) vert[0].getY()).put((float) vert[0].getZ());
-        _meshData.getVertexBuffer().put((float) vert[1].getX()).put((float) vert[1].getY()).put((float) vert[1].getZ());
-        _meshData.getVertexBuffer().put((float) vert[2].getX()).put((float) vert[2].getY()).put((float) vert[2].getZ());
-        _meshData.getVertexBuffer().put((float) vert[3].getX()).put((float) vert[3].getY()).put((float) vert[3].getZ());
-        _meshData.getVertexBuffer().put((float) vert[4].getX()).put((float) vert[4].getY()).put((float) vert[4].getZ());
-        _meshData.getVertexBuffer().put((float) vert[5].getX()).put((float) vert[5].getY()).put((float) vert[5].getZ());
-        _meshData.getVertexBuffer().put((float) vert[6].getX()).put((float) vert[6].getY()).put((float) vert[6].getZ());
-        _meshData.getVertexBuffer().put((float) vert[7].getX()).put((float) vert[7].getY()).put((float) vert[7].getZ());
+        _meshData.getVertexBuffer().put(vert[0].getXf()).put(vert[0].getYf()).put(vert[0].getZf());
+        _meshData.getVertexBuffer().put(vert[1].getXf()).put(vert[1].getYf()).put(vert[1].getZf());
+        _meshData.getVertexBuffer().put(vert[2].getXf()).put(vert[2].getYf()).put(vert[2].getZf());
+        _meshData.getVertexBuffer().put(vert[3].getXf()).put(vert[3].getYf()).put(vert[3].getZf());
+        _meshData.getVertexBuffer().put(vert[4].getXf()).put(vert[4].getYf()).put(vert[4].getZf());
+        _meshData.getVertexBuffer().put(vert[5].getXf()).put(vert[5].getYf()).put(vert[5].getZf());
+        _meshData.getVertexBuffer().put(vert[6].getXf()).put(vert[6].getYf()).put(vert[6].getZf());
+        _meshData.getVertexBuffer().put(vert[7].getXf()).put(vert[7].getYf()).put(vert[7].getZf());
     }
 
     /**
@@ -170,7 +170,7 @@ public class StripBox extends Mesh implements Savable {
         _meshData.getNormalBuffer().clear();
         for (int i = 0; i < 8; i++) {
             norm.set(vert[i]).normalizeLocal();
-            _meshData.getNormalBuffer().put((float) norm.getX()).put((float) norm.getY()).put((float) norm.getZ());
+            _meshData.getNormalBuffer().put(norm.getXf()).put(norm.getYf()).put(norm.getZf());
         }
     }
 
@@ -205,7 +205,7 @@ public class StripBox extends Mesh implements Savable {
     private void setIndexData() {
         _meshData.setIndexMode(IndexMode.TriangleStrip);
         if (_meshData.getIndexBuffer() == null) {
-            final int[] indices = { 1, 0, 4, 5, 7, 0, 3, 1, 2, 4, 6, 7, 2, 3 };
+            final int[] indices = { 2, 3, 6, 7, 5, 3, 0, 2, 1, 6, 4, 5, 1, 0 };
             _meshData.setIndexBuffer(BufferUtils.createIntBuffer(indices));
         }
     }
@@ -253,17 +253,6 @@ public class StripBox extends Mesh implements Savable {
      */
     public Vector3 getCenter() {
         return _center;
-    }
-
-    /**
-     * Sets the center of the box. Note that even though the center is set, Mesh information is not updated. In most
-     * cases, you'll want to use setData()
-     * 
-     * @param aCenter
-     *            The new center.
-     */
-    public void setCenter(final Vector3 aCenter) {
-        _center.set(aCenter);
     }
 
     @Override
