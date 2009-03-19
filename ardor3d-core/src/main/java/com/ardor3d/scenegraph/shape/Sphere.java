@@ -90,7 +90,7 @@ public class Sphere extends Mesh {
      * @param radius
      *            The radius of the sphere.
      */
-    public Sphere(final String name, final Vector3 center, final int zSamples, final int radialSamples,
+    public Sphere(final String name, final ReadOnlyVector3 center, final int zSamples, final int radialSamples,
             final double radius) {
         super(name);
         setData(center, zSamples, radialSamples, radius);
@@ -110,8 +110,10 @@ public class Sphere extends Mesh {
      *            The number of samples along the radial.
      * @param radius
      *            The radius of the sphere.
+     * @param textureMode
+     *            the mode to use when setting uv coordinates for this Sphere.
      */
-    public Sphere(final String name, final Vector3 center, final int zSamples, final int radialSamples,
+    public Sphere(final String name, final ReadOnlyVector3 center, final int zSamples, final int radialSamples,
             final double radius, final TextureMode textureMode) {
         super(name);
         _textureMode = textureMode;

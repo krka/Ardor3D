@@ -25,6 +25,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.GeoSphere;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
@@ -51,12 +52,11 @@ public class SphereComparisonsExample extends ExampleBase {
 
         final Node globesNode = new Node("globes");
 
-        Sphere sphere = new Sphere("No mapping", 65, 65, 1);
-        sphere.setTextureMode(Sphere.TEX_ORIGINAL);
+        Sphere sphere = new Sphere("Linear mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Linear);
         globesNode.attachChild(sphere);
 
         sphere = new Sphere("With mapping", 65, 65, 1);
-        sphere.setTextureMode(Sphere.TEX_PROJECTED);
+        sphere = new Sphere("Projected mapping", Vector3.ZERO, 65, 65, 1, TextureMode.Projected);
         globesNode.attachChild(sphere);
 
         GeoSphere geoSphere = new GeoSphere("UV geo sphere - original", true, 2.0, 3, GeoSphere.TextureMode.Original);
@@ -65,8 +65,7 @@ public class SphereComparisonsExample extends ExampleBase {
         geoSphere = new GeoSphere("UV geo sphere - projected", true, 2.0, 3, GeoSphere.TextureMode.Projected);
         globesNode.attachChild(geoSphere);
 
-        sphere = new Sphere("With mapping raidus 2 ", 65, 65, 2);
-        sphere.setTextureMode(Sphere.TEX_PROJECTED);
+        sphere = new Sphere("Projected mapping, radius 2", Vector3.ZERO, 65, 65, 2, TextureMode.Projected);
         globesNode.attachChild(sphere);
 
         globesNode.setRotation(new Quaternion().fromAngleAxis(-MathUtils.HALF_PI, Vector3.UNIT_X));
