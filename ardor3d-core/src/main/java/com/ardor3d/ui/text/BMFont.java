@@ -10,7 +10,6 @@
 
 package com.ardor3d.ui.text;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -69,17 +68,20 @@ public class BMFont {
      * not seem to be read properly by the Ardor3D loader. PNG works fine.
      * 
      * @param fileUrl
+     *            - the location of the .fnt font file. Can not be null.
      * @param useMipMaps
      *            if true, use trilinear filtering with max anisotropy, else min filter is bilinear. MipMaps result in
      *            blurrier text, but less shimmering.
-     * @throws URISyntaxException
      * @throws IOException
+     *             if there are any problems reading the .fnt file.
+     * @throws URISyntaxException
+     *             if unable to generate a URI from the given fileUrl
      */
-    public BMFont(final URL fileUrl, final boolean useMipMaps) throws URISyntaxException, IOException {
+    public BMFont(final URL fileUrl, final boolean useMipMaps) throws IOException, URISyntaxException {
         _useMipMaps = useMipMaps;
-        final File fontFile = new File(fileUrl.toURI());
-        parseFontFile(fontFile);
-        initialize(fontFile);
+
+        parseFontFile(fileUrl);
+        initialize(fileUrl);
     }
 
     /** apply default render states to spatial */
@@ -166,9 +168,11 @@ public class BMFont {
 
     /**
      * load the texture and create default render states. Only a single page is supported.
+     * 
+     * @param fontUrl
      */
     // ----------------------------------------------------------
-    protected void initialize(final File fontFile) throws MalformedURLException {
+    protected void initialize(final URL fontUrl) throws MalformedURLException, URISyntaxException {
         _styleName = _info.face + "-" + _info.size;
 
         if (_info.bold) {
@@ -184,11 +188,9 @@ public class BMFont {
         }
 
         // only a single page is supported
-        final String parentPath = fontFile.getParent();
         if (_pages.size() > 0) {
             final Page page = _pages.get(0);
-            final File texFile = new File(parentPath + File.separator + page.file);
-            final URI texUri = texFile.toURI();
+            final URI texUri = fontUrl.toURI().resolve("./" + page.file);
             final URL texUrl = texUri.toURL();
 
             Texture.MinificationFilter minFilter;
@@ -214,24 +216,24 @@ public class BMFont {
 
     /**
      * 
-     * @param fileUrl
+     * @param fontUrl
      * @throws IOException
      */
-    protected void parseFontFile(final File fontFile) throws IOException {
+    protected void parseFontFile(final URL fontUrl) throws IOException {
         _maxCharAdv = 0;
         _charMap.clear();
         _pages.clear();
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             final DocumentBuilder db = dbf.newDocumentBuilder();
-            final Document doc = db.parse(fontFile);
+            final Document doc = db.parse(fontUrl.openStream());
 
             doc.getDocumentElement().normalize();
             recurse(doc.getFirstChild());
 
             db.reset();
         } catch (final Throwable t) {
-            final IOException ex = new IOException("Error loading font file " + fontFile.getPath());
+            final IOException ex = new IOException("Error loading font file " + fontUrl.toString());
             ex.initCause(t);
             throw ex;
         }
