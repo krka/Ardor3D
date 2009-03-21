@@ -18,6 +18,13 @@ import com.google.inject.Inject;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * Implementation of the {@link com.ardor3d.input.MouseManager} interface for use with AWT windows.
+ * This implementation does not support the optional {@link #setPosition(int, int)} and {@link #setGrabbed(com.ardor3d.input.GrabbedState)}
+ * methods. The constructor takes an AWT {@link java.awt.Component} instance, for which the cursor is set. In
+ * a multi-canvas application, each canvas can have its own AwtMouseManager instance, or it is
+ * possible to use a single one for the AWT container that includes the canvases.
+ */
 public class AwtMouseManager implements MouseManager {
     private final Component _component;
 
@@ -26,7 +33,7 @@ public class AwtMouseManager implements MouseManager {
         this._component = component;
     }
 
-    public void setCursor(MouseCursor cursor) {
+    public void setCursor(final MouseCursor cursor) {
         if (cursor == MouseCursor.SYSTEM_DEFAULT) {
             _component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             return;
@@ -44,7 +51,7 @@ public class AwtMouseManager implements MouseManager {
         throw new UnsupportedOperationException();
     }
 
-    public void setGrabbed(GrabbedState grabbedState) {
+    public void setGrabbed(final GrabbedState grabbedState) {
         throw new UnsupportedOperationException();
     }
 

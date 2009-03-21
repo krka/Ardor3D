@@ -21,6 +21,10 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Immutable
 public class MouseCursor {
+    /**
+     * This constant is used to identify that the native operating system's default cursor should be used.
+     * It is not a valid mouse cursor in itself.
+     */
     public static final MouseCursor SYSTEM_DEFAULT = new MouseCursor("system default", new Image(Image.Format.Guess, 1, 1, null), 0, 0);
 
     private final String _name;

@@ -37,6 +37,7 @@ public class LwjglMouseManager implements MouseManager {
             try {
                 Mouse.create();
             } catch (LWJGLException e) {
+                // this typically happens if the Display hasn't been initialised.
                 throw new RuntimeException("Unable to initialise mouse manager", e);
             }
             _inited = true;
