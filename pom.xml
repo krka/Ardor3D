@@ -22,6 +22,10 @@
     <module>ardor3d-archetype</module>
   </modules>
 
+  <scm>
+    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk</connection>
+  </scm>
+  
   <repositories>
     <repository>
       <id>maven2-repository.dev.java.net</id>
