@@ -1,9 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                        http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ardor3d</groupId>
   <artifactId>ardor3d</artifactId>
   <packaging>pom</packaging>
-  <version>0.4</version>
+  <version>0.5-SNAPSHOT</version>
   <name>Ardor 3D</name>
 
   <modules>
@@ -19,7 +19,7 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/tags/ardor3d-0.4</connection>
+    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk</connection>
   </scm>
   
   <repositories>
