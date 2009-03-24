@@ -12,8 +12,6 @@ package com.ardor3d.ui.text;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,10 +72,8 @@ public class BMFont {
      *            blurrier text, but less shimmering.
      * @throws IOException
      *             if there are any problems reading the .fnt file.
-     * @throws URISyntaxException
-     *             if unable to generate a URI from the given fileUrl
      */
-    public BMFont(final URL fileUrl, final boolean useMipMaps) throws IOException, URISyntaxException {
+    public BMFont(final URL fileUrl, final boolean useMipMaps) throws IOException {
         _useMipMaps = useMipMaps;
 
         parseFontFile(fileUrl);
@@ -172,7 +168,7 @@ public class BMFont {
      * @param fontUrl
      */
     // ----------------------------------------------------------
-    protected void initialize(final URL fontUrl) throws MalformedURLException, URISyntaxException {
+    protected void initialize(final URL fontUrl) throws MalformedURLException {
         _styleName = _info.face + "-" + _info.size;
 
         if (_info.bold) {
@@ -190,8 +186,17 @@ public class BMFont {
         // only a single page is supported
         if (_pages.size() > 0) {
             final Page page = _pages.get(0);
-            final URI texUri = fontUrl.toURI().resolve("./" + page.file);
-            final URL texUrl = texUri.toURL();
+
+            // XXX: have another look here.
+            // Basically, we can't use new URL(fontURL, "./"+page.file)
+            // because the URL might have %2F entries instead of /.
+            // We also can't use URI .resolve because of jars (jar URLs are opaque)
+            // So, we grab the URL as a string
+            String url = fontUrl.toString();
+            // Replace the %2F (or %2f) with forward slashes
+            url = url.replaceAll("\\%2[F,f]", "/");
+            // And make a new URL by chopping off the file name and appending of font file.
+            final URL texUrl = new URL(url.substring(0, url.lastIndexOf('/') + 1) + page.file);
 
             Texture.MinificationFilter minFilter;
             Texture.MagnificationFilter magFilter;
