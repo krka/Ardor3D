@@ -18,6 +18,7 @@ import com.ardor3d.extension.model.collada.binding.ColladaException;
 import com.ardor3d.extension.model.collada.binding.DaeLibraries;
 import com.ardor3d.extension.model.collada.binding.DaeList;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
+import com.ardor3d.extension.model.collada.binding.animation.DaeAnimation;
 import com.ardor3d.extension.model.collada.binding.fx.DaeEffect;
 import com.ardor3d.extension.model.collada.binding.fx.DaeImage;
 import com.ardor3d.extension.model.collada.binding.fx.DaeMaterial;
@@ -34,6 +35,7 @@ public class Collada extends DaeTreeNode {
     private DaeList<DaeLibraries<DaeVisualScene>> libraryVisualScenes;
     private DaeList<DaeLibraries<DaeController>> libraryControllers;
     private DaeList<DaeLibraries<DaeNode>> libraryNodes;
+    private DaeList<DaeLibraries<DaeAnimation>> libraryAnimations;
     private DaeScene scene;
 
     public Collada() {

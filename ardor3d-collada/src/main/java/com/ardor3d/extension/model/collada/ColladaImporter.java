@@ -33,18 +33,15 @@ public class ColladaImporter {
      *            the name of the resource to find. ResourceLocatorTool will be used with TYPE_MODEL to find the
      *            resource.
      * @return a Node containing the Collada scene.
-     * @throws Exception
      */
-    public static Node readColladaScene(final String resource) throws Exception {
+    public static Node readColladaScene(final String resource) {
         final URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
 
         if (url == null) {
             throw new Error("Unable to locate '" + resource + "' on the classpath");
         }
 
-        final Node scene = readColladaScene(url);
-
-        return scene;
+        return readColladaScene(url);
     }
 
     /**
@@ -53,21 +50,13 @@ public class ColladaImporter {
      * @param resource
      *            the name of the resource to find.
      * @return a Node containing the Collada scene.
-     * @throws Exception
      */
-    public static Node readColladaScene(final URL resource) throws Exception {
-        final IBindingFactory bindingFactory = BindingDirectory.getFactory(Collada.class);
-
-        final IUnmarshallingContext context = bindingFactory.createUnmarshallingContext();
-
-        final SimpleResourceLocator srl = new SimpleResourceLocator(resource);
-        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-
-        final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
+    public static Node readColladaScene(final URL resource) {
 
         // Collada may or may not have a scene.
         // FIXME: We should eventually return the libraries too since you could have those without a scene.
-
+        Collada collada = readCollada(resource);
+        
         Node scene = null;
         if (collada.getScene() != null) {
             // It's possible to have a scene that is all physics information...
@@ -77,9 +66,34 @@ public class ColladaImporter {
             }
         }
 
-        ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
 
         return scene;
+    }
+
+    /**
+     * Reads the whole Collada object from the given resource and returns it. Exceptions may be thrown
+     * by underlying tools; these will be wrapped in a RuntimeException and rethrown.
+     *
+     * @param resource the URL to read the resource from
+     * @return the Collada tree
+     */
+    public static Collada readCollada(final URL resource) {
+        try {
+            final IBindingFactory bindingFactory = BindingDirectory.getFactory(Collada.class);
+
+            final IUnmarshallingContext context = bindingFactory.createUnmarshallingContext();
+
+            final SimpleResourceLocator srl = new SimpleResourceLocator(resource);
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+
+            final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
+
+            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+
+            return collada;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
+        }
     }
 
     // just a simple way to test things out without bringing up OpenGL, etc.
