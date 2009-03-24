@@ -43,8 +43,8 @@ public class MultiFaceBox extends Box {
         final FloatBuffer fb = _meshData.getTextureCoords(0).coords;
         fb.rewind();
         for (int i = 0; i < 6; i++) {
-            final float top = i / 8f;
-            final float bottom = (i + 1) / 8f;
+            final float bottom = i / 8f;
+            final float top = (i + 1) / 8f;
             final float[] tex = new float[] { 1, bottom, 0, bottom, 0, top, 1, top };
             fb.put(tex);
         }
