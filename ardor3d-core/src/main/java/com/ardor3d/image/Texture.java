@@ -1164,7 +1164,7 @@ public abstract class Texture implements Savable {
 
     /**
      * @param bias
-     *            the load bias level for this texture. The default is 0.
+     *            the lod bias for this texture. The default is 0.
      */
     public void setLodBias(final float bias) {
         _lodBias = bias;

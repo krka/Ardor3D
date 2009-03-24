@@ -193,7 +193,7 @@ public class BMFont {
             // We also can't use URI .resolve because of jars (jar URLs are opaque)
             // So, we grab the URL as a string
             String url = fontUrl.toString();
-            // Replace the %2F (or %2f) with forward slashes
+            // Replace any %2F (or %2f) with forward slashes
             url = url.replaceAll("\\%2[F,f]", "/");
             // And make a new URL by chopping off the file name and appending of font file.
             final URL texUrl = new URL(url.substring(0, url.lastIndexOf('/') + 1) + page.file);
