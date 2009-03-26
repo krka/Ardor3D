@@ -4,7 +4,7 @@
     <groupId>com.ardor3d</groupId>
     <artifactId>ardor3d</artifactId>
     <relativePath>../pom.xml</relativePath>
-    <version>0.4.1</version>
+    <version>0.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>ardor3d-swt</artifactId>
