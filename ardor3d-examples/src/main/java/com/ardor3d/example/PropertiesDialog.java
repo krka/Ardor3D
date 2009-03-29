@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,10 +70,15 @@ public final class PropertiesDialog extends JDialog {
     // Array of windowed resolutions
     private final String[] windowedResolutions = { "640 x 480", "800 x 600", "1024 x 768", "1152 x 864" };
 
+    // Array of possible samples
+    private final String[] samples = { "0 samples", "2 samples", "4 samples", "8 samples" };
+
     // UI components
     private JCheckBox fullscreenBox = null;
 
     private JComboBox displayResCombo = null;
+
+    private JComboBox samplesCombo = null;
 
     private JComboBox colorDepthCombo = null;
 
@@ -263,6 +270,8 @@ public final class PropertiesDialog extends JDialog {
 
         displayResCombo = setUpResolutionChooser();
         displayResCombo.addKeyListener(aListener);
+        samplesCombo = setUpSamplesChooser();
+        samplesCombo.addKeyListener(aListener);
         colorDepthCombo = new JComboBox();
         colorDepthCombo.addKeyListener(aListener);
         displayFreqCombo = new JComboBox();
@@ -280,9 +289,12 @@ public final class PropertiesDialog extends JDialog {
         updateResolutionChoices();
         displayResCombo.setSelectedItem(source.getWidth() + " x " + source.getHeight());
 
+        samplesCombo.setSelectedItem(source.getSamples() + " samples");
+
         optionsPanel.add(displayResCombo);
         optionsPanel.add(colorDepthCombo);
         optionsPanel.add(displayFreqCombo);
+        optionsPanel.add(samplesCombo);
         optionsPanel.add(fullscreenBox);
         optionsPanel.add(rendererCombo);
 
@@ -345,6 +357,10 @@ public final class PropertiesDialog extends JDialog {
             freq = Integer.parseInt(freqString.substring(0, freqString.indexOf(' ')));
         }
 
+        final String samplesString = (String) samplesCombo.getSelectedItem();
+        int samples = -1;
+        samples = Integer.parseInt(samplesString.substring(0, samplesString.indexOf(' ')));
+
         final String renderer = (String) rendererCombo.getSelectedItem();
 
         boolean valid = false;
@@ -353,7 +369,7 @@ public final class PropertiesDialog extends JDialog {
         if (!fullscreen) {
             valid = true;
         } else {
-            final ModeValidator validator = new ModeValidator(renderer, width, height, depth, freq);
+            final ModeValidator validator = new ModeValidator(renderer, width, height, depth, freq, samples);
             if (mainThreadTasks != null) {
                 mainThreadTasks.add(validator);
             } else {
@@ -371,6 +387,7 @@ public final class PropertiesDialog extends JDialog {
             source.setFrequency(freq);
             source.setFullscreen(fullscreen);
             source.setRenderer(renderer);
+            source.setSamples(samples);
             try {
                 source.save();
             } catch (final IOException ioe) {
@@ -412,6 +429,12 @@ public final class PropertiesDialog extends JDialog {
      */
     private JComboBox setUpRendererChooser() {
         final JComboBox nameBox = new JComboBox(new String[] { "LWJGL", "JOGL" });
+        nameBox.setSelectedItem(source.getRenderer());
+        return nameBox;
+    }
+
+    private JComboBox setUpSamplesChooser() {
+        final JComboBox nameBox = new JComboBox(samples);
         nameBox.setSelectedItem(source.getRenderer());
         return nameBox;
     }
@@ -462,6 +485,7 @@ public final class PropertiesDialog extends JDialog {
             displayFreqCombo.setEnabled(true);
             updateDisplayChoices();
         }
+        pack();
     }
 
     //
@@ -507,7 +531,12 @@ public final class PropertiesDialog extends JDialog {
      * Returns every possible bit depth for the given resolution.
      */
     private static String[] getDepths(final String resolution, final DisplayMode[] modes) {
-        final List<String> depths = new ArrayList<String>(4);
+        final Set<String> depths = new TreeSet<String>(new Comparator<String>() {
+            public int compare(final String o1, final String o2) {
+                // reverse order
+                return -o1.compareTo(o2);
+            }
+        });
         for (int i = 0; i < modes.length; i++) {
             // Filter out all bit depths lower than 16 - Java incorrectly
             // reports
@@ -588,14 +617,16 @@ public final class PropertiesDialog extends JDialog {
         boolean ready = false, valid = true;
 
         String renderer;
-        int width, height, depth, freq;
+        int width, height, depth, freq, samples;
 
-        ModeValidator(final String renderer, final int width, final int height, final int depth, final int freq) {
+        ModeValidator(final String renderer, final int width, final int height, final int depth, final int freq,
+                final int samples) {
             this.renderer = renderer;
             this.width = width;
             this.height = height;
             this.depth = depth;
             this.freq = freq;
+            this.samples = samples;
         }
 
         public void run() {
