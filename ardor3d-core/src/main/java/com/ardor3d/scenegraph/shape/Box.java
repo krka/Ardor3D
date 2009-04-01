@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -84,7 +85,8 @@ public class Box extends Mesh implements Savable {
      * @param zExtent
      *            z extent of the box, in both directions.
      */
-    public Box(final String name, final Vector3 center, final double xExtent, final double yExtent, final double zExtent) {
+    public Box(final String name, final ReadOnlyVector3 center, final double xExtent, final double yExtent,
+            final double zExtent) {
         super(name);
         setData(center, xExtent, yExtent, zExtent);
     }
@@ -99,7 +101,7 @@ public class Box extends Mesh implements Savable {
      * @param maxPoint
      *            The new maxPoint of the box.
      */
-    public void setData(final Vector3 minPoint, final Vector3 maxPoint) {
+    public void setData(final ReadOnlyVector3 minPoint, final ReadOnlyVector3 maxPoint) {
         center.set(maxPoint).addLocal(minPoint).multiplyLocal(0.5);
 
         final double x = maxPoint.getX() - center.getX();
@@ -122,7 +124,7 @@ public class Box extends Mesh implements Savable {
      * @param zExtent
      *            z extent of the box, in both directions.
      */
-    public void setData(final Vector3 center, final double xExtent, final double yExtent, final double zExtent) {
+    public void setData(final ReadOnlyVector3 center, final double xExtent, final double yExtent, final double zExtent) {
         if (center != null) {
             this.center.set(center);
         }
