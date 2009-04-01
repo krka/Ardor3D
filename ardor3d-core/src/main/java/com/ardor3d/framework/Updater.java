@@ -21,5 +21,5 @@ public interface Updater {
     public void init();
 
     @MainThread
-    public void update(final ReadOnlyTimer _timer);
+    public void update(final ReadOnlyTimer timer);
 }
