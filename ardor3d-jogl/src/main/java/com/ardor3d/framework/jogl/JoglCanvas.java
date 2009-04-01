@@ -269,7 +269,9 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         checkFocus();
 
         _canvasRenderer.draw();
-        latch.countDown();
+        if (latch != null) {
+            latch.countDown();
+        }
     }
 
     private void checkFocus() {

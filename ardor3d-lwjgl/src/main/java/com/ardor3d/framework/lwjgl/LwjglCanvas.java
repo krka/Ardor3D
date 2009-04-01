@@ -107,7 +107,10 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
         checkFocus();
 
         _canvasRenderer.draw();
-        latch.countDown();
+
+        if (latch != null) {
+            latch.countDown();
+        }
     }
 
     private void checkFocus() {
