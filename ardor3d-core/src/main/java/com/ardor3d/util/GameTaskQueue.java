@@ -30,6 +30,9 @@ public class GameTaskQueue {
     private final ConcurrentLinkedQueue<GameTask<?>> queue = new ConcurrentLinkedQueue<GameTask<?>>();
     private final AtomicBoolean executeAll = new AtomicBoolean();
 
+	// Default execution time is 0, which means only 1 task will be executed at a time.
+    private long _executionTime = 0;
+
     /**
      * The state of this <code>GameTaskQueue</code> if it will execute all enqueued Callables on an execute invokation.
      * 
@@ -47,6 +50,33 @@ public class GameTaskQueue {
      */
     public void setExecuteAll(final boolean executeAll) {
         this.executeAll.set(executeAll);
+        if (executeAll == true) {
+            _executionTime = Integer.MAX_VALUE;
+        }
+    }
+
+    /**
+     * Sets the minimum amount of time the queue will execute tasks per frame. If this is set, the execute() loop will
+     * execute as many tasks as it can before the execution window threshold is passed. Any remaining tasks will be
+     * executed in the following frame.
+     * 
+     * @param msecs
+     */
+    public void setExecutionTime(final int msecs) {
+        _executionTime = msecs;
+        executeAll.set(true);
+    }
+
+    /**
+     * min time queue is permitted to execute tasks per frame
+     * 
+     * @return -1 if executeAll is false, else min time allocated for task execution per frame
+     */
+    public long getExecutionTime() {
+        if (executeAll.get() == false) {
+            return -1;
+        }
+        return _executionTime;
     }
 
     /**
@@ -68,6 +98,8 @@ public class GameTaskQueue {
      * invoked in the OpenGL thread.
      */
     public void execute() {
+        final long beginTime = System.currentTimeMillis();
+        long elapsedTime;
         GameTask<?> task = queue.poll();
         do {
             if (task == null) {
@@ -80,6 +112,7 @@ public class GameTaskQueue {
                 }
             }
             task.invoke();
-        } while ((executeAll.get()) && ((task = queue.poll()) != null));
+            elapsedTime = System.currentTimeMillis() - beginTime;
+        } while ((executeAll.get()) && (elapsedTime < _executionTime) && ((task = queue.poll()) != null));
     }
 }
