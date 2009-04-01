@@ -37,7 +37,7 @@ public interface NativeCanvas extends Canvas {
     /**
      * <code>setVSyncEnabled</code> attempts to enable or disable monitor vertical synchronization. The method is a
      * "best attempt" to change the monitor vertical refresh synchronization, and is <b>not </b> guaranteed to be
-     * successful. This is dependant on OS.
+     * successful. This is dependent on OS.
      * 
      * @param enabled
      *            <code>true</code> to synchronize, <code>false</code> to ignore synchronization
