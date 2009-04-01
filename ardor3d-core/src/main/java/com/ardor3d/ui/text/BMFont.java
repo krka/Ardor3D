@@ -100,7 +100,7 @@ public class BMFont {
     }
 
     public int getSize() {
-        return _info.size;
+        return Math.abs(_info.size);
     }
 
     /**
