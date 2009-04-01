@@ -102,7 +102,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
     protected TextureCombineMode _textureCombineMode = TextureCombineMode.Inherit;
 
     /** Keeps track of the current frustum intersection state of this Spatial. */
-    protected Camera.FrustumIntersect _frustrumIntersects = Camera.FrustumIntersect.Intersects;
+    protected Camera.FrustumIntersect _frustumIntersects = Camera.FrustumIntersect.Intersects;
 
     /** RenderBucketType for this spatial */
     protected RenderBucketType _renderBucketType = RenderBucketType.Inherit;
@@ -530,13 +530,13 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
         final int state = camera.getPlaneState();
 
         // check to see if we can cull this node
-        _frustrumIntersects = (_parent != null ? _parent._frustrumIntersects : Camera.FrustumIntersect.Intersects);
+        _frustumIntersects = (_parent != null ? _parent._frustumIntersects : Camera.FrustumIntersect.Intersects);
 
-        if (cm == Spatial.CullHint.Dynamic && _frustrumIntersects == Camera.FrustumIntersect.Intersects) {
-            _frustrumIntersects = camera.contains(_worldBound);
+        if (cm == Spatial.CullHint.Dynamic && _frustumIntersects == Camera.FrustumIntersect.Intersects) {
+            _frustumIntersects = camera.contains(_worldBound);
         }
 
-        if (_frustrumIntersects != Camera.FrustumIntersect.Outside) {
+        if (_frustumIntersects != Camera.FrustumIntersect.Outside) {
             draw(r);
         }
         camera.setPlaneState(state);
@@ -1115,7 +1115,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
      * @return The spatial's last frustum intersection result.
      */
     public Camera.FrustumIntersect getLastFrustumIntersection() {
-        return _frustrumIntersects;
+        return _frustumIntersects;
     }
 
     /**
@@ -1123,11 +1123,11 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
      * of a scene tree and don't want the parent of that node to influence culling. (See texture renderer code for
      * example.)
      * 
-     * @param intersects
+     * @param frustumIntersects
      *            the new value
      */
-    public void setLastFrustumIntersection(final Camera.FrustumIntersect frustrumIntersects) {
-        _frustrumIntersects = frustrumIntersects;
+    public void setLastFrustumIntersection(final Camera.FrustumIntersect frustumIntersects) {
+        _frustumIntersects = frustumIntersects;
     }
 
     /**
