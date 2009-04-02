@@ -22,6 +22,7 @@ import com.ardor3d.extension.model.collada.util.ColladaNodeUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.UrlUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
@@ -55,26 +56,36 @@ public class ColladaImporter {
 
         // Collada may or may not have a scene.
         // FIXME: We should eventually return the libraries too since you could have those without a scene.
-        Collada collada = readCollada(resource);
-        
-        Node scene = null;
-        if (collada.getScene() != null) {
-            // It's possible to have a scene that is all physics information...
-            if (collada.getScene().getInstanceVisualScene() != null) {
-                final String id = collada.getScene().getInstanceVisualScene().getUrl().substring(1);
-                scene = ColladaNodeUtils.getVisualScene(id, collada);
-            }
-        }
+        final Collada collada = readCollada(resource);
 
+        Node scene = null;
+        try {
+            final URL parentDir = UrlUtils.resolveRelativeURL(resource, "./");
+            final SimpleResourceLocator srl = new SimpleResourceLocator(parentDir);
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+
+            if (collada.getScene() != null) {
+                // It's possible to have a scene that is all physics information...
+                if (collada.getScene().getInstanceVisualScene() != null) {
+                    final String id = collada.getScene().getInstanceVisualScene().getUrl().substring(1);
+                    scene = ColladaNodeUtils.getVisualScene(id, collada);
+                }
+            }
+
+            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+        } catch (final Exception e) {
+            throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
+        }
 
         return scene;
     }
 
     /**
-     * Reads the whole Collada object from the given resource and returns it. Exceptions may be thrown
-     * by underlying tools; these will be wrapped in a RuntimeException and rethrown.
-     *
-     * @param resource the URL to read the resource from
+     * Reads the whole Collada object from the given resource and returns it. Exceptions may be thrown by underlying
+     * tools; these will be wrapped in a RuntimeException and rethrown.
+     * 
+     * @param resource
+     *            the URL to read the resource from
      * @return the Collada tree
      */
     public static Collada readCollada(final URL resource) {
@@ -83,15 +94,10 @@ public class ColladaImporter {
 
             final IUnmarshallingContext context = bindingFactory.createUnmarshallingContext();
 
-            final SimpleResourceLocator srl = new SimpleResourceLocator(resource);
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-
             final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
 
-            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-
             return collada;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
         }
     }
