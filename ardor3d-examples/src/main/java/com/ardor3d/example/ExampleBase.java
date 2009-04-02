@@ -152,9 +152,12 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+            SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
                     "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+            srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+                    "com/ardor3d/example/media/models/"));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
         }
