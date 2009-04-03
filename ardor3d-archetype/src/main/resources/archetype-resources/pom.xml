@@ -8,7 +8,7 @@
 
   <properties>
     <!-- Update this property to upgrade to a new version of Ardor3D -->
-    <a3d.version>0.4-SNAPSHOT</a3d.version>
+    <a3d.version>0.5-SNAPSHOT</a3d.version>
   </properties>
 
   <!--
@@ -29,41 +29,41 @@
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-awt</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-swt</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
 
     <!-- Open GL Implementation wrappers -->
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-jogl</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-lwjgl</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
 
     <!-- A3D engine modules -->
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-effects</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-core</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.ardor3d</groupId>
       <artifactId>ardor3d-examples</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.5-SNAPSHOT</version>
     </dependency>
 
     <!-- Other stuff -->
