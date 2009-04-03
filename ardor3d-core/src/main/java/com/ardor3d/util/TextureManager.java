@@ -242,6 +242,7 @@ final public class TextureManager {
         if (texture.getTextureId() > 0) {
             try {
                 deleter.deleteTextureId(texture.getTextureId());
+                texture.setTextureId(0);
             } catch (final Exception e) {
             } // ignore.
         }
