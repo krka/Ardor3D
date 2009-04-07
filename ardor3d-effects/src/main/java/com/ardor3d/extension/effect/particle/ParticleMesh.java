@@ -19,7 +19,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -136,7 +135,7 @@ public class ParticleMesh extends ParticleSystem {
 
         mesh.getMeshData().setVertexBuffer(_geometryCoordinates);
         mesh.getMeshData().setColorBuffer(_appearanceColors);
-        mesh.getMeshData().setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(numParticles * verts)), 0);
+        mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * verts), 0);
         mesh.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(indices));
 
         final Vector3 temp = Vector3.fetchTempInstance();
@@ -149,10 +148,10 @@ public class ParticleMesh extends ParticleSystem {
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
                     final int index = _psGeom.getMeshData().getIndexBuffer() != null ? _psGeom.getMeshData()
                             .getIndexBuffer().get(ind) : ind;
-                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).coords, index);
-                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).coords, ind);
+                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).getBuffer(), index);
+                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).getBuffer(), ind);
                 } else {
-                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0).coords, ind);
+                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0).getBuffer(), ind);
                 }
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }

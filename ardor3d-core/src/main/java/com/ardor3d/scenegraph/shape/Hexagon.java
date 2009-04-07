@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -50,7 +49,7 @@ public class Hexagon extends Mesh {
         // allocate vertices
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(NUM_POINTS)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
 
@@ -110,13 +109,13 @@ public class Hexagon extends Mesh {
     }
 
     private void setTextureData() {
-        _meshData.getTextureCoords(0).coords.put(0.25f).put(0);
-        _meshData.getTextureCoords(0).coords.put(0.75f).put(0);
-        _meshData.getTextureCoords(0).coords.put(1.0f).put(0.5f);
-        _meshData.getTextureCoords(0).coords.put(0.75f).put(1.0f);
-        _meshData.getTextureCoords(0).coords.put(0.25f).put(1.0f);
-        _meshData.getTextureCoords(0).coords.put(0.0f).put(0.5f);
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(0.5f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.25f).put(0);
+        _meshData.getTextureCoords(0).getBuffer().put(0.75f).put(0);
+        _meshData.getTextureCoords(0).getBuffer().put(1.0f).put(0.5f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.75f).put(1.0f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.25f).put(1.0f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.0f).put(0.5f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.5f);
     }
 
     /**

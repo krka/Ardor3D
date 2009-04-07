@@ -33,31 +33,326 @@ import com.ardor3d.util.geom.BufferUtils;
  * MeshData contains all the commonly used buffers for rendering a mesh.
  */
 public class MeshData implements Cloneable, Savable {
+
+    /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
 
-    /** Number of vertices represented by this data */
+    /** Number of vertices represented by this data. */
     protected int _vertexCount;
 
-    /** Number of primitives represented by this data */
+    /** Number of primitives represented by this data. */
     protected int[] _primitiveCounts = new int[1];
 
-    /** Buffer data */
-    protected transient FloatBuffer _vertexBuffer;
-    protected transient FloatBuffer _normalBuffer;
-    protected transient FloatBuffer _colorBuffer;
-    protected transient List<TexCoords> _textureCoords = new ArrayList<TexCoords>(1);
+    /** Buffer data holding buffers and number of coordinates per vertex */
+    protected transient FloatBufferData _vertexCoords;
+    protected transient FloatBufferData _normalCoords;
+    protected transient FloatBufferData _colorCoords;
+    protected transient FloatBufferData _fogCoords;
+    protected transient FloatBufferData _tangentCoords;
+    protected transient List<FloatBufferData> _textureCoords = new ArrayList<FloatBufferData>(1);
 
-    /** Interleaved data */
+    /** Interleaved data. */
     protected transient FloatBuffer _interleavedBuffer;
     protected transient InterleavedFormat _interleavedFormat = InterleavedFormat.GL_V3F;
 
-    /** TODO: this should be handled differently */
-    protected transient FloatBuffer _tangentBuffer;
-
-    /** Index data */
+    /** Index data. */
     protected transient IntBuffer _indexBuffer;
     protected transient int[] _indexLengths;
     protected transient IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
+
+    /**
+     * Gets the vertex count.
+     * 
+     * @return the vertex count
+     */
+    public int getVertexCount() {
+        return _vertexCount;
+    }
+
+    /**
+     * Gets the vertex buffer.
+     * 
+     * @return the vertex buffer
+     */
+    public FloatBuffer getVertexBuffer() {
+        if (_vertexCoords == null) {
+            return null;
+        }
+        return _vertexCoords.getBuffer();
+    }
+
+    /**
+     * Sets the vertex buffer.
+     * 
+     * @param vertexBuffer
+     *            the new vertex buffer
+     */
+    public void setVertexBuffer(final FloatBuffer vertexBuffer) {
+        _vertexCoords = new FloatBufferData(vertexBuffer, 3);
+        updateVertexCount();
+    }
+
+    /**
+     * Gets the vertex coords.
+     * 
+     * @return the vertex coords
+     */
+    public FloatBufferData getVertexCoords() {
+        return _vertexCoords;
+    }
+
+    /**
+     * Sets the vertex coords.
+     * 
+     * @param bufferData
+     *            the new vertex coords
+     */
+    public void setVertexCoords(final FloatBufferData bufferData) {
+        _vertexCoords = bufferData;
+    }
+
+    /**
+     * Gets the normal buffer.
+     * 
+     * @return the normal buffer
+     */
+    public FloatBuffer getNormalBuffer() {
+        if (_normalCoords == null) {
+            return null;
+        }
+        return _normalCoords.getBuffer();
+    }
+
+    /**
+     * Sets the normal buffer.
+     * 
+     * @param normalBuffer
+     *            the new normal buffer
+     */
+    public void setNormalBuffer(final FloatBuffer normalBuffer) {
+        _normalCoords = new FloatBufferData(normalBuffer, 3);
+    }
+
+    /**
+     * Gets the normal coords.
+     * 
+     * @return the normal coords
+     */
+    public FloatBufferData getNormalCoords() {
+        return _normalCoords;
+    }
+
+    /**
+     * Sets the normal coords.
+     * 
+     * @param bufferData
+     *            the new normal coords
+     */
+    public void setNormalCoords(final FloatBufferData bufferData) {
+        _normalCoords = bufferData;
+    }
+
+    /**
+     * Gets the color buffer.
+     * 
+     * @return the color buffer
+     */
+    public FloatBuffer getColorBuffer() {
+        if (_colorCoords == null) {
+            return null;
+        }
+        return _colorCoords.getBuffer();
+    }
+
+    /**
+     * Sets the color buffer.
+     * 
+     * @param colorBuffer
+     *            the new color buffer
+     */
+    public void setColorBuffer(final FloatBuffer colorBuffer) {
+        _colorCoords = new FloatBufferData(colorBuffer, 4);
+    }
+
+    /**
+     * Gets the color coords.
+     * 
+     * @return the color coords
+     */
+    public FloatBufferData getColorCoords() {
+        return _colorCoords;
+    }
+
+    /**
+     * Sets the color coords.
+     * 
+     * @param bufferData
+     *            the new color coords
+     */
+    public void setColorCoords(final FloatBufferData bufferData) {
+        _colorCoords = bufferData;
+    }
+
+    /**
+     * Gets the fog buffer.
+     * 
+     * @return the fog buffer
+     */
+    public FloatBuffer getFogBuffer() {
+        if (_fogCoords == null) {
+            return null;
+        }
+        return _fogCoords.getBuffer();
+    }
+
+    /**
+     * Sets the fog buffer.
+     * 
+     * @param fogBuffer
+     *            the new fog buffer
+     */
+    public void setFogBuffer(final FloatBuffer fogBuffer) {
+        _fogCoords = new FloatBufferData(fogBuffer, 3);
+    }
+
+    /**
+     * Gets the fog coords.
+     * 
+     * @return the fog coords
+     */
+    public FloatBufferData getFogCoords() {
+        return _fogCoords;
+    }
+
+    /**
+     * Sets the fog coords.
+     * 
+     * @param bufferData
+     *            the new fog coords
+     */
+    public void setFogCoords(final FloatBufferData bufferData) {
+        _fogCoords = bufferData;
+    }
+
+    /**
+     * Gets the tangent buffer.
+     * 
+     * @return the tangent buffer
+     */
+    public FloatBuffer getTangentBuffer() {
+        if (_tangentCoords == null) {
+            return null;
+        }
+        return _tangentCoords.getBuffer();
+    }
+
+    /**
+     * Sets the tagent buffer.
+     * 
+     * @param tangentBuffer
+     *            the new tagent buffer
+     */
+    public void setTagentBuffer(final FloatBuffer tangentBuffer) {
+        _tangentCoords = new FloatBufferData(tangentBuffer, 3);
+    }
+
+    /**
+     * Gets the tangent coords.
+     * 
+     * @return the tangent coords
+     */
+    public FloatBufferData getTangentCoords() {
+        return _tangentCoords;
+    }
+
+    /**
+     * Sets the tangent coords.
+     * 
+     * @param bufferData
+     *            the new tangent coords
+     */
+    public void setTangentCoords(final FloatBufferData bufferData) {
+        _tangentCoords = bufferData;
+    }
+
+    /**
+     * Gets the texture buffer.
+     * 
+     * @param index
+     *            the index
+     * 
+     * @return the texture buffer
+     */
+    public FloatBuffer getTextureBuffer(final int index) {
+        if (_textureCoords.size() <= index) {
+            return null;
+        }
+        return _textureCoords.get(index).getBuffer();
+    }
+
+    /**
+     * Sets the texture buffer.
+     * 
+     * @param textureBuffer
+     *            the texture buffer
+     * @param index
+     *            the index
+     */
+    public void setTextureBuffer(final FloatBuffer textureBuffer, final int index) {
+        while (_textureCoords.size() <= index) {
+            _textureCoords.add(null);
+        }
+        _textureCoords.set(index, new FloatBufferData(textureBuffer, 2));
+    }
+
+    /**
+     * Gets the texture coords.
+     * 
+     * @return the texture coords
+     */
+    public List<FloatBufferData> getTextureCoords() {
+        return _textureCoords;
+    }
+
+    /**
+     * Gets the texture coords.
+     * 
+     * @param index
+     *            the index
+     * 
+     * @return the texture coords
+     */
+    public FloatBufferData getTextureCoords(final int index) {
+        if (_textureCoords.size() <= index) {
+            return null;
+        }
+        return _textureCoords.get(index);
+    }
+
+    /**
+     * Sets the texture coords.
+     * 
+     * @param textureCoords
+     *            the new texture coords
+     */
+    public void setTextureCoords(final List<FloatBufferData> textureCoords) {
+        _textureCoords = textureCoords;
+    }
+
+    /**
+     * Sets the texture coords.
+     * 
+     * @param textureCoords
+     *            the texture coords
+     * @param index
+     *            the index
+     */
+    public void setTextureCoords(final FloatBufferData textureCoords, final int index) {
+        while (_textureCoords.size() <= index) {
+            _textureCoords.add(null);
+        }
+        _textureCoords.set(index, textureCoords);
+    }
 
     /**
      * Retrieves the interleaved buffer, if set or created through packInterleaved.
@@ -69,163 +364,47 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Sets the interleaved buffer.
      * 
-     * @param interleaved
+     * @param interleavedBuffer
+     *            the interleaved buffer
      */
     public void setInterleavedBuffer(final FloatBuffer interleavedBuffer) {
         _interleavedBuffer = interleavedBuffer;
     }
 
+    /**
+     * Gets the interleaved format.
+     * 
+     * @return the interleaved format
+     */
     public InterleavedFormat getInterleavedFormat() {
         return _interleavedFormat;
     }
 
+    /**
+     * Sets the interleaved format.
+     * 
+     * @param interleavedFormat
+     *            the new interleaved format
+     */
     public void setInterleavedFormat(final InterleavedFormat interleavedFormat) {
         _interleavedFormat = interleavedFormat;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public int getVertexCount() {
-        return _vertexCount;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public FloatBuffer getVertexBuffer() {
-        return _vertexBuffer;
-    }
-
-    /**
-     * 
-     * @param vertices
-     */
-    public void setVertexBuffer(final FloatBuffer vertexBuffer) {
-        _vertexBuffer = vertexBuffer;
-        updateVertexCount();
     }
 
     /**
      * Update the vertex count based on the current limit of the vertex buffer.
      */
     public void updateVertexCount() {
-        if (_vertexBuffer == null) {
+        if (_vertexCoords == null) {
             _vertexCount = 0;
         } else {
-            _vertexCount = _vertexBuffer.limit() / 3;
+            _vertexCount = _vertexCoords.getCount();
         }
         // update primitive count if we are using arrays
         if (_indexBuffer == null) {
             updatePrimitiveCounts();
         }
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public FloatBuffer getNormalBuffer() {
-        return _normalBuffer;
-    }
-
-    /**
-     * 
-     * @param normals
-     */
-    public void setNormalBuffer(final FloatBuffer normalBuffer) {
-        _normalBuffer = normalBuffer;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public FloatBuffer getColorBuffer() {
-        return _colorBuffer;
-    }
-
-    /**
-     * 
-     * @param colors
-     */
-    public void setColorBuffer(final FloatBuffer colorBuffer) {
-        _colorBuffer = colorBuffer;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public FloatBuffer getTangentBuffer() {
-        return _tangentBuffer;
-    }
-
-    /**
-     * 
-     * @param vertices
-     */
-    public void setTangentBuffer(final FloatBuffer tangentBuffer) {
-        _tangentBuffer = tangentBuffer;
-    }
-
-    /**
-     * 
-     * @param index
-     * @return
-     */
-    public FloatBuffer getTextureBuffer(final int index) {
-        if (_textureCoords.size() <= index) {
-            return null;
-        }
-        return _textureCoords.get(index).coords;
-    }
-
-    /**
-     * 
-     * @param textureBuffer
-     * @param index
-     */
-    public void setTextureBuffer(final FloatBuffer textureBuffer, final int index) {
-        while (_textureCoords.size() <= index) {
-            _textureCoords.add(null);
-        }
-        _textureCoords.set(index, new TexCoords(textureBuffer));
-    }
-
-    /**
-     * 
-     * @param index
-     * @return
-     */
-    public List<TexCoords> getTextureCoords() {
-        return _textureCoords;
-    }
-
-    /**
-     * 
-     * @param index
-     * @return
-     */
-    public TexCoords getTextureCoords(final int index) {
-        if (_textureCoords.size() <= index) {
-            return null;
-        }
-        return _textureCoords.get(index);
-    }
-
-    public void setTextureCoords(final List<TexCoords> textureCoords) {
-        _textureCoords = textureCoords;
-    }
-
-    public void setTextureCoords(final TexCoords textureCoords, final int index) {
-        while (_textureCoords.size() <= index) {
-            _textureCoords.add(null);
-        }
-        _textureCoords.set(index, textureCoords);
     }
 
     /**
@@ -257,20 +436,21 @@ public class MeshData implements Cloneable, Savable {
             _textureCoords.add(null);
         }
 
-        TexCoords dest = _textureCoords.get(toIndex);
-        final TexCoords src = _textureCoords.get(fromIndex);
-        if (dest == null || dest.coords.capacity() != src.coords.limit()) {
-            dest = new TexCoords(BufferUtils.createFloatBuffer(src.coords.capacity()), src.perVert);
+        FloatBufferData dest = _textureCoords.get(toIndex);
+        final FloatBufferData src = _textureCoords.get(fromIndex);
+        if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
+            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()), src
+                    .getCoordsPerVertex());
             _textureCoords.set(toIndex, dest);
         }
-        dest.coords.clear();
-        final int oldLimit = src.coords.limit();
-        src.coords.clear();
-        for (int i = 0, len = dest.coords.capacity(); i < len; i++) {
-            dest.coords.put(factor * src.coords.get());
+        dest.getBuffer().clear();
+        final int oldLimit = src.getBuffer().limit();
+        src.getBuffer().clear();
+        for (int i = 0, len = dest.getBuffer().capacity(); i < len; i++) {
+            dest.getBuffer().put(factor * src.getBuffer().get());
         }
-        src.coords.limit(oldLimit);
-        dest.coords.limit(oldLimit);
+        src.getBuffer().limit(oldLimit);
+        dest.getBuffer().limit(oldLimit);
     }
 
     /**
@@ -286,16 +466,19 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the index buffer.
      * 
-     * @return
+     * @return the index buffer
      */
     public IntBuffer getIndexBuffer() {
         return _indexBuffer;
     }
 
     /**
+     * Sets the index buffer.
      * 
      * @param indices
+     *            the new index buffer
      */
     public void setIndexBuffer(final IntBuffer indices) {
         _indexBuffer = indices;
@@ -303,6 +486,8 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the index mode.
+     * 
      * @return the IndexMode of the first section of this MeshData.
      */
     public IndexMode getIndexMode() {
@@ -310,6 +495,8 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Sets the index mode.
+     * 
      * @param indexMode
      *            the new IndexMode to use for the first section of this MeshData.
      */
@@ -318,19 +505,43 @@ public class MeshData implements Cloneable, Savable {
         updatePrimitiveCounts();
     }
 
+    /**
+     * Gets the index lengths.
+     * 
+     * @return the index lengths
+     */
     public int[] getIndexLengths() {
         return _indexLengths;
     }
 
+    /**
+     * Sets the index lengths.
+     * 
+     * @param indexLengths
+     *            the new index lengths
+     */
     public void setIndexLengths(final int[] indexLengths) {
         _indexLengths = indexLengths;
         updatePrimitiveCounts();
     }
 
+    /**
+     * Gets the index modes.
+     * 
+     * @return the index modes
+     */
     public IndexMode[] getIndexModes() {
         return _indexModes;
     }
 
+    /**
+     * Gets the index mode.
+     * 
+     * @param sectionIndex
+     *            the section index
+     * 
+     * @return the index mode
+     */
     public IndexMode getIndexMode(final int sectionIndex) {
         if (sectionIndex < 0 || sectionIndex >= getSectionCount()) {
             throw new IllegalArgumentException("invalid section index: " + sectionIndex);
@@ -350,6 +561,7 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the section count.
      * 
      * @return the number of sections (lengths, indexModes, etc.) this MeshData contains.
      */
@@ -358,6 +570,8 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the total primitive count.
+     * 
      * @return the sum of the primitive counts on all sections of this mesh data.
      */
     public int getTotalPrimitiveCount() {
@@ -369,6 +583,11 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the primitive count.
+     * 
+     * @param section
+     *            the section
+     * 
      * @return the number of primitives (triangles, quads, lines, points, etc.) on a given section of this mesh data.
      */
     public int getPrimitiveCount(final int section) {
@@ -385,7 +604,9 @@ public class MeshData implements Cloneable, Savable {
      * @param store
      *            an int array to store the results in. if null, or the length < the size of the primitive, a new array
      *            is created and returned.
+     * 
      * @return the primitive's vertex indices as an array
+     * 
      * @throws IndexOutOfBoundsException
      *             if primitiveIndex is outside of range [0, count-1] where count is the number of primitives in the
      *             given section.
@@ -412,6 +633,18 @@ public class MeshData implements Cloneable, Savable {
         return result;
     }
 
+    /**
+     * Gets the primitive.
+     * 
+     * @param primitiveIndex
+     *            the primitive index
+     * @param section
+     *            the section
+     * @param store
+     *            the store
+     * 
+     * @return the primitive
+     */
     public Vector3[] getPrimitive(final int primitiveIndex, final int section, final Vector3[] store) {
         final int count = getPrimitiveCount(section);
         if (primitiveIndex >= count || primitiveIndex < 0) {
@@ -444,6 +677,7 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Gets the vertex index.
      * 
      * @param primitiveIndex
      *            which triangle, quad, etc.
@@ -451,6 +685,7 @@ public class MeshData implements Cloneable, Savable {
      *            which point on the triangle, quad, etc. (triangle has three points, so this would be 0-2, etc.)
      * @param section
      *            which section to pull from (corresponds to array position in indexmodes and lengths)
+     * 
      * @return the position you would expect to find the given point in the index buffer
      */
     public int getVertexIndex(final int primitiveIndex, final int point, final int section) {
@@ -504,12 +739,15 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Random vertex.
+     * 
      * @param store
      *            the vector object to store the result in. if null, a new one is created.
+     * 
      * @return a random vertex from the vertices stored in this MeshData. null is returned if there are no vertices.
      */
     public Vector3 randomVertex(final Vector3 store) {
-        if (_vertexBuffer == null) {
+        if (_vertexCoords == null) {
             return null;
         }
 
@@ -519,19 +757,22 @@ public class MeshData implements Cloneable, Savable {
         }
 
         final int i = MathUtils.nextRandomInt(0, getVertexCount() - 1);
-        BufferUtils.populateFromBuffer(result, _vertexBuffer, i);
+        BufferUtils.populateFromBuffer(result, _vertexCoords.getBuffer(), i);
 
         return result;
     }
 
     /**
+     * Random point on primitives.
+     * 
      * @param store
      *            the vector object to store the result in. if null, a new one is created.
+     * 
      * @return a random point from the surface of a primitive stored in this MeshData. null is returned if there are no
      *         vertices or indices.
      */
     public Vector3 randomPointOnPrimitives(final Vector3 store) {
-        if (_vertexBuffer == null || _indexBuffer == null) {
+        if (_vertexCoords == null || _indexBuffer == null) {
             return null;
         }
 
@@ -609,34 +850,65 @@ public class MeshData implements Cloneable, Savable {
         return result;
     }
 
+    /**
+     * Translate points.
+     * 
+     * @param x
+     *            the x
+     * @param y
+     *            the y
+     * @param z
+     *            the z
+     */
     public void translatePoints(final double x, final double y, final double z) {
         translatePoints(new Vector3(x, y, z));
     }
 
+    /**
+     * Translate points.
+     * 
+     * @param amount
+     *            the amount
+     */
     public void translatePoints(final Vector3 amount) {
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.addInBuffer(amount, _vertexBuffer, x);
+            BufferUtils.addInBuffer(amount, _vertexCoords.getBuffer(), x);
         }
     }
 
+    /**
+     * Rotate points.
+     * 
+     * @param rotate
+     *            the rotate
+     */
     public void rotatePoints(final Quaternion rotate) {
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _vertexBuffer, x);
+            BufferUtils.populateFromBuffer(store, _vertexCoords.getBuffer(), x);
             rotate.apply(store, store);
-            BufferUtils.setInBuffer(store, _vertexBuffer, x);
+            BufferUtils.setInBuffer(store, _vertexCoords.getBuffer(), x);
         }
     }
 
+    /**
+     * Rotate normals.
+     * 
+     * @param rotate
+     *            the rotate
+     */
     public void rotateNormals(final Quaternion rotate) {
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
-            BufferUtils.populateFromBuffer(store, _normalBuffer, x);
+            BufferUtils.populateFromBuffer(store, _normalCoords.getBuffer(), x);
             rotate.apply(store, store);
-            BufferUtils.setInBuffer(store, _normalBuffer, x);
+            BufferUtils.setInBuffer(store, _normalCoords.getBuffer(), x);
         }
     }
 
+    /**
+     * Update primitive counts.
+     */
     private void updatePrimitiveCounts() {
         final int maxIndex = _indexBuffer != null ? _indexBuffer.limit() : _vertexCount;
         final int maxSection = _indexLengths != null ? _indexLengths.length : 1;
@@ -681,73 +953,6 @@ public class MeshData implements Cloneable, Savable {
 
     }
 
-    /**
-     * Pack all used buffers into an interleaved buffer. TODO: Ugly, experimental and incomplete...
-     */
-    public void packInterleaved() {
-        final boolean hasVertexBuffer = _vertexBuffer != null;
-        final boolean hasNormalBuffer = _normalBuffer != null;
-        final boolean hasColorBuffer = _colorBuffer != null;
-
-        final FloatBuffer textureBuffer = getTextureBuffer(0);
-        final boolean hasTextureBuffer = textureBuffer != null;
-
-        int bufferSize = 0;
-        if (hasVertexBuffer) {
-            bufferSize += _vertexCount * 3;
-            _vertexBuffer.rewind();
-        }
-        if (hasNormalBuffer) {
-            bufferSize += _vertexCount * 3;
-            _normalBuffer.rewind();
-        }
-        if (hasColorBuffer) {
-            bufferSize += _vertexCount * 4;
-            _colorBuffer.rewind();
-        }
-        if (hasTextureBuffer) {
-            bufferSize += _vertexCount * 2;
-            textureBuffer.rewind();
-        }
-
-        _interleavedBuffer = BufferUtils.createFloatBuffer(bufferSize);
-        _interleavedBuffer.rewind();
-
-        for (int i = 0; i < _vertexCount; i++) {
-            if (hasTextureBuffer) {
-                _interleavedBuffer.put(textureBuffer.get()).put(textureBuffer.get());
-            }
-
-            if (hasColorBuffer) {
-                _interleavedBuffer.put(_colorBuffer.get()).put(_colorBuffer.get()).put(_colorBuffer.get());
-                _colorBuffer.get();
-            }
-
-            if (hasNormalBuffer) {
-                _interleavedBuffer.put(_normalBuffer.get()).put(_normalBuffer.get()).put(_normalBuffer.get());
-            }
-
-            if (hasVertexBuffer) {
-                _interleavedBuffer.put(_vertexBuffer.get()).put(_vertexBuffer.get()).put(_vertexBuffer.get());
-            }
-        }
-
-        _interleavedFormat = InterleavedFormat.GL_V3F;
-        if (!hasNormalBuffer && !hasColorBuffer && hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_T2F_V3F;
-        } else if (!hasNormalBuffer && hasColorBuffer && !hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_C3F_V3F;
-        } else if (!hasNormalBuffer && hasColorBuffer && hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_T2F_C3F_V3F;
-        } else if (hasNormalBuffer && !hasColorBuffer && !hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_N3F_V3F;
-        } else if (hasNormalBuffer && !hasColorBuffer && hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_T2F_N3F_V3F;
-        } else if (hasNormalBuffer && hasColorBuffer && hasTextureBuffer) {
-            _interleavedFormat = InterleavedFormat.GL_T2F_C4F_N3F_V3F;
-        }
-    }
-
     // /////////////////
     // Method for Cloneable
     // /////////////////
@@ -773,13 +978,14 @@ public class MeshData implements Cloneable, Savable {
         final OutputCapsule capsule = e.getCapsule(this);
 
         capsule.write(_vertexCount, "vertexCount", 0);
-        capsule.write(_vertexBuffer, "vertexBuffer", null);
-        capsule.write(_normalBuffer, "normalBuffer", null);
-        capsule.write(_colorBuffer, "colorBuffer", null);
-        capsule.writeSavableList(_textureCoords, "textureCoords", new ArrayList<TexCoords>(1));
+        capsule.write(_vertexCoords, "vertexBuffer", null);
+        capsule.write(_normalCoords, "normalBuffer", null);
+        capsule.write(_colorCoords, "colorBuffer", null);
+        capsule.write(_fogCoords, "fogBuffer", null);
+        capsule.write(_tangentCoords, "tangentBuffer", null);
+        capsule.writeSavableList(_textureCoords, "textureCoords", new ArrayList<FloatBufferData>(1));
         capsule.write(_indexBuffer, "indexBuffer", null);
         capsule.write(_interleavedBuffer, "interleavedBuffer", null);
-        capsule.write(_tangentBuffer, "tangentBuffer", null);
         capsule.write(_indexLengths, "indexLengths", null);
         capsule.write(_indexModes, "indexModes");
     }
@@ -788,13 +994,14 @@ public class MeshData implements Cloneable, Savable {
         final InputCapsule capsule = e.getCapsule(this);
 
         _vertexCount = capsule.readInt("vertexCount", 0);
-        _vertexBuffer = capsule.readFloatBuffer("vertexBuffer", null);
-        _normalBuffer = capsule.readFloatBuffer("normalBuffer", null);
-        _colorBuffer = capsule.readFloatBuffer("colorBuffer", null);
-        _textureCoords = capsule.readSavableList("textureCoords", new ArrayList<TexCoords>(1));
+        _vertexCoords = (FloatBufferData) capsule.readSavable("vertexBuffer", null);
+        _normalCoords = (FloatBufferData) capsule.readSavable("normalBuffer", null);
+        _colorCoords = (FloatBufferData) capsule.readSavable("colorBuffer", null);
+        _fogCoords = (FloatBufferData) capsule.readSavable("fogBuffer", null);
+        _tangentCoords = (FloatBufferData) capsule.readSavable("tangentBuffer", null);
+        _textureCoords = capsule.readSavableList("textureCoords", new ArrayList<FloatBufferData>(1));
         _indexBuffer = capsule.readIntBuffer("indexBuffer", null);
         _interleavedBuffer = capsule.readFloatBuffer("interleavedBuffer", null);
-        _tangentBuffer = capsule.readFloatBuffer("tangentBuffer", null);
         _indexLengths = capsule.readIntArray("indexLengths", null);
         _indexModes = capsule.readEnumArray("indexModes", IndexMode.class, new IndexMode[] { IndexMode.Triangles });
 

@@ -17,7 +17,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -114,7 +113,7 @@ public class Capsule extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         // determine tri quantity
         final int tris = 2 * radialSamples * sampleLines;

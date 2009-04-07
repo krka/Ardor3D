@@ -25,7 +25,6 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 
 /**
  * A utility class to generate normals for Meshes.<br />
@@ -117,7 +116,7 @@ public class NormalGenerator {
             _sourceColors = null;
         }
         if (mesh.getMeshData().getTextureCoords(0) != null) {
-            _sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0).coords);
+            _sourceTexCoords = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(0).getBuffer());
         } else {
             _sourceTexCoords = null;
         }
@@ -210,7 +209,7 @@ public class NormalGenerator {
         // Tex coord buffer:
         FloatBuffer texCoords = null;
         if (_splitTexCoords != null) {
-            texCoords = mesh.getMeshData().getTextureCoords(0).coords;
+            texCoords = mesh.getMeshData().getTextureCoords(0).getBuffer();
             if (texCoords.capacity() < _splitTexCoords.length * 2) {
                 texCoords = BufferUtils.createFloatBuffer(_splitTexCoords);
             } else {
@@ -237,7 +236,7 @@ public class NormalGenerator {
         mesh.getMeshData().setNormalBuffer(normals);
         mesh.getMeshData().setColorBuffer(colors);
         mesh.getMeshData().getTextureCoords().clear();
-        mesh.getMeshData().setTextureCoords(new TexCoords(texCoords), 0);
+        mesh.getMeshData().setTextureBuffer(texCoords, 0);
         mesh.getMeshData().setIndexBuffer(indices);
     }
 

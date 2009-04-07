@@ -22,7 +22,6 @@ import com.ardor3d.math.Vector4;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -504,7 +503,7 @@ public class ProjectedGrid extends Mesh {
      */
     private void buildTextureCoordinates() {
         texs = BufferUtils.createVector2Buffer(_meshData.getVertexCount());
-        _meshData.setTextureCoords(new TexCoords(texs), 0);
+        _meshData.setTextureBuffer(texs, 0);
         texs.clear();
 
         vertBuf.rewind();

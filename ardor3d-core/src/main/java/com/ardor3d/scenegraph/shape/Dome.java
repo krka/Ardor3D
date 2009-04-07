@@ -15,7 +15,6 @@ import java.io.IOException;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -158,7 +157,7 @@ public class Dome extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         // generate geometry
         final double fInvRS = 1.0 / _radialSamples;
@@ -208,7 +207,7 @@ public class Dome extends Mesh {
                             (float) -kNormal.getZ());
                 }
 
-                _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put((float) fYFraction);
+                _meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) fYFraction);
 
                 i++;
             }
@@ -216,7 +215,7 @@ public class Dome extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-            _meshData.getTextureCoords(0).coords.put(1.0f).put((float) fYFraction);
+            _meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) fYFraction);
 
             i++;
         }
@@ -231,7 +230,7 @@ public class Dome extends Mesh {
             _meshData.getNormalBuffer().put(0).put(-1).put(0);
         }
 
-        _meshData.getTextureCoords(0).coords.put(0.5f).put(1.0f);
+        _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(1.0f);
 
         Vector3.releaseTempInstance(tempVa);
         Vector3.releaseTempInstance(tempVb);

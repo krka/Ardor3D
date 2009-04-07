@@ -16,7 +16,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -65,7 +64,7 @@ public class Disk extends Mesh {
         final int verts = 1 + radialSamples * shellLess;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector3Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector3Buffer(verts), 0);
 
         final int tris = radialSamples * (2 * shellLess - 1);
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
@@ -84,7 +83,7 @@ public class Disk extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
         }
 
-        _meshData.getTextureCoords(0).coords.put(.5f).put(.5f);
+        _meshData.getTextureCoords(0).getBuffer().put(.5f).put(.5f);
 
         final double inverseShellLess = 1.0 / shellLess;
         final double inverseRadial = 1.0 / _radialSamples;
@@ -102,7 +101,7 @@ public class Disk extends Mesh {
                 final int i = shellCount + shellLess * radialCount;
                 texCoord.setX(0.5 * (1.0 + radialFraction.getX()));
                 texCoord.setY(0.5 * (1.0 + radialFraction.getY()));
-                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).coords, i);
+                BufferUtils.setInBuffer(texCoord, _meshData.getTextureCoords(0).getBuffer(), i);
 
                 radialFraction.multiplyLocal(_radius);
                 BufferUtils.setInBuffer(radialFraction, _meshData.getVertexBuffer(), i);

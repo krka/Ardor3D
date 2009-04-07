@@ -15,7 +15,6 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -133,8 +132,8 @@ public class RoundedBox extends Mesh implements Savable {
 
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
-            _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(48)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
+            _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(48), 0);
+            final FloatBuffer tex = _meshData.getTextureCoords(0).getBuffer();
 
             final double[][] ratio = new double[][] {
                     { 0.5 * _border.getX() / (_extent.getX() + _slope.getX()),

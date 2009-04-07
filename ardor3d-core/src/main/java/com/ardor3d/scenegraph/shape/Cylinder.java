@@ -15,7 +15,6 @@ import java.io.IOException;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -222,7 +221,7 @@ public class Cylinder extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         final int count = ((_closed ? 2 : 0) + 2 * (_axisSamples - 1)) * _radialSamples;
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * count));
@@ -299,7 +298,7 @@ public class Cylinder extends Mesh {
                 tempNormal.multiplyLocal((_radius - _radius2) * axisFraction + _radius2).addLocal(sliceCenter);
                 _meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 
-                _meshData.getTextureCoords(0).coords.put((float) (_inverted ? 1 - radialFraction : radialFraction))
+                _meshData.getTextureCoords(0).getBuffer().put((float) (_inverted ? 1 - radialFraction : radialFraction))
                         .put((float) axisFractionTexture);
                 i++;
             }
@@ -307,7 +306,7 @@ public class Cylinder extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), save, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), save, i);
 
-            _meshData.getTextureCoords(0).coords.put((_inverted ? 0.0f : 1.0f)).put((float) axisFractionTexture);
+            _meshData.getTextureCoords(0).getBuffer().put((_inverted ? 0.0f : 1.0f)).put((float) axisFractionTexture);
 
             i++;
         }
@@ -315,10 +314,10 @@ public class Cylinder extends Mesh {
         if (_closed) {
             _meshData.getVertexBuffer().put(0).put(0).put((float) -halfHeight); // bottom center
             _meshData.getNormalBuffer().put(0).put(0).put(-1 * (_inverted ? -1 : 1));
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(0);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0);
             _meshData.getVertexBuffer().put(0).put(0).put((float) halfHeight); // top center
             _meshData.getNormalBuffer().put(0).put(0).put(1 * (_inverted ? -1 : 1));
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(1);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(1);
         }
     }
 

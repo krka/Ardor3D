@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -63,7 +62,7 @@ public class Tube extends Mesh implements Savable {
         final int verts = (2 * (_axisSamples + 1) * (_radialSamples + 1) + _radialSamples * 4);
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(_meshData.getTextureBuffer(0), verts), 0);
 
         final int tris = (4 * _radialSamples * (1 + _axisSamples));
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * tris));
@@ -120,7 +119,7 @@ public class Tube extends Mesh implements Savable {
     private void setGeometryData() {
         _meshData.getVertexBuffer().rewind();
         _meshData.getNormalBuffer().rewind();
-        _meshData.getTextureCoords(0).coords.rewind();
+        _meshData.getTextureCoords(0).getBuffer().rewind();
 
         final double inverseRadial = 1.0 / _radialSamples;
         final double axisStep = _height / _axisSamples;
@@ -149,7 +148,7 @@ public class Tube extends Mesh implements Savable {
                     _meshData.getNormalBuffer().put((float) -cos[radialCount % _radialSamples]).put(0).put(
                             (float) -sin[radialCount % _radialSamples]);
                 }
-                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
+                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
@@ -166,7 +165,7 @@ public class Tube extends Mesh implements Savable {
                     _meshData.getNormalBuffer().put((float) cos[radialCount % _radialSamples]).put(0).put(
                             (float) sin[radialCount % _radialSamples]);
                 }
-                _meshData.getTextureCoords(0).coords.put((float) (radialCount * inverseRadial)).put(
+                _meshData.getTextureCoords(0).getBuffer().put((float) (radialCount * inverseRadial)).put(
                         (float) (axisTextureStep * axisCount));
             }
         }
@@ -183,9 +182,9 @@ public class Tube extends Mesh implements Savable {
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
                 _meshData.getNormalBuffer().put(0).put(-1).put(0);
             }
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
         // top edge
@@ -201,9 +200,9 @@ public class Tube extends Mesh implements Savable {
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
                 _meshData.getNormalBuffer().put(0).put(1).put(0);
             }
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).coords.put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
                     (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
 

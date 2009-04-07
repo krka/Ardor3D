@@ -35,7 +35,7 @@ public class Point extends Mesh {
     private boolean _antialiased = false;
 
     public Point() {
-        this("point", null, null, null, (TexCoords) null);
+        this("point", null, null, null, (FloatBufferData) null);
     }
 
     /**
@@ -57,7 +57,7 @@ public class Point extends Mesh {
             final Vector2[] texture) {
         super(name);
         reconstruct(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
-                .createFloatBuffer(color), TexCoords.makeNew(texture));
+                .createFloatBuffer(color), FloatBufferDataUtil.makeNew(texture));
         _meshData.setIndexMode(IndexMode.Points);
     }
 
@@ -77,7 +77,7 @@ public class Point extends Mesh {
      *            the texture coordinates of the points.
      */
     public Point(final String name, final FloatBuffer vertex, final FloatBuffer normal, final FloatBuffer color,
-            final TexCoords coords) {
+            final FloatBufferData coords) {
         super(name);
         reconstruct(vertex, normal, color, coords);
         _meshData.setIndexMode(IndexMode.Points);

@@ -80,10 +80,10 @@ import com.ardor3d.scene.state.jogl.JoglWireframeStateUtil;
 import com.ardor3d.scene.state.jogl.JoglZBufferStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.VBOInfo;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -537,12 +537,14 @@ public class JoglRenderer extends AbstractRenderer {
         renderable.render(this);
     }
 
-    public void setupVertexData(final FloatBuffer vertexBuffer, final VBOInfo vbo) {
+    public void setupVertexData(final FloatBufferData vertexBufferData, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
+
+        final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
 
         if (vertexBuffer != null && caps.isVBOSupported() && vbo != null && vbo.isVBOVertexEnabled()
                 && vbo.getVBOVertexID() <= 0) {
@@ -566,7 +568,7 @@ public class JoglRenderer extends AbstractRenderer {
         if (caps.isVBOSupported() && vbo != null && vbo.getVBOVertexID() > 0) {
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOVertexID());
-            gl.glVertexPointer(3, GL.GL_FLOAT, 0, 0);
+            gl.glVertexPointer(vertexBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, 0);
         } else if (vertexBuffer == null) {
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
         } else if (_oldVertexBuffer != vertexBuffer) {
@@ -575,18 +577,20 @@ public class JoglRenderer extends AbstractRenderer {
                 JoglRendererUtil.setBoundVBO(rendRecord, 0);
             }
             vertexBuffer.rewind();
-            gl.glVertexPointer(3, GL.GL_FLOAT, 0, vertexBuffer);
+            gl.glVertexPointer(vertexBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, vertexBuffer);
         }
         _oldVertexBuffer = vertexBuffer;
     }
 
-    public void setupNormalData(final FloatBuffer normalBuffer, final NormalsMode normalMode,
+    public void setupNormalData(final FloatBufferData normalBufferData, final NormalsMode normalMode,
             final Transform worldTransform, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
+
+        final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
 
         if (normalMode != NormalsMode.Off) {
             applyNormalMode(normalMode, worldTransform);
@@ -619,17 +623,19 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public void setupColorData(final FloatBuffer colorBuffer, final VBOInfo vbo, final ColorRGBA defaultColor) {
+    public void setupColorData(final FloatBufferData colorBufferData, final VBOInfo vbo, final ColorRGBA defaultColor) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
+        final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
+
         if ((caps.isVBOSupported() && vbo != null && vbo.getVBOColorID() > 0)) {
             gl.glEnableClientState(GL.GL_COLOR_ARRAY);
             JoglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOColorID());
-            gl.glColorPointer(4, GL.GL_FLOAT, 0, 0);
+            gl.glColorPointer(colorBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, 0);
         } else if (colorBuffer == null) {
             gl.glDisableClientState(GL.GL_COLOR_ARRAY);
 
@@ -645,7 +651,8 @@ public class JoglRenderer extends AbstractRenderer {
                 JoglRendererUtil.setBoundVBO(rendRecord, 0);
             }
             colorBuffer.rewind();
-            gl.glColorPointer(4, GL.GL_FLOAT, 0, colorBuffer); // TODO Check assumed <type> GL_FLOAT
+            gl.glColorPointer(colorBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, colorBuffer); // TODO Check assumed
+            // <type> GL_FLOAT
         }
 
         _oldColorBuffer = colorBuffer;
@@ -665,7 +672,7 @@ public class JoglRenderer extends AbstractRenderer {
         _oldInterleavedBuffer = interleavedBuffer;
     }
 
-    public void setupFogData(final FloatBuffer fogBuffer, final VBOInfo vbo) {
+    public void setupFogData(final FloatBufferData fogBufferData, final VBOInfo vbo) {
     // final RenderContext context = ContextManager.getCurrentContext();
     // final RendererRecord rendRecord = (RendererRecord) context.getRendererRecord();
 
@@ -701,7 +708,7 @@ public class JoglRenderer extends AbstractRenderer {
     // }
     }
 
-    public void setupTextureData(final List<TexCoords> textureCoords, final VBOInfo vbo) {
+    public void setupTextureData(final List<FloatBufferData> textureCoords, final VBOInfo vbo) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
@@ -723,24 +730,24 @@ public class JoglRenderer extends AbstractRenderer {
                     continue;
                 }
 
-                final TexCoords texC = textureCoords.get(i + offset);
+                final FloatBufferData texC = textureCoords.get(i + offset);
                 if ((caps.isVBOSupported() && vbo != null && vbo.getVBOTextureID(i) > 0)) {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     JoglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOTextureID(i));
-                    gl.glTexCoordPointer(texC.perVert, GL.GL_FLOAT, 0, 0);
+                    gl.glTexCoordPointer(texC.getCoordsPerVertex(), GL.GL_FLOAT, 0, 0);
                 } else if (texC == null) {
                     gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != texC.coords) {
+                } else if (_oldTextureBuffers[i] != texC.getBuffer()) {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     if (caps.isVBOSupported()) {
                         JoglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
-                    texC.coords.rewind();
-                    gl.glTexCoordPointer(texC.perVert, GL.GL_FLOAT, 0, texC.coords);
+                    texC.getBuffer().rewind();
+                    gl.glTexCoordPointer(texC.getCoordsPerVertex(), GL.GL_FLOAT, 0, texC.getBuffer());
                 } else {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                 }
-                _oldTextureBuffers[i] = texC != null ? texC.coords : null;
+                _oldTextureBuffers[i] = texC != null ? texC.getBuffer() : null;
             }
 
             if (ts.getNumberOfSetTextures() < _prevTextureNumber) {

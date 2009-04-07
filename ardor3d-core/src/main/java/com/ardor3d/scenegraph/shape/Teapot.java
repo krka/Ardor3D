@@ -11,7 +11,6 @@
 package com.ardor3d.scenegraph.shape;
 
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -698,7 +697,7 @@ public class Teapot extends Mesh {
                 0.125f, 0.0f, 0.0f, 0.75f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.25f, 0.0f, 0.0f, 1.5f, 0.0f, 1.25f, 0.0f,
                 1.0f, 0.0f, 0.75f, 0.0f, 0.5f, 0.0f, 0.25f, 0.0f, 0.0f, 0.0f, 1.75f, 0.0f, 1.5f, 0.0f, 1.25f, 0.0f,
                 1.0f, 0.0f, 0.75f, 0.0f, 0.5f, 0.0f, 0.25f, 0.0f };
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createFloatBuffer(texs)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createFloatBuffer(texs), 0);
     }
 
     private void setIndexData() {

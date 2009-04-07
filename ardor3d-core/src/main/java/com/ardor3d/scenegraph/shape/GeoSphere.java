@@ -16,14 +16,16 @@ import java.nio.IntBuffer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * GeoSphere - generate a polygon mesh approximating a sphere by recursive subdivision. First approximation is an
- * octahedron; each level of refinement increases the number of polygons by a factor of 4. <p/> Shared vertices are not
- * retained, so numerical errors may produce cracks between polygons at high subdivision levels. <p/> Initial idea and
- * text from C-Sourcecode by Jon Leech 3/24/89
+ * octahedron; each level of refinement increases the number of polygons by a factor of 4.
+ * <p/>
+ * Shared vertices are not retained, so numerical errors may produce cracks between polygons at high subdivision levels.
+ * <p/>
+ * Initial idea and text from C-Sourcecode by Jon Leech 3/24/89
  */
 
 public class GeoSphere extends Mesh {
@@ -102,9 +104,9 @@ public class GeoSphere extends Mesh {
         FloatBuffer vertBuf = _meshData.getVertexBuffer();
         _meshData.setVertexBuffer(vertBuf = BufferUtils.createVector3Buffer(vertBuf, verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
-        final TexCoords textureCoords = _meshData.getTextureCoords(0);
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector3Buffer(
-                textureCoords != null ? textureCoords.coords : null, verts)), 0);
+        final FloatBufferData textureCoords = _meshData.getTextureCoords(0);
+        _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector3Buffer(
+                textureCoords != null ? textureCoords.getBuffer() : null, verts), 2), 0);
 
         int pos = 0;
 
@@ -308,7 +310,7 @@ public class GeoSphere extends Mesh {
         final double zNorm = vec.getZ() / length;
         normBuf.put((float) zNorm);
 
-        final FloatBuffer texBuf = _meshData.getTextureCoords(0).coords;
+        final FloatBuffer texBuf = _meshData.getTextureCoords(0).getBuffer();
         if (vec.getX() > 0.0 && vec.getY() == 0.0) {
             if (begining) {
                 texBuf.put(0);

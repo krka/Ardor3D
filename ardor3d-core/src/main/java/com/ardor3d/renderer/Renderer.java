@@ -25,9 +25,9 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.VBOInfo;
 import com.ardor3d.util.Ardor3dException;
 
@@ -310,16 +310,16 @@ public interface Renderer {
      * @param vertices
      *            transform to apply.
      */
-    void setupVertexData(final FloatBuffer vertexBuffer, final VBOInfo vbo);
+    void setupVertexData(final FloatBufferData vertexCoords, final VBOInfo vbo);
 
-    void setupNormalData(final FloatBuffer normalBuffer, final NormalsMode normalMode, final Transform worldTransform,
-            final VBOInfo vbo);
+    void setupNormalData(final FloatBufferData normalCoords, final NormalsMode normalMode,
+            final Transform worldTransform, final VBOInfo vbo);
 
-    void setupColorData(final FloatBuffer colorBuffer, final VBOInfo vbo, final ColorRGBA defaultColor);
+    void setupColorData(final FloatBufferData colorCoords, final VBOInfo vbo, final ColorRGBA defaultColor);
 
-    void setupFogData(final FloatBuffer fogBuffer, final VBOInfo vbo);
+    void setupFogData(final FloatBufferData fogCoords, final VBOInfo vbo);
 
-    void setupTextureData(final List<TexCoords> textureCoords, final VBOInfo vbo);
+    void setupTextureData(final List<FloatBufferData> textureCoords, final VBOInfo vbo);
 
     void setupInterleavedData(final FloatBuffer interleavedBuffer, InterleavedFormat format, final VBOInfo vbo);
 

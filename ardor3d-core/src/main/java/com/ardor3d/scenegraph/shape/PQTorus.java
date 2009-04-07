@@ -16,7 +16,6 @@ import java.nio.IntBuffer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -84,7 +83,7 @@ public class PQTorus extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         final Vector3 pointB = Vector3.fetchTempInstance();
         final Vector3 T = Vector3.fetchTempInstance(), N = Vector3.fetchTempInstance(), B = Vector3.fetchTempInstance();
@@ -137,7 +136,7 @@ public class PQTorus extends Mesh {
 
                 _meshData.getVertexBuffer().put(tempNormA.getXf()).put(tempNormA.getYf()).put(tempNormA.getZf());
                 _meshData.getNormalBuffer().put(tempNormB.getXf()).put(tempNormB.getYf()).put(tempNormB.getZf());
-                _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
+                _meshData.getTextureCoords(0).getBuffer().put((float) radialFraction).put((float) circleFraction);
 
                 nvertex++;
             }

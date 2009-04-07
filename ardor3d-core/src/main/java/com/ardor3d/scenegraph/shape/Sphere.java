@@ -16,7 +16,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -154,7 +153,7 @@ public class Sphere extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         // generate geometry
         final double fInvRS = 1.0 / _radialSamples;
@@ -210,16 +209,16 @@ public class Sphere extends Mesh {
                 }
 
                 if (_textureMode == TextureMode.Linear) {
-                    _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put(
+                    _meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put(
                             (float) (0.5 * (fZFraction + 1.0)));
                 } else if (_textureMode == TextureMode.Projected) {
-                    _meshData.getTextureCoords(0).coords.put((float) fRadialFraction).put(
+                    _meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put(
                             (float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
                 } else if (_textureMode == TextureMode.Polar) {
                     final double r = (MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI;
                     final double u = r * afCos[iR] + 0.5;
                     final double v = r * afSin[iR] + 0.5;
-                    _meshData.getTextureCoords(0).coords.put((float) u).put((float) v);
+                    _meshData.getTextureCoords(0).getBuffer().put((float) u).put((float) v);
                 }
 
                 i++;
@@ -229,13 +228,13 @@ public class Sphere extends Mesh {
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
             if (_textureMode == TextureMode.Linear) {
-                _meshData.getTextureCoords(0).coords.put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
+                _meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
             } else if (_textureMode == TextureMode.Projected) {
-                _meshData.getTextureCoords(0).coords.put(1.0f).put(
+                _meshData.getTextureCoords(0).getBuffer().put(1.0f).put(
                         (float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
             } else if (_textureMode == TextureMode.Polar) {
                 final float r = (float) ((MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI);
-                _meshData.getTextureCoords(0).coords.put(r + 0.5f).put(0.5f);
+                _meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
             }
 
             i++;
@@ -253,11 +252,11 @@ public class Sphere extends Mesh {
             _meshData.getNormalBuffer().put(0).put(0).put(1);
         }
 
-        _meshData.getTextureCoords(0).coords.position(i * 2);
+        _meshData.getTextureCoords(0).getBuffer().position(i * 2);
         if (_textureMode == TextureMode.Polar) {
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(0.5f);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.5f);
         } else {
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(0.0f);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.0f);
         }
 
         i++;
@@ -272,9 +271,9 @@ public class Sphere extends Mesh {
         }
 
         if (_textureMode == TextureMode.Polar) {
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(0.5f);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.5f);
         } else {
-            _meshData.getTextureCoords(0).coords.put(0.5f).put(1.0f);
+            _meshData.getTextureCoords(0).getBuffer().put(0.5f).put(1.0f);
         }
         Vector3.releaseTempInstance(tempVa);
         Vector3.releaseTempInstance(tempVb);

@@ -18,7 +18,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -50,7 +49,7 @@ public class Dodecahedron extends Mesh {
         // allocate vertices
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(NUM_POINTS)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
 
@@ -122,7 +121,7 @@ public class Dodecahedron extends Mesh {
                 tex.setX(0.5);
             }
             tex.setY(Math.acos(vert.getZ()) * MathUtils.INV_PI);
-            _meshData.getTextureCoords(0).coords.put((float) tex.getX()).put((float) tex.getY());
+            _meshData.getTextureCoords(0).getBuffer().put((float) tex.getX()).put((float) tex.getY());
         }
     }
 

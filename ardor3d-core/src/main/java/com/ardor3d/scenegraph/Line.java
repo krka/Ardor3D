@@ -66,7 +66,7 @@ public class Line extends Mesh {
      *            the texture coordinates of the lines.
      */
     public Line(final String name, final FloatBuffer vertex, final FloatBuffer normal, final FloatBuffer color,
-            final TexCoords coords) {
+            final FloatBufferData coords) {
         super(name);
         reconstruct(vertex, normal, color, coords);
         _meshData.setIndexMode(IndexMode.Lines);
@@ -91,13 +91,13 @@ public class Line extends Mesh {
             final Vector2[] texture) {
         super(name);
         reconstruct(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
-                .createFloatBuffer(color), TexCoords.makeNew(texture));
+                .createFloatBuffer(color), FloatBufferDataUtil.makeNew(texture));
         _meshData.setIndexMode(IndexMode.Lines);
     }
 
     @Override
     public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final TexCoords coords) {
+            final FloatBufferData coords) {
         super.reconstruct(vertices, normals, colors, coords);
         generateIndices();
     }

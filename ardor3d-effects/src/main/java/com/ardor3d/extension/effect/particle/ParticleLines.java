@@ -18,7 +18,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -69,7 +68,7 @@ public class ParticleLines extends ParticleSystem {
         attachChild(line);
         line.getMeshData().setVertexBuffer(_geometryCoordinates);
         line.getMeshData().setColorBuffer(_appearanceColors);
-        line.getMeshData().setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(numParticles * 2)), 0);
+        line.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * 2), 0);
         line.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(indices));
         setRenderBucketType(RenderBucketType.Opaque);
         setLightCombineMode(Spatial.LightCombineMode.Off);
@@ -81,7 +80,7 @@ public class ParticleLines extends ParticleSystem {
             _particles[k].setStartIndex(k * verts);
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
-                BufferUtils.setInBuffer(sharedTextureData[a], line.getMeshData().getTextureCoords(0).coords, ind);
+                BufferUtils.setInBuffer(sharedTextureData[a], line.getMeshData().getTextureCoords(0).getBuffer(), ind);
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 

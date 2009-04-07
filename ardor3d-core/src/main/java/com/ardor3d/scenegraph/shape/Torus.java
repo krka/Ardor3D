@@ -15,7 +15,6 @@ import java.io.IOException;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -79,7 +78,7 @@ public class Torus extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
 
         // allocate texture coordinates
-        _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(verts)), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         // generate geometry
         final double inverseCircleSamples = 1.0 / _circleSamples;
@@ -119,14 +118,14 @@ public class Torus extends Mesh {
                 _meshData.getVertexBuffer().put((float) tempNormal.getX()).put((float) tempNormal.getY()).put(
                         (float) tempNormal.getZ());
 
-                _meshData.getTextureCoords(0).coords.put((float) radialFraction).put((float) circleFraction);
+                _meshData.getTextureCoords(0).getBuffer().put((float) radialFraction).put((float) circleFraction);
                 i++;
             }
 
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-            _meshData.getTextureCoords(0).coords.put(1.0f).put((float) circleFraction);
+            _meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) circleFraction);
 
             i++;
         }
@@ -135,8 +134,8 @@ public class Torus extends Mesh {
         for (int iR = 0; iR <= _radialSamples; iR++, i++) {
             BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iR, i);
             BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iR, i);
-            BufferUtils.copyInternalVector2(_meshData.getTextureCoords(0).coords, iR, i);
-            _meshData.getTextureCoords(0).coords.put(i * 2 + 1, 1.0f);
+            BufferUtils.copyInternalVector2(_meshData.getTextureCoords(0).getBuffer(), iR, i);
+            _meshData.getTextureCoords(0).getBuffer().put(i * 2 + 1, 1.0f);
         }
     }
 

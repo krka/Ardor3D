@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.FloatBufferDataUtil;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 
 /**
  * Note: Does not work with geometry using texcoords other than 2d coords.
@@ -56,7 +56,7 @@ public abstract class GeometryTool {
             final Vector2[][] tex = new Vector2[mesh.getMeshData().getNumberOfUnits()][];
             for (int x = 0; x < tex.length; x++) {
                 if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x).coords);
+                    tex[x] = BufferUtils.getVector2Array(mesh.getMeshData().getTextureCoords(x).getBuffer());
                 }
             }
 
@@ -133,7 +133,7 @@ public abstract class GeometryTool {
             for (int x = 0; x < newTexs.length; x++) {
                 if (mesh.getMeshData().getTextureCoords(x) != null) {
                     mesh.getMeshData().setTextureCoords(
-                            TexCoords.makeNew((Vector2[]) newTexs[x].toArray(new Vector2[0])), x);
+                            FloatBufferDataUtil.makeNew((Vector2[]) newTexs[x].toArray(new Vector2[0])), x);
                 }
             }
 

@@ -24,7 +24,7 @@ import com.ardor3d.extension.model.collada.binding.core.DaeParamType;
 import com.ardor3d.extension.model.collada.binding.core.DaeSource;
 import com.ardor3d.extension.model.collada.binding.core.DaeVertices;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class ColladaInputPipe {
@@ -102,7 +102,7 @@ public class ColladaInputPipe {
                 break;
             case TEXCOORD:
                 _buffer = BufferUtils.createFloatBuffer(size);
-                meshData.setTextureCoords(new TexCoords(_buffer, _params.size()), _set);
+                meshData.setTextureCoords(new FloatBufferData(_buffer, _params.size()), _set);
                 break;
             default:
         }

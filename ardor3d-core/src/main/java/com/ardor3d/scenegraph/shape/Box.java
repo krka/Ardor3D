@@ -16,7 +16,6 @@ import java.nio.FloatBuffer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -231,8 +230,8 @@ public class Box extends Mesh implements Savable {
      */
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
-            _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
-            final FloatBuffer tex = _meshData.getTextureCoords(0).coords;
+            _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(24), 0);
+            final FloatBuffer tex = _meshData.getTextureBuffer(0);
 
             for (int i = 0; i < 6; i++) {
                 tex.put(1).put(0);

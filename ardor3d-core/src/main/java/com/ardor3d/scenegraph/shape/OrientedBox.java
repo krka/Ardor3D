@@ -15,7 +15,7 @@ import java.io.IOException;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -111,13 +111,13 @@ public class OrientedBox extends Mesh {
      */
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
-            _meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(24)), 0);
+            _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector2Buffer(24), 2), 0);
 
             for (int x = 0; x < 6; x++) {
-                _meshData.getTextureCoords(0).coords.put(_texTopRight.getXf()).put(_texTopRight.getYf());
-                _meshData.getTextureCoords(0).coords.put(_texTopLeft.getXf()).put(_texTopLeft.getYf());
-                _meshData.getTextureCoords(0).coords.put(_texBotLeft.getXf()).put(_texBotLeft.getYf());
-                _meshData.getTextureCoords(0).coords.put(_texBotRight.getXf()).put(_texBotRight.getYf());
+                _meshData.getTextureCoords(0).getBuffer().put(_texTopRight.getXf()).put(_texTopRight.getYf());
+                _meshData.getTextureCoords(0).getBuffer().put(_texTopLeft.getXf()).put(_texTopLeft.getYf());
+                _meshData.getTextureCoords(0).getBuffer().put(_texBotLeft.getXf()).put(_texBotLeft.getYf());
+                _meshData.getTextureCoords(0).getBuffer().put(_texBotRight.getXf()).put(_texBotRight.getYf());
             }
         }
     }

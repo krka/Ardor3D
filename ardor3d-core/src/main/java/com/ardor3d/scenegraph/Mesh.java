@@ -232,14 +232,14 @@ public class Mesh extends Spatial implements Renderable {
                 renderer.setupInterleavedData(_meshData.getInterleavedBuffer(), _meshData.getInterleavedFormat(),
                         _vboInfo);
             } else {
-                renderer.setupVertexData(_meshData.getVertexBuffer(), _vboInfo);
+                renderer.setupVertexData(_meshData.getVertexCoords(), _vboInfo);
                 if (RENDER_VERTEX_ONLY) {
                     renderer.setupNormalData(null, NormalsMode.Off, null, null);
                     renderer.setupColorData(null, null, null);
                     renderer.setupTextureData(null, null);
                 } else {
-                    renderer.setupNormalData(_meshData.getNormalBuffer(), getNormalsMode(), _worldTransform, _vboInfo);
-                    renderer.setupColorData(_meshData.getColorBuffer(), _vboInfo, _defaultColor);
+                    renderer.setupNormalData(_meshData.getNormalCoords(), getNormalsMode(), _worldTransform, _vboInfo);
+                    renderer.setupColorData(_meshData.getColorCoords(), _vboInfo, _defaultColor);
                     renderer.setupTextureData(_meshData.getTextureCoords(), _vboInfo);
                 }
             }
@@ -307,7 +307,7 @@ public class Mesh extends Spatial implements Renderable {
      *            the new texture coordinates to use (position 0).
      */
     public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final TexCoords coords) {
+            final FloatBufferData coords) {
 
         _meshData.setVertexBuffer(vertices);
         _meshData.setNormalBuffer(normals);
@@ -332,7 +332,7 @@ public class Mesh extends Spatial implements Renderable {
      *            the new texture coordinates to use (position 0).
      */
     public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final TexCoords coords, final IntBuffer indices) {
+            final FloatBufferData coords, final IntBuffer indices) {
 
         reconstruct(vertices, normals, colors, coords);
         _meshData.setIndexBuffer(indices);

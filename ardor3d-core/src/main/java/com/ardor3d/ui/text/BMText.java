@@ -24,7 +24,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.TexCoords;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -645,7 +645,7 @@ public class BMText extends Mesh {
                 cursorX += chr.xadvance + kern + _spacing;
             }
         }
-        reconstruct(vertices, null, null, new TexCoords(texCrds), indices);
+        reconstruct(vertices, null, null, new FloatBufferData(texCrds, 2), indices);
     }
 
     // this is inefficient yet incredibly convenient

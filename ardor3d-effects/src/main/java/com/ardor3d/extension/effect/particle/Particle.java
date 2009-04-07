@@ -299,7 +299,7 @@ public class Particle implements Savable {
                 // set texcoords
                 final float sU = col / side, eU = (col + 1) / side;
                 final float sV = row / side, eV = (row + 1) / side;
-                final FloatBuffer texs = parent.getParticleGeometry().getMeshData().getTextureCoords(0).coords;
+                final FloatBuffer texs = parent.getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer();
                 texs.position(startIndex * 2);
                 texs.put(sU).put(sV);
                 texs.put(sU).put(eV);

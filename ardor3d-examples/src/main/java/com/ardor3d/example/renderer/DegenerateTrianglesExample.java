@@ -31,7 +31,6 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.scenegraph.Spatial.CullHint;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
@@ -124,8 +123,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
 
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
-        meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
+        final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(totalSize);
 
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2);
         final int[] indexLengths = new int[ySize - 1];
@@ -149,6 +147,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
 
         meshData.setVertexBuffer(vertexBuffer);
         meshData.setNormalBuffer(normalBuffer);
+        meshData.setTextureBuffer(textureBuffer, 0);
 
         meshData.setIndexBuffer(indexBuffer);
         meshData.setIndexLengths(indexLengths);
@@ -163,8 +162,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
 
         final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize);
         final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize);
-        meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
+        final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(totalSize);
 
         final IntBuffer indexBuffer = BufferUtils.createIntBuffer((ySize - 1) * xSize * 2 + (ySize - 1) * 2);
 
@@ -190,6 +188,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
 
         meshData.setVertexBuffer(vertexBuffer);
         meshData.setNormalBuffer(normalBuffer);
+        meshData.setTextureBuffer(textureBuffer, 0);
 
         meshData.setIndexBuffer(indexBuffer);
         meshData.setIndexMode(IndexMode.TriangleStrip);

@@ -22,7 +22,6 @@ import com.ardor3d.renderer.InterleavedFormat;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.TexCoords;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
@@ -59,73 +58,13 @@ public class InterleavedDataExample extends ExampleBase {
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.Guess, true));
 
-        final Mesh automaticMesh = createAutomaticMesh();
-        automaticMesh.setRenderState(ts);
-        automaticMesh.updateModelBound();
-
         final Mesh manualMesh = createManualMesh();
         manualMesh.setRenderState(ts);
         manualMesh.updateModelBound();
 
-        automaticMesh.setTranslation(-110, 0, -300);
-        manualMesh.setTranslation(10, 0, -300);
+        manualMesh.setTranslation(-50, -50, -200);
 
-        _root.attachChild(automaticMesh);
         _root.attachChild(manualMesh);
-    }
-
-    private Mesh createAutomaticMesh() {
-        final Mesh mesh = new Mesh();
-        final MeshData meshData = mesh.getMeshData();
-
-        final int xSize = 100;
-        final int ySize = 100;
-        final int totalSize = xSize * ySize;
-
-        final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
-        final FloatBuffer normalBuffer = BufferUtils.createVector3Buffer(totalSize * 6);
-        meshData.setTextureCoords(new TexCoords(BufferUtils.createVector2Buffer(totalSize * 6)), 0);
-        final FloatBuffer textureBuffer = meshData.getTextureCoords(0).coords;
-        final IntBuffer indexBuffer = BufferUtils.createIntBuffer(totalSize * 6);
-
-        for (int y = 0; y < ySize; y++) {
-            for (int x = 0; x < xSize; x++) {
-                vertexBuffer.put(x).put(y).put(0);
-                vertexBuffer.put(x + 1).put(y).put(0);
-                vertexBuffer.put(x).put(y + 1).put(0);
-
-                vertexBuffer.put(x + 1).put(y).put(0);
-                vertexBuffer.put(x + 1).put(y + 1).put(0);
-                vertexBuffer.put(x).put(y + 1).put(0);
-
-                normalBuffer.put(0).put(0).put(1);
-                normalBuffer.put(0).put(0).put(1);
-                normalBuffer.put(0).put(0).put(1);
-
-                normalBuffer.put(0).put(0).put(1);
-                normalBuffer.put(0).put(0).put(1);
-                normalBuffer.put(0).put(0).put(1);
-
-                textureBuffer.put(0).put(0);
-                textureBuffer.put(1).put(0);
-                textureBuffer.put(0).put(1);
-
-                textureBuffer.put(1).put(0);
-                textureBuffer.put(1).put(1);
-                textureBuffer.put(0).put(1);
-            }
-        }
-
-        for (int index = 0; index < totalSize * 6; index++) {
-            indexBuffer.put(index);
-        }
-
-        meshData.setVertexBuffer(vertexBuffer);
-        meshData.setNormalBuffer(normalBuffer);
-        meshData.setIndexBuffer(indexBuffer);
-
-        meshData.packInterleaved();
-        return mesh;
     }
 
     private Mesh createManualMesh() {
