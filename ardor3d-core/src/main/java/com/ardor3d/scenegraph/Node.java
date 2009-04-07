@@ -11,8 +11,6 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -162,11 +160,11 @@ public class Node extends Spatial {
         if (childName == null) {
             return -1;
         }
-        for (int x = 0, max = _children.size(); x < max; x++) {
-            final Spatial child = _children.get(x);
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+            final Spatial child = _children.get(i);
             if (childName.equals(child.getName())) {
-                detachChildAt(x);
-                return x;
+                detachChildAt(i);
+                return i;
             }
         }
         return -1;
@@ -200,7 +198,7 @@ public class Node extends Spatial {
      * <code>detachAllChildren</code> removes all children attached to this node.
      */
     public void detachAllChildren() {
-        for (int i = _children.size() - 1; i >= 0; i--) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             detachChildAt(i);
         }
         logger.fine("All children removed.");
@@ -242,8 +240,7 @@ public class Node extends Spatial {
 
     @Override
     protected void updateChildren(final double time) {
-        // FIXME: Not thread safe.
-        for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial pkChild = getChild(i);
             if (pkChild != null) {
                 pkChild.updateGeometricState(time, false);
@@ -274,8 +271,8 @@ public class Node extends Spatial {
         if (name == null) {
             return null;
         }
-        for (int x = 0, cSize = getNumberOfChildren(); x < cSize; x++) {
-            final Spatial child = _children.get(x);
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+            final Spatial child = _children.get(i);
             if (name.equals(child.getName())) {
                 return child;
             } else if (child instanceof Node) {
@@ -300,7 +297,7 @@ public class Node extends Spatial {
             return true;
         }
 
-        for (int i = 0, max = getNumberOfChildren(); i < max; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial child = _children.get(i);
             if (child instanceof Node && ((Node) child).hasChild(spat)) {
                 return true;
@@ -324,7 +321,7 @@ public class Node extends Spatial {
     public void propagateDirtyDown(final DirtyType dirtyType) {
         super.propagateDirtyDown(dirtyType);
 
-        for (int i = 0, max = getNumberOfChildren(); i < max; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial child = _children.get(i);
 
             child.propagateDirtyDown(dirtyType);
@@ -336,7 +333,7 @@ public class Node extends Spatial {
         super.updateWorldTransform(recurse);
 
         if (recurse) {
-            for (int i = 0, n = getNumberOfChildren(); i < n; i++) {
+            for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
                 _children.get(i).updateWorldTransform(true);
             }
         }
@@ -348,7 +345,7 @@ public class Node extends Spatial {
         super.applyWorldRenderStates(recurse, stateStacks);
 
         if (recurse) {
-            for (int i = 0, n = getNumberOfChildren(); i < n; i++) {
+            for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
                 _children.get(i).applyWorldRenderStates(true, stateStacks);
             }
         }
@@ -364,7 +361,7 @@ public class Node extends Spatial {
     @Override
     public void draw(final Renderer r) {
         Spatial child;
-        for (int i = 0, cSize = _children.size(); i < cSize; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             child = _children.get(i);
             if (child != null) {
                 child.onDraw(r);
@@ -381,7 +378,7 @@ public class Node extends Spatial {
     @Override
     public void updateWorldBound(final boolean recurse) {
         BoundingVolume worldBound = null;
-        for (int i = 0, cSize = _children.size(); i < cSize; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial child = _children.get(i);
             if (child != null) {
                 if (recurse) {
@@ -410,7 +407,7 @@ public class Node extends Spatial {
         }
 
         Spatial child;
-        for (int i = 0, cSize = _children.size(); i < cSize; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             child = _children.get(i);
             if (child != null) {
                 child.acceptVisitor(visitor, preexecute);
@@ -424,7 +421,7 @@ public class Node extends Spatial {
 
     @Override
     public void sortLights() {
-        for (int i = 0, cSize = _children.size(); i < cSize; i++) {
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial pkChild = getChild(i);
             if (pkChild != null) {
                 pkChild.sortLights();
@@ -466,38 +463,9 @@ public class Node extends Spatial {
         }
 
         // go through children and set parent to this node
-        for (int x = 0, cSize = _children.size(); x < cSize; x++) {
-            final Spatial child = _children.get(x);
+        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+            final Spatial child = _children.get(i);
             child._parent = this;
         }
-    }
-
-    // /////////////////
-    // Methods for Externalizable
-    // /////////////////
-
-    /**
-     * Used with serialization. Not to be called manually.
-     * 
-     * @param in
-     *            ObjectInput
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    @Override
-    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
-    // TODO
-    }
-
-    /**
-     * Used with serialization. Not to be called manually.
-     * 
-     * @param out
-     *            ObjectOutput
-     * @throws IOException
-     */
-    @Override
-    public void writeExternal(final ObjectOutput out) throws IOException {
-    // TODO
     }
 }
