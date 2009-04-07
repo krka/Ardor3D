@@ -117,6 +117,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected FirstPersonControl _controlHandle;
 
+    protected Vector3 _worldUp = new Vector3(0, 1, 0);
+
     @Inject
     public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
         _logicalLayer = logicalLayer;
@@ -424,7 +426,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             return;
         }
 
-        _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, Vector3.UNIT_Y, true);
+        _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, _worldUp, true);
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
                 new TriggerAction() {
