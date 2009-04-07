@@ -23,12 +23,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Matrix4;
-import com.ardor3d.math.Quaternion;
-import com.ardor3d.math.Vector2;
-import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyMatrix3;
+import com.ardor3d.math.type.ReadOnlyMatrix4;
+import com.ardor3d.math.type.ReadOnlyQuaternion;
+import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -500,7 +501,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
-    public void setUniform(final String name, final Vector2 value) {
+    public void setUniform(final String name, final ReadOnlyVector2 value) {
         final ShaderVariableFloat2 shaderUniform = getShaderUniform(name, ShaderVariableFloat2.class);
         shaderUniform.value1 = (float) value.getX();
         shaderUniform.value2 = (float) value.getY();
@@ -516,7 +517,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
-    public void setUniform(final String name, final Vector3 value) {
+    public void setUniform(final String name, final ReadOnlyVector3 value) {
         final ShaderVariableFloat3 shaderUniform = getShaderUniform(name, ShaderVariableFloat3.class);
         shaderUniform.value1 = (float) value.getX();
         shaderUniform.value2 = (float) value.getY();
@@ -533,7 +534,25 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
-    public void setUniform(final String name, final ColorRGBA value) {
+    public void setUniform(final String name, final ReadOnlyVector4 value) {
+        final ShaderVariableFloat4 shaderUniform = getShaderUniform(name, ShaderVariableFloat4.class);
+        shaderUniform.value1 = (float) value.getX();
+        shaderUniform.value2 = (float) value.getY();
+        shaderUniform.value3 = (float) value.getZ();
+        shaderUniform.value4 = (float) value.getW();
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform variable to change
+     * @param value
+     *            the new value
+     */
+    public void setUniform(final String name, final ReadOnlyColorRGBA value) {
         final ShaderVariableFloat4 shaderUniform = getShaderUniform(name, ShaderVariableFloat4.class);
         shaderUniform.value1 = value.getRed();
         shaderUniform.value2 = value.getGreen();
@@ -551,7 +570,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
-    public void setUniform(final String name, final Quaternion value) {
+    public void setUniform(final String name, final ReadOnlyQuaternion value) {
         final ShaderVariableFloat4 shaderUniform = getShaderUniform(name, ShaderVariableFloat4.class);
         shaderUniform.value1 = (float) value.getX();
         shaderUniform.value2 = (float) value.getY();
@@ -597,7 +616,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param rowMajor
      *            true if is this in row major order
      */
-    public void setUniform(final String name, final Matrix3 value, final boolean rowMajor) {
+    public void setUniform(final String name, final ReadOnlyMatrix3 value, final boolean rowMajor) {
         final ShaderVariableMatrix3 shaderUniform = getShaderUniform(name, ShaderVariableMatrix3.class);
         // prepare buffer for writing
         shaderUniform.matrixBuffer.rewind();
@@ -619,7 +638,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param rowMajor
      *            true if is this in row major order
      */
-    public void setUniform(final String name, final Matrix4 value, final boolean rowMajor) {
+    public void setUniform(final String name, final ReadOnlyMatrix4 value, final boolean rowMajor) {
         final ShaderVariableMatrix4 shaderUniform = getShaderUniform(name, ShaderVariableMatrix4.class);
         // prepare buffer for writing
         shaderUniform.matrixBuffer.rewind();
@@ -661,7 +680,7 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param rowMajor
      *            true if is this in row major order
      */
-    public void setUniform(final String name, final Matrix4[] values, final boolean rowMajor) {
+    public void setUniform(final String name, final ReadOnlyMatrix4[] values, final boolean rowMajor) {
         final ShaderVariableMatrix4Array shaderUniform = getShaderUniform(name, ShaderVariableMatrix4Array.class);
         // prepare buffer for writing
         FloatBuffer matrixBuffer = shaderUniform.matrixBuffer;
@@ -671,7 +690,7 @@ public class GLSLShaderObjectsState extends RenderState {
         }
 
         matrixBuffer.rewind();
-        for (final Matrix4 value : values) {
+        for (final ReadOnlyMatrix4 value : values) {
             value.toFloatBuffer(matrixBuffer);
         }
         matrixBuffer.flip();
