@@ -90,16 +90,23 @@ public class LittleEndien implements DataInput {
     }
 
     public final void readFully(final byte b[]) throws IOException {
-        final int i = in.read(b, 0, b.length);
-        if (i == -1) {
-            throw new EOFException("EOF reached");
-        }
+        readFully(b, 0, b.length);
     }
 
     public final void readFully(final byte b[], final int off, final int len) throws IOException {
-        final int i = in.read(b, off, len);
-        if (i == -1) {
+        // this may look over-complicated, but the problem is that the InputStream.read() methods are
+        // not guaranteed to fill up the buffer you pass to it. So we need to loop until we have filled
+        // up the buffer or until we reach the end of the file.
+
+        final int bytesRead = in.read(b, off, len);
+
+        if (bytesRead == -1) {
             throw new EOFException("EOF reached");
+        }
+
+        if (bytesRead < len) {
+            // we didn't get all the data we wanted, so read some more
+            readFully(b, off + bytesRead, len - bytesRead);
         }
     }
 
