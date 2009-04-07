@@ -13,6 +13,7 @@ package com.ardor3d.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInput;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -89,11 +90,17 @@ public class LittleEndien implements DataInput {
     }
 
     public final void readFully(final byte b[]) throws IOException {
-        in.read(b, 0, b.length);
+        final int i = in.read(b, 0, b.length);
+        if (i == -1) {
+            throw new EOFException("EOF reached");
+        }
     }
 
     public final void readFully(final byte b[], final int off, final int len) throws IOException {
-        in.read(b, off, len);
+        final int i = in.read(b, off, len);
+        if (i == -1) {
+            throw new EOFException("EOF reached");
+        }
     }
 
     public final int skipBytes(final int n) throws IOException {
