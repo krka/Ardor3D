@@ -88,7 +88,11 @@ public class MeshData implements Cloneable, Savable {
      *            the new vertex buffer
      */
     public void setVertexBuffer(final FloatBuffer vertexBuffer) {
-        _vertexCoords = new FloatBufferData(vertexBuffer, 3);
+        if (vertexBuffer == null) {
+            _vertexCoords = null;
+        } else {
+            _vertexCoords = new FloatBufferData(vertexBuffer, 3);
+        }
         updateVertexCount();
     }
 
@@ -130,7 +134,11 @@ public class MeshData implements Cloneable, Savable {
      *            the new normal buffer
      */
     public void setNormalBuffer(final FloatBuffer normalBuffer) {
-        _normalCoords = new FloatBufferData(normalBuffer, 3);
+        if (normalBuffer == null) {
+            _normalCoords = null;
+        } else {
+            _normalCoords = new FloatBufferData(normalBuffer, 3);
+        }
     }
 
     /**
@@ -171,7 +179,11 @@ public class MeshData implements Cloneable, Savable {
      *            the new color buffer
      */
     public void setColorBuffer(final FloatBuffer colorBuffer) {
-        _colorCoords = new FloatBufferData(colorBuffer, 4);
+        if (colorBuffer == null) {
+            _colorCoords = null;
+        } else {
+            _colorCoords = new FloatBufferData(colorBuffer, 4);
+        }
     }
 
     /**
@@ -212,7 +224,11 @@ public class MeshData implements Cloneable, Savable {
      *            the new fog buffer
      */
     public void setFogBuffer(final FloatBuffer fogBuffer) {
-        _fogCoords = new FloatBufferData(fogBuffer, 3);
+        if (fogBuffer == null) {
+            _fogCoords = null;
+        } else {
+            _fogCoords = new FloatBufferData(fogBuffer, 3);
+        }
     }
 
     /**
@@ -253,7 +269,11 @@ public class MeshData implements Cloneable, Savable {
      *            the new tagent buffer
      */
     public void setTagentBuffer(final FloatBuffer tangentBuffer) {
-        _tangentCoords = new FloatBufferData(tangentBuffer, 3);
+        if (tangentBuffer == null) {
+            _tangentCoords = null;
+        } else {
+            _tangentCoords = new FloatBufferData(tangentBuffer, 3);
+        }
     }
 
     /**
