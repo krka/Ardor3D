@@ -1033,7 +1033,7 @@ public abstract class Spatial implements Cloneable, Savable {
      * @return True if the SpatialController was in the list to remove.
      * @see com.ardor3d.scenegraph.SpatialController
      */
-    public boolean removeController(final SpatialController controller) {
+    public boolean removeController(final SpatialController<?> controller) {
         if (_controllers == null) {
             return false;
         }
