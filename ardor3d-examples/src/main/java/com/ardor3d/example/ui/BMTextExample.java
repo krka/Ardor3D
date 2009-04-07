@@ -23,9 +23,8 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
@@ -89,8 +88,8 @@ public class BMTextExample extends ExampleBase {
         zup.attachChild(textMoveNode);
         textMoveNode.attachChild(textExampleNode);
 
-        final Controller fontChanger = createFontChanger();
-        final Controller nodeMover = createNodeMover();
+        final SpatialController<BMText> fontChanger = createFontChanger();
+        final SpatialController<Node> nodeMover = createNodeMover();
         textMoveNode.addController(nodeMover);
 
         final BMFont font = BMFontLoader.defaultFont();
@@ -164,17 +163,15 @@ public class BMTextExample extends ExampleBase {
      * 
      */
     // -----------------------------------------------------
-    Controller createFontChanger() {
-        final Controller fontChanger = new Controller() {
+    SpatialController<BMText> createFontChanger() {
+        final SpatialController<BMText> fontChanger = new SpatialController<BMText>() {
             private static final long serialVersionUID = 1L;
 
             final Random rand = new Random();
             final int changeInterval = 20000;
             final List<BMFont> fonts = BMFontLoader.allFonts();
 
-            @Override
-            public void update(final double time, final Spatial caller) {
-                final BMText text = (BMText) caller;
+            public void update(final double time, final BMText text) {
                 final int t = (int) (System.currentTimeMillis() / changeInterval);
                 final int index = t % fonts.size();
                 if (!fonts.get(index).equals(text.getFont())) {
@@ -202,14 +199,13 @@ public class BMTextExample extends ExampleBase {
      * 
      */
     // -----------------------------------------------------
-    private Controller createNodeMover() {
-        final Controller nodeMover = new Controller() {
+    private SpatialController<Node> createNodeMover() {
+        final SpatialController<Node> nodeMover = new SpatialController<Node>() {
             private static final long serialVersionUID = 1L;
 
             Matrix3 rot = new Matrix3();
 
-            @Override
-            public void update(final double time, final Spatial caller) {
+            public void update(final double time, final Node caller) {
                 final long t = System.currentTimeMillis();
                 final double s = Math.cos(t * Math.PI / 10000.0);
                 final double y = 60 + s * 65;

@@ -21,12 +21,13 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 /**
- * <code>Controller</code> provides a base class for creation of controllers to modify nodes and render states over
- * time. The base controller provides a repeat type, min and max time, as well as speed. Subclasses of this will provide
- * the update method that takes the time between the last call and the current one and modifies an object in a
- * application specific way.
+ * <code>ComplexSpatialController</code> provides a base class for creation of controllers to modify nodes and render
+ * states over time. The base controller provides a repeat type, min and max time, as well as speed. Subclasses of this
+ * will provide the update method that takes the time between the last call and the current one and modifies an object
+ * in a application specific way.
  */
-public abstract class Controller implements Serializable, Savable {
+public abstract class ComplexSpatialController<T extends Spatial> implements SpatialController<T>, Serializable,
+        Savable {
 
     private static final long serialVersionUID = 1;
 
@@ -174,16 +175,7 @@ public abstract class Controller implements Serializable, Savable {
         return _active;
     }
 
-    /**
-     * Defined by extending classes, <code>update</code> is a signal to Controller that it should update whatever
-     * object(s) it is controlling.
-     * 
-     * @param time
-     *            The time in seconds between the last call to update and the current one
-     * @param caller
-     *            The spatial currently executing this controller.
-     */
-    public abstract void update(double time, Spatial caller);
+    public abstract void update(double time, T caller);
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
@@ -203,7 +195,8 @@ public abstract class Controller implements Serializable, Savable {
         _active = capsule.readBoolean("active", true);
     }
 
-    public Class<? extends Controller> getClassTag() {
+    @SuppressWarnings("unchecked")
+    public Class<? extends ComplexSpatialController> getClassTag() {
         return this.getClass();
     }
 

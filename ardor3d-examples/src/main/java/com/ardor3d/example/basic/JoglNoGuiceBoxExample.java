@@ -29,9 +29,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
@@ -130,14 +129,13 @@ public class JoglNoGuiceBoxExample implements Scene {
         _root.attachChild(_box);
 
         // set it to rotate:
-        _box.addController(new Controller() {
+        _box.addController(new SpatialController<Box>() {
             private static final long serialVersionUID = 1L;
             private final Vector3 _axis = new Vector3(1, 1, 0.5f).normalizeLocal();
             private final Matrix3 _rotate = new Matrix3();
             private double _angle = 0;
 
-            @Override
-            public void update(final double time, final Spatial caller) {
+            public void update(final double time, final Box caller) {
                 // update our rotation
                 _angle = _angle + (_timer.getTimePerFrame() * 25);
                 if (_angle > 180) {

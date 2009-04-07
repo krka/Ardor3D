@@ -27,11 +27,10 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.shape.PQTorus;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -81,14 +80,13 @@ public class CollisionTreeExample extends ExampleBase {
 
         torusNode = new Node("torus node");
 
-        torus.addController(new Controller() {
+        torus.addController(new SpatialController<PQTorus>() {
             private static final long serialVersionUID = 1L;
             private double currentTime;
 
-            @Override
-            public void update(final double time, final Spatial caller) {
+            public void update(final double time, final PQTorus caller) {
                 currentTime += time * 0.2;
-                final ReadOnlyVector3 t = torus.getTranslation();
+                final ReadOnlyVector3 t = caller.getTranslation();
                 caller.setTranslation(Math.sin(currentTime) * 10.0, t.getY(), t.getZ());
             }
         });

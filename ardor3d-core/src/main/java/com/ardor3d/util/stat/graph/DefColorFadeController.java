@@ -11,9 +11,9 @@
 package com.ardor3d.util.stat.graph;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.Spatial.CullHint;
 
 /**
@@ -33,7 +33,7 @@ import com.ardor3d.scenegraph.Spatial.CullHint;
  * blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
  * </pre>
  */
-public class DefColorFadeController extends Controller {
+public class DefColorFadeController implements SpatialController<Spatial> {
 
     private static final long serialVersionUID = 1L;
 
@@ -63,7 +63,6 @@ public class DefColorFadeController extends Controller {
         _rate = rate;
     }
 
-    @Override
     public void update(final double time, final Spatial caller) {
         if (_target == null) {
             return;

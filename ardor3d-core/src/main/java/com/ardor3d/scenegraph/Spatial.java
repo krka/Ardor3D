@@ -10,10 +10,7 @@
 
 package com.ardor3d.scenegraph;
 
-import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -46,7 +43,7 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Maps;
 
-public abstract class Spatial implements Cloneable, Savable, Externalizable {
+public abstract class Spatial implements Cloneable, Savable {
 
     /** This spatial's name. */
     protected String _name;
@@ -64,7 +61,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
     protected Node _parent;
 
     /** ArrayList of controllers for this spatial. */
-    protected List<Controller> _controllers;
+    protected List<SpatialController<?>> _controllers;
 
     /** The render states of this spatial. */
     protected final EnumMap<RenderState.StateType, RenderState> _renderStateList = new EnumMap<RenderState.StateType, RenderState>(
@@ -592,18 +589,17 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
 
     }
 
+    @SuppressWarnings("unchecked")
     public void updateControllers(final double time) {
         if (_controllers != null) {
             for (int i = 0, gSize = _controllers.size(); i < gSize; i++) {
                 try {
-                    final Controller controller = _controllers.get(i);
+                    final SpatialController controller = _controllers.get(i);
                     if (controller != null) {
-                        if (controller.isActive()) {
-                            controller.update(time, this);
-                        }
+                        controller.update(time, this);
                     }
                 } catch (final IndexOutOfBoundsException e) {
-                    // a controller was removed in Controller.update (note: this
+                    // a controller was removed in SpatialController.update (note: this
                     // may skip one controller)
                     break;
                 }
@@ -1016,28 +1012,28 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
     }
 
     /**
-     * Adds a Controller to this Spatial's list of controllers.
+     * Adds a SpatialController to this Spatial's list of controllers.
      * 
      * @param controller
-     *            The Controller to add
-     * @see com.ardor3d.scenegraph.Controller
+     *            The SpatialController to add
+     * @see com.ardor3d.scenegraph.SpatialController
      */
-    public void addController(final Controller controller) {
+    public void addController(final SpatialController<?> controller) {
         if (_controllers == null) {
-            _controllers = new ArrayList<Controller>(1);
+            _controllers = new ArrayList<SpatialController<?>>(1);
         }
         _controllers.add(controller);
     }
 
     /**
-     * Removes a Controller from this Spatial's list of controllers, if it exist.
+     * Removes a SpatialController from this Spatial's list of controllers, if it exist.
      * 
      * @param controller
-     *            The Controller to remove
-     * @return True if the Controller was in the list to remove.
-     * @see com.ardor3d.scenegraph.Controller
+     *            The SpatialController to remove
+     * @return True if the SpatialController was in the list to remove.
+     * @see com.ardor3d.scenegraph.SpatialController
      */
-    public boolean removeController(final Controller controller) {
+    public boolean removeController(final SpatialController controller) {
         if (_controllers == null) {
             return false;
         }
@@ -1045,14 +1041,14 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
     }
 
     /**
-     * Removes a Controller from this Spatial's list of controllers by index.
+     * Removes a SpatialController from this Spatial's list of controllers by index.
      * 
      * @param index
      *            The index of the controller to remove
-     * @return The Controller removed or null if nothing was removed.
-     * @see com.ardor3d.scenegraph.Controller
+     * @return The SpatialController removed or null if nothing was removed.
+     * @see com.ardor3d.scenegraph.SpatialController
      */
-    public Controller removeController(final int index) {
+    public SpatialController<?> removeController(final int index) {
         if (_controllers == null) {
             return null;
         }
@@ -1062,7 +1058,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
     /**
      * Removes all Controllers from this Spatial's list of controllers.
      * 
-     * @see com.ardor3d.scenegraph.Controller
+     * @see com.ardor3d.scenegraph.SpatialController
      */
     public void clearControllers() {
         if (_controllers != null) {
@@ -1076,23 +1072,23 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
      * @param i
      *            The index to get a controller from.
      * @return The controller at index i.
-     * @see com.ardor3d.scenegraph.Controller
+     * @see com.ardor3d.scenegraph.SpatialController
      */
-    public Controller getController(final int i) {
+    public SpatialController<?> getController(final int i) {
         if (_controllers == null) {
-            _controllers = new ArrayList<Controller>(1);
+            _controllers = new ArrayList<SpatialController<?>>(1);
         }
         return _controllers.get(i);
     }
 
     /**
-     * Returns the ArrayList that contains this spatial's Controllers.
+     * Returns the ArrayList that contains this spatial's SpatialControllers.
      * 
      * @return This spatial's _controllers.
      */
-    public List<Controller> getControllers() {
+    public List<SpatialController<?>> getControllers() {
         if (_controllers == null) {
-            _controllers = new ArrayList<Controller>(1);
+            _controllers = new ArrayList<SpatialController<?>>(1);
         }
         return _controllers;
     }
@@ -1247,7 +1243,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
             _userData = userData;
         }
 
-        _controllers = capsule.readSavableList("controllers", null);
+        // _controllers = capsule.readSavableList("controllers", null);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
@@ -1271,34 +1267,7 @@ public abstract class Spatial implements Cloneable, Savable, Externalizable {
             capsule.write((Savable) _userData, "userData", null);
         }
 
-        capsule.writeSavableList(_controllers, "controllers", null);
-    }
-
-    // /////////////////
-    // Methods for Externalizable
-    // /////////////////
-
-    /**
-     * Used with serialization. Not to be called manually.
-     * 
-     * @param in
-     *            ObjectInput
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
-    // TODO
-    }
-
-    /**
-     * Used with serialization. Not to be called manually.
-     * 
-     * @param out
-     *            ObjectOutput
-     * @throws IOException
-     */
-    public void writeExternal(final ObjectOutput out) throws IOException {
-    // TODO
+        // capsule.writeSavableList(_controllers, "controllers", null);
     }
 
     /**

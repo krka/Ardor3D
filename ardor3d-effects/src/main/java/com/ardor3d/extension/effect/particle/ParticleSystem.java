@@ -28,11 +28,11 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Controller.RepeatType;
+import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.ComplexSpatialController.RepeatType;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -246,7 +246,7 @@ public abstract class ParticleSystem extends Node {
     }
 
     @Override
-    public void addController(final Controller c) {
+    public void addController(final SpatialController<?> c) {
         super.addController(c);
         if (c instanceof ParticleController) {
             _controller = (ParticleController) c;
@@ -921,7 +921,7 @@ public abstract class ParticleSystem extends Node {
 
     public void warmUp(final int iterations) {
         if (_controller != null) {
-            _controller.warmUp(iterations);
+            _controller.warmUp(iterations, this);
         }
     }
 

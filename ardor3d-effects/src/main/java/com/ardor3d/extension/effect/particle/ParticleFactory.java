@@ -32,14 +32,14 @@ public class ParticleFactory {
         } else {
             system = new ParticleMesh(name, number, particleType);
         }
-        final ParticleController particleController = new ParticleController(system);
+        final ParticleController particleController = new ParticleController();
         system.addController(particleController);
         return system;
     }
 
     public static ParticleMesh buildMeshParticles(final String name, final Mesh mesh) {
         final ParticleMesh particleMesh = new ParticleMesh(name, mesh);
-        final ParticleController particleController = new ParticleController(particleMesh);
+        final ParticleController particleController = new ParticleController();
         particleMesh.addController(particleController);
         return particleMesh;
     }

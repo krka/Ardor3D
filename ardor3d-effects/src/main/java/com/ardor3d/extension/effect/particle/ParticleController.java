@@ -18,8 +18,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
-import com.ardor3d.scenegraph.Controller;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.ComplexSpatialController;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -28,11 +27,10 @@ import com.ardor3d.util.export.OutputCapsule;
 /**
  * <code>ParticleController</code> controls and maintains the parameters of a particle system over time.
  */
-public class ParticleController extends Controller {
+public class ParticleController extends ComplexSpatialController<ParticleSystem> {
 
     private static final long serialVersionUID = 1L;
 
-    private ParticleSystem _particles;
     private int _particlesToCreate = 0;
     private double _releaseVariance;
     private double _currentTime;
@@ -48,16 +46,10 @@ public class ParticleController extends Controller {
     private List<ParticleInfluence> influences;
     protected List<ParticleControllerListener> listeners;
 
-    public ParticleController() {}
-
     /**
-     * ParticleManager constructor
-     * 
-     * @param system
-     *            Target ParticleGeometry to act upon.
+     * ParticleController constructor
      */
-    public ParticleController(final ParticleSystem system) {
-        _particles = system;
+    public ParticleController() {
 
         setMinTime(0);
         setMaxTime(Float.MAX_VALUE);
@@ -68,8 +60,6 @@ public class ParticleController extends Controller {
         _controlFlow = false;
         _updateOnlyInView = false;
         _precision = .01f; // 10ms
-
-        system.updateRotationMatrix();
     }
 
     protected boolean _ignoreOneUpdate = false;
@@ -83,11 +73,12 @@ public class ParticleController extends Controller {
      * (which may be a point, line or rectangle.)
      * 
      * @param secondsPassed
-     *            double
-     * @param caller
+     *            double precision time
+     * @param particles
+     *            the particles we are updating
      */
     @Override
-    public void update(final double secondsPassed, final Spatial caller) {
+    public void update(final double secondsPassed, final ParticleSystem particles) {
 
         if (_ignoreOneUpdate) {
             _ignoreOneUpdate = false;
@@ -99,7 +90,7 @@ public class ParticleController extends Controller {
             final Camera cam = _viewCamera != null ? _viewCamera : ContextManager.getCurrentContext()
                     .getCurrentCamera();
             final int state = cam.getPlaneState();
-            final boolean out = cam.contains(_particles.getWorldBound()).equals(FrustumIntersect.Outside);
+            final boolean out = cam.contains(particles.getWorldBound()).equals(FrustumIntersect.Outside);
             cam.setPlaneState(state);
             if (out) {
                 return;
@@ -121,7 +112,7 @@ public class ParticleController extends Controller {
         _prevTime = _currentTime;
 
         // Update the current rotation matrix if needed.
-        _particles.updateRotationMatrix();
+        particles.updateRotationMatrix();
 
         // If we are in the time window where this controller is active
         // (defaults to 0 to Float.MAX_VALUE for ParticleController)
@@ -134,7 +125,7 @@ public class ParticleController extends Controller {
                 // is added to any current value Note this is a double value,
                 // so we will keep adding up partial particles
 
-                _releaseParticles += (_particles.getReleaseRate() * _timePassed * (1.0 + _releaseVariance
+                _releaseParticles += (particles.getReleaseRate() * _timePassed * (1.0 + _releaseVariance
                         * (MathUtils.nextRandomFloat() - 0.5)));
 
                 // Try to create all "whole" particles we have added up
@@ -149,12 +140,12 @@ public class ParticleController extends Controller {
                 }
             }
 
-            _particles.updateInvScale();
+            particles.updateInvScale();
 
             // If we have any influences, prepare them all
             if (influences != null) {
                 for (final ParticleInfluence influence : influences) {
-                    influence.prepare(_particles);
+                    influence.prepare(particles);
                 }
             }
 
@@ -169,9 +160,9 @@ public class ParticleController extends Controller {
             boolean anyAlive = false;
 
             // i is index through all particles
-            while (i < _particles.getNumParticles()) {
+            while (i < particles.getNumParticles()) {
                 // Current particle
-                final Particle p = _particles.getParticle(i);
+                final Particle p = particles.getParticle(i);
 
                 // If we have influences and particle is alive
                 if (influences != null && p.getStatus() == Particle.Status.Alive) {
@@ -209,14 +200,14 @@ public class ParticleController extends Controller {
                         }
 
                         // Recreate the particle
-                        p.recreateParticle(_particles.getRandomLifeSpan());
+                        p.recreateParticle(particles.getRandomLifeSpan());
                         p.setStatus(Particle.Status.Alive);
-                        _particles.initParticleLocation(i);
-                        _particles.resetParticleVelocity(i);
+                        particles.initParticleLocation(i);
+                        particles.resetParticleVelocity(i);
                         p.updateVerts(null);
                     }
 
-                } else if (!reuse || (_controlFlow && _particles.getReleaseRate() > 0)) {
+                } else if (!reuse || (_controlFlow && particles.getReleaseRate() > 0)) {
                     // The particle wasn't dead, or we expect more particles
                     // later, so we're not dead!
                     dead = false;
@@ -236,15 +227,15 @@ public class ParticleController extends Controller {
                 setActive(false);
                 if (listeners != null && listeners.size() > 0) {
                     for (final ParticleControllerListener listener : listeners) {
-                        listener.onDead(_particles);
+                        listener.onDead(particles);
                     }
                 }
             }
 
             // If we have a bound and any live particles, update it
-            if (_particles.getParticleGeometry().getWorldBound() != null && anyAlive) {
-                _particles.getParticleGeometry().updateModelBound();
-                _particles.updateWorldBoundManually();
+            if (particles.getParticleGeometry().getWorldBound() != null && anyAlive) {
+                particles.getParticleGeometry().updateModelBound();
+                particles.updateWorldBoundManually();
             }
         }
     }
@@ -344,15 +335,6 @@ public class ParticleController extends Controller {
      */
     public void setViewCamera(final Camera viewCamera) {
         _viewCamera = viewCamera;
-    }
-
-    /**
-     * Get the Spatial that holds all of the particle information for display.
-     * 
-     * @return Spatial holding particle information.
-     */
-    public Spatial getParticles() {
-        return _particles;
     }
 
     /**
@@ -481,13 +463,13 @@ public class ParticleController extends Controller {
      * @param iterations
      *            The number of iterations to warm up.
      */
-    public void warmUp(int iterations) {
+    public void warmUp(int iterations, final ParticleSystem particles) {
         // first set the initial positions of all the verts
-        _particles.initAllParticlesLocation();
+        particles.initAllParticlesLocation();
 
         iterations *= 10;
         for (int i = iterations; --i >= 0;) {
-            update(.1, _particles);
+            update(.1, particles);
         }
         ignoreNextUpdate();
     }
@@ -496,7 +478,6 @@ public class ParticleController extends Controller {
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(_particles, "particleMesh", null);
         capsule.write(_releaseVariance, "releaseVariance", 0);
         capsule.write(_precision, "precision", 0);
         capsule.write(_controlFlow, "controlFlow", false);
@@ -509,7 +490,6 @@ public class ParticleController extends Controller {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        _particles = (ParticleSystem) capsule.readSavable("particleMesh", null);
         _releaseVariance = capsule.readDouble("releaseVariance", 0);
         _precision = capsule.readDouble("precision", 0);
         _controlFlow = capsule.readBoolean("controlFlow", false);

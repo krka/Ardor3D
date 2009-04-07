@@ -20,9 +20,9 @@ import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.Controller;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
@@ -75,7 +75,7 @@ public class ManyLightsExample extends ExampleBase {
 
         _lightState.attach(pointLight);
 
-        lightSphere.addController(new Controller() {
+        lightSphere.addController(new SpatialController<Spatial>() {
             private static final long serialVersionUID = 1L;
 
             double timeX = rand.nextDouble() * Math.PI * 8;
@@ -83,7 +83,6 @@ public class ManyLightsExample extends ExampleBase {
             double timeZ = rand.nextDouble() * Math.PI * 8;
             double speed = MathUtils.nextRandomDouble();
 
-            @Override
             public void update(final double tpf, final Spatial caller) {
                 timeX += tpf * speed;
                 timeY += tpf * speed;
@@ -93,7 +92,7 @@ public class ManyLightsExample extends ExampleBase {
                 final double yPos = Math.cos(timeY * 0.5) * worldsize;
                 final double zPos = Math.sin(timeZ * 0.6) * worldsize;
 
-                lightSphere.setTranslation(xPos, yPos, zPos);
+                caller.setTranslation(xPos, yPos, zPos);
                 pointLight.setLocation(xPos, yPos, zPos);
             }
         });
