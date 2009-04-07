@@ -1243,7 +1243,14 @@ public abstract class Spatial implements Cloneable, Savable {
             _userData = userData;
         }
 
-        // _controllers = capsule.readSavableList("controllers", null);
+        final List<Savable> list = capsule.readSavableList("controllers", null);
+        if (list != null) {
+            for (final Savable s : list) {
+                if (s instanceof SpatialController) {
+                    addController((SpatialController<?>) s);
+                }
+            }
+        }
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
@@ -1267,7 +1274,15 @@ public abstract class Spatial implements Cloneable, Savable {
             capsule.write((Savable) _userData, "userData", null);
         }
 
-        // capsule.writeSavableList(_controllers, "controllers", null);
+        if (_controllers != null) {
+            final List<Savable> list = new ArrayList<Savable>();
+            for (final SpatialController<?> sc : _controllers) {
+                if (sc instanceof Savable) {
+                    list.add((Savable) sc);
+                }
+            }
+            capsule.writeSavableList(list, "controllers", null);
+        }
     }
 
     /**
