@@ -474,6 +474,58 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * <code>copyTextureCoords</code> copys the texture coordinates of a given texture unit to another location. If the
+     * texture unit is not valid, then the coordinates are ignored. Coords are multiplied by the given factor.
+     * 
+     * @param fromIndex
+     *            the coordinates to copy.
+     * @param toIndex
+     *            the texture unit to set them to.
+     * @param factorS
+     *            a multiple to apply to the S channel when copying
+     * @param factorT
+     *            a multiple to apply to the T channel when copying
+     */
+    public void copyTextureCoordinates(final int fromIndex, final int toIndex, final float factorS, final float factorT) {
+        if (_textureCoords == null) {
+            return;
+        }
+
+        if (fromIndex < 0 || fromIndex >= _textureCoords.size() || _textureCoords.get(fromIndex) == null) {
+            return;
+        }
+
+        if (toIndex < 0 || toIndex == fromIndex) {
+            return;
+        }
+
+        // make sure we are big enough
+        while (toIndex >= _textureCoords.size()) {
+            _textureCoords.add(null);
+        }
+
+        FloatBufferData dest = _textureCoords.get(toIndex);
+        final FloatBufferData src = _textureCoords.get(fromIndex);
+        if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
+            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()), src
+                    .getCoordsPerVertex());
+            _textureCoords.set(toIndex, dest);
+        }
+        dest.getBuffer().clear();
+        final int oldLimit = src.getBuffer().limit();
+        src.getBuffer().clear();
+        for (int i = 0, len = dest.getBuffer().capacity(); i < len; i++) {
+            if (i % 2 == 0) {
+                dest.getBuffer().put(factorS * src.getBuffer().get());
+            } else {
+                dest.getBuffer().put(factorT * src.getBuffer().get());
+            }
+        }
+        src.getBuffer().limit(oldLimit);
+        dest.getBuffer().limit(oldLimit);
+    }
+
+    /**
      * <code>getNumberOfUnits</code> returns the number of texture units this geometry is currently using.
      * 
      * @return the number of texture units in use.
