@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
 import com.ardor3d.extension.model.collada.binding.core.DaeGeometry;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputShared;
-import com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray;
 import com.ardor3d.extension.model.collada.binding.core.DaeMesh;
 import com.ardor3d.extension.model.collada.binding.core.DaePolygons;
 import com.ardor3d.extension.model.collada.binding.core.DaePolylist;
+import com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray;
 import com.ardor3d.extension.model.collada.binding.core.DaeSource;
 import com.ardor3d.extension.model.collada.binding.core.DaeTriangles;
 import com.ardor3d.renderer.IndexMode;
@@ -54,6 +54,9 @@ public class ColladaMeshUtils {
             if (cMesh.getPolygons() != null) {
                 for (final DaePolygons p : cMesh.getPolygons()) {
                     final Spatial child = buildMesh(p);
+                    if (child.getName() == null) {
+                        child.setName(meshNode.getName() + "_polygons");
+                    }
                     if (child != null) {
                         meshNode.attachChild(child);
                         hasChild = true;
@@ -63,6 +66,9 @@ public class ColladaMeshUtils {
             if (cMesh.getPolylist() != null) {
                 for (final DaePolylist p : cMesh.getPolylist()) {
                     final Spatial child = buildMesh(p);
+                    if (child.getName() == null) {
+                        child.setName(meshNode.getName() + "_polylist");
+                    }
                     if (child != null) {
                         meshNode.attachChild(child);
                         hasChild = true;
@@ -72,6 +78,9 @@ public class ColladaMeshUtils {
             if (cMesh.getTriangles() != null) {
                 for (final DaeTriangles t : cMesh.getTriangles()) {
                     final Spatial child = buildMesh(t);
+                    if (child.getName() == null) {
+                        child.setName(meshNode.getName() + "_triangles");
+                    }
                     if (child != null) {
                         meshNode.attachChild(child);
                         hasChild = true;
@@ -98,6 +107,9 @@ public class ColladaMeshUtils {
             // If we did not find a valid child, the spec says to add verts as a "cloud of points"
             if (!hasChild) {
                 final Point points = buildPoints(cMesh);
+                if (points.getName() == null) {
+                    points.setName(meshNode.getName() + "_points");
+                }
                 if (points != null) {
                     meshNode.attachChild(points);
                 }
