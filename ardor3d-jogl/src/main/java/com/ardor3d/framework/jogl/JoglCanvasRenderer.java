@@ -81,10 +81,17 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         if (_context == null) {
             _context = GLDrawableFactory.getFactory().createExternalGLContext();
         }
+
         setCurrentContext();
 
+        // Look up a shared context, if a shared JoglCanvasRenderer is given.
+        RenderContext sharedContext = null;
+        if (settings.getShareContext() != null) {
+            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getContext());
+        }
+
         final JoglContextCapabilities caps = new JoglContextCapabilities(_context.getGL());
-        final RenderContext currentContext = new RenderContext(_context, caps);
+        final RenderContext currentContext = new RenderContext(_context, caps, sharedContext);
 
         ContextManager.addContext(_context, currentContext);
 

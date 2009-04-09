@@ -7,7 +7,7 @@
 	<classpathentry kind="lib" path="lib/jogl/gluegen-rt.jar"/>
 	<classpathentry kind="lib" path="lib/jogl/jogl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ardor3d-jogl/lib/jogl/native/windows_i586"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ardor3d-jogl/lib/jogl/native/macosx-universal"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

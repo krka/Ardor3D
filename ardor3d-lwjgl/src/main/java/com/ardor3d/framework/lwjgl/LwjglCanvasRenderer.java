@@ -34,6 +34,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     protected Camera _camera;
     protected boolean _doSwap;
     protected LwjglRenderer _renderer;
+    protected Object _context = new Object();
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
     // and since it is at the moment more work than it is worth to get it ready. Later on, when
@@ -59,14 +60,21 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
-        final Object contextKey = this;
+
+        // Look up a shared context, if a shared LwjglCanvasRenderer is given.
+        // XXX: Shared contexts will probably not work... lwjgl does not seem to have a way to make a new glcontext that
+        // shares lists, textures, etc.
+        RenderContext sharedContext = null;
+        if (settings.getShareContext() != null) {
+            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getContext());
+        }
 
         setCurrentContext();
 
         final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
-        final RenderContext currentContext = new RenderContext(contextKey, caps);
+        final RenderContext currentContext = new RenderContext(this, caps, sharedContext);
 
-        ContextManager.addContext(contextKey, currentContext);
+        ContextManager.addContext(this, currentContext);
 
         _renderer = new LwjglRenderer();
 
@@ -125,7 +133,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void setCurrentContext() {
         try {
-            GLContext.useContext(this);
+            GLContext.useContext(_context);
         } catch (final LWJGLException e) {
             throw new RuntimeException(e);
         }
@@ -141,5 +149,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void setCamera(final Camera camera) {
         _camera = camera;
+    }
+
+    public Object getContext() {
+        return _context;
     }
 }

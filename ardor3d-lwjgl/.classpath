@@ -9,7 +9,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/lwjgl/lwjgl_util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lwjgl/lwjgl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ardor3d-lwjgl/lib/lwjgl/native/win32"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ardor3d-lwjgl/lib/lwjgl/native/macosx"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

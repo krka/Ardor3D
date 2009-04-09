@@ -135,7 +135,8 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
         final GLContext glContext = _glCanvas.getContext();
         _canvasRenderer.setContext(glContext);
-        // hack
+
+        // FIXME: remove need for directly setting _parentContext.
         JoglPbufferTextureRenderer._parentContext = glContext;
 
         this.add(_glCanvas);

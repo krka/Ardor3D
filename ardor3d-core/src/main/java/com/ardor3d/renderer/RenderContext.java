@@ -53,17 +53,14 @@ public class RenderContext {
     protected Camera _currentCamera = null;
 
     public RenderContext(final Object key, final ContextCapabilities caps) {
-        _contextHolder = key;
-        _capabilities = caps;
-        setupRecords();
-        _glContextRep = new Object();
+        this(key, caps, null);
     }
 
     public RenderContext(final Object key, final ContextCapabilities caps, final RenderContext shared) {
         _contextHolder = key;
         _capabilities = caps;
         setupRecords();
-        _glContextRep = shared._glContextRep;
+        _glContextRep = (shared == null) ? new Object() : shared._glContextRep;
     }
 
     protected void setupRecords() {

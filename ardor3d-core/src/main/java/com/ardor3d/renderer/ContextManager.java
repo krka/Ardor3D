@@ -40,4 +40,8 @@ public class ContextManager {
     public static void addContext(final Object contextKey, final RenderContext context) {
         contextStore.put(contextKey, context);
     }
+
+    public static RenderContext getContextForKey(final Object key) {
+        return contextStore.get(key);
+    }
 }

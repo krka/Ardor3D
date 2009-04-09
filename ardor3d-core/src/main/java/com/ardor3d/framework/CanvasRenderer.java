@@ -65,4 +65,9 @@ public interface CanvasRenderer {
      * Have the CanvasRenderer release the graphics context.
      */
     public void releaseCurrentContext();
+
+    /**
+     * @return the Object representing the gl context used by this CanvasRenderer.
+     */
+    public Object getContext();
 }
