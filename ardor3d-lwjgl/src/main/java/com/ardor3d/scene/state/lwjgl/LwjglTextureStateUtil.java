@@ -63,6 +63,7 @@ import com.ardor3d.renderer.state.record.TextureUnitRecord;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
@@ -122,21 +123,29 @@ public abstract class LwjglTextureStateUtil {
         // Create the texture...
         if (texture.getTextureKey() != null) {
 
-            // First, check if we've already created this texture for our gl context (already on the card)
-
-            // if texture key has a context already, and it is not ours, complain.
-            if (texture.getTextureKey().getContextRep() != null
-                    && texture.getTextureKey().getContextRep() != context.getGlContextRep()) {
+            if (texture.getTextureKey().getContextRep() == null) {
+                // remove from cache, we'll add it later
+                TextureManager.removeFromCache(texture.getTextureKey());
+            } else if (texture.getTextureKey().getContextRep() != context.getGlContextRep()) {
+                // if texture key has a context already, and it is not ours, complain.
                 logger.warning("Texture key is morphing contexts: " + texture.getTextureKey());
             }
 
             // make sure our context is set.
-            texture.getTextureKey().setContextRep(context.getGlContextRep());
+            // XXX don't alter object which is a key in cache hash:
+            // XXX texture.getTextureKey().setContextRep(context.getGlContextRep());
+            final TextureKey texKey = new TextureKey(texture.getTextureKey());
+            texKey.setContextRep(context.getGlContextRep());
 
             // Look for a texture in the cache just like ours, also in the same context.
-            final Texture cached = TextureManager.findCachedTexture(texture.getTextureKey());
+            final Texture cached = TextureManager.findCachedTexture(texKey);
 
             if (cached == null) {
+                final Texture otherContext = TextureManager.findCachedTexture(texture.getTextureKey());
+                if (otherContext != null) {
+                    otherContext.createSimpleClone(texture);
+                }
+                texture.setTextureKey(texKey);
                 TextureManager.addToCache(texture);
             } else if (cached.getTextureId() != 0) {
                 texture.setTextureId(cached.getTextureId());

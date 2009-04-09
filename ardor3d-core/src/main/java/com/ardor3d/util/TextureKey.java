@@ -46,6 +46,15 @@ final public class TextureKey implements Savable {
         _format = imageType;
     }
 
+    public TextureKey(final TextureKey other) {
+        _location = other._location;
+        _flipped = other._flipped;
+        _format = other._format;
+        _fileType = other._fileType;
+        _glContextRep = other._glContextRep;
+        _minFilter = other._minFilter;
+    }
+
     @Override
     public boolean equals(final Object other) {
         if (other == this) {

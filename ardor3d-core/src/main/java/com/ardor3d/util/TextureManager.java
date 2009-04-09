@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ import com.google.common.collect.Maps;
 final public class TextureManager {
     private static final Logger logger = Logger.getLogger(TextureManager.class.getName());
 
-    private static HashMap<TextureKey, Texture> m_tCache = new HashMap<TextureKey, Texture>();
+    private static WeakHashMap<TextureKey, Texture> m_tCache = new WeakHashMap<TextureKey, Texture>();
     private static List<Integer> cleanupStore = new ArrayList<Integer>();
 
     private TextureManager() {}
@@ -233,6 +234,10 @@ final public class TextureManager {
         }
     }
 
+    public static Texture removeFromCache(final TextureKey tk) {
+        return m_tCache.remove(tk);
+    }
+
     @MainThread
     public static boolean releaseTexture(final Texture texture, final Renderer deleter) {
         if (texture == null) {
@@ -246,7 +251,7 @@ final public class TextureManager {
             } catch (final Exception e) {
             } // ignore.
         }
-        return m_tCache.remove(texture.getTextureKey()) != null;
+        return removeFromCache(texture.getTextureKey()) != null;
     }
 
     public static void registerForCleanup(final TextureKey textureKey, final int textureId) {
