@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-lwjgl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-swt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-animations"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
