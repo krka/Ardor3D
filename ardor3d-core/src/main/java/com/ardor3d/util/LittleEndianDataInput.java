@@ -11,56 +11,58 @@
 package com.ardor3d.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.DataInput;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
- * <code>LittleEndien</code> is a class to read littleendien stored data via a InputStream. All functions work as
- * defined in DataInput, but assume they come from a LittleEndien input stream. Currently used to read .ms3d and .3ds
- * files.
+ * LittleEndianDataInput is a class to read little-endian stored data via a InputStream. All functions work as defined
+ * in DataInput, but assume they come from a LittleEndian input stream.
  */
-public class LittleEndien implements DataInput {
+public class LittleEndianDataInput implements DataInput {
 
-    private final BufferedInputStream in;
-    private final BufferedReader inRead;
+    private final BufferedInputStream _stream;
 
     /**
-     * Creates a new LittleEndien reader from the given input stream. The stream is wrapped in a BufferedReader
+     * Number of bytes to read when reading a char... For data meant to be read from C/C++ this is often 1, for Java and
+     * C# this is usually 2.
+     */
+    public int CHAR_SIZE = 2;
+
+    /**
+     * Creates a new LittleEndian reader from the given input stream. The stream is wrapped in a BufferedInputStream
      * automatically.
      * 
      * @param in
      *            The input stream to read from.
      */
-    public LittleEndien(final InputStream in) {
-        this.in = new BufferedInputStream(in);
-        inRead = new BufferedReader(new InputStreamReader(in));
+    public LittleEndianDataInput(final InputStream in) {
+        _stream = new BufferedInputStream(in);
     }
 
     public final int readUnsignedShort() throws IOException {
-        return (in.read() & 0xff) | ((in.read() & 0xff) << 8);
+        return (_stream.read() & 0xff) | ((_stream.read() & 0xff) << 8);
     }
 
     /**
      * read an unsigned int as a long
      */
-    public final long readUInt() throws IOException {
-        return ((in.read() & 0xff) | ((in.read() & 0xff) << 8) | ((in.read() & 0xff) << 16) | (((long) (in.read() & 0xff)) << 24));
+    public final long readUnsignedInt() throws IOException {
+        return ((_stream.read() & 0xff) | ((_stream.read() & 0xff) << 8) | ((_stream.read() & 0xff) << 16) | (((long) (_stream
+                .read() & 0xff)) << 24));
     }
 
     public final boolean readBoolean() throws IOException {
-        return (in.read() != 0);
+        return (_stream.read() != 0);
     }
 
     public final byte readByte() throws IOException {
-        return (byte) in.read();
+        return (byte) _stream.read();
     }
 
     public final int readUnsignedByte() throws IOException {
-        return in.read();
+        return _stream.read();
     }
 
     public final short readShort() throws IOException {
@@ -72,13 +74,15 @@ public class LittleEndien implements DataInput {
     }
 
     public final int readInt() throws IOException {
-        return ((in.read() & 0xff) | ((in.read() & 0xff) << 8) | ((in.read() & 0xff) << 16) | ((in.read() & 0xff) << 24));
+        return ((_stream.read() & 0xff) | ((_stream.read() & 0xff) << 8) | ((_stream.read() & 0xff) << 16) | ((_stream
+                .read() & 0xff) << 24));
     }
 
     public final long readLong() throws IOException {
-        return ((in.read() & 0xff) | ((long) (in.read() & 0xff) << 8) | ((long) (in.read() & 0xff) << 16)
-                | ((long) (in.read() & 0xff) << 24) | ((long) (in.read() & 0xff) << 32)
-                | ((long) (in.read() & 0xff) << 40) | ((long) (in.read() & 0xff) << 48) | ((long) (in.read() & 0xff) << 56));
+        return ((_stream.read() & 0xff) | ((long) (_stream.read() & 0xff) << 8)
+                | ((long) (_stream.read() & 0xff) << 16) | ((long) (_stream.read() & 0xff) << 24)
+                | ((long) (_stream.read() & 0xff) << 32) | ((long) (_stream.read() & 0xff) << 40)
+                | ((long) (_stream.read() & 0xff) << 48) | ((long) (_stream.read() & 0xff) << 56));
     }
 
     public final float readFloat() throws IOException {
@@ -98,7 +102,7 @@ public class LittleEndien implements DataInput {
         // not guaranteed to fill up the buffer you pass to it. So we need to loop until we have filled
         // up the buffer or until we reach the end of the file.
 
-        final int bytesRead = in.read(b, off, len);
+        final int bytesRead = _stream.read(b, off, len);
 
         if (bytesRead == -1) {
             throw new EOFException("EOF reached");
@@ -111,11 +115,11 @@ public class LittleEndien implements DataInput {
     }
 
     public final int skipBytes(final int n) throws IOException {
-        return (int) in.skip(n);
+        return (int) _stream.skip(n);
     }
 
     public final String readLine() throws IOException {
-        return inRead.readLine();
+        throw new IOException("Unsupported operation");
     }
 
     public final String readUTF() throws IOException {
@@ -123,10 +127,10 @@ public class LittleEndien implements DataInput {
     }
 
     public final void close() throws IOException {
-        in.close();
+        _stream.close();
     }
 
     public final int available() throws IOException {
-        return in.available();
+        return _stream.available();
     }
 }

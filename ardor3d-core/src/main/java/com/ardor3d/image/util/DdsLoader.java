@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.util.LittleEndien;
+import com.ardor3d.util.LittleEndianDataInput;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -93,7 +93,7 @@ public final class DdsLoader implements ImageLoader {
         private final DataInput _in;
 
         public DDSReader(final InputStream in) {
-            _in = new LittleEndien(in);
+            _in = new LittleEndianDataInput(in);
         }
 
         /**

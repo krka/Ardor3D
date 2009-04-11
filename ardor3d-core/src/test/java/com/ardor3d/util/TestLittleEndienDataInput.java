@@ -24,10 +24,10 @@ import java.io.IOException;
  * input stream for the tests to work. This size is currently 8192, but if it changes, or if the
  * implementation changes, these tests can break.
  */
-public class TestLittleEndien {
+public class TestLittleEndienDataInput {
     MockInputStream in;
     byte[] array;
-    LittleEndien littleEndien;
+    LittleEndianDataInput littleEndien;
 
 
     @Before
@@ -36,7 +36,7 @@ public class TestLittleEndien {
 
         array = new byte[10];
 
-        littleEndien = new LittleEndien(in);
+        littleEndien = new LittleEndianDataInput(in);
     }
 
 
