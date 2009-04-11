@@ -17,6 +17,20 @@ public class DaeJoints extends DaeTreeNode {
     private DaeList<DaeInputUnshared> inputs;
 
     /**
+     * Constructor for use by JiBX.
+     */
+    public DaeJoints() {
+    }
+
+    /**
+     * Constructor for use with test code - normally, these classes are instantiated by JiBX only.
+     *
+     */
+    public DaeJoints(DaeList<DaeInputUnshared> inputs) {
+        this.inputs = inputs;
+    }
+
+    /**
      * @return the inputs
      */
     public DaeList<DaeInputUnshared> getInputs() {

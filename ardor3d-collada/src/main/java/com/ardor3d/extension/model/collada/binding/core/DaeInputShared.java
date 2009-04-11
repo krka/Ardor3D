@@ -12,11 +12,24 @@ package com.ardor3d.extension.model.collada.binding.core;
 
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
-public class DaeInputShared extends DaeTreeNode {
+public class DaeInputShared extends DaeTreeNode implements DaeInput {
     private int offset;
     private String source;
     private String semantic;
     private int set;
+
+    public DaeInputShared() {
+    }
+
+    public DaeInputShared(int offset, String source, String semantic, int set, DaeTreeNode parent) {
+        this.offset = offset;
+        this.source = source;
+        this.semantic = semantic;
+        this.set = set;
+
+        registerParent(parent);
+    }
+
 
     public int getOffset() {
         return offset;

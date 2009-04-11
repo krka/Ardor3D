@@ -80,14 +80,14 @@
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeJoints" name="joints" post-set="postset">
-    <collection field="inputs">
+    <collection field="inputs" pre-set="preset">
       <structure name="input" type="com.ardor3d.extension.model.collada.binding.core.DaeInputUnshared"/>
     </collection>
     <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeVertexWeights" name="vertex_weights" post-set="postset">
-    <collection field="inputs">
+    <collection field="inputs" pre-set="preset">
       <structure name="input" type="com.ardor3d.extension.model.collada.binding.core.DaeInputShared"/>
     </collection>
     <structure name="vcount" field="vcount" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray" usage="optional"/>
@@ -469,10 +469,11 @@
     <structure name="extra" usage="optional"/>
   </mapping>
 
-  <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeNode" name="node" pre-set="postsetSpecifiedInAbstract">
+  <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeNode" name="node" post-set="postset">
     <value name="id" set-method="setId" get-method="getId" style="attribute" usage="optional"/>
     <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
     <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
+    <value name="type" set-method="setType" get-method="getType" style="attribute" usage="optional"/>
 
     <structure field="asset" usage="optional"/>
 

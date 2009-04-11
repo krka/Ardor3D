@@ -16,6 +16,7 @@
     <module>ardor3d-effects</module>
     <module>ardor3d-collada</module>
     <module>ardor3d-archetype</module>
+    <module>ardor3d-animations</module>
   </modules>
 
   <scm>

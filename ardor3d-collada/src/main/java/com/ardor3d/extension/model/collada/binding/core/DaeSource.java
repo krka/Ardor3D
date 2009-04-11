@@ -18,6 +18,10 @@ public class DaeSource extends DaeTreeNode {
     private DaeSimpleIntegerArray intArray;
     private DaeAccessor commonAccessor;
 
+    public DaeSource() {
+    }
+
+
     public DaeNameArray getNameArray() {
         return nameArray;
     }
@@ -32,5 +36,21 @@ public class DaeSource extends DaeTreeNode {
 
     public DaeAccessor getCommonAccessor() {
         return commonAccessor;
+    }
+
+    public static DaeSource createNameArraySource(DaeNameArray nameArray) {
+        DaeSource result = new DaeSource();
+
+        result.nameArray = nameArray;
+
+        return result;
+    }
+
+    public static DaeSource createFloatArraySource(DaeFloatArray floatArray) {
+        DaeSource result = new DaeSource();
+
+        result.floatArray = floatArray;
+
+        return result;
     }
 }

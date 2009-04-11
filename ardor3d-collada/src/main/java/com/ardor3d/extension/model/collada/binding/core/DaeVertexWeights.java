@@ -19,6 +19,16 @@ public class DaeVertexWeights extends DaeTreeNode {
     private DaeSimpleIntegerArray vcount;
     private DaeSimpleIntegerArray v;
 
+    public DaeVertexWeights() {
+    }
+
+    public DaeVertexWeights(int count, DaeList<DaeInputShared> inputs, DaeSimpleIntegerArray vcount, DaeSimpleIntegerArray v) {
+        this.count = count;
+        this.inputs = inputs;
+        this.vcount = vcount;
+        this.v = v;
+    }
+
     /**
      * @return the count
      */

@@ -15,6 +15,7 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 
 public class DaeNode extends DaeTreeNode {
     private DaeAsset asset;
+    private DaeType type; // node by default, joint only if explicitly specified
     private DaeList<DaeTransform> transforms;
     private DaeList<DaeInstanceCamera> instanceCameras;
     private DaeList<DaeInstanceController> instanceControllers;
@@ -77,5 +78,18 @@ public class DaeNode extends DaeTreeNode {
      */
     public DaeList<DaeInstanceLight> getInstanceLights() {
         return instanceLights;
+    }
+
+    public void setType(DaeType type) {
+        this.type = type;
+    }
+
+    public DaeType getType() {
+        return type != null ? type : DaeType.NODE; // NODE if not specified
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", type: " + type;
     }
 }

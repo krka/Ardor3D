@@ -25,6 +25,9 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.UrlUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.ardor3d.animations.runtime.AnimationRegistry;
+import com.ardor3d.animations.reference.Animatable;
+import com.ardor3d.animations.reference.Skeleton;
 
 public class ColladaImporter {
     /**
@@ -36,13 +39,17 @@ public class ColladaImporter {
      * @return a Node containing the Collada scene.
      */
     public static Node readColladaScene(final String resource) {
+        return readColladaScene(resource, null);
+    }
+
+    public static Node readColladaScene(final String resource, AnimationRegistry animationRegistry) {
         final URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
 
         if (url == null) {
             throw new Error("Unable to locate '" + resource + "' on the classpath");
         }
 
-        return readColladaScene(url);
+        return readColladaScene(url, animationRegistry);
     }
 
     /**
@@ -53,6 +60,11 @@ public class ColladaImporter {
      * @return a Node containing the Collada scene.
      */
     public static Node readColladaScene(final URL resource) {
+        return readColladaScene(resource, null);
+
+    }
+
+    public static Node readColladaScene(final URL resource, AnimationRegistry animationRegistry) {
 
         // Collada may or may not have a scene.
         // FIXME: We should eventually return the libraries too since you could have those without a scene.
@@ -68,7 +80,7 @@ public class ColladaImporter {
                 // It's possible to have a scene that is all physics information...
                 if (collada.getScene().getInstanceVisualScene() != null) {
                     final String id = collada.getScene().getInstanceVisualScene().getUrl().substring(1);
-                    scene = ColladaNodeUtils.getVisualScene(id, collada);
+                    scene = ColladaNodeUtils.getVisualScene(id, collada, animationRegistry);
                 }
             }
 
@@ -94,13 +106,12 @@ public class ColladaImporter {
 
             final IUnmarshallingContext context = bindingFactory.createUnmarshallingContext();
 
-            final Collada collada = (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
-
-            return collada;
+            return (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
         } catch (final Exception e) {
             throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
         }
     }
+
 
     // just a simple way to test things out without bringing up OpenGL, etc.
     // XXX: Maybe we should move this to a test or something.
@@ -108,9 +119,19 @@ public class ColladaImporter {
     static int indent = 0;
 
     public static void main(final String[] args) throws Exception {
-        final Spatial scene = readColladaScene("/duck/duck.dae");
+        final AnimationRegistry animationRegistry = new AnimationRegistry();
+
+        final Spatial scene = readColladaScene("/HC_Medium_Char_Skin.dae", animationRegistry);
 
         printScene(scene);
+
+        for (Animatable animatable : animationRegistry.getAnimatables()) {
+            System.out.println(animatable);
+        }
+
+        for (Skeleton skeleton : animationRegistry.getSkeletons().values()) {
+            System.out.println(skeleton);
+        }
     }
 
     private static void printScene(final Spatial spat) {

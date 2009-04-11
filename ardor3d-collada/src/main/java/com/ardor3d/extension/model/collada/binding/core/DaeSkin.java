@@ -22,6 +22,24 @@ public class DaeSkin extends DaeTreeNode {
     private DaeVertexWeights vertexWeights;
 
     /**
+     * Constructor for use by JiBX.
+     */
+    public DaeSkin() {
+    }
+
+    /**
+     * Constructor for use with test code - normally, these classes are instantiated by JiBX only.
+     *
+     */
+    public DaeSkin(String source, DaeSimpleFloatArray bindShapeMatrix, DaeList<DaeSource> sources, DaeJoints joints, DaeVertexWeights vertexWeights) {
+        this.source = source;
+        this.bindShapeMatrix = bindShapeMatrix;
+        this.sources = sources;
+        this.joints = joints;
+        this.vertexWeights = vertexWeights;
+    }
+
+    /**
      * @return the source
      */
     public String getSource() {

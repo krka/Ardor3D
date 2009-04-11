@@ -25,6 +25,17 @@
       <artifactId>ardor3d-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.ardor3d</groupId>
+      <artifactId>ardor3d-animations</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
