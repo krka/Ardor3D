@@ -62,8 +62,9 @@ public class Node extends Spatial {
      * 
      * @param name
      *            the name of the node. This is required for identification purposes.
-     * @param childrenList
-     *            the list to use for storing children. Defaults to a synchronized ArrayList.
+     * @param children
+     *            the list to use for storing children. Defaults to a synchronized ArrayList, but using
+     *  this constructor, you can select a different kind of list.
      */
     public Node(final String name, final List<Spatial> children) {
         super(name);
@@ -372,8 +373,8 @@ public class Node extends Spatial {
     /**
      * <code>updateWorldBound</code> merges the bounds of all the children maintained by this node. This will allow for
      * faster culling operations.
-     * 
-     * @see com.ardor3d.scenegraph.Spatial#updateWorldBound()
+     *
+     * @see com.ardor3d.scenegraph.Spatial#updateWorldBound(boolean)
      */
     @Override
     public void updateWorldBound(final boolean recurse) {
