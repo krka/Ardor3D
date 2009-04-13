@@ -110,10 +110,10 @@ public class WaterNode extends Node {
     protected String projectedShaderRefractionStr = "com/ardor3d/extension/effect/water/projectedwatershader_refraction";
     protected String currentShaderStr;
 
-    protected String normalMapTextureString = "images/water/normalmap3.dds";
-    protected String dudvMapTextureString = "images/water/dudvmap.png";
-    protected String foamMapTextureString = "images/water/oceanfoam.png";
-    protected String fallbackMapTextureString = "images/water/water2.png";
+    protected String normalMapTextureString = "";
+    protected String dudvMapTextureString = "";
+    protected String foamMapTextureString = "";
+    protected String fallbackMapTextureString = "";
 
     private boolean initialized;
 
