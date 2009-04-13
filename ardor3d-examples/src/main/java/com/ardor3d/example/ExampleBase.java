@@ -60,6 +60,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -189,6 +190,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         _wireframeState = new WireframeState();
         _wireframeState.setEnabled(false);
         _root.setRenderState(_wireframeState);
+
+        _root.setRenderBucketType(RenderBucketType.Opaque);
 
         initExample();
     }

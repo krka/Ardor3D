@@ -12,12 +12,13 @@ package com.ardor3d.scenegraph.extension;
 
 import java.io.IOException;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -129,6 +130,8 @@ public class Skybox extends Node {
         ts.setTexture(texture, textureUnit);
         ts.setEnabled(true);
 
+        texture.setWrap(WrapMode.EdgeClamp);
+
         // Set the texture to the quad
         _skyboxQuads[face.ordinal()].setRenderState(ts);
 
@@ -175,10 +178,12 @@ public class Skybox extends Node {
         setTextureCombineMode(TextureCombineMode.Replace);
 
         final ZBufferState zbuff = new ZBufferState();
-        zbuff.setWritable(false);
-        zbuff.setEnabled(true);
-        zbuff.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
+        zbuff.setEnabled(false);
         setRenderState(zbuff);
+
+        final FogState fs = new FogState();
+        fs.setEnabled(false);
+        setRenderState(fs);
 
         // We don't want it making our skybox disapear, so force view
         setCullHint(Spatial.CullHint.Never);
@@ -193,11 +198,8 @@ public class Skybox extends Node {
             // Make sure the quad is viewable
             _skyboxQuads[i].setCullHint(Spatial.CullHint.Never);
 
-            // Set a bounding volume
-            _skyboxQuads[i].setModelBound(new BoundingBox());
-            _skyboxQuads[i].updateModelBound();
-
-            _skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
+            // _skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
+            _skyboxQuads[i].setRenderBucketType(RenderBucketType.PreBucket);
             _skyboxQuads[i].setVBOInfo(null);
 
             // And attach the skybox as a child
