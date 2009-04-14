@@ -15,12 +15,7 @@ package com.ardor3d.util;
  */
 public class Constants {
 
-    public static final boolean debug = (!"FALSE".equalsIgnoreCase(System.getProperty("ardor3d.debug")));
-
     public static final boolean stats = (System.getProperty("ardor3d.stats") != null);
-
-    public static final boolean infoLogging = (System.getProperty("ardor3d.info") != null) ? (!"FALSE"
-            .equalsIgnoreCase(System.getProperty("ardor3d.info"))) : true;
 
     public static boolean updateGraphs = false;
 
