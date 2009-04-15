@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.extension.model.collada.binding.DaeList;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
+import com.ardor3d.extension.model.collada.binding.ColladaException;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputShared;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputUnshared;
@@ -40,7 +41,7 @@ public class ColladaInputPipe {
     private FloatBuffer _buffer;
 
     enum Type {
-        VERTEX, NORMAL, TEXCOORD, UNKNOWN;
+        VERTEX, NORMAL, TEXCOORD, UNKNOWN
     }
 
     public ColladaInputPipe(final DaeInputShared input, final Collada rootNode) {
@@ -60,7 +61,7 @@ public class ColladaInputPipe {
         } else if (n instanceof DaeVertices) {
             _source = getPositionSource((DaeVertices) n, rootNode);
         } else {
-            throw new IllegalArgumentException("Input source not found: " + input.getSource());
+            throw new ColladaException("Input source not found: " + input.getSource(), input);
         }
 
         // add a hook to our params from the technique_common
@@ -84,7 +85,11 @@ public class ColladaInputPipe {
                 }
             }
         }
-        return null;
+
+        // changed this to throw an exception instead - otherwise, there will just be a nullpointer exception
+        // outside. This provides much more information about what went wrong / Petter
+        // return null;
+        throw new ColladaException("Unable to find POSITION semantic for inputs under DaeVertices", v);
     }
 
     public void setupBuffer(final int numEntries, final MeshData meshData) {
