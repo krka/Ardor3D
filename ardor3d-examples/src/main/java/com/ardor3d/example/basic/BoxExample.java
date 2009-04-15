@@ -46,11 +46,9 @@ public class BoxExample extends ExampleBase {
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        if (timer.getTimePerFrame() < 1) {
-            angle = angle + (timer.getTimePerFrame() * 25);
-            if (angle > 360) {
-                angle = 0;
-            }
+        angle = angle + (timer.getTimePerFrame() * 25);
+        if (angle > 360) {
+            angle = 0;
         }
 
         rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
@@ -73,15 +71,12 @@ public class BoxExample extends ExampleBase {
         t.setRandomColors();
 
         final TextureState ts = new TextureState();
-        ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.GuessNoCompression, true));
+        _root.setRenderState(ts);
 
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
-
-        _root.setRenderState(ts);
-
     }
 }
