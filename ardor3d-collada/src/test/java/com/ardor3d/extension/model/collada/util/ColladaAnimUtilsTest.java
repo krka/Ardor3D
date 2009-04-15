@@ -82,7 +82,7 @@ public class ColladaAnimUtilsTest {
 
         DaeList<DaeInputUnshared> jointInputs = new DaeList<DaeInputUnshared>();
 
-        DaeInputUnshared jointInput = new DaeInputUnshared("#jointNamesSource", "JOINTS", collada);
+        DaeInputUnshared jointInput = new DaeInputUnshared("#jointNamesSource", "JOINT", collada);
 
         jointInputs.add(jointInput);
 
