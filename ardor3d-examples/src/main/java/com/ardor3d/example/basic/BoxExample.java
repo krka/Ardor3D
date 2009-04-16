@@ -28,11 +28,21 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * A simple example showing a textured and lit box spinning.
+ */
 public class BoxExample extends ExampleBase {
 
-    private Mesh t;
+    /** Keep a reference to the box to be able to rotate it each frame. */
+    private Mesh box;
+
+    /** Rotation matrix for the spinning box. */
     private final Matrix3 rotate = new Matrix3();
+
+    /** Angle of rotation for the box. */
     private double angle = 0;
+
+    /** Axis to rotate the box around. */
     private final Vector3 axis = new Vector3(1, 1, 0.5f).normalizeLocal();
 
     public static void main(final String[] args) {
@@ -46,37 +56,43 @@ public class BoxExample extends ExampleBase {
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        angle = angle + (timer.getTimePerFrame() * 25);
-        if (angle > 360) {
-            angle = 0;
-        }
+        // Update the angle using the current tpf to rotate at a constant speed.
+        angle += timer.getTimePerFrame() * 50;
+        // Wrap the angle to keep it inside 0-360 range
+        angle %= 360;
 
+        // Update the rotation matrix using the angle and rotation axis.
         rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
-        t.setRotation(rotate);
+        // Update the box rotation using the rotation matrix.
+        box.setRotation(rotate);
     }
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Vertex Colors");
+        _canvas.setTitle("Box Example");
 
-        final Vector3 max = new Vector3(5, 5, 5);
-        final Vector3 min = new Vector3(-5, -5, -5);
+        // Create a new box centered at (0,0,0) with width/height/depth of size 10.
+        box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
+        // Set a bounding box for frustum culling.
+        box.setModelBound(new BoundingBox());
+        // Update bounding to fit the box.
+        box.updateModelBound();
+        // Move the box out from the camera 15 units.
+        box.setTranslation(new Vector3(0, 0, -15));
+        // Give the box some nice colors.
+        box.setRandomColors();
+        // Attach the box to the scenegraph root.
+        _root.attachChild(box);
 
-        t = new Box("Box", min, max);
-        t.setModelBound(new BoundingBox());
-        t.updateModelBound();
-        t.setTranslation(new Vector3(0, 0, -15));
-        _root.attachChild(t);
-
-        t.setRandomColors();
-
+        // Add a texture to the box.
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.GuessNoCompression, true));
-        _root.setRenderState(ts);
+        box.setRenderState(ts);
 
+        // Add a material to the box, to show both vertex color and lighting/shading.
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
+        box.setRenderState(ms);
     }
 }
