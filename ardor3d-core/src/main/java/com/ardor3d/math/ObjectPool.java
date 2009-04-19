@@ -23,7 +23,7 @@ import java.util.List;
 public abstract class ObjectPool<T extends Poolable> {
     private final ThreadLocal<List<T>> _pool = new ThreadLocal<List<T>>() {
         @Override
-        protected synchronized List<T> initialValue() {
+        protected List<T> initialValue() {
             return new ArrayList<T>(_maxSize);
         }
     };
