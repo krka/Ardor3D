@@ -491,10 +491,10 @@ public class OrientedBoundingBox extends BoundingVolume {
         final int vertsPerPrimitive = data.getIndexMode(section).getVertexCount();
         Vector3[] store = new Vector3[vertsPerPrimitive];
 
-        final Vector3 min = Vector3.fetchTempInstance().set(
-                new Vector3(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
-        final Vector3 max = Vector3.fetchTempInstance().set(
-                new Vector3(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
+        final Vector3 min = Vector3.fetchTempInstance().set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+                Double.POSITIVE_INFINITY);
+        final Vector3 max = Vector3.fetchTempInstance().set(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                Double.NEGATIVE_INFINITY);
 
         Vector3 point;
         for (int i = start; i < end; i++) {
