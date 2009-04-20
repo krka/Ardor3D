@@ -116,13 +116,13 @@ final public class TextureManager {
      *            the filter for the far values.
      * @param imageType
      *            the type to use for image data
-     * @param flipped
-     *            If true, the images Y values are flipped.
+     * @param wasFlipped
+     *            If true, the images Y values were flipped - for cache check purposes only.
      * @return the loaded texture. If there is a problem loading the texture, null is returned.
      */
     public static Texture loadFromImage(final Image image, final Texture.MinificationFilter minFilter,
-            final Image.Format imageType, final boolean flipped) {
-        final TextureKey key = new TextureKey(null, flipped, imageType, minFilter);
+            final Image.Format imageType, final boolean wasFlipped) {
+        final TextureKey key = new TextureKey(null, wasFlipped, imageType, minFilter);
         key.setFileType("img_" + image.hashCode());
         return loadFromKey(key, image, null);
     }
