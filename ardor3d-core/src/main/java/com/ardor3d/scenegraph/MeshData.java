@@ -693,13 +693,18 @@ public class MeshData implements Cloneable, Savable {
 
         final IndexMode mode = getIndexMode(section);
         final int rSize = mode.getVertexCount();
+
         int[] result = store;
         if (result == null || result.length < rSize) {
             result = new int[rSize];
         }
 
         for (int i = 0; i < rSize; i++) {
-            result[i] = getIndexBuffer().get(getVertexIndex(primitiveIndex, i, section));
+            if (getIndexBuffer() != null) {
+                result[i] = getIndexBuffer().get(getVertexIndex(primitiveIndex, i, section));
+            } else {
+                result[i] = getVertexIndex(primitiveIndex, i, section);
+            }
         }
 
         return result;
