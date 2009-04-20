@@ -126,8 +126,8 @@ public class WaterNode extends Node {
         tangent = new Vector3(1.0f, 0.0f, 0.0f);
         binormal = new Vector3(0.0f, 0.0f, 1.0f);
 
-        waterMaxAmplitude = 1.0f;
-        clipBias = 0.0f;
+        waterMaxAmplitude = 0.0f;
+        clipBias = 1.0f;
         waterColorStart = new ColorRGBA(0.0f, 0.0f, 0.1f, 1.0f);
         waterColorEnd = new ColorRGBA(0.0f, 0.3f, 0.1f, 1.0f);
         heightFalloffStart = 300.0f;
@@ -363,7 +363,7 @@ public class WaterNode extends Node {
 
             if (useRefraction && aboveWater) {
                 clipState.setClipPlaneEquation(ClipState.CLIP_PLANE0, -normal.getX(), -normal.getY(), -normal.getZ(),
-                        -heightTotal);
+                        -waterPlane.getConstant());
 
                 renderRefraction();
             }
