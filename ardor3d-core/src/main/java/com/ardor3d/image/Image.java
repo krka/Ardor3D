@@ -264,6 +264,10 @@ public class Image implements Serializable, Savable {
          * 32 bit float, intensity only format
          */
         Intensity32F;
+
+        public boolean isDepthFormat() {
+            return this == Depth16 || this == Depth24 || this == Depth32;
+        }
     }
 
     // image attributes

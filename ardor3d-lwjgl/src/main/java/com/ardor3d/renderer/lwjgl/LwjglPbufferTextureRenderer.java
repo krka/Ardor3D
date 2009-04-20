@@ -10,6 +10,8 @@
 
 package com.ardor3d.renderer.lwjgl;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,7 +34,11 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.record.TextureRecord;
+import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.lwjgl.LwjglTextureStateUtil;
+import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureManager;
@@ -98,11 +104,29 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         GL11.glGenTextures(ibuf);
         tex.setTextureId(ibuf.get(0));
         TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
 
-        final int source = getSourceFromRTTType(tex);
-        GL11.glCopyTexImage2D(GL11.GL_TEXTURE_2D, 0, source, 0, 0, _width, _height, 0);
-        logger.fine("setup tex" + tex.getTextureId() + ": " + _width + "," + _height);
+        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
+        final int pixFormat = LwjglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
+        final int pixDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
+
+        // Initialize our texture with some default data.
+        if (pixDataType == GL11.GL_UNSIGNED_BYTE) {
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
+                    (ByteBuffer) null);
+        } else {
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
+                    (FloatBuffer) null);
+        }
+
+        // Setup filtering and wrap
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
+        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
+
+        LwjglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
+        LwjglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
+        logger.fine("setup pbuffer tex" + tex.getTextureId() + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final Texture tex, final boolean doClear) {
@@ -127,7 +151,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 initPbuffer();
             }
 
-            if (_useDirectRender && tex.getRTTSource() != Texture.RenderToTextureType.Depth) {
+            if (_useDirectRender && !tex.getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
                 activate();
@@ -188,7 +212,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 initPbuffer();
             }
 
-            if (texs.size() == 1 && _useDirectRender && texs.get(0).getRTTSource() != Texture.RenderToTextureType.Depth) {
+            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 LwjglTextureStateUtil.doTextureBind(texs.get(0).getTextureId(), 0, Texture.Type.TwoDimensional);
                 activate();
@@ -234,77 +258,6 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
 
         GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
-    }
-
-    private int getSourceFromRTTType(final Texture tex) {
-        int source = GL11.GL_RGBA;
-        switch (tex.getRTTSource()) {
-            case RGBA:
-            case RGBA2:
-            case RGBA4:
-            case RGB5_A1:
-            case RGBA8:
-            case RGB10_A2:
-            case RGBA12:
-            case RGBA16:
-            case RGBA16F:
-            case RGBA32F:
-                break;
-            case RGB:
-            case R3_G3_B2:
-            case RGB4:
-            case RGB5:
-            case RGB8:
-            case RGB10:
-            case RGB12:
-            case RGB16:
-            case RGB16F:
-            case RGB32F:
-                source = GL11.GL_RGB;
-                break;
-            case Alpha:
-            case Alpha4:
-            case Alpha8:
-            case Alpha12:
-            case Alpha16:
-            case Alpha16F:
-            case Alpha32F:
-                source = GL11.GL_ALPHA;
-                break;
-            case Depth:
-                source = GL11.GL_DEPTH_COMPONENT;
-                break;
-            case Intensity:
-            case Intensity4:
-            case Intensity8:
-            case Intensity12:
-            case Intensity16:
-            case Intensity16F:
-            case Intensity32F:
-                source = GL11.GL_INTENSITY;
-                break;
-            case Luminance:
-            case Luminance4:
-            case Luminance8:
-            case Luminance12:
-            case Luminance16:
-            case Luminance16F:
-            case Luminance32F:
-                source = GL11.GL_LUMINANCE;
-                break;
-            case LuminanceAlpha:
-            case Luminance4Alpha4:
-            case Luminance8Alpha8:
-            case Luminance6Alpha2:
-            case Luminance12Alpha4:
-            case Luminance12Alpha12:
-            case Luminance16Alpha16:
-            case LuminanceAlpha32F:
-            case LuminanceAlpha16F:
-                source = GL11.GL_LUMINANCE_ALPHA;
-                break;
-        }
-        return source;
     }
 
     @Override

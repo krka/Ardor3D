@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
@@ -266,7 +267,7 @@ public class DirectionalShadowMapPass extends Pass {
         _shadowMapTexture.setMinificationFilter(Texture.MinificationFilter.NearestNeighborNoMipMaps);
         _shadowMapTexture.setWrap(Texture.WrapMode.Clamp);
         _shadowMapTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
-        _shadowMapTexture.setRenderToTextureType(Texture.RenderToTextureType.Depth);
+        _shadowMapTexture.setRenderToTextureFormat(Image.Format.Depth24);
         _shadowMapTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
 
         _shadowMapTexture.setDepthCompareMode(DepthTextureCompareMode.RtoTexture);

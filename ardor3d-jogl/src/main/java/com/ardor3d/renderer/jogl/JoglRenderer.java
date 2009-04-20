@@ -453,8 +453,6 @@ public class JoglRenderer extends AbstractRenderer {
             // pixels in the region to be uploaded to the texture.
             rowLength = srcWidth;
         }
-        // Consider moving these conversion methods.
-        final int dataFormat = JoglTextureUtil.getGLDataFormat(format);
         final int pixelFormat = JoglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
@@ -486,8 +484,9 @@ public class JoglRenderer extends AbstractRenderer {
                         dstHeight, format);
             }
         } else {
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, dataFormat, dstWidth, dstHeight, 0, pixelFormat, GL.GL_UNSIGNED_BYTE,
-                    data);
+            final int internalFormat = JoglTextureUtil.getGLInternalFormat(format);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, dstWidth, dstHeight, 0, pixelFormat,
+                    GL.GL_UNSIGNED_BYTE, data);
         }
 
         // Restore the texture configuration (when necessary).

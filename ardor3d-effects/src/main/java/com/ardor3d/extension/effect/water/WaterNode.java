@@ -273,7 +273,7 @@ public class WaterNode extends Node {
             textureDepth = new Texture2D();
             textureDepth.setWrap(Texture.WrapMode.EdgeClamp);
             textureDepth.setMagnificationFilter(Texture.MagnificationFilter.NearestNeighbor);
-            textureDepth.setRenderToTextureType(Texture.RenderToTextureType.Depth);
+            textureDepth.setRenderToTextureFormat(Image.Format.Depth24);
             tRenderer.setupTexture(textureDepth);
 
             textureState.setTexture(textureRefract, 3);

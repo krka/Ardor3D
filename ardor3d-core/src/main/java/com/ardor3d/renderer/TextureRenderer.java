@@ -106,9 +106,9 @@ public interface TextureRenderer {
 
     /**
      * <code>setupTexture</code> initializes a Texture object for use with TextureRenderer. Generates a valid gl texture
-     * id for this texture and sets up data storage for it. The texture will be equal to the pbuffer size.
+     * id for this texture and sets up data storage for it. The texture will be equal to the texture renderer's size.
      * 
-     * Note that the pbuffer size is not necessarily what is specified in the constructor.
+     * Note that the texture renderer's size is not necessarily what is specified in the constructor.
      * 
      * @param tex
      *            The texture to setup for use in Texture Rendering.
@@ -117,7 +117,7 @@ public interface TextureRenderer {
 
     /**
      * <code>copyToTexture</code> copies the current frame buffer contents to the given Texture. What is copied is based
-     * on the rttSource of the texture object when it was setup.
+     * on the rttFormat of the texture object when it was setup.
      * 
      * @param tex
      *            The Texture to copy into.

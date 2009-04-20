@@ -18,7 +18,7 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -521,13 +521,12 @@ public final class Debugger {
         bQuad.setCullHint(Spatial.CullHint.Never);
     }
 
-    public static void drawBuffer(final Texture.RenderToTextureType rttSource, final int location, final Renderer r) {
+    public static void drawBuffer(final Image.Format rttFormat, final int location, final Renderer r) {
         final Camera cam = Camera.getCurrentCamera();
-        drawBuffer(rttSource, location, r, cam.getWidth() / 6.25);
+        drawBuffer(rttFormat, location, r, cam.getWidth() / 6.25);
     }
 
-    public static void drawBuffer(final Texture.RenderToTextureType rttSource, final int location, final Renderer r,
-            final double size) {
+    public static void drawBuffer(final Image.Format rttFormat, final int location, final Renderer r, final double size) {
         final Camera cam = Camera.getCurrentCamera();
         r.flushGraphics();
         double locationX = cam.getWidth(), locationY = cam.getHeight();
@@ -539,7 +538,7 @@ public final class Debugger {
             bQuad.setRenderState(ts);
         }
 
-        bufTexture.setRenderToTextureType(rttSource);
+        bufTexture.setRenderToTextureFormat(rttFormat);
 
         if (bufTexRend == null) {
             final DisplaySettings settings = new DisplaySettings(256, 256, 0, 0, 0, 8, 0, 0, false, false);

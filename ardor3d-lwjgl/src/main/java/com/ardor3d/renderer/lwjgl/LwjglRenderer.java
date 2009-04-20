@@ -431,7 +431,7 @@ public class LwjglRenderer extends AbstractRenderer {
             rowLength = srcWidth;
         }
         // Consider moving these conversion methods.
-        final int dataFormat = LwjglTextureUtil.getGLDataFormat(format);
+        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(format);
         final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
@@ -464,7 +464,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         dstHeight, format);
             }
         } else {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, dataFormat, dstWidth, dstHeight, 0, pixelFormat,
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dstWidth, dstHeight, 0, pixelFormat,
                     GL11.GL_UNSIGNED_BYTE, data);
         }
 

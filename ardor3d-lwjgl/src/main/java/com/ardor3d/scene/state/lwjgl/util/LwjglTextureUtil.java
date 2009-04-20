@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.lwjgl.util;
 
 import org.lwjgl.opengl.ARBDepthTexture;
+import org.lwjgl.opengl.ARBHalfFloatPixel;
 import org.lwjgl.opengl.ARBMultitexture;
 import org.lwjgl.opengl.ARBShadow;
 import org.lwjgl.opengl.ARBTextureEnvCombine;
@@ -18,6 +19,7 @@ import org.lwjgl.opengl.ARBTextureEnvDot3;
 import org.lwjgl.opengl.ARBTextureFloat;
 import org.lwjgl.opengl.EXTTextureCompressionS3TC;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Image.Format;
@@ -48,7 +50,7 @@ public abstract class LwjglTextureUtil {
         }
     }
 
-    public static int getGLDataFormat(final Format format) {
+    public static int getGLInternalFormat(final Format format) {
         switch (format) {
             // first some frequently used formats
             case RGBA8:
@@ -161,6 +163,27 @@ public abstract class LwjglTextureUtil {
                 return ARBTextureFloat.GL_INTENSITY32F_ARB;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
+    }
+
+    public static int getGLPixelDataType(final Format format) {
+        switch (format) {
+            case RGBA16F:
+            case RGB16F:
+            case Alpha16F:
+            case Luminance16F:
+            case Intensity16F:
+            case LuminanceAlpha16F:
+                return ARBHalfFloatPixel.GL_HALF_FLOAT_ARB;
+            case RGBA32F:
+            case RGB32F:
+            case Alpha32F:
+            case Luminance32F:
+            case Intensity32F:
+            case LuminanceAlpha32F:
+                return GL11.GL_FLOAT;
+            default:
+                return GL11.GL_UNSIGNED_BYTE;
+        }
     }
 
     public static int getGLPixelFormat(final Format requestedFormat, final Format imageFormat,
@@ -483,4 +506,55 @@ public abstract class LwjglTextureUtil {
         throw new IllegalArgumentException("invalid CombinerFunctionRGB type: " + combineFunc);
     }
 
+    public static int bytesPerPixel(final int format, final int type) {
+        int n, m;
+
+        switch (format) {
+            case GL11.GL_COLOR_INDEX:
+            case GL11.GL_STENCIL_INDEX:
+            case GL11.GL_DEPTH_COMPONENT:
+            case GL11.GL_RED:
+            case GL11.GL_GREEN:
+            case GL11.GL_BLUE:
+            case GL11.GL_ALPHA:
+            case GL11.GL_LUMINANCE:
+                n = 1;
+                break;
+            case GL11.GL_LUMINANCE_ALPHA:
+                n = 2;
+                break;
+            case GL11.GL_RGB:
+            case GL12.GL_BGR:
+                n = 3;
+                break;
+            case GL11.GL_RGBA:
+            case GL12.GL_BGRA:
+                n = 4;
+                break;
+            default:
+                n = 0;
+        }
+
+        switch (type) {
+            case GL11.GL_UNSIGNED_BYTE:
+            case GL11.GL_BYTE:
+            case GL11.GL_BITMAP:
+                m = 1;
+                break;
+            case GL11.GL_UNSIGNED_SHORT:
+            case GL11.GL_SHORT:
+            case ARBHalfFloatPixel.GL_HALF_FLOAT_ARB:
+                m = 2;
+                break;
+            case GL11.GL_UNSIGNED_INT:
+            case GL11.GL_INT:
+            case GL11.GL_FLOAT:
+                m = 4;
+                break;
+            default:
+                m = 0;
+        }
+
+        return n * m;
+    }
 }

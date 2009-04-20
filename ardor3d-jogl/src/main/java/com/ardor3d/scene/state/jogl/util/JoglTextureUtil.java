@@ -12,6 +12,7 @@ package com.ardor3d.scene.state.jogl.util;
 
 import javax.media.opengl.GL;
 
+import com.ardor3d.image.Image;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionAlpha;
@@ -24,6 +25,7 @@ import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
 public abstract class JoglTextureUtil {
@@ -39,7 +41,7 @@ public abstract class JoglTextureUtil {
         }
     }
 
-    public static int getGLDataFormat(final Format format) {
+    public static int getGLInternalFormat(final Format format) {
         switch (format) {
             // first some frequently used formats
             case RGBA8:
@@ -152,6 +154,48 @@ public abstract class JoglTextureUtil {
                 return GL.GL_INTENSITY32F_ARB;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
+    }
+
+    public static int getGLPixelDataType(final Format format) {
+        switch (format) {
+            case RGBA16F:
+            case RGB16F:
+            case Alpha16F:
+            case Luminance16F:
+            case Intensity16F:
+            case LuminanceAlpha16F:
+                return GL.GL_HALF_FLOAT_ARB;
+            case RGBA32F:
+            case RGB32F:
+            case Alpha32F:
+            case Luminance32F:
+            case Intensity32F:
+            case LuminanceAlpha32F:
+                return GL.GL_FLOAT;
+            default:
+                return GL.GL_UNSIGNED_BYTE;
+        }
+    }
+
+    public static int getGLPixelFormat(final Format requestedFormat, final Format imageFormat,
+            final ContextCapabilities caps) {
+        if (requestedFormat != Image.Format.GuessNoCompression && requestedFormat != Image.Format.Guess) {
+            // If we specified a precise format, return that one.
+            return getGLPixelFormat(requestedFormat);
+
+        } else if (requestedFormat == Image.Format.Guess && caps.isS3TCSupported()) {
+            // Enable S3TC DXT compression if available and we're guessing
+            // format.
+            if (imageFormat == Image.Format.RGB8) {
+                return getGLPixelFormat(Image.Format.RGB_TO_DXT1);
+            } else if (imageFormat == Image.Format.RGBA8) {
+                return getGLPixelFormat(Image.Format.RGBA_TO_DXT5);
+            }
+        }
+
+        // requested format was GuessNoCompression, or we don't support compression, or it's a format we don't compress,
+        // so just use image format.
+        return getGLPixelFormat(imageFormat);
     }
 
     public static int getGLPixelFormat(final Format format) {
@@ -451,5 +495,57 @@ public abstract class JoglTextureUtil {
                 return GL.GL_DOT3_RGBA;
         }
         throw new IllegalArgumentException("invalid CombinerFunctionRGB type: " + combineFunc);
+    }
+
+    public static int bytesPerPixel(final int format, final int type) {
+        int n, m;
+
+        switch (format) {
+            case GL.GL_COLOR_INDEX:
+            case GL.GL_STENCIL_INDEX:
+            case GL.GL_DEPTH_COMPONENT:
+            case GL.GL_RED:
+            case GL.GL_GREEN:
+            case GL.GL_BLUE:
+            case GL.GL_ALPHA:
+            case GL.GL_LUMINANCE:
+                n = 1;
+                break;
+            case GL.GL_LUMINANCE_ALPHA:
+                n = 2;
+                break;
+            case GL.GL_RGB:
+            case GL.GL_BGR:
+                n = 3;
+                break;
+            case GL.GL_RGBA:
+            case GL.GL_BGRA:
+                n = 4;
+                break;
+            default:
+                n = 0;
+        }
+
+        switch (type) {
+            case GL.GL_UNSIGNED_BYTE:
+            case GL.GL_BYTE:
+            case GL.GL_BITMAP:
+                m = 1;
+                break;
+            case GL.GL_UNSIGNED_SHORT:
+            case GL.GL_SHORT:
+            case GL.GL_HALF_FLOAT_ARB:
+                m = 2;
+                break;
+            case GL.GL_UNSIGNED_INT:
+            case GL.GL_INT:
+            case GL.GL_FLOAT:
+                m = 4;
+                break;
+            default:
+                m = 0;
+        }
+
+        return n * m;
     }
 }

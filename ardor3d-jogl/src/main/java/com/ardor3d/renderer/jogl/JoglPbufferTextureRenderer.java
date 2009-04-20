@@ -30,7 +30,11 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.record.TextureRecord;
+import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.jogl.JoglTextureStateUtil;
+import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
@@ -71,11 +75,24 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         gl.glGenTextures(1, ibuf);
         tex.setTextureId(ibuf.get(0));
         TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
 
-        final int source = getSourceFromRTTType(tex);
-        gl.glCopyTexImage2D(GL.GL_TEXTURE_2D, 0, source, 0, 0, _width, _height, 0);
-        logger.fine("setup tex" + tex.getTextureId() + ": " + _width + "," + _height);
+        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
+        final int pixFormat = JoglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
+        final int pixDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
+
+        // Initialize our texture with some default data.
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType, null);
+
+        // Setup filtering and wrap
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
+        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
+
+        JoglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
+        JoglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
+
+        logger.fine("setup pbuffer tex" + tex.getTextureId() + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final Texture tex, final boolean doClear) {
@@ -95,7 +112,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 initPbuffer();
             }
 
-            if (_useDirectRender && tex.getRTTSource() != Texture.RenderToTextureType.Depth) {
+            if (_useDirectRender && !tex.getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexture();
                 activate();
@@ -151,7 +168,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 initPbuffer();
             }
 
-            if (texs.size() == 1 && _useDirectRender && texs.get(0).getRTTSource() != Texture.RenderToTextureType.Depth) {
+            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 JoglTextureStateUtil.doTextureBind(texs.get(0).getTextureId(), 0, Texture.Type.TwoDimensional);
                 activate();
@@ -199,77 +216,6 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         final GL gl = GLU.getCurrentGL();
 
         gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
-    }
-
-    private int getSourceFromRTTType(final Texture tex) {
-        int source = GL.GL_RGBA;
-        switch (tex.getRTTSource()) {
-            case RGBA:
-            case RGBA2:
-            case RGBA4:
-            case RGB5_A1:
-            case RGBA8:
-            case RGB10_A2:
-            case RGBA12:
-            case RGBA16:
-            case RGBA16F:
-            case RGBA32F:
-                break;
-            case RGB:
-            case R3_G3_B2:
-            case RGB4:
-            case RGB5:
-            case RGB8:
-            case RGB10:
-            case RGB12:
-            case RGB16:
-            case RGB16F:
-            case RGB32F:
-                source = GL.GL_RGB;
-                break;
-            case Alpha:
-            case Alpha4:
-            case Alpha8:
-            case Alpha12:
-            case Alpha16:
-            case Alpha16F:
-            case Alpha32F:
-                source = GL.GL_ALPHA;
-                break;
-            case Depth:
-                source = GL.GL_DEPTH_COMPONENT;
-                break;
-            case Intensity:
-            case Intensity4:
-            case Intensity8:
-            case Intensity12:
-            case Intensity16:
-            case Intensity16F:
-            case Intensity32F:
-                source = GL.GL_INTENSITY;
-                break;
-            case Luminance:
-            case Luminance4:
-            case Luminance8:
-            case Luminance12:
-            case Luminance16:
-            case Luminance16F:
-            case Luminance32F:
-                source = GL.GL_LUMINANCE;
-                break;
-            case LuminanceAlpha:
-            case Luminance4Alpha4:
-            case Luminance8Alpha8:
-            case Luminance6Alpha2:
-            case Luminance12Alpha4:
-            case Luminance12Alpha12:
-            case Luminance16Alpha16:
-            case LuminanceAlpha32F:
-            case LuminanceAlpha16F:
-                source = GL.GL_LUMINANCE_ALPHA;
-                break;
-        }
-        return source;
     }
 
     @Override

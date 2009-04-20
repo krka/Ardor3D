@@ -12,6 +12,7 @@ package com.ardor3d.image;
 
 import java.io.IOException;
 
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
@@ -409,54 +410,6 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * When doing RenderToTexture operations with this texture, this value indicates what content to render into this
-     * texture.
-     */
-    public enum RenderToTextureType {
-        /**
-         *Each element is an RGB triple. OpenGL converts it to fixed-point or floating-point and assembles it into an
-         * RGBA element by attaching 1 for alpha. Each component is then clamped to the range [0,1].
-         */
-        RGB,
-        /**
-         * Each element contains all four components. OpenGL converts it to fixed-point or floating-point. Each
-         * component is then clamped to the range [0,1].
-         */
-        RGBA,
-        /**
-         * Each element is a single depth component clamped to the range [0, 1]. Each component is then clamped to the
-         * range [0,1].
-         */
-        Depth,
-        /**
-         * Each element is a luminance/alpha pair. OpenGL converts it to fixed-point or floating point, then assembles
-         * it into an RGBA element by replicating the luminance value three times for red, green, and blue. Each
-         * component is then clamped to the range [0,1].
-         */
-        Alpha,
-        /**
-         * Each element is a single luminance value. OpenGL converts it to fixed-point or floating-point, then assembles
-         * it into an RGBA element by replicating the luminance value three times for red, green, and blue and attaching
-         * 1 for alpha. Each component is then clamped to the range [0,1].
-         */
-        Luminance,
-        /**
-         * Each element is a luminance/alpha pair. OpenGL converts it to fixed-point or floating point, then assembles
-         * it into an RGBA element by replicating the luminance value three times for red, green, and blue. Each
-         * component is then clamped to the range [0,1].
-         */
-        LuminanceAlpha,
-        /**
-         * Each element has both luminance (grayness) and alpha (transparency) information, but the luminance and alpha
-         * values at every texel are the same. Each component is then clamped to the range [0,1].
-         */
-        Intensity, Alpha4, Alpha8, Alpha12, Alpha16, Luminance4, Luminance8, Luminance12, Luminance16, Luminance4Alpha4, Luminance6Alpha2, Luminance8Alpha8, Luminance12Alpha4, Luminance12Alpha12, Luminance16Alpha16, Intensity4, Intensity8, Intensity12, Intensity16, R3_G3_B2, RGB4, RGB5, RGB8, RGB10, RGB12, RGB16, RGBA2, RGBA4, RGB5_A1, RGBA8, RGB10_A2, RGBA12, RGBA16,
-        // floats
-        RGBA32F, RGB32F, Alpha32F, Intensity32F, Luminance32F, LuminanceAlpha32F, RGBA16F, RGB16F, Alpha16F, Intensity16F, Luminance16F, LuminanceAlpha16F;
-
-    }
-
-    /**
      * The shadowing texture compare mode
      */
     public enum DepthTextureCompareMode {
@@ -505,7 +458,7 @@ public abstract class Texture implements Savable {
     private ApplyMode _apply = ApplyMode.Modulate;
     private MinificationFilter _minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
     private MagnificationFilter _magnificationFilter = MagnificationFilter.Bilinear;
-    private RenderToTextureType _rttSource = RenderToTextureType.RGBA;
+    private Image.Format _rttFormat = Format.RGBA8;
 
     private EnvironmentalMapMode _envMapMode = EnvironmentalMapMode.None;
 
@@ -1313,23 +1266,25 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * @return Returns the rttSource.
+     * @return Returns the Image.Format used to describe the data type that RTT operations will use to draw to this
+     *         texture.
      */
-    public RenderToTextureType getRTTSource() {
-        return _rttSource;
+    public Format getRenderToTextureFormat() {
+        return _rttFormat;
     }
 
     /**
-     * @param rttSource
-     *            The rttSource to set.
+     * @param rttFormat
+     *            The Image.Format used to describe the data type that RTT operations to use when drawing to this
+     *            texture.
      * @throws IllegalArgumentException
-     *             if rttSource is null
+     *             if rttFormat is null
      */
-    public void setRenderToTextureType(final RenderToTextureType rttSource) {
-        if (rttSource == null) {
+    public void setRenderToTextureFormat(final Format rttFormat) {
+        if (rttFormat == null) {
             throw new IllegalArgumentException("invalid RenderToTextureType: null");
         }
-        _rttSource = rttSource;
+        _rttFormat = rttFormat;
     }
 
     /**
@@ -1376,7 +1331,7 @@ public abstract class Texture implements Savable {
         capsule.write(_envPlaneT, "envPlaneT", null);
         capsule.write(_envPlaneR, "envPlaneR", null);
         capsule.write(_envPlaneQ, "envPlaneQ", null);
-        capsule.write(_rttSource, "rttSource", RenderToTextureType.RGBA);
+        capsule.write(_rttFormat, "rttFormat", Image.Format.RGBA8);
         capsule.write(_memReq, "memReq", 0);
         capsule.write(_combineFuncRGB, "combineFuncRGB", CombinerFunctionRGB.Replace);
         capsule.write(_combineFuncAlpha, "combineFuncAlpha", CombinerFunctionAlpha.Replace);
@@ -1426,7 +1381,7 @@ public abstract class Texture implements Savable {
         _envPlaneT = (Vector4) capsule.readSavable("envPlaneT", null);
         _envPlaneR = (Vector4) capsule.readSavable("envPlaneR", null);
         _envPlaneQ = (Vector4) capsule.readSavable("envPlaneQ", null);
-        _rttSource = capsule.readEnum("rttSource", RenderToTextureType.class, RenderToTextureType.RGBA);
+        _rttFormat = capsule.readEnum("rttSource", Image.Format.class, Format.RGBA8);
         _memReq = capsule.readInt("memReq", 0);
         _combineFuncRGB = capsule.readEnum("combineFuncRGB", CombinerFunctionRGB.class, CombinerFunctionRGB.Replace);
         _combineFuncAlpha = capsule.readEnum("combineFuncAlpha", CombinerFunctionAlpha.class,
