@@ -28,10 +28,31 @@ import com.ardor3d.framework.DisplaySettings;
 public class SwtCanvas extends GLCanvas implements Canvas {
     private CanvasRenderer _canvasRenderer;
     private boolean _inited = false;
+    private final GLData _passedGLData;
 
     public SwtCanvas(final Composite composite, final int style, final GLData glData) {
         super(composite, style, glData);
+        _passedGLData = clone(glData);
         setCurrent();
+    }
+
+    private GLData clone(final GLData glData) {
+        final GLData rVal = new GLData();
+        rVal.accumAlphaSize = glData.accumAlphaSize;
+        rVal.accumBlueSize = glData.accumBlueSize;
+        rVal.accumGreenSize = glData.accumGreenSize;
+        rVal.accumRedSize = glData.accumRedSize;
+        rVal.alphaSize = glData.alphaSize;
+        rVal.blueSize = glData.blueSize;
+        rVal.depthSize = glData.depthSize;
+        rVal.doubleBuffer = glData.doubleBuffer;
+        rVal.greenSize = glData.greenSize;
+        rVal.redSize = glData.redSize;
+        rVal.sampleBuffers = glData.sampleBuffers;
+        rVal.samples = glData.samples;
+        rVal.stencilSize = glData.stencilSize;
+        rVal.stereo = glData.stereo;
+        return rVal;
     }
 
     public void setCanvasRenderer(final CanvasRenderer renderer) {
@@ -46,8 +67,9 @@ public class SwtCanvas extends GLCanvas implements Canvas {
 
         setCurrent();
 
-        final DisplaySettings settings = new DisplaySettings(Math.max(size.x, 1), Math.max(size.y, 1), 0, 0, 0, 8, 0,
-                0, false, false);
+        final DisplaySettings settings = new DisplaySettings(Math.max(size.x, 1), Math.max(size.y, 1), 0, 0,
+                _passedGLData.alphaSize, _passedGLData.depthSize, _passedGLData.stencilSize, _passedGLData.samples,
+                false, _passedGLData.stereo);
 
         _canvasRenderer.init(settings, false); // false - do not do back buffer swap, swt will do that.
         _inited = true;
