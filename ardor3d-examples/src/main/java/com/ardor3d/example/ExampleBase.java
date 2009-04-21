@@ -120,6 +120,10 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
     protected Vector3 _worldUp = new Vector3(0, 1, 0);
 
+    protected static int _minDepthBits = -1;
+    protected static int _minAlphaBits = -1;
+    protected static int _minStencilBits = -1;
+
     @Inject
     public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
         _logicalLayer = logicalLayer;
@@ -300,8 +304,17 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         // Convert to DisplayProperties (XXX: maybe merge these classes?)
         final DisplaySettings settings = new DisplaySettings(prefs.getWidth(), prefs.getHeight(), prefs.getDepth(),
-                prefs.getFrequency(), prefs.getAlphaBits(), prefs.getDepthBits(), prefs.getStencilBits(), prefs
-                        .getSamples(), prefs.isFullscreen(), _stereo);
+                prefs.getFrequency(),
+                // alpha
+                _minAlphaBits != -1 ? _minAlphaBits : prefs.getAlphaBits(),
+                // depth
+                _minDepthBits != -1 ? _minDepthBits : prefs.getDepthBits(),
+                // stencil
+                _minStencilBits != -1 ? _minStencilBits : prefs.getStencilBits(),
+                // samples
+                prefs.getSamples(),
+                // other
+                prefs.isFullscreen(), _stereo);
 
         // get our framework
         final ArdorModule ardorModule = new ArdorModule();
