@@ -65,7 +65,7 @@ public enum AwtKey {
             Key.RIGHT), AWT_KEY_END(KeyEvent.VK_END, Key.END), AWT_KEY_DOWN(KeyEvent.VK_DOWN, Key.DOWN), AWT_KEY_NEXT(
             KeyEvent.VK_PAGE_DOWN, Key.NEXT), AWT_KEY_INSERT(KeyEvent.VK_INSERT, Key.INSERT), AWT_KEY_DELETE(
             KeyEvent.VK_DELETE, Key.DELETE), AWT_KEY_LMENU(KeyEvent.VK_ALT, Key.LMENU), AWT_KEY_RMENU(KeyEvent.VK_ALT,
-            Key.RMENU);
+            Key.RMENU), AWT_COMMAND(KeyEvent.VK_META, Key.LMETA);
 
     private final int _awtCode;
     private final Key _key;
