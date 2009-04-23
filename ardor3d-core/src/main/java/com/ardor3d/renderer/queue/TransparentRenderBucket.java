@@ -85,6 +85,13 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
         return _twoPassTransparent;
     }
 
+    /**
+     * 
+     * @param twoPassTransparent
+     *            true to enable two pass drawing. In this mode, the Spatial will be draw twice, first with only back
+     *            faces showing and second with only front faces showing. This results in more accurate and
+     *            artifact-free results, but takes more drawing time and is not necessary for planar surfaces.
+     */
     public void setTwoPassTransparency(final boolean twoPassTransparent) {
         _twoPassTransparent = twoPassTransparent;
     }

@@ -497,7 +497,10 @@ public abstract class Spatial implements Cloneable, Savable {
     }
 
     /**
-     * @return
+     * @return a number representing z ordering when used in the Ortho bucket. Higher values are
+     *         "further into the screen" and lower values are "closer". Or in other words, if you draw two quads, one
+     *         with a zorder of 1 and the other with a zorder of 2, the quad with zorder of 2 will be "under" the other
+     *         quad.
      */
     public int getZOrder() {
         return _zOrder;
@@ -957,36 +960,42 @@ public abstract class Spatial implements Cloneable, Savable {
     }
 
     /**
-     * <code>setRenderQueueMode</code> determines at what phase of the rendering proces this Spatial will rendered.
-     * There are 4 different phases: QUEUE_SKIP - The spatial will be drawn as soon as possible, before the other phases
-     * of rendering. QUEUE_OPAQUE - The renderer will try to find the optimal order for rendering all objects using this
-     * mode. You should use this mode for most normal objects, except transparant ones, as it could give a nice
-     * performance boost to your application. QUEUE_TRANSPARENT - This is the mode you should use for object with
-     * transparancy in them. It will ensure the objects furthest away are rendered first. That ensures when another
-     * transparent object is drawn on top of previously drawn objects, you can see those (and the object drawn using
-     * SKIP and OPAQUE) through the tranparant parts of the newly drawn object. QUEUE_ORTHO - This is a special mode,
-     * for drawing 2D object without prespective (such as GUI or HUD parts) Lastly, there is a special mode,
-     * QUEUE_INHERIT, that will ensure that this spatial uses the same mode as the parent Node does.
+     * Set the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
+     * in.
      * 
      * @param renderBucketType
-     *            The mode to use for this Spatial.
+     *            the render bucket type to use for this spatial.
+     * @see com.ardor3d.renderer.queue.RenderBucketType
      */
     public void setRenderBucketType(final RenderBucketType renderBucketType) {
         _renderBucketType = renderBucketType;
     }
 
     /**
-     * @return
+     * Get the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
+     * in.
+     * <p>
+     * This method returns the actual bucket type that is set on this spatial, if the type is set to
+     * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
+     * parent will be used during rendering.
+     * 
+     * @return the render queue mode set on this spatial.
+     * @see com.ardor3d.renderer.queue.RenderBucketType
      */
     public RenderBucketType getLocalRenderBucketType() {
         return _renderBucketType;
     }
 
     /**
-     * Returns this spatial's renderqueue mode. If the mode is set to inherit, then the spatial gets its renderqueue
-     * mode from its parent.
+     * Get the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
+     * in.
+     * <p>
+     * This method returns the effective bucket type that is used for rendering. If the type is set to
+     * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
+     * parent will be used during rendering.
      * 
-     * @return The spatial's current renderqueue mode.
+     * @return the render queue mode used for this spatial.
+     * @see com.ardor3d.renderer.queue.RenderBucketType
      */
     public RenderBucketType getRenderBucketType() {
         if (_renderBucketType != RenderBucketType.Inherit) {
