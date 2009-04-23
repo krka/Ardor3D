@@ -22,9 +22,9 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -195,10 +195,12 @@ public class BMText extends Mesh {
 
     public void setTextColor(final ReadOnlyColorRGBA clr) {
         _textClr.set(clr);
+        setDefaultColor(_textClr);
     }
 
     public void setTextColor(final float r, final float g, final float b, final float a) {
         _textClr.set(r, g, b, a);
+        setDefaultColor(_textClr);
     }
 
     /**

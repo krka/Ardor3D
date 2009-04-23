@@ -56,7 +56,7 @@ public class BasicText extends BMText {
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
         blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.One);
+        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
         blend.setTestEnabled(true);
         blend.setReference(0f);
         blend.setTestFunction(BlendState.TestFunction.GreaterThan);
