@@ -12,6 +12,13 @@ package com.ardor3d.extension.effect.water;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Stack;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
@@ -29,19 +36,17 @@ import com.ardor3d.util.geom.BufferUtils;
  * <code>ProjectedGrid</code> Projected grid mesh
  */
 public class ProjectedGrid extends Mesh {
+    /** The Constant logger. */
+    private static final Logger logger = Logger.getLogger(ProjectedGrid.class.getName());
+
     private static final long serialVersionUID = 1L;
 
     private final int sizeX;
     private final int sizeY;
 
-    // x/z step
-    private static Vector3 calcVec1 = new Vector3();
-    private static Vector3 calcVec2 = new Vector3();
-    private static Vector3 calcVec3 = new Vector3();
-
     private FloatBuffer vertBuf;
-    private FloatBuffer normBuf;
-    private FloatBuffer texs;
+    private final FloatBuffer normBuf;
+    private final FloatBuffer texs;
     private IntBuffer indexBuffer;
 
     private double viewPortWidth = 0;
@@ -73,8 +78,6 @@ public class ProjectedGrid extends Mesh {
     private final Vector3 camloc = new Vector3();
     private final Vector3 camdir = new Vector3();
     private final Vector4 pointFinal = new Vector4();
-    private final Vector4 pointTop = new Vector4();
-    private final Vector4 pointBottom = new Vector4();
     private final Vector3 realPoint = new Vector3();
 
     public boolean freezeProjector = false;
@@ -90,28 +93,48 @@ public class ProjectedGrid extends Mesh {
     private final float[] normBufArray;
     private final float[] texBufArray;
 
-    public ProjectedGrid(final String name, final Camera cam, final int sizeX, final int sizeY,
+    private int nrUpdateThreads = 1;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final Stack<Future<?>> futureStack = new Stack<Future<?>>();
+
+    public ProjectedGrid(final String name, final Camera camera, final int sizeX, final int sizeY,
             final float textureScale, final HeightGenerator heightGenerator, final Timer timer) {
         super(name);
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.textureScale = textureScale;
         this.heightGenerator = heightGenerator;
-        camera = cam;
-
+        this.camera = camera;
         this.timer = timer;
 
         buildVertices(sizeX * sizeY);
-        buildTextureCoordinates();
-        buildNormals();
+        texs = BufferUtils.createVector2Buffer(_meshData.getVertexCount());
+        _meshData.setTextureBuffer(texs, 0);
+        normBuf = BufferUtils.createVector3Buffer(_meshData.getVertexCount());
+        _meshData.setNormalBuffer(normBuf);
 
         vertBufArray = new float[_meshData.getVertexCount() * 3];
         normBufArray = new float[_meshData.getVertexCount() * 3];
         texBufArray = new float[_meshData.getVertexCount() * 2];
     }
 
-    public void switchFreeze() {
-        freezeProjector = !freezeProjector;
+    public void setNrUpdateThreads(final int nrUpdateThreads) {
+        this.nrUpdateThreads = nrUpdateThreads;
+        if (this.nrUpdateThreads < 1) {
+            this.nrUpdateThreads = 1;
+        }
+    }
+
+    public int getNrUpdateThreads() {
+        return nrUpdateThreads;
+    }
+
+    public void setFreezeUpdate(final boolean freeze) {
+        freezeProjector = freeze;
+    }
+
+    public boolean isFreezeUpdate() {
+        return freezeProjector;
     }
 
     @Override
@@ -124,8 +147,6 @@ public class ProjectedGrid extends Mesh {
         if (freezeProjector) {
             return;
         }
-
-        final double time = timer.getTimeInSeconds();
 
         camloc.set(camera.getLocation());
         camdir.set(camera.getDirection());
@@ -175,12 +196,60 @@ public class ProjectedGrid extends Mesh {
         source.set(1, 0);
         getWorldIntersection(source, modelViewProjectionInverse, intersectBottomRight);
 
+        if (nrUpdateThreads <= 1) {
+            updateGrid(0, sizeY);
+        } else {
+            for (int i = 0; i < nrUpdateThreads; i++) {
+                final int from = sizeY * i / (nrUpdateThreads);
+                final int to = sizeY * (i + 1) / (nrUpdateThreads);
+                final Future<?> future = executorService.submit(new Runnable() {
+                    public void run() {
+                        updateGrid(from, to);
+                    }
+                });
+                futureStack.push(future);
+            }
+            try {
+                while (!futureStack.isEmpty()) {
+                    futureStack.pop().get();
+                }
+            } catch (final InterruptedException ex) {
+                logger.log(Level.SEVERE, "InterruptedException in thread execution", ex);
+            } catch (final ExecutionException ex) {
+                logger.log(Level.SEVERE, "ExecutionException in thread execution", ex);
+            }
+        }
+
         vertBuf.rewind();
+        vertBuf.put(vertBufArray);
+
+        texs.rewind();
+        texs.put(texBufArray);
+
+        normBuf.rewind();
+        normBuf.put(normBufArray);
+    }
+
+    private void updateGrid(final int from, final int to) {
+        final double time = timer.getTimeInSeconds();
         final double du = 1.0f / (double) (sizeX - 1);
         final double dv = 1.0f / (double) (sizeY - 1);
-        double u = 0, v = 0;
-        int index = 0;
-        for (int y = 0; y < sizeY; y++) {
+
+        final Vector4 pointTop = Vector4.fetchTempInstance();
+        final Vector4 pointFinal = Vector4.fetchTempInstance();
+        final Vector4 pointBottom = Vector4.fetchTempInstance();
+
+        int smallerFrom = from;
+        if (smallerFrom > 0) {
+            smallerFrom--;
+        }
+        int biggerTo = to;
+        if (biggerTo < sizeY) {
+            biggerTo++;
+        }
+        double u = 0, v = smallerFrom * dv;
+        int index = smallerFrom * sizeX * 3;
+        for (int y = smallerFrom; y < biggerTo; y++) {
             for (int x = 0; x < sizeX; x++) {
                 interpolate(intersectTopLeft, intersectTopRight, u, pointTop);
                 interpolate(intersectBottomLeft, intersectBottomRight, u, pointBottom);
@@ -188,34 +257,39 @@ public class ProjectedGrid extends Mesh {
 
                 pointFinal.setX(pointFinal.getX() / pointFinal.getW());
                 pointFinal.setZ(pointFinal.getZ() / pointFinal.getW());
-                realPoint.set(pointFinal.getX(), heightGenerator.getHeight(pointFinal.getX(), pointFinal.getZ(), time),
-                        pointFinal.getZ());
+                pointFinal.setY(heightGenerator.getHeight(pointFinal.getX(), pointFinal.getZ(), time));
 
-                vertBufArray[index++] = (float) realPoint.getX();
-                vertBufArray[index++] = (float) realPoint.getY();
-                vertBufArray[index++] = (float) realPoint.getZ();
+                vertBufArray[index++] = (float) pointFinal.getX();
+                vertBufArray[index++] = (float) pointFinal.getY();
+                vertBufArray[index++] = (float) pointFinal.getZ();
 
                 u += du;
             }
             v += dv;
             u = 0;
         }
-        vertBuf.put(vertBufArray);
 
-        texs.rewind();
-        for (int i = 0; i < _meshData.getVertexCount(); i++) {
-            texBufArray[i * 2] = vertBufArray[i * 3] * textureScale;
-            texBufArray[i * 2 + 1] = vertBufArray[i * 3 + 2] * textureScale;
+        Vector4.releaseTempInstance(pointTop);
+        Vector4.releaseTempInstance(pointFinal);
+        Vector4.releaseTempInstance(pointBottom);
+
+        index = from * sizeX;
+        for (int y = from; y < to; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                texBufArray[index * 2] = vertBufArray[index * 3] * textureScale;
+                texBufArray[index * 2 + 1] = vertBufArray[index * 3 + 2] * textureScale;
+                index++;
+            }
         }
-        texs.put(texBufArray);
 
-        normBuf.rewind();
-        oppositePoint.set(0, 0, 0);
-        adjacentPoint.set(0, 0, 0);
-        rootPoint.set(0, 0, 0);
-        tempNorm.set(0, 0, 0);
-        int adj = 0, opp = 0, normalIndex = 0;
-        for (int row = 0; row < sizeY; row++) {
+        final Vector3 oppositePoint = Vector3.fetchTempInstance();
+        final Vector3 adjacentPoint = Vector3.fetchTempInstance();
+        final Vector3 rootPoint = Vector3.fetchTempInstance();
+        final Vector3 tempNorm = Vector3.fetchTempInstance();
+
+        int adj = 0, opp = 0;
+        int normalIndex = from * sizeX;
+        for (int row = from; row < to; row++) {
             for (int col = 0; col < sizeX; col++) {
                 if (row == sizeY - 1) {
                     if (col == sizeX - 1) { // last row, last col
@@ -252,7 +326,11 @@ public class ProjectedGrid extends Mesh {
                 normalIndex++;
             }
         }
-        normBuf.put(normBufArray);
+
+        Vector3.releaseTempInstance(oppositePoint);
+        Vector3.releaseTempInstance(adjacentPoint);
+        Vector3.releaseTempInstance(rootPoint);
+        Vector3.releaseTempInstance(tempNorm);
     }
 
     private Matrix4 getMinMax(final Vector3 fakeLoc, final Vector3 fakePoint, final Camera cam) {
@@ -357,21 +435,6 @@ public class ProjectedGrid extends Mesh {
     // }
 
     /**
-     * <code>setDetailTexture</code> copies the texture coordinates from the first texture channel to another channel
-     * specified by unit, mulitplying by the factor specified by repeat so that the texture in that channel will be
-     * repeated that many times across the block.
-     * 
-     * @param unit
-     *            channel to copy coords to
-     * @param repeat
-     *            number of times to repeat the texture across and down the block
-     */
-    public void setDetailTexture(final int unit, final double repeat) {
-    // TODO
-    // copyTextureCoordinates(0, unit, repeat);
-    }
-
-    /**
      * <code>getSurfaceNormal</code> returns the normal of an arbitrary point on the terrain. The normal is linearly
      * interpreted from the normals of the 4 nearest defined points. If the point provided is not within the bounds of
      * the height map, null is returned.
@@ -429,7 +492,7 @@ public class ProjectedGrid extends Mesh {
             store = new Vector3();
         }
 
-        final Vector3 topLeft = store, topRight = calcVec1, bottomLeft = calcVec2, bottomRight = calcVec3;
+        final Vector3 topLeft = store, topRight = new Vector3(), bottomLeft = new Vector3(), bottomRight = new Vector3();
 
         final int focalSpot = (int) (col + row * sizeX);
 
@@ -495,73 +558,6 @@ public class ProjectedGrid extends Mesh {
             indexBuffer.put(sizeX + i);
             // set the bottom right corner
             indexBuffer.put((1 + sizeX) + i);
-        }
-    }
-
-    /**
-     * <code>buildTextureCoordinates</code> calculates the texture coordinates of the terrain.
-     */
-    private void buildTextureCoordinates() {
-        texs = BufferUtils.createVector2Buffer(_meshData.getVertexCount());
-        _meshData.setTextureBuffer(texs, 0);
-        texs.clear();
-
-        vertBuf.rewind();
-        for (int i = 0; i < _meshData.getVertexCount(); i++) {
-            texs.put(vertBuf.get() * textureScale);
-            vertBuf.get(); // ignore vert y coord.
-            texs.put(vertBuf.get() * textureScale);
-        }
-    }
-
-    /**
-     * <code>buildNormals</code> calculates the normals of each vertex that makes up the block of terrain.
-     */
-    Vector3 oppositePoint = new Vector3();
-    Vector3 adjacentPoint = new Vector3();
-    Vector3 rootPoint = new Vector3();
-    Vector3 tempNorm = new Vector3();
-
-    private void buildNormals() {
-        normBuf = BufferUtils.createVector3Buffer(normBuf, _meshData.getVertexCount());
-        _meshData.setNormalBuffer(normBuf);
-
-        oppositePoint.set(0, 0, 0);
-        adjacentPoint.set(0, 0, 0);
-        rootPoint.set(0, 0, 0);
-        tempNorm.set(0, 0, 0);
-        int adj = 0, opp = 0, normalIndex = 0;
-        for (int row = 0; row < sizeY; row++) {
-            for (int col = 0; col < sizeX; col++) {
-                BufferUtils.populateFromBuffer(rootPoint, vertBuf, normalIndex);
-                if (row == sizeY - 1) {
-                    if (col == sizeX - 1) { // last row, last col
-                        // up cross left
-                        adj = normalIndex - sizeX;
-                        opp = normalIndex - 1;
-                    } else { // last row, except for last col
-                        // right cross up
-                        adj = normalIndex + 1;
-                        opp = normalIndex - sizeX;
-                    }
-                } else {
-                    if (col == sizeY - 1) { // last column except for last row
-                        // left cross down
-                        adj = normalIndex - 1;
-                        opp = normalIndex + sizeX;
-                    } else { // most cases
-                        // down cross right
-                        adj = normalIndex + sizeX;
-                        opp = normalIndex + 1;
-                    }
-                }
-                BufferUtils.populateFromBuffer(adjacentPoint, vertBuf, adj);
-                BufferUtils.populateFromBuffer(oppositePoint, vertBuf, opp);
-                tempNorm.set(adjacentPoint).subtractLocal(rootPoint).crossLocal(oppositePoint.subtractLocal(rootPoint))
-                        .normalizeLocal();
-                BufferUtils.setInBuffer(tempNorm, normBuf, normalIndex);
-                normalIndex++;
-            }
         }
     }
 }
