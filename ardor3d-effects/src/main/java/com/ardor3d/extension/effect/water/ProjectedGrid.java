@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,7 +96,7 @@ public class ProjectedGrid extends Mesh {
     private final float[] texBufArray;
 
     private int nrUpdateThreads = 1;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory());
     private final Stack<Future<?>> futureStack = new Stack<Future<?>>();
 
     public ProjectedGrid(final String name, final Camera camera, final int sizeX, final int sizeY,
@@ -558,6 +560,30 @@ public class ProjectedGrid extends Mesh {
             indexBuffer.put(sizeX + i);
             // set the bottom right corner
             indexBuffer.put((1 + sizeX) + i);
+        }
+    }
+
+    static class DeamonThreadFactory implements ThreadFactory {
+        static final AtomicInteger poolNumber = new AtomicInteger(1);
+        final ThreadGroup group;
+        final AtomicInteger threadNumber = new AtomicInteger(1);
+        final String namePrefix;
+
+        DeamonThreadFactory() {
+            final SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            namePrefix = "ProjectedGrid Pool-" + poolNumber.getAndIncrement() + "-thread-";
+        }
+
+        public Thread newThread(final Runnable r) {
+            final Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
+            if (!t.isDaemon()) {
+                t.setDaemon(true);
+            }
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
         }
     }
 }
