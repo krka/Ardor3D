@@ -32,6 +32,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial.CullHint;
 import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
@@ -56,6 +57,17 @@ public class ProjectedGridExample extends ExampleBase {
     public ProjectedGridExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
+    }
+
+    double counter = 0;
+
+    @Override
+    protected void updateExample(final ReadOnlyTimer timer) {
+        counter += timer.getTimePerFrame();
+        if (counter > 1) {
+            counter = 0;
+            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
+        }
     }
 
     @Override
