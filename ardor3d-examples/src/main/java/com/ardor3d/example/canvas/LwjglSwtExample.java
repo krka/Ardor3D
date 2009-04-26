@@ -63,7 +63,7 @@ public class LwjglSwtExample {
         final ExampleScene scene = new ExampleScene();
         final RotatingCubeGame game = new RotatingCubeGame(scene, exit, injector.getInstance(LogicalLayer.class), Key.T);
 
-        frameWork.registerUpdater(game);
+        frameWork.addUpdater(game);
 
         // INIT SWT STUFF
         final Display display = new Display();
@@ -157,26 +157,26 @@ public class LwjglSwtExample {
         final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer1 = new LwjglCanvasRenderer(scene);
         canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
-        frameWork.registerCanvas(canvas1);
+        frameWork.addCanvas(canvas1);
         canvas1.addControlListener(newResizeHandler(canvas1, lwjglCanvasRenderer1));
         canvas1.setFocus();
 
         final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer2 = new LwjglCanvasRenderer(scene);
         canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
-        frameWork.registerCanvas(canvas2);
+        frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, lwjglCanvasRenderer2));
 
         final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer3 = new LwjglCanvasRenderer(scene);
         canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
-        frameWork.registerCanvas(canvas3);
+        frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, lwjglCanvasRenderer3));
 
         final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer4 = new LwjglCanvasRenderer(scene);
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
-        frameWork.registerCanvas(canvas4);
+        frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, lwjglCanvasRenderer4));
 
         final LogicalLayer logicalLayer = injector.getInstance(LogicalLayer.class);

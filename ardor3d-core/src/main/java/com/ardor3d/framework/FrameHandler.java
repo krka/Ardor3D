@@ -11,7 +11,6 @@
 package com.ardor3d.framework;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +31,7 @@ public final class FrameHandler {
     /**
      * Thread synchronization of the updaters list is delegated to the CopyOnWriteArrayList.
      */
-    private final List<Updater> _updaters;
+    private final CopyOnWriteArrayList<Updater> _updaters;
 
     /**
      * Canvases is both protected by an intrinsic lock and by the fact that it is a CopyOnWriteArrayList. This is
@@ -40,7 +39,7 @@ public final class FrameHandler {
      * over that number of elements. See {@link #updateFrame()} for the code that does this.
      */
     @GuardedBy("this")
-    private final List<Canvas> _canvases;
+    private final CopyOnWriteArrayList<Canvas> _canvases;
     private final Timer _timer;
 
     @Inject
@@ -69,9 +68,9 @@ public final class FrameHandler {
         int numCanvases;
         Iterator<Canvas> iterator;
 
-        // make sure that there is no race condition with registerCanvas - getting the iterator and
+        // make sure that there is no race condition with addCanvas - getting the iterator and
         // the number of canvases currently in the list in a synchronized section, and ensuring that
-        // the registerCanvas() method is also synchronized on this, means that they will
+        // the addCanvas() method is also synchronized on this, means that they will
         // both remain valid outside the section later, when we call the probably long-running, alien
         // draw() methods. Since 'canvases' is a CopyOnWriteArrayList, the iterator is guaranteed to
         // be valid outside the synchronized section, and getting them both inside the synchronized section
@@ -108,18 +107,60 @@ public final class FrameHandler {
         }
     }
 
-    public void registerUpdater(final Updater updater) {
-        _updaters.add(updater);
+    /**
+     * Add an updater to the frame handler.
+     * <p>
+     * The frame handler calls the {@link Updater#update(com.ardor3d.util.ReadOnlyTimer) update} method of each updater
+     * that has been added to it once per frame, before rendering begins.
+     * <p>
+     * <strong>Note:</strong> that is the frame handler has already been initialized then the updater will <em>not</em>
+     * have it's {@code init} method called automatically, it is up to the client code to perform any initialization
+     * explicitly under this scenario.
+     * 
+     * @param updater
+     *            the updater to add.
+     */
+    public void addUpdater(final Updater updater) {
+        _updaters.addIfAbsent(updater);
     }
 
+    /**
+     * Remove an updater from the frame handler.
+     * 
+     * @param updater
+     *            the updater to remove.
+     * @return {@code true} if the updater was removed, {@code false} otherwise (which will happen if, for example, the
+     *         updater had not previously been added to the frame handler).
+     */
     public boolean removeUpdater(final Updater updater) {
         return _updaters.remove(updater);
     }
 
-    public synchronized void registerCanvas(final Canvas canvas) {
-        _canvases.add(canvas);
+    /**
+     * Add a canvas to the frame handler.
+     * <p>
+     * The frame handler calls the {@link Canvas#draw(java.util.concurrent.CountDownLatch)} draw} method of each canvas
+     * that has been added to it once per frame, after updating is complete.
+     * <p>
+     * <strong>Note:</strong> that is the frame handler has already been initialized then the canvas will <em>not</em>
+     * have it's {@code init} method called automatically, it is up to the client code to perform any initialization
+     * explicitly under this scenario.
+     * 
+     * @param canvas
+     *            the canvas to add.
+     */
+    public synchronized void addCanvas(final Canvas canvas) {
+        _canvases.addIfAbsent(canvas);
     }
 
+    /**
+     * Remove a canvas from the frame handler.
+     * 
+     * @param canvas
+     *            the canvas to remove.
+     * @return {@code true} if the canvas was removed, {@code false} otherwise (which will happen if, for example, the
+     *         canvas had not previously been added to the frame handler).
+     */
     public synchronized boolean removeCanvas(final Canvas canvas) {
         return _canvases.remove(canvas);
     }
@@ -133,6 +174,6 @@ public final class FrameHandler {
         for (final Updater updater : _updaters) {
             updater.init();
         }
-
     }
+
 }

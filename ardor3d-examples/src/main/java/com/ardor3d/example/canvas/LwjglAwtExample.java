@@ -66,8 +66,8 @@ public class LwjglAwtExample {
         final ExampleScene scene2 = new ExampleScene();
         final RotatingCubeGame game2 = new RotatingCubeGame(scene2, exit, logicalLayer, Key.G);
 
-        frameWork.registerUpdater(game1);
-        frameWork.registerUpdater(game2);
+        frameWork.addUpdater(game1);
+        frameWork.addUpdater(game2);
 
         final JFrame frame = new JFrame("AWT Example");
         frame.addWindowListener(new WindowAdapter() {
@@ -177,7 +177,7 @@ public class LwjglAwtExample {
                     }
                 }));
 
-        frameWork.registerCanvas(theCanvas);
+        frameWork.addCanvas(theCanvas);
 
     }
 

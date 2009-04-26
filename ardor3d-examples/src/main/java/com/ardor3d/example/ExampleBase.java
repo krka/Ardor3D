@@ -367,10 +367,10 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         ll.registerInput(canvas, physicalLayer);
 
         // Register our example as an updater.
-        frameWork.registerUpdater(updater);
+        frameWork.addUpdater(updater);
 
         // Make a native canvas and register it.
-        frameWork.registerCanvas(canvas);
+        frameWork.addCanvas(canvas);
 
         gameThread._canvas = canvas;
 

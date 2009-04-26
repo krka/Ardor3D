@@ -63,7 +63,7 @@ public class JoglSwtExample {
         final ExampleScene scene = new ExampleScene();
         final RotatingCubeGame game = new RotatingCubeGame(scene, exit, injector.getInstance(LogicalLayer.class), Key.T);
 
-        frameWork.registerUpdater(game);
+        frameWork.addUpdater(game);
 
         // INIT SWT STUFF
         final Display display = new Display();
@@ -147,26 +147,26 @@ public class JoglSwtExample {
         final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer1 = new JoglCanvasRenderer(scene);
         canvas1.setCanvasRenderer(canvasRenderer1);
-        frameWork.registerCanvas(canvas1);
+        frameWork.addCanvas(canvas1);
         canvas1.addControlListener(newResizeHandler(canvas1, canvasRenderer1));
         canvas1.setFocus();
 
         final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer2 = new JoglCanvasRenderer(scene);
         canvas2.setCanvasRenderer(canvasRenderer2);
-        frameWork.registerCanvas(canvas2);
+        frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, canvasRenderer2));
 
         final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer3 = new JoglCanvasRenderer(scene);
         canvas3.setCanvasRenderer(canvasRenderer3);
-        frameWork.registerCanvas(canvas3);
+        frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, canvasRenderer3));
 
         final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
         final JoglCanvasRenderer canvasRenderer4 = new JoglCanvasRenderer(scene);
         canvas4.setCanvasRenderer(canvasRenderer4);
-        frameWork.registerCanvas(canvas4);
+        frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, canvasRenderer4));
 
         final LogicalLayer logicalLayer = injector.getInstance(LogicalLayer.class);
