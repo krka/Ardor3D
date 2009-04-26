@@ -45,7 +45,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * There are several system params you can use to modify the test:
  * <ul>
  * <li>-Djogl=true -- use JoglRenderer and canvas instead of Lwjgl.</li>
- * <li>-Dsync=true -- ask the canvas to use vertical sync to lock to the monitor refresh rate.</li>
+ * <li>-Dvsync=true -- ask the canvas to use vertical sync to lock to the monitor refresh rate.</li>
  * <li>-DnoBallCollide=true -- do not do ball-to-ball collision checks.</li>
  * <li>-Dballs=# -- change the number of balls to some integer value. (default is 16)</li>
  * <li>-Dwidth=# -- change the width of the window to some integer value. (default is 500)</li>
