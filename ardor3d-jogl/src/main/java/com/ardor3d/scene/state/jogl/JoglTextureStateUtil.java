@@ -451,8 +451,8 @@ public class JoglTextureStateUtil {
                         case TwoDimensional:
                             if (JoglTextureUtil.isCompressedType(image.getFormat())) {
                                 gl.glCompressedTexImage2D(GL.GL_TEXTURE_2D, m, JoglTextureUtil
-                                        .getGLInternalFormat(image.getFormat()), width, height, hasBorder ? 1 : 0, data
-                                        .limit(), data);
+                                        .getGLInternalFormat(image.getFormat()), width, height, hasBorder ? 1 : 0,
+                                        mipSizes[m], data);
                             } else {
                                 gl.glTexImage2D(GL.GL_TEXTURE_2D, m, JoglTextureUtil.getGLInternalFormat(image
                                         .getFormat()), width, height, hasBorder ? 1 : 0, JoglTextureUtil
@@ -463,8 +463,8 @@ public class JoglTextureStateUtil {
                         case OneDimensional:
                             if (JoglTextureUtil.isCompressedType(image.getFormat())) {
                                 gl.glCompressedTexImage1D(GL.GL_TEXTURE_1D, m, JoglTextureUtil
-                                        .getGLInternalFormat(image.getFormat()), width, hasBorder ? 1 : 0,
-                                        data.limit(), data);
+                                        .getGLInternalFormat(image.getFormat()), width, hasBorder ? 1 : 0, mipSizes[m],
+                                        data);
                             } else {
                                 gl.glTexImage1D(GL.GL_TEXTURE_1D, m, JoglTextureUtil.getGLInternalFormat(image
                                         .getFormat()), width, hasBorder ? 1 : 0, JoglTextureUtil.getGLPixelFormat(image
@@ -476,7 +476,7 @@ public class JoglTextureStateUtil {
                             if (JoglTextureUtil.isCompressedType(image.getFormat())) {
                                 gl.glCompressedTexImage3D(GL.GL_TEXTURE_3D, m, JoglTextureUtil
                                         .getGLInternalFormat(image.getFormat()), width, height, depth, hasBorder ? 1
-                                        : 0, data.limit(), data);
+                                        : 0, mipSizes[m], data);
                             } else {
                                 gl.glTexImage3D(GL.GL_TEXTURE_3D, m, JoglTextureUtil.getGLInternalFormat(image
                                         .getFormat()), width, height, depth, hasBorder ? 1 : 0, JoglTextureUtil
@@ -490,7 +490,7 @@ public class JoglTextureStateUtil {
                                     if (JoglTextureUtil.isCompressedType(image.getFormat())) {
                                         gl.glCompressedTexImage2D(getGLCubeMapFace(face), m, JoglTextureUtil
                                                 .getGLInternalFormat(image.getFormat()), width, height, hasBorder ? 1
-                                                : 0, data.limit(), data);
+                                                : 0, mipSizes[m], data);
                                     } else {
                                         gl.glTexImage2D(getGLCubeMapFace(face), m, JoglTextureUtil
                                                 .getGLInternalFormat(image.getFormat()), width, height, hasBorder ? 1
