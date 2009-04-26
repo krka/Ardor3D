@@ -796,18 +796,17 @@ public class JoglRenderer extends AbstractRenderer {
                     gl.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, 0);
                 } else if (textureBufferData == null) {
                     gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != textureBufferData.getBuffer()) {
+                } else if (_oldTextureBuffers[i] != textureBuffer) {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                     if (caps.isVBOSupported()) {
                         JoglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
-                    textureBufferData.getBuffer().rewind();
-                    gl.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, textureBufferData
-                            .getBuffer());
+                    textureBuffer.rewind();
+                    gl.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), GL.GL_FLOAT, 0, textureBuffer);
                 } else {
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                 }
-                _oldTextureBuffers[i] = textureBufferData != null ? textureBufferData.getBuffer() : null;
+                _oldTextureBuffers[i] = textureBuffer;
             }
 
             if (ts.getNumberOfSetTextures() < _prevTextureNumber) {

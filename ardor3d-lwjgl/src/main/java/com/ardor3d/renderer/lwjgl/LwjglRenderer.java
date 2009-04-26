@@ -747,17 +747,17 @@ public class LwjglRenderer extends AbstractRenderer {
                     GL11.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), GL11.GL_FLOAT, 0, 0);
                 } else if (textureBufferData == null) {
                     GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != textureBufferData.getBuffer()) {
+                } else if (_oldTextureBuffers[i] != textureBuffer) {
                     GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                     if (caps.isVBOSupported()) {
                         LwjglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
-                    textureBufferData.getBuffer().rewind();
-                    GL11.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), 0, textureBufferData.getBuffer());
+                    textureBuffer.rewind();
+                    GL11.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), 0, textureBuffer);
                 } else {
                     GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                 }
-                _oldTextureBuffers[i] = textureBufferData != null ? textureBufferData.getBuffer() : null;
+                _oldTextureBuffers[i] = textureBuffer;
             }
 
             if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
