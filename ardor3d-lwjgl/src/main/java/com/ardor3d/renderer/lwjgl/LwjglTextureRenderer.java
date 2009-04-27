@@ -195,7 +195,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                 setReadBuffer(colorsAdded != 0 ? EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT : GL11.GL_NONE);
 
                 // Check FBO complete
-                checkFBOComplete();
+                checkFBOComplete(_fboID);
 
                 switchCameraIn(doClear);
 
@@ -249,7 +249,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Check FBO complete
-        checkFBOComplete();
+        checkFBOComplete(_fboID);
 
         switchCameraIn(doClear);
     }
@@ -284,32 +284,38 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         }
     }
 
-    private void checkFBOComplete() {
+    /**
+     * Check the currently bound FBO status for completeness. The passed in fboID is for informational purposes only.
+     * 
+     * @param fboID
+     *            an id to use for log messages, particularly if there are any issues.
+     */
+    public static void checkFBOComplete(final int fboID) {
         final int framebuffer = EXTFramebufferObject
                 .glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
         switch (framebuffer) {
             case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
                 break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-                throw new RuntimeException("FrameBuffer: " + _fboID
+                throw new RuntimeException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
             default:
                 throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + framebuffer);
