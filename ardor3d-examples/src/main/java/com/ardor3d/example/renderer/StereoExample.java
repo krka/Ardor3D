@@ -89,20 +89,17 @@ public class StereoExample extends ExampleBase {
 
         final Mesh tp = new Teapot("Teapot");
         tp.setModelBound(new BoundingBox());
-        tp.updateModelBound();
         tp.setTranslation(new Vector3(0, 0, -50));
         tp.setScale(2);
         _root.attachChild(tp);
 
         final Mesh torus = new Torus("Torus", 16, 16, 1, 4);
         torus.setModelBound(new BoundingBox());
-        torus.updateModelBound();
         torus.setTranslation(new Vector3(4, 0, -10));
         _root.attachChild(torus);
 
         final Mesh sphere = new Sphere("Sphere", 16, 16, 5);
         sphere.setModelBound(new BoundingBox());
-        sphere.updateModelBound();
         sphere.setTranslation(new Vector3(-8, 0, -30));
         _root.attachChild(sphere);
 

@@ -137,13 +137,11 @@ public class RenderTextureSideBySideExample extends ExampleBase {
         sphere = new Sphere("Sphere", 25, 25, 5);
         sphere.setTranslation(new Vector3(-10, 0, 0));
         sphere.setModelBound(new BoundingBox());
-        sphere.updateModelBound();
         _root.attachChild(sphere);
 
         quad = new Quad("Quad", 15, 13f);
         quad.setTranslation(new Vector3(10, 0, 0));
         quad.setModelBound(new BoundingBox());
-        quad.updateModelBound();
         quad.setLightCombineMode(LightCombineMode.Off);
         _root.attachChild(quad);
 

@@ -85,7 +85,6 @@ public class ManyCollisionsExample extends ExampleBase {
 
         final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
         sphere.setModelBound(new BoundingBox());
-        sphere.updateModelBound();
 
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);

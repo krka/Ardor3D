@@ -59,7 +59,6 @@ public class ManyLightsExample extends ExampleBase {
         // Create a sphere to show where the light is in the demo.
         final Sphere lightSphere = new Sphere("lightSphere" + i, 9, 9, .1f);
         lightSphere.setModelBound(new BoundingSphere());
-        lightSphere.updateModelBound();
         lightSphere.setLightCombineMode(Spatial.LightCombineMode.Off);
         lightSphere.setDefaultColor(lightColor);
 
@@ -110,7 +109,6 @@ public class ManyLightsExample extends ExampleBase {
     void randomSphere(final int i) {
         // Crate a sphere and position it.
         final Sphere sphere = new Sphere("sphere" + i, 18, 18, MathUtils.nextRandomDouble() * 1.75 + 1.25);
-        sphere.setModelBound(new BoundingSphere());
         sphere.updateModelBound();
         sphere.setTranslation(new Vector3(rand.nextDouble() * worldsize * 2 - worldsize, rand.nextDouble() * worldsize
                 * 2 - worldsize, rand.nextDouble() * worldsize * 2 - worldsize));

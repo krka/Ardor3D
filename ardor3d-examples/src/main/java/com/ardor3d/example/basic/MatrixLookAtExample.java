@@ -76,10 +76,10 @@ public class MatrixLookAtExample extends ExampleBase {
 
         final Box box = new Box("Box", new Vector3(), 1, 1, 4);
         box.setModelBound(new BoundingBox());
-        box.updateModelBound();
         box.setRandomColors();
 
         targetMesh = new Sphere("Target", 8, 8, 2);
+        // update the default bounding sphere
         targetMesh.updateModelBound();
         _root.attachChild(targetMesh);
         targetMesh.setRandomColors();

@@ -61,7 +61,6 @@ public class MeshDataSharingExample extends ExampleBase {
 
         final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
         sphere.setModelBound(new BoundingBox());
-        sphere.updateModelBound();
         sphere.setVBOInfo(new VBOInfo(true));
 
         final CullState cs = new CullState();

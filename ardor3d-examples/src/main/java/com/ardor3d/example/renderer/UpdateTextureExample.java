@@ -153,7 +153,6 @@ public class UpdateTextureExample extends ExampleBase {
 
         t = new Box("Box", min, max);
         t.setModelBound(new BoundingBox());
-        t.updateModelBound();
         t.setTranslation(new Vector3(0, 0, -15));
         _root.attachChild(t);
 

@@ -58,20 +58,17 @@ public class SwitchNodeExample extends ExampleBase {
 
         Box box = new Box("Box", new Vector3(), 2, 1, 1);
         box.setModelBound(new BoundingBox());
-        box.updateModelBound();
         box.setTranslation(new Vector3(0, 0, 0));
         switchNode.attachChild(box);
 
         box = new Box("Box", new Vector3(), 1, 2, 1);
         box.setModelBound(new BoundingBox());
-        box.updateModelBound();
         box.setTranslation(new Vector3(0, 0, 0));
         box.setRandomColors();
         switchNode.attachChild(box);
 
         box = new Box("Box", new Vector3(), 1, 1, 2);
         box.setModelBound(new BoundingBox());
-        box.updateModelBound();
         box.setTranslation(new Vector3(0, 0, 0));
         box.setRandomColors();
         switchNode.attachChild(box);

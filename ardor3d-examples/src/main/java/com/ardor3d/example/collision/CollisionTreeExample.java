@@ -68,7 +68,6 @@ public class CollisionTreeExample extends ExampleBase {
 
         sphere.setSolidColor(ColorRGBA.WHITE);
         sphere.setModelBound(new BoundingBox());
-        sphere.updateModelBound();
 
         sphereNode = new Node("sphere node");
 
@@ -76,7 +75,6 @@ public class CollisionTreeExample extends ExampleBase {
         torus.setTranslation(new Vector3(0, 0, 0));
         torus.setSolidColor(ColorRGBA.WHITE);
         torus.setModelBound(new BoundingBox());
-        torus.updateModelBound();
 
         torusNode = new Node("torus node");
 

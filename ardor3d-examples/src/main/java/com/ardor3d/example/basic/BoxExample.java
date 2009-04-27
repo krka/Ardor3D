@@ -75,8 +75,6 @@ public class BoxExample extends ExampleBase {
         box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
         // Set a bounding box for frustum culling.
         box.setModelBound(new BoundingBox());
-        // Update bounding to fit the box.
-        box.updateModelBound();
         // Move the box out from the camera 15 units.
         box.setTranslation(new Vector3(0, 0, -15));
         // Give the box some nice colors.

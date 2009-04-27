@@ -43,7 +43,6 @@ public class TransformRotationExample extends ExampleBase {
         ms.setEnabled(true);
         center.setRenderState(ms);
         center.setModelBound(new BoundingBox());
-        center.updateModelBound();
         _root.attachChild(center);
 
         final Box box = new Box("Box", new Vector3(), 0.1, 0.1, 0.1);
@@ -53,7 +52,6 @@ public class TransformRotationExample extends ExampleBase {
         ms.setEnabled(true);
         box.setRenderState(ms);
         box.setModelBound(new BoundingBox());
-        box.updateModelBound();
 
         final Node bt1 = new Node("BoxTransform1");
         final Node bt2 = new Node("BoxTransform2");
