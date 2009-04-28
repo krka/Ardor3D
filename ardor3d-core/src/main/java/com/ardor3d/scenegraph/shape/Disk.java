@@ -147,6 +147,6 @@ public class Disk extends Mesh {
         final InputCapsule capsule = e.getCapsule(this);
         _shellSamples = capsule.readInt("shellSamples", 0);
         _radialSamples = capsule.readInt("radialSamples", 0);
-        _radius = capsule.readDouble("raidus", 0);
+        _radius = capsule.readDouble("radius", 0);
     }
 }
