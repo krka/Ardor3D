@@ -220,6 +220,7 @@ public class LwjglHeadlessExample implements Scene {
 
     // Used for calculating fps.
     private double counter = 0;
+    private int frames = 0;
 
     /**
      * Update our scene... Update our timer, print the current fps (once per second) and finally update the geometric
@@ -229,9 +230,12 @@ public class LwjglHeadlessExample implements Scene {
         timer.update();
 
         counter += timer.getTimePerFrame();
+        frames++;
         if (counter > 1) {
+            final double fps = (frames / counter);
             counter = 0;
-            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
         }
 
         // Update controllers/render states/transforms/bounds for rootNode.

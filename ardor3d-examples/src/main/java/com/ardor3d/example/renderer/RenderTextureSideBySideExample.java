@@ -68,14 +68,18 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     }
 
     double counter = 0;
+    int frames = 0;
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         final double tpf = timer.getTimePerFrame();
-        counter += tpf;
+        counter += timer.getTimePerFrame();
+        frames++;
         if (counter > 1) {
+            final double fps = (frames / counter);
             counter = 0;
-            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
         }
         if (tpf < 1) {
             angle = angle + (tpf * 1);

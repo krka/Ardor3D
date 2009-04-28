@@ -58,13 +58,17 @@ public class DegenerateTrianglesExample extends ExampleBase {
     }
 
     private double counter = 0;
+    private int frames = 0;
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         counter += timer.getTimePerFrame();
+        frames++;
         if (counter > 1) {
+            final double fps = (frames / counter);
             counter = 0;
-            System.out.printf("%7.1f FPS\n", timer.getFrameRate());
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
         }
     }
 
