@@ -21,6 +21,7 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
@@ -51,11 +52,30 @@ public class BoundingBox extends BoundingVolume {
     /**
      * Constructor instantiates a new <code>BoundingBox</code> object with given values.
      */
-    public BoundingBox(final Vector3 c, final double x, final double y, final double z) {
+    public BoundingBox(final BoundingBox other) {
+        this(other.getCenter(), other.getXExtent(), other.getYExtent(), other.getZExtent());
+    }
+
+    /**
+     * Constructor instantiates a new <code>BoundingBox</code> object with given values.
+     */
+    public BoundingBox(final ReadOnlyVector3 c, final double x, final double y, final double z) {
         _center.set(c);
         setXExtent(x);
         setYExtent(y);
         setZExtent(z);
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof BoundingBox)) {
+            return false;
+        }
+        final BoundingBox b = (BoundingBox) other;
+        return _center.equals(b._center) && _xExtent == b._xExtent && _yExtent == b._yExtent && _zExtent == b._zExtent;
     }
 
     @Override
@@ -85,6 +105,75 @@ public class BoundingBox extends BoundingVolume {
 
     public double getZExtent() {
         return _zExtent;
+    }
+
+    // Some transform matrices are not in decomposed form and in this
+    // situation we need to use a different, more robust, algorithm
+    // for computing the new bounding box.
+    @Override
+    public BoundingVolume transform(final ReadOnlyTransform transform, final BoundingVolume store) {
+
+        if (transform.isRotationMatrix()) {
+            return super.transform(transform, store);
+        }
+
+        BoundingBox box;
+        if (store == null || store.getType() != Type.AABB) {
+            box = new BoundingBox();
+        } else {
+            box = (BoundingBox) store;
+        }
+
+        final Vector3[] corners = new Vector3[8];
+        for (int i = 0; i < corners.length; i++) {
+            corners[i] = Vector3.fetchTempInstance();
+        }
+        int index = 0;
+        for (int x = 0; x < 2; x++) {
+            for (int y = 0; y < 2; y++) {
+                for (int z = 0; z < 2; z++) {
+                    corners[index++].set(_center.getX() + ((x == 0) ? 1 : -1) * _xExtent, _center.getY()
+                            + ((y == 0) ? 1 : -1) * _yExtent, _center.getZ() + ((z == 0) ? 1 : -1) * _zExtent);
+                }
+            }
+        }
+        // Transform all of these points by the transform
+        for (int i = 0; i < corners.length; i++) {
+            transform.applyForward(corners[i]);
+        }
+        // Now compute based on these transformed points
+        double minX = corners[0].getX();
+        double minY = corners[0].getY();
+        double minZ = corners[0].getZ();
+        double maxX = minX;
+        double maxY = minY;
+        double maxZ = minZ;
+        for (int i = 1; i < corners.length; i++) {
+            final double curX = corners[i].getX();
+            final double curY = corners[i].getY();
+            final double curZ = corners[i].getZ();
+            minX = Math.min(minX, curX);
+            minY = Math.min(minY, curY);
+            minZ = Math.min(minZ, curZ);
+            maxX = Math.max(maxX, curX);
+            maxY = Math.max(maxY, curY);
+            maxZ = Math.max(maxZ, curZ);
+        }
+
+        final double ctrX = (maxX + minX) * 0.5f;
+        final double ctrY = (maxY + minY) * 0.5f;
+        final double ctrZ = (maxZ + minZ) * 0.5f;
+
+        box._center.set(ctrX, ctrY, ctrZ);
+        box._xExtent = maxX - ctrX;
+        box._yExtent = maxY - ctrY;
+        box._zExtent = maxZ - ctrZ;
+
+        for (int i = 0; i < corners.length; i++) {
+            Vector3.releaseTempInstance(corners[i]);
+        }
+
+        return box;
     }
 
     @Override
