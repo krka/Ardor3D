@@ -621,18 +621,47 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      *            the destination vector into which to rotate the source vector
      * @return this quaternion for chaining
      */
-    public Quaternion fromVectorToVector(final Vector3 from, final Vector3 to) {
-        final Vector3 axis = from.cross(to, Vector3.fetchTempInstance());
-        if (axis.lengthSquared() < MathUtils.EPSILON) {
+    public Quaternion fromVectorToVector(final ReadOnlyVector3 from, final ReadOnlyVector3 to) {
+        final ReadOnlyVector3 a = from;
+        final ReadOnlyVector3 b = to;
+        final double factor = a.length() * b.length();
+        if (Math.abs(factor) > MathUtils.EPSILON) {
+            // Vectors have length > 0
+            final Vector3 pivotVector = Vector3.fetchTempInstance();
+            try {
+                final double dot = a.dot(b) / factor;
+                final double theta = Math.acos(Math.max(-1.0, Math.min(dot, 1.0)));
+                a.cross(b, pivotVector);
+                if (dot < 0.0 && pivotVector.length() < MathUtils.EPSILON) {
+                    // Vectors parallel and opposite direction, therefore a rotation of 180 degrees about any vector
+                    // perpendicular to this vector will rotate vector a onto vector b.
+                    //
+                    // The following guarantees the dot-product will be 0.0.
+                    int dominantIndex;
+                    if (Math.abs(a.getX()) > Math.abs(a.getY())) {
+                        if (Math.abs(a.getX()) > Math.abs(a.getZ())) {
+                            dominantIndex = 0;
+                        } else {
+                            dominantIndex = 2;
+                        }
+                    } else {
+                        if (Math.abs(a.getY()) > Math.abs(a.getZ())) {
+                            dominantIndex = 1;
+                        } else {
+                            dominantIndex = 2;
+                        }
+                    }
+                    pivotVector.setValue(dominantIndex, -a.getValue((dominantIndex + 1) % 3));
+                    pivotVector.setValue((dominantIndex + 1) % 3, a.getValue(dominantIndex));
+                    pivotVector.setValue((dominantIndex + 2) % 3, 0f);
+                }
+                return fromAngleAxis(theta, pivotVector);
+            } finally {
+                Vector3.releaseTempInstance(pivotVector);
+            }
+        } else {
             return setIdentity();
         }
-        double dotp = from.dot(to);
-        final double denom = from.length() * to.length();
-        if (denom < MathUtils.EPSILON) {
-            return setIdentity();
-        }
-        dotp /= denom;
-        return fromAngleAxis(Math.acos(dotp), axis);
     }
 
     /**
