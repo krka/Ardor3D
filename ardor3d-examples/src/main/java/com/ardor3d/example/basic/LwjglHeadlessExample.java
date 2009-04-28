@@ -100,7 +100,7 @@ public class LwjglHeadlessExample implements Scene {
      */
     public LwjglHeadlessExample() {
         // Setup our headless canvas for rendering.
-        settings = new DisplaySettings(800, 600, 0, 0, false);
+        settings = new DisplaySettings(800, 600, 0, 0, 8, 8, 0, 0, false, false);
         canvas = new LwjglHeadlessCanvas(settings, this);
         canvas.getRenderer().setBackgroundColor(ColorRGBA.BLACK_NO_ALPHA);
 
