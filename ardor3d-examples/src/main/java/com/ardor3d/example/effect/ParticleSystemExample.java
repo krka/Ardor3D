@@ -17,6 +17,7 @@ import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -87,6 +88,7 @@ public class ParticleSystemExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear, Format.Guess,
                 true));
+        ts.getTexture().setWrap(WrapMode.BorderClamp);
         ts.setEnabled(true);
         particles.setRenderState(ts);
 
