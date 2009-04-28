@@ -55,7 +55,7 @@ public class Particle implements Savable {
     private double lifeSpan;
     private final double[] values = new double[3];
     private int currentAge;
-    private final int currentTexIndex = -1;
+    private int currentTexIndex = -1;
     private ParticleSystem parent;
     private final Vector3 bbX = new Vector3(), bbY = new Vector3();
 
@@ -166,28 +166,25 @@ public class Particle implements Savable {
                 bbY.set(camLeft).multiplyLocal(-sA).addLocal(camUp.getX() * cA, camUp.getY() * cA, camUp.getZ() * cA);
             }
         } else {
-            bbX.set(parent.getLeftVector()).multiplyLocal(currSize);
-            bbY.set(parent.getUpVector()).multiplyLocal(currSize);
+            bbX.set(parent.getLeftVector()).multiplyLocal(0);
+            bbY.set(parent.getUpVector()).multiplyLocal(0);
         }
 
         final Vector3 tempVec3 = Vector3.fetchTempInstance();
+        final FloatBuffer vertexBuffer = parent.getParticleGeometry().getMeshData().getVertexBuffer();
         switch (type) {
             case Quad: {
-                _position.add(bbX, tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex);
-
-                _position.add(bbX, tempVec3).addLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 1);
-
                 _position.subtract(bbX, tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 2);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 0);
 
                 _position.subtract(bbX, tempVec3).addLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 3);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 1);
+
+                _position.add(bbX, tempVec3).addLocal(bbY);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 2);
+
+                _position.add(bbX, tempVec3).subtractLocal(bbY);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 3);
                 break;
             }
             case GeomMesh: {
@@ -204,39 +201,32 @@ public class Particle implements Savable {
                         tempVec3.set(triModel.get(x));
                     }
                     tempVec3.multiplyLocal(currSize).addLocal(_position);
-                    BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                            startIndex + x);
+                    BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + x);
                 }
                 Quaternion.releaseTempInstance(tempQuat);
                 break;
             }
             case Triangle: {
-                _position.add(bbX, tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex);
+                _position.subtract(3 * bbX.getX(), 3 * bbX.getY(), 3 * bbX.getZ(), tempVec3).subtractLocal(bbY);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 0);
 
                 _position.add(bbX, tempVec3).addLocal(3 * bbY.getX(), 3 * bbY.getY(), 3 * bbY.getZ());
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 1);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 1);
 
-                _position.subtract(bbX.multiplyLocal(3), tempVec3).subtractLocal(bbY);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 2);
+                _position.add(bbX, tempVec3).subtractLocal(bbY);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 2);
                 break;
             }
             case Line: {
                 _position.subtract(bbX, tempVec3);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex);
 
                 _position.add(bbX, tempVec3);
-                BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex + 1);
+                BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + 1);
                 break;
             }
             case Point: {
-                BufferUtils.setInBuffer(_position, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                        startIndex);
+                BufferUtils.setInBuffer(_position, vertexBuffer, startIndex);
                 break;
             }
         }
@@ -301,12 +291,13 @@ public class Particle implements Savable {
                 final float sV = row / side, eV = (row + 1) / side;
                 final FloatBuffer texs = parent.getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer();
                 texs.position(startIndex * 2);
-                texs.put(sU).put(sV);
-                texs.put(sU).put(eV);
                 texs.put(eU).put(sV);
                 texs.put(eU).put(eV);
+                texs.put(sU).put(eV);
+                texs.put(sU).put(sV);
                 texs.clear();
             }
+            currentTexIndex = newTexIndex;
         }
 
         return false;
@@ -315,17 +306,12 @@ public class Particle implements Savable {
     public void killParticle() {
         setStatus(Status.Dead);
 
-        currColor.setAlpha(0);
-
         final Vector3 tempVec3 = Vector3.fetchTempInstance();
-        BufferUtils.populateFromBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(),
-                startIndex);
+        final FloatBuffer vertexBuffer = parent.getParticleGeometry().getMeshData().getVertexBuffer();
+        BufferUtils.populateFromBuffer(tempVec3, vertexBuffer, startIndex);
         final int verts = ParticleSystem.getVertsForParticleType(type);
-        for (int x = 0; x < verts; x++) {
-            BufferUtils.setInBuffer(tempVec3, parent.getParticleGeometry().getMeshData().getVertexBuffer(), startIndex
-                    + x);
-            BufferUtils.setInBuffer(currColor, parent.getParticleGeometry().getMeshData().getColorBuffer(), startIndex
-                    + x);
+        for (int x = 1; x < verts; x++) {
+            BufferUtils.setInBuffer(tempVec3, vertexBuffer, startIndex + x);
         }
         Vector3.releaseTempInstance(tempVec3);
 

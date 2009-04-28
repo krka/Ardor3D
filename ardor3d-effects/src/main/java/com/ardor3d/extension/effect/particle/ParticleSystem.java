@@ -164,11 +164,11 @@ public abstract class ParticleSystem extends Node {
     }
 
     public void forceRespawn() {
-        for (int i = _particles.length; --i >= 0;) {
-            _particles[i].recreateParticle(0);
-            _particles[i].setStatus(Particle.Status.Alive);
-            _particles[i].updateAndCheck(1);
-            _particles[i].setStatus(Particle.Status.Available);
+        for (final Particle p : _particles) {
+            p.recreateParticle(0);
+            p.setStatus(Particle.Status.Alive);
+            p.updateAndCheck(1);
+            p.setStatus(Particle.Status.Available);
         }
 
         if (_controller != null) {

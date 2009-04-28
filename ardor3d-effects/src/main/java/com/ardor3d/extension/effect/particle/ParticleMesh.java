@@ -16,9 +16,11 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -83,15 +85,18 @@ public class ParticleMesh extends ParticleSystem {
         }
         Vector2 sharedTextureData[];
 
-        // setup texture coords
+        // setup texture coords and index mode
+        final MeshData meshData = mesh.getMeshData();
         switch (getParticleType()) {
             case GeomMesh:
             case Triangle:
-                sharedTextureData = new Vector2[] { new Vector2(0.0, 0.0), new Vector2(0.0, 2.0), new Vector2(2.0, 0.0) };
+                sharedTextureData = new Vector2[] { new Vector2(2.0, 0.0), new Vector2(0.0, 2.0), new Vector2(0.0, 0.0) };
+                meshData.setIndexMode(IndexMode.Triangles);
                 break;
             case Quad:
-                sharedTextureData = new Vector2[] { new Vector2(0.0, 0.0), new Vector2(0.0, 1.0),
-                        new Vector2(1.0, 0.0), new Vector2(1.0, 1.0) };
+                sharedTextureData = new Vector2[] { new Vector2(1.0, 0.0), new Vector2(1.0, 1.0),
+                        new Vector2(0.0, 1.0), new Vector2(0.0, 0.0) };
+                meshData.setIndexMode(IndexMode.Quads);
                 break;
             default:
                 throw new IllegalStateException(
@@ -101,44 +106,13 @@ public class ParticleMesh extends ParticleSystem {
         final int verts = getVertsForParticleType(getParticleType());
 
         _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
-
-        // setup indices
-        int[] indices;
-        switch (getParticleType()) {
-            case Triangle:
-            case GeomMesh:
-                indices = new int[numParticles * 3];
-                for (int j = 0; j < numParticles; j++) {
-                    indices[0 + j * 3] = j * 3 + 2;
-                    indices[1 + j * 3] = j * 3 + 1;
-                    indices[2 + j * 3] = j * 3 + 0;
-                }
-                break;
-            case Quad:
-                indices = new int[numParticles * 6];
-                for (int j = 0; j < numParticles; j++) {
-                    indices[0 + j * 6] = j * 4 + 2;
-                    indices[1 + j * 6] = j * 4 + 1;
-                    indices[2 + j * 6] = j * 4 + 0;
-
-                    indices[3 + j * 6] = j * 4 + 2;
-                    indices[4 + j * 6] = j * 4 + 3;
-                    indices[5 + j * 6] = j * 4 + 1;
-                }
-                break;
-            default:
-                throw new IllegalStateException(
-                        "Particle Mesh may only have particle type of ParticleType.Quad, ParticleType.GeomMesh or ParticleType.Triangle");
-        }
-
         _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
 
-        mesh.getMeshData().setVertexBuffer(_geometryCoordinates);
-        mesh.getMeshData().setColorBuffer(_appearanceColors);
-        mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * verts), 0);
-        mesh.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(indices));
+        meshData.setVertexBuffer(_geometryCoordinates);
+        meshData.setColorBuffer(_appearanceColors);
+        meshData.setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * verts), 0);
 
-        final Vector3 temp = Vector3.fetchTempInstance();
+        final Vector2 temp = Vector2.fetchTempInstance();
         for (int k = 0; k < numParticles; k++) {
             _particles[k] = new Particle(this);
             _particles[k].init();
@@ -149,15 +123,15 @@ public class ParticleMesh extends ParticleSystem {
                     final int index = _psGeom.getMeshData().getIndexBuffer() != null ? _psGeom.getMeshData()
                             .getIndexBuffer().get(ind) : ind;
                     BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).getBuffer(), index);
-                    BufferUtils.setInBuffer(temp, mesh.getMeshData().getTextureCoords(0).getBuffer(), ind);
+                    BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
                 } else {
-                    BufferUtils.setInBuffer(sharedTextureData[a], mesh.getMeshData().getTextureCoords(0).getBuffer(), ind);
+                    BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
                 }
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 
         }
-        Vector3.releaseTempInstance(temp);
+        Vector2.releaseTempInstance(temp);
         updateWorldRenderStates(true);
         _particleGeom.setCastsShadows(false);
     }

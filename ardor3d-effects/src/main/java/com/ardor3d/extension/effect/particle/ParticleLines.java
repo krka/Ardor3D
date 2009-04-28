@@ -44,11 +44,6 @@ public class ParticleLines extends ParticleSystem {
         _geometryCoordinates = BufferUtils.createVector3Buffer(numParticles * verts);
 
         // setup indices for PT_LINES
-        final int[] indices = new int[numParticles * 2];
-        for (int j = 0; j < numParticles; j++) {
-            indices[0 + j * 2] = j * 2 + 0;
-            indices[1 + j * 2] = j * 2 + 1;
-        }
 
         _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
         _particles = new Particle[numParticles];
@@ -69,7 +64,6 @@ public class ParticleLines extends ParticleSystem {
         line.getMeshData().setVertexBuffer(_geometryCoordinates);
         line.getMeshData().setColorBuffer(_appearanceColors);
         line.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * 2), 0);
-        line.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(indices));
         setRenderBucketType(RenderBucketType.Opaque);
         setLightCombineMode(Spatial.LightCombineMode.Off);
         setTextureCombineMode(TextureCombineMode.Replace);
