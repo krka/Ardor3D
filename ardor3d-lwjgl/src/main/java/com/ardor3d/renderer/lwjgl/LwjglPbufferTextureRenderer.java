@@ -83,7 +83,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         // boolean useRGB, boolean useRGBA, boolean useDepth, boolean isRectangle, int target, int mipmaps
         _texture = new RenderTexture(false, true, true, pTarget == RenderTexture.RENDER_TEXTURE_RECTANGLE, pTarget, 0);
 
-        setMultipleTargets(true);
+        setMultipleTargets(false);
     }
 
     /**

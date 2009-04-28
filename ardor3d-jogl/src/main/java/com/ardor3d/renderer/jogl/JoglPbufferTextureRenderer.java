@@ -53,7 +53,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     public JoglPbufferTextureRenderer(final DisplaySettings settings, final TextureRenderer.Target target,
             final Renderer parentRenderer) {
         super(settings, target, parentRenderer);
-        setMultipleTargets(true);
+        setMultipleTargets(false);
     }
 
     /**
