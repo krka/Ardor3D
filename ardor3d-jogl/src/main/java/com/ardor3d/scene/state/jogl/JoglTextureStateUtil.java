@@ -1531,7 +1531,7 @@ public class JoglTextureStateUtil {
             final TextureStateRecord record, final ContextCapabilities caps) {
         final GL gl = GLU.getCurrentGL();
 
-        if (!caps.isTexture3DSupported()) {
+        if (!caps.isTextureCubeMapSupported()) {
             return;
         }
 

@@ -1548,7 +1548,7 @@ public abstract class LwjglTextureStateUtil {
      */
     public static void applyWrap(final TextureCubeMap cubeMap, final TextureRecord texRecord, final int unit,
             final TextureStateRecord record, final ContextCapabilities caps) {
-        if (!caps.isTexture3DSupported()) {
+        if (!caps.isTextureCubeMapSupported()) {
             return;
         }
 
