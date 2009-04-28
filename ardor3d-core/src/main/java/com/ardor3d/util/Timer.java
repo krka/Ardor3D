@@ -45,9 +45,10 @@ public class Timer implements ReadOnlyTimer {
     }
 
     public void update() {
-        _tpf = (getTime() - _previousTime) * INVERSE_TIMER_RESOLUTION;
+        final long time = getTime();
+        _tpf = (time - _previousTime) * INVERSE_TIMER_RESOLUTION;
         _fps = 1.0 / _tpf;
-        _previousTime = getTime();
+        _previousTime = time;
     }
 
     public void reset() {
