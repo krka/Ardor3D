@@ -103,7 +103,7 @@ public class LwjglHeadlessCanvas {
         EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
         _colorRBID = buffer.get(0);
         EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _colorRBID);
-        EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL11.GL_RGB, width,
+        EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL11.GL_RGBA, width,
                 height);
         // Attach color renderbuffer to framebuffer
         EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
