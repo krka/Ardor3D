@@ -10,8 +10,6 @@
 
 package com.ardor3d.example.benchmark.ball;
 
-import com.ardor3d.framework.Canvas;
-
 public class Ball {
     protected final static int radius = 26;
 
@@ -35,14 +33,12 @@ public class Ball {
         _d2 = _d * _d;
     }
 
-    public void setRandomPositionIn(final Canvas canvas) {
-        _x = (canvas.getCanvasRenderer().getCamera().getWidth() - 2 * radius) * Math.random();
-        _y = (canvas.getCanvasRenderer().getCamera().getHeight() - 2 * radius) * Math.random();
+    public void setRandomPositionIn(final int areaWidth, final int areaHeight) {
+        _x = (areaWidth - 2 * radius) * Math.random();
+        _y = (areaHeight - 2 * radius) * Math.random();
     }
 
-    public void move(final Canvas canvas) {
-        final int width = canvas.getCanvasRenderer().getCamera().getWidth();
-        final int height = canvas.getCanvasRenderer().getCamera().getHeight();
+    public void move(final int areaWidth, final int areaHeight) {
 
         _x += _vx;
         _y += _vy;
@@ -60,13 +56,13 @@ public class Ball {
             _vy = -_vy;
         }
         // right
-        if (_x > width - _d && _vx > 0) {
-            // _vx += (_x - width + _d) * elastity;
+        if (_x > areaWidth - _d && _vx > 0) {
+            // _vx += (_x - areaWidth + _d) * elastity;
             _vx = -_vx;
         }
         // bottom
-        if (_y > height - _d && _vy > 0) {
-            // _vy += (_y - height + _d) * elastity;
+        if (_y > areaHeight - _d && _vy > 0) {
+            // _vy += (_y - areaHeight + _d) * elastity;
             _vy = -_vy;
         }
     }

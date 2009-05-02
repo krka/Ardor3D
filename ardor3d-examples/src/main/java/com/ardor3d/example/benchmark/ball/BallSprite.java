@@ -10,28 +10,32 @@
 
 package com.ardor3d.example.benchmark.ball;
 
-import com.ardor3d.framework.Canvas;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.shape.Quad;
 
 class BallSprite extends Quad {
 
     private final Ball _ball;
-    private final Canvas _canvas;
+    private final int _areaWidth;
+    private final int _areaHeight;
 
-    public BallSprite(final String name, final double width, final double height, final Canvas canvas) {
+    public BallSprite(final String name, final double width, final double height, final int areaWidth,
+            final int areaHeight) {
         super(name, width, height);
+        _areaWidth = areaWidth;
+        _areaHeight = areaHeight;
         _ball = new Ball();
-        _ball.setRandomPositionIn(canvas);
-        _canvas = canvas;
+        _ball.setRandomPositionIn(_areaWidth, _areaHeight);
         setTranslation(_ball._x + Ball.radius, _ball._y + Ball.radius, 0);
         setRenderBucketType(RenderBucketType.Ortho);
+        setModelBound(null);
+        setCullHint(CullHint.Never);
     }
 
     @Override
     public void updateGeometricState(final double time, final boolean initiator) {
         super.updateGeometricState(time, initiator);
-        _ball.move(_canvas);
+        _ball.move(_areaWidth, _areaHeight);
         setTranslation(_ball._x + Ball.radius, _ball._y + Ball.radius, 0);
     }
 

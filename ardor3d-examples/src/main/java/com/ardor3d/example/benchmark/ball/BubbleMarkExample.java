@@ -29,7 +29,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
@@ -157,12 +156,6 @@ public class BubbleMarkExample implements Scene {
             ex.printStackTrace();
         }
 
-        // Create a ZBuffer to display pixels closest to the camera above farther ones.
-        final ZBufferState buf = new ZBufferState();
-        buf.setEnabled(true);
-        buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
-        root.setRenderState(buf);
-
         // Create a texture for our balls to use.
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
@@ -193,8 +186,7 @@ public class BubbleMarkExample implements Scene {
 
         // Add fps display
         frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
-        frameRateLabel.setTranslation(5, canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTranslation(5, height - 5 - frameRateLabel.getHeight(), 0);
         frameRateLabel.setTextColor(ColorRGBA.BLACK);
         frameRateLabel.setZOrder(-1);
         root.attachChild(frameRateLabel);
@@ -210,7 +202,7 @@ public class BubbleMarkExample implements Scene {
 
         // Add balls
         for (int i = 0; i < balls.length; i++) {
-            final BallSprite ballSprite = new BallSprite("ball", Ball.radius * 2, Ball.radius * 2, canvas);
+            final BallSprite ballSprite = new BallSprite("ball", Ball.radius * 2, Ball.radius * 2, width, height);
             root.attachChild(ballSprite);
             balls[i] = ballSprite;
         }
