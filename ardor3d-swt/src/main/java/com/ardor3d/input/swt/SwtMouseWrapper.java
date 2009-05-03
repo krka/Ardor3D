@@ -31,8 +31,8 @@ import com.ardor3d.input.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 import com.google.common.collect.PeekingIterator;
+import com.google.common.collect.EnumMultiset;
 
 /**
  * A mouse wrapper for use with SWT.
@@ -50,7 +50,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     @GuardedBy("this")
     private MouseState _lastState = null;
 
-    private final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
+    private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -81,7 +81,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         if (!_clicks.isEmpty()) {
             for (final MouseButton mb : MouseButton.values()) {
                 if (System.currentTimeMillis() - _lastClickTime.get(mb) > MouseState.CLICK_TIME_MS) {
-                    _clicks.removeAllOccurrences(mb);
+                    _clicks.setCount(mb, 0);
                 }
             }
         }
@@ -94,7 +94,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
     public synchronized void mouseDown(final MouseEvent e) {
         final MouseButton b = getButtonForEvent(e);
         if (_clickArmed.contains(b)) {
-            _clicks.removeAllOccurrences(b);
+            _clicks.setCount(b, 0);
         }
         _clickArmed.add(b);
         _lastClickTime.put(b, System.currentTimeMillis());
@@ -119,9 +119,9 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         if (_clickArmed.contains(b) && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
             _clicks.add(b); // increment count of clicks for button b.
             // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
-            addNewState(e, 0, buttons, Multisets.newEnumMultiset(_clicks));
+            addNewState(e, 0, buttons, EnumMultiset.create(_clicks));
         } else {
-            _clicks.removeAllOccurrences(b); // clear click count for button b.
+            _clicks.setCount(b, 0); // clear click count for button b.
         }
         _clickArmed.remove(b);
 

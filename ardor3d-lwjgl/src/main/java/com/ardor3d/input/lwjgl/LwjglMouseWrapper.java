@@ -23,8 +23,8 @@ import com.ardor3d.input.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
 import com.google.common.collect.PeekingIterator;
+import com.google.common.collect.EnumMultiset;
 
 /**
  * Wrapper over the {@link org.lwjgl.input.Mouse} mouse interface class.
@@ -32,7 +32,7 @@ import com.google.common.collect.PeekingIterator;
 public class LwjglMouseWrapper implements MouseWrapper {
     private LwjglMouseIterator _currentIterator = null;
 
-    private static final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
+    private static final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     private static final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private static final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -115,7 +115,7 @@ public class LwjglMouseWrapper implements MouseWrapper {
                 _nextState = nextState;
                 _sendClickState = false;
                 return new MouseState(nextState.getX(), nextState.getY(), nextState.getDx(), nextState.getDy(),
-                        nextState.getDwheel(), buttons, Multisets.newEnumMultiset(_clicks));
+                        nextState.getDwheel(), buttons, EnumMultiset.create(_clicks));
             } else {
                 return nextState;
             }
@@ -124,12 +124,12 @@ public class LwjglMouseWrapper implements MouseWrapper {
         private void processButtonForClick(final MouseButton b, final boolean down) {
             boolean expired = false;
             if (_clicks.isEmpty() && System.currentTimeMillis() - _lastClickTime.get(b) > MouseState.CLICK_TIME_MS) {
-                _clicks.removeAllOccurrences(b);
+                _clicks.setCount(b, 0);
                 expired = true;
             }
             if (down) {
                 if (_clickArmed.contains(b)) {
-                    _clicks.removeAllOccurrences(b);
+                    _clicks.setCount(b, 0);
                 }
                 _clickArmed.add(b);
                 _lastClickTime.put(b, System.currentTimeMillis());
@@ -139,7 +139,7 @@ public class LwjglMouseWrapper implements MouseWrapper {
                     // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
                     _sendClickState = true;
                 } else {
-                    _clicks.removeAllOccurrences(b); // clear click count for button b.
+                    _clicks.setCount(b, 0); // clear click count for button b.
                 }
                 _clickArmed.remove(b);
             }

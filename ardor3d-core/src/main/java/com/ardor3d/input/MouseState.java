@@ -16,7 +16,7 @@ import java.util.EnumSet;
 import com.ardor3d.annotation.Immutable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
+import com.google.common.collect.EnumMultiset;
 
 /**
  * Describes the mouse state at some point in time.
@@ -32,7 +32,7 @@ public class MouseState {
     private final int _dy;
     private final int _dwheel;
     private final EnumMap<MouseButton, ButtonState> _buttonStates = Maps.newEnumMap(MouseButton.class);
-    private final Multiset<MouseButton> _clickCounts = Multisets.newEnumMultiset(MouseButton.class);
+    private final Multiset<MouseButton> _clickCounts = EnumMultiset.create(MouseButton.class);
 
     /**
      * Constructs a new MouseState instance.
@@ -146,9 +146,9 @@ public class MouseState {
      */
     public Multiset<MouseButton> getClickCounts() {
         if (_clickCounts.isEmpty()) {
-            return Multisets.newEnumMultiset(MouseButton.class);
+            return EnumMultiset.create(MouseButton.class);
         } else {
-            return Multisets.newEnumMultiset(_clickCounts);
+            return EnumMultiset.create(_clickCounts);
         }
     }
 

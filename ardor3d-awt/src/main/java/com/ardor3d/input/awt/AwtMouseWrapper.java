@@ -10,20 +10,10 @@
 
 package com.ardor3d.input.awt;
 
-import com.ardor3d.annotation.GuardedBy;
-import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.MouseButton;
-import com.ardor3d.input.MouseState;
-import com.ardor3d.input.MouseWrapper;
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multisets;
-import com.google.common.collect.PeekingIterator;
-import com.google.inject.Inject;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -32,6 +22,18 @@ import java.awt.event.MouseWheelListener;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
+
+import com.ardor3d.annotation.GuardedBy;
+import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseState;
+import com.ardor3d.input.MouseWrapper;
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.EnumMultiset;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.PeekingIterator;
+import com.google.inject.Inject;
 
 /**
  * Mouse wrapper class for use with AWT.
@@ -49,7 +51,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     private final Component _component;
     private final Frame _frame;
 
-    private final Multiset<MouseButton> _clicks = Multisets.newEnumMultiset(MouseButton.class);
+    private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
@@ -86,7 +88,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         if (!_clicks.isEmpty()) {
             for (final MouseButton mb : MouseButton.values()) {
                 if (System.currentTimeMillis() - _lastClickTime.get(mb) > MouseState.CLICK_TIME_MS) {
-                    _clicks.removeAllOccurrences(mb);
+                    _clicks.setCount(mb, 0);
                 }
             }
         }
@@ -100,7 +102,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     public synchronized void mousePressed(final MouseEvent e) {
         final MouseButton b = getButtonForEvent(e);
         if (_clickArmed.contains(b)) {
-            _clicks.removeAllOccurrences(b);
+            _clicks.setCount(b, 0);
         }
         _clickArmed.add(b);
         _lastClickTime.put(b, System.currentTimeMillis());
@@ -125,9 +127,9 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         if (_clickArmed.contains(b) && (System.currentTimeMillis() - _lastClickTime.get(b) <= MouseState.CLICK_TIME_MS)) {
             _clicks.add(b); // increment count of clicks for button b.
             // XXX: Note the double event add... this prevents sticky click counts, but is it the best way?
-            addNewState(e, buttons, Multisets.newEnumMultiset(_clicks));
+            addNewState(e, buttons, EnumMultiset.create(_clicks));
         } else {
-            _clicks.removeAllOccurrences(b); // clear click count for button b.
+            _clicks.setCount(b, 0); // clear click count for button b.
         }
         _clickArmed.remove(b);
 
