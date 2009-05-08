@@ -400,7 +400,7 @@ public class WaterNode extends Node {
         }
 
         try {
-            System.out.println("loading " + currentShaderStr);
+            logger.info("loading " + currentShaderStr);
             waterShader.setVertexShader(WaterNode.class.getClassLoader()
                     .getResourceAsStream(currentShaderStr + ".vert"));
             waterShader.setFragmentShader(WaterNode.class.getClassLoader().getResourceAsStream(
@@ -424,6 +424,8 @@ public class WaterNode extends Node {
                 waterShader.setUniform("foamMap", 3);
             }
         }
+
+        waterShader._needSendShader = true;
 
         logger.info("Shader reloaded...");
     }

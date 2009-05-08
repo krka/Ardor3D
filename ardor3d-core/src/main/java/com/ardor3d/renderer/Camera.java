@@ -1233,12 +1233,39 @@ public class Camera implements Savable, Externalizable, Cloneable {
         return store;
     }
 
-    /* @see Camera#getScreenCoordinates */
     public Vector3 getScreenCoordinates(final ReadOnlyVector3 worldPos) {
         return getScreenCoordinates(worldPos, null);
     }
 
     public Vector3 getScreenCoordinates(final ReadOnlyVector3 worldPosition, Vector3 store) {
+        store = getNormalizedDeviceCoordinates(worldPosition, store);
+
+        store.setX(((store.getX() + 1) * (_viewPortRight - _viewPortLeft) / 2) * getWidth());
+        store.setY(((store.getY() + 1) * (_viewPortTop - _viewPortBottom) / 2) * getHeight());
+        store.setZ((store.getZ() + 1) / 2);
+
+        return store;
+    }
+
+    public Vector3 getFrustumCoordinates(final ReadOnlyVector3 worldPos) {
+        return getFrustumCoordinates(worldPos, null);
+    }
+
+    public Vector3 getFrustumCoordinates(final ReadOnlyVector3 worldPosition, Vector3 store) {
+        store = getNormalizedDeviceCoordinates(worldPosition, store);
+
+        store.setX(((store.getX() + 1) * (_frustumRight - _frustumLeft) / 2) + _frustumLeft);
+        store.setY(((store.getY() + 1) * (_frustumTop - _frustumBottom) / 2) + _frustumBottom);
+        store.setZ(((store.getZ() + 1) * (_frustumFar - _frustumNear) / 2) + _frustumNear);
+
+        return store;
+    }
+
+    public Vector3 getNormalizedDeviceCoordinates(final ReadOnlyVector3 worldPos) {
+        return getNormalizedDeviceCoordinates(worldPos, null);
+    }
+
+    public Vector3 getNormalizedDeviceCoordinates(final ReadOnlyVector3 worldPosition, Vector3 store) {
         if (store == null) {
             store = new Vector3();
         }
@@ -1247,9 +1274,9 @@ public class Camera implements Savable, Externalizable, Cloneable {
         position.set(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), 1);
         _modelViewProjection.applyPre(position, position);
         position.multiplyLocal(1.0 / position.getW());
-        store.setX(((position.getX() + 1) * (_viewPortRight - _viewPortLeft) / 2) * getWidth());
-        store.setY(((position.getY() + 1) * (_viewPortTop - _viewPortBottom) / 2) * getHeight());
-        store.setZ((position.getZ() + 1) / 2);
+        store.setX(position.getX());
+        store.setY(position.getY());
+        store.setZ(position.getZ());
         Vector4.releaseTempInstance(position);
 
         return store;
