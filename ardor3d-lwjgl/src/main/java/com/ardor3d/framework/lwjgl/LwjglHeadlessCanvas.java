@@ -56,6 +56,7 @@ public class LwjglHeadlessCanvas {
 
     private final int _fboID, _depthRBID, _colorRBID;
     private final IntBuffer _data;
+    private Pbuffer _buff;
 
     /**
      * Construct a new LwjglHeadlessCanvas. Only width, height, alpha, depth and stencil are used. Samples will be
@@ -77,15 +78,15 @@ public class LwjglHeadlessCanvas {
             // Create a Pbuffer so we can have a valid gl context to work with
             final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(), _settings
                     .getStencilBits()).withSamples(_settings.getSamples());
-            final Pbuffer buff = new Pbuffer(1, 1, format, null);
-            buff.makeCurrent();
+            _buff = new Pbuffer(1, 1, format, null);
+            _buff.makeCurrent();
         } catch (final LWJGLException ex) {
             try {
                 // try again without samples
                 final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(),
                         _settings.getStencilBits());
-                final Pbuffer buff = new Pbuffer(1, 1, format, null);
-                buff.makeCurrent();
+                _buff = new Pbuffer(1, 1, format, null);
+                _buff.makeCurrent();
             } catch (final LWJGLException ex2) {
                 ex2.printStackTrace();
             }
@@ -155,6 +156,14 @@ public class LwjglHeadlessCanvas {
     }
 
     public void draw() {
+        // Make sure this OpenGL context is current.
+        ContextManager.switchContext(this);
+        try {
+            _buff.makeCurrent();
+        } catch (final LWJGLException ex) {
+            ex.printStackTrace();
+        }
+
         // make sure camera is set
         if (Camera.getCurrentCamera() != _camera) {
             _camera.update();
