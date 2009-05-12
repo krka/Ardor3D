@@ -79,7 +79,7 @@
 
   <!-- these properties help simplify specifying some commonly occurring variables -->
   <properties>
-    <lwjgl.version>ardor3d-2.0.1</lwjgl.version>
+    <lwjgl.version>ardor3d-2.1.0</lwjgl.version>
     <swt.version>ardor3d-3448</swt.version>
   </properties>
 
@@ -101,7 +101,7 @@
       <dependency>
         <groupId>com.google.code.google-collections</groupId>
         <artifactId>google-collect</artifactId>
-        <version>snapshot-20080530</version>
+        <version>1.0-rc1</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
