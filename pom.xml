@@ -33,10 +33,16 @@
     <!-- Ardor3D internal repository -->
     <repository>
       <id>ardor3d</id>
-      <url>http://ardor3d.com:8081/nexus/content/repositories/thirdparty</url>
       <name>Ardor3D repository</name>
+      <url>http://ardor3d.com:8081/nexus/content/repositories/thirdparty</url>
       <layout>default</layout>
     </repository>
+	<repository>
+	  <id>google-maven-repository</id>
+	  <name>Google Maven Repository</name>
+	  <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
+      <layout>default</layout>
+	</repository>
   </repositories>
 
   <build>
