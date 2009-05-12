@@ -106,7 +106,7 @@
       </dependency>
       <dependency>
         <groupId>com.google.code.google-collections</groupId>
-        <artifactId>google-collect</artifactId>
+        <artifactId>google-collections</artifactId>
         <version>1.0-rc1</version>
       </dependency>
       <dependency>
