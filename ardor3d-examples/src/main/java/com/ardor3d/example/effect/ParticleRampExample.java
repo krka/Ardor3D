@@ -93,7 +93,7 @@ public class ParticleRampExample extends ExampleBase {
         particles.setRenderState(ts);
 
         final ZBufferState zstate = new ZBufferState();
-        zstate.setEnabled(false);
+        zstate.setWritable(false);
         particles.setRenderState(zstate);
 
         particles.getParticleGeometry().setModelBound(new BoundingBox());
