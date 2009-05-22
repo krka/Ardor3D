@@ -10,8 +10,6 @@
 
 package com.ardor3d.framework.jogl;
 
-import java.util.logging.Logger;
-
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
@@ -37,8 +35,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
      * Set to true to be safe when rendering in multiple canvases. Set to false for a faster, single canvas mode.
      */
     public static boolean MULTI_CANVAS_MODE = true;
-
-    private static final Logger logger = Logger.getLogger(JoglCanvasRenderer.class.getName());
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
     // and since it is at the moment more work than it is worth to get it ready. Later on, when
@@ -133,8 +129,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         if (MULTI_CANVAS_MODE && !_context.equals(GLContext.getCurrent())) {
             while (_context.makeCurrent() == GLContext.CONTEXT_NOT_CURRENT) {
                 try {
-                    logger.info("Waiting for the GLContext to initialize...");
-                    Thread.sleep(500);
+                    Thread.sleep(50);
                 } catch (final InterruptedException e1) {
                     e1.printStackTrace();
                 }
@@ -150,7 +145,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _renderer.clearBuffers();
 
         final boolean drew = _scene.renderUnto(_renderer);
-        _renderer.flushFrame(_doSwap);
+        _renderer.flushFrame(drew && _doSwap);
         if (MULTI_CANVAS_MODE) {
             _context.release();
         }

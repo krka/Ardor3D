@@ -36,7 +36,8 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.jogl.JoglTextureStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
@@ -63,20 +64,23 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     public void setupTexture(final Texture2D tex) {
         final GL gl = GLU.getCurrentGL();
 
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
-        if (tex.getTextureId() != 0) {
-            ibuf.put(tex.getTextureId());
-            gl.glDeleteTextures(1, ibuf);
-            ibuf.clear();
+        // check if we are already setup... if so, throw error.
+        if (tex.getTextureKey() == null) {
+            tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
+        } else if (tex.getTextureIdForContext(context.getGlContextRep()) != 0) {
+            throw new Ardor3dException("Texture is already setup and has id.");
         }
 
         // Create the texture
+        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
         gl.glGenTextures(1, ibuf);
-        tex.setTextureId(ibuf.get(0));
-        TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
+        final int textureId = ibuf.get(0);
+        tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
         final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
         final int pixFormat = JoglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
         final int pixDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
@@ -85,14 +89,11 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType, null);
 
         // Setup filtering and wrap
-        final RenderContext context = ContextManager.getCurrentContext();
-        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
-        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
-
+        final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
         JoglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
         JoglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
-        logger.fine("setup pbuffer tex" + tex.getTextureId() + ": " + _width + "," + _height);
+        logger.fine("setup pbuffer tex" + textureId + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final Texture tex, final boolean doClear) {
@@ -126,7 +127,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
                 deactivate();
                 switchCameraOut();
-                JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+                JoglTextureStateUtil.doTextureBind(tex, 0, true);
                 _pbuffer.bindTexture();
             } else {
                 // render and copy to a texture
@@ -170,7 +171,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
             if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
-                JoglTextureStateUtil.doTextureBind(texs.get(0).getTextureId(), 0, Texture.Type.TwoDimensional);
+                JoglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();
                 switchCameraIn(doClear);
                 _pbuffer.releaseTexture();
@@ -211,7 +212,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     }
 
     public void copyToTexture(final Texture tex, final int width, final int height) {
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
         final GL gl = GLU.getCurrentGL();
 

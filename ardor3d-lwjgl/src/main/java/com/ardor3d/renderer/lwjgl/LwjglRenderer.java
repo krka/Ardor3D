@@ -23,6 +23,7 @@ import org.lwjgl.opengl.ARBBufferObject;
 import org.lwjgl.opengl.ARBMultitexture;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.EXTFogCoord;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.OpenGLException;
@@ -31,10 +32,10 @@ import org.lwjgl.opengl.Util;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.AbstractRenderer;
 import com.ardor3d.renderer.Camera;
@@ -42,8 +43,6 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.InterleavedFormat;
-import com.ardor3d.renderer.NormalsMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.queue.RenderQueue;
@@ -85,13 +84,14 @@ import com.ardor3d.scene.state.lwjgl.LwjglZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.VBOInfo;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
+import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.WeakIdentityCache;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
@@ -104,23 +104,19 @@ import com.ardor3d.util.stat.StatType;
 public class LwjglRenderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(LwjglRenderer.class.getName());
 
-    private boolean _inOrthoMode;
-
     private FloatBuffer _oldVertexBuffer;
 
     private FloatBuffer _oldNormalBuffer;
 
     private FloatBuffer _oldColorBuffer;
 
-    private FloatBuffer _oldInterleavedBuffer;
+    private FloatBuffer _oldFogBuffer;
 
     private final FloatBuffer[] _oldTextureBuffers;
 
     private int _prevNormMode = GL11.GL_ZERO;
 
     private int _prevTextureNumber = 0;
-
-    protected WeakIdentityCache<Buffer, Integer> _vboMap = new WeakIdentityCache<Buffer, Integer>();
 
     private final DoubleBuffer _transformBuffer = BufferUtils.createDoubleBuffer(16);
     {
@@ -232,8 +228,6 @@ public class LwjglRenderer extends AbstractRenderer {
             }
         }
 
-        _vboMap.expunge();
-
         if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_FRAMES, 1);
         }
@@ -241,7 +235,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
     // XXX: look more at this
     public void reset() {
-        _oldColorBuffer = _oldNormalBuffer = _oldVertexBuffer = _oldInterleavedBuffer = null;
+        _oldColorBuffer = _oldNormalBuffer = _oldVertexBuffer = null;
         Arrays.fill(_oldTextureBuffers, null);
     }
 
@@ -291,7 +285,7 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     public boolean checkAndAdd(final Spatial s) {
-        final RenderBucketType rqMode = s.getRenderBucketType();
+        final RenderBucketType rqMode = s.getSceneHints().getRenderBucketType();
         if (rqMode != RenderBucketType.Skip) {
             getQueue().addToQueue(s, rqMode);
             return true;
@@ -314,28 +308,49 @@ public class LwjglRenderer extends AbstractRenderer {
         GL11.glFinish();
     }
 
-    private void applyNormalsMode(final NormalsMode normMode, final Transform worldTransform) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
-        switch (normMode) {
-            case NormalizeIfScaled:
-                final ReadOnlyVector3 scale = worldTransform.getScale();
-                if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
-                    if (scale.getX() == scale.getY() && scale.getY() == scale.getZ() && caps.isOpenGL1_2Supported()
-                            && _prevNormMode != GL12.GL_RESCALE_NORMAL) {
-                        if (_prevNormMode == GL11.GL_NORMALIZE) {
-                            GL11.glDisable(GL11.GL_NORMALIZE);
+    public void applyNormalsMode(final NormalsMode normalsMode, final ReadOnlyTransform worldTransform) {
+        if (normalsMode != NormalsMode.Off) {
+            final RenderContext context = ContextManager.getCurrentContext();
+            final ContextCapabilities caps = context.getCapabilities();
+            switch (normalsMode) {
+                case NormalizeIfScaled:
+                    final ReadOnlyVector3 scale = worldTransform.getScale();
+                    if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
+                        if (scale.getX() == scale.getY() && scale.getY() == scale.getZ() && caps.isOpenGL1_2Supported()
+                                && _prevNormMode != GL12.GL_RESCALE_NORMAL) {
+                            if (_prevNormMode == GL11.GL_NORMALIZE) {
+                                GL11.glDisable(GL11.GL_NORMALIZE);
+                            }
+                            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+                            _prevNormMode = GL12.GL_RESCALE_NORMAL;
+                        } else if (_prevNormMode != GL11.GL_NORMALIZE) {
+                            if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                            }
+                            GL11.glEnable(GL11.GL_NORMALIZE);
+                            _prevNormMode = GL11.GL_NORMALIZE;
                         }
-                        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                        _prevNormMode = GL12.GL_RESCALE_NORMAL;
-                    } else if (_prevNormMode != GL11.GL_NORMALIZE) {
+                    } else {
+                        if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                            _prevNormMode = GL11.GL_ZERO;
+                        } else if (_prevNormMode == GL11.GL_NORMALIZE) {
+                            GL11.glDisable(GL11.GL_NORMALIZE);
+                            _prevNormMode = GL11.GL_ZERO;
+                        }
+                    }
+                    break;
+                case AlwaysNormalize:
+                    if (_prevNormMode != GL11.GL_NORMALIZE) {
                         if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
                             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                         }
                         GL11.glEnable(GL11.GL_NORMALIZE);
                         _prevNormMode = GL11.GL_NORMALIZE;
                     }
-                } else {
+                    break;
+                case UseProvided:
+                default:
                     if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
                         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                         _prevNormMode = GL11.GL_ZERO;
@@ -343,34 +358,25 @@ public class LwjglRenderer extends AbstractRenderer {
                         GL11.glDisable(GL11.GL_NORMALIZE);
                         _prevNormMode = GL11.GL_ZERO;
                     }
-                }
-                break;
-            case AlwaysNormalize:
-                if (_prevNormMode != GL11.GL_NORMALIZE) {
-                    if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
-                        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                    }
-                    GL11.glEnable(GL11.GL_NORMALIZE);
-                    _prevNormMode = GL11.GL_NORMALIZE;
-                }
-                break;
-            case UseProvided:
-            default:
-                if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
-                    GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                    _prevNormMode = GL11.GL_ZERO;
-                } else if (_prevNormMode == GL11.GL_NORMALIZE) {
-                    GL11.glDisable(GL11.GL_NORMALIZE);
-                    _prevNormMode = GL11.GL_ZERO;
-                }
-                break;
+                    break;
+            }
+        } else {
+            if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                _prevNormMode = GL11.GL_ZERO;
+            } else if (_prevNormMode == GL11.GL_NORMALIZE) {
+                GL11.glDisable(GL11.GL_NORMALIZE);
+                _prevNormMode = GL11.GL_ZERO;
+            }
         }
     }
 
-    public void deleteVBO(final Buffer buffer) {
-        final Integer i = removeFromVBOCache(buffer);
-        if (i != null) {
-            deleteVBO(i.intValue());
+    public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
+        if (defaultColor != null) {
+            GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
+                    .getAlpha());
+        } else {
+            GL11.glColor4f(1, 1, 1, 1);
         }
     }
 
@@ -380,15 +386,6 @@ public class LwjglRenderer extends AbstractRenderer {
         }
         final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
         deleteVBOId(rendRecord, vboid);
-    }
-
-    public void clearVBOCache() {
-        _vboMap.clear();
-    }
-
-    public Integer removeFromVBOCache(final Buffer buffer) {
-        return _vboMap.remove(buffer);
-
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -403,6 +400,13 @@ public class LwjglRenderer extends AbstractRenderer {
     public void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
             final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
             final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException {
+
+        // Ignore textures that do not have an id set
+        if (dstTexture.getTextureIdForContext(ContextManager.getCurrentContext().getGlContextRep()) == 0) {
+            logger.warning("Attempting to update a texture that is not currently on the card.");
+            return;
+        }
+
         // Check that the texture type is supported.
         if (dstTexture.getType() != Texture.Type.TwoDimensional) {
             throw new UnsupportedOperationException("Unsupported Texture Type: " + dstTexture.getType());
@@ -435,8 +439,10 @@ public class LwjglRenderer extends AbstractRenderer {
         final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
-        if (origTexBinding != dstTexture.getTextureId()) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, dstTexture.getTextureId());
+        final RenderContext context = ContextManager.getCurrentContext();
+        final int dstTexID = dstTexture.getTextureIdForContext(context.getGlContextRep());
+        if (origTexBinding != dstTexID) {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, dstTexID);
         }
         if (origAlignment != alignment) {
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, alignment);
@@ -470,7 +476,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         // Restore the texture configuration (when necessary).
         // Restore the texture binding.
-        if (origTexBinding != dstTexture.getTextureId()) {
+        if (origTexBinding != dstTexID) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, origTexBinding);
         }
         // Restore alignment.
@@ -509,284 +515,7 @@ public class LwjglRenderer extends AbstractRenderer {
         renderable.render(this);
     }
 
-    public void setupVertexData(final FloatBufferData vertexBufferData, final VBOInfo vbo) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
-
-        if (vertexBuffer != null && caps.isVBOSupported() && vbo != null && vbo.isVBOVertexEnabled()
-                && vbo.getVBOVertexID() <= 0) {
-            Object vboid;
-            if ((vboid = _vboMap.get(vertexBuffer)) != null) {
-                vbo.setVBOVertexID(((Integer) vboid).intValue());
-            } else {
-                vertexBuffer.rewind();
-                final int vboID = makeVBOId(rendRecord);
-                vbo.setVBOVertexID(vboID);
-                _vboMap.put(vertexBuffer, vboID);
-
-                rendRecord.invalidateVBO();
-                LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOVertexID());
-                ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbo.getVBOVertexID());
-                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vertexBuffer,
-                        ARBBufferObject.GL_STATIC_DRAW_ARB);
-            }
-        }
-
-        if (caps.isVBOSupported() && vbo != null && vbo.getVBOVertexID() > 0) {
-            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOVertexID());
-            GL11.glVertexPointer(vertexBufferData.getCoordsPerVertex(), GL11.GL_FLOAT, 0, 0);
-        } else if (vertexBuffer == null) {
-            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-        } else if (_oldVertexBuffer != vertexBuffer) {
-            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            if (caps.isVBOSupported()) {
-                LwjglRendererUtil.setBoundVBO(rendRecord, 0);
-            }
-            vertexBuffer.rewind();
-            GL11.glVertexPointer(vertexBufferData.getCoordsPerVertex(), 0, vertexBuffer);
-        }
-
-        _oldVertexBuffer = vertexBuffer;
-    }
-
-    public void setupNormalData(final FloatBufferData normalBufferData, final NormalsMode normalMode,
-            final Transform worldTransform, final VBOInfo vbo) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
-
-        if (normalBuffer != null && caps.isVBOSupported() && vbo != null && vbo.isVBONormalEnabled()
-                && vbo.getVBONormalID() <= 0) {
-            Object vboid;
-            if ((vboid = _vboMap.get(normalBuffer)) != null) {
-                vbo.setVBONormalID(((Integer) vboid).intValue());
-            } else {
-                normalBuffer.rewind();
-                final int vboID = makeVBOId(rendRecord);
-                vbo.setVBONormalID(vboID);
-                _vboMap.put(normalBuffer, vboID);
-
-                rendRecord.invalidateVBO();
-                LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBONormalID());
-                ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbo.getVBONormalID());
-                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, normalBuffer,
-                        ARBBufferObject.GL_STATIC_DRAW_ARB);
-            }
-        }
-
-        if (normalMode != NormalsMode.Off) {
-            applyNormalsMode(normalMode, worldTransform);
-
-            if ((caps.isVBOSupported() && vbo != null && vbo.getVBONormalID() > 0)) {
-                GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-                LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBONormalID());
-                GL11.glNormalPointer(GL11.GL_FLOAT, 0, 0);
-            } else if (normalBuffer == null) {
-                GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-            } else if (_oldNormalBuffer != normalBuffer) {
-                GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-                if (caps.isVBOSupported()) {
-                    LwjglRendererUtil.setBoundVBO(rendRecord, 0);
-                }
-                normalBuffer.rewind();
-                GL11.glNormalPointer(0, normalBuffer);
-            }
-            _oldNormalBuffer = normalBuffer;
-        } else {
-            if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
-                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                _prevNormMode = GL11.GL_ZERO;
-            } else if (_prevNormMode == GL11.GL_NORMALIZE) {
-                GL11.glDisable(GL11.GL_NORMALIZE);
-                _prevNormMode = GL11.GL_ZERO;
-            }
-            GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-            _oldNormalBuffer = null;
-        }
-    }
-
-    public void setupColorData(final FloatBufferData colorBufferData, final VBOInfo vbo, final ColorRGBA defaultColor) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
-
-        if (colorBuffer != null && caps.isVBOSupported() && vbo != null && vbo.isVBOColorEnabled()
-                && vbo.getVBOColorID() <= 0) {
-            Object vboid;
-            if ((vboid = _vboMap.get(colorBuffer)) != null) {
-                vbo.setVBOColorID(((Integer) vboid).intValue());
-            } else {
-                colorBuffer.rewind();
-                final int vboID = makeVBOId(rendRecord);
-                vbo.setVBOColorID(vboID);
-                _vboMap.put(colorBuffer, vboID);
-
-                rendRecord.invalidateVBO();
-                LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOColorID());
-                ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbo.getVBOColorID());
-                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, colorBuffer,
-                        ARBBufferObject.GL_STATIC_DRAW_ARB);
-            }
-        }
-
-        if ((caps.isVBOSupported() && vbo != null && vbo.getVBOColorID() > 0)) {
-            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-            LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOColorID());
-            GL11.glColorPointer(colorBufferData.getCoordsPerVertex(), GL11.GL_FLOAT, 0, 0);
-        } else if (colorBuffer == null) {
-            GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
-
-            if (defaultColor != null) {
-                GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
-                        .getAlpha());
-            } else {
-                GL11.glColor4f(1, 1, 1, 1);
-            }
-        } else if (_oldColorBuffer != colorBuffer) {
-            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-            if (caps.isVBOSupported()) {
-                LwjglRendererUtil.setBoundVBO(rendRecord, 0);
-            }
-            colorBuffer.rewind();
-            GL11.glColorPointer(colorBufferData.getCoordsPerVertex(), 0, colorBuffer);
-        }
-
-        _oldColorBuffer = colorBuffer;
-    }
-
-    public void setupFogData(final FloatBufferData fogBufferData, final VBOInfo vbo) {
-    // final RenderContext context = ContextManager.getCurrentContext();
-    // final RendererRecord rendRecord = (RendererRecord) context.getRendererRecord();
-
-    // if (supportsFogCoords) {
-    // oldLimit = -1;
-    // final FloatBuffer fogCoords = g.getFogBuffer();
-    // if (fogCoords != null) {
-    // oldLimit = fogCoords.limit();
-    // // make sure only the necessary verts are sent through on old cards.
-    // fogCoords.limit(g.getVertexQuantity());
-    // }
-    // if ((caps.isVBOSupported() && vbo != null && vbo.getVBOVertexID() > 0)) { // use
-    // // VBO
-    // GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
-    // rendRecord.setBoundVBO(vbo.getVBOVertexID());
-    // EXTFogCoord.glFogCoordPointerEXT(GL11.GL_FLOAT, 0, 0);
-    // } else if (fogCoords == null) {
-    // GL11.glDisableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
-    // } else if (_oldFogBuffer != fogCoords) {
-    // // fog coords have changed
-    // GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
-    // // ensure no VBO is bound
-    // if (caps.isVBOSupported()) {
-    // rendRecord.setBoundVBO(0);
-    // }
-    // fogCoords.rewind();
-    // EXTFogCoord.glFogCoordPointerEXT(0, g.getFogBuffer());
-    // }
-    // if (oldLimit != -1) {
-    // fogCoords.limit(oldLimit);
-    // }
-    // _oldFogBuffer = fogCoords;
-    // }
-    }
-
-    public void setupTextureData(final List<FloatBufferData> textureCoords, final VBOInfo vbo) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
-
-        final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int offset = 0;
-        if (ts != null) {
-            offset = ts.getTextureCoordinateOffset();
-
-            for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
-                if (caps.isMultitextureSupported()) {
-                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                }
-
-                if (textureCoords == null || i >= textureCoords.size()) {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    continue;
-                }
-
-                final FloatBufferData textureBufferData = textureCoords.get(i + offset);
-                final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
-
-                if (textureBuffer != null && caps.isVBOSupported() && vbo != null && vbo.isVBOTextureEnabled()
-                        && vbo.getVBOTextureID(i) <= 0) {
-                    Object vboid;
-                    if ((vboid = _vboMap.get(textureBuffer)) != null) {
-                        vbo.setVBOTextureID(i, ((Integer) vboid).intValue());
-                    } else {
-                        textureBuffer.rewind();
-                        final int vboID = makeVBOId(rendRecord);
-                        vbo.setVBOTextureID(i, vboID);
-                        _vboMap.put(textureBuffer, vboID);
-
-                        rendRecord.invalidateVBO();
-                        LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOTextureID(i));
-                        ARBBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbo
-                                .getVBOTextureID(i));
-                        ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, textureBuffer,
-                                ARBBufferObject.GL_STATIC_DRAW_ARB);
-                    }
-                }
-
-                if ((caps.isVBOSupported() && vbo != null && vbo.getVBOTextureID(i) > 0)) {
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    LwjglRendererUtil.setBoundVBO(rendRecord, vbo.getVBOTextureID(i));
-                    GL11.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), GL11.GL_FLOAT, 0, 0);
-                } else if (textureBufferData == null) {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != textureBuffer) {
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    if (caps.isVBOSupported()) {
-                        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
-                    }
-                    textureBuffer.rewind();
-                    GL11.glTexCoordPointer(textureBufferData.getCoordsPerVertex(), 0, textureBuffer);
-                } else {
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                }
-                _oldTextureBuffers[i] = textureBuffer;
-            }
-
-            if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
-                for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
-                    if (caps.isMultitextureSupported()) {
-                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                    }
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                }
-            }
-
-            _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
-                    .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
-        }
-    }
-
-    public void setupInterleavedData(final FloatBuffer interleavedBuffer, final InterleavedFormat format,
-            final VBOInfo vbo) {
-        if (_oldInterleavedBuffer != interleavedBuffer) {
-            interleavedBuffer.rewind();
-
-            final int glFormat = getGLInterleavedFormat(format);
-
-            GL11.glInterleavedArrays(glFormat, 0, interleavedBuffer);
-        }
-        _oldInterleavedBuffer = interleavedBuffer;
-    }
-
-    public boolean doTransforms(final Transform transform) {
+    public boolean doTransforms(final ReadOnlyTransform transform) {
         // set world matrix
         if (!transform.isIdentity()) {
             synchronized (_transformMatrix) {
@@ -808,21 +537,114 @@ public class LwjglRenderer extends AbstractRenderer {
         GL11.glPopMatrix();
     }
 
-    public void drawElements(final IntBuffer indices, final VBOInfo vbo, final int[] indexLengths,
-            final IndexMode[] indexModes) {
-        final RenderContext context = ContextManager.getCurrentContext();
-        final RendererRecord rendRecord = context.getRendererRecord();
-        final ContextCapabilities caps = context.getCapabilities();
+    // TODO: Arrays
+    public void setupVertexData(final FloatBufferData vertexBufferData) {
+        final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
 
-        boolean useIndicesVBO = false;
-        if ((caps.isVBOSupported() && vbo != null && vbo.getVBOIndexID() > 0)) {
-            useIndicesVBO = true;
-            LwjglRendererUtil.setBoundElementVBO(rendRecord, vbo.getVBOIndexID());
-        } else if (caps.isVBOSupported()) {
-            LwjglRendererUtil.setBoundElementVBO(rendRecord, 0);
+        if (vertexBuffer == null) {
+            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+        } else if (_oldVertexBuffer != vertexBuffer) {
+            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            vertexBuffer.rewind();
+            GL11.glVertexPointer(vertexBufferData.getValuesPerTuple(), 0, vertexBuffer);
         }
 
-        if (!useIndicesVBO && indices == null) {
+        _oldVertexBuffer = vertexBuffer;
+    }
+
+    public void setupNormalData(final FloatBufferData normalBufferData) {
+        final FloatBuffer normalBuffer = normalBufferData != null ? normalBufferData.getBuffer() : null;
+
+        if (normalBuffer == null) {
+            GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+        } else if (_oldNormalBuffer != normalBuffer) {
+            GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
+            normalBuffer.rewind();
+            GL11.glNormalPointer(0, normalBuffer);
+        }
+
+        _oldNormalBuffer = normalBuffer;
+    }
+
+    public void setupColorData(final FloatBufferData colorBufferData) {
+        final FloatBuffer colorBuffer = colorBufferData != null ? colorBufferData.getBuffer() : null;
+
+        if (colorBuffer == null) {
+            GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+        } else if (_oldColorBuffer != colorBuffer) {
+            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            colorBuffer.rewind();
+            GL11.glColorPointer(colorBufferData.getValuesPerTuple(), 0, colorBuffer);
+        }
+
+        _oldColorBuffer = colorBuffer;
+    }
+
+    public void setupFogData(final FloatBufferData fogBufferData) {
+        final FloatBuffer fogBuffer = fogBufferData != null ? fogBufferData.getBuffer() : null;
+
+        if (fogBuffer == null) {
+            GL11.glDisableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
+        } else if (_oldFogBuffer != fogBuffer) {
+            GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
+            fogBuffer.rewind();
+            EXTFogCoord.glFogCoordPointerEXT(0, fogBuffer);
+        }
+
+        _oldFogBuffer = fogBuffer;
+    }
+
+    public void setupTextureData(final List<FloatBufferData> textureCoords) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+        int offset = 0;
+        if (ts != null) {
+            offset = ts.getTextureCoordinateOffset();
+
+            for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                if (caps.isMultitextureSupported()) {
+                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                }
+
+                if (textureCoords == null || i >= textureCoords.size()) {
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    continue;
+                }
+
+                final FloatBufferData textureBufferData = textureCoords.get(i + offset);
+                final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
+
+                if (textureBufferData == null) {
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                } else if (_oldTextureBuffers[i] != textureBuffer) {
+                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    textureBuffer.rewind();
+                    GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), 0, textureBuffer);
+                } else { // TODO: needed?
+                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                }
+
+                _oldTextureBuffers[i] = textureBuffer;
+            }
+
+            if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
+                for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+                    if (caps.isMultitextureSupported()) {
+                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                    }
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                }
+            }
+
+            _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
+                    .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+        }
+    }
+
+    public void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+        if (indices == null || indices.getBuffer() == null) {
             logger.severe("Missing indices for drawElements call without VBO");
             return;
         }
@@ -830,14 +652,11 @@ public class LwjglRenderer extends AbstractRenderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            if (!useIndicesVBO) {
-                indices.position(0);
-                GL11.glDrawElements(glIndexMode, indices);
-            } else {
-                GL11.glDrawElements(glIndexMode, indices.limit(), GL11.GL_UNSIGNED_INT, 0);
-            }
+            indices.getBuffer().rewind();
+            GL11.glDrawElements(glIndexMode, indices.getBuffer());
+
             if (Constants.stats) {
-                addStats(indexModes[0], indices.limit());
+                addStats(indexModes[0], indices.getBufferLimit());
             }
         } else {
             int offset = 0;
@@ -847,13 +666,10 @@ public class LwjglRenderer extends AbstractRenderer {
 
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
-                if (!useIndicesVBO) {
-                    indices.position(offset);
-                    indices.limit(offset + count);
-                    GL11.glDrawElements(glIndexMode, indices);
-                } else {
-                    GL11.glDrawElements(glIndexMode, count, GL11.GL_UNSIGNED_INT, offset);
-                }
+                indices.getBuffer().position(offset);
+                indices.getBuffer().limit(offset + count);
+                GL11.glDrawElements(glIndexMode, indices.getBuffer());
+
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
@@ -867,14 +683,388 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void drawArrays(final FloatBuffer vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes) {
+    private int setupVBO(final FloatBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+        if (data == null) {
+            return -1;
+        }
+
+        int vboID = data.getVBOID(context.getGlContextRep());
+        if (vboID > 0) {
+            updateVBO(data, rendRecord, vboID, 0);
+
+            return vboID;
+        }
+
+        final FloatBuffer dataBuffer = data.getBuffer();
+        if (dataBuffer != null) {
+            // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
+            dataBuffer.rewind();
+            vboID = makeVBOId(rendRecord);
+            data.setVBOID(context.getGlContextRep(), vboID);
+
+            rendRecord.invalidateVBO();
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer,
+                    getGLVBOAccessMode(data.getVboAccessMode()));
+        } else {
+            throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
+        }
+        return vboID;
+    }
+
+    private void updateVBO(final FloatBufferData data, final RendererRecord rendRecord, final int vboID,
+            final int offset) {
+        if (data.isNeedsRefresh()) {
+            final FloatBuffer dataBuffer = data.getBuffer();
+            dataBuffer.rewind();
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, dataBuffer);
+            data.setNeedsRefresh(false);
+        }
+    }
+
+    private int setupVBO(final IntBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+        if (data == null) {
+            return -1;
+        }
+
+        int vboID = data.getVBOID(context.getGlContextRep());
+        if (vboID > 0) {
+            if (data.isNeedsRefresh()) {
+                final IntBuffer dataBuffer = data.getBuffer();
+                dataBuffer.rewind();
+                LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
+                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer);
+                data.setNeedsRefresh(false);
+            }
+
+            return vboID;
+        }
+
+        final IntBuffer dataBuffer = data.getBuffer();
+        if (dataBuffer != null) {
+            // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
+            dataBuffer.rewind();
+            vboID = makeVBOId(rendRecord);
+            data.setVBOID(context.getGlContextRep(), vboID);
+
+            rendRecord.invalidateVBO();
+            LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
+            ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, dataBuffer,
+                    getGLVBOAccessMode(data.getVboAccessMode()));
+        } else {
+            throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
+        }
+        return vboID;
+    }
+
+    public void setupVertexDataVBO(final FloatBufferData data) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+
+        final int vboID = setupVBO(data, context, rendRecord);
+
+        if (vboID > 0) {
+            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            GL11.glVertexPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
+        } else {
+            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+        }
+    }
+
+    public void setupNormalDataVBO(final FloatBufferData data) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+
+        final int vboID = setupVBO(data, context, rendRecord);
+
+        if (vboID > 0) {
+            GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            GL11.glNormalPointer(GL11.GL_FLOAT, 0, 0);
+        } else {
+            GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+        }
+    }
+
+    public void setupColorDataVBO(final FloatBufferData data) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+
+        final int vboID = setupVBO(data, context, rendRecord);
+
+        if (vboID > 0) {
+            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            GL11.glColorPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
+        } else {
+            GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+        }
+    }
+
+    public void setupFogDataVBO(final FloatBufferData data) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        if (!caps.isFogCoordinatesSupported()) {
+            return;
+        }
+
+        final RendererRecord rendRecord = context.getRendererRecord();
+        final int vboID = setupVBO(data, context, rendRecord);
+
+        if (vboID > 0) {
+            GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
+            LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+            EXTFogCoord.glFogCoordPointerEXT(GL11.GL_FLOAT, 0, 0);
+        } else {
+            GL11.glDisableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
+            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+        }
+    }
+
+    public void setupTextureDataVBO(final List<FloatBufferData> textureCoords) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+        int offset = 0;
+        if (ts != null) {
+            offset = ts.getTextureCoordinateOffset();
+
+            for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                if (caps.isMultitextureSupported()) {
+                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                }
+
+                if (textureCoords == null || i >= textureCoords.size()) {
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    continue;
+                }
+
+                final FloatBufferData data = textureCoords.get(i + offset);
+                final int vboID = setupVBO(data, context, rendRecord);
+
+                if (vboID > 0) {
+                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+                    GL11.glTexCoordPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
+                } else {
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+                }
+            }
+
+            if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
+                for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+                    if (caps.isMultitextureSupported()) {
+                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                    }
+                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                }
+            }
+
+            _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
+                    .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+        }
+    }
+
+    public void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
+            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
+            final List<FloatBufferData> textureCoords) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        if (interleaved.getVBOID(context.getGlContextRep()) <= 0) {
+            initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords);
+        }
+
+        final int vboID = interleaved.getVBOID(context.getGlContextRep());
+        LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+
+        int offset = 0;
+
+        if (normalCoords != null) {
+            updateVBO(normalCoords, rendRecord, vboID, offset);
+            GL11.glNormalPointer(GL11.GL_FLOAT, 0, offset);
+            GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
+            offset += normalCoords.getBufferLimit() * 4;
+        } else {
+            GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+        }
+
+        if (colorCoords != null) {
+            updateVBO(colorCoords, rendRecord, vboID, offset);
+            GL11.glColorPointer(colorCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+            GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            offset += colorCoords.getBufferLimit() * 4;
+        } else {
+            GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+        }
+
+        if (textureCoords != null) {
+            final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+            int coordinateOffset = 0;
+            if (ts != null) {
+                coordinateOffset = ts.getTextureCoordinateOffset();
+
+                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                    if (caps.isMultitextureSupported()) {
+                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                    }
+
+                    if (textureCoords == null || i >= textureCoords.size()) {
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        continue;
+                    }
+
+                    final FloatBufferData textureBufferData = textureCoords.get(i + coordinateOffset);
+
+                    if (textureBufferData != null) {
+                        updateVBO(textureBufferData, rendRecord, vboID, offset);
+                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        offset += textureBufferData.getBufferLimit() * 4;
+                    } else {
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    }
+                }
+
+                if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
+                    for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+                        if (caps.isMultitextureSupported()) {
+                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                        }
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    }
+                }
+
+                _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
+                        .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+            }
+        }
+
+        if (vertexCoords != null) {
+            updateVBO(vertexCoords, rendRecord, vboID, offset);
+            GL11.glVertexPointer(vertexCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+            GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            offset += vertexCoords.getBufferLimit() * 4;
+        } else {
+            GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+        }
+
+        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+    }
+
+    private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
+            final FloatBufferData vertexCoords, final FloatBufferData normalCoords, final FloatBufferData colorCoords,
+            final List<FloatBufferData> textureCoords) {
+        final RendererRecord rendRecord = context.getRendererRecord();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        final int vboID = makeVBOId(rendRecord);
+        interleaved.setVBOID(context.getGlContextRep(), vboID);
+
+        rendRecord.invalidateVBO();
+        LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+        final int bufferSize = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
+        ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferSize,
+                getGLVBOAccessMode(interleaved.getVboAccessMode()));
+
+        int offset = 0;
+        if (normalCoords != null) {
+            normalCoords.getBuffer().rewind();
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, normalCoords
+                    .getBuffer());
+            offset += normalCoords.getBufferLimit() * 4;
+        }
+        if (colorCoords != null) {
+            colorCoords.getBuffer().rewind();
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, colorCoords
+                    .getBuffer());
+            offset += colorCoords.getBufferLimit() * 4;
+        }
+        if (textureCoords != null) {
+            final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+            int coordinateOffset = 0;
+            if (ts != null) {
+                coordinateOffset = ts.getTextureCoordinateOffset();
+
+                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                    if (textureCoords == null || i >= textureCoords.size()) {
+                        continue;
+                    }
+
+                    final FloatBufferData textureBufferData = textureCoords.get(i + coordinateOffset);
+                    final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
+                    if (textureBuffer != null) {
+                        textureBuffer.rewind();
+                        ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset,
+                                textureBuffer);
+                        offset += textureBufferData.getBufferLimit() * 4;
+                    }
+                }
+            }
+        }
+        if (vertexCoords != null) {
+            vertexCoords.getBuffer().rewind();
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, vertexCoords
+                    .getBuffer());
+            offset += vertexCoords.getBufferLimit() * 4;
+        }
+    }
+
+    public void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+
+        final int vboID = setupVBO(indices, context, rendRecord);
+
+        LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
+
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            GL11.glDrawArrays(glIndexMode, 0, vertexBuffer.limit() / 3);
+            GL11.glDrawElements(glIndexMode, indices.getBufferLimit(), GL11.GL_UNSIGNED_INT, 0);
+            if (Constants.stats) {
+                addStats(indexModes[0], indices.getBufferLimit());
+            }
+        } else {
+            int offset = 0;
+            int indexModeCounter = 0;
+            for (int i = 0; i < indexLengths.length; i++) {
+                final int count = indexLengths[i];
+
+                final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
+
+                GL11.glDrawElements(glIndexMode, count, GL11.GL_UNSIGNED_INT, offset);
+                if (Constants.stats) {
+                    addStats(indexModes[indexModeCounter], count);
+                }
+
+                offset += count;
+
+                if (indexModeCounter < indexModes.length - 1) {
+                    indexModeCounter++;
+                }
+            }
+        }
+    }
+
+    public void drawArrays(final FloatBufferData vertices, final int[] indexLengths, final IndexMode[] indexModes) {
+        if (indexLengths == null) {
+            final int glIndexMode = getGLIndexMode(indexModes[0]);
+
+            GL11.glDrawArrays(glIndexMode, 0, vertices.getTupleCount());
 
             if (Constants.stats) {
-                addStats(indexModes[0], vertexBuffer.limit() / 3);
+                addStats(indexModes[0], vertices.getTupleCount());
             }
         } else {
             int offset = 0;
@@ -896,28 +1086,6 @@ public class LwjglRenderer extends AbstractRenderer {
                     indexModeCounter++;
                 }
             }
-        }
-    }
-
-    private void addStats(final IndexMode indexMode, final int count) {
-        switch (indexMode) {
-            case Triangles:
-            case TriangleFan:
-            case TriangleStrip:
-                StatCollector.addStat(StatType.STAT_TRIANGLE_COUNT, count);
-                break;
-            case Lines:
-            case LineLoop:
-            case LineStrip:
-                StatCollector.addStat(StatType.STAT_LINE_COUNT, count);
-                break;
-            case Points:
-                StatCollector.addStat(StatType.STAT_POINT_COUNT, count);
-                break;
-            case Quads:
-            case QuadStrip:
-                StatCollector.addStat(StatType.STAT_QUAD_COUNT, count);
-                break;
         }
     }
 
@@ -944,11 +1112,45 @@ public class LwjglRenderer extends AbstractRenderer {
         vboCleanupCache.clear();
     }
 
-    public void renderDisplayList(final int displayListID) {
-        GL11.glCallList(displayListID);
+    public void unbindVBO() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
+        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+        LwjglRendererUtil.setBoundElementVBO(rendRecord, 0);
+    }
 
-        // invalidate "current arrays"
-        reset();
+    private int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
+        int glMode = ARBBufferObject.GL_STATIC_DRAW_ARB;
+        switch (vboAccessMode) {
+            case StaticDraw:
+                glMode = ARBBufferObject.GL_STATIC_DRAW_ARB;
+                break;
+            case StaticRead:
+                glMode = ARBBufferObject.GL_STATIC_READ_ARB;
+                break;
+            case StaticCopy:
+                glMode = ARBBufferObject.GL_STATIC_COPY_ARB;
+                break;
+            case DynamicDraw:
+                glMode = ARBBufferObject.GL_DYNAMIC_DRAW_ARB;
+                break;
+            case DynamicRead:
+                glMode = ARBBufferObject.GL_DYNAMIC_READ_ARB;
+                break;
+            case DynamicCopy:
+                glMode = ARBBufferObject.GL_DYNAMIC_COPY_ARB;
+                break;
+            case StreamDraw:
+                glMode = ARBBufferObject.GL_STREAM_DRAW_ARB;
+                break;
+            case StreamRead:
+                glMode = ARBBufferObject.GL_STREAM_READ_ARB;
+                break;
+            case StreamCopy:
+                glMode = ARBBufferObject.GL_STREAM_COPY_ARB;
+                break;
+        }
+        return glMode;
     }
 
     private int getGLIndexMode(final IndexMode indexMode) {
@@ -983,55 +1185,6 @@ public class LwjglRenderer extends AbstractRenderer {
                 break;
         }
         return glMode;
-    }
-
-    private int getGLInterleavedFormat(final InterleavedFormat format) {
-        int glInterleavedFormat = GL11.GL_V3F;
-        switch (format) {
-            case GL_V2F:
-                glInterleavedFormat = GL11.GL_V2F;
-                break;
-            case GL_V3F:
-                glInterleavedFormat = GL11.GL_V3F;
-                break;
-            case GL_C3F_V3F:
-                glInterleavedFormat = GL11.GL_C3F_V3F;
-                break;
-            case GL_C4F_N3F_V3F:
-                glInterleavedFormat = GL11.GL_C4F_N3F_V3F;
-                break;
-            case GL_C4UB_V2F:
-                glInterleavedFormat = GL11.GL_C4UB_V2F;
-                break;
-            case GL_C4UB_V3F:
-                glInterleavedFormat = GL11.GL_C4UB_V3F;
-                break;
-            case GL_N3F_V3F:
-                glInterleavedFormat = GL11.GL_N3F_V3F;
-                break;
-            case GL_T2F_C3F_V3F:
-                glInterleavedFormat = GL11.GL_T2F_C3F_V3F;
-                break;
-            case GL_T2F_C4F_N3F_V3F:
-                glInterleavedFormat = GL11.GL_T2F_C4F_N3F_V3F;
-                break;
-            case GL_T2F_C4UB_V3F:
-                glInterleavedFormat = GL11.GL_T2F_C4UB_V3F;
-                break;
-            case GL_T2F_N3F_V3F:
-                glInterleavedFormat = GL11.GL_T2F_N3F_V3F;
-                break;
-            case GL_T2F_V3F:
-                glInterleavedFormat = GL11.GL_T2F_V3F;
-                break;
-            case GL_T4F_C4F_N3F_V4F:
-                glInterleavedFormat = GL11.GL_T4F_C4F_N3F_V4F;
-                break;
-            case GL_T4F_V4F:
-                glInterleavedFormat = GL11.GL_T4F_V4F;
-                break;
-        }
-        return glInterleavedFormat;
     }
 
     public void setModelViewMatrix(final Buffer matrix) {
@@ -1263,11 +1416,42 @@ public class LwjglRenderer extends AbstractRenderer {
         throw new IllegalArgumentException("Unknown state: " + state);
     }
 
-    public void deleteTextureId(final int textureId) {
-        LwjglTextureStateUtil.deleteTextureId(textureId);
+    public void deleteTexture(final Texture texture) {
+        LwjglTextureStateUtil.deleteTexture(texture);
     }
 
     public void loadTexture(final Texture texture, final int unit) {
         LwjglTextureStateUtil.load(texture, unit);
+    }
+
+    /**
+     * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
+     * list until {@link #endDisplayList()} is called.
+     * 
+     * @return id of new display list
+     */
+    public int startDisplayList() {
+        final int id = GL11.glGenLists(1);
+
+        GL11.glNewList(id, GL11.GL_COMPILE);
+
+        return id;
+    }
+
+    /**
+     * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
+     */
+    public void endDisplayList() {
+        GL11.glEndList();
+    }
+
+    /**
+     * Draw the given display list.
+     */
+    public void renderDisplayList(final int displayListID) {
+        GL11.glCallList(displayListID);
+
+        // invalidate "current arrays"
+        reset();
     }
 }

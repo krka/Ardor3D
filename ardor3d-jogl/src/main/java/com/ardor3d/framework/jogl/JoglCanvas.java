@@ -309,6 +309,8 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             }
         } catch (final GLException releaseFailure) {
             logger.log(Level.WARNING, "Failed to release OpenGL Context: " + _glCanvas, releaseFailure);
+        } finally {
+            _glCanvas = null;
         }
 
         // Dispose of any window resources.

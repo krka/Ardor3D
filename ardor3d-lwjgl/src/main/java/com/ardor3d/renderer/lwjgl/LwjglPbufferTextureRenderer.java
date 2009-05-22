@@ -41,7 +41,7 @@ import com.ardor3d.scene.state.lwjgl.LwjglTextureStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -91,21 +91,23 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
      * texture id for this texture and inits the data type for the texture.
      */
     public void setupTexture(final Texture2D tex) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
-
-        if (tex.getTextureId() != 0) {
-            ibuf.put(tex.getTextureId());
-            GL11.glDeleteTextures(ibuf);
-            ibuf.clear();
+        // check if we are already setup... if so, throw error.
+        if (tex.getTextureKey() == null) {
+            tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
+        } else if (tex.getTextureIdForContext(context.getGlContextRep()) != 0) {
+            throw new Ardor3dException("Texture is already setup and has id.");
         }
 
         // Create the texture
+        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
         GL11.glGenTextures(ibuf);
-        tex.setTextureId(ibuf.get(0));
-        TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
+        final int textureId = ibuf.get(0);
+        tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
         final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
         final int pixFormat = LwjglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
         final int pixDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
@@ -120,13 +122,11 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         }
 
         // Setup filtering and wrap
-        final RenderContext context = ContextManager.getCurrentContext();
-        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
-        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
-
+        final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
         LwjglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
         LwjglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
-        logger.fine("setup pbuffer tex" + tex.getTextureId() + ": " + _width + "," + _height);
+
+        logger.fine("setup pbuffer tex" + textureId + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final Texture tex, final boolean doClear) {
@@ -165,7 +165,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
 
                 deactivate();
                 switchCameraOut();
-                LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+                LwjglTextureStateUtil.doTextureBind(tex, 0, true);
                 _pbuffer.bindTexImage(Pbuffer.FRONT_LEFT_BUFFER);
             } else {
                 // render and copy to a texture
@@ -214,7 +214,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
 
             if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
-                LwjglTextureStateUtil.doTextureBind(texs.get(0).getTextureId(), 0, Texture.Type.TwoDimensional);
+                LwjglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();
                 switchCameraIn(doClear);
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
@@ -255,7 +255,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     }
 
     public void copyToTexture(final Texture tex, final int width, final int height) {
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
 
         GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
     }

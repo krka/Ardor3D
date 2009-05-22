@@ -34,7 +34,8 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.jogl.JoglTextureStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -65,20 +66,23 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     public void setupTexture(final Texture2D tex) {
         final GL gl = GLU.getCurrentGL();
 
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
-        if (tex.getTextureId() != 0) {
-            ibuf.put(tex.getTextureId());
-            gl.glDeleteTextures(ibuf.limit(), ibuf); // TODO Check <size>
-            ibuf.clear();
+        // check if we are already setup... if so, throw error.
+        if (tex.getTextureKey() == null) {
+            tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
+        } else if (tex.getTextureIdForContext(context.getGlContextRep()) != 0) {
+            throw new Ardor3dException("Texture is already setup and has id.");
         }
 
         // Create the texture
+        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
         gl.glGenTextures(ibuf.limit(), ibuf); // TODO Check <size>
-        tex.setTextureId(ibuf.get(0));
-        TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
+        final int textureId = ibuf.get(0);
+        tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
         final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
         final int pixFormat = JoglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
         final int pixDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
@@ -92,14 +96,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Setup filtering and wrap
-        final RenderContext context = ContextManager.getCurrentContext();
-        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
-        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
-
+        final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
         JoglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
         JoglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
-        logger.fine("setup fbo tex with id " + tex.getTextureId() + ": " + _width + "," + _height);
+        logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
@@ -158,13 +159,15 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             }
             // we can only render to 1 depth texture at a time, so # groups is at minimum == numDepth
             final int groups = Math.max(depths.size(), (int) (0.999f + (colors.size() / (float) maxDrawBuffers)));
+
+            final RenderContext context = ContextManager.getCurrentContext();
             for (int i = 0; i < groups; i++) {
                 // First handle colors
                 int colorsAdded = 0;
                 while (colorsAdded < maxDrawBuffers && !colors.isEmpty()) {
                     final Texture tex = colors.removeFirst();
                     gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT + colorsAdded,
-                            GL.GL_TEXTURE_2D, tex.getTextureId(), 0);
+                            GL.GL_TEXTURE_2D, tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     colorsAdded++;
                 }
 
@@ -173,7 +176,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = depths.removeFirst();
                     // Set up our depth texture
                     gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D,
-                            tex.getTextureId(), 0);
+                            tex.getTextureIdForContext(context.getGlContextRep()), 0);
                     _usingDepthRB = false;
                 } else if (!_usingDepthRB) {
                     // setup our default depth render buffer if not already set
@@ -202,7 +205,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             // automatically generate mipmaps for our textures.
             for (int x = 0, max = texs.size(); x < max; x++) {
                 if (texs.get(x).getMinificationFilter().usesMipMapLevels()) {
-                    JoglTextureStateUtil.doTextureBind(texs.get(x).getTextureId(), 0, Texture.Type.TwoDimensional);
+                    JoglTextureStateUtil.doTextureBind(texs.get(x), 0, true);
                     gl.glGenerateMipmapEXT(GL.GL_TEXTURE_2D);
                 }
             }
@@ -218,19 +221,22 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     protected void setupForSingleTexDraw(final Texture tex, final boolean doClear) {
         final GL gl = GLU.getCurrentGL();
 
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        final RenderContext context = ContextManager.getCurrentContext();
+        final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
+
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
         if (tex.getRenderToTextureFormat().isDepthFormat()) {
             // Setup depth texture into FBO
-            gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D, tex
-                    .getTextureId(), 0);
+            gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D,
+                    textureId, 0);
 
             setDrawBuffer(GL.GL_NONE);
             setReadBuffer(GL.GL_NONE);
         } else {
             // Set textures into FBO
-            gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D, tex
-                    .getTextureId(), 0);
+            gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D,
+                    textureId, 0);
 
             // setup depth RB
             gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_RENDERBUFFER_EXT,
@@ -279,7 +285,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
 
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+            JoglTextureStateUtil.doTextureBind(tex, 0, true);
             gl.glGenerateMipmapEXT(GL.GL_TEXTURE_2D);
         }
     }
@@ -320,7 +326,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     public void copyToTexture(final Texture tex, final int width, final int height) {
         final GL gl = GLU.getCurrentGL();
 
-        JoglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
         gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
     }

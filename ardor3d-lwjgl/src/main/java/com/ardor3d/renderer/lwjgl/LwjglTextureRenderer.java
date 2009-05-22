@@ -37,7 +37,8 @@ import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.lwjgl.LwjglTextureStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -67,20 +68,23 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
      */
     public void setupTexture(final Texture2D tex) {
 
-        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
-        if (tex.getTextureId() != 0) {
-            ibuf.put(tex.getTextureId());
-            GL11.glDeleteTextures(ibuf);
-            ibuf.clear();
+        // check if we are already setup... if so, throw error.
+        if (tex.getTextureKey() == null) {
+            tex.setTextureKey(TextureKey.getRTTKey(tex.getMinificationFilter()));
+        } else if (tex.getTextureIdForContext(context.getGlContextRep()) != 0) {
+            throw new Ardor3dException("Texture is already setup and has id.");
         }
 
         // Create the texture
+        final IntBuffer ibuf = BufferUtils.createIntBuffer(1);
         GL11.glGenTextures(ibuf);
-        tex.setTextureId(ibuf.get(0));
-        TextureManager.registerForCleanup(tex.getTextureKey(), tex.getTextureId());
+        final int textureId = ibuf.get(0);
+        tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
         final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
         final int pixFormat = LwjglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
         final int pixDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
@@ -100,14 +104,11 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         // Setup filtering and wrap
-        final RenderContext context = ContextManager.getCurrentContext();
-        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
-        final TextureRecord texRecord = record.getTextureRecord(tex.getTextureId(), tex.getType());
-
+        final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
         LwjglTextureStateUtil.applyFilter(tex, texRecord, 0, record, context.getCapabilities());
         LwjglTextureStateUtil.applyWrap(tex, texRecord, 0, record, context.getCapabilities());
 
-        logger.fine("setup fbo tex with id " + tex.getTextureId() + ": " + _width + "," + _height);
+        logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
 
     public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
@@ -165,6 +166,8 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             }
             // we can only render to 1 depth texture at a time, so # groups is at minimum == numDepth
             final int groups = Math.max(depths.size(), (int) (0.999f + (colors.size() / (float) maxDrawBuffers)));
+
+            final RenderContext context = ContextManager.getCurrentContext();
             for (int i = 0; i < groups; i++) {
                 // First handle colors
                 int colorsAdded = 0;
@@ -172,7 +175,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = colors.removeFirst();
                     EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                             EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT + colorsAdded, GL11.GL_TEXTURE_2D, tex
-                                    .getTextureId(), 0);
+                                    .getTextureIdForContext(context.getGlContextRep()), 0);
                     colorsAdded++;
                 }
 
@@ -181,7 +184,8 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     final Texture tex = depths.removeFirst();
                     // Set up our depth texture
                     EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                            EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, tex.getTextureId(), 0);
+                            EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, tex
+                                    .getTextureIdForContext(context.getGlContextRep()), 0);
                     _usingDepthRB = false;
                 } else if (!_usingDepthRB) {
                     // setup our default depth render buffer if not already set
@@ -211,7 +215,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             // automatically generate mipmaps for our textures.
             for (int x = 0, max = texs.size(); x < max; x++) {
                 if (texs.get(x).getMinificationFilter().usesMipMapLevels()) {
-                    LwjglTextureStateUtil.doTextureBind(texs.get(x).getTextureId(), 0, Texture.Type.TwoDimensional);
+                    LwjglTextureStateUtil.doTextureBind(texs.get(x), 0, true);
                     EXTFramebufferObject.glGenerateMipmapEXT(GL11.GL_TEXTURE_2D);
                 }
             }
@@ -225,20 +229,22 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void setupForSingleTexDraw(final Texture tex, final boolean doClear) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
 
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
 
         if (tex.getRenderToTextureFormat().isDepthFormat()) {
             // Setup depth texture into FBO
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                    EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, tex.getTextureId(), 0);
+                    EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, textureId, 0);
 
             setDrawBuffer(GL11.GL_NONE);
             setReadBuffer(GL11.GL_NONE);
         } else {
             // Set textures into FBO
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
-                    EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, tex.getTextureId(), 0);
+                    EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, textureId, 0);
 
             // setup depth RB
             EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
@@ -279,7 +285,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
-            LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+            LwjglTextureStateUtil.doTextureBind(tex, 0, true);
             EXTFramebufferObject.glGenerateMipmapEXT(GL11.GL_TEXTURE_2D);
         }
     }
@@ -323,7 +329,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     public void copyToTexture(final Texture tex, final int width, final int height) {
-        LwjglTextureStateUtil.doTextureBind(tex.getTextureId(), 0, Texture.Type.TwoDimensional);
+        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
 
         GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
     }
