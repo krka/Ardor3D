@@ -31,8 +31,8 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.scenegraph.Spatial.CullHint;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -77,8 +77,8 @@ public class DegenerateTrianglesExample extends ExampleBase {
         _canvas.setTitle("Degenerate vs MultiStrip Example");
 
         t = BasicText.createDefaultTextLabel("Text", "[SPACE] MultiStrip Mesh");
-        t.setRenderBucketType(RenderBucketType.Ortho);
-        t.setLightCombineMode(LightCombineMode.Off);
+        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(t);
 
@@ -103,19 +103,19 @@ public class DegenerateTrianglesExample extends ExampleBase {
         degenerateStripMesh.setTranslation(-xSize * 0.5, -ySize * 0.5, -requiredDistance);
         _root.attachChild(degenerateStripMesh);
 
-        degenerateStripMesh.setCullHint(CullHint.Always);
+        degenerateStripMesh.getSceneHints().setCullHint(CullHint.Always);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
             public void perform(final Canvas source, final InputState inputState, final double tpf) {
                 showDegenerateMesh = !showDegenerateMesh;
                 if (showDegenerateMesh) {
                     t.setText("[SPACE] Degenerate Mesh");
-                    multiStripMesh.setCullHint(CullHint.Always);
-                    degenerateStripMesh.setCullHint(CullHint.Inherit);
+                    multiStripMesh.getSceneHints().setCullHint(CullHint.Always);
+                    degenerateStripMesh.getSceneHints().setCullHint(CullHint.Inherit);
                 } else {
                     t.setText("[SPACE] MultiStrip Mesh");
-                    multiStripMesh.setCullHint(CullHint.Inherit);
-                    degenerateStripMesh.setCullHint(CullHint.Always);
+                    multiStripMesh.getSceneHints().setCullHint(CullHint.Inherit);
+                    degenerateStripMesh.getSceneHints().setCullHint(CullHint.Always);
                 }
             }
         }));

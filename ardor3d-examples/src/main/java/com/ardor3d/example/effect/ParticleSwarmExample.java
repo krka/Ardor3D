@@ -73,7 +73,7 @@ public class ParticleSwarmExample extends ExampleBase {
         sphere = new Sphere("sp", 12, 12, 3);
         sphere.setModelBound(new BoundingBox());
         sphere.setDefaultColor(ColorRGBA.BLUE);
-        sphere.setRenderBucketType(RenderBucketType.Opaque);
+        sphere.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
 
         particles = ParticleFactory.buildParticles("particles", 30);
         particles.setEmissionDirection(new Vector3(0, 1, 0));

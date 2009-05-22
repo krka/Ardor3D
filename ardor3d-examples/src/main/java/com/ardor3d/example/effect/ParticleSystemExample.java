@@ -43,20 +43,25 @@ public class ParticleSystemExample extends ExampleBase {
         super(layer, frameWork);
     }
 
+    int ignore = 10;
+
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
+        // We'll ignore the first 10 iterations because our timer is going to be unstable.
+        if (ignore > 0) {
+            ignore--;
+            return;
+        }
         if ((int) currentPos.getX() == (int) newPos.getX() && (int) currentPos.getY() == (int) newPos.getY()
                 && (int) currentPos.getZ() == (int) newPos.getZ()) {
             newPos.setX(MathUtils.nextRandomDouble() * 50 - 25);
             newPos.setY(MathUtils.nextRandomDouble() * 50 - 25);
             newPos.setZ(MathUtils.nextRandomDouble() * 50 - 150);
         }
-
-        final double frameRate = timer.getFrameRate() / 2;
-        currentPos.setX(currentPos.getX() - (currentPos.getX() - newPos.getX()) / frameRate);
-        currentPos.setY(currentPos.getY() - (currentPos.getY() - newPos.getY()) / frameRate);
-        currentPos.setZ(currentPos.getZ() - (currentPos.getZ() - newPos.getZ()) / frameRate);
-
+        final double tpf = timer.getTimePerFrame();
+        currentPos.setX(currentPos.getX() - (currentPos.getX() - newPos.getX()) * tpf);
+        currentPos.setY(currentPos.getY() - (currentPos.getY() - newPos.getY()) * tpf);
+        currentPos.setZ(currentPos.getZ() - (currentPos.getZ() - newPos.getZ()) * tpf);
         _root.setTranslation(currentPos);
     }
 
@@ -77,7 +82,6 @@ public class ParticleSystemExample extends ExampleBase {
         particles.setMaximumAngle(360 * MathUtils.DEG_TO_RAD);
         particles.getParticleController().setControlFlow(false);
         particles.setParticlesInWorldCoords(true);
-        particles.warmUp(60);
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
@@ -99,5 +103,19 @@ public class ParticleSystemExample extends ExampleBase {
         particles.getParticleGeometry().setModelBound(new BoundingBox());
 
         _root.attachChild(particles);
+        // kick things off by setting our start and end
+        newPos.setX(MathUtils.nextRandomDouble() * 50 - 25);
+        newPos.setY(MathUtils.nextRandomDouble() * 50 - 25);
+        newPos.setZ(MathUtils.nextRandomDouble() * 50 - 150);
+
+        currentPos.setX(MathUtils.nextRandomDouble() * 50 - 25);
+        currentPos.setY(MathUtils.nextRandomDouble() * 50 - 25);
+        currentPos.setZ(MathUtils.nextRandomDouble() * 50 - 150);
+        _root.setTranslation(currentPos);
+
+        // update our world transforms so the the particles will be in the right spot when we warm things up
+        _root.updateWorldTransform(true);
+
+        particles.warmUp(60);
     }
 }

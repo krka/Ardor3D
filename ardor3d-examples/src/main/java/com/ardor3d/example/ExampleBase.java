@@ -195,7 +195,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         _wireframeState.setEnabled(false);
         _root.setRenderState(_wireframeState);
 
-        _root.setRenderBucketType(RenderBucketType.Opaque);
+        _root.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
 
         initExample();
     }

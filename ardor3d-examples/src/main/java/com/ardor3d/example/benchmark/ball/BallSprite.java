@@ -11,6 +11,7 @@
 package com.ardor3d.example.benchmark.ball;
 
 import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 
 class BallSprite extends Quad {
@@ -27,9 +28,9 @@ class BallSprite extends Quad {
         _ball = new Ball();
         _ball.setRandomPositionIn(_areaWidth, _areaHeight);
         setTranslation(_ball._x + Ball.radius, _ball._y + Ball.radius, 0);
-        setRenderBucketType(RenderBucketType.Ortho);
+        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         setModelBound(null);
-        setCullHint(CullHint.Never);
+        getSceneHints().setCullHint(CullHint.Never);
     }
 
     @Override

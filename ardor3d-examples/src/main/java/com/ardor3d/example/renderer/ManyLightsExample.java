@@ -23,6 +23,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
@@ -59,7 +60,7 @@ public class ManyLightsExample extends ExampleBase {
         // Create a sphere to show where the light is in the demo.
         final Sphere lightSphere = new Sphere("lightSphere" + i, 9, 9, .1f);
         lightSphere.setModelBound(new BoundingSphere());
-        lightSphere.setLightCombineMode(Spatial.LightCombineMode.Off);
+        lightSphere.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         lightSphere.setDefaultColor(lightColor);
 
         // Create a new point light and fill out the properties

@@ -8,9 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.example.basic;
-
-import java.nio.FloatBuffer;
+package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
@@ -18,27 +16,22 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.InputState;
+import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
-import com.ardor3d.intersection.PickData;
-import com.ardor3d.intersection.PickResults;
-import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.PrimitivePickResults;
-import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Arrow;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
@@ -64,28 +57,63 @@ import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.scenegraph.shape.Tube;
 import com.ardor3d.scenegraph.shape.GeoSphere.TextureMode;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.scenegraph.CompileOptions;
+import com.ardor3d.util.scenegraph.RenderDelegate;
+import com.ardor3d.util.scenegraph.SceneCompiler;
 import com.google.inject.Inject;
 
-public class ShapesExample extends ExampleBase {
+public class DisplayListExample extends ExampleBase {
     private int wrapCount;
     private int index;
     private BasicText _text;
-    private PickResults _pickResults;
+    private final Node _shapeRoot = new Node("shapeRoot");
+    private RenderDelegate _delegate;
+    private boolean first = true;
+    private double counter = 0;
+    private int frames = 0;
 
     public static void main(final String[] args) {
-        start(ShapesExample.class);
+        start(DisplayListExample.class);
     }
 
     @Inject
-    public ShapesExample(final LogicalLayer layer, final FrameHandler frameWork) {
+    public DisplayListExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 
     @Override
+    protected void renderExample(final Renderer renderer) {
+        if (first) {
+            final CompileOptions options = new CompileOptions();
+            options.setDisplayList(true);
+            SceneCompiler.compile(_shapeRoot, _canvas.getCanvasRenderer().getRenderer(), options);
+            first = false;
+            _delegate = _shapeRoot.getRenderDelegate(ContextManager.getCurrentContext().getGlContextRep());
+        }
+
+        super.renderExample(renderer);
+    }
+
+    @Override
+    protected void updateExample(final ReadOnlyTimer timer) {
+        counter += timer.getTimePerFrame();
+        frames++;
+        if (counter > 1) {
+            final double fps = (frames / counter);
+            counter = 0;
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
+        }
+    }
+
+    @Override
     protected void initExample() {
-        _canvas.setTitle("Shapes Example");
+        _canvas.setTitle("Display List Example");
+
+        _root.attachChild(_shapeRoot);
+        _shapeRoot.getSceneHints().setDataMode(DataMode.Arrays);
 
         wrapCount = 5;
         addMesh(new Arrow("Arrow", 3, 1));
@@ -111,89 +139,43 @@ public class ShapesExample extends ExampleBase {
         addMesh(new Teapot("Teapot"));
         addMesh(new Torus("Torus", 16, 8, 1.0, 2.5));
         addMesh(new Tube("Tube", 2, 3, 4));
-        addMesh(createLines());
 
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.Guess, true));
-        _root.setRenderState(ts);
+        _shapeRoot.setRenderState(ts);
 
         final BlendState bs = new BlendState();
         bs.setBlendEnabled(true);
-        _root.setRenderState(bs);
+        _shapeRoot.setRenderState(bs);
 
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
-        _root.setRenderState(ms);
+        _shapeRoot.setRenderState(ms);
 
-        // Set up a reusable pick results
-        _pickResults = new PrimitivePickResults();
-        _pickResults.setCheckDistance(true);
-
-        // Set up our pick label
-        _text = BasicText.createDefaultTextLabel("", "pick");
+        // Set up our label
+        _text = BasicText.createDefaultTextLabel("label", "[SPACE] display list on");
         _text.setTranslation(10, 10, 0);
-        _text.getSceneHints().setCullHint(CullHint.Always);
         _root.attachChild(_text);
     }
 
     @Override
     protected void registerInputTriggers() {
         super.registerInputTriggers();
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+            private boolean useDL = true;
 
-        // Add mouse-over to show labels
-
-        _logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
             public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                // Put together a pick ray
-                final Vector2 pos = Vector2.fetchTempInstance().set(inputState.getMouseState().getX(),
-                        inputState.getMouseState().getY());
-                final Ray3 pickRay = Ray3.fetchTempInstance();
-                _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
-                Vector2.releaseTempInstance(pos);
-
-                // Do the pick
-                _pickResults.clear();
-                PickingUtil.findPick(_root, pickRay, _pickResults);
-                Ray3.releaseTempInstance(pickRay);
-
-                if (_pickResults.getNumber() > 0) {
-                    // picked something, show label.
-                    _text.getSceneHints().setCullHint(CullHint.Never);
-
-                    // set our text to the name of the ancestor of this object that is right under the _root node.
-                    final PickData pick = _pickResults.getPickData(0);
-                    final Spatial topLevel = getTopLevel(pick.getTargetMesh());
-                    _text.setText(topLevel.getName());
+                useDL = !useDL;
+                if (useDL) {
+                    _text.setText("[SPACE] display list on");
+                    _shapeRoot.setRenderDelegate(_delegate, ContextManager.getCurrentContext().getGlContextRep());
                 } else {
-                    // No pick, clear label.
-                    _text.getSceneHints().setCullHint(CullHint.Always);
-                    _text.setText("");
-                }
-            }
-
-            private Spatial getTopLevel(final Spatial target) {
-                if (target.getParent() == null || target.getParent().equals(_root)) {
-                    return target;
-                } else {
-                    return getTopLevel(target.getParent());
+                    _text.setText("[SPACE] display list off");
+                    _shapeRoot.setRenderDelegate(null, ContextManager.getCurrentContext().getGlContextRep());
                 }
             }
         }));
-
-    }
-
-    private Spatial createLines() {
-        final FloatBuffer verts = BufferUtils.createVector3Buffer(3);
-        verts.put(0).put(0).put(0);
-        verts.put(5).put(5).put(0);
-        verts.put(0).put(5).put(0);
-        final Line line = new Line("Lines", verts, null, null, null);
-        line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        line.setLineWidth(2);
-        line.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-
-        return line;
     }
 
     private void addMesh(final Spatial spatial) {
@@ -201,7 +183,7 @@ public class ShapesExample extends ExampleBase {
         if (spatial instanceof Mesh) {
             ((Mesh) spatial).updateModelBound();
         }
-        _root.attachChild(spatial);
+        _shapeRoot.attachChild(spatial);
         index++;
     }
 }

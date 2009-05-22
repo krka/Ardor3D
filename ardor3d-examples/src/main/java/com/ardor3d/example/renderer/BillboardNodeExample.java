@@ -24,9 +24,9 @@ import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.extension.BillboardNode;
 import com.ardor3d.scenegraph.extension.BillboardNode.BillboardAlignment;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
@@ -49,8 +49,8 @@ public class BillboardNodeExample extends ExampleBase {
         _canvas.setTitle("BillboardNode - Example");
 
         t = BasicText.createDefaultTextLabel("Text", "[SPACE] " + BillboardAlignment.ScreenAligned);
-        t.setRenderBucketType(RenderBucketType.Ortho);
-        t.setLightCombineMode(LightCombineMode.Off);
+        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(t);
 

@@ -42,7 +42,7 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -88,8 +88,6 @@ public class UpdateTextureExample extends ExampleBase {
             final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
                     .getTexture();
             TextureManager.releaseTexture(prevTexture, renderer);
-            prevTexture.getTextureKey().setContextRep(null); // TODO: hack for texture caching bug
-            TextureManager.releaseTexture(prevTexture, renderer);
             final TextureState ts = (TextureState) _root.getLocalRenderState(RenderState.StateType.Texture);
             ts.setTexture(nextTexture);
         }
@@ -132,8 +130,8 @@ public class UpdateTextureExample extends ExampleBase {
         _canvas.setTitle("Update texture - Example");
 
         final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Updating texture...");
-        keyText.setRenderBucketType(RenderBucketType.Ortho);
-        keyText.setLightCombineMode(LightCombineMode.Off);
+        keyText.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         keyText.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(keyText);
 

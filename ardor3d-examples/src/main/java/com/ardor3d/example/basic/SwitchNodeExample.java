@@ -27,8 +27,8 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.extension.SwitchNode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
@@ -49,8 +49,8 @@ public class SwitchNodeExample extends ExampleBase {
         _canvas.setTitle("SwitchNode - Example");
 
         final BasicText t = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch to next child");
-        t.setRenderBucketType(RenderBucketType.Ortho);
-        t.setLightCombineMode(LightCombineMode.Off);
+        t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(t);
 

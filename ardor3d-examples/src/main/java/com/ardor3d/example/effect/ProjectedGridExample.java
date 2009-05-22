@@ -29,8 +29,8 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial.CullHint;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -113,13 +113,13 @@ public class ProjectedGridExample extends ExampleBase {
         ms.setColorMaterial(ColorMaterial.Diffuse);
         _root.setRenderState(ms);
 
-        _root.setCullHint(CullHint.Never);
+        _root.getSceneHints().setCullHint(CullHint.Never);
 
         // Setup textfields for presenting example info.
         final Node textNodes = new Node("Text");
         _root.attachChild(textNodes);
-        textNodes.setRenderBucketType(RenderBucketType.Ortho);
-        textNodes.setLightCombineMode(LightCombineMode.Off);
+        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
         final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
         for (int i = 0; i < _exampleInfo.length; i++) {

@@ -188,7 +188,7 @@ public class BubbleMarkExample implements Scene {
         frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
         frameRateLabel.setTranslation(5, height - 5 - frameRateLabel.getHeight(), 0);
         frameRateLabel.setTextColor(ColorRGBA.BLACK);
-        frameRateLabel.setZOrder(-1);
+        frameRateLabel.getSceneHints().setOrthoOrder(-1);
         root.attachChild(frameRateLabel);
     }
 

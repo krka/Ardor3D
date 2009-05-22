@@ -27,7 +27,7 @@ import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
@@ -118,8 +118,8 @@ public class RenderTextureSideBySideExample extends ExampleBase {
 
         if (textureRenderer == null) {
             final BasicText t = BasicText.createDefaultTextLabel("Text", "RTT not supported on this computer.");
-            t.setRenderBucketType(RenderBucketType.Ortho);
-            t.setLightCombineMode(LightCombineMode.Off);
+            t.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+            t.getSceneHints().setLightCombineMode(LightCombineMode.Off);
             t.setTranslation(new Vector3(0, 20, 0));
             _root.attachChild(t);
         } else {
@@ -146,7 +146,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
         quad = new Quad("Quad", 15, 13f);
         quad.setTranslation(new Vector3(10, 0, 0));
         quad.setModelBound(new BoundingBox());
-        quad.setLightCombineMode(LightCombineMode.Off);
+        quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         _root.attachChild(quad);
 
         final TextureState ts = new TextureState();

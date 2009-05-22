@@ -16,6 +16,8 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.example.Exit;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
@@ -35,10 +37,12 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.state.LightState;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.TextureManager;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.inject.Inject;
@@ -83,6 +87,12 @@ public class RotatingCubeGame implements Updater {
         buf.setEnabled(true);
         buf.setFunction(ZBufferState.TestFunction.LessThanOrEqualTo);
         scene.getRoot().setRenderState(buf);
+
+        // Add a texture to the box.
+        final TextureState ts = new TextureState();
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+                Format.GuessNoCompression, true));
+        box.setRenderState(ts);
 
         final PointLight light = new PointLight();
 

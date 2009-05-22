@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.canvas;
 
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -29,12 +30,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Exit;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
+import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.SwtFocusWrapper;
@@ -42,6 +45,8 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -94,6 +99,16 @@ public class LwjglSwtExample {
         });
         item.setText("Add &3d Canvas");
         item.setAccelerator(SWT.MOD1 + '3');
+
+        AWTImageLoader.registerLoader();
+
+        try {
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+                    "com/ardor3d/example/media/"));
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+        } catch (final URISyntaxException ex) {
+            ex.printStackTrace();
+        }
 
         addNewCanvas(tabFolder, scene, injector);
 

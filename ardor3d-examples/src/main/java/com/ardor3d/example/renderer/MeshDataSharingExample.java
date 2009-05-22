@@ -25,7 +25,7 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.VBOInfo;
+import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -65,7 +65,7 @@ public class MeshDataSharingExample extends ExampleBase {
 
         final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
         sphere.setModelBound(new BoundingBox());
-        sphere.setVBOInfo(new VBOInfo(true));
+        sphere.getSceneHints().setDataMode(DataMode.VBO);
 
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);

@@ -29,8 +29,8 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
 import com.ardor3d.scenegraph.extension.QuadImposterNode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
@@ -62,8 +62,8 @@ public class QuadImposterExample extends ExampleBase {
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(), Vector3.UNIT_Y);
 
         final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Switch imposters off");
-        keyText.setRenderBucketType(RenderBucketType.Ortho);
-        keyText.setLightCombineMode(LightCombineMode.Off);
+        keyText.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         keyText.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(keyText);
 
