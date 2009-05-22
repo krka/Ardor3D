@@ -23,7 +23,8 @@ import com.ardor3d.image.Image.Format;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.Spatial.TextureCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
+import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -71,7 +72,7 @@ public class TextureState extends RenderState {
      */
     protected int _offset = 0;
 
-    public transient int[] _idCache = new int[MAX_TEXTURES];
+    public transient TextureKey[] _keyCache = new TextureKey[MAX_TEXTURES];
 
     /**
      * Constructor instantiates a new <code>TextureState</code> object.
@@ -163,7 +164,7 @@ public class TextureState extends RenderState {
         }
 
         _texture.set(index, null);
-        _idCache[index] = 0;
+        _keyCache[index] = null;
         return true;
     }
 
@@ -178,7 +179,7 @@ public class TextureState extends RenderState {
         }
 
         _texture.set(textureUnit, null);
-        _idCache[textureUnit] = 0;
+        _keyCache[textureUnit] = null;
         return true;
 
     }
@@ -227,21 +228,21 @@ public class TextureState extends RenderState {
     }
 
     /**
-     * Fast access for retrieving a Texture ID. A return is guaranteed when <code>textureUnit</code> is any number under
-     * or equal to the highest textureunit currently in use. This value can be retrieved with
-     * <code>getNumberOfSetTextures</code>. A higher value might result in unexpected behaviour such as an exception
+     * Fast access for retrieving a TextureKey. A return is guaranteed when <code>textureUnit</code> is any number under
+     * or equal to the highest texture unit currently in use. This value can be retrieved with
+     * <code>getNumberOfSetTextures</code>. A higher value might result in unexpected behavior such as an exception
      * being thrown.
      * 
      * @param textureUnit
-     *            The texture unit from which to retrieve the ID.
-     * @return the textureID, or 0 if there is none.
+     *            The texture unit from which to retrieve the TextureKey.
+     * @return the TextureKey, or null if there is none.
      */
-    public final int getTextureID(final int textureUnit) {
-        if (textureUnit < _idCache.length && textureUnit >= 0) {
-            return _idCache[textureUnit];
+    public final TextureKey getTextureKey(final int textureUnit) {
+        if (textureUnit < _keyCache.length && textureUnit >= 0) {
+            return _keyCache[textureUnit];
         }
 
-        return 0;
+        return null;
     }
 
     /**
@@ -304,7 +305,7 @@ public class TextureState extends RenderState {
             return stack.peek();
         }
 
-        final TextureCombineMode mode = spat.getTextureCombineMode();
+        final TextureCombineMode mode = spat.getSceneHints().getTextureCombineMode();
         if (mode == TextureCombineMode.Replace || (mode != TextureCombineMode.Off && stack.size() == 1)) {
             // todo: use dummy state if off?
             return stack.peek();

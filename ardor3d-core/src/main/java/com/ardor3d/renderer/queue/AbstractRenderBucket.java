@@ -13,7 +13,6 @@ package com.ardor3d.renderer.queue;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -23,7 +22,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.SortUtil;
 
 public class AbstractRenderBucket implements RenderBucket {
-    private static final Logger _logger = Logger.getLogger(AbstractRenderBucket.class.getName());
 
     protected final Renderer _renderer;
     protected Comparator<Spatial> _comparator;

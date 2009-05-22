@@ -24,7 +24,9 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -173,9 +175,9 @@ public class Skybox extends Node {
         _skyboxQuads[Face.Down.ordinal()].setTranslation(new Vector3(0, -_yExtent, 0));
 
         // We don't want the light to effect our skybox
-        setLightCombineMode(Spatial.LightCombineMode.Off);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
         final ZBufferState zbuff = new ZBufferState();
         zbuff.setEnabled(false);
@@ -186,21 +188,20 @@ public class Skybox extends Node {
         setRenderState(fs);
 
         // We don't want it making our skybox disapear, so force view
-        setCullHint(Spatial.CullHint.Never);
+        getSceneHints().setCullHint(CullHint.Never);
 
         for (int i = 0; i < 6; i++) {
             // Make sure texture is only what is set.
-            _skyboxQuads[i].setTextureCombineMode(TextureCombineMode.Replace);
+            _skyboxQuads[i].getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
             // Make sure no lighting on the skybox
-            _skyboxQuads[i].setLightCombineMode(Spatial.LightCombineMode.Off);
+            _skyboxQuads[i].getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
             // Make sure the quad is viewable
-            _skyboxQuads[i].setCullHint(Spatial.CullHint.Never);
+            _skyboxQuads[i].getSceneHints().setCullHint(CullHint.Never);
 
             // _skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
-            _skyboxQuads[i].setRenderBucketType(RenderBucketType.PreBucket);
-            _skyboxQuads[i].setVBOInfo(null);
+            _skyboxQuads[i].getSceneHints().setRenderBucketType(RenderBucketType.PreBucket);
 
             // And attach the skybox as a child
             attachChild(_skyboxQuads[i]);

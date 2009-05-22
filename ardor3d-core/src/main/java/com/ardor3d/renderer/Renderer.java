@@ -12,23 +12,22 @@ package com.ardor3d.renderer;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.VBOInfo;
+import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 
 /**
@@ -192,17 +191,6 @@ public interface Renderer {
     boolean checkAndAdd(Spatial s);
 
     /**
-     * Checks the VBO cache to see if this Buffer is mapped to a VBO-id. If it does the mapping will be removed from the
-     * cache and the VBO with the VBO-id found will be deleted.
-     * 
-     * If no mapped VBO-id is found, this method does not do anything else.
-     * 
-     * @param buffer
-     *            The Buffer who's associated VBO should be deleted.
-     */
-    void deleteVBO(Buffer buffer);
-
-    /**
      * Attempts to delete the VBO with this VBO id. Ignores ids < 1.
      * 
      * @param vboid
@@ -210,25 +198,9 @@ public interface Renderer {
     void deleteVBO(int vboid);
 
     /**
-     * Clears all entries from the VBO cache. Does not actually delete any VBO buffer, only all mappings between Buffers
-     * and VBO-ids.
-     * 
+     * Unbind the current VBO elements.
      */
-    void clearVBOCache();
-
-    /**
-     * Removes the mapping between this Buffer and it's VBO-id. Does not actually delete the VBO. <br>
-     * This method is useful if you want to use the same Buffer to create several VBOs. After a VBO is created for this
-     * Buffer, update the Buffer and remove it from the VBO cache. You can now reuse the same buffer with another Mesh
-     * object. <br>
-     * If no association is found, this method does nothing.
-     * 
-     * @param buffer
-     *            The nio Buffer whose associated VBO should be deleted.
-     * @return An int wrapped in an Integer object that's the VBO-id of the VBO previously mapped to this Buffer, or
-     *         null is no mapping existed.
-     */
-    Integer removeFromVBOCache(Buffer buffer);
+    void unbindVBO();
 
     /**
      * Updates a region of the content area of the provided texture using the specified region of the given data.
@@ -294,7 +266,7 @@ public interface Renderer {
      * @param transform
      *            transform to apply.
      */
-    boolean doTransforms(final Transform transform);
+    boolean doTransforms(final ReadOnlyTransform transform);
 
     /**
      * <code>undoTransforms</code> reverts the latest transform.
@@ -304,29 +276,43 @@ public interface Renderer {
      */
     void undoTransforms(final Transform transform);
 
-    /**
-     * <code>setupVertexData</code> sets up the buffers for vertex data.
-     * 
-     * @param vertices
-     *            transform to apply.
-     */
-    void setupVertexData(final FloatBufferData vertexCoords, final VBOInfo vbo);
+    // TODO: Arrays
+    void setupVertexData(final FloatBufferData vertexCoords);
 
-    void setupNormalData(final FloatBufferData normalCoords, final NormalsMode normalMode,
-            final Transform worldTransform, final VBOInfo vbo);
+    void setupNormalData(final FloatBufferData normalCoords);
 
-    void setupColorData(final FloatBufferData colorCoords, final VBOInfo vbo, final ColorRGBA defaultColor);
+    void setupColorData(final FloatBufferData colorCoords);
 
-    void setupFogData(final FloatBufferData fogCoords, final VBOInfo vbo);
+    void setupFogData(final FloatBufferData fogCoords);
 
-    void setupTextureData(final List<FloatBufferData> textureCoords, final VBOInfo vbo);
+    void setupTextureData(final List<FloatBufferData> textureCoords);
 
-    void setupInterleavedData(final FloatBuffer interleavedBuffer, InterleavedFormat format, final VBOInfo vbo);
+    void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes);
 
-    void drawElements(final IntBuffer indices, final VBOInfo vbo, final int[] indexLengths, final IndexMode[] indexModes);
+    void drawArrays(final FloatBufferData vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes);
 
-    void drawArrays(final FloatBuffer vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes);
+    void applyNormalsMode(final NormalsMode normMode, final ReadOnlyTransform worldTransform);
 
+    void applyDefaultColor(final ReadOnlyColorRGBA defaultColor);
+
+    // TODO: VBO
+    void setupVertexDataVBO(final FloatBufferData vertexCoords);
+
+    void setupNormalDataVBO(final FloatBufferData normalCoords);
+
+    void setupColorDataVBO(final FloatBufferData colorCoords);
+
+    void setupFogDataVBO(final FloatBufferData fogCoords);
+
+    void setupTextureDataVBO(final List<FloatBufferData> textureCoords);
+
+    void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
+            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
+            final List<FloatBufferData> textureCoords);
+
+    void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes);
+
+    // TODO: Display List
     void renderDisplayList(final int displayListID);
 
     void setProjectionMatrix(Buffer matrix);
@@ -396,5 +382,18 @@ public interface Renderer {
 
     void loadTexture(Texture texture, int unit);
 
-    void deleteTextureId(int textureId);
+    void deleteTexture(Texture texture);
+
+    /**
+     * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
+     * list until {@link #endDisplayList()} is called.
+     * 
+     * @return id of new display list
+     */
+    int startDisplayList();
+
+    /**
+     * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
+     */
+    void endDisplayList();
 }

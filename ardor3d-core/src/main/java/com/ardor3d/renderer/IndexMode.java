@@ -89,4 +89,34 @@ public enum IndexMode {
         }
         throw new IllegalArgumentException("Unhandled type: " + this);
     }
+
+    /**
+     * @param indexMode
+     * @param size
+     * @return the number of primitives you would have if you connected an array of points of the given size using the
+     *         given index mode.
+     */
+    public static int getPrimitiveCount(final IndexMode indexMode, final int size) {
+        switch (indexMode) {
+            case Triangles:
+                return size / 3;
+            case TriangleFan:
+            case TriangleStrip:
+                return size - 2;
+            case Quads:
+                return size / 4;
+            case QuadStrip:
+                return size / 2 - 1;
+            case Lines:
+                return size / 2;
+            case LineStrip:
+                return size - 1;
+            case LineLoop:
+                return size;
+            case Points:
+                return size;
+        }
+
+        throw new IllegalArgumentException("unimplemented index mode: " + indexMode);
+    }
 }

@@ -40,6 +40,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.OrientedBox;
@@ -59,21 +60,21 @@ public final class Debugger {
 
     private static final Sphere boundingSphere = new Sphere("bsphere", 10, 10, 1);
     static {
-        boundingSphere.setRenderBucketType(RenderBucketType.Skip);
+        boundingSphere.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         boundingSphere.setRenderState(new WireframeState());
         boundingSphere.setRenderState(new ZBufferState());
         boundingSphere.updateWorldRenderStates(false);
     }
     private static final Box boundingBox = new Box("bbox", new Vector3(), 1, 1, 1);
     static {
-        boundingBox.setRenderBucketType(RenderBucketType.Skip);
+        boundingBox.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         boundingBox.setRenderState(new WireframeState());
         boundingBox.setRenderState(new ZBufferState());
         boundingBox.updateWorldRenderStates(false);
     }
     private static final OrientedBox boundingOB = new OrientedBox("bobox");
     static {
-        boundingOB.setRenderBucketType(RenderBucketType.Skip);
+        boundingOB.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         boundingOB.setRenderState(new WireframeState());
         boundingOB.setRenderState(new ZBufferState());
         boundingOB.updateWorldRenderStates(false);
@@ -106,7 +107,7 @@ public final class Debugger {
             return;
         }
 
-        if (se.getWorldBound() != null && se.getCullHint() != Spatial.CullHint.Always) {
+        if (se.getWorldBound() != null && se.getSceneHints().getCullHint() != CullHint.Always) {
             final Camera cam = Camera.getCurrentCamera();
             final int state = cam.getPlaneState();
             if (cam.contains(se.getWorldBound()) != Camera.FrustumIntersect.Outside) {
@@ -228,7 +229,7 @@ public final class Debugger {
             return;
         }
         cam.setPlaneState(state);
-        if (element instanceof Mesh && element.getCullHint() != Spatial.CullHint.Always) {
+        if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
             final Mesh geom = (Mesh) element;
 
             double rSize = size;
@@ -342,7 +343,7 @@ public final class Debugger {
             return;
         }
         cam.setPlaneState(state);
-        if (element instanceof Mesh && element.getCullHint() != Spatial.CullHint.Always) {
+        if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
             final Mesh geom = (Mesh) element;
 
             double rSize = size;
@@ -449,7 +450,7 @@ public final class Debugger {
 
     private static final AxisRods rods = new AxisRods("debug_rods", true, 1);
     static {
-        rods.setRenderBucketType(RenderBucketType.Skip);
+        rods.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
     }
     private static boolean axisInited = false;
 
@@ -517,8 +518,8 @@ public final class Debugger {
     private static TextureRenderer bufTexRend;
 
     static {
-        bQuad.setRenderBucketType(RenderBucketType.Ortho);
-        bQuad.setCullHint(Spatial.CullHint.Never);
+        bQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        bQuad.getSceneHints().setCullHint(CullHint.Never);
     }
 
     public static void drawBuffer(final Image.Format rttFormat, final int location, final Renderer r) {

@@ -198,7 +198,7 @@ public class BMFont {
             if (_useMipMaps) {
                 minFilter = Texture.MinificationFilter.Trilinear;
             }
-            final TextureKey tkey = new TextureKey(texUrl, false, Image.Format.GuessNoCompression, minFilter);
+            final TextureKey tkey = TextureKey.getKey(texUrl, false, Image.Format.GuessNoCompression, minFilter);
             _pageTexture = TextureManager.loadFromKey(tkey, null, null);
             _pageTexture.setMagnificationFilter(magFilter);
 
@@ -447,9 +447,9 @@ public class BMFont {
             spatial.setRenderState(blendState);
             spatial.setRenderState(zBuffState);
             if (_useBlend) {
-                spatial.setRenderBucketType(RenderBucketType.Transparent);
+                spatial.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
             } else {
-                spatial.setRenderBucketType(RenderBucketType.Opaque);
+                spatial.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
             }
         }
 

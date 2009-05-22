@@ -48,6 +48,7 @@ public class RenderContext {
 
     protected final ContextCapabilities _capabilities;
 
+    /** The object tied to this RenderContext, such as the Canvas, etc. */
     protected Object _contextHolder = null;
 
     protected Camera _currentCamera = null;

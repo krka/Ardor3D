@@ -52,11 +52,11 @@ public class FloatBufferDataUtil {
             return new FloatBufferData(BufferUtils.createFloatBuffer(vertexCount * coordsPerVertex), coordsPerVertex);
         }
 
-        if (tc.getBuffer().limit() == coordsPerVertex * vertexCount && tc.getCoordsPerVertex() == coordsPerVertex) {
+        if (tc.getBuffer().limit() == coordsPerVertex * vertexCount && tc.getValuesPerTuple() == coordsPerVertex) {
             tc.getBuffer().rewind();
             return tc;
         } else if (tc.getBuffer().limit() == coordsPerVertex * vertexCount) {
-            tc.setCoordsPerVertex(coordsPerVertex);
+            tc.setValuesPerTuple(coordsPerVertex);
         } else {
             return new FloatBufferData(BufferUtils.createFloatBuffer(vertexCount * coordsPerVertex), coordsPerVertex);
         }

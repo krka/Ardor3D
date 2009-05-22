@@ -16,7 +16,8 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -55,8 +56,8 @@ public class AxisRods extends Node {
         this.length = length;
         this.width = width;
         this.rightHanded = rightHanded;
-        setLightCombineMode(Spatial.LightCombineMode.Off);
-        setTextureCombineMode(Spatial.TextureCombineMode.Off);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Off);
 
         buildAxis();
     }

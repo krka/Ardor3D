@@ -17,6 +17,7 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.util.TextureKey;
 
 public class OpaqueRenderBucket extends AbstractRenderBucket {
 
@@ -60,8 +61,22 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
 
             for (int x = 0, nots = Math.min(ts1.getNumberOfSetTextures(), ts2.getNumberOfSetTextures()); x < nots; x++) {
 
-                final int tid1 = ts1.getTextureID(x);
-                final int tid2 = ts2.getTextureID(x);
+                final TextureKey key1 = ts1.getTextureKey(x);
+                final TextureKey key2 = ts2.getTextureKey(x);
+
+                if (key1 == null) {
+                    if (key2 == null) {
+                        continue;
+                    } else {
+                        return -1;
+                    }
+                } else if (key2 == null) {
+                    return 1;
+                }
+
+                final int tid1 = key1.hashCode();
+                final int tid2 = key2.hashCode();
+
                 if (tid1 == tid2) {
                     continue;
                 } else if (tid1 < tid2) {

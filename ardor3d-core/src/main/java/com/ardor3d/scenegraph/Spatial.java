@@ -17,6 +17,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.WeakHashMap;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Matrix3;
@@ -28,22 +29,26 @@ import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.NormalsMode;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyEventListener;
 import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.Hintable;
+import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.google.common.collect.Maps;
 
-public abstract class Spatial implements Cloneable, Savable {
+public abstract class Spatial implements Cloneable, Savable, Hintable {
 
     /** This spatial's name. */
     protected String _name;
@@ -76,39 +81,15 @@ public abstract class Spatial implements Cloneable, Savable {
     /** Field for user data. Note: If this object is not explicitly of type Savable, it will be ignored during save. */
     protected Object _userData = null;
 
-    // TODO: maybe pack these below into some visualxxx class
-
-    /**
-     * A flag indicating how normals should be treated by the renderer.
-     */
-    protected NormalsMode _normalsMode = NormalsMode.Inherit;
-
-    /**
-     * A flag indicating if scene culling should be done on this object by inheritance, dynamically, never, or always.
-     */
-    protected CullHint _cullHint = CullHint.Inherit;
-
-    /**
-     * Flag signaling how lights are combined for this node. By default set to INHERIT.
-     */
-    protected LightCombineMode _lightCombineMode = LightCombineMode.Inherit;
-
-    /**
-     * Flag signaling how textures are combined for this node. By default set to INHERIT.
-     */
-    protected TextureCombineMode _textureCombineMode = TextureCombineMode.Inherit;
-
     /** Keeps track of the current frustum intersection state of this Spatial. */
     protected Camera.FrustumIntersect _frustumIntersects = Camera.FrustumIntersect.Intersects;
 
-    /** RenderBucketType for this spatial */
-    protected RenderBucketType _renderBucketType = RenderBucketType.Inherit;
+    /** The hints for Ardor3D's use when evaluating and rendering this spatial. */
+    protected final SceneHints _sceneHints;
 
-    /** TODO: this should be done some other way */
-    protected int _zOrder = 0;
-
-    /** Field for setting whether the Spatial is enabled for Picking or Collision. Both are enabled by default. */
-    protected EnumSet<PickingHint> _pickingHints = EnumSet.allOf(PickingHint.class);
+    /** The render delegates to use for this Spatial, mapped by glContext reference. */
+    protected final transient WeakHashMap<Object, RenderDelegate> _delegateMap = new WeakHashMap<Object, RenderDelegate>();
+    private static final Object defaultDelegateRef = new Object();
 
     /**
      * Constructs a new Spatial. Initializes the transform fields.
@@ -116,6 +97,7 @@ public abstract class Spatial implements Cloneable, Savable {
     public Spatial() {
         _localTransform = new Transform();
         _worldTransform = new Transform();
+        _sceneHints = new SceneHints(this);
     }
 
     /**
@@ -146,6 +128,37 @@ public abstract class Spatial implements Cloneable, Savable {
      */
     public void setName(final String name) {
         _name = name;
+    }
+
+    /**
+     * 
+     * @param delegate
+     *            the new delegate, or null for default behavior
+     * @param glContextRef
+     *            if null, the delegate is set as the default render delegate for this spatial. Otherwise, the delegate
+     *            is used when this Spatial is rendered in a RenderContext tied to the given glContextRef.
+     */
+    public void setRenderDelegate(final RenderDelegate delegate, final Object glContextRef) {
+        if (glContextRef == null) {
+            _delegateMap.put(defaultDelegateRef, delegate);
+        } else {
+            _delegateMap.put(glContextRef, delegate);
+        }
+    }
+
+    /**
+     * 
+     * @param glContextRef
+     *            if null, retrieve the default render delegate for this spatial. Otherwise, retrieve the delegate used
+     *            when this Spatial is rendered in a RenderContext tied to the given glContextRef.
+     * @return delegate as described.
+     */
+    public RenderDelegate getRenderDelegate(final Object glContextRef) {
+        if (glContextRef == null) {
+            return _delegateMap.get(defaultDelegateRef);
+        } else {
+            return _delegateMap.get(glContextRef);
+        }
     }
 
     /**
@@ -196,6 +209,17 @@ public abstract class Spatial implements Cloneable, Savable {
         } else {
             return _parent.hasAncestor(ancestor);
         }
+    }
+
+    public Hintable getParentHintable() {
+        return _parent;
+    }
+
+    /**
+     * @return the scene hints set on this Spatial
+     */
+    public SceneHints getSceneHints() {
+        return _sceneHints;
     }
 
     /**
@@ -490,23 +514,6 @@ public abstract class Spatial implements Cloneable, Savable {
     }
 
     /**
-     * @param zOrder
-     */
-    public void setZOrder(final int zOrder) {
-        _zOrder = zOrder;
-    }
-
-    /**
-     * @return a number representing z ordering when used in the Ortho bucket. Higher values are
-     *         "further into the screen" and lower values are "closer". Or in other words, if you draw two quads, one
-     *         with a zorder of 1 and the other with a zorder of 2, the quad with zorder of 2 will be "under" the other
-     *         quad.
-     */
-    public int getZOrder() {
-        return _zOrder;
-    }
-
-    /**
      * <code>onDraw</code> checks the spatial with the camera to see if it should be culled, if not, the node's draw
      * method is called.
      * <p>
@@ -516,11 +523,11 @@ public abstract class Spatial implements Cloneable, Savable {
      *            the renderer used for display.
      */
     public void onDraw(final Renderer r) {
-        final CullHint cm = getCullHint();
-        if (cm == Spatial.CullHint.Always) {
+        final CullHint cm = _sceneHints.getCullHint();
+        if (cm == CullHint.Always) {
             setLastFrustumIntersection(Camera.FrustumIntersect.Outside);
             return;
-        } else if (cm == Spatial.CullHint.Never) {
+        } else if (cm == CullHint.Never) {
             setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
             draw(r);
             return;
@@ -532,7 +539,7 @@ public abstract class Spatial implements Cloneable, Savable {
         // check to see if we can cull this node
         _frustumIntersects = (_parent != null ? _parent._frustumIntersects : Camera.FrustumIntersect.Intersects);
 
-        if (cm == Spatial.CullHint.Dynamic && _frustumIntersects == Camera.FrustumIntersect.Intersects) {
+        if (cm == CullHint.Dynamic && _frustumIntersects == Camera.FrustumIntersect.Intersects) {
             _frustumIntersects = camera.contains(_worldBound);
         }
 
@@ -546,10 +553,34 @@ public abstract class Spatial implements Cloneable, Savable {
      * <code>draw</code> abstract method that handles drawing data to the renderer if it is geometry and passing the
      * call to it's children if it is a node.
      * 
-     * @param r
+     * @param renderer
      *            the renderer used for display.
      */
-    public abstract void draw(Renderer r);
+    public abstract void draw(final Renderer renderer);
+
+    /**
+     * Grab the render delegate for this spatial based on the currently set RenderContext.
+     * 
+     * @return the delegate or null if a delegate was not found.
+     */
+    protected RenderDelegate getCurrentRenderDelegate() {
+        // short circuit... ignore if no delegates at all.
+        if (_delegateMap.size() == 0) {
+            return null;
+        }
+
+        // otherwise... grab our current context
+        final RenderContext context = ContextManager.getCurrentContext();
+
+        // get the delegate for this context
+        RenderDelegate delegate = getRenderDelegate(context.getGlContextRep());
+        // if none, check for a default delegate.
+        if (delegate == null) {
+            delegate = getRenderDelegate(null);
+        }
+
+        return delegate;
+    }
 
     public void updateGeometricState(final double time) {
         updateGeometricState(time, true);
@@ -818,195 +849,6 @@ public abstract class Spatial implements Cloneable, Savable {
         }
     }
 
-    /**
-     * @see #setCullHint(CullHint)
-     * @return the cull mode of this spatial, or if set to INHERIT, the cullmode of it's parent.
-     */
-    public CullHint getCullHint() {
-        if (_cullHint != CullHint.Inherit) {
-            return _cullHint;
-        } else if (_parent != null) {
-            return _parent.getCullHint();
-        } else {
-            return CullHint.Dynamic;
-        }
-    }
-
-    /**
-     * Returns this spatial's texture combine mode. If the mode is set to inherit, then the spatial gets its combine
-     * mode from its parent.
-     * 
-     * @return The spatial's texture current combine mode.
-     */
-    public TextureCombineMode getTextureCombineMode() {
-        if (_textureCombineMode != TextureCombineMode.Inherit) {
-            return _textureCombineMode;
-        } else if (_parent != null) {
-            return _parent.getTextureCombineMode();
-        } else {
-            return TextureCombineMode.CombineClosest;
-        }
-    }
-
-    /**
-     * Returns this spatial's light combine mode. If the mode is set to inherit, then the spatial gets its combine mode
-     * from its parent.
-     * 
-     * @return The spatial's light current combine mode.
-     */
-    public LightCombineMode getLightCombineMode() {
-        if (_lightCombineMode != LightCombineMode.Inherit) {
-            return _lightCombineMode;
-        } else if (_parent != null) {
-            return _parent.getLightCombineMode();
-        } else {
-            return LightCombineMode.CombineFirst;
-        }
-    }
-
-    /**
-     * Returns this spatial's normals mode. If the mode is set to inherit, then the spatial gets its normals mode from
-     * its parent. If no parent, we'll default to NormalizeIfScaled.
-     * 
-     * @return The spatial's current normals mode.
-     */
-    public NormalsMode getNormalsMode() {
-        if (_normalsMode != NormalsMode.Inherit) {
-            return _normalsMode;
-        } else if (_parent != null) {
-            return _parent.getNormalsMode();
-        } else {
-            return NormalsMode.NormalizeIfScaled;
-        }
-    }
-
-    /**
-     * <code>setCullHint</code> sets how scene culling should work on this spatial during drawing. CullHint.Dynamic:
-     * Determine via the defined Camera planes whether or not this Spatial should be culled. CullHint.Always: Always
-     * throw away this object and any children during draw commands. CullHint.Never: Never throw away this object
-     * (always draw it) CullHint.Inherit: Look for a non-inherit parent and use its cull mode. NOTE: You must set this
-     * AFTER attaching to a parent or it will be reset with the parent's cullMode value.
-     * 
-     * @param hint
-     *            one of CullHint.Dynamic, CullHint.Always, CullHint.Inherit or CullHint.Never
-     */
-    public void setCullHint(final CullHint hint) {
-        _cullHint = hint;
-    }
-
-    /**
-     * @return the cullmode set on this Spatial
-     */
-    public CullHint getLocalCullHint() {
-        return _cullHint;
-    }
-
-    /**
-     * @return
-     */
-    public NormalsMode getLocalNormalsMode() {
-        return _normalsMode;
-    }
-
-    /**
-     * @param mode
-     */
-    public void setNormalsMode(final NormalsMode mode) {
-        _normalsMode = mode;
-    }
-
-    /**
-     * Sets how lights from parents should be combined for this spatial.
-     * 
-     * @param mode
-     *            The light combine mode for this spatial
-     * @throws IllegalArgumentException
-     *             if mode is null
-     */
-    public void setLightCombineMode(final LightCombineMode mode) {
-        if (mode == null) {
-            throw new IllegalArgumentException("mode can not be null.");
-        }
-        _lightCombineMode = mode;
-    }
-
-    /**
-     * @return the lightCombineMode set on this Spatial
-     */
-    public LightCombineMode getLocalLightCombineMode() {
-        return _lightCombineMode;
-    }
-
-    /**
-     * Sets how textures from parents should be combined for this Spatial.
-     * 
-     * @param mode
-     *            The new texture combine mode for this spatial.
-     * @throws IllegalArgumentException
-     *             if mode is null
-     */
-    public void setTextureCombineMode(final TextureCombineMode mode) {
-        if (mode == null) {
-            throw new IllegalArgumentException("mode can not be null.");
-        }
-        _textureCombineMode = mode;
-    }
-
-    /**
-     * @return the textureCombineMode set on this Spatial
-     */
-    public TextureCombineMode getLocalTextureCombineMode() {
-        return _textureCombineMode;
-    }
-
-    /**
-     * Set the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
-     * in.
-     * 
-     * @param renderBucketType
-     *            the render bucket type to use for this spatial.
-     * @see com.ardor3d.renderer.queue.RenderBucketType
-     */
-    public void setRenderBucketType(final RenderBucketType renderBucketType) {
-        _renderBucketType = renderBucketType;
-    }
-
-    /**
-     * Get the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
-     * in.
-     * <p>
-     * This method returns the actual bucket type that is set on this spatial, if the type is set to
-     * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
-     * parent will be used during rendering.
-     * 
-     * @return the render queue mode set on this spatial.
-     * @see com.ardor3d.renderer.queue.RenderBucketType
-     */
-    public RenderBucketType getLocalRenderBucketType() {
-        return _renderBucketType;
-    }
-
-    /**
-     * Get the render bucket type used to determine which "phase" of the rendering process this Spatial will rendered
-     * in.
-     * <p>
-     * This method returns the effective bucket type that is used for rendering. If the type is set to
-     * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
-     * parent will be used during rendering.
-     * 
-     * @return the render queue mode used for this spatial.
-     * @see com.ardor3d.renderer.queue.RenderBucketType
-     */
-    public RenderBucketType getRenderBucketType() {
-        if (_renderBucketType != RenderBucketType.Inherit) {
-            return _renderBucketType;
-        } else if (_parent != null) {
-            return _parent.getRenderBucketType();
-        } else {
-            return RenderBucketType.Skip;
-        }
-    }
-
     public Object getUserData() {
         return _userData;
     }
@@ -1149,47 +991,6 @@ public abstract class Spatial implements Cloneable, Savable {
     }
 
     /**
-     * Enable or disable a picking hint for this Spatial
-     * 
-     * @param pickingHint
-     *            PickingHint to set. Pickable or Collidable
-     * @param enabled
-     *            Enable or disable
-     */
-    public void setPickingHint(final PickingHint pickingHint, final boolean enabled) {
-        if (enabled) {
-            _pickingHints.add(pickingHint);
-        } else {
-            _pickingHints.remove(pickingHint);
-        }
-    }
-
-    /**
-     * Enable or disable all picking hints for this Spatial
-     * 
-     * @param enabled
-     *            Enable or disable
-     */
-    public void setAllPickingHints(final boolean enabled) {
-        if (enabled) {
-            _pickingHints.addAll(EnumSet.allOf(PickingHint.class));
-        } else {
-            _pickingHints.clear();
-        }
-    }
-
-    /**
-     * Returns whether a certain pick hint is set on this spatial.
-     * 
-     * @param pickingHint
-     *            Pick hint to test for
-     * @return Enabled or disabled
-     */
-    public boolean isPickingHintEnabled(final PickingHint pickingHint) {
-        return _pickingHints.contains(pickingHint);
-    }
-
-    /**
      * Returns the Spatial's name followed by the class of the spatial <br>
      * Example: "MyNode (com.ardor3d.scene.Spatial)
      * 
@@ -1224,15 +1025,6 @@ public abstract class Spatial implements Cloneable, Savable {
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule capsule = im.getCapsule(this);
         _name = capsule.readString("name", null);
-        // isCollidable = capsule.readBoolean("isCollidable", true);
-        _cullHint = capsule.readEnum("cullMode", CullHint.class, CullHint.Inherit);
-        _zOrder = capsule.readInt("zOrder", 0);
-        _renderBucketType = capsule.readEnum("renderBucketType", RenderBucketType.class, RenderBucketType.Inherit);
-        _lightCombineMode = capsule.readEnum("lightCombineMode", LightCombineMode.class, LightCombineMode.Inherit);
-        _textureCombineMode = capsule.readEnum("textureCombineMode", TextureCombineMode.class,
-                TextureCombineMode.Inherit);
-
-        _normalsMode = capsule.readEnum("normalsMode", NormalsMode.class, NormalsMode.Inherit);
 
         final Savable[] savs = capsule.readSavableArray("renderStateList", null);
         _renderStateList.clear();
@@ -1265,14 +1057,6 @@ public abstract class Spatial implements Cloneable, Savable {
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(_name, "name", null);
-        // capsule.write(isCollidable, "isCollidable", true);
-        capsule.write(_cullHint, "cullMode", CullHint.Inherit);
-        capsule.write(_renderBucketType, "renderBucketType", RenderBucketType.Inherit);
-        capsule.write(_zOrder, "zOrder", 0);
-        capsule.write(_lightCombineMode, "lightCombineMode", LightCombineMode.Inherit);
-        capsule.write(_textureCombineMode, "textureCombineMode", TextureCombineMode.Inherit);
-
-        capsule.write(_normalsMode, "normalsMode", NormalsMode.Inherit);
 
         capsule.write(_renderStateList.values().toArray(new RenderState[0]), "renderStateList", null);
 
@@ -1292,86 +1076,5 @@ public abstract class Spatial implements Cloneable, Savable {
             }
             capsule.writeSavableList(list, "controllers", null);
         }
-    }
-
-    /**
-     * Describes how to combine textures from ancestor texturestates when an updateRenderState is called on a Spatial.
-     */
-    public enum TextureCombineMode {
-        /** When updating render states, turn off texturing for this spatial. */
-        Off,
-
-        /**
-         * Combine textures starting from the root node and working towards the given Spatial. Ignore disabled states.
-         */
-        CombineFirst,
-
-        /**
-         * Combine textures starting from the given Spatial and working towards the root. Ignore disabled states.
-         * (Default)
-         */
-        CombineClosest,
-
-        /**
-         * Similar to CombineClosest, but if a disabled state is encountered, it will stop combining at that point.
-         */
-        CombineClosestEnabled,
-
-        /** Inherit mode from parent. */
-        Inherit,
-
-        /** Do not combine textures, just use the most recent texture state. */
-        Replace;
-    }
-
-    /**
-     * Describes how to combine lights from ancestor lightstates when an updateRenderState is called on a Spatial.
-     */
-    public enum LightCombineMode {
-        /** When updating render states, turn off lighting for this spatial. */
-        Off,
-
-        /**
-         * Combine lights starting from the root node and working towards the given Spatial. Ignore disabled states.
-         * Stop combining when lights == MAX_LIGHTS_ALLOWED
-         */
-        CombineFirst,
-
-        /**
-         * Combine lights starting from the given Spatial and working up towards the root. Ignore disabled states. Stop
-         * combining when lights == MAX_LIGHTS_ALLOWED
-         */
-        CombineClosest,
-
-        /**
-         * Similar to CombineClosest, but if a disabled state is encountered, it will stop combining at that point. Stop
-         * combining when lights == MAX_LIGHTS_ALLOWED
-         */
-        CombineClosestEnabled,
-
-        /** Inherit mode from parent. */
-        Inherit,
-
-        /** Do not combine lights, just use the most recent light state. */
-        Replace;
-    }
-
-    public enum CullHint {
-        /** Do whatever our parent does. If no parent, we'll default to dynamic. */
-        Inherit,
-        /**
-         * Do not draw if we are not at least partially within the view frustum of the renderer's camera.
-         */
-        Dynamic,
-        /** Always cull this from view. */
-        Always,
-        /**
-         * Never cull this from view. Note that we will still get culled if our parent is culled.
-         */
-        Never;
-    }
-
-    public enum PickingHint {
-        Pickable, Collidable
     }
 }

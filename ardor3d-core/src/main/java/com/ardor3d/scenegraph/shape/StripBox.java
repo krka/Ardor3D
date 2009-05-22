@@ -15,8 +15,8 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -183,7 +183,7 @@ public class StripBox extends Mesh implements Savable {
      */
     private void setTextureData() {
         if (_meshData.getTextureCoords(0) == null) {
-            _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector2Buffer(24), 2), 0);
+            _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector2Buffer(8), 2), 0);
             final FloatBuffer tex = _meshData.getTextureCoords(0).getBuffer();
             tex.put(1).put(0); // 0
             tex.put(0).put(0); // 1

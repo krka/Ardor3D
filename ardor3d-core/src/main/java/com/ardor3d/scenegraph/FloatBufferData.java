@@ -12,7 +12,6 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.logging.Logger;
 
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -22,18 +21,12 @@ import com.ardor3d.util.export.Savable;
 
 /**
  * Simple data class storing a buffer of floats and a number that indicates how many floats to group together to make up
- * a texture coordinate "tuple"
+ * a "tuple"
  */
-public class FloatBufferData implements Savable {
-
-    /** The Constant logger. */
-    private static final Logger logger = Logger.getLogger(FloatBufferData.class.getName());
-
-    /** Buffer holding the data. */
-    private FloatBuffer buffer;
+public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements Savable {
 
     /** Specifies the number of coordinates per vertex. Must be 1 - 4. */
-    private int coordsPerVertex;
+    private int _valuesPerTuple;
 
     /**
      * Instantiates a new FloatBufferData.
@@ -44,70 +37,43 @@ public class FloatBufferData implements Savable {
      * Creates a new FloatBufferData.
      * 
      * @param buffer
-     *            Buffer holding the data
-     * @param coordsPerVertex
-     *            Specifies the number of coordinates per vertex. Must be 1 - 4.
+     *            Buffer holding the data. Must not be null.
+     * @param valuesPerTuple
+     *            Specifies the number of values per tuple. Can not be < 1.
      */
-    public FloatBufferData(final FloatBuffer buffer, final int coordsPerVertex) {
+    public FloatBufferData(final FloatBuffer buffer, final int valuesPerTuple) {
         if (buffer == null) {
-            logger.severe("Buffer can not be null!");
-        }
-        if (coordsPerVertex < 1 || coordsPerVertex > 4) {
-            logger.severe("Number of coordinates per vertex must be 1 - 4");
+            throw new IllegalArgumentException("Buffer can not be null!");
         }
 
-        this.buffer = buffer;
-        this.coordsPerVertex = coordsPerVertex;
-    }
-
-    /**
-     * Gets the count.
-     * 
-     * @return the count
-     */
-    public int getCount() {
-        if (buffer != null) {
-            return buffer.limit() / coordsPerVertex;
+        if (valuesPerTuple < 1) {
+            throw new IllegalArgumentException("valuesPerTuple must be greater than 1.");
         }
 
-        return 0;
+        _buffer = buffer;
+        _valuesPerTuple = valuesPerTuple;
+    }
+
+    public int getTupleCount() {
+        // TODO Auto-generated method stub
+        return getBufferLimit() / _valuesPerTuple;
     }
 
     /**
-     * Get the buffer holding the coordinate data.
-     * 
-     * @return the buffer
+     * @return number of values per tuple
      */
-    public FloatBuffer getBuffer() {
-        return buffer;
+    public int getValuesPerTuple() {
+        return _valuesPerTuple;
     }
 
     /**
-     * Set the buffer holding the coordinate data. This method should only be used internally.
+     * Set number of values per tuple. This method should only be used internally.
      * 
-     * @param buffer
-     *            the buffer to set
+     * @param valuesPerTuple
+     *            number of values per tuple
      */
-    void setBuffer(final FloatBuffer buffer) {
-        this.buffer = buffer;
-    }
-
-    /**
-     * Gets number of coordinates per vertex
-     * 
-     * @return number of coordinates per vertex
-     */
-    public int getCoordsPerVertex() {
-        return coordsPerVertex;
-    }
-
-    /**
-     * Set number of coordinates per vertex. This method should only be used internally.
-     * 
-     * @param coordsPerVertex
-     */
-    void setCoordsPerVertex(final int coordsPerVertex) {
-        this.coordsPerVertex = coordsPerVertex;
+    void setValuesPerTuple(final int valuesPerTuple) {
+        _valuesPerTuple = valuesPerTuple;
     }
 
     public Class<? extends FloatBufferData> getClassTag() {
@@ -116,13 +82,13 @@ public class FloatBufferData implements Savable {
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule cap = im.getCapsule(this);
-        buffer = cap.readFloatBuffer("buffer", null);
-        coordsPerVertex = cap.readInt("coordsPerVertex", 0);
+        _buffer = cap.readFloatBuffer("buffer", null);
+        _valuesPerTuple = cap.readInt("valuesPerTuple", 0);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
         final OutputCapsule cap = ex.getCapsule(this);
-        cap.write(buffer, "buffer", null);
-        cap.write(coordsPerVertex, "coordsPerVertex", 0);
+        cap.write(_buffer, "buffer", null);
+        cap.write(_valuesPerTuple, "valuesPerTuple", 0);
     }
 }

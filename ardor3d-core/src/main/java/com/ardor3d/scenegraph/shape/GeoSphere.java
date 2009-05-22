@@ -15,8 +15,8 @@ import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -105,7 +105,7 @@ public class GeoSphere extends Mesh {
         _meshData.setVertexBuffer(vertBuf = BufferUtils.createVector3Buffer(vertBuf, verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
         final FloatBufferData textureCoords = _meshData.getTextureCoords(0);
-        _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector3Buffer(
+        _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector2Buffer(
                 textureCoords != null ? textureCoords.getBuffer() : null, verts), 2), 0);
 
         int pos = 0;

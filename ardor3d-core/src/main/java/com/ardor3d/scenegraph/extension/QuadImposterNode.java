@@ -32,6 +32,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -106,11 +108,11 @@ public class QuadImposterNode extends Node {
         _imposterQuad.initialize(1, 1);
         _imposterQuad.setModelBound(new BoundingBox());
         _imposterQuad.updateModelBound();
-        _imposterQuad.setTextureCombineMode(Spatial.TextureCombineMode.Replace);
-        _imposterQuad.setLightCombineMode(Spatial.LightCombineMode.Off);
+        _imposterQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        _imposterQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         super.attachChild(_imposterQuad);
 
-        setRenderBucketType(RenderBucketType.Transparent);
+        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
         _targetScene = new Node();
         super.attachChild(_targetScene);

@@ -18,6 +18,8 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 
 public class BasicText extends BMText {
     static Logger logger = Logger.getLogger(BasicText.class.getName());
@@ -37,7 +39,7 @@ public class BasicText extends BMText {
 
     public BasicText(final String name, final String text, final BMFont font, final double fontSize) {
         super(name, text, font);
-        setRenderBucketType(RenderBucketType.Ortho);
+        getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         setFontScale(fontSize);
         setAutoFade(AutoFade.Off);
         setAutoScale(AutoScale.Off);
@@ -62,8 +64,8 @@ public class BasicText extends BMText {
         blend.setTestFunction(BlendState.TestFunction.GreaterThan);
         setRenderState(blend);
 
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         updateModelBound();
     }
 

@@ -14,7 +14,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.SpatialController;
-import com.ardor3d.scenegraph.Spatial.CullHint;
+import com.ardor3d.scenegraph.hint.CullHint;
 
 /**
  * <p>
@@ -78,9 +78,9 @@ public class DefColorFadeController implements SpatialController<Spatial> {
         }
 
         if (alpha != 0) {
-            _target.setCullHint(CullHint.Inherit);
+            _target.getSceneHints().setCullHint(CullHint.Inherit);
         } else {
-            _target.setCullHint(CullHint.Always);
+            _target.getSceneHints().setCullHint(CullHint.Always);
         }
 
         color.setAlpha(alpha);

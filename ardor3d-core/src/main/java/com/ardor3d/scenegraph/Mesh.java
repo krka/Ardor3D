@@ -23,7 +23,9 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.renderer.NormalsMode;
+import com.ardor3d.renderer.ContextCapabilities;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
@@ -31,12 +33,15 @@ import com.ardor3d.renderer.state.LightUtil;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.scenegraph.hint.DataMode;
+import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
 
@@ -63,18 +68,9 @@ public class Mesh extends Spatial implements Renderable {
     /** The compiled lightState for this mesh */
     protected LightState _lightState;
 
-    /** The mesh's VBO information. */
-    protected transient VBOInfo _vboInfo;
-
     protected ColorRGBA _defaultColor = new ColorRGBA(ColorRGBA.WHITE);
 
     protected boolean _castsShadows = true;
-
-    /**
-     * Non -1 values signal that drawing this scene should use the provided display list instead of drawing from the
-     * buffers.
-     */
-    protected int _displayListID = -1;
 
     /**
      * Constructs a new Spatial.
@@ -225,32 +221,101 @@ public class Mesh extends Spatial implements Renderable {
         renderer.applyState(StateType.FragmentProgram, _states.get(StateType.FragmentProgram));
         renderer.applyState(StateType.VertexProgram, _states.get(StateType.VertexProgram));
 
-        if (getDisplayListID() != -1) {
-            renderer.renderDisplayList(getDisplayListID());
-        } else {
-            if (_meshData.getInterleavedBuffer() != null) {
-                renderer.setupInterleavedData(_meshData.getInterleavedBuffer(), _meshData.getInterleavedFormat(),
-                        _vboInfo);
-            } else {
-                renderer.setupVertexData(_meshData.getVertexCoords(), _vboInfo);
-                if (RENDER_VERTEX_ONLY) {
-                    renderer.setupNormalData(null, NormalsMode.Off, null, null);
-                    renderer.setupColorData(null, null, null);
-                    renderer.setupTextureData(null, null);
-                } else {
-                    renderer.setupNormalData(_meshData.getNormalCoords(), getNormalsMode(), _worldTransform, _vboInfo);
-                    renderer.setupColorData(_meshData.getColorCoords(), _vboInfo, _defaultColor);
-                    renderer.setupTextureData(_meshData.getTextureCoords(), _vboInfo);
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        if ((getSceneHints().getDataMode() == DataMode.VBO || getSceneHints().getDataMode() == DataMode.VBOInterleaved)
+                && caps.isVBOSupported()) {
+            if (getSceneHints().getDataMode() == DataMode.VBOInterleaved) {
+                if (_meshData.getColorCoords() == null) {
+                    renderer.applyDefaultColor(_defaultColor);
                 }
+                renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
+                // Make sure we have a FBD to hold our id.
+                if (_meshData.getInterleavedData() == null) {
+                    final FloatBufferData interleaved = new FloatBufferData(FloatBuffer.allocate(0), 1);
+                    _meshData.setInterleavedData(interleaved);
+                }
+                renderer.setupInterleavedDataVBO(_meshData.getInterleavedData(), _meshData.getVertexCoords(), _meshData
+                        .getNormalCoords(), _meshData.getColorCoords(), _meshData.getTextureCoords());
+            } else {
+                if (RENDER_VERTEX_ONLY) {
+                    renderer.applyNormalsMode(NormalsMode.Off, null);
+                    renderer.setupNormalDataVBO(null);
+                    renderer.applyDefaultColor(null);
+                    renderer.setupColorDataVBO(null);
+                    renderer.setupTextureDataVBO(null);
+                } else {
+                    renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
+                    if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
+                        renderer.setupNormalDataVBO(_meshData.getNormalCoords());
+                    } else {
+                        renderer.setupNormalDataVBO(null);
+                    }
+
+                    if (_meshData.getColorCoords() != null) {
+                        renderer.setupColorDataVBO(_meshData.getColorCoords());
+                    } else {
+                        renderer.applyDefaultColor(_defaultColor);
+                        renderer.setupColorDataVBO(null);
+                    }
+
+                    renderer.setupTextureDataVBO(_meshData.getTextureCoords());
+                }
+                renderer.setupVertexDataVBO(_meshData.getVertexCoords());
             }
 
             if (_meshData.getIndexBuffer() != null) {
-                renderer.drawElements(_meshData.getIndexBuffer(), _vboInfo, _meshData.getIndexLengths(), _meshData
-                        .getIndexModes());
+                // TODO: Maybe ask for the IndexBuffer's dynamic/static type and fall back to arrays for indices?
+                renderer
+                        .drawElementsVBO(_meshData.getIndices(), _meshData.getIndexLengths(), _meshData.getIndexModes());
             } else {
                 renderer
-                        .drawArrays(_meshData.getVertexBuffer(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+                        .drawArrays(_meshData.getVertexCoords(), _meshData.getIndexLengths(), _meshData.getIndexModes());
             }
+
+            if (Constants.stats) {
+                StatCollector.addStat(StatType.STAT_VERTEX_COUNT, _meshData.getVertexCount());
+                StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
+            }
+        } else {
+            // Use arrays
+            if (caps.isVBOSupported()) {
+                renderer.unbindVBO();
+            }
+
+            if (RENDER_VERTEX_ONLY) {
+                renderer.applyNormalsMode(NormalsMode.Off, null);
+                renderer.setupNormalData(null);
+                renderer.applyDefaultColor(null);
+                renderer.setupColorData(null);
+                renderer.setupTextureData(null);
+            } else {
+                renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
+                if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
+                    renderer.setupNormalData(_meshData.getNormalCoords());
+                } else {
+                    renderer.setupNormalData(null);
+                }
+
+                if (_meshData.getColorCoords() != null) {
+                    renderer.setupColorData(_meshData.getColorCoords());
+                } else {
+                    renderer.applyDefaultColor(_defaultColor);
+                    renderer.setupColorData(null);
+                }
+
+                renderer.setupTextureData(_meshData.getTextureCoords());
+            }
+            renderer.setupVertexData(_meshData.getVertexCoords());
+
+            if (_meshData.getIndexBuffer() != null) {
+                renderer.drawElements(_meshData.getIndices(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+            } else {
+                renderer
+                        .drawArrays(_meshData.getVertexCoords(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+            }
+
             if (Constants.stats) {
                 StatCollector.addStat(StatType.STAT_VERTEX_COUNT, _meshData.getVertexCount());
                 StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
@@ -276,14 +341,6 @@ public class Mesh extends Spatial implements Renderable {
                 _states.put(state.getType(), state);
             }
         }
-    }
-
-    public int getDisplayListID() {
-        return _displayListID;
-    }
-
-    public void setDisplayListID(final int displayListID) {
-        _displayListID = displayListID;
     }
 
     public boolean isCastsShadows() {
@@ -313,10 +370,6 @@ public class Mesh extends Spatial implements Renderable {
         _meshData.setNormalBuffer(normals);
         _meshData.setColorBuffer(colors);
         _meshData.setTextureCoords(coords, 0);
-
-        if (getVBOInfo() != null) {
-            resizeTextureIds(1);
-        }
     }
 
     /**
@@ -338,10 +391,6 @@ public class Mesh extends Spatial implements Renderable {
         _meshData.setIndexBuffer(indices);
     }
 
-    public void resizeTextureIds(final int i) {
-        _vboInfo.resizeTextureIds(i);
-    }
-
     /**
      * 
      */
@@ -353,7 +402,12 @@ public class Mesh extends Spatial implements Renderable {
             }
         }
 
-        r.draw((Renderable) this);
+        final RenderDelegate delegate = getCurrentRenderDelegate();
+        if (delegate == null) {
+            r.draw((Renderable) this);
+        } else {
+            delegate.render(this, r);
+        }
     }
 
     /**
@@ -390,28 +444,6 @@ public class Mesh extends Spatial implements Renderable {
      */
     public ReadOnlyColorRGBA getDefaultColor() {
         return _defaultColor;
-    }
-
-    /**
-     * Sets VBO info on this Geometry.
-     * 
-     * @param info
-     *            the VBO info to set
-     * @see VBOInfo
-     */
-    public void setVBOInfo(final VBOInfo info) {
-        _vboInfo = info;
-        if (_vboInfo != null) {
-            _vboInfo.resizeTextureIds(_meshData.getTextureCoords().size());
-        }
-    }
-
-    /**
-     * @return VBO info object
-     * @see VBOInfo
-     */
-    public VBOInfo getVBOInfo() {
-        return _vboInfo;
     }
 
     public RenderState _getWorldRenderState(final StateType type) {
@@ -481,7 +513,6 @@ public class Mesh extends Spatial implements Renderable {
         capsule.write(_castsShadows, "castsShadows", true);
         capsule.write(_modelBound, "modelBound", null);
         capsule.write(_defaultColor, "defaultColor", new ColorRGBA(ColorRGBA.WHITE));
-        capsule.write(_vboInfo, "vboInfo", null);
     }
 
     @Override
@@ -492,7 +523,6 @@ public class Mesh extends Spatial implements Renderable {
         _castsShadows = capsule.readBoolean("castsShadows", true);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
         _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
-        _vboInfo = (VBOInfo) capsule.readSavable("vboInfo", null);
     }
 
 }

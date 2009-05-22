@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.renderer;
+package com.ardor3d.scenegraph.hint;
 
 public enum NormalsMode {
     /**

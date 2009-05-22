@@ -27,7 +27,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
-import com.ardor3d.scenegraph.Spatial.CullHint;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.MultiStatSample;
@@ -69,7 +69,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
         _defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
         _graphRoot.setRenderState(_defBlendState);
-        _graphRoot.setCullHint(CullHint.Never);
+        _graphRoot.getSceneHints().setCullHint(CullHint.Never);
     }
 
     public void statsUpdated() {
@@ -232,7 +232,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         _horizontals = new Line("horiz", verts, null, null, null);
         _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
-        _horizontals.setRenderBucketType(RenderBucketType.Ortho);
+        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
 
         _horizontals.setDefaultColor(getColorConfig(LineGrapher.Horizontal, ConfigKeys.Color.name(), new ColorRGBA(
                 ColorRGBA.BLUE)));
@@ -258,7 +258,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
 
         _verticals = new Line("vert", verts, null, null, null);
         _verticals.getMeshData().setIndexMode(IndexMode.Lines);
-        _verticals.setRenderBucketType(RenderBucketType.Ortho);
+        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
 
         _verticals.setDefaultColor(getColorConfig(LineGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(
                 ColorRGBA.RED)));
@@ -280,17 +280,17 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             this.maxSamples = maxSamples;
 
             point = new Point("p", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            point.setRenderBucketType(RenderBucketType.Ortho);
+            point.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
 
             point.setDefaultColor(getColorConfig(type, ConfigKeys.PointColor.name(), new ColorRGBA(ColorRGBA.WHITE)));
             point.setPointSize(getIntConfig(type, ConfigKeys.PointSize.name(), 5));
             point.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
             if (!getBooleanConfig(type, ConfigKeys.ShowPoints.name(), false)) {
-                point.setCullHint(CullHint.Always);
+                point.getSceneHints().setCullHint(CullHint.Always);
             }
 
             line = new Line("l", BufferUtils.createVector3Buffer(maxSamples), null, null, null);
-            line.setRenderBucketType(RenderBucketType.Ortho);
+            line.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
             line.getMeshData().setIndexMode(IndexMode.LineStrip);
 
             line.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
@@ -298,7 +298,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             line.setStipplePattern(getShortConfig(type, ConfigKeys.Stipple.name(), (short) 0xFFFF));
             line.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
             if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
-                line.setCullHint(CullHint.Always);
+                line.getSceneHints().setCullHint(CullHint.Always);
             }
         }
     }
@@ -312,7 +312,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             lineKey.getMeshData().setVertexBuffer(fb);
         }
 
-        lineKey.setRenderBucketType(RenderBucketType.Ortho);
+        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         lineKey.getMeshData().setIndexMode(IndexMode.LineStrip);
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
@@ -320,7 +320,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
         lineKey.setStipplePattern(getShortConfig(type, ConfigKeys.Stipple.name(), (short) 0xFFFF));
         lineKey.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
         if (!getBooleanConfig(type, ConfigKeys.ShowLines.name(), true)) {
-            lineKey.setCullHint(CullHint.Always);
+            lineKey.getSceneHints().setCullHint(CullHint.Always);
         }
 
         return lineKey;

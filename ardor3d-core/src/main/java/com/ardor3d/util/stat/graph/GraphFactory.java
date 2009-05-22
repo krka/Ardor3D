@@ -22,7 +22,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.stat.StatCollector;
 
@@ -137,10 +138,10 @@ public abstract class GraphFactory {
      *            the maximum value along the V axis to use in the texture for UVs
      */
     private static void setupGraphQuad(final Quad quad, final Texture2D graphTexture, final float maxU, final float maxV) {
-        quad.setTextureCombineMode(Spatial.TextureCombineMode.Replace);
-        quad.setLightCombineMode(Spatial.LightCombineMode.Off);
-        quad.setRenderBucketType(RenderBucketType.Ortho);
-        quad.setZOrder(-1);
+        quad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        quad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        quad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        quad.getSceneHints().setOrthoOrder(-1);
 
         final FloatBuffer tbuf = quad.getMeshData().getTextureCoords(0).getBuffer();
         tbuf.clear();

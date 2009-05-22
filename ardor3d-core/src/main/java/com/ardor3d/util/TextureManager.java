@@ -13,9 +13,7 @@ package com.ardor3d.util;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +39,6 @@ final public class TextureManager {
     private static final Logger logger = Logger.getLogger(TextureManager.class.getName());
 
     private static WeakHashMap<TextureKey, Texture> m_tCache = new WeakHashMap<TextureKey, Texture>();
-    private static List<Integer> cleanupStore = new ArrayList<Integer>();
 
     private TextureManager() {}
 
@@ -99,7 +96,7 @@ final public class TextureManager {
             return TextureState.getDefaultTexture();
         }
 
-        final TextureKey tkey = new TextureKey(file, flipped, imageType, minFilter);
+        final TextureKey tkey = TextureKey.getKey(file, flipped, imageType, minFilter);
 
         return loadFromKey(tkey, null, null);
     }
@@ -122,8 +119,7 @@ final public class TextureManager {
      */
     public static Texture loadFromImage(final Image image, final Texture.MinificationFilter minFilter,
             final Image.Format imageType, final boolean wasFlipped) {
-        final TextureKey key = new TextureKey(null, wasFlipped, imageType, minFilter);
-        key.setFileType("img_" + image.hashCode());
+        final TextureKey key = TextureKey.getKey(null, wasFlipped, imageType, "img_" + image.hashCode(), minFilter);
         return loadFromKey(key, image, null);
     }
 
@@ -135,7 +131,7 @@ final public class TextureManager {
 
         Texture result = store;
 
-        // First look for the texture using the supplied key and supplied context.
+        // First look for the texture using the supplied key
         final Texture cache = findCachedTexture(tkey);
 
         if (cache != null) {
@@ -149,8 +145,6 @@ final public class TextureManager {
             }
             cache.createSimpleClone(result);
             return result;
-        } else {
-            tkey.setContextRep(null);
         }
 
         Image img = imageData;
@@ -244,44 +238,27 @@ final public class TextureManager {
             return false;
         }
 
-        if (texture.getTextureId() > 0) {
-            try {
-                deleter.deleteTextureId(texture.getTextureId());
-                texture.setTextureId(0);
-            } catch (final Exception e) {
-            } // ignore.
-        }
+        try {
+            deleter.deleteTexture(texture);
+        } catch (final Exception e) {
+        } // ignore.
         return removeFromCache(texture.getTextureKey()) != null;
     }
 
-    public static void registerForCleanup(final TextureKey textureKey, final int textureId) {
-        final Texture t = m_tCache.get(textureKey);
-        if (t != null) {
-            t.setTextureId(textureId);
-        }
-
-        cleanupStore.add(textureId);
+    public static void registerForCleanup(final TextureKey textureKey) {
+    // TODO: implement me.
     }
 
     @MainThread
     public static void doTextureCleanup(final Renderer deleter) {
-        for (final Integer i : cleanupStore) {
-            if (i != null) {
-                try {
-                    deleter.deleteTextureId(i.intValue());
-                } catch (final Exception e) {
-                } // ignore.
-            }
-        }
+    // TODO: implement me.
     }
 
     @MainThread
     public static void clearCache(final Renderer deleter) {
         final HashMap<TextureKey, Texture> map = Maps.newHashMap(m_tCache);
         for (final Texture t : map.values()) {
-            if (t.getTextureId() > 0) {
-                releaseTexture(t, deleter);
-            }
+            releaseTexture(t, deleter);
         }
     }
 

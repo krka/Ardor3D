@@ -11,12 +11,15 @@
 package com.ardor3d.renderer;
 
 import java.util.EnumMap;
+import java.util.List;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
@@ -72,12 +75,12 @@ public abstract class AbstractRenderer implements Renderer {
         // first look up in enforced states
         RenderState tempState = context.getEnforcedState(type);
 
-        // Not there? Look in the states we receive
+        // Not there? Use the state we received
         if (tempState == null) {
             tempState = state;
         }
 
-        // Still missing? Use our default states.
+        // Still null? Use our default state
         if (tempState == null) {
             tempState = defaultStateList.get(type);
         }
@@ -94,4 +97,64 @@ public abstract class AbstractRenderer implements Renderer {
     }
 
     protected abstract void doApplyState(RenderState state);
+
+    protected void addStats(final IndexMode indexMode, final int vertCount) {
+        final int primCount = IndexMode.getPrimitiveCount(indexMode, vertCount);
+        switch (indexMode) {
+            case Triangles:
+            case TriangleFan:
+            case TriangleStrip:
+                StatCollector.addStat(StatType.STAT_TRIANGLE_COUNT, primCount);
+                break;
+            case Lines:
+            case LineLoop:
+            case LineStrip:
+                StatCollector.addStat(StatType.STAT_LINE_COUNT, primCount);
+                break;
+            case Points:
+                StatCollector.addStat(StatType.STAT_POINT_COUNT, primCount);
+                break;
+            case Quads:
+            case QuadStrip:
+                StatCollector.addStat(StatType.STAT_QUAD_COUNT, primCount);
+                break;
+        }
+    }
+
+    protected int getTotalInterleavedSize(final RenderContext context, final FloatBufferData vertexCoords,
+            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
+            final List<FloatBufferData> textureCoords) {
+        final ContextCapabilities caps = context.getCapabilities();
+
+        int bufferSize = 0;
+        if (normalCoords != null) {
+            bufferSize += normalCoords.getBufferLimit() * 4;
+        }
+        if (colorCoords != null) {
+            bufferSize += colorCoords.getBufferLimit() * 4;
+        }
+        if (textureCoords != null) {
+            final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+            int offset = 0;
+            if (ts != null) {
+                offset = ts.getTextureCoordinateOffset();
+
+                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                    if (textureCoords == null || i >= textureCoords.size()) {
+                        continue;
+                    }
+
+                    final FloatBufferData textureBufferData = textureCoords.get(i + offset);
+                    if (textureBufferData != null) {
+                        bufferSize += textureBufferData.getBufferLimit() * 4;
+                    }
+                }
+            }
+        }
+        if (vertexCoords != null) {
+            bufferSize += vertexCoords.getBufferLimit() * 4;
+        }
+
+        return bufferSize;
+    }
 }

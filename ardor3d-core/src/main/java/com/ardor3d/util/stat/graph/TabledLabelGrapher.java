@@ -22,7 +22,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial.CullHint;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.Constants;
@@ -64,9 +64,9 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
         _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
         _graphRoot.setRenderState(_defBlendState);
 
-        _bgQuad.setRenderBucketType(RenderBucketType.Ortho);
+        _bgQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         _bgQuad.setDefaultColor(new ColorRGBA(ColorRGBA.BLACK));
-        _graphRoot.setCullHint(CullHint.Never);
+        _graphRoot.getSceneHints().setCullHint(CullHint.Never);
     }
 
     public void statsUpdated() {

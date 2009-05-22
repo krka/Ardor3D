@@ -46,7 +46,21 @@ public class Camera implements Savable, Externalizable, Cloneable {
     private static final Logger _logger = Logger.getLogger(Camera.class.getName());
 
     public enum FrustumIntersect {
-        Outside, Inside, Intersects;
+        /**
+         * Object being compared to the frustum is completely outside of the frustum.
+         */
+        Outside,
+
+        /**
+         * Object being compared to the frustum is completely inside of the frustum.
+         */
+        Inside,
+
+        /**
+         * Object being compared to the frustum intersects one of the frustum planes and is thus both inside and outside
+         * of the frustum.
+         */
+        Intersects;
     }
 
     // planes of the frustum

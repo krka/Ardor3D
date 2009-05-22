@@ -26,6 +26,7 @@ import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.scenegraph.RenderDelegate;
 
 /**
  * Node defines an internal node of a scene graph. The internal node maintains a collection of children and handles
@@ -63,8 +64,8 @@ public class Node extends Spatial {
      * @param name
      *            the name of the node. This is required for identification purposes.
      * @param children
-     *            the list to use for storing children. Defaults to a synchronized ArrayList, but using
-     *  this constructor, you can select a different kind of list.
+     *            the list to use for storing children. Defaults to a synchronized ArrayList, but using this
+     *            constructor, you can select a different kind of list.
      */
     public Node(final String name, final List<Spatial> children) {
         super(name);
@@ -361,19 +362,32 @@ public class Node extends Spatial {
      */
     @Override
     public void draw(final Renderer r) {
-        Spatial child;
-        for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
-            child = _children.get(i);
-            if (child != null) {
-                child.onDraw(r);
+
+        final RenderDelegate delegate = getCurrentRenderDelegate();
+        if (delegate == null) {
+            Spatial child;
+            for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
+                child = _children.get(i);
+                if (child != null) {
+                    child.onDraw(r);
+                }
             }
+        } else {
+            // Queue as needed
+            if (!r.isProcessingQueue()) {
+                if (r.checkAndAdd(this)) {
+                    return;
+                }
+            }
+
+            delegate.render(this, r);
         }
     }
 
     /**
      * <code>updateWorldBound</code> merges the bounds of all the children maintained by this node. This will allow for
      * faster culling operations.
-     *
+     * 
      * @see com.ardor3d.scenegraph.Spatial#updateWorldBound(boolean)
      */
     @Override

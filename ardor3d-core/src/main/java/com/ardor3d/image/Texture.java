@@ -20,6 +20,7 @@ import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector4;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -454,7 +455,6 @@ public abstract class Texture implements Savable {
     private float _anisotropicFilterPercent = 0.0f;
     private float _lodBias = 0.0f;
 
-    private transient int _textureId;
     private ApplyMode _apply = ApplyMode.Modulate;
     private MinificationFilter _minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
     private MagnificationFilter _magnificationFilter = MagnificationFilter.Bilinear;
@@ -590,39 +590,56 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * <code>getTextureId</code> returns the texture id of this texture. This id is required to be unique to any other
-     * texture objects running in the same JVM. However, no guarantees are made that it will be unique, and as such, the
-     * user is responsible for this.
-     * 
-     * @return the id of the texture.
+     * @param glContext
+     *            the object representing the OpenGL context this texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return the texture id of this texture in the given context. If the texture is not found in the given context, 0
+     *         is returned.
      */
-    public int getTextureId() {
-        return _textureId;
+    public int getTextureIdForContext(final Object glContext) {
+        return _key.getTextureIdForContext(glContext);
     }
 
     /**
-     * <code>setTextureId</code> sets the texture id for this texture. Zero means no id is set.
+     * Sets the id for this texture in regards to the given OpenGL context.
      * 
+     * @param glContext
+     *            the object representing the OpenGL context this texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
      * @param textureId
-     *            the texture id of this texture.
+     *            the texture id of this texture. To be valid, this must be greater than 0.
+     * @throws IllegalArgumentException
+     *             if textureId is less than or equal to 0.
      */
-    public void setTextureId(final int textureId) {
-        _textureId = textureId;
+    public void setTextureIdForContext(final Object glContext, final int textureId) {
+        _key.setTextureIdForContext(glContext, textureId);
     }
 
     /**
-     * <code>getImage</code> returns the image data that makes up this texture. If no image data has been set, this will
-     * return null.
+     * <p>
+     * Removes any texture id for this texture for the given OpenGL context.
+     * </p>
+     * <p>
+     * Note: This does not remove the texture from the card and is provided for use by code that does remove textures
+     * from the card.
+     * </p>
      * 
-     * @return the image data that makes up the texture.
+     * @param glContext
+     *            the object representing the OpenGL context this texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     */
+    public void removeFromIdCache(final Object glContext) {
+
+    }
+
+    /**
+     * @return the image data that makes up this texture. If no image data has been set, this will return null.
      */
     public Image getImage() {
         return _image;
     }
 
     /**
-     * <code>getApply</code> returns the apply mode for the texture.
-     * 
      * @return the apply mode of the texture.
      */
     public ApplyMode getApply() {
@@ -630,26 +647,22 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * <code>getBlendColor</code> returns the color set to be used with CombinerSource.Constant for this texture (as
-     * applicable) If null, black is assumed.
-     * 
-     * @return the blend color.
+     * @return the color set to be used with CombinerSource.Constant for this texture (as applicable) If null, black is
+     *         assumed.
      */
     public ReadOnlyColorRGBA getBlendColor() {
         return _blendColor;
     }
 
     /**
-     * <code>getBorderColor</code> returns the color to be used for border operations. If null, black is assumed.
-     * 
-     * @return the border color.
+     * @return the color to be used for border operations. If null, black is assumed.
      */
     public ReadOnlyColorRGBA getBorderColor() {
         return _borderColor;
     }
 
     /**
-     * <code>setWrap</code> sets the wrap mode of this texture for a particular axis.
+     * Sets the wrap mode of this texture for a particular axis.
      * 
      * @param axis
      *            the texture axis to define a wrapmode on.
@@ -661,7 +674,7 @@ public abstract class Texture implements Savable {
     public abstract void setWrap(WrapAxis axis, WrapMode mode);
 
     /**
-     * <code>setWrap</code> sets the wrap mode of this texture for all axis.
+     * Sets the wrap mode of this texture for all axis.
      * 
      * @param mode
      *            the wrap mode for the given axis of the texture.
@@ -671,20 +684,21 @@ public abstract class Texture implements Savable {
     public abstract void setWrap(WrapMode mode);
 
     /**
-     * <code>getWrap</code> returns the wrap mode for a given coordinate axis on this texture.
-     * 
      * @param axis
      *            the axis to return for
-     * @return the wrap mode of the texture.
+     * @return the wrap mode for the given coordinate axis on this texture.
      * @throws IllegalArgumentException
      *             if axis is null or invalid for this type of texture
      */
     public abstract WrapMode getWrap(WrapAxis axis);
 
+    /**
+     * @return the {@link Type} enum value of this Texture object.
+     */
     public abstract Type getType();
 
     /**
-     * @return Returns the combineFuncRGB.
+     * @return the combineFuncRGB.
      */
     public CombinerFunctionRGB getCombineFuncRGB() {
         return _combineFuncRGB;
@@ -1133,80 +1147,76 @@ public abstract class Texture implements Savable {
         }
 
         final Texture that = (Texture) other;
-        if (_textureId != that._textureId) {
+        if (getImage() != null && !getImage().equals(that.getImage())) {
             return false;
         }
-        if (_textureId == 0) {
-            if (getImage() != null && !getImage().equals(that.getImage())) {
-                return false;
-            }
-            if (getImage() == null && that.getImage() != null) {
-                return false;
-            }
-            if (getAnisotropicFilterPercent() != that.getAnisotropicFilterPercent()) {
-                return false;
-            }
-            if (getApply() != that.getApply()) {
-                return false;
-            }
-            if (getCombineFuncAlpha() != that.getCombineFuncAlpha()) {
-                return false;
-            }
-            if (getCombineFuncRGB() != that.getCombineFuncRGB()) {
-                return false;
-            }
-            if (getCombineOp0Alpha() != that.getCombineOp0Alpha()) {
-                return false;
-            }
-            if (getCombineOp1RGB() != that.getCombineOp1RGB()) {
-                return false;
-            }
-            if (getCombineOp2Alpha() != that.getCombineOp2Alpha()) {
-                return false;
-            }
-            if (getCombineOp2RGB() != that.getCombineOp2RGB()) {
-                return false;
-            }
-            if (getCombineScaleAlpha() != that.getCombineScaleAlpha()) {
-                return false;
-            }
-            if (getCombineScaleRGB() != that.getCombineScaleRGB()) {
-                return false;
-            }
-            if (getCombineSrc0Alpha() != that.getCombineSrc0Alpha()) {
-                return false;
-            }
-            if (getCombineSrc0RGB() != that.getCombineSrc0RGB()) {
-                return false;
-            }
-            if (getCombineSrc1Alpha() != that.getCombineSrc1Alpha()) {
-                return false;
-            }
-            if (getCombineSrc1RGB() != that.getCombineSrc1RGB()) {
-                return false;
-            }
-            if (getCombineSrc2Alpha() != that.getCombineSrc2Alpha()) {
-                return false;
-            }
-            if (getCombineSrc2RGB() != that.getCombineSrc2RGB()) {
-                return false;
-            }
-            if (getEnvironmentalMapMode() != that.getEnvironmentalMapMode()) {
-                return false;
-            }
-            if (getMagnificationFilter() != that.getMagnificationFilter()) {
-                return false;
-            }
-            if (getMinificationFilter() != that.getMinificationFilter()) {
-                return false;
-            }
-            if (!_blendColor.equals(that._blendColor)) {
-                return false;
-            }
-            if (!_borderColor.equals(that._borderColor)) {
-                return false;
-            }
+        if (getImage() == null && that.getImage() != null) {
+            return false;
         }
+        if (getAnisotropicFilterPercent() != that.getAnisotropicFilterPercent()) {
+            return false;
+        }
+        if (getApply() != that.getApply()) {
+            return false;
+        }
+        if (getCombineFuncAlpha() != that.getCombineFuncAlpha()) {
+            return false;
+        }
+        if (getCombineFuncRGB() != that.getCombineFuncRGB()) {
+            return false;
+        }
+        if (getCombineOp0Alpha() != that.getCombineOp0Alpha()) {
+            return false;
+        }
+        if (getCombineOp1RGB() != that.getCombineOp1RGB()) {
+            return false;
+        }
+        if (getCombineOp2Alpha() != that.getCombineOp2Alpha()) {
+            return false;
+        }
+        if (getCombineOp2RGB() != that.getCombineOp2RGB()) {
+            return false;
+        }
+        if (getCombineScaleAlpha() != that.getCombineScaleAlpha()) {
+            return false;
+        }
+        if (getCombineScaleRGB() != that.getCombineScaleRGB()) {
+            return false;
+        }
+        if (getCombineSrc0Alpha() != that.getCombineSrc0Alpha()) {
+            return false;
+        }
+        if (getCombineSrc0RGB() != that.getCombineSrc0RGB()) {
+            return false;
+        }
+        if (getCombineSrc1Alpha() != that.getCombineSrc1Alpha()) {
+            return false;
+        }
+        if (getCombineSrc1RGB() != that.getCombineSrc1RGB()) {
+            return false;
+        }
+        if (getCombineSrc2Alpha() != that.getCombineSrc2Alpha()) {
+            return false;
+        }
+        if (getCombineSrc2RGB() != that.getCombineSrc2RGB()) {
+            return false;
+        }
+        if (getEnvironmentalMapMode() != that.getEnvironmentalMapMode()) {
+            return false;
+        }
+        if (getMagnificationFilter() != that.getMagnificationFilter()) {
+            return false;
+        }
+        if (getMinificationFilter() != that.getMinificationFilter()) {
+            return false;
+        }
+        if (!_blendColor.equals(that._blendColor)) {
+            return false;
+        }
+        if (!_borderColor.equals(that._borderColor)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -1248,7 +1258,6 @@ public abstract class Texture implements Savable {
         rVal.setImage(_image); // NOT CLONED.
         rVal._memReq = _memReq;
         rVal.setImageLocation(_imageLocation);
-        rVal.setTextureId(_textureId);
         rVal.setBlendColor(_blendColor != null ? _blendColor.clone() : null);
         rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
@@ -1363,7 +1372,6 @@ public abstract class Texture implements Savable {
         if (_image == null) {
             _key = (TextureKey) capsule.readSavable("textureKey", null);
             if (_key != null && _key.getLocation() != null) {
-                _key.setMinificationFilter(_minificationFilter);
                 TextureManager.loadFromKey(_key, null, this);
             }
         }

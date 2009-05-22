@@ -13,10 +13,16 @@ package com.ardor3d.util;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -33,26 +39,94 @@ final public class TextureKey implements Savable {
     protected boolean _flipped;
     protected Image.Format _format = Image.Format.Guess;
     protected String _fileType;
-    protected transient Object _glContextRep = null;
     protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
+    protected final transient WeakHashMap<Object, Integer> _idCache = new WeakHashMap<Object, Integer>();
+    protected int _code = Integer.MAX_VALUE;
 
+    protected static final List<TextureKey> _keyCache = new ArrayList<TextureKey>();
+
+    /** DO NOT USE. FOR SAVABLE USE ONLY */
     public TextureKey() {}
 
-    public TextureKey(final URL location, final boolean flipped, final Image.Format imageType,
-            final Texture.MinificationFilter minFilter) {
-        _location = location;
-        _flipped = flipped;
-        _minFilter = minFilter;
-        _format = imageType;
+    private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
+
+    /**
+     * Get a new unique TextureKey. This is meant for use by RTT and other situations where we know we are making a
+     * unique texture.
+     * 
+     * @param minFilter
+     *            our minification filter value.
+     * @return the new TextureKey
+     */
+    public static synchronized TextureKey getRTTKey(final MinificationFilter minFilter) {
+        int val = _uniqueTK.addAndGet(1);
+        if (val == Integer.MAX_VALUE) {
+            _uniqueTK.set(Integer.MIN_VALUE);
+            val = Integer.MIN_VALUE;
+        }
+        return getKey(null, false, Format.Guess, "" + val, minFilter);
     }
 
-    public TextureKey(final TextureKey other) {
-        _location = other._location;
-        _flipped = other._flipped;
-        _format = other._format;
-        _fileType = other._fileType;
-        _glContextRep = other._glContextRep;
-        _minFilter = other._minFilter;
+    public static synchronized TextureKey getKey(final URL location, final boolean flipped,
+            final Image.Format imageType, final Texture.MinificationFilter minFilter) {
+        return getKey(location, flipped, imageType, null, minFilter);
+    }
+
+    public static synchronized TextureKey getKey(final URL location, final boolean flipped,
+            final Image.Format imageType, final String fileType, final Texture.MinificationFilter minFilter) {
+        final TextureKey key = new TextureKey();
+
+        key._location = location;
+        key._flipped = flipped;
+        key._minFilter = minFilter;
+        key._format = imageType;
+        key._fileType = fileType;
+
+        final int cacheLoc = _keyCache.indexOf(key);
+        if (cacheLoc == -1) {
+            _keyCache.add(key);
+            TextureManager.registerForCleanup(key);
+            return key;
+        }
+
+        return _keyCache.get(cacheLoc);
+    }
+
+    public static boolean removeKey(final TextureKey key) {
+        return _keyCache.remove(key);
+    }
+
+    /**
+     * @param glContext
+     *            the object representing the OpenGL context a texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @return the texture id of a texture in the given context. If the texture is not found in the given context, 0 is
+     *         returned.
+     */
+    public int getTextureIdForContext(final Object glContext) {
+        if (_idCache.containsKey(glContext)) {
+            return _idCache.get(glContext);
+        }
+        return 0;
+    }
+
+    /**
+     * Sets the id for a texture in regards to the given OpenGL context.
+     * 
+     * @param glContext
+     *            the object representing the OpenGL context a texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     * @param textureId
+     *            the texture id of a texture. To be valid, this must be greater than 0.
+     * @throws IllegalArgumentException
+     *             if textureId is less than or equal to 0.
+     */
+    public void setTextureIdForContext(final Object glContext, final int textureId) {
+        if (textureId <= 0) {
+            throw new IllegalArgumentException("textureId must be > 0");
+        }
+
+        _idCache.put(glContext, textureId);
     }
 
     @Override
@@ -70,13 +144,6 @@ final public class TextureKey implements Savable {
                 return false;
             }
         } else if (!_location.equals(that._location)) {
-            return false;
-        }
-        if (_glContextRep == null) {
-            if (that._glContextRep != null) {
-                return false;
-            }
-        } else if (!_glContextRep.equals(that._glContextRep)) {
             return false;
         }
 
@@ -97,40 +164,26 @@ final public class TextureKey implements Savable {
 
     @Override
     public int hashCode() {
-        int result = 17;
+        if (_code == Integer.MAX_VALUE) {
 
-        result += 31 * result + (_location != null ? _location.hashCode() : 0);
-        result += 31 * result + (_fileType != null ? _fileType.hashCode() : 0);
-        result += 31 * result + _minFilter.hashCode();
-        result += 31 * result + _format.hashCode();
-        result += 31 * result + (_flipped ? 1 : 0);
-        result += 31 * result + (_glContextRep != null ? _glContextRep.hashCode() : 0);
+        }
+        _code = 17;
 
-        return result;
+        _code += 31 * _code + (_location != null ? _location.hashCode() : 0);
+        _code += 31 * _code + (_fileType != null ? _fileType.hashCode() : 0);
+        _code += 31 * _code + _minFilter.hashCode();
+        _code += 31 * _code + _format.hashCode();
+        _code += 31 * _code + (_flipped ? 1 : 0);
+
+        return _code;
     }
 
     public Texture.MinificationFilter getMinificationFilter() {
         return _minFilter;
     }
 
-    public void setMinificationFilter(final Texture.MinificationFilter minFilter) {
-        _minFilter = minFilter;
-    }
-
-    public Object getContextRep() {
-        return _glContextRep;
-    }
-
-    public void setContextRep(final Object contextRep) {
-        _glContextRep = contextRep;
-    }
-
     public Image.Format getFormat() {
         return _format;
-    }
-
-    public void setFormat(final Image.Format format) {
-        _format = format;
     }
 
     /**
@@ -141,34 +194,14 @@ final public class TextureKey implements Savable {
     }
 
     /**
-     * @param flipped
-     *            The flipped to set.
-     */
-    public void setFlipped(final boolean flipped) {
-        _flipped = flipped;
-    }
-
-    /**
      * @return Returns the location.
      */
     public URL getLocation() {
         return _location;
     }
 
-    /**
-     * @param location
-     *            The location to set.
-     */
-    public void setLocation(final URL location) {
-        _location = location;
-    }
-
     public String getFileType() {
         return _fileType;
-    }
-
-    public void setFileType(final String fileType) {
-        _fileType = fileType;
     }
 
     @Override
@@ -217,5 +250,4 @@ final public class TextureKey implements Savable {
         _minFilter = capsule.readEnum("minFilter", MinificationFilter.class, MinificationFilter.Trilinear);
         _fileType = capsule.readString("fileType", null);
     }
-
 }

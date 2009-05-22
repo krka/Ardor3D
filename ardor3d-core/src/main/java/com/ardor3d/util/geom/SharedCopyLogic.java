@@ -35,12 +35,8 @@ public class SharedCopyLogic implements CopyLogic {
 
     protected Mesh clone(final Mesh original) {
         final Mesh copy = new Mesh(original.getName());
-        copy.setCullHint(original.getLocalCullHint());
-        copy.setLightCombineMode(original.getLocalLightCombineMode());
+        copy.getSceneHints().set(original.getSceneHints());
         copy.setTransform(original.getTransform());
-        copy.setRenderBucketType(original.getLocalRenderBucketType());
-        copy.setTextureCombineMode(original.getLocalTextureCombineMode());
-        copy.setZOrder(original.getZOrder());
 
         for (final StateType type : StateType.values()) {
             final RenderState state = original.getLocalRenderState(type);
@@ -53,12 +49,8 @@ public class SharedCopyLogic implements CopyLogic {
 
     protected Node clone(final Node original) {
         final Node copy = new Node(original.getName());
-        copy.setCullHint(original.getLocalCullHint());
-        copy.setLightCombineMode(original.getLocalLightCombineMode());
+        copy.getSceneHints().set(original.getSceneHints());
         copy.setTransform(original.getTransform());
-        copy.setRenderBucketType(original.getLocalRenderBucketType());
-        copy.setTextureCombineMode(original.getLocalTextureCombineMode());
-        copy.setZOrder(original.getZOrder());
 
         for (final StateType type : StateType.values()) {
             final RenderState state = original.getLocalRenderState(type);

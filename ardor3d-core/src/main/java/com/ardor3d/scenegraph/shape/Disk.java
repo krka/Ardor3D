@@ -64,7 +64,7 @@ public class Disk extends Mesh {
         final int verts = 1 + radialSamples * shellLess;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
-        _meshData.setTextureBuffer(BufferUtils.createVector3Buffer(verts), 0);
+        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         final int tris = radialSamples * (2 * shellLess - 1);
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));

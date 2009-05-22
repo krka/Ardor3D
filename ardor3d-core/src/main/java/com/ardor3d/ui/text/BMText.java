@@ -24,7 +24,9 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -178,17 +180,17 @@ public class BMText extends Mesh {
             _spacing = _font.getOutlineWidth() - 1;
         }
         getMeshData().setIndexMode(IndexMode.Quads);
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
         setText(text);
 
         // -- never cull
         setModelBound(null);
-        setCullHint(Spatial.CullHint.Never);
+        getSceneHints().setCullHint(CullHint.Never);
 
         // -- default to non-pickable
-        setAllPickingHints(false);
+        getSceneHints().setAllPickingHints(false);
 
         _font.applyRenderStatesTo(this, useBlend);
     }

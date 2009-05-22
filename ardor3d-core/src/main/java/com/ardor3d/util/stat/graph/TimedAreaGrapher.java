@@ -27,7 +27,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial.CullHint;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.MultiStatSample;
@@ -69,7 +69,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         _defBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
         _defBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
         _graphRoot.setRenderState(_defBlendState);
-        _graphRoot.setCullHint(CullHint.Never);
+        _graphRoot.getSceneHints().setCullHint(CullHint.Never);
     }
 
     public void statsUpdated() {
@@ -227,7 +227,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         _horizontals = new Line("horiz", verts, null, null, null);
         _horizontals.getMeshData().setIndexMode(IndexMode.Lines);
-        _horizontals.setRenderBucketType(RenderBucketType.Ortho);
+        _horizontals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
 
         _horizontals.setDefaultColor(getColorConfig(TimedAreaGrapher.Horizontal, ConfigKeys.Color.name(),
                 new ColorRGBA(ColorRGBA.BLUE)));
@@ -253,7 +253,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
 
         _verticals = new Line("vert", verts, null, null, null);
         _verticals.getMeshData().setIndexMode(IndexMode.Lines);
-        _verticals.setRenderBucketType(RenderBucketType.Ortho);
+        _verticals.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
 
         _verticals.setDefaultColor(getColorConfig(TimedAreaGrapher.Vertical, ConfigKeys.Color.name(), new ColorRGBA(
                 ColorRGBA.RED)));
@@ -279,12 +279,12 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
                 area.getMeshData().getIndexBuffer().put(i);
             }
             area.getMeshData().getIndexBuffer().rewind();
-            area.setRenderBucketType(RenderBucketType.Ortho);
+            area.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
             area.getMeshData().setIndexMode(IndexMode.LineStrip);
 
             area.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
             if (!getBooleanConfig(type, ConfigKeys.ShowAreas.name(), true)) {
-                area.setCullHint(CullHint.Always);
+                area.getSceneHints().setCullHint(CullHint.Always);
             }
         }
     }
@@ -298,7 +298,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
             lineKey.getMeshData().setVertexBuffer(fb);
         }
 
-        lineKey.setRenderBucketType(RenderBucketType.Ortho);
+        lineKey.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         lineKey.getMeshData().setIndexMode(IndexMode.LineLoop);
 
         lineKey.setDefaultColor(getColorConfig(type, ConfigKeys.Color.name(), new ColorRGBA(ColorRGBA.LIGHT_GRAY)));
@@ -306,7 +306,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
         lineKey.setStipplePattern(getShortConfig(type, ConfigKeys.Stipple.name(), (short) 0xFFFF));
         lineKey.setAntialiased(getBooleanConfig(type, ConfigKeys.Antialias.name(), true));
         if (!getBooleanConfig(type, ConfigKeys.ShowAreas.name(), true)) {
-            lineKey.setCullHint(CullHint.Always);
+            lineKey.getSceneHints().setCullHint(CullHint.Always);
         }
 
         return lineKey;

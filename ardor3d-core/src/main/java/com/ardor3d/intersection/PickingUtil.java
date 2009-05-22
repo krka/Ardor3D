@@ -20,11 +20,11 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.Spatial.PickingHint;
+import com.ardor3d.scenegraph.hint.PickingHint;
 
 public abstract class PickingUtil {
     public static void findPick(final Spatial spatial, final Ray3 ray, final PickResults results) {
-        if (!spatial.isPickingHintEnabled(PickingHint.Pickable)) {
+        if (!spatial.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
             return;
         }
 
@@ -56,8 +56,8 @@ public abstract class PickingUtil {
 
     public static void findCollisions(final Spatial spatial, final Spatial scene, final CollisionResults results) {
         if (spatial == scene || spatial.getWorldBound() == null
-                || !spatial.isPickingHintEnabled(PickingHint.Collidable)
-                || !scene.isPickingHintEnabled(PickingHint.Collidable)) {
+                || !spatial.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)
+                || !scene.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)) {
             return;
         }
 
@@ -87,7 +87,7 @@ public abstract class PickingUtil {
     }
 
     public static void findTrianglePick(final Mesh mesh, final Ray3 toTest, final List<PrimitiveKey> results) {
-        if (mesh.getWorldBound() == null || !mesh.isPickingHintEnabled(PickingHint.Pickable)) {
+        if (mesh.getWorldBound() == null || !mesh.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
             return;
         }
 
@@ -109,8 +109,8 @@ public abstract class PickingUtil {
      * @return True if they intersect.
      */
     public static boolean hasTriangleCollision(final Mesh testMesh, final Mesh toCheck) {
-        if (!testMesh.isPickingHintEnabled(PickingHint.Collidable)
-                || !toCheck.isPickingHintEnabled(PickingHint.Collidable)) {
+        if (!testMesh.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)
+                || !toCheck.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)) {
             return false;
         }
 
@@ -142,8 +142,8 @@ public abstract class PickingUtil {
      */
     public static void findPrimitiveCollision(final Mesh testMesh, final Mesh toCheck,
             final List<PrimitiveKey> testIndex, final List<PrimitiveKey> otherIndex) {
-        if (!testMesh.isPickingHintEnabled(PickingHint.Collidable)
-                || !toCheck.isPickingHintEnabled(PickingHint.Collidable)) {
+        if (!testMesh.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)
+                || !toCheck.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)) {
             return;
         }
 
@@ -161,8 +161,8 @@ public abstract class PickingUtil {
 
     public static boolean hasCollision(final Spatial spatial, final Spatial scene, final boolean checkPrimitives) {
         if (spatial == scene || spatial.getWorldBound() == null
-                || !spatial.isPickingHintEnabled(PickingHint.Collidable)
-                || !scene.isPickingHintEnabled(PickingHint.Collidable)) {
+                || !spatial.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)
+                || !scene.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)) {
             return false;
         }
 

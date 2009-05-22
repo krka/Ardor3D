@@ -22,7 +22,7 @@ import com.ardor3d.renderer.state.record.LightStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -318,7 +318,7 @@ public class LightState extends RenderState {
             return stack.peek();
         }
 
-        final LightCombineMode mode = spat.getLightCombineMode();
+        final LightCombineMode mode = spat.getSceneHints().getLightCombineMode();
 
         final Mesh mesh = (Mesh) spat;
         LightState lightState = mesh.getLightState();
