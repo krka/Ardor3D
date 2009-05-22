@@ -51,7 +51,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.Spatial.CullHint;
+import com.ardor3d.scenegraph.hint.CullHint;
 
 /**
  * A pass providing a shadow mapping layer across the top of an existing scene.
@@ -452,14 +452,14 @@ public class DirectionalShadowMapPass extends Pass {
         CullHint cullModeBefore = CullHint.Never;
 
         if (!_cullOccluders) {
-            cullModeBefore = _occludersRenderNode.getCullHint();
-            _occluderNodes.get(0).setCullHint(CullHint.Never);
+            cullModeBefore = _occludersRenderNode.getSceneHints().getCullHint();
+            _occluderNodes.get(0).getSceneHints().setCullHint(CullHint.Never);
         }
 
         _shadowMapRenderer.render(_occludersRenderNode, _shadowMapTexture, true);
 
         if (!_cullOccluders) {
-            _occludersRenderNode.setCullHint(cullModeBefore);
+            _occludersRenderNode.getSceneHints().setCullHint(cullModeBefore);
         }
     }
 

@@ -17,7 +17,8 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Line;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -64,9 +65,9 @@ public class ParticleLines extends ParticleSystem {
         line.getMeshData().setVertexBuffer(_geometryCoordinates);
         line.getMeshData().setColorBuffer(_appearanceColors);
         line.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles * 2), 0);
-        setRenderBucketType(RenderBucketType.Opaque);
-        setLightCombineMode(Spatial.LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
         for (int k = 0; k < numParticles; k++) {
             _particles[k] = new Particle(this);

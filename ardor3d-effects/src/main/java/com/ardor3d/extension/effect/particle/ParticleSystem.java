@@ -33,6 +33,7 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.ComplexSpatialController.RepeatType;
+import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -1025,6 +1026,7 @@ public abstract class ParticleSystem extends Node {
 
             setWorldTranslation(Vector3.ZERO);
             setWorldRotation(Matrix3.IDENTITY);
+            markDirty(DirtyType.Transform);
         } else {
             _originCenter.set(_originOffset);
         }

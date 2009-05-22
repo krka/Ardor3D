@@ -39,6 +39,8 @@ import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.TextureManager;
 
 /**
@@ -228,7 +230,7 @@ public class WaterNode extends Node {
             noFog.setEnabled(false);
         }
 
-        setCullHint(CullHint.Never);
+        getSceneHints().setCullHint(CullHint.Never);
 
         setWaterEffectOnSpatial(this);
     }
@@ -443,8 +445,8 @@ public class WaterNode extends Node {
             spatial.setRenderState(waterShader);
             spatial.setRenderState(textureState);
         } else {
-            spatial.setRenderBucketType(RenderBucketType.Transparent);
-            spatial.setLightCombineMode(Spatial.LightCombineMode.Off);
+            spatial.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+            spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
             spatial.setRenderState(fallbackTextureState);
             spatial.setRenderState(as1);
         }
@@ -456,8 +458,8 @@ public class WaterNode extends Node {
         }
 
         spatial.setRenderState(cullBackFace);
-        spatial.setRenderBucketType(RenderBucketType.Transparent);
-        spatial.setLightCombineMode(Spatial.LightCombineMode.Off);
+        spatial.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+        spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         spatial.setRenderState(fallbackTextureState);
         spatial.setRenderState(as1);
     }
@@ -560,8 +562,8 @@ public class WaterNode extends Node {
 
         CullHint cullMode = CullHint.Dynamic;
         if (skyBox != null) {
-            cullMode = skyBox.getCullHint();
-            skyBox.setCullHint(CullHint.Always);
+            cullMode = skyBox.getSceneHints().getCullHint();
+            skyBox.getSceneHints().setCullHint(CullHint.Always);
         }
 
         texArray.clear();
@@ -578,7 +580,7 @@ public class WaterNode extends Node {
         }
 
         if (skyBox != null) {
-            skyBox.setCullHint(cullMode);
+            skyBox.getSceneHints().setCullHint(cullMode);
         }
     }
 

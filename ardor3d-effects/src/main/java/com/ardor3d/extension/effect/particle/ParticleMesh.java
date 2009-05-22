@@ -21,6 +21,8 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -41,25 +43,25 @@ public class ParticleMesh extends ParticleSystem {
 
     public ParticleMesh(final String name, final int numParticles) {
         super(name, numParticles);
-        setRenderBucketType(RenderBucketType.Transparent);
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     }
 
     public ParticleMesh(final String name, final int numParticles, final ParticleSystem.ParticleType type) {
         super(name, numParticles, type);
-        setRenderBucketType(RenderBucketType.Transparent);
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     }
 
     public ParticleMesh(final String name, final Mesh geom) {
         super(name, 0, ParticleSystem.ParticleType.GeomMesh);
         _numParticles = geom.getMeshData().getTotalPrimitiveCount();
         _psGeom = geom;
-        setRenderBucketType(RenderBucketType.Transparent);
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         initializeParticles(_numParticles);
     }
 

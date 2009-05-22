@@ -26,7 +26,7 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -133,11 +133,11 @@ public class MeshShadows {
                     lv.setUpdate(false);
 
                     if (!_target.isCastsShadows()) {
-                        lv.setCullHint(Spatial.CullHint.Always);
+                        lv.getSceneHints().setCullHint(CullHint.Always);
                         continue;
                     }
 
-                    lv.setCullHint(Spatial.CullHint.Dynamic);
+                    lv.getSceneHints().setCullHint(CullHint.Dynamic);
 
                     // Translate the vertex information from the mesh to
                     // world

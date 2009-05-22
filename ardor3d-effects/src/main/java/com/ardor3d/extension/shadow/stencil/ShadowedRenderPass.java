@@ -266,7 +266,7 @@ public class ShadowedRenderPass extends Pass {
         _additiveOffset.setTypeEnabled(OffsetType.Point, true);
         _additiveOffset.setUnits(-5);
 
-        _volumeNode.setRenderBucketType(RenderBucketType.Skip);
+        _volumeNode.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         _volumeNode.attachChild(new Node());
 
         _noTexture = new TextureState();
@@ -724,7 +724,7 @@ public class ShadowedRenderPass extends Pass {
         _quadHeight = cam.getHeight();
         _shadowQuad.resize(_quadWidth, cam.getHeight());
         _shadowQuad.setTranslation(new Vector3(_quadWidth >> 1, _quadHeight >> 1, 0));
-        _shadowQuad.setRenderBucketType(RenderBucketType.Skip);
+        _shadowQuad.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         _shadowQuad.updateGeometricState(0, true);
 
     }

@@ -17,6 +17,8 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.scenegraph.Point;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -59,9 +61,9 @@ public class ParticlePoints extends ParticleSystem {
         };
         _particleGeom.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
         attachChild(_particleGeom);
-        setRenderBucketType(RenderBucketType.Opaque);
-        setLightCombineMode(LightCombineMode.Off);
-        setTextureCombineMode(TextureCombineMode.Replace);
+        getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
+        getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
         for (int k = 0; k < numParticles; k++) {
             _particles[k] = new Particle(this);
@@ -69,8 +71,8 @@ public class ParticlePoints extends ParticleSystem {
             _particles[k].setStartIndex(k * verts);
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
-                BufferUtils.setInBuffer(sharedTextureData[a],
-                        getParticleGeometry().getMeshData().getTextureCoords(0).getBuffer(), ind);
+                BufferUtils.setInBuffer(sharedTextureData[a], getParticleGeometry().getMeshData().getTextureCoords(0)
+                        .getBuffer(), ind);
                 BufferUtils.setInBuffer(_particles[k].getCurrentColor(), _appearanceColors, (ind));
             }
 

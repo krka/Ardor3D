@@ -120,7 +120,7 @@ public class SwarmInfluence extends ParticleInfluence {
     }
 
     public void setSwarmOffset(final ReadOnlyVector3 offset) {
-        _swarmPoint.set(offset);
+        _swarmOffset.set(offset);
     }
 
     public double getDeviance() {

@@ -53,7 +53,7 @@ import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.Spatial.LightCombineMode;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -849,7 +849,7 @@ public class ParallelSplitShadowMapPass extends Pass {
                     new IndexMode[] { IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines });
             lineFrustum.getMeshData().setIndexLengths(new int[] { 4, 4, 8, 8 });
             lineFrustum.setLineWidth(2);
-            lineFrustum.setLightCombineMode(LightCombineMode.Off);
+            lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 
             final BlendState lineBlendState = new BlendState();
             lineBlendState.setEnabled(true);

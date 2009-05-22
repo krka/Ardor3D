@@ -469,7 +469,7 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
 
         iterations *= 10;
         for (int i = iterations; --i >= 0;) {
-            update(.1, particles);
+            particles.updateGeometricState(0.1, false);
         }
         ignoreNextUpdate();
     }
