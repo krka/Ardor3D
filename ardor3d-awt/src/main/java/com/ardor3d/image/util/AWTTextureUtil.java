@@ -22,11 +22,8 @@ public abstract class AWTTextureUtil {
     public static Texture loadTexture(final BufferedImage image, final Texture.MinificationFilter minFilter,
             final Image.Format imageFormat, final boolean flipped) {
         final Image imageData = AWTImageLoader.makeArdor3dImage(image, flipped);
-        final TextureKey tkey = new TextureKey(null, flipped, imageFormat, minFilter);
-        if (image != null) {
-            tkey.setFileType("" + image.hashCode());
-        }
+        final String fileType = (image != null) ? "" + image.hashCode() : null;
+        final TextureKey tkey = TextureKey.getKey(null, flipped, imageFormat, fileType, minFilter);
         return TextureManager.loadFromKey(tkey, imageData, null);
     }
-
 }

@@ -13,7 +13,9 @@ package com.ardor3d.image.util;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.PixelGrabber;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -52,7 +54,8 @@ public class AWTImageLoader implements ImageLoader {
             return null;
         }
 
-        final boolean hasAlpha = hasAlpha(image), grayscale = isGreyscale(image);
+        final boolean hasAlpha = image.getColorModel().hasAlpha();
+        final boolean grayscale = image.getColorModel().getNumComponents() == 1;
         BufferedImage tex;
 
         if (flipImage
@@ -82,7 +85,7 @@ public class AWTImageLoader implements ImageLoader {
         }
 
         // Get a pointer to the image memory
-        final byte data[] = asByteArray(tex, grayscale, hasAlpha);
+        final byte data[] = asByteArray(tex);
         final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils
                 .createByteBuffer(data.length);
         scratch.clear();
@@ -96,23 +99,80 @@ public class AWTImageLoader implements ImageLoader {
         return ardorImage;
     }
 
-    public static byte[] asByteArray(final BufferedImage image) {
-        return asByteArray(image, hasAlpha(image), isGreyscale(image));
+    public static Image makeArdor3DImage(final RenderableImage image, final boolean flipImage) {
+        return makeArdor3dImage(image.createDefaultRendering(), flipImage);
     }
 
-    public static byte[] asByteArray(final BufferedImage image, final boolean isGreyscale, final boolean hasAlpha) {
+    public static Image makeArdor3dImage(final RenderedImage image, final boolean flipImage) {
+        if (image == null) {
+            return null;
+        }
+
+        final ColorModel colorModel = image.getColorModel();
+        final boolean hasAlpha = colorModel.hasAlpha();
+        final boolean grayscale = colorModel.getNumComponents() == 1;
+
+        // Get a pointer to the image memory
+        final byte data[] = asByteArray(image, grayscale, hasAlpha);
+        final ByteBuffer scratch = createOnHeap ? BufferUtils.createByteBufferOnHeap(data.length) : BufferUtils
+                .createByteBuffer(data.length);
+        scratch.clear();
+        scratch.put(data);
+        scratch.flip();
+        final Image ardorImage = new Image();
+        ardorImage.setFormat(grayscale ? Image.Format.Luminance8 : hasAlpha ? Image.Format.RGBA8 : Image.Format.RGB8);
+        ardorImage.setWidth(image.getWidth());
+        ardorImage.setHeight(image.getHeight());
+        ardorImage.setData(scratch);
+        return ardorImage;
+    }
+
+    public static byte[] asByteArray(final BufferedImage image) {
         final int imageWidth = image.getWidth(null);
         final int imageHeight = image.getHeight(null);
+        final boolean hasAlpha = image.getColorModel().hasAlpha();
+        final boolean grayscale = image.getColorModel().getNumComponents() == 1;
 
         if (image.getRaster().getTransferType() == DataBuffer.TYPE_BYTE) {
             return (byte[]) image.getRaster().getDataElements(0, 0, imageWidth, imageHeight, null);
+        }
+
+        final byte[] rVal = new byte[imageWidth * imageHeight * (grayscale ? 1 : (hasAlpha ? 4 : 3))];
+        final int[] tmpData = new int[imageWidth];
+        int index = 0;
+        for (int y = 0; y < imageHeight; y++) {
+            image.getRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
+            for (int i = 0; i < imageWidth; i++) {
+                final int argb = tmpData[i];
+                if (grayscale) {
+                    rVal[index++] = (byte) (argb & 0xFF);
+                } else {
+                    rVal[index++] = (byte) ((argb >> 16) & 0xFF);
+                    rVal[index++] = (byte) ((argb >> 8) & 0xFF);
+                    rVal[index++] = (byte) (argb & 0xFF);
+                    if (hasAlpha) {
+                        rVal[index++] = (byte) ((argb >> 24) & 0xFF);
+                    }
+                }
+            }
+        }
+        return rVal;
+    }
+
+    public static byte[] asByteArray(final RenderedImage image, final boolean isGreyscale, final boolean hasAlpha) {
+        final int imageWidth = image.getWidth();
+        final int imageHeight = image.getHeight();
+        final Raster raster = image.getData();
+
+        if (raster.getTransferType() == DataBuffer.TYPE_BYTE) {
+            return (byte[]) image.getData().getDataElements(0, 0, imageWidth, imageHeight, null);
         }
 
         final byte[] rVal = new byte[imageWidth * imageHeight * (isGreyscale ? 1 : (hasAlpha ? 4 : 3))];
         final int[] tmpData = new int[imageWidth];
         int index = 0;
         for (int y = 0; y < imageHeight; y++) {
-            image.getRGB(0, y, imageWidth, 1, tmpData, 0, imageWidth);
+            getRGB(raster, image.getColorModel(), 0, y, imageWidth, 1, tmpData, 0, imageWidth);
             for (int i = 0; i < imageWidth; i++) {
                 final int argb = tmpData[i];
                 if (isGreyscale) {
@@ -131,63 +191,47 @@ public class AWTImageLoader implements ImageLoader {
     }
 
     /**
-     * <code>hasAlpha</code> returns true if the specified image has transparent pixels
-     * 
-     * @param image
-     *            Image to check
-     * @return true if the specified image has transparent pixels
+     * Extract rgb values from raster using the colormodel.
      */
-    protected static boolean hasAlpha(final java.awt.Image image) {
-        if (null == image) {
-            return false;
+    private static int[] getRGB(final Raster raster, final ColorModel colorModel, final int startX, final int startY,
+            final int w, final int h, int[] rgbArray, final int offset, final int scansize) {
+        Object data;
+        final int nbands = raster.getNumBands();
+        final int dataType = raster.getDataBuffer().getDataType();
+        switch (dataType) {
+            case DataBuffer.TYPE_BYTE:
+                data = new byte[nbands];
+                break;
+            case DataBuffer.TYPE_USHORT:
+                data = new short[nbands];
+                break;
+            case DataBuffer.TYPE_INT:
+                data = new int[nbands];
+                break;
+            case DataBuffer.TYPE_FLOAT:
+                data = new float[nbands];
+                break;
+            case DataBuffer.TYPE_DOUBLE:
+                data = new double[nbands];
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown data buffer type: " + dataType);
         }
-        if (image instanceof BufferedImage) {
-            final BufferedImage bufferedImage = (BufferedImage) image;
-            return bufferedImage.getColorModel().hasAlpha();
+
+        if (rgbArray == null) {
+            rgbArray = new int[offset + h * scansize];
         }
-        final PixelGrabber pixelGrabber = new PixelGrabber(image, 0, 0, 1, 1, false);
-        try {
-            pixelGrabber.grabPixels();
-            final ColorModel colorModel = pixelGrabber.getColorModel();
-            if (colorModel != null) {
-                return colorModel.hasAlpha();
+
+        int yoff = offset;
+        int off;
+        for (int y = startY; y < startY + h; y++, yoff += scansize) {
+            off = yoff;
+            for (int x = startX; x < startX + w; x++) {
+                rgbArray[off++] = colorModel.getRGB(raster.getDataElements(x, y, data));
             }
+        }
 
-            return false;
-        } catch (final InterruptedException e) {
-            logger.warning("Unable to determine alpha of image: " + image);
-        }
-        return false;
-    }
-
-    /**
-     * <code>isGreyscale</code> returns true if the specified image is greyscale.
-     * 
-     * @param image
-     *            Image to check
-     * @return true if the specified image is greyscale.
-     */
-    protected static boolean isGreyscale(final java.awt.Image image) {
-        if (null == image) {
-            return false;
-        }
-        if (image instanceof BufferedImage) {
-            final BufferedImage bufferedImage = (BufferedImage) image;
-            return bufferedImage.getColorModel().getNumComponents() == 1;
-        }
-        final PixelGrabber pixelGrabber = new PixelGrabber(image, 0, 0, 1, 1, false);
-        try {
-            pixelGrabber.grabPixels();
-            final ColorModel colorModel = pixelGrabber.getColorModel();
-            if (colorModel != null) {
-                return colorModel.getNumComponents() == 1;
-            }
-
-            return false;
-        } catch (final InterruptedException e) {
-            logger.warning("Unable to determine if image is greyscale: " + image);
-        }
-        return false;
+        return rgbArray;
     }
 
     public static void setCreateOnHeap(final boolean createOnHeap) {

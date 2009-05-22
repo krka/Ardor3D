@@ -14,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.AWTGLCanvas;
+import org.lwjgl.opengl.PixelFormat;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
@@ -26,16 +27,17 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
 
     private CanvasRenderer _canvasRenderer;
     private boolean _inited = false;
+    private final DisplaySettings _settings;
 
     private volatile boolean _updated = false;
-    private CountDownLatch _latch = null; // this would have to be volatile if we are not careful with the order of
-                                          // reads
+    // _latch would have to be volatile if we are not careful with the order of reads and writes between this one and
+    // '_updated'
+    private CountDownLatch _latch = null;
 
-    // and writes between this one and '_updated'
-
-    // TODO: get rid of exception and ensure correct pixel format according to DisplaySystem
-    public AwtCanvas() throws LWJGLException {
-        super();
+    public AwtCanvas(final DisplaySettings settings) throws LWJGLException {
+        super(new PixelFormat(settings.getColorDepth(), settings.getAlphaBits(), settings.getDepthBits(), settings
+                .getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
+        _settings = settings;
     }
 
     public void setCanvasRenderer(final CanvasRenderer canvasRenderer) {
@@ -81,9 +83,8 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     private void privateInit() {
-        final DisplaySettings settings = new DisplaySettings(getWidth(), getHeight(), 0, 0, 0, 8, 0, 0, false, false);
-
-        _canvasRenderer.init(settings, false); // false - do not do back buffer swap, awt will do that.
+        _canvasRenderer.init(_settings, false); // false - do not do back buffer swap, awt will do that.
+        _canvasRenderer.getCamera().resize(getWidth(), getHeight());
         _inited = true;
     }
 
