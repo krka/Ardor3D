@@ -11,8 +11,17 @@
 /**
  * 
  */
+
 package com.ardor3d.scenegraph.hint;
 
 public enum PickingHint {
-    Pickable, Collidable
+    /**
+     * Scene object can be included in results from pick operations.
+     */
+    Pickable,
+
+    /**
+     * Scene object can be included in results from collision checks.
+     */
+    Collidable
 }

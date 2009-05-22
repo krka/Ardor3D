@@ -1,7 +1,8 @@
+
 package com.ardor3d.scenegraph.hint;
 
 /**
- * Describes how to combine textures from ancestor texturestates when an updateRenderState is called on a Spatial.
+ * Describes how to combine textures from ancestor TextureStates.
  */
 public enum TextureCombineMode {
     /** When updating render states, turn off texturing for this spatial. */
@@ -13,8 +14,7 @@ public enum TextureCombineMode {
     CombineFirst,
 
     /**
-     * Combine textures starting from the given Spatial and working towards the root. Ignore disabled states.
-     * (Default)
+     * Combine textures starting from the given Spatial and working towards the root. Ignore disabled states. (Default)
      */
     CombineClosest,
 

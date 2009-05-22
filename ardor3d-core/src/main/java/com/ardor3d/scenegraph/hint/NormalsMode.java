@@ -11,24 +11,27 @@
 package com.ardor3d.scenegraph.hint;
 
 public enum NormalsMode {
+
     /**
-     * When used in scenegraphs, indicates to do whatever our parent does.
-     * 
-     * @see com.ardor3d.scene.Spatial#getNormalsMode()
+     * Do whatever our parent does. If no parent, we'll default to NormalizeIfScaled.
      */
     Inherit,
+
     /**
      * Send through the normals currently set as-is.
      */
     UseProvided,
+
     /**
      * Tell the card to normalize any normals data we might give it.
      */
     AlwaysNormalize,
+
     /**
      * If a scale other than 1,1,1 is being used then tell the card to normalize any normals data we might give it.
      */
     NormalizeIfScaled,
+
     /**
      * Do not send normal data to the card, even if we have some.
      */

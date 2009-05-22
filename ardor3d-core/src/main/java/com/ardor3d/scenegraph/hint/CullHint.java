@@ -14,6 +14,9 @@
 
 package com.ardor3d.scenegraph.hint;
 
+/**
+ * Describes how a scene object interacts with Ardor3D's frustum culling.
+ */
 public enum CullHint {
 
     /**

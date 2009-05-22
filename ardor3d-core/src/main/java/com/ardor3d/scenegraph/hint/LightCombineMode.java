@@ -1,15 +1,16 @@
+
 package com.ardor3d.scenegraph.hint;
 
 /**
- * Describes how to combine lights from ancestor lightstates when an updateRenderState is called on a Spatial.
+ * Describes how to combine lights from ancestor LightStates.
  */
 public enum LightCombineMode {
     /** When updating render states, turn off lighting for this spatial. */
     Off,
 
     /**
-     * Combine lights starting from the root node and working towards the given Spatial. Ignore disabled states.
-     * Stop combining when lights == MAX_LIGHTS_ALLOWED
+     * Combine lights starting from the root node and working towards the given Spatial. Ignore disabled states. Stop
+     * combining when lights == MAX_LIGHTS_ALLOWED
      */
     CombineFirst,
 

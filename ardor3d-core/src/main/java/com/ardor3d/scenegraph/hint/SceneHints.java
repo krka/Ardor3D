@@ -20,6 +20,9 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
+/**
+ * SceneHints encapsulates various rendering and interaction preferences for a scene object.
+ */
 public class SceneHints implements Savable {
 
     /**
