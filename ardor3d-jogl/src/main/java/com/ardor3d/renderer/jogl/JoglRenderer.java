@@ -1112,7 +1112,8 @@ public class JoglRenderer extends AbstractRenderer {
 
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
-                gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, offset);
+                // offset in this call is done in bytes.
+                gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, offset * 4);
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }

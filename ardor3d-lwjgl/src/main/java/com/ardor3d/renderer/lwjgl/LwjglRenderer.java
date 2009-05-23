@@ -1043,7 +1043,8 @@ public class LwjglRenderer extends AbstractRenderer {
 
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
-                GL11.glDrawElements(glIndexMode, count, GL11.GL_UNSIGNED_INT, offset);
+                // offset in this call is done in bytes.
+                GL11.glDrawElements(glIndexMode, count, GL11.GL_UNSIGNED_INT, offset * 4);
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
