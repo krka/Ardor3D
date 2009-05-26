@@ -46,7 +46,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * The WaterNode handles rendering of a water effect on all of it's children. What is reflected in the water is
  * controlled through setReflectedScene/addReflectedScene. The skybox (if any) needs to be explicitly set through
- * setSkybox since it needs to be relocated when renderering the reflection. The water is treated as a plane no matter
+ * setSkybox since it needs to be relocated when rendering the reflection. The water is treated as a plane no matter
  * what the geometry is, which is controlled through the water node plane equation settings.
  */
 public class WaterNode extends Node {
@@ -450,18 +450,6 @@ public class WaterNode extends Node {
             spatial.setRenderState(fallbackTextureState);
             spatial.setRenderState(as1);
         }
-    }
-
-    private void setFallbackEffectOnSpatial(final Spatial spatial) {
-        if (fallbackTextureState == null) {
-            createFallbackData();
-        }
-
-        spatial.setRenderState(cullBackFace);
-        spatial.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-        spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        spatial.setRenderState(fallbackTextureState);
-        spatial.setRenderState(as1);
     }
 
     // temporary vectors for mem opt.
