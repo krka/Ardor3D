@@ -35,7 +35,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -79,7 +79,7 @@ public class GLSLShaderObjectsState extends RenderState {
     public GLSLShaderDataLogic _shaderDataLogic;
 
     /** The Mesh this shader currently operates on during rendering */
-    public MeshData _meshData;
+    public Mesh _mesh;
 
     public boolean _needSendShader = true;
 
@@ -225,8 +225,8 @@ public class GLSLShaderObjectsState extends RenderState {
      * 
      * @param meshData
      */
-    public void setMeshData(final MeshData meshData) {
-        _meshData = meshData;
+    public void setMesh(final Mesh mesh) {
+        _mesh = mesh;
     }
 
     /**

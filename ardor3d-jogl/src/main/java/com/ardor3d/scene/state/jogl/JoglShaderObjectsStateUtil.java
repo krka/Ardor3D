@@ -176,7 +176,7 @@ public abstract class JoglShaderObjectsStateUtil {
                 }
 
                 if (state._shaderDataLogic != null) {
-                    state._shaderDataLogic.applyData(state, state._meshData, renderer);
+                    state._shaderDataLogic.applyData(state, state._mesh, renderer);
                 }
             }
 

@@ -10,6 +10,8 @@
 
 package com.ardor3d.example;
 
+import java.awt.Component;
+
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.jogl.JoglCanvas;
@@ -24,8 +26,6 @@ import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-
-import java.awt.*;
 
 /**
  * Guice configuration module for use with a single Jogl window.
