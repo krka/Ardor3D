@@ -13,12 +13,12 @@ package com.ardor3d.renderer.queue;
 public enum RenderBucketType {
 
     /**
-     * Use your parent's RenderBucketType. If you do not have a parent, {@link #Skip} will be used instead.
+     * Use your parent's RenderBucketType. If you do not have a parent, {@link #Opaque} will be used instead.
      */
     Inherit,
 
     /**
-     * TODO: Add definition.
+     * Used for objects that we want to guarantee will be rendered first.
      */
     PreBucket,
 
@@ -47,7 +47,7 @@ public enum RenderBucketType {
     Ortho,
 
     /**
-     * TODO: Add definition.
+     * Used for objects that we want to guarantee will be rendered last.
      */
     PostBucket,
 

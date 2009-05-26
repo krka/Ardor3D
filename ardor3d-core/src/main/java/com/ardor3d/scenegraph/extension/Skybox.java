@@ -200,7 +200,7 @@ public class Skybox extends Node {
             // Make sure the quad is viewable
             _skyboxQuads[i].getSceneHints().setCullHint(CullHint.Never);
 
-            // _skyboxQuads[i].setRenderBucketType(RenderBucketType.Skip);
+            // Add to the prebucket.
             _skyboxQuads[i].getSceneHints().setRenderBucketType(RenderBucketType.PreBucket);
 
             // And attach the skybox as a child

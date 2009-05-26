@@ -280,7 +280,8 @@ public class SceneHints implements Savable {
      * <p>
      * This method returns the effective bucket type that is used for rendering. If the type is set to
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
-     * parent will be used during rendering.
+     * parent will be used during rendering. If no parent, then
+     * {@link com.ardor3d.renderer.queue.RenderBucketType#Opaque Opaque} is used.
      * 
      * @return the render queue mode used for this spatial.
      * @see com.ardor3d.renderer.queue.RenderBucketType
@@ -295,7 +296,7 @@ public class SceneHints implements Savable {
             return parent.getSceneHints().getRenderBucketType();
         }
 
-        return RenderBucketType.Skip;
+        return RenderBucketType.Opaque;
     }
 
     /**
@@ -304,7 +305,8 @@ public class SceneHints implements Savable {
      * <p>
      * This method returns the actual bucket type that is set on this spatial, if the type is set to
      * {@link com.ardor3d.renderer.queue.RenderBucketType#Inherit Inherit} then the bucket type from the spatial's
-     * parent will be used during rendering.
+     * parent will be used during rendering. If no parent, then
+     * {@link com.ardor3d.renderer.queue.RenderBucketType#Opaque Opaque} is used.
      * 
      * @return the render queue mode set on this spatial.
      * @see com.ardor3d.renderer.queue.RenderBucketType
