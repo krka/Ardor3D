@@ -127,7 +127,7 @@ public final class Debugger {
         }
     }
 
-    private static void drawBounds(final BoundingVolume bv, final Renderer r) {
+    public static void drawBounds(final BoundingVolume bv, final Renderer r) {
 
         switch (bv.getType()) {
             case AABB:
@@ -150,18 +150,18 @@ public final class Debugger {
         boundingSphere.setSolidColor(color);
     }
 
-    private static void drawBoundingSphere(final BoundingSphere sphere, final Renderer r) {
+    public static void drawBoundingSphere(final BoundingSphere sphere, final Renderer r) {
         boundingSphere.setData(sphere.getCenter(), 10, 10, sphere.getRadius());
         boundingSphere.draw(r);
     }
 
-    private static void drawBoundingBox(final BoundingBox box, final Renderer r) {
+    public static void drawBoundingBox(final BoundingBox box, final Renderer r) {
         boundingBox.getCenter().set(box.getCenter());
         boundingBox.setData(boundingBox.getCenter(), box.getXExtent(), box.getYExtent(), box.getZExtent());
         boundingBox.draw(r);
     }
 
-    private static void drawOBB(final OrientedBoundingBox box, final Renderer r) {
+    public static void drawOBB(final OrientedBoundingBox box, final Renderer r) {
         boundingOB.getCenter().set(box.getCenter());
         boundingOB.getxAxis().set(box.getXAxis());
         boundingOB.getYAxis().set(box.getYAxis());
