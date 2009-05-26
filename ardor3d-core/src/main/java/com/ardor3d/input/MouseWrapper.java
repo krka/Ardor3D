@@ -22,7 +22,7 @@ public interface MouseWrapper {
     public void init();
 
     /**
-     * Returns a peeking iterator that allows the client to loop through all keyboard events that have not yet been
+     * Returns a peeking iterator that allows the client to loop through all mouse events that have not yet been
      * handled.
      * 
      * @return an iterator that allows the client to check which events have still not been handled
