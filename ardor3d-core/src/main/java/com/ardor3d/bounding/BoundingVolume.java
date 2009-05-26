@@ -174,6 +174,10 @@ public abstract class BoundingVolume implements Serializable, Savable {
         _center.set(newCenter);
     }
 
+    public void setCenter(final double x, final double y, final double z) {
+        _center.set(x, y, z);
+    }
+
     /**
      * Find the distance from the center of this Bounding Volume to the given point.
      * 
