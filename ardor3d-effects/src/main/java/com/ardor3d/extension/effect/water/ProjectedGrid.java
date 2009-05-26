@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
-import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
@@ -53,8 +52,6 @@ public class ProjectedGrid extends Mesh {
 
     private double viewPortWidth = 0;
     private double viewPortHeight = 0;
-    private double viewPortLeft = 0;
-    private double viewPortBottom = 0;
 
     private final Vector4 origin = new Vector4();
     private final Vector4 direction = new Vector4();
@@ -68,22 +65,12 @@ public class ProjectedGrid extends Mesh {
     private final Vector4 intersectTopRight = new Vector4();
     private final Vector4 intersectBottomRight = new Vector4();
 
-    private final Matrix4 modelViewMatrix1 = new Matrix4();
-    private final Matrix4 projectionMatrix1 = new Matrix4();
-    private final Matrix4 modelViewProjection1 = new Matrix4();
-    private final Matrix4 modelViewProjectionInverse1 = new Matrix4();
-    private final Vector4 intersectBottomLeft1 = new Vector4();
-    private final Vector4 intersectTopLeft1 = new Vector4();
-    private final Vector4 intersectTopRight1 = new Vector4();
-    private final Vector4 intersectBottomRight1 = new Vector4();
-
     private final Vector3 camloc = new Vector3();
     private final Vector3 camdir = new Vector3();
     private final Vector4 pointFinal = new Vector4();
     private final Vector3 realPoint = new Vector3();
 
     public boolean freezeProjector = false;
-    public boolean useReal = false;
     private final Vector3 projectorLoc = new Vector3();
     private final Timer timer;
     private final Camera camera;
@@ -155,8 +142,6 @@ public class ProjectedGrid extends Mesh {
 
         viewPortWidth = camera.getWidth();
         viewPortHeight = camera.getHeight();
-        viewPortLeft = camera.getViewPortLeft();
-        viewPortBottom = camera.getViewPortBottom();
         modelViewMatrix.set(camera.getModelViewMatrix());
         projectionMatrix.set(camera.getProjectionMatrix());
         modelViewProjectionInverse.set(modelViewMatrix).multiplyLocal(projectionMatrix);
@@ -169,25 +154,11 @@ public class ProjectedGrid extends Mesh {
         projectorLoc.set(camera.getLocation());
         realPoint.set(projectorLoc).addLocal(camera.getDirection());
 
-        Matrix4 rangeMatrix = null;
-        if (useReal) {
-            final Vector3 fakeLoc = new Vector3(projectorLoc);
-            final Vector3 fakePoint = new Vector3(realPoint);
-            fakeLoc.addLocal(0, 1000, 0);
-
-            rangeMatrix = getMinMax(fakeLoc, fakePoint, camera);
-        }
-
         MathUtils.matrixLookAt(projectorLoc, realPoint, Vector3.UNIT_Y, modelViewMatrix);
-        MathUtils.matrixPerspective(camera.getFovY() + 10.0f, viewPortWidth / viewPortHeight, camera.getFrustumNear(),
+        MathUtils.matrixPerspective(camera.getFovY() + 10.0, viewPortWidth / viewPortHeight, camera.getFrustumNear(),
                 camera.getFrustumFar(), projectionMatrix);
         modelViewProjectionInverse.set(modelViewMatrix).multiplyLocal(projectionMatrix);
         modelViewProjectionInverse.invertLocal();
-
-        if (useReal && rangeMatrix != null) {
-            rangeMatrix.multiplyLocal(modelViewProjectionInverse);
-            modelViewProjectionInverse.set(rangeMatrix);
-        }
 
         source.set(0, 0);
         getWorldIntersection(source, modelViewProjectionInverse, intersectBottomLeft);
@@ -335,66 +306,8 @@ public class ProjectedGrid extends Mesh {
         Vector3.releaseTempInstance(tempNorm);
     }
 
-    private Matrix4 getMinMax(final Vector3 fakeLoc, final Vector3 fakePoint, final Camera cam) {
-        Matrix4 rangeMatrix;
-        MathUtils.matrixLookAt(fakeLoc, fakePoint, Vector3.UNIT_Y, modelViewMatrix1);
-        MathUtils.matrixPerspective(camera.getFovY(), viewPortWidth / viewPortHeight, cam.getFrustumNear(), cam
-                .getFrustumFar(), projectionMatrix1);
-        modelViewProjection1.set(modelViewMatrix1).multiplyLocal(projectionMatrix1);
-        modelViewProjectionInverse1.set(modelViewProjection1).invertLocal();
-
-        source.set(0, 0);
-        getWorldIntersection(source, modelViewProjectionInverse, intersectBottomLeft1);
-        source.set(0, 1);
-        getWorldIntersection(source, modelViewProjectionInverse, intersectTopLeft1);
-        source.set(1, 1);
-        getWorldIntersection(source, modelViewProjectionInverse, intersectTopRight1);
-        source.set(1, 0);
-        getWorldIntersection(source, modelViewProjectionInverse, intersectBottomRight1);
-
-        modelViewProjection1.applyPre(intersectBottomLeft1, intersectBottomLeft1);
-        modelViewProjection1.applyPre(intersectTopLeft1, intersectTopLeft1);
-        modelViewProjection1.applyPre(intersectTopRight1, intersectTopRight1);
-        modelViewProjection1.applyPre(intersectBottomRight1, intersectBottomRight1);
-
-        double minX = Float.MAX_VALUE, minY = Float.MAX_VALUE, maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE;
-        minX = Math.min(intersectBottomLeft1.getX(), minX);
-        minX = Math.min(intersectTopLeft1.getX(), minX);
-        minX = Math.min(intersectTopRight1.getX(), minX);
-        minX = Math.min(intersectBottomRight1.getX(), minX);
-
-        maxX = Math.max(intersectBottomLeft1.getX(), maxX);
-        maxX = Math.max(intersectTopLeft1.getX(), maxX);
-        maxX = Math.max(intersectTopRight1.getX(), maxX);
-        maxX = Math.max(intersectBottomRight1.getX(), maxX);
-
-        minY = Math.min(intersectBottomLeft1.getY(), minY);
-        minY = Math.min(intersectTopLeft1.getY(), minY);
-        minY = Math.min(intersectTopRight1.getY(), minY);
-        minY = Math.min(intersectBottomRight1.getY(), minY);
-
-        maxY = Math.max(intersectBottomLeft1.getY(), maxY);
-        maxY = Math.max(intersectTopLeft1.getY(), maxY);
-        maxY = Math.max(intersectTopRight1.getY(), maxY);
-        maxY = Math.max(intersectBottomRight1.getY(), maxY);
-
-        rangeMatrix = new Matrix4(maxX - minX, 0, 0, minX, 0, maxY - minY, 0, minY, 0, 0, 1, 0, 0, 0, 0, 1);
-        rangeMatrix.transposeLocal();
-        return rangeMatrix;
-    }
-
     private void interpolate(final Vector4 beginVec, final Vector4 finalVec, final double changeAmnt,
             final Vector4 resultVec) {
-        resultVec.lerpLocal(beginVec, finalVec, changeAmnt);
-
-        // resultVec.x = (1 - changeAmnt) * beginVec.x + changeAmnt * finalVec.x;
-        // // resultVec.y = (1 - changeAmnt) * beginVec.y + changeAmnt * finalVec.y;
-        // resultVec.z = (1 - changeAmnt) * beginVec.z + changeAmnt * finalVec.z;
-        // resultVec.w = (1 - changeAmnt) * beginVec.w + changeAmnt * finalVec.w;
-    }
-
-    private void interpolate(final Vector3 beginVec, final Vector3 finalVec, final double changeAmnt,
-            final Vector3 resultVec) {
         resultVec.lerpLocal(beginVec, finalVec, changeAmnt);
     }
 
@@ -424,17 +337,6 @@ public class ProjectedGrid extends Mesh {
         store.set(origin);
         store.addLocal(direction);
     }
-
-    private double homogenousIntersect(final Quaternion a, final Quaternion xa, final Quaternion xb) {
-        // double tx = -xb.w*(dotXYZ(a.xyz,xa.xyz)+xa.w*a.w);
-        // double tw = dotXYZ(a,xa.w*xb.xyz-xb.w*xa.xyz);
-        // return tx/tw;
-        return 0;
-    }
-
-    // private double dotXYZ(final Quaternion a, final Quaternion b) {
-    // return a.x * b.x + a.y * b.y + a.z * b.z;
-    // }
 
     /**
      * <code>getSurfaceNormal</code> returns the normal of an arbitrary point on the terrain. The normal is linearly
