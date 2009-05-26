@@ -48,6 +48,21 @@ public class AbstractRenderBucket implements RenderBucket {
         _currentList[_currentListSize++] = spatial;
     }
 
+    public void remove(final Spatial spatial) {
+        int index = 0;
+        for (int i = 0; i < _currentListSize; i++) {
+            if (_currentList[index] == spatial) {
+                break;
+            }
+            index++;
+        }
+        for (int i = index; i < _currentListSize - 1; i++) {
+            _currentList[i] = _currentList[i + 1];
+        }
+
+        _currentListSize--;
+    }
+
     public void clear() {
         for (int i = 0; i < _currentListSize; i++) {
             _currentList[i] = null;

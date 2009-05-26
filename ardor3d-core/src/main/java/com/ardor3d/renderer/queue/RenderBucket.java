@@ -15,6 +15,8 @@ import com.ardor3d.scenegraph.Spatial;
 public interface RenderBucket {
     void add(Spatial spatial);
 
+    void remove(Spatial spatial);
+
     void clear();
 
     void sort();

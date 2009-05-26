@@ -61,9 +61,34 @@ public class RenderQueue {
         }
     }
 
+    public void removeFromQueue(final Spatial spatial, final RenderBucketType type) {
+        if (type == RenderBucketType.Inherit || type == RenderBucketType.Skip) {
+            throw new Ardor3dException("Can't add spatial to bucket of type: " + type);
+        }
+
+        if (renderBuckets.containsKey(type)) {
+            final RenderBucket renderBucket = renderBuckets.get(type);
+            renderBucket.remove(spatial);
+        } else {
+            throw new Ardor3dException("No bucket exists of type: " + type);
+        }
+    }
+
     public void clearBuckets() {
         for (final RenderBucket renderBucket : renderBuckets.values()) {
             renderBucket.clear();
+        }
+    }
+
+    public void sortBuckets() {
+        for (final RenderBucket renderBucket : renderBuckets.values()) {
+            renderBucket.sort();
+        }
+    }
+
+    public void renderOnly() {
+        for (final RenderBucket renderBucket : renderBuckets.values()) {
+            renderBucket.render();
         }
     }
 
