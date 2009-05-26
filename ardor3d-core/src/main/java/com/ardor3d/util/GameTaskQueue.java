@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * <code>GameTaskQueue</code> is a simple queueing system to enqueue tasks that need to be accomplished in the OpenGL
+ * <code>GameTaskQueue</code> is a simple queuing system to enqueue tasks that need to be accomplished in the OpenGL
  * thread and get back a Future object to be able to retrieve a return from the Callable that was passed in.
  * 
  * @see Future
@@ -28,9 +28,9 @@ public class GameTaskQueue {
     public static final String UPDATE = "update";
 
     private final ConcurrentLinkedQueue<GameTask<?>> queue = new ConcurrentLinkedQueue<GameTask<?>>();
-    private final AtomicBoolean executeAll = new AtomicBoolean();
+    private final AtomicBoolean executeMultiple = new AtomicBoolean();
 
-	// Default execution time is 0, which means only 1 task will be executed at a time.
+    // Default execution time is 0, which means only 1 task will be executed at a time.
     private long _executionTime = 0;
 
     /**
@@ -39,32 +39,34 @@ public class GameTaskQueue {
      * @return boolean
      */
     public boolean isExecuteAll() {
-        return executeAll.get();
+        return executeMultiple.get();
     }
 
     /**
-     * Sets the executeAll boolean value to determine if when execute() is invoked if it should simply execute one
-     * Callable, or if it should invoke all. This defaults to false to keep the game moving more smoothly.
-     * 
-     * @param executeAll
+     * @param executeMultiple
+     *            if false, only one task at most is executed per call to execute. If true, we will execute as many
+     *            tasks as are available, bounded by the max execution time.
+     * @see #setExecutionTime(int)
      */
-    public void setExecuteAll(final boolean executeAll) {
-        this.executeAll.set(executeAll);
-        if (executeAll == true) {
+    public void setExecuteMultiple(final boolean executeMultiple) {
+        this.executeMultiple.set(executeMultiple);
+        if (executeMultiple == true) {
             _executionTime = Integer.MAX_VALUE;
         }
     }
 
     /**
-     * Sets the minimum amount of time the queue will execute tasks per frame. If this is set, the execute() loop will
-     * execute as many tasks as it can before the execution window threshold is passed. Any remaining tasks will be
-     * executed in the following frame.
+     * Sets the minimum amount of time the queue will execute tasks per frame. If this is set, executeMultiple is
+     * automatically set to true and the execute() loop will execute as many tasks as it can before the execution window
+     * threshold is passed. Any remaining tasks will be executed in the following frame.
      * 
      * @param msecs
+     *            the maximum number of milliseconds to start tasks. Note that this does not guarantee the tasks will
+     *            finish under this time, only start.
      */
     public void setExecutionTime(final int msecs) {
         _executionTime = msecs;
-        executeAll.set(true);
+        executeMultiple.set(true);
     }
 
     /**
@@ -73,7 +75,7 @@ public class GameTaskQueue {
      * @return -1 if executeAll is false, else min time allocated for task execution per frame
      */
     public long getExecutionTime() {
-        if (executeAll.get() == false) {
+        if (executeMultiple.get() == false) {
             return -1;
         }
         return _executionTime;
@@ -94,8 +96,8 @@ public class GameTaskQueue {
     }
 
     /**
-     * This method should be invoked in the update() or render() method inside the main game to make sure the tasks are
-     * invoked in the OpenGL thread.
+     * Execute the tasks from this queue. Note that depending on the queue type, tasks may expect to be run in a certain
+     * context (for example, the Render queue expects to be run from the Thread owning a GL context.)
      */
     public void execute() {
         final long beginTime = System.currentTimeMillis();
@@ -113,6 +115,6 @@ public class GameTaskQueue {
             }
             task.invoke();
             elapsedTime = System.currentTimeMillis() - beginTime;
-        } while ((executeAll.get()) && (elapsedTime < _executionTime) && ((task = queue.poll()) != null));
+        } while ((executeMultiple.get()) && (elapsedTime < _executionTime) && ((task = queue.poll()) != null));
     }
 }
