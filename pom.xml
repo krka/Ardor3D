@@ -6,7 +6,7 @@
   <version>0.5-SNAPSHOT</version>
   <name>Ardor 3D</name>
 
-  <modules> 
+  <modules>
     <module>ardor3d-core</module>
     <module>ardor3d-jogl</module>
     <module>ardor3d-lwjgl</module>
