@@ -785,7 +785,7 @@ public class JoglRenderer extends AbstractRenderer {
             if (data.isNeedsRefresh()) {
                 final IntBuffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
-                JoglRendererUtil.setBoundVBO(rendRecord, vboID);
+                JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
                 gl.glBufferSubDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer.limit() * 4, dataBuffer);
                 data.setNeedsRefresh(false);
             }
