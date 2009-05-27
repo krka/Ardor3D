@@ -177,8 +177,6 @@ public class ClipmapLevel extends Mesh {
      * @param center
      */
     public void updateVertices() {
-        getMeshData().getIndexBuffer().limit(getMeshData().getIndexBuffer().capacity());
-
         updateVertices((int) clipmapTestFrustum.getLocation().getX(), (int) clipmapTestFrustum.getLocation().getZ());
     }
 
@@ -504,8 +502,9 @@ public class ClipmapLevel extends Mesh {
         }
 
         final IntBuffer indices = getMeshData().getIndexBuffer();
+        indices.limit(getStripIndex());
         indices.rewind();
-        indices.put(tmpIndices);
+        indices.put(tmpIndices, 0, getStripIndex());
     }
 
     /**

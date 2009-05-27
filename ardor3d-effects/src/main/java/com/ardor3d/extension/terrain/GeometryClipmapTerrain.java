@@ -45,6 +45,8 @@ public class GeometryClipmapTerrain extends Node {
     private final int clipSideSize;
     private final Vector3 lightDirection = new Vector3(1, 1, 2);
 
+    private boolean initialized = false;
+
     /** Shader for rendering clipmap geometry with morphing. */
     private GLSLShaderObjectsState _geometryClipmapShader;
 
@@ -69,6 +71,12 @@ public class GeometryClipmapTerrain extends Node {
                 attachChild(clipmap);
 
                 clipmap.getSceneHints().setDataMode(DataMode.VBO);
+
+                // clipmap.getSceneHints().setDataMode(DataMode.VBOInterleaved);
+                // final FloatBufferData interleavedData = new FloatBufferData();
+                // interleavedData.setVboAccessMode(VBOAccessMode.DynamicDraw);
+                // clipmap.getMeshData().setInterleavedData(interleavedData);
+
                 clipmap.getMeshData().getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
                 clipmap.getMeshData().getIndices().setVboAccessMode(VBOAccessMode.DynamicDraw);
             }
@@ -116,18 +124,21 @@ public class GeometryClipmapTerrain extends Node {
     public void draw(final Renderer r) {
         updateShader();
 
+        if (!initialized) {
+            for (int i = clips.size() - 1; i >= visibleLevels; i--) {
+                final ClipmapLevel clip = clips.get(i);
+
+                clip.getMeshData().getIndexBuffer().limit(clip.getMeshData().getIndexBuffer().capacity());
+            }
+
+            initialized = true;
+        }
+
         // draw levels from coarse to fine.
         for (int i = clips.size() - 1; i >= visibleLevels; i--) {
             final ClipmapLevel clip = clips.get(i);
 
             if (clip.getStripIndex() > 0) {
-                int[] indexLengths = clip.getMeshData().getIndexLengths();
-                if (indexLengths == null) {
-                    indexLengths = new int[1];
-                    clip.getMeshData().setIndexLengths(indexLengths);
-                }
-                indexLengths[0] = clip.getStripIndex();
-
                 clip.draw(r);
             }
         }
