@@ -28,7 +28,6 @@ import com.ardor3d.renderer.state.GLSLShaderDataLogic;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.hint.DataMode;
 
 /**
@@ -70,15 +69,16 @@ public class GeometryClipmapTerrain extends Node {
                 clips.add(clipmap);
                 attachChild(clipmap);
 
-                clipmap.getSceneHints().setDataMode(DataMode.VBO);
+                clipmap.getSceneHints().setDataMode(DataMode.Arrays);
 
                 // clipmap.getSceneHints().setDataMode(DataMode.VBOInterleaved);
                 // final FloatBufferData interleavedData = new FloatBufferData();
                 // interleavedData.setVboAccessMode(VBOAccessMode.DynamicDraw);
                 // clipmap.getMeshData().setInterleavedData(interleavedData);
 
-                clipmap.getMeshData().getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
-                clipmap.getMeshData().getIndices().setVboAccessMode(VBOAccessMode.DynamicDraw);
+                // clipmap.getSceneHints().setDataMode(DataMode.VBO);
+                // clipmap.getMeshData().getVertexCoords().setVboAccessMode(VBOAccessMode.DynamicDraw);
+                // clipmap.getMeshData().getIndices().setVboAccessMode(VBOAccessMode.DynamicDraw);
             }
         } catch (final Exception ex) {
             ex.printStackTrace();
