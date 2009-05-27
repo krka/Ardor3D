@@ -3,7 +3,7 @@
   <groupId>com.ardor3d</groupId>
   <artifactId>ardor3d</artifactId>
   <packaging>pom</packaging>
-  <version>0.5</version>
+  <version>0.6-SNAPSHOT</version>
   <name>Ardor 3D</name>
 
   <modules>
@@ -20,7 +20,7 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/tags/ardor3d-0.5</connection>
+    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk</connection>
   </scm>
   
   <repositories>
