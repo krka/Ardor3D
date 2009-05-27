@@ -12,12 +12,12 @@ package com.ardor3d.extension.terrain;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
+import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
@@ -26,9 +26,6 @@ import com.ardor3d.util.geom.BufferUtils;
  * ClipmapLevel
  */
 public class ClipmapLevel extends Mesh {
-
-    /** The Constant logger. */
-    private static final Logger logger = Logger.getLogger(ClipmapLevel.class.getName());
 
     /**
      * Precalculated useful variables.
@@ -502,9 +499,9 @@ public class ClipmapLevel extends Mesh {
         }
 
         final IntBuffer indices = getMeshData().getIndexBuffer();
-        indices.limit(getStripIndex());
-        indices.rewind();
+        indices.clear();
         indices.put(tmpIndices, 0, getStripIndex());
+        indices.flip();
     }
 
     /**
@@ -555,7 +552,7 @@ public class ClipmapLevel extends Mesh {
                     fillRow(left, right, z, z + 1);
                 }
             } else {
-                // Top boarder is over the bottom boarder. Update from top to bottom.
+                // Top border is over the bottom border. Update from top to bottom.
                 for (int z = top; z <= bottom - 1; z++) {
                     fillRow(left, right, z, z + 1);
                 }
@@ -606,12 +603,8 @@ public class ClipmapLevel extends Mesh {
     private void addIndex(final int x, final int z) {
         // calculate the index
         final int i = x + z * clipSideSize;
-
-        // final IntBuffer indices = getMeshData().getIndexBuffer();
-
         // add the index and increment counter.
         final int currentStripIndex = getStripIndex();
-        // indices.put(currentStripIndex, i);
         tmpIndices[currentStripIndex] = i;
         stripIndex++;
     }
@@ -620,7 +613,7 @@ public class ClipmapLevel extends Mesh {
      * Gets the number of triangles that are visible in current frame. This changes every frame.
      */
     public int getStripIndex() {
-        return stripIndex >= 3 ? stripIndex - 2 : 0;
+        return stripIndex;
     }
 
     /**
