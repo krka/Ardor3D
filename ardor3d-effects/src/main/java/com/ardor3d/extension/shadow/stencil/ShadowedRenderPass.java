@@ -573,8 +573,8 @@ public class ShadowedRenderPass extends Pass {
 
     protected void getShadowLights(final Spatial s) {
         if (s instanceof Mesh) {
-            final Mesh g = (Mesh) s;
-            final LightState ls = (LightState) g._getWorldRenderState(StateType.Light);
+            final Mesh mesh = (Mesh) s;
+            final LightState ls = (LightState) mesh.getWorldRenderState(StateType.Light);
             if (ls != null) {
                 for (int q = ls.getNumberOfChildren(); --q >= 0;) {
                     final Light l = ls.get(q);
@@ -643,7 +643,7 @@ public class ShadowedRenderPass extends Pass {
             final MeshShadows sv = _meshes.get(mesh);
 
             // Create the geometry for the shadow volume
-            final LightState state = (LightState) mesh._getWorldRenderState(RenderState.StateType.Light);
+            final LightState state = (LightState) mesh.getWorldRenderState(RenderState.StateType.Light);
             if (state != null) {
                 sv.createGeometry(state);
             }
