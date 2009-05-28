@@ -447,20 +447,14 @@ public class Mesh extends Spatial implements Renderable {
         return _defaultColor;
     }
 
-    public RenderState _getWorldRenderState(final StateType type) {
+    /**
+     * @param type
+     *            StateType of RenderState we want to grab
+     * @return the compiled RenderState for this Mesh, either from RenderStates applied locally or those inherited from
+     *         this Mesh's ancestors. May be null if a state of the given type was never applied in either place.
+     */
+    public RenderState getWorldRenderState(final StateType type) {
         return _states.get(type);
-    }
-
-    public EnumMap<StateType, RenderState> _getWorldRenderStates() {
-        return _states;
-    }
-
-    public RenderState _setWorldRenderState(final RenderState state) {
-        return _states.put(state.getType(), state);
-    }
-
-    public RenderState _clearWorldRenderState(final StateType type) {
-        return _states.remove(type);
     }
 
     /**

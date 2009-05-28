@@ -78,7 +78,7 @@ public class SceneCompiler {
         public void visit(final Spatial spatial) {
             if (spatial instanceof Mesh) {
                 final Mesh mesh = (Mesh) spatial;
-                final TextureState state = (TextureState) mesh._getWorldRenderState(StateType.Texture);
+                final TextureState state = (TextureState) mesh.getWorldRenderState(StateType.Texture);
                 _renderer.applyState(state.getType(), state);
             }
         }

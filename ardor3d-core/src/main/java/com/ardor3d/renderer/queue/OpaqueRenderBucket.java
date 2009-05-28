@@ -48,9 +48,9 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
          * Compare opaque items by their texture states - generally the most expensive switch. Later this might expand
          * to comparisons by other states as well, such as lighting or material.
          */
-        private int compareByStates(final Mesh g1, final Mesh g2) {
-            final TextureState ts1 = (TextureState) g1._getWorldRenderState(RenderState.StateType.Texture);
-            final TextureState ts2 = (TextureState) g2._getWorldRenderState(RenderState.StateType.Texture);
+        private int compareByStates(final Mesh mesh1, final Mesh mesh2) {
+            final TextureState ts1 = (TextureState) mesh1.getWorldRenderState(RenderState.StateType.Texture);
+            final TextureState ts2 = (TextureState) mesh2.getWorldRenderState(RenderState.StateType.Texture);
             if (ts1 == ts2) {
                 return 0;
             } else if (ts1 == null && ts2 != null) {

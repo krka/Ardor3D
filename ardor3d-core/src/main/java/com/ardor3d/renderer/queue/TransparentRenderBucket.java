@@ -12,6 +12,8 @@ package com.ardor3d.renderer.queue;
 
 import java.util.Comparator;
 
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.RenderState;
@@ -43,41 +45,42 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
     @Override
     public void render() {
+        final RenderContext context = ContextManager.getCurrentContext();
         for (int i = 0; i < _currentListSize; i++) {
             final Spatial spatial = _currentList[i];
 
-            if (_twoPassTransparent
-                    && spatial instanceof Mesh
-                    && ((((Mesh) spatial)._getWorldRenderState(RenderState.StateType.Cull) == null || !((Mesh) spatial)
-                            ._getWorldRenderState(RenderState.StateType.Cull).isEnabled()))) {
-                final Mesh geom = (Mesh) spatial;
-                final RenderState oldCullState = geom._getWorldRenderState(RenderState.StateType.Cull);
-                geom._setWorldRenderState(_tranparentCull);
-                final ZBufferState oldZState = (ZBufferState) geom._getWorldRenderState(RenderState.StateType.ZBuffer);
-                geom._setWorldRenderState(_transparentZBuff);
+            if (_twoPassTransparent && spatial instanceof Mesh) {
+                final Mesh mesh = (Mesh) spatial;
+                if (mesh.getWorldRenderState(RenderState.StateType.Cull) == null) {
+                    final RenderState oldCullState = context.getEnforcedState(StateType.Cull);
+                    final RenderState oldZState = context.getEnforcedState(StateType.ZBuffer);
 
-                // first render back-facing tris only
-                _tranparentCull.setCullFace(CullState.Face.Front);
-                geom.draw(_renderer);
+                    context.enforceState(_tranparentCull);
+                    context.enforceState(_transparentZBuff);
 
-                // then render front-facing tris only
-                if (oldZState != null) {
-                    geom._setWorldRenderState(oldZState);
-                } else {
-                    geom._clearWorldRenderState(StateType.ZBuffer);
+                    // first render back-facing tris only
+                    _tranparentCull.setCullFace(CullState.Face.Front);
+                    mesh.draw(_renderer);
+
+                    // then render front-facing tris only
+                    // reset enforced zstate
+                    if (oldZState != null) {
+                        context.enforceState(oldZState);
+                    } else {
+                        context.clearEnforcedState(StateType.ZBuffer);
+                    }
+                    _tranparentCull.setCullFace(CullState.Face.Back);
+                    mesh.draw(_renderer);
+                    // reset enforced cull state
+                    if (oldCullState != null) {
+                        context.enforceState(oldCullState);
+                    } else {
+                        context.clearEnforcedState(StateType.Cull);
+                    }
+                    continue;
                 }
-                _tranparentCull.setCullFace(CullState.Face.Back);
-                geom.draw(_renderer);
-                if (oldCullState != null) {
-                    geom._setWorldRenderState(oldCullState);
-                } else {
-                    geom._clearWorldRenderState(StateType.Cull);
-                }
-            } else {
-                spatial.draw(_renderer);
             }
-            // TODO: this optimization should not be in the Spatial
-            // obj.queueDistance = Double.NEGATIVE_INFINITY;
+            spatial.draw(_renderer);
         }
     }
 
