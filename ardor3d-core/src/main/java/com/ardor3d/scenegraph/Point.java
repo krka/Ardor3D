@@ -13,9 +13,9 @@ package com.ardor3d.scenegraph;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Vector2;
-import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -53,8 +53,8 @@ public class Point extends Mesh {
      * @param texture
      *            the texture coordinates of the points.
      */
-    public Point(final String name, final Vector3[] vertex, final Vector3[] normal, final ColorRGBA[] color,
-            final Vector2[] texture) {
+    public Point(final String name, final ReadOnlyVector3[] vertex, final ReadOnlyVector3[] normal,
+            final ReadOnlyColorRGBA[] color, final ReadOnlyVector2[] texture) {
         super(name);
         reconstruct(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
                 .createFloatBuffer(color), FloatBufferDataUtil.makeNew(texture));

@@ -10,12 +10,12 @@
 
 package com.ardor3d.scenegraph;
 
-import com.ardor3d.math.Vector2;
-import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class FloatBufferDataUtil {
-    public static FloatBufferData makeNew(final Vector2[] coords) {
+    public static FloatBufferData makeNew(final ReadOnlyVector2[] coords) {
         if (coords == null) {
             return null;
         }
@@ -23,7 +23,7 @@ public class FloatBufferDataUtil {
         return new FloatBufferData(BufferUtils.createFloatBuffer(coords), 2);
     }
 
-    public static FloatBufferData makeNew(final Vector3[] coords) {
+    public static FloatBufferData makeNew(final ReadOnlyVector3[] coords) {
         if (coords == null) {
             return null;
         }
