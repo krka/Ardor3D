@@ -175,10 +175,13 @@ public final class Debugger {
 
     private static final Line normalLines = new Line("normLine");
     static {
+        normalLines.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         normalLines.setRenderState(new ZBufferState());
         normalLines.setLineWidth(3.0f);
         normalLines.getMeshData().setIndexMode(IndexMode.Lines);
-        normalLines.reconstruct(BufferUtils.createVector3Buffer(500), null, BufferUtils.createColorBuffer(500), null);
+        normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
+        normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
+        normalLines.generateIndices();
         normalLines.updateWorldRenderStates(false);
     }
     private static final Vector3 _normalVect = new Vector3();

@@ -649,7 +649,9 @@ public class BMText extends Mesh {
                 cursorX += chr.xadvance + kern + _spacing;
             }
         }
-        reconstruct(vertices, null, null, new FloatBufferData(texCrds, 2), indices);
+        _meshData.setVertexBuffer(vertices);
+        _meshData.setTextureCoords(new FloatBufferData(texCrds, 2), 0);
+        _meshData.setIndexBuffer(indices);
     }
 
     // this is inefficient yet incredibly convenient

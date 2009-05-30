@@ -182,7 +182,8 @@ public class MeshShadows {
                     createShadowQuads(vertex, edges, shadowVertex, shadowNormal, shadowIndex, light);
 
                     // Rebuild the Mesh
-                    lv.reconstruct(shadowVertex, shadowNormal, null, null);
+                    lv.getMeshData().setVertexBuffer(shadowVertex);
+                    lv.getMeshData().setNormalBuffer(shadowNormal);
                     lv.getMeshData().setIndexBuffer(shadowIndex);
                     shadowVertex.rewind();
                     shadowIndex.rewind();

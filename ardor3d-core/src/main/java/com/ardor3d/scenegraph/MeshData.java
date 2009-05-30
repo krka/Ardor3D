@@ -91,11 +91,10 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setVertexBuffer(final FloatBuffer vertexBuffer) {
         if (vertexBuffer == null) {
-            _vertexCoords = null;
+            setVertexCoords(null);
         } else {
-            _vertexCoords = new FloatBufferData(vertexBuffer, 3);
+            setVertexCoords(new FloatBufferData(vertexBuffer, 3));
         }
-        updateVertexCount();
     }
 
     /**
@@ -115,6 +114,7 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setVertexCoords(final FloatBufferData bufferData) {
         _vertexCoords = bufferData;
+        updateVertexCount();
     }
 
     /**

@@ -56,7 +56,7 @@ public class Point extends Mesh {
     public Point(final String name, final ReadOnlyVector3[] vertex, final ReadOnlyVector3[] normal,
             final ReadOnlyColorRGBA[] color, final ReadOnlyVector2[] texture) {
         super(name);
-        reconstruct(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
+        setupData(BufferUtils.createFloatBuffer(vertex), BufferUtils.createFloatBuffer(normal), BufferUtils
                 .createFloatBuffer(color), FloatBufferDataUtil.makeNew(texture));
         _meshData.setIndexMode(IndexMode.Points);
     }
@@ -79,8 +79,24 @@ public class Point extends Mesh {
     public Point(final String name, final FloatBuffer vertex, final FloatBuffer normal, final FloatBuffer color,
             final FloatBufferData coords) {
         super(name);
-        reconstruct(vertex, normal, color, coords);
+        setupData(vertex, normal, color, coords);
         _meshData.setIndexMode(IndexMode.Points);
+    }
+
+    /**
+     * Initialize the meshdata object with data.
+     * 
+     * @param vertices
+     * @param normals
+     * @param colors
+     * @param coords
+     */
+    private void setupData(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
+            final FloatBufferData coords) {
+        _meshData.setVertexBuffer(vertices);
+        _meshData.setNormalBuffer(normals);
+        _meshData.setColorBuffer(colors);
+        _meshData.setTextureCoords(coords, 0);
     }
 
     /**

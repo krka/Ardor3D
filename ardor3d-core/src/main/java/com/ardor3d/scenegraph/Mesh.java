@@ -12,7 +12,6 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Stack;
@@ -350,46 +349,6 @@ public class Mesh extends Spatial implements Renderable {
 
     public void setCastsShadows(final boolean castsShadows) {
         _castsShadows = castsShadows;
-    }
-
-    /**
-     * <code>reconstruct</code> reinitializes the geometry with new data. This will reuse the geometry object.
-     * 
-     * @param vertices
-     *            the new vertices to use.
-     * @param normals
-     *            the new normals to use.
-     * @param colors
-     *            the new colors to use.
-     * @param coords
-     *            the new texture coordinates to use (position 0).
-     */
-    public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final FloatBufferData coords) {
-
-        _meshData.setVertexBuffer(vertices);
-        _meshData.setNormalBuffer(normals);
-        _meshData.setColorBuffer(colors);
-        _meshData.setTextureCoords(coords, 0);
-    }
-
-    /**
-     * <code>reconstruct</code> reinitializes the geometry with new data. This will reuse the geometry object.
-     * 
-     * @param vertices
-     *            the new vertices to use.
-     * @param normals
-     *            the new normals to use.
-     * @param colors
-     *            the new colors to use.
-     * @param coords
-     *            the new texture coordinates to use (position 0).
-     */
-    public void reconstruct(final FloatBuffer vertices, final FloatBuffer normals, final FloatBuffer colors,
-            final FloatBufferData coords, final IntBuffer indices) {
-
-        reconstruct(vertices, normals, colors, coords);
-        _meshData.setIndexBuffer(indices);
     }
 
     /**
