@@ -104,6 +104,7 @@ import com.ardor3d.util.stat.StatType;
 public class LwjglRenderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(LwjglRenderer.class.getName());
 
+    // TODO: move these to a context record.
     private FloatBuffer _oldVertexBuffer;
 
     private FloatBuffer _oldNormalBuffer;
