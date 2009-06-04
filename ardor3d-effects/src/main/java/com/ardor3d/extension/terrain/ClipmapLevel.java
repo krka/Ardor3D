@@ -14,10 +14,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
-import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
@@ -107,15 +107,12 @@ public class ClipmapLevel extends Mesh {
             final float heightScale, final HeightmapPyramid heightmapPyramid) throws Exception {
         super("Clipmap Level " + levelIndex);
 
-        // Check some exception cases first
+        // Check some exception cases
         if (levelIndex < 0) {
-            throw new Exception("L must be positive");
+            throw new Exception("levelIndezx must be positive");
         }
-        if (clipSideSize != 15 && clipSideSize != 31 && clipSideSize != 63 && clipSideSize != 127
-                && clipSideSize != 255) {
-            // The check for "one less of power of two" would be a bit
-            // longer. We check only for some handy legal values.
-            throw new Exception("N must be 15, 31, 63, 127 or 255");
+        if (!MathUtils.isPowerOfTwo(clipSideSize + 1)) {
+            throw new Exception("clipSideSize must be one less than power of two");
         }
 
         // Apply the values
@@ -143,14 +140,15 @@ public class ClipmapLevel extends Mesh {
     private void initialize() {
         getMeshData().setIndexMode(IndexMode.TriangleStrip);
 
-        // N is the number of vertices per clipmapside, so number of all vertices is N * N
+        // clipSideSize is the number of vertices per clipmapside, so number of all vertices is clipSideSize *
+        // clipSideSize
         final FloatBuffer vertices = BufferUtils.createVector4Buffer(clipSideSize * clipSideSize);
         getMeshData().setVertexCoords(new FloatBufferData(vertices, 4));
 
         // final FloatBuffer textureCoords = BufferUtils.createVector2Buffer(N * N);
         // getMeshData().setTextureBuffer(textureCoords, 0);
 
-        // Gp through all vertices of the current clip and update their height
+        // Go through all vertices of the current clip and update their height
         for (int z = 0; z < clipSideSize; z++) {
             for (int x = 0; x < clipSideSize; x++) {
                 updateVertex(x * vertexDistance, z * vertexDistance);
@@ -191,9 +189,9 @@ public class ClipmapLevel extends Mesh {
         clipRegion.setX(cx - ((clipSideSize + 1) * vertexDistance / 2));
         clipRegion.setY(cz - ((clipSideSize + 1) * vertexDistance / 2));
 
-        // Calculate the modulo to G2 of the new position.
+        // Calculate the modulo to doubleVertexDistance of the new position.
         // This makes sure that the current level always fits in the hole of the
-        // coarser level. The gridspacing of the coarser level is G * 2, so here G2.
+        // coarser level. The gridspacing of the coarser level is vertexDistance * 2, so here doubleVertexDistance.
         int modX = clipRegion.getX() % doubleVertexDistance;
         int modY = clipRegion.getY() % doubleVertexDistance;
         modX += modX < 0 ? doubleVertexDistance : 0;
@@ -212,11 +210,10 @@ public class ClipmapLevel extends Mesh {
         final int zmin = clipRegion.getTop();
         final int zmax = clipRegion.getBottom();
 
-        // Update now the L shaped region.
+        // Update the L shaped region.
         // This replaces the old data with the new one.
         if (dz > 0) {
             // Center moved in positive z direction.
-
             for (int z = zmin; z <= zmax - dz; z += vertexDistance) {
                 if (dx > 0) {
                     // Center moved in positive x direction.
@@ -241,7 +238,6 @@ public class ClipmapLevel extends Mesh {
             }
         } else {
             // Center moved in negative z direction.
-
             for (int z = zmin; z <= zmin - dz - vertexDistance; z += vertexDistance) {
                 // Update the top part of the L shaped region.
                 for (int x = xmin; x <= xmax; x += vertexDistance) {
@@ -335,8 +331,7 @@ public class ClipmapLevel extends Mesh {
             x2 = wrap(x2, lowFieldSize);
             z2 = wrap(z2, lowFieldSize);
 
-            // If we can get the additional height, get the two values,
-            // and apply the median of it to the W value
+            // Apply the median of the coarser heightvalues to the W value
             final float coarser1 = heightmapPyramid.getHeight(levelIndex + 1, x1, z1);
             final float coarser2 = heightmapPyramid.getHeight(levelIndex + 1, x2, z2);
             vertices.put(index * VERT_SIZE + 3, (coarser1 + coarser2) * heightScale * 0.5f); // w
