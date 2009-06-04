@@ -15,7 +15,7 @@ package com.ardor3d.extension.terrain;
  */
 public interface Heightmap {
     /**
-     * Gets the height.
+     * Gets the height at a specific coordinate in the heightmap.
      * 
      * @param x
      *            the x
@@ -27,7 +27,7 @@ public interface Heightmap {
     float getHeight(int x, int y);
 
     /**
-     * Gets the size.
+     * Gets the size of the heightmap (the side).
      * 
      * @return the size
      */

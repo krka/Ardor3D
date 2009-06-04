@@ -96,7 +96,10 @@ public class GeometryClipmapTerrain extends Node {
             }
         }
 
-        // TODO: only run update and refresh if needed.
+        // TODO: Only run update and refresh if needed. A clipmap only needs to be updated if the camera location has
+        // crossed a gridpoint.
+        // TODO: Check for each level readyness and time to generate. Drop levels if over a threshold. (for example when
+        // moving faster than data can be downloaded or generated)
 
         // Update vertices.
         for (int i = clips.size() - 1; i >= visibleLevels; i--) {

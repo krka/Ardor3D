@@ -10,6 +10,9 @@
 
 package com.ardor3d.extension.terrain;
 
+/**
+ * Used to calculate clipmap block boundaries etc
+ */
 public class Region {
     private int x;
     private int y;
