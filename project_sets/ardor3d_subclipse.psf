@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.tigris.subversion.subclipse.core.svnnature">
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-animations,ardor3d-animations"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-awt,ardor3d-awt"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-core,ardor3d-core"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-collada,ardor3d-collada"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-effects,ardor3d-effects"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-examples,ardor3d-examples"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-jogl,ardor3d-jogl"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-lwjgl,ardor3d-lwjgl"/>
-<project reference="0.9.3,http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-swt,ardor3d-swt"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-animations,ardor3d-animations"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-awt,ardor3d-awt"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-core,ardor3d-core"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-collada,ardor3d-collada"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-effects,ardor3d-effects"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-examples,ardor3d-examples"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-jogl,ardor3d-jogl"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-lwjgl,ardor3d-lwjgl"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-swt,ardor3d-swt"/>
 </provider>
 </psf>
