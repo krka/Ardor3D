@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -342,13 +343,12 @@ public class Node extends Spatial {
     }
 
     @Override
-    protected void applyWorldRenderStates(final boolean recurse,
-            final Map<RenderState.StateType, Stack<RenderState>> stateStacks) {
-        super.applyWorldRenderStates(recurse, stateStacks);
+    protected void updateWorldRenderStates(final boolean recurse, final Map<StateType, Stack<RenderState>> stateStacks) {
+        super.updateWorldRenderStates(recurse, stateStacks);
 
         if (recurse) {
             for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
-                _children.get(i).applyWorldRenderStates(true, stateStacks);
+                _children.get(i).updateWorldRenderStates(true, stateStacks);
             }
         }
     }
