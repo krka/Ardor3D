@@ -79,7 +79,9 @@ public class SceneCompiler {
             if (spatial instanceof Mesh) {
                 final Mesh mesh = (Mesh) spatial;
                 final TextureState state = (TextureState) mesh.getWorldRenderState(StateType.Texture);
-                _renderer.applyState(state.getType(), state);
+                if (state != null) {
+                    _renderer.applyState(state.getType(), state);
+                }
             }
         }
 
