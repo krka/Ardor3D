@@ -12,7 +12,7 @@ package com.ardor3d.renderer;
 
 import java.util.concurrent.Callable;
 
-public abstract class RendererCallable implements Callable<Void> {
+public abstract class RendererCallable<V> implements Callable<V> {
 
     private Renderer _renderer;
 

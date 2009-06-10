@@ -97,12 +97,13 @@ public class DisplayListDelegate implements RenderDelegate {
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(new RendererCallable() {
-                    public Void call() throws Exception {
-                        getRenderer().deleteDisplayLists(idMap.get(glref));
-                        return null;
-                    }
-                });
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(
+                        new RendererCallable<Void>() {
+                            public Void call() throws Exception {
+                                getRenderer().deleteDisplayLists(idMap.get(glref));
+                                return null;
+                            }
+                        });
             }
         }
     }
