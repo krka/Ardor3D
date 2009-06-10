@@ -236,7 +236,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     @MainThread
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
-        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).execute(renderer);
+        GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.RENDER)
+                .execute(renderer);
 
         // Clean up card garbage such as textures, vbos, etc.
         ContextGarbageCollector.doRuntimeCleanup(renderer);

@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
-import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.google.common.collect.MapMaker;
 
@@ -38,10 +37,6 @@ public final class GameTaskQueueManager {
             }
             return manager;
         }
-    }
-
-    public static GameTaskQueueManager getManager() {
-        return getManager(ContextManager.getCurrentContext());
     }
 
     private GameTaskQueueManager() {
