@@ -67,10 +67,10 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
@@ -219,7 +219,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         }
 
         // Execute updateQueue item
-        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.UPDATE).execute();
+        GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
+                .execute();
 
         /** Call simpleUpdate in any derived classes of SimpleGame. */
         updateExample(timer);
@@ -235,7 +236,10 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     @MainThread
     public boolean renderUnto(final Renderer renderer) {
         // Execute renderQueue item
-        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).execute();
+        GameTaskQueueManager.getManager().getQueue(GameTaskQueue.RENDER).execute(renderer);
+
+        // Clean up card garbage such as textures, vbos, etc.
+        ContextGarbageCollector.doRuntimeCleanup(renderer);
 
         /** Draw the rootNode and all its children. */
         if (!_canvas.isClosing()) {
@@ -293,8 +297,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     }
 
     protected void quit(final Renderer renderer) {
-        TextureManager.doTextureCleanup(renderer);
-        _canvas.cleanup();
+        ContextGarbageCollector.doFinalCleanup(renderer);
         _canvas.close();
     }
 

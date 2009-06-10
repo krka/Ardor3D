@@ -11,10 +11,11 @@
 package com.ardor3d.util;
 
 import java.io.IOException;
+import java.lang.ref.ReferenceQueue;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.WeakHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,12 +25,16 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.util.ImageLoaderUtil;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Multimap;
 
 /**
  * <code>TextureManager</code> provides static methods for building a <code>Texture</code> object. Typically, the
@@ -38,7 +43,9 @@ import com.google.common.collect.Maps;
 final public class TextureManager {
     private static final Logger logger = Logger.getLogger(TextureManager.class.getName());
 
-    private static WeakHashMap<TextureKey, Texture> m_tCache = new WeakHashMap<TextureKey, Texture>();
+    private static Map<TextureKey, Texture> _tCache = new MapMaker().weakKeys().weakValues().makeMap();
+
+    private static ReferenceQueue<TextureKey> _textureRefQueue = new ReferenceQueue<TextureKey>();
 
     private TextureManager() {}
 
@@ -224,54 +231,104 @@ final public class TextureManager {
     public static void addToCache(final Texture t) {
         if (TextureState.getDefaultTexture() == null
                 || (t != TextureState.getDefaultTexture() && t.getImage() != TextureState.getDefaultTextureImage())) {
-            m_tCache.put(t.getTextureKey(), t);
-        }
-    }
-
-    public static Texture removeFromCache(final TextureKey tk) {
-        return m_tCache.remove(tk);
-    }
-
-    @MainThread
-    public static boolean releaseTexture(final Texture texture, final Renderer deleter) {
-        if (texture == null) {
-            return false;
-        }
-
-        try {
-            deleter.deleteTexture(texture);
-        } catch (final Exception e) {
-        } // ignore.
-        return removeFromCache(texture.getTextureKey()) != null;
-    }
-
-    public static void registerForCleanup(final TextureKey textureKey) {
-    // TODO: implement me.
-    }
-
-    @MainThread
-    public static void doTextureCleanup(final Renderer deleter) {
-    // TODO: implement me.
-    }
-
-    @MainThread
-    public static void clearCache(final Renderer deleter) {
-        final HashMap<TextureKey, Texture> map = Maps.newHashMap(m_tCache);
-        for (final Texture t : map.values()) {
-            releaseTexture(t, deleter);
+            _tCache.put(t.getTextureKey(), t);
         }
     }
 
     public static Texture findCachedTexture(final TextureKey textureKey) {
-        return m_tCache.get(textureKey);
+        return _tCache.get(textureKey);
+    }
+
+    public static Texture removeFromCache(final TextureKey tk) {
+        return _tCache.remove(tk);
+    }
+
+    /**
+     * 
+     * @param deleter
+     */
+    public static void cleanAllTextures(final Renderer deleter) {
+        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+
+        // gather up expired textures... these don't exist in our cache
+        gatherGCdIds(idMap);
+
+        // Walk through the cached items and delete those too.
+        for (final TextureKey key : _tCache.keySet()) {
+            final Set<Object> contextObjects = key.getContextObjects();
+            for (final Object o : contextObjects) {
+                // Add id to map
+                idMap.put(o, key.getTextureIdForContext(o));
+            }
+        }
+
+        handleTextureDelete(deleter, idMap);
+    }
+
+    /**
+     * 
+     */
+    public static void cleanExpiredTextures(final Renderer deleter) {
+        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+
+        // gather up expired textures...
+        gatherGCdIds(idMap);
+
+        // send to be deleted on next render.
+        handleTextureDelete(deleter, idMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void gatherGCdIds(final Multimap<Object, Integer> idMap) {
+        // Pull all expired textures from ref queue and add to an id multimap.
+        ContextIdReference<TextureKey> ref;
+        while ((ref = (ContextIdReference<TextureKey>) _textureRefQueue.poll()) != null) {
+            final Set<Object> contextObjects = ref.getContextObjects();
+            for (final Object o : contextObjects) {
+                // Add id to map
+                idMap.put(o, ref.get(o));
+            }
+            ref.clear();
+        }
+    }
+
+    private static void handleTextureDelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
+        Object currentGLRef = null;
+        // Grab the current context, if any.
+        if (deleter != null && ContextManager.getCurrentContext() != null) {
+            currentGLRef = ContextManager.getCurrentContext().getGlContextRep();
+        }
+        // For each affected context...
+        for (final Object glref : idMap.keySet()) {
+            // If we have a deleter and the context is current, immediately delete
+            if (deleter != null && glref.equals(currentGLRef)) {
+                deleter.deleteTextureIds(idMap.get(glref));
+            }
+            // Otherwise, add a delete request to that context's render task queue.
+            else {
+                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(new RendererCallable() {
+                    public Void call() throws Exception {
+                        getRenderer().deleteTextureIds(idMap.get(glref));
+                        return null;
+                    }
+                });
+            }
+        }
     }
 
     @MainThread
     public static void preloadCache(final Renderer r) {
-        for (final Texture t : m_tCache.values()) {
+        for (final Texture t : _tCache.values()) {
+            if (t == null) {
+                continue;
+            }
             if (t.getTextureKey()._location != null) {
                 r.loadTexture(t, 0);
             }
         }
+    }
+
+    static ReferenceQueue<? super TextureKey> getRefQueue() {
+        return _textureRefQueue;
     }
 }

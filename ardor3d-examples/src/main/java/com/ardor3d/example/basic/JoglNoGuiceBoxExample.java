@@ -32,6 +32,7 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -89,8 +90,7 @@ public class JoglNoGuiceBoxExample implements Scene {
         }
 
         // Done, do cleanup
-        TextureManager.doTextureCleanup(_canvas.getCanvasRenderer().getRenderer());
-        _canvas.cleanup();
+        ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
         _canvas.close();
     }
 

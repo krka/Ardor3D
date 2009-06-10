@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.MapMaker;
 
 /**
  * CollisionTreeManager is an automated system for handling the creation and deletion of CollisionTrees. The manager
@@ -80,7 +80,7 @@ public enum CollisionTreeManager {
      * private constructor for the Singleton. Initializes the cache.
      */
     private CollisionTreeManager() {
-        _cache = Collections.synchronizedMap(new WeakHashMap<Mesh, CollisionTree>(1));
+        _cache = new MapMaker().weakKeys().makeMap();
         _protectedList = Collections.synchronizedList(new ArrayList<Mesh>(1));
         setCollisionTreeController(new UsageTreeController());
     }

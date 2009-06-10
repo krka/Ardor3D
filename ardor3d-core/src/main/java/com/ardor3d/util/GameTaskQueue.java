@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.RendererCallable;
+
 /**
  * <code>GameTaskQueue</code> is a simple queuing system to enqueue tasks that need to be accomplished in the OpenGL
  * thread and get back a Future object to be able to retrieve a return from the Callable that was passed in.
@@ -100,6 +103,14 @@ public class GameTaskQueue {
      * context (for example, the Render queue expects to be run from the Thread owning a GL context.)
      */
     public void execute() {
+        execute(null);
+    }
+
+    /**
+     * Execute the tasks from this queue. Note that depending on the queue type, tasks may expect to be run in a certain
+     * context (for example, the Render queue expects to be run from the Thread owning a GL context.)
+     */
+    public void execute(final Renderer renderer) {
         final long beginTime = System.currentTimeMillis();
         long elapsedTime;
         GameTask<?> task = queue.poll();
@@ -107,6 +118,12 @@ public class GameTaskQueue {
             if (task == null) {
                 return;
             }
+
+            // Inject the Renderer if correct type of Callable.
+            if (renderer != null && task.getCallable() instanceof RendererCallable) {
+                ((RendererCallable) task.getCallable()).setRenderer(renderer);
+            }
+
             while (task.isCancelled()) {
                 task = queue.poll();
                 if (task == null) {

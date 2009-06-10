@@ -340,8 +340,4 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             GLContext.getCurrent().getGL().setSwapInterval(enabled ? 1 : 0);
         }
     }
-
-    public void cleanup() {
-        _canvasRenderer.cleanup();
-    }
 }

@@ -10,9 +10,6 @@
 
 package com.ardor3d.renderer.state.record;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.DrawBufferTarget;
 
@@ -23,7 +20,6 @@ public class RendererRecord extends StateRecord {
     private boolean _vboValid;
     private boolean _elementVboValid;
     private transient final ColorRGBA _tempColor = new ColorRGBA();
-    private final List<Integer> _vboCleanupCache = new ArrayList<Integer>();
     private DrawBufferTarget _drawBufferTarget = null;
 
     @Override
@@ -99,10 +95,6 @@ public class RendererRecord extends StateRecord {
 
     public ColorRGBA getTempColor() {
         return _tempColor;
-    }
-
-    public List<Integer> getVboCleanupCache() {
-        return _vboCleanupCache;
     }
 
     public DrawBufferTarget getDrawBufferTarget() {

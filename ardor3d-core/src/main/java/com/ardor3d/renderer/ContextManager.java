@@ -10,13 +10,15 @@
 
 package com.ardor3d.renderer;
 
-import com.ardor3d.util.WeakIdentityCache;
+import java.util.Map;
+
+import com.google.common.collect.MapMaker;
 
 public class ContextManager {
 
     protected static RenderContext currentContext = null;
 
-    protected static final WeakIdentityCache<Object, RenderContext> contextStore = new WeakIdentityCache<Object, RenderContext>();
+    protected static final Map<Object, RenderContext> contextStore = new MapMaker().weakKeys().makeMap();
 
     /**
      * @return a RenderContext object representing the current OpenGL context.
@@ -43,5 +45,23 @@ public class ContextManager {
 
     public static RenderContext getContextForKey(final Object key) {
         return contextStore.get(key);
+    }
+
+    /**
+     * Find the first context we manage that uses the given shared opengl context.
+     * 
+     * @param glref
+     * @return
+     */
+    public static RenderContext getContextForRef(final Object glref) {
+        if (glref == null) {
+            return null;
+        }
+        for (final RenderContext context : contextStore.values()) {
+            if (glref.equals(context.getGlContextRep())) {
+                return context;
+            }
+        }
+        return null;
     }
 }

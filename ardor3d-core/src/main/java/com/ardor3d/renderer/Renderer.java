@@ -12,6 +12,7 @@ package com.ardor3d.renderer;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.List;
 
 import com.ardor3d.image.Image;
@@ -23,6 +24,7 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Renderable;
@@ -191,11 +193,18 @@ public interface Renderer {
     boolean checkAndAdd(Spatial s);
 
     /**
-     * Attempts to delete the VBO with this VBO id. Ignores ids < 1.
+     * Attempts to delete the VBOs with the given id. Ignores null ids or ids < 1.
      * 
-     * @param vboid
+     * @param ids
      */
-    void deleteVBO(int vboid);
+    void deleteVBOs(Collection<Integer> ids);
+
+    /**
+     * Attempts to delete any VBOs associated with this buffer that are relevant to the current RenderContext.
+     * 
+     * @param ids
+     */
+    void deleteVBOs(AbstractBufferData<?> buffer);
 
     /**
      * Unbind the current VBO elements.
@@ -246,11 +255,6 @@ public interface Renderer {
      *             if an error is found.
      */
     void checkCardError() throws Ardor3dException;
-
-    /**
-     * Perform any necessary cleanup operations such as deleting VBOs, etc.
-     */
-    void cleanup();
 
     /**
      * <code>draw</code> renders the renderable to the back buffer.
@@ -380,10 +384,6 @@ public interface Renderer {
      */
     void applyState(StateType type, RenderState state);
 
-    void loadTexture(Texture texture, int unit);
-
-    void deleteTexture(Texture texture);
-
     /**
      * Start a new display list. All further renderer commands that can be stored in a display list are part of this new
      * list until {@link #endDisplayList()} is called.
@@ -393,7 +393,43 @@ public interface Renderer {
     int startDisplayList();
 
     /**
-     * Ends a display list. Will likely cause an OpenGL exception is a display list is not currently being generated.
+     * Ends a display list. Will likely cause an OpenGL exception if a display list is not currently being generated.
      */
     void endDisplayList();
+
+    /**
+     * Loads a texture onto the card for the current OpenGL context.
+     * 
+     * @param texture
+     *            the texture obejct to load.
+     * @param unit
+     *            the texture unit to load into
+     */
+    void loadTexture(Texture texture, int unit);
+
+    /**
+     * Explicitly remove this Texture from the graphics card. Note, the texture is only removed for the current context.
+     * If the texture is used in other contexts, those uses are not touched. If the texture is not used in this context,
+     * this is a no-op.
+     * 
+     * @param texture
+     *            the Texture object to remove.
+     */
+    void deleteTexture(Texture texture);
+
+    /**
+     * Removes the given texture ids from the current OpenGL context.
+     * 
+     * @param ids
+     *            a list/set of ids to remove.
+     */
+    void deleteTextureIds(Collection<Integer> ids);
+
+    /**
+     * Removes the given display lists by id from the current OpenGL context.
+     * 
+     * @param ids
+     *            a list/set of ids to remove.
+     */
+    void deleteDisplayLists(Collection<Integer> collection);
 }

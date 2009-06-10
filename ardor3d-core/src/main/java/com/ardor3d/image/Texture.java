@@ -629,7 +629,7 @@ public abstract class Texture implements Savable {
      *            {@link RenderContext#getGlContextRep()}
      */
     public void removeFromIdCache(final Object glContext) {
-
+        _key.removeFromIdCache(glContext);
     }
 
     /**

@@ -64,7 +64,7 @@ public class SceneCompiler {
             context.setCurrentCamera(originalCam);
 
             // add a display list delegate to the given Spatial
-            scene.setRenderDelegate(new DisplayListDelegate(id), context.getGlContextRep());
+            scene.setRenderDelegate(new DisplayListDelegate(id, context.getGlContextRep()), context.getGlContextRep());
         }
     }
 

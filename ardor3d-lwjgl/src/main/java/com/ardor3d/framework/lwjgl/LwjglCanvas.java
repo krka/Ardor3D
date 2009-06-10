@@ -255,9 +255,4 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     public void setVSyncEnabled(final boolean enabled) {
         Display.setVSyncEnabled(enabled);
     }
-
-    public void cleanup() {
-        _canvasRenderer.cleanup();
-    }
-
 }

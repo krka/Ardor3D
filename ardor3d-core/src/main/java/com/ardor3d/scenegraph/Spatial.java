@@ -17,7 +17,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.WeakHashMap;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Matrix3;
@@ -46,6 +45,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.scenegraph.RenderDelegate;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 
 public abstract class Spatial implements Cloneable, Savable, Hintable {
@@ -88,7 +88,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     protected final SceneHints _sceneHints;
 
     /** The render delegates to use for this Spatial, mapped by glContext reference. */
-    protected final transient WeakHashMap<Object, RenderDelegate> _delegateMap = new WeakHashMap<Object, RenderDelegate>();
+    protected final transient Map<Object, RenderDelegate> _delegateMap = new MapMaker().weakKeys().makeMap();
     private static final Object defaultDelegateRef = new Object();
 
     /**
@@ -139,10 +139,18 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      *            is used when this Spatial is rendered in a RenderContext tied to the given glContextRef.
      */
     public void setRenderDelegate(final RenderDelegate delegate, final Object glContextRef) {
-        if (glContextRef == null) {
-            _delegateMap.put(defaultDelegateRef, delegate);
+        if (delegate != null) {
+            if (glContextRef == null) {
+                _delegateMap.put(defaultDelegateRef, delegate);
+            } else {
+                _delegateMap.put(glContextRef, delegate);
+            }
         } else {
-            _delegateMap.put(glContextRef, delegate);
+            if (glContextRef == null) {
+                _delegateMap.remove(defaultDelegateRef);
+            } else {
+                _delegateMap.remove(glContextRef);
+            }
         }
     }
 

@@ -49,7 +49,7 @@ public class RenderContext {
     protected final ContextCapabilities _capabilities;
 
     /** The object tied to this RenderContext, such as the Canvas, etc. */
-    protected Object _contextHolder = null;
+    protected final Object _contextKey;
 
     protected Camera _currentCamera = null;
 
@@ -58,7 +58,7 @@ public class RenderContext {
     }
 
     public RenderContext(final Object key, final ContextCapabilities caps, final RenderContext shared) {
-        _contextHolder = key;
+        _contextKey = key;
         _capabilities = caps;
         setupRecords();
         _glContextRep = (shared == null) ? new Object() : shared._glContextRep;
@@ -155,12 +155,8 @@ public class RenderContext {
         return _currentStates.get(type);
     }
 
-    public Object getContextHolder() {
-        return _contextHolder;
-    }
-
-    public void setContextHolder(final Object contextHolder) {
-        _contextHolder = contextHolder;
+    public Object getContextKey() {
+        return _contextKey;
     }
 
     public void setCurrentState(final StateType type, final RenderState state) {

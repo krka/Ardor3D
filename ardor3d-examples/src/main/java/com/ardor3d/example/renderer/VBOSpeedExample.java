@@ -33,6 +33,7 @@ import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.scenegraph.visitor.DeleteVBOsVisitor;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -107,7 +108,9 @@ public class VBOSpeedExample extends ExampleBase {
                 vboMode = (vboMode + 1) % 3;
                 if (vboMode == 0) {
                     t.setText("[SPACE] VBO Off");
+                    final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer().getRenderer());
                     _root.getSceneHints().setDataMode(DataMode.Arrays);
+                    _root.acceptVisitor(viz, false);
                 } else if (vboMode == 1) {
                     t.setText("[SPACE] VBO On");
                     _root.getSceneHints().setDataMode(DataMode.VBO);

@@ -18,10 +18,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
@@ -32,6 +30,7 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.util.Constants;
+import com.google.common.collect.MapMaker;
 
 /**
  * <code>BufferUtils</code> is a helper class for generating nio buffers from ardor3d data classes such as Vectors and
@@ -40,8 +39,7 @@ import com.ardor3d.util.Constants;
 public final class BufferUtils {
 
     // // -- TRACKER HASH -- ////
-    private static final Map<Buffer, Object> trackingHash = Collections
-            .synchronizedMap(new WeakHashMap<Buffer, Object>());
+    private static final Map<Buffer, Object> trackingHash = new MapMaker().weakKeys().makeMap();
     private static final Object ref = new Object();
 
     // // -- COLORRGBA METHODS -- ////

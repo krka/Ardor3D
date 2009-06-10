@@ -22,11 +22,24 @@ import com.ardor3d.annotation.MainThread;
  */
 public interface Canvas {
 
+    /**
+     * Do work to initialize this canvas, generally setting up the associated CanvasRenderer, etc.
+     */
     @MainThread
-    public void init();
+    void init();
 
+    /**
+     * Ask the canvas to render itself. Note that this may occur in another thread and therefore a latch is given so the
+     * caller may know when the draw has completed.
+     * 
+     * @param latch
+     *            a counter that should be decremented once drawing has completed.
+     */
     @MainThread
-    public void draw(CountDownLatch latch);
+    void draw(CountDownLatch latch);
 
+    /**
+     * @return the CanvasRenderer associated with this Canvas.
+     */
     CanvasRenderer getCanvasRenderer();
 }

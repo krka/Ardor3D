@@ -58,6 +58,8 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     protected GLContext _context;
     protected JoglRenderer _renderer;
 
+    private RenderContext _currentContext;
+
     @Inject
     public JoglCanvasRenderer(final Scene scene) {
         _scene = scene;
@@ -83,13 +85,14 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         // Look up a shared context, if a shared JoglCanvasRenderer is given.
         RenderContext sharedContext = null;
         if (settings.getShareContext() != null) {
-            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getContext());
+            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
+                    .getContextKey());
         }
 
         final JoglContextCapabilities caps = new JoglContextCapabilities(_context.getGL());
-        final RenderContext currentContext = new RenderContext(_context, caps, sharedContext);
+        _currentContext = new RenderContext(_context, caps, sharedContext);
 
-        ContextManager.addContext(_context, currentContext);
+        ContextManager.addContext(_context, _currentContext);
 
         _renderer = new JoglRenderer();
 
@@ -160,15 +163,15 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         return _scene;
     }
 
-    public void cleanup() {
-        _renderer.cleanup();
-    }
-
     public Renderer getRenderer() {
         return _renderer;
     }
 
     public void setCamera(final Camera camera) {
         _camera = camera;
+    }
+
+    public RenderContext getRenderContext() {
+        return _currentContext;
     }
 }

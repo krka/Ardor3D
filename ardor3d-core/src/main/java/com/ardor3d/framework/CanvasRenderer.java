@@ -12,19 +12,20 @@ package com.ardor3d.framework;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 
 /**
  * Represents a class that knows how to render a scene using a specific Open GL implementation.
  */
 public interface CanvasRenderer {
-    public void init(DisplaySettings settings, boolean doSwap);
+    void init(DisplaySettings settings, boolean doSwap);
 
     /**
      * Draw the current state of the scene.
      */
     @MainThread
-    public boolean draw();
+    boolean draw();
 
     /**
      * Returns the camera being used by this canvas renderer. Modifying the returned {@link Camera} instance effects the
@@ -32,7 +33,7 @@ public interface CanvasRenderer {
      * 
      * @return the camera used by this canvas renderer
      */
-    public Camera getCamera();
+    Camera getCamera();
 
     /**
      * Replaces the camera being used by this canvas renderer.
@@ -40,14 +41,14 @@ public interface CanvasRenderer {
      * @param camera
      *            the camera to use
      */
-    public void setCamera(Camera camera);
+    void setCamera(Camera camera);
 
     /**
      * Returns the scene being used by this canvas renderer.
      * 
      * @return the camera used by this canvas renderer
      */
-    public Scene getScene();
+    Scene getScene();
 
     /**
      * Returns the renderer being used by this canvas renderer.
@@ -59,15 +60,15 @@ public interface CanvasRenderer {
     /**
      * Have the CanvasRenderer claim the graphics context.
      */
-    public void setCurrentContext();
+    void setCurrentContext();
 
     /**
      * Have the CanvasRenderer release the graphics context.
      */
-    public void releaseCurrentContext();
+    void releaseCurrentContext();
 
     /**
-     * @return the Object representing the gl context used by this CanvasRenderer.
+     * @return the Ardor3D RenderContext associated with this CanvasRenderer.
      */
-    public Object getContext();
+    RenderContext getRenderContext();
 }

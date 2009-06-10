@@ -12,6 +12,7 @@ package com.ardor3d.scene.state.jogl;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
@@ -1568,6 +1569,10 @@ public class JoglTextureStateUtil {
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
         final int id = texture.getTextureIdForContext(context.getGlContextRep());
+        if (id == 0) {
+            // Not on card... return.
+            return;
+        }
 
         final IntBuffer idBuffer = BufferUtils.createIntBuffer(1);
         idBuffer.clear();
@@ -1576,6 +1581,27 @@ public class JoglTextureStateUtil {
         gl.glDeleteTextures(idBuffer.limit(), idBuffer);
         record.removeTextureRecord(id);
         texture.removeFromIdCache(context.getGlContextRep());
+    }
+
+    public static void deleteTextureIds(final Collection<Integer> ids) {
+        final GL gl = GLU.getCurrentGL();
+
+        // ask for the current state record
+        final RenderContext context = ContextManager.getCurrentContext();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
+
+        final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
+        idBuffer.clear();
+        for (final Integer i : ids) {
+            if (i != null) {
+                idBuffer.put(i);
+                record.removeTextureRecord(i);
+            }
+        }
+        idBuffer.flip();
+        if (idBuffer.remaining() > 0) {
+            gl.glDeleteTextures(idBuffer.remaining(), idBuffer);
+        }
     }
 
     /**

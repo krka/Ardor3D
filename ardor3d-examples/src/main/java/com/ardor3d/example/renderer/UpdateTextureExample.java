@@ -85,9 +85,6 @@ public class UpdateTextureExample extends ExampleBase {
             final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
             final Texture nextTexture = TextureManager.loadFromImage(nextImage, Texture.MinificationFilter.Trilinear,
                     Image.Format.GuessNoCompression, true);
-            final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
-                    .getTexture();
-            TextureManager.releaseTexture(prevTexture, renderer);
             final TextureState ts = (TextureState) _root.getLocalRenderState(RenderState.StateType.Texture);
             ts.setTexture(nextTexture);
         }

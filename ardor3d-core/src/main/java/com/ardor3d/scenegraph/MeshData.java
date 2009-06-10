@@ -15,7 +15,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
@@ -29,13 +29,14 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.MapMaker;
 
 /**
  * MeshData contains all the commonly used buffers for rendering a mesh.
  */
 public class MeshData implements Cloneable, Savable {
 
-    private final transient WeakHashMap<Object, Integer> _vboIdCache = new WeakHashMap<Object, Integer>();
+    private final transient Map<Object, Integer> _vboIdCache = new MapMaker().weakKeys().makeMap();
 
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());

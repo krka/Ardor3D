@@ -11,11 +11,12 @@
 package com.ardor3d.util;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ardor3d.image.Image;
@@ -40,10 +41,11 @@ final public class TextureKey implements Savable {
     protected Image.Format _format = Image.Format.Guess;
     protected String _fileType;
     protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
-    protected final transient WeakHashMap<Object, Integer> _idCache = new WeakHashMap<Object, Integer>();
+    protected final transient ContextIdReference<TextureKey> _idCache = new ContextIdReference<TextureKey>(this,
+            TextureManager.getRefQueue());
     protected int _code = Integer.MAX_VALUE;
 
-    protected static final List<TextureKey> _keyCache = new ArrayList<TextureKey>();
+    protected static final List<WeakReference<TextureKey>> _keyCache = new ArrayList<WeakReference<TextureKey>>();
 
     /** DO NOT USE. FOR SAVABLE USE ONLY */
     public TextureKey() {}
@@ -82,14 +84,13 @@ final public class TextureKey implements Savable {
         key._format = imageType;
         key._fileType = fileType;
 
-        final int cacheLoc = _keyCache.indexOf(key);
+        final int cacheLoc = _keyCache.indexOf(new WeakReference<TextureKey>(key));
         if (cacheLoc == -1) {
-            _keyCache.add(key);
-            TextureManager.registerForCleanup(key);
+            _keyCache.add(new WeakReference<TextureKey>(key));
             return key;
         }
 
-        return _keyCache.get(cacheLoc);
+        return _keyCache.get(cacheLoc).get();
     }
 
     public static boolean removeKey(final TextureKey key) {
@@ -108,6 +109,30 @@ final public class TextureKey implements Savable {
             return _idCache.get(glContext);
         }
         return 0;
+    }
+
+    /**
+     * @return a Set of context objects that currently reference this texture.
+     */
+    public Set<Object> getContextObjects() {
+        return _idCache.getContextObjects();
+    }
+
+    /**
+     * <p>
+     * Removes any texture id for this texture for the given OpenGL context.
+     * </p>
+     * <p>
+     * Note: This does not remove the texture from the card and is provided for use by code that does remove textures
+     * from the card.
+     * </p>
+     * 
+     * @param glContext
+     *            the object representing the OpenGL context this texture belongs to. See
+     *            {@link RenderContext#getGlContextRep()}
+     */
+    public void removeFromIdCache(final Object glContext) {
+        _idCache.remove(glContext);
     }
 
     /**

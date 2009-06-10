@@ -35,6 +35,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     protected boolean _doSwap;
     protected LwjglRenderer _renderer;
     protected Object _context = new Object();
+    private RenderContext _currentContext;
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
     // and since it is at the moment more work than it is worth to get it ready. Later on, when
@@ -66,15 +67,16 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         // shares lists, textures, etc.
         RenderContext sharedContext = null;
         if (settings.getShareContext() != null) {
-            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getContext());
+            sharedContext = ContextManager.getContextForKey(settings.getShareContext().getRenderContext()
+                    .getContextKey());
         }
 
         setCurrentContext();
 
         final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
-        final RenderContext currentContext = new RenderContext(this, caps, sharedContext);
+        _currentContext = new RenderContext(this, caps, sharedContext);
 
-        ContextManager.addContext(this, currentContext);
+        ContextManager.addContext(this, _currentContext);
 
         _renderer = new LwjglRenderer();
 
@@ -123,10 +125,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return _scene;
     }
 
-    public void cleanup() {
-        _renderer.cleanup();
-    }
-
     public Renderer getRenderer() {
         return _renderer;
     }
@@ -151,7 +149,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         _camera = camera;
     }
 
-    public Object getContext() {
-        return _context;
+    public RenderContext getRenderContext() {
+        return _currentContext;
     }
 }

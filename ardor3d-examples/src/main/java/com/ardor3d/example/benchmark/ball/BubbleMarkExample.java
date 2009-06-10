@@ -31,6 +31,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -116,8 +117,7 @@ public class BubbleMarkExample implements Scene {
         }
 
         // Done, do cleanup
-        TextureManager.doTextureCleanup(canvas.getCanvasRenderer().getRenderer());
-        canvas.cleanup();
+        ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
         canvas.close();
     }
 

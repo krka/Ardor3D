@@ -17,14 +17,14 @@ public interface NativeCanvas extends Canvas {
     /**
      * <code>close</code> shutdowns and destroys any window contexts.
      */
-    public void close();
+    void close();
 
     /**
      * <code>isActive</code> returns true if the display is active.
      * 
      * @return whether the display system is active.
      */
-    public boolean isActive();
+    boolean isActive();
 
     /**
      * <code>isClosing</code> notifies if the window is currently closing. This could be caused via the application
@@ -32,7 +32,7 @@ public interface NativeCanvas extends Canvas {
      * 
      * @return true if the window is closing, false otherwise.
      */
-    public boolean isClosing();
+    boolean isClosing();
 
     /**
      * <code>setVSyncEnabled</code> attempts to enable or disable monitor vertical synchronization. The method is a
@@ -42,7 +42,7 @@ public interface NativeCanvas extends Canvas {
      * @param enabled
      *            <code>true</code> to synchronize, <code>false</code> to ignore synchronization
      */
-    public void setVSyncEnabled(boolean enabled);
+    void setVSyncEnabled(boolean enabled);
 
     /**
      * Sets the title of the display system. This is usually reflected by the renderer as text in the menu bar.
@@ -50,7 +50,7 @@ public interface NativeCanvas extends Canvas {
      * @param title
      *            The new display title.
      */
-    public void setTitle(String title);
+    void setTitle(String title);
 
     /**
      * Sets one or more icons for the DisplaySystem.
@@ -70,7 +70,7 @@ public interface NativeCanvas extends Canvas {
      * @param iconImages
      *            Array of Images to be used as icons.
      */
-    public void setIcon(Image[] iconImages);
+    void setIcon(Image[] iconImages);
 
     /**
      * If running in windowed mode, move the window's position to the given display coordinates.
@@ -78,10 +78,5 @@ public interface NativeCanvas extends Canvas {
      * @param locX
      * @param locY
      */
-    public void moveWindowTo(int locX, int locY);
-
-    /**
-     * 
-     */
-    public void cleanup();
+    void moveWindowTo(int locX, int locY);
 }

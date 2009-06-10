@@ -16,6 +16,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -83,6 +84,7 @@ import com.ardor3d.scene.state.lwjgl.LwjglWireframeStateUtil;
 import com.ardor3d.scene.state.lwjgl.LwjglZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
+import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -381,12 +383,49 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void deleteVBO(final int vboid) {
-        if (vboid < 1) {
+    public void deleteVBOs(final Collection<Integer> ids) {
+        final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
+        idBuffer.clear();
+        for (final Integer i : ids) {
+            if (i != null && i > 0) {
+                idBuffer.put(i);
+            }
+        }
+        idBuffer.flip();
+        if (idBuffer.remaining() > 0) {
+            ARBBufferObject.glDeleteBuffersARB(idBuffer);
+        }
+    }
+
+    public void deleteDisplayLists(final Collection<Integer> ids) {
+        for (final Integer i : ids) {
+            if (i != null && i > 0) {
+                System.err.println("deleted DL: " + i);
+                GL11.glDeleteLists(i, 1);
+            }
+        }
+    }
+
+    public void deleteVBOs(final AbstractBufferData<?> buffer) {
+        if (buffer == null) {
             return;
         }
-        final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
-        deleteVBOId(rendRecord, vboid);
+
+        // ask for the current state record
+        final RenderContext context = ContextManager.getCurrentContext();
+
+        final int id = buffer.getVBOID(context.getGlContextRep());
+        if (id == 0) {
+            // Not on card... return.
+            return;
+        }
+
+        buffer.removeVBOID(context.getGlContextRep());
+
+        _idBuff.clear();
+        _idBuff.put(id);
+        _idBuff.rewind();
+        ARBBufferObject.glDeleteBuffersARB(_idBuff);
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -506,12 +545,6 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void cleanup() {
-        // clear vbos
-        final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
-        cleanupVBOs(rendRecord);
-    }
-
     public void draw(final Renderable renderable) {
         renderable.render(this);
     }
@@ -538,7 +571,6 @@ public class LwjglRenderer extends AbstractRenderer {
         GL11.glPopMatrix();
     }
 
-    // TODO: Arrays
     public void setupVertexData(final FloatBufferData vertexBufferData) {
         final FloatBuffer vertexBuffer = vertexBufferData != null ? vertexBufferData.getBuffer() : null;
 
@@ -1095,23 +1127,7 @@ public class LwjglRenderer extends AbstractRenderer {
         _idBuff.rewind();
         ARBBufferObject.glGenBuffersARB(_idBuff);
         final int vboID = _idBuff.get(0);
-        rendRecord.getVboCleanupCache().add(vboID);
         return vboID;
-    }
-
-    public void deleteVBOId(final RendererRecord rendRecord, final int id) {
-        _idBuff.rewind();
-        _idBuff.put(id).flip();
-        ARBBufferObject.glDeleteBuffersARB(_idBuff);
-        rendRecord.getVboCleanupCache().remove(Integer.valueOf(id));
-    }
-
-    public void cleanupVBOs(final RendererRecord rendRecord) {
-        final List<Integer> vboCleanupCache = rendRecord.getVboCleanupCache();
-        for (int x = vboCleanupCache.size(); --x >= 0;) {
-            deleteVBOId(rendRecord, vboCleanupCache.get(x));
-        }
-        vboCleanupCache.clear();
     }
 
     public void unbindVBO() {
@@ -1424,6 +1440,10 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void loadTexture(final Texture texture, final int unit) {
         LwjglTextureStateUtil.load(texture, unit);
+    }
+
+    public void deleteTextureIds(final Collection<Integer> ids) {
+        LwjglTextureStateUtil.deleteTextureIds(ids);
     }
 
     /**

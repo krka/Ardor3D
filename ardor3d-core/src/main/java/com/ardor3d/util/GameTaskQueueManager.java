@@ -10,22 +10,38 @@
 
 package com.ardor3d.util;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
+
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
+import com.google.common.collect.MapMaker;
 
 /**
  * <code>GameTaskQueueManager</code> is just a simple Singleton class allowing easy access to task queues.
  */
 public final class GameTaskQueueManager {
 
-    private static final GameTaskQueueManager MANAGER_INSTANCE = new GameTaskQueueManager();
+    private static final Map<RenderContext, GameTaskQueueManager> _managers = new MapMaker().weakKeys().makeMap();
 
-    protected final ConcurrentMap<String, GameTaskQueue> managedQueues = new ConcurrentHashMap<String, GameTaskQueue>(2);
+    private final ConcurrentMap<String, GameTaskQueue> _managedQueues = new ConcurrentHashMap<String, GameTaskQueue>(2);
+
+    public static GameTaskQueueManager getManager(final RenderContext context) {
+        synchronized (_managers) {
+            GameTaskQueueManager manager = _managers.get(context);
+            if (manager == null) {
+                manager = new GameTaskQueueManager();
+                _managers.put(context, manager);
+            }
+            return manager;
+        }
+    }
 
     public static GameTaskQueueManager getManager() {
-        return MANAGER_INSTANCE;
+        return getManager(ContextManager.getCurrentContext());
     }
 
     private GameTaskQueueManager() {
@@ -34,11 +50,11 @@ public final class GameTaskQueueManager {
     }
 
     public void addQueue(final String name, final GameTaskQueue queue) {
-        managedQueues.put(name, queue);
+        _managedQueues.put(name, queue);
     }
 
     public GameTaskQueue getQueue(final String name) {
-        return managedQueues.get(name);
+        return _managedQueues.get(name);
     }
 
     /**

@@ -16,6 +16,7 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -78,6 +79,7 @@ import com.ardor3d.scene.state.jogl.JoglWireframeStateUtil;
 import com.ardor3d.scene.state.jogl.JoglZBufferStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
+import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -403,12 +405,52 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public void deleteVBO(final int vboid) {
-        if (vboid < 1) {
+    public void deleteVBOs(final Collection<Integer> ids) {
+        final GL gl = GLU.getCurrentGL();
+        final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
+        idBuffer.clear();
+        for (final Integer i : ids) {
+            if (i != null && i > 0) {
+                idBuffer.put(i);
+            }
+        }
+        idBuffer.flip();
+        if (idBuffer.remaining() > 0) {
+            gl.glDeleteBuffers(idBuffer.remaining(), idBuffer);
+        }
+    }
+
+    public void deleteDisplayLists(final Collection<Integer> ids) {
+        final GL gl = GLU.getCurrentGL();
+        for (final Integer i : ids) {
+            if (i != null && i > 0) {
+                gl.glDeleteLists(i, 1);
+            }
+        }
+    }
+
+    public void deleteVBOs(final AbstractBufferData<?> buffer) {
+        if (buffer == null) {
             return;
         }
-        final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
-        deleteVBOId(rendRecord, vboid);
+
+        final GL gl = GLU.getCurrentGL();
+
+        // ask for the current state record
+        final RenderContext context = ContextManager.getCurrentContext();
+
+        final int id = buffer.getVBOID(context.getGlContextRep());
+        if (id == 0) {
+            // Not on card... return.
+            return;
+        }
+
+        buffer.removeVBOID(context.getGlContextRep());
+
+        _idBuff.clear();
+        _idBuff.put(id);
+        _idBuff.rewind();
+        gl.glDeleteBuffers(1, _idBuff);
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -535,12 +577,6 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public void cleanup() {
-        // clear vbos
-        final RendererRecord rendRecord = ContextManager.getCurrentContext().getRendererRecord();
-        cleanupVBOs(rendRecord);
-    }
-
     public void draw(final Renderable renderable) {
         renderable.render(this);
     }
@@ -571,7 +607,6 @@ public class JoglRenderer extends AbstractRenderer {
         gl.glPopMatrix();
     }
 
-    // TODO: Arrays
     public void setupVertexData(final FloatBufferData vertexBufferData) {
         final GL gl = GLU.getCurrentGL();
 
@@ -620,7 +655,6 @@ public class JoglRenderer extends AbstractRenderer {
         _oldColorBuffer = colorBuffer;
     }
 
-    // TODO
     public void setupFogData(final FloatBufferData fogBufferData) {
         final GL gl = GLU.getCurrentGL();
 
@@ -1167,25 +1201,7 @@ public class JoglRenderer extends AbstractRenderer {
         _idBuff.rewind();
         gl.glGenBuffersARB(_idBuff.limit(), _idBuff);
         final int vboID = _idBuff.get(0);
-        rendRecord.getVboCleanupCache().add(vboID);
         return vboID;
-    }
-
-    public void deleteVBOId(final RendererRecord rendRecord, final int id) {
-        final GL gl = GLU.getCurrentGL();
-
-        _idBuff.rewind();
-        _idBuff.put(id).flip();
-        gl.glDeleteBuffersARB(_idBuff.limit(), _idBuff);
-        rendRecord.getVboCleanupCache().remove(Integer.valueOf(id));
-    }
-
-    public void cleanupVBOs(final RendererRecord rendRecord) {
-        final List<Integer> vboCleanupCache = rendRecord.getVboCleanupCache();
-        for (int x = vboCleanupCache.size(); --x >= 0;) {
-            deleteVBOId(rendRecord, vboCleanupCache.get(x));
-        }
-        vboCleanupCache.clear();
     }
 
     public void unbindVBO() {
@@ -1500,6 +1516,10 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void loadTexture(final Texture texture, final int unit) {
         JoglTextureStateUtil.load(texture, unit);
+    }
+
+    public void deleteTextureIds(final Collection<Integer> ids) {
+        JoglTextureStateUtil.deleteTextureIds(ids);
     }
 
     /**

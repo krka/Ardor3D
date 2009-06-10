@@ -358,10 +358,10 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     private void giveBackContext() throws LWJGLException {
         if (Display.isCreated()) {
             Display.makeCurrent();
-            ContextManager.switchContext(_oldContext.getContextHolder());
-        } else if (_oldContext.getContextHolder() instanceof AWTGLCanvas) {
-            ((AWTGLCanvas) _oldContext.getContextHolder()).makeCurrent();
-            ContextManager.switchContext(_oldContext.getContextHolder());
+            ContextManager.switchContext(_oldContext.getContextKey());
+        } else if (_oldContext.getContextKey() instanceof AWTGLCanvas) {
+            ((AWTGLCanvas) _oldContext.getContextKey()).makeCurrent();
+            ContextManager.switchContext(_oldContext.getContextKey());
         }
     }
 
