@@ -41,10 +41,9 @@ public final class GameTaskQueueManager {
             if (manager == null) {
                 manager = new GameTaskQueueManager();
                 _managers.put(key, manager);
-
-                if (key != DEFAULT_CONTEXT && _managers.containsKey(DEFAULT_CONTEXT)) {
-                    _managers.get(DEFAULT_CONTEXT).moveTasksTo(manager);
-                }
+            }
+            if (key != DEFAULT_CONTEXT && _managers.containsKey(DEFAULT_CONTEXT)) {
+                _managers.get(DEFAULT_CONTEXT).moveTasksTo(manager);
             }
             return manager;
         }
@@ -66,7 +65,7 @@ public final class GameTaskQueueManager {
     public void moveTasksTo(final GameTaskQueueManager manager) {
         for (final String key : _managedQueues.keySet()) {
             final GameTaskQueue q = manager.getQueue(key);
-            if (q != null) {
+            if (q != null && q.size() > 0) {
                 q.enqueueAll(_managedQueues.get(key));
             }
         }

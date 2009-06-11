@@ -151,4 +151,11 @@ public class GameTaskQueue {
         _queue.addAll(queue._queue);
         queue._queue.clear();
     }
+
+    /**
+     * @return count of tasks in queue.
+     */
+    public int size() {
+        return _queue.size();
+    }
 }
