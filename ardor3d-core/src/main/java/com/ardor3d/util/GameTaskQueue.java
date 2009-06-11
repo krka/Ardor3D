@@ -30,8 +30,8 @@ public class GameTaskQueue {
     public static final String RENDER = "render";
     public static final String UPDATE = "update";
 
-    private final ConcurrentLinkedQueue<GameTask<?>> queue = new ConcurrentLinkedQueue<GameTask<?>>();
-    private final AtomicBoolean executeMultiple = new AtomicBoolean();
+    private final ConcurrentLinkedQueue<GameTask<?>> _queue = new ConcurrentLinkedQueue<GameTask<?>>();
+    private final AtomicBoolean _executeMultiple = new AtomicBoolean();
 
     // Default execution time is 0, which means only 1 task will be executed at a time.
     private long _executionTime = 0;
@@ -42,7 +42,7 @@ public class GameTaskQueue {
      * @return boolean
      */
     public boolean isExecuteAll() {
-        return executeMultiple.get();
+        return _executeMultiple.get();
     }
 
     /**
@@ -52,7 +52,7 @@ public class GameTaskQueue {
      * @see #setExecutionTime(int)
      */
     public void setExecuteMultiple(final boolean executeMultiple) {
-        this.executeMultiple.set(executeMultiple);
+        _executeMultiple.set(executeMultiple);
         if (executeMultiple == true) {
             _executionTime = Integer.MAX_VALUE;
         }
@@ -69,7 +69,7 @@ public class GameTaskQueue {
      */
     public void setExecutionTime(final int msecs) {
         _executionTime = msecs;
-        executeMultiple.set(true);
+        _executeMultiple.set(true);
     }
 
     /**
@@ -78,7 +78,7 @@ public class GameTaskQueue {
      * @return -1 if executeAll is false, else min time allocated for task execution per frame
      */
     public long getExecutionTime() {
-        if (executeMultiple.get() == false) {
+        if (_executeMultiple.get() == false) {
             return -1;
         }
         return _executionTime;
@@ -94,7 +94,7 @@ public class GameTaskQueue {
      */
     public <V> Future<V> enqueue(final Callable<V> callable) {
         final GameTask<V> task = new GameTask<V>(callable);
-        queue.add(task);
+        _queue.add(task);
         return task;
     }
 
@@ -113,7 +113,7 @@ public class GameTaskQueue {
     public void execute(final Renderer renderer) {
         final long beginTime = System.currentTimeMillis();
         long elapsedTime;
-        GameTask<?> task = queue.poll();
+        GameTask<?> task = _queue.poll();
         do {
             if (task == null) {
                 return;
@@ -125,13 +125,30 @@ public class GameTaskQueue {
             }
 
             while (task.isCancelled()) {
-                task = queue.poll();
+                task = _queue.poll();
                 if (task == null) {
                     return;
                 }
             }
             task.invoke();
             elapsedTime = System.currentTimeMillis() - beginTime;
-        } while ((executeMultiple.get()) && (elapsedTime < _executionTime) && ((task = queue.poll()) != null));
+        } while ((_executeMultiple.get()) && (elapsedTime < _executionTime) && ((task = _queue.poll()) != null));
+    }
+
+    /**
+     * Remove all tasks from this queue without executing them.
+     */
+    public void clear() {
+        _queue.clear();
+    }
+
+    /**
+     * Move the tasks from the given queue to this one.
+     * 
+     * @param gameTaskQueue
+     */
+    public void enqueueAll(final GameTaskQueue queue) {
+        _queue.addAll(queue._queue);
+        queue._queue.clear();
     }
 }

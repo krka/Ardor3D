@@ -25,15 +25,26 @@ import com.google.common.collect.MapMaker;
 public final class GameTaskQueueManager {
 
     private static final Map<RenderContext, GameTaskQueueManager> _managers = new MapMaker().weakKeys().makeMap();
+    private static final RenderContext DEFAULT_CONTEXT = new RenderContext(null, null);
 
     private final ConcurrentMap<String, GameTaskQueue> _managedQueues = new ConcurrentHashMap<String, GameTaskQueue>(2);
 
+    public static GameTaskQueueManager getManager() {
+        return getManager(DEFAULT_CONTEXT);
+    }
+
     public static GameTaskQueueManager getManager(final RenderContext context) {
+        final RenderContext key = context != null ? context : DEFAULT_CONTEXT;
+
         synchronized (_managers) {
-            GameTaskQueueManager manager = _managers.get(context);
+            GameTaskQueueManager manager = _managers.get(key);
             if (manager == null) {
                 manager = new GameTaskQueueManager();
-                _managers.put(context, manager);
+                _managers.put(key, manager);
+
+                if (key != DEFAULT_CONTEXT && _managers.containsKey(DEFAULT_CONTEXT)) {
+                    _managers.get(DEFAULT_CONTEXT).moveTasksTo(manager);
+                }
             }
             return manager;
         }
@@ -50,6 +61,24 @@ public final class GameTaskQueueManager {
 
     public GameTaskQueue getQueue(final String name) {
         return _managedQueues.get(name);
+    }
+
+    public void moveTasksTo(final GameTaskQueueManager manager) {
+        for (final String key : _managedQueues.keySet()) {
+            final GameTaskQueue q = manager.getQueue(key);
+            if (q != null) {
+                q.enqueueAll(_managedQueues.get(key));
+            }
+        }
+    }
+
+    /**
+     * Clears all tasks from the queues managed by this manager.
+     */
+    public void clearTasks() {
+        for (final GameTaskQueue q : _managedQueues.values()) {
+            q.clear();
+        }
     }
 
     /**
