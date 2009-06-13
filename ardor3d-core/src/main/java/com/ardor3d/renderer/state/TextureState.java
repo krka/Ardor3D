@@ -59,7 +59,7 @@ public class TextureState extends RenderState {
     }
 
     /** The texture(s). */
-    protected List<Texture> _texture = new ArrayList<Texture>();
+    protected List<Texture> _texture = new ArrayList<Texture>(1);
 
     /**
      * Perspective correction to use for the object rendered with this texture state. Default is
