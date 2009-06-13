@@ -88,6 +88,7 @@ public class LwjglNoGuiceBoxExample implements Scene {
         while (!_exit) {
             updateExample();
             _canvas.draw(null);
+            Thread.yield();
         }
 
         // Done, do cleanup

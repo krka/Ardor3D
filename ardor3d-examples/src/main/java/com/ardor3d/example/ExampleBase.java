@@ -137,6 +137,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
             while (!exit) {
                 _frameHandler.updateFrame();
+                Thread.yield();
             }
             // grab the graphics context so cleanup will work out.
             _canvas.getCanvasRenderer().setCurrentContext();

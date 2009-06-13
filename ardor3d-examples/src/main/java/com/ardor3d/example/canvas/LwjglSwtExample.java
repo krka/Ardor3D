@@ -120,6 +120,7 @@ public class LwjglSwtExample {
         while (!shell.isDisposed() && !exit.isExit()) {
             display.readAndDispatch();
             frameWork.updateFrame();
+            Thread.yield();
 
             // using the below way makes things really jerky. Not sure how to handle that.
 

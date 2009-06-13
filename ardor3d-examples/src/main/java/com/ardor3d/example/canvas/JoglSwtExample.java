@@ -119,6 +119,7 @@ public class JoglSwtExample {
         while (!shell.isDisposed() && !exit.isExit()) {
             display.readAndDispatch();
             frameWork.updateFrame();
+            Thread.yield();
         }
 
         display.dispose();

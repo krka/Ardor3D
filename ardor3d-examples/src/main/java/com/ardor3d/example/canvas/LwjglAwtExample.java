@@ -132,6 +132,7 @@ public class LwjglAwtExample {
 
         while (!exit.isExit()) {
             frameWork.updateFrame();
+            Thread.yield();
         }
 
         frame.dispose();
