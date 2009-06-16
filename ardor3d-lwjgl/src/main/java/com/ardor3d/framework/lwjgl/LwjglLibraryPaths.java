@@ -43,10 +43,10 @@ public enum LwjglLibraryPaths {
             "/solaris/libopenal.so",
     }),
     WINDOWS_XP("Windows XP", null, new String[] {
-            "/win32/jinput-dx8.dll",
-            "/win32/jinput-raw.dll",
-            "/win32/lwjgl.dll",
-            "/win32/OpenAL32.dll",
+            "/windows/jinput-dx8.dll",
+            "/windows/jinput-raw.dll",
+            "/windows/lwjgl.dll",
+            "/windows/OpenAL32.dll",
     });
     
     private final String _operatingSystem;
