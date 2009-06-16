@@ -476,7 +476,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * <code>setTranslation</code> sets the translation of this spatial. This marks the spatial as DirtyType.Transform.
      * 
-     * @param rotation
+     * @param translation
      *            the new translation of this spatial
      */
     public void setTranslation(final ReadOnlyVector3 translation) {
@@ -493,6 +493,28 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      */
     public void setTranslation(final double x, final double y, final double z) {
         _localTransform.setTranslation(x, y, z);
+        markDirty(DirtyType.Transform);
+    }
+
+    /**
+     * <code>addTranslation</code> adds the given translation to the translation of this spatial. This marks the spatial
+     * as DirtyType.Transform.
+     * 
+     * @param translation
+     */
+    public void addTranslation(final ReadOnlyVector3 translation) {
+        addTranslation(translation.getX(), translation.getY(), translation.getZ());
+    }
+
+    /**
+     * adds to the current translation of this spatial. This marks the spatial as DirtyType.Transform.
+     * 
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void addTranslation(final double x, final double y, final double z) {
+        _localTransform.translate(x, y, z);
         markDirty(DirtyType.Transform);
     }
 
@@ -1055,7 +1077,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         final List<Savable> list = capsule.readSavableList("controllers", null);
         if (list != null) {
             for (final Savable s : list) {
-                if (s instanceof SpatialController) {
+                if (s instanceof SpatialController<?>) {
                     addController((SpatialController<?>) s);
                 }
             }
