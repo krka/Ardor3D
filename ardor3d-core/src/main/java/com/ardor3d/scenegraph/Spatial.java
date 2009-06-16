@@ -403,6 +403,10 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         _worldTransform.setTranslation(x, y, z);
     }
 
+    public void setWorldTransform(final ReadOnlyTransform transform) {
+        _worldTransform.set(transform);
+    }
+
     /**
      * Sets the rotation of this spatial. This marks the spatial as DirtyType.Transform.
      * 
