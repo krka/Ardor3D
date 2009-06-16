@@ -90,7 +90,7 @@ public class ExportImportExample extends ExampleBase {
         torus.setRenderState(ts);
 
         final Quad quad = new Quad("Quad");
-        quad.initialize(150, 120);
+        quad.resize(150, 120);
         quad.updateModelBound();
         quad.setRenderState(bgts);
 

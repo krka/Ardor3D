@@ -30,8 +30,7 @@ public class Quad extends Mesh {
     }
 
     /**
-     * Constructor creates a new <code>Quad</code> object. That data for the <code>Quad</code> is not set until a call
-     * to <code>initialize</code> is made.
+     * Constructor creates a new <code>Quad</code> object.
      * 
      * @param name
      *            the name of this <code>Quad</code>.
@@ -82,24 +81,15 @@ public class Quad extends Mesh {
      * @param height
      *            the height of the <code>Quad</code>.
      */
-    public void initialize(final double width, final double height) {
-        _width = width;
-        _height = height;
-
+    private void initialize(final double width, final double height) {
         final int verts = 4;
         _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
-
         final FloatBuffer tbuf = BufferUtils.createVector2Buffer(verts);
         _meshData.setTextureBuffer(tbuf, 0);
 
         final int tris = 2;
         _meshData.setIndexBuffer(BufferUtils.createIntBuffer(tris * 3));
-
-        _meshData.getVertexBuffer().put((float) (-width / 2)).put((float) (height / 2)).put(0);
-        _meshData.getVertexBuffer().put((float) (-width / 2)).put((float) (-height / 2)).put(0);
-        _meshData.getVertexBuffer().put((float) (width / 2)).put((float) (-height / 2)).put(0);
-        _meshData.getVertexBuffer().put((float) (width / 2)).put((float) (height / 2)).put(0);
 
         _meshData.getNormalBuffer().put(0).put(0).put(1);
         _meshData.getNormalBuffer().put(0).put(0).put(1);
@@ -117,6 +107,8 @@ public class Quad extends Mesh {
         _meshData.getIndexBuffer().put(0);
         _meshData.getIndexBuffer().put(2);
         _meshData.getIndexBuffer().put(3);
+
+        resize(width, height);
     }
 
     public double getWidth() {

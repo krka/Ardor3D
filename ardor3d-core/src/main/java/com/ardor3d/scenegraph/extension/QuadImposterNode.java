@@ -105,7 +105,7 @@ public class QuadImposterNode extends Node {
         _texture = new Texture2D();
 
         _imposterQuad = new Quad("ImposterQuad");
-        _imposterQuad.initialize(1, 1);
+        _imposterQuad.resize(1, 1);
         _imposterQuad.setModelBound(new BoundingBox());
         _imposterQuad.updateModelBound();
         _imposterQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
