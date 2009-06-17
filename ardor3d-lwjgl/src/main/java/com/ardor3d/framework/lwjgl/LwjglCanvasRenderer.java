@@ -86,17 +86,24 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         _renderer.setBackgroundColor(ColorRGBA.BLACK);
 
-        /** Set up how our camera sees. */
-        _camera = new Camera(settings.getWidth(), settings.getHeight());
-        _camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
-        _camera.setParallelProjection(false);
+        if (_camera == null) {
+            /** Set up how our camera sees. */
+            _camera = new Camera(settings.getWidth(), settings.getHeight());
+            _camera.setFrustumPerspective(45.0f, (float) settings.getWidth() / (float) settings.getHeight(), 1, 1000);
+            _camera.setParallelProjection(false);
 
-        final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
-        final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
-        final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
-        final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
-        /** Move our camera to a correct place and orientation. */
-        _camera.setFrame(loc, left, up, dir);
+            final Vector3 loc = new Vector3(0.0f, 0.0f, 10.0f);
+            final Vector3 left = new Vector3(-1.0f, 0.0f, 0.0f);
+            final Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
+            final Vector3 dir = new Vector3(0.0f, 0f, -1.0f);
+            /** Move our camera to a correct place and orientation. */
+            _camera.setFrame(loc, left, up, dir);
+        } else {
+            // use new width and height to set ratio.
+            _camera.setFrustumPerspective(_camera.getFovY(),
+                    (float) settings.getWidth() / (float) settings.getHeight(), _camera.getFrustumNear(), _camera
+                            .getFrustumFar());
+        }
     }
 
     @MainThread
@@ -106,11 +113,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         ContextManager.switchContext(this);
         setCurrentContext();
 
-        // render stuff
-        if (Camera.getCurrentCamera() != _camera) {
-            _camera.update();
+        // render stuff, first apply our camera if we have one
+        if (_camera != null) {
+            if (Camera.getCurrentCamera() != _camera) {
+                _camera.update();
+            }
+            _camera.apply(_renderer);
         }
-        _camera.apply(_renderer);
         _renderer.clearBuffers();
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
