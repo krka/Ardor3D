@@ -72,8 +72,6 @@ import com.ardor3d.util.stat.StatType;
 public abstract class LwjglTextureStateUtil {
     private static final Logger logger = Logger.getLogger(LwjglTextureStateUtil.class.getName());
 
-    private static final long serialVersionUID = 1L;
-
     public static void load(final Texture texture, final int unit) {
         if (texture == null) {
             return;
