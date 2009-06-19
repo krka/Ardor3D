@@ -22,7 +22,6 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -650,7 +649,7 @@ public class BMText extends Mesh {
             }
         }
         _meshData.setVertexBuffer(vertices);
-        _meshData.setTextureCoords(new FloatBufferData(texCrds, 2), 0);
+        _meshData.setTextureBuffer(texCrds, 0);
         _meshData.setIndexBuffer(indices);
     }
 
