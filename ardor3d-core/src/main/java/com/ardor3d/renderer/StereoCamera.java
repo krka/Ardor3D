@@ -54,13 +54,6 @@ public class StereoCamera extends Camera {
         _rightCamera.resize(width, height);
     }
 
-    @Override
-    public void resize(final int width, final int height, final boolean force) {
-        super.resize(width, height, force);
-        _leftCamera.resize(width, height, force);
-        _rightCamera.resize(width, height, force);
-    }
-
     /**
      * @return the sideBySideMode
      * @see #setSideBySideMode(boolean)
@@ -89,8 +82,6 @@ public class StereoCamera extends Camera {
             _leftCamera.setViewPort(0, 1, 0, 1);
             _rightCamera.setViewPort(0, 1, 0, 1);
         }
-        _leftCamera.onViewPortChange();
-        _rightCamera.onViewPortChange();
 
         // Set frustum:
         final double aspectRatio = (getWidth() / (double) getHeight() / (_sideBySideMode ? 2.0 : 1.0));
