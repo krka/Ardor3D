@@ -13,12 +13,12 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
@@ -105,7 +105,7 @@ public class ViewportExample extends ExampleBase {
         super.registerInputTriggers();
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.V), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
                 fullViewport = !fullViewport;
                 setFullViewport(fullViewport, source.getCanvasRenderer().getRenderer());

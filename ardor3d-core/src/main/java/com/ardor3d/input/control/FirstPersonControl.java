@@ -11,7 +11,6 @@
 package com.ardor3d.input.control;
 
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseState;
@@ -165,8 +164,8 @@ public class FirstPersonControl {
         final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                final MouseState mouse = inputState.getMouseState();
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
                     control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
                 }
@@ -194,8 +193,8 @@ public class FirstPersonControl {
         };
         final TriggerAction moveAction = new TriggerAction() {
 
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                control.move(source.getCanvasRenderer().getCamera(), inputState.getKeyboardState(), tpf);
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
             }
         };
         layer.registerTrigger(new InputTrigger(keysHeld, moveAction));

@@ -26,12 +26,12 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -133,7 +133,7 @@ public class UpdateTextureExample extends ExampleBase {
         _root.attachChild(keyText);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 updateTexture = !updateTexture;
                 if (updateTexture) {
                     keyText.setText("[SPACE] Updating texture...");

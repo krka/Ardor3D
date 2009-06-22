@@ -99,7 +99,8 @@ public class TestLogicalLayer {
         expect(pl.drainAvailableStates()).andReturn(states2);
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(false);
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(true);
-        ta1.perform(canvas, state2, tpf);
+        // FIXME: These new TwoInputStates(...) are not right.
+        ta1.perform(canvas, new TwoInputStates(state1, state2), tpf);
 
         replay(mocks);
 
@@ -130,9 +131,9 @@ public class TestLogicalLayer {
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p2.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p2.apply(isA(TwoInputStates.class))).andReturn(true);
-        ta1.perform(canvas, state2, tpf);
-        ta2.perform(canvas, state1, tpf);
-        ta2.perform(canvas, state2, tpf);
+        ta1.perform(canvas, new TwoInputStates(state1, state2), tpf);
+        ta2.perform(canvas, new TwoInputStates(state2, state1), tpf);
+        ta2.perform(canvas, new TwoInputStates(state1, state2), tpf);
 
         replay(mocks);
 
@@ -163,8 +164,8 @@ public class TestLogicalLayer {
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(false);
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p2.apply(isA(TwoInputStates.class))).andReturn(true);
-        ta1.perform(canvas, state2, tpf);
-        ta2.perform(canvas, state1, tpf);
+        ta1.perform(canvas, new TwoInputStates(state1, state2), tpf);
+        ta2.perform(canvas, new TwoInputStates(state2, state1), tpf);
 
         replay(mocks);
 
@@ -197,9 +198,9 @@ public class TestLogicalLayer {
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p2.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p2.apply(isA(TwoInputStates.class))).andReturn(true);
-        ta1.perform(canvas, state1, tpf);
-        ta2.perform(canvas, state1, tpf);
-        ta2.perform(canvas, state1, tpf);
+        ta1.perform(canvas, new TwoInputStates(state1, state1), tpf);
+        ta2.perform(canvas, new TwoInputStates(state1, state1), tpf);
+        ta2.perform(canvas, new TwoInputStates(state1, state1), tpf);
 
         replay(mocks);
 
@@ -232,7 +233,7 @@ public class TestLogicalLayer {
         expect(pl.drainAvailableStates()).andReturn(states2);
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(true);
         expect(p1.apply(isA(TwoInputStates.class))).andReturn(false);
-        ta1.perform(canvas, state1, tpf);
+        ta1.perform(canvas, new TwoInputStates(state1, state2), tpf);
 
         replay(mocks);
 

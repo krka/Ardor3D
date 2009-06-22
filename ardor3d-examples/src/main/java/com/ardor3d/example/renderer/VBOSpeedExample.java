@@ -18,12 +18,12 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
@@ -104,7 +104,7 @@ public class VBOSpeedExample extends ExampleBase {
         }
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 vboMode = (vboMode + 1) % 3;
                 if (vboMode == 0) {
                     t.setText("[SPACE] VBO Off");

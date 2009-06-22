@@ -31,7 +31,6 @@ import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseButton;
@@ -214,10 +213,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
             StatCollector.update();
         }
 
-        // check and execute any input triggers, if we are concerned with input
-        if (_logicalLayer != null) {
-            _logicalLayer.checkTriggers(timer.getTimePerFrame());
-        }
+        updateLogicalLayer(timer);
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
@@ -228,6 +224,13 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         /** Update controllers/render states/transforms/bounds for rootNode. */
         _root.updateGeometricState(timer.getTimePerFrame(), true);
+    }
+
+    protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+        // check and execute any input triggers, if we are concerned with input
+        if (_logicalLayer != null) {
+            _logicalLayer.checkTriggers(timer.getTimePerFrame());
+        }
     }
 
     protected void updateExample(final ReadOnlyTimer timer) {
@@ -451,10 +454,11 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonClickedCondition(MouseButton.RIGHT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 
-                        final Vector2 pos = Vector2.fetchTempInstance().set(inputState.getMouseState().getX(),
-                                inputState.getMouseState().getY());
+                        final Vector2 pos = Vector2.fetchTempInstance().set(
+                                inputStates.getCurrent().getMouseState().getX(),
+                                inputStates.getCurrent().getMouseState().getY());
                         final Ray3 pickRay = new Ray3();
                         _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
                         Vector2.releaseTempInstance(pos);
@@ -463,13 +467,13 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 exit();
             }
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.L), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _lightState.setEnabled(!_lightState.isEnabled());
                 // Either an update or a markDirty is needed here since we did not touch the affected spatial directly.
                 _root.markDirty(DirtyType.RenderState);
@@ -477,7 +481,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.T), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _wireframeState.setEnabled(!_wireframeState.isEnabled());
                 // Either an update or a markDirty is needed here since we did not touch the affected spatial directly.
                 _root.markDirty(DirtyType.RenderState);
@@ -485,19 +489,19 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.B), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _showBounds = !_showBounds;
             }
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.N), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _showNormals = !_showNormals;
             }
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F1), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _doShot = true;
             }
         }));
@@ -506,14 +510,14 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 MouseButton.LEFT), new MouseButtonClickedCondition(MouseButton.RIGHT));
 
         _logicalLayer.registerTrigger(new InputTrigger(clickLeftOrRight, new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                System.err.println("clicked: " + inputState.getMouseState().getClickCounts());
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                System.err.println("clicked: " + inputStates.getCurrent().getMouseState().getClickCounts());
             }
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                         if (_mouseManager.isSetGrabbedSupported()) {
                             _mouseManager.setGrabbed(GrabbedState.GRABBED);
                         }
@@ -521,7 +525,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 }));
         _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                 new TriggerAction() {
-                    public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                    public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                         if (_mouseManager.isSetGrabbedSupported()) {
                             _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
                         }

@@ -32,7 +32,6 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.awt.AwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.util.AWTImageLoader;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
@@ -44,6 +43,7 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.inject.Guice;
@@ -172,7 +172,7 @@ public class LwjglAwtExample {
         logicalLayer.registerInput(theCanvas, pl);
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
                 }
@@ -187,7 +187,7 @@ public class LwjglAwtExample {
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 if (source != theCanvas) {
                     return;
                 }

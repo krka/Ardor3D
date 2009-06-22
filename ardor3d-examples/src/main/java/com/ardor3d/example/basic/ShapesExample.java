@@ -17,11 +17,11 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -139,10 +139,10 @@ public class ShapesExample extends ExampleBase {
         // Add mouse-over to show labels
 
         _logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 // Put together a pick ray
-                final Vector2 pos = Vector2.fetchTempInstance().set(inputState.getMouseState().getX(),
-                        inputState.getMouseState().getY());
+                final Vector2 pos = Vector2.fetchTempInstance().set(inputStates.getCurrent().getMouseState().getX(),
+                        inputStates.getCurrent().getMouseState().getY());
                 final Ray3 pickRay = Ray3.fetchTempInstance();
                 _canvas.getCanvasRenderer().getCamera().getPickRay(pos, false, pickRay);
                 Vector2.releaseTempInstance(pos);

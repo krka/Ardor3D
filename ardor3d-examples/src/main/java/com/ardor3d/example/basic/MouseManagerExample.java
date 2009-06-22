@@ -21,7 +21,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.GrabbedState;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseCursor;
@@ -31,6 +30,7 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -108,7 +108,7 @@ public class MouseManagerExample extends ExampleBase {
             _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
 
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
-                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                     if (useCursorOne) {
                         _mouseManager.setCursor(_cursor1);
                     } else {
@@ -119,12 +119,12 @@ public class MouseManagerExample extends ExampleBase {
             }));
 
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
-                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                     _mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
                 }
             }));
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K), new TriggerAction() {
-                public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                     if (_mouseManager.isSetPositionSupported()) {
                         _mouseManager.setPosition(0, 0);
                     }
@@ -133,7 +133,7 @@ public class MouseManagerExample extends ExampleBase {
 
             _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
                     new TriggerAction() {
-                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                        public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                             if (_mouseManager.isSetGrabbedSupported()) {
                                 _mouseManager.setGrabbed(GrabbedState.GRABBED);
                             }
@@ -141,7 +141,7 @@ public class MouseManagerExample extends ExampleBase {
                     }));
             _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
                     new TriggerAction() {
-                        public void perform(final Canvas source, final InputState inputState, final double tpf) {
+                        public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                             if (_mouseManager.isSetGrabbedSupported()) {
                                 _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
                             }

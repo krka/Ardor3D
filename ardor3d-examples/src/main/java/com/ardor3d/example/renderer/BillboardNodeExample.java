@@ -15,12 +15,12 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.TextureState;
@@ -68,7 +68,7 @@ public class BillboardNodeExample extends ExampleBase {
         _root.attachChild(billboard);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 int ordinal = billboard.getAlignment().ordinal() + 1;
                 if (ordinal > BillboardAlignment.values().length - 1) {
                     ordinal = 0;

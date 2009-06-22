@@ -19,7 +19,6 @@ import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.ButtonState;
-import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
@@ -121,60 +120,60 @@ public class RotatingCubeGame implements Updater {
 
     private void registerInputTriggers() {
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.W), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 moveForward(source, tpf);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.S), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 moveBack(source, tpf);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.A), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 turnLeft(source, tpf);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.D), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 turnRight(source, tpf);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.Q), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 moveLeft(source, tpf);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.E), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 moveRight(source, tpf);
             }
         }));
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 exit.exit();
             }
         }));
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(toggleRotationKey), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 toggleRotation();
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.U), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 toggleRotation();
             }
         }));
 
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 resetCamera(source);
             }
         }));
         logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.NINE), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 lookAtZero(source);
             }
         }));
@@ -183,8 +182,8 @@ public class RotatingCubeGame implements Updater {
                 Predicates.or(TriggerConditions.leftButtonDown(), TriggerConditions.rightButtonDown()));
 
         logicalLayer.registerTrigger(new InputTrigger(mouseMovedAndOneButtonPressed, new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
-                final MouseState mouseState = inputState.getMouseState();
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final MouseState mouseState = inputStates.getCurrent().getMouseState();
 
                 turn(source, mouseState.getDx() * tpf * -MOUSE_TURN_SPEED);
                 rotateUpDown(source, mouseState.getDy() * tpf * -MOUSE_TURN_SPEED);
@@ -192,7 +191,7 @@ public class RotatingCubeGame implements Updater {
         }));
         logicalLayer.registerTrigger(new InputTrigger(new MouseButtonCondition(ButtonState.DOWN, ButtonState.DOWN,
                 ButtonState.UNDEFINED), new TriggerAction() {
-            public void perform(final Canvas source, final InputState inputState, final double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 moveForward(source, tpf);
             }
         }));
