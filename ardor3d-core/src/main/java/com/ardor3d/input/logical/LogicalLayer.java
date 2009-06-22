@@ -10,6 +10,10 @@
 
 package com.ardor3d.input.logical;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.annotation.ThreadSafe;
@@ -17,10 +21,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.PhysicalLayer;
 import com.google.inject.Inject;
-
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Implementation of a logical layer on top of the physical one, to be able to more easily trigger certain commands for
@@ -30,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public final class LogicalLayer {
     private final Set<InputSource> _inputs = new CopyOnWriteArraySet<InputSource>();
     private final Set<InputTrigger> _triggers = new CopyOnWriteArraySet<InputTrigger>();
+    private LogicalTriggersApplier _applier = new BasicTriggersApplier();
 
     @Inject
     public LogicalLayer() {}
@@ -73,12 +74,14 @@ public final class LogicalLayer {
             final List<InputState> newStates = is.physicalLayer.drainAvailableStates();
 
             if (newStates.isEmpty()) {
-                checkAndPerformTriggers(is.source, new TwoInputStates(is.lastState, is.lastState), tpf);
+                _applier.checkAndPerformTriggers(_triggers, is.source, new TwoInputStates(is.lastState, is.lastState),
+                        tpf);
             } else {
                 for (final InputState inputState : newStates) {
                     // no trigger is valid in the LOST_FOCUS state, so don't bother checking them
                     if (inputState != InputState.LOST_FOCUS) {
-                        checkAndPerformTriggers(is.source, new TwoInputStates(is.lastState, inputState), tpf);
+                        _applier.checkAndPerformTriggers(_triggers, is.source, new TwoInputStates(is.lastState,
+                                inputState), tpf);
                     }
 
                     is.lastState = inputState;
@@ -87,10 +90,12 @@ public final class LogicalLayer {
         }
     }
 
-    private void checkAndPerformTriggers(final Canvas source, final TwoInputStates states, final double tpf) {
-        for (final InputTrigger trigger : _triggers) {
-            trigger.performIfValid(source, states, tpf);
-        }
+    public void setApplier(final LogicalTriggersApplier applier) {
+        _applier = applier;
+    }
+
+    public LogicalTriggersApplier getApplier() {
+        return _applier;
     }
 
     private static class InputSource {
@@ -104,5 +109,9 @@ public final class LogicalLayer {
             this.physicalLayer = physicalLayer;
             lastState = InputState.EMPTY;
         }
+    }
+
+    public Set<InputTrigger> getTriggers() {
+        return _triggers;
     }
 }

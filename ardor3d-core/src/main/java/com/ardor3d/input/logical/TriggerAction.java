@@ -12,7 +12,6 @@ package com.ardor3d.input.logical;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.input.InputState;
 
 /**
  * Defines an action to be performed when a given input condition is true.
@@ -30,5 +29,5 @@ public interface TriggerAction {
      *            the time per frame in seconds
      */
     @MainThread
-    public void perform(Canvas source, InputState inputState, double tpf);
+    public void perform(Canvas source, TwoInputStates inputState, double tpf);
 }

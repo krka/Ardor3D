@@ -39,7 +39,7 @@ public final class InputTrigger {
      */
     void performIfValid(final Canvas source, final TwoInputStates states, final double tpf) {
         if (condition.apply(states)) {
-            action.perform(source, states.getCurrent(), tpf);
+            action.perform(source, states, tpf);
         }
     }
 }
