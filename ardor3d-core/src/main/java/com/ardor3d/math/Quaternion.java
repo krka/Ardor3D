@@ -228,11 +228,11 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      * bank.
      * 
      * @param heading
-     *            the Euler heading angle. (rotation about the y axis)
+     *            the Euler heading angle in radians. (rotation about the y axis)
      * @param attitude
-     *            the Euler attitude angle. (rotation about the z axis)
+     *            the Euler attitude angle in radians. (rotation about the z axis)
      * @param bank
-     *            the Euler bank angle. (rotation about the x axis)
+     *            the Euler bank angle in radians. (rotation about the x axis)
      * @return this quaternion for chaining
      * @see http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
      */
@@ -264,7 +264,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
-     * Converts this quaternion to Euler rotation angles (heading, attitude, bank).
+     * Converts this quaternion to Euler rotation angles in radians (heading, attitude, bank).
      * 
      * @param store
      *            the double[] array to store the computed angles in. If null, a new double[] will be created
