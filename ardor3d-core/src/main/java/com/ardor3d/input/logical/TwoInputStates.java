@@ -48,4 +48,16 @@ public final class TwoInputStates {
     public InputState getCurrent() {
         return _current;
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TwoInputStates)) {
+            return false;
+        }
+        final TwoInputStates comp = (TwoInputStates) o;
+        return _previous == comp._previous && _current == comp._current;
+    }
 }
