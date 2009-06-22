@@ -50,7 +50,7 @@ public class Arrow extends Node {
     protected void buildArrow() {
         // Start with cylinders:
         final Cylinder base = new Cylinder("base", 4, 16, _width * .75, _length);
-        rotator.fromAngles(90 * MathUtils.DEG_TO_RAD, 0, 0);
+        rotator.fromEulerAngles(0, 0, 90 * MathUtils.DEG_TO_RAD);
         base.getMeshData().rotatePoints(rotator);
         base.getMeshData().rotateNormals(rotator);
         attachChild(base);

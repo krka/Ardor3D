@@ -79,21 +79,6 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
         _w = w;
     }
 
-    /**
-     * Constructs a new quaternion from the given Euler rotation angles (y,r,p).
-     * 
-     * @param angles
-     *            the Euler angles of rotation (in radians).
-     * @throws IllegalArgumentException
-     *             if angles is not length 3
-     * @throws NullPointerException
-     *             if angles is null.
-     */
-    public Quaternion(final double[] angles) {
-        this(0, 0, 0, 1);
-        fromAngles(angles);
-    }
-
     public double getX() {
         return _x;
     }
@@ -219,58 +204,59 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
-     * Updates this quaternion from the given Euler rotation angles (y,r,p).
+     * Updates this quaternion from the given Euler rotation angles, applied in the given order: heading, attitude,
+     * bank.
      * 
      * @param angles
-     *            the Euler angles of rotation (in radians).
+     *            the Euler angles of rotation (in radians) stored as heading, attitude, and bank.
      * @return this quaternion for chaining
      * @throws IllegalArgumentException
      *             if angles is not length 3
      * @throws NullPointerException
      *             if angles is null.
      */
-    public Quaternion fromAngles(final double[] angles) {
+    public Quaternion fromEulerAngles(final double[] angles) {
         if (angles.length != 3) {
             throw new IllegalArgumentException("Angles array must have three elements");
         }
 
-        return fromAngles(angles[0], angles[1], angles[2]);
+        return fromEulerAngles(angles[0], angles[1], angles[2]);
     }
 
     /**
-     * Updates this quaternion from the given Euler rotation angles (y,r,p). Note that we are applying in order: roll,
-     * pitch, yaw but we've ordered them in x, y, and z for convenience. See:
-     * http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
+     * Updates this quaternion from the given Euler rotation angles, applied in the given order: heading, attitude,
+     * bank.
      * 
-     * @param yaw
-     *            the Euler yaw of rotation (in radians). (aka Bank, often rot around x)
-     * @param roll
-     *            the Euler roll of rotation (in radians). (aka Heading, often rot around y)
-     * @param pitch
-     *            the Euler pitch of rotation (in radians). (aka Attitude, often rot around z)
+     * @param heading
+     *            the Euler heading angle. (rotation about the y axis)
+     * @param attitude
+     *            the Euler attitude angle. (rotation about the z axis)
+     * @param bank
+     *            the Euler bank angle. (rotation about the x axis)
      * @return this quaternion for chaining
+     * @see http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
      */
-    public Quaternion fromAngles(final double yaw, final double roll, final double pitch) {
-        double angle = pitch * 0.5;
-        final double sinPitch = MathUtils.sin(angle);
-        final double cosPitch = MathUtils.cos(angle);
-        angle = roll * 0.5;
-        final double sinRoll = MathUtils.sin(angle);
-        final double cosRoll = MathUtils.cos(angle);
-        angle = yaw * 0.5;
-        final double sinYaw = MathUtils.sin(angle);
-        final double cosYaw = MathUtils.cos(angle);
+    public Quaternion fromEulerAngles(final double heading, final double attitude, final double bank) {
+        double angle = heading * 0.5;
+        final double sinHeading = MathUtils.sin(angle);
+        final double cosHeading = MathUtils.cos(angle);
+        angle = attitude * 0.5;
+        final double sinAttitude = MathUtils.sin(angle);
+        final double cosAttitude = MathUtils.cos(angle);
+        angle = bank * 0.5;
+        final double sinBank = MathUtils.sin(angle);
+        final double cosBank = MathUtils.cos(angle);
 
         // variables used to reduce multiplication calls.
-        final double cosRollXcosPitch = cosRoll * cosPitch;
-        final double sinRollXsinPitch = sinRoll * sinPitch;
-        final double cosRollXsinPitch = cosRoll * sinPitch;
-        final double sinRollXcosPitch = sinRoll * cosPitch;
+        final double cosHeadingXcosAttitude = cosHeading * cosAttitude;
+        final double sinHeadingXsinAttitude = sinHeading * sinAttitude;
+        final double cosHeadingXsinAttitude = cosHeading * sinAttitude;
+        final double sinHeadingXcosAttitude = sinHeading * cosAttitude;
 
-        final double w = (cosRollXcosPitch * cosYaw - sinRollXsinPitch * sinYaw);
-        final double x = (cosRollXcosPitch * sinYaw + sinRollXsinPitch * cosYaw);
-        final double y = (sinRollXcosPitch * cosYaw + cosRollXsinPitch * sinYaw);
-        final double z = (cosRollXsinPitch * cosYaw - sinRollXcosPitch * sinYaw);
+        final double w = (cosHeadingXcosAttitude * cosBank - sinHeadingXsinAttitude * sinBank);
+        final double x = (cosHeadingXcosAttitude * sinBank + sinHeadingXsinAttitude * cosBank);
+        final double y = (sinHeadingXcosAttitude * cosBank + cosHeadingXsinAttitude * sinBank);
+        final double z = (cosHeadingXsinAttitude * cosBank - sinHeadingXcosAttitude * sinBank);
 
         set(x, y, z, w);
 
@@ -278,16 +264,17 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
-     * converts this quaternion to Euler rotation angles (yaw, roll, pitch). See
-     * http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+     * Converts this quaternion to Euler rotation angles (heading, attitude, bank).
      * 
      * @param store
      *            the double[] array to store the computed angles in. If null, a new double[] will be created
-     * @return the double[] array.
+     * @return the double[] array, filled with heading, attitude and bank in that order..
      * @throws IllegalArgumentException
      *             if non-null store is not at least length 3
+     * @see http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+     * @see #fromEulerAngles(double, double, double)
      */
-    public double[] toAngles(final double[] store) {
+    public double[] toEulerAngles(final double[] store) {
         double[] result = store;
         if (result == null) {
             result = new double[3];
@@ -303,17 +290,17 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
         // is correction factor
         final double test = getX() * getY() + getZ() * getW();
         if (test > 0.499 * unit) { // singularity at north pole
-            result[1] = 2 * Math.atan2(getX(), getW());
-            result[2] = MathUtils.HALF_PI;
-            result[0] = 0;
+            result[0] = 2 * Math.atan2(getX(), getW());
+            result[1] = MathUtils.HALF_PI;
+            result[2] = 0;
         } else if (test < -0.499 * unit) { // singularity at south pole
-            result[1] = -2 * Math.atan2(getX(), getW());
-            result[2] = -MathUtils.HALF_PI;
-            result[0] = 0;
+            result[0] = -2 * Math.atan2(getX(), getW());
+            result[1] = -MathUtils.HALF_PI;
+            result[2] = 0;
         } else {
-            result[1] = Math.atan2(2 * getY() * getW() - 2 * getX() * getZ(), sqx - sqy - sqz + sqw); // roll or heading
-            result[2] = Math.asin(2 * test / unit); // pitch or attitude
-            result[0] = Math.atan2(2 * getX() * getW() - 2 * getY() * getZ(), -sqx + sqy - sqz + sqw); // yaw or bank
+            result[0] = Math.atan2(2 * getY() * getW() - 2 * getX() * getZ(), sqx - sqy - sqz + sqw);
+            result[1] = Math.asin(2 * test / unit);
+            result[2] = Math.atan2(2 * getX() * getW() - 2 * getY() * getZ(), -sqx + sqy - sqz + sqw);
         }
         return result;
     }

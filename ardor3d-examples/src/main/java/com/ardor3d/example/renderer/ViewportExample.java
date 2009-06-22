@@ -20,6 +20,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
@@ -73,7 +74,8 @@ public class ViewportExample extends ExampleBase {
         // A box to check aspect ratio of 3D objects
         box1 = new Box("test box 1", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
         box1.setTranslation(0, 5, 0);
-        box1.setRotation(new Quaternion(new double[] { Math.toRadians(30), Math.toRadians(45), Math.toRadians(60) }));
+        box1.setRotation(new Quaternion().fromEulerAngles(MathUtils.DEG_TO_RAD * 45, MathUtils.DEG_TO_RAD * 60,
+                MathUtils.DEG_TO_RAD * 30));
         box1.setSolidColor(ColorRGBA.GREEN);
         box1.setRenderState(ms);
         box1.updateModelBound();

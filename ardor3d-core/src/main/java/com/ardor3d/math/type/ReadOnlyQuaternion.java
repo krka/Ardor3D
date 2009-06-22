@@ -35,7 +35,7 @@ public interface ReadOnlyQuaternion {
 
     public double[] toArray(final double[] store);
 
-    public double[] toAngles(final double[] store);
+    public double[] toEulerAngles(final double[] store);
 
     public Matrix3 toRotationMatrix(final Matrix3 store);
 
