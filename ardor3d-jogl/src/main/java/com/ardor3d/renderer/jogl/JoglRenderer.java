@@ -679,6 +679,7 @@ public class JoglRenderer extends AbstractRenderer {
 
         final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
         int offset = 0;
+        int set = 0;
         if (ts != null) {
             offset = ts.getTextureCoordinateOffset();
 
@@ -707,19 +708,19 @@ public class JoglRenderer extends AbstractRenderer {
 
                 _oldTextureBuffers[i] = textureBuffer;
             }
-
-            if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
-                for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
-                    if (caps.isMultitextureSupported()) {
-                        gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                    }
-                    gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                }
-            }
-
-            _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
-                    .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+            set = ts.getNumberOfSetTextures();
         }
+
+        if (set < _prevTextureNumber) {
+            for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+                if (caps.isMultitextureSupported()) {
+                    gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
+                }
+                gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+            }
+        }
+
+        _prevTextureNumber = set < caps.getNumberOfFixedTextureUnits() ? set : caps.getNumberOfFixedTextureUnits();
     }
 
     public void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
