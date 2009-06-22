@@ -109,50 +109,31 @@ public class PhysicalLayer {
     }
 
     private void readKeyboardState() {
-        EnumSet<Key> keysDown = null;
-        EnumSet<Key> keysChanged = null;
-
         final PeekingIterator<KeyEvent> eventIterator = _keyboardWrapper.getEvents();
 
-        while (eventIterator.hasNext()) {
-            // only initialising these variables if we actually have to use them; this
-            // initialisation will be done during the first loop iteration.
-            if (keysDown == null) {
-                // EnumSet.copyOf fails if the collection is empty, since it needs at least one object to
-                // figure out which type of enum to deal with. Hence the check below.
-                if (_currentKeyboardState.getKeysDown().isEmpty()) {
-                    keysDown = EnumSet.noneOf(Key.class);
-                } else {
-                    keysDown = EnumSet.copyOf(_currentKeyboardState.getKeysDown());
-                }
-
-                keysChanged = EnumSet.noneOf(Key.class);
-            }
-
-            final KeyEvent keyEvent = eventIterator.peek();
-
-            if (keysChanged.contains(keyEvent.getKey())) {
-                // this key has already changed once in this keyboard state, so we need a new state.
-                // exit this loop and return.
-                break;
-            }
-
-            eventIterator.next();
-
-            // add this to the changed keys and keep track of whether it is now down or not
-            keysChanged.add(keyEvent.getKey());
-
-            if (keyEvent.getState() == KeyState.DOWN) {
-                keysDown.add(keyEvent.getKey());
-            } else {
-                keysDown.remove(keyEvent.getKey());
-            }
+        // if no new events, just leave the current state as is
+        if (!eventIterator.hasNext()) {
+            return;
         }
 
-        // check if the current keyboard state should be updated
-        if (keysChanged != null && !keysChanged.isEmpty()) {
-            _currentKeyboardState = new KeyboardState(keysDown);
+        KeyEvent keyEvent = eventIterator.next();
+
+        // EnumSet.copyOf fails if the collection is empty, since it needs at least one object to
+        // figure out which type of enum to deal with. Hence the check below.
+        EnumSet<Key> keysDown = _currentKeyboardState.getKeysDown().isEmpty() ?
+                EnumSet.noneOf(Key.class) :
+                EnumSet.copyOf(_currentKeyboardState.getKeysDown());
+
+        if (keyEvent.getState() == KeyState.DOWN) {
+            keysDown.add(keyEvent.getKey());
+        } else {
+            // ignore the fact that this removal might fail - for instance, at startup, the
+            // set of keys tracked as down will be empty even if somebody presses a key when the
+            // app starts.
+            keysDown.remove(keyEvent.getKey());
         }
+
+        _currentKeyboardState = new KeyboardState(keysDown);
     }
 
     /**

@@ -153,11 +153,10 @@ public class TestPhysicalLayer {
         mouseWrapper.init();
         focusWrapper.init();
 
-        expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(AdownBdown.iterator()));
-        expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
-        expect(keyboardWrapper.getEvents()).andReturn(Iterators.peekingIterator(noKeys.iterator()));
+        final PeekingIterator<KeyEvent> keyIterator = Iterators.peekingIterator(AdownBdown.iterator());
 
-        expect(mouseWrapper.getEvents()).andReturn(Iterators.peekingIterator(noMice.iterator())).times(3);
+        expect(keyboardWrapper.getEvents()).andReturn(keyIterator).times(4);
+        expect(mouseWrapper.getEvents()).andReturn(Iterators.peekingIterator(noMice.iterator())).times(4);
         expect(focusWrapper.getAndClearFocusLost()).andReturn(false).times(2);
 
         replay(mocks);
@@ -165,9 +164,14 @@ public class TestPhysicalLayer {
         pl.readState();
         inputStates = pl.drainAvailableStates();
 
-        assertEquals("1 states", 1, inputStates.size());
+        assertEquals("2 states", 2, inputStates.size());
 
         is = inputStates.get(0);
+
+        assertTrue("a down", is.getKeyboardState().isDown(Key.A));
+        assertFalse("b down", is.getKeyboardState().isDown(Key.B));
+
+        is = inputStates.get(1);
 
         assertTrue("a down", is.getKeyboardState().isDown(Key.A));
         assertTrue("b down", is.getKeyboardState().isDown(Key.B));
