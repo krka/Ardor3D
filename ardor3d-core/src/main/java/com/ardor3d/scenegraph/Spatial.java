@@ -599,7 +599,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      */
     protected RenderDelegate getCurrentRenderDelegate() {
         // short circuit... ignore if no delegates at all.
-        if (_delegateMap.size() == 0) {
+        if (_delegateMap.isEmpty()) {
             return null;
         }
 
