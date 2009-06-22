@@ -38,7 +38,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
      */
     public static final ReadOnlyColorRGBA BLACK = new ColorRGBA(0f, 0f, 0f, 1f);
     /**
-     * the color black (0, 0, 0, 0).
+     * the color black with a zero alpha value (0, 0, 0, 0).
      */
     public static final ReadOnlyColorRGBA BLACK_NO_ALPHA = new ColorRGBA(0f, 0f, 0f, 0f);
     /**
