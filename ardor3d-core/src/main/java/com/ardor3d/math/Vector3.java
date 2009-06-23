@@ -44,9 +44,19 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static ReadOnlyVector3 ONE = new Vector3(1, 1, 1);
 
     /**
+     * -1, -1, -1
+     */
+    public final static ReadOnlyVector3 NEG_ONE = new Vector3(-1, -1, -1);
+
+    /**
      * 1, 0, 0
      */
     public final static ReadOnlyVector3 UNIT_X = new Vector3(1, 0, 0);
+
+    /**
+     * -1, 0, 0
+     */
+    public final static ReadOnlyVector3 NEG_UNIT_X = new Vector3(-1, 0, 0);
 
     /**
      * 0, 1, 0
@@ -54,9 +64,19 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static ReadOnlyVector3 UNIT_Y = new Vector3(0, 1, 0);
 
     /**
+     * 0, -1, 0
+     */
+    public final static ReadOnlyVector3 NEG_UNIT_Y = new Vector3(0, -1, 0);
+
+    /**
      * 0, 0, 1
      */
     public final static ReadOnlyVector3 UNIT_Z = new Vector3(0, 0, 1);
+
+    /**
+     * 0, 0, -1
+     */
+    public final static ReadOnlyVector3 NEG_UNIT_Z = new Vector3(0, 0, -1);
 
     protected double _x = 0;
     protected double _y = 0;

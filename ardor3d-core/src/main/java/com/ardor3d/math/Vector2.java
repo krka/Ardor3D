@@ -44,14 +44,29 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     public final static ReadOnlyVector2 ONE = new Vector2(1, 1);
 
     /**
+     * -1, -1
+     */
+    public final static ReadOnlyVector2 NEG_ONE = new Vector2(-1, -1);
+
+    /**
      * 1, 0
      */
     public final static ReadOnlyVector2 UNIT_X = new Vector2(1, 0);
 
     /**
+     * -1, 0
+     */
+    public final static ReadOnlyVector2 NEG_UNIT_X = new Vector2(-1, 0);
+
+    /**
      * 0, 1
      */
     public final static ReadOnlyVector2 UNIT_Y = new Vector2(0, 1);
+
+    /**
+     * 0, -1
+     */
+    public final static ReadOnlyVector2 NEG_UNIT_Y = new Vector2(0, -1);
 
     protected double _x = 0;
     protected double _y = 0;
