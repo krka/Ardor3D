@@ -14,9 +14,9 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 
 import com.ardor3d.annotation.Immutable;
+import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.EnumMultiset;
 
 /**
  * Describes the mouse state at some point in time.
@@ -85,6 +85,16 @@ public class MouseState {
 
     public int getDwheel() {
         return _dwheel;
+    }
+
+    /**
+     * 
+     * @param state
+     *            the button state to look for
+     * @return true if at least one mouse button is in the given button state.
+     */
+    public boolean hasButtonState(final ButtonState state) {
+        return _buttonStates.containsValue(state);
     }
 
     /**
