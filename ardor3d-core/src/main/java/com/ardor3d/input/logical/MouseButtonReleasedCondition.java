@@ -11,6 +11,7 @@
 package com.ardor3d.input.logical;
 
 import com.ardor3d.annotation.Immutable;
+import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
 import com.google.common.base.Predicate;
@@ -42,7 +43,8 @@ public final class MouseButtonReleasedCondition implements Predicate<TwoInputSta
         final InputState currentState = states.getCurrent();
         final InputState previousState = states.getPrevious();
 
-        if (currentState == null || previousState == null) {
+        if (currentState == null || previousState == null
+                || !previousState.getMouseState().hasButtonState(ButtonState.DOWN)) {
             return false;
         }
 
