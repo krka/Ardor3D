@@ -147,7 +147,7 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     }
 
     /**
-     * @return the string representation of this ring.
+     * @return the string representation of this rectangle.
      */
     @Override
     public String toString() {
@@ -155,8 +155,8 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     }
 
     /**
-     * @return returns a unique code for this ring object based on its values. If two rings are numerically equal, they
-     *         will return the same hash code value.
+     * @return returns a unique code for this rectangle object based on its values. If two rectangles are numerically
+     *         equal, they will return the same hash code value.
      */
     @Override
     public int hashCode() {
@@ -172,7 +172,7 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     /**
      * @param o
      *            the object to compare for equality
-     * @return true if this ring and the provided ring have the same constant and normal values.
+     * @return true if this rectangle and the provided rectangle have the same corner values.
      */
     @Override
     public boolean equals(final Object o) {

@@ -10,7 +10,10 @@
 
 package com.ardor3d.renderer.state.record;
 
+import java.util.Stack;
+
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.renderer.DrawBufferTarget;
 
 public class RendererRecord extends StateRecord {
@@ -21,6 +24,7 @@ public class RendererRecord extends StateRecord {
     private boolean _elementVboValid;
     private transient final ColorRGBA _tempColor = new ColorRGBA();
     private DrawBufferTarget _drawBufferTarget = null;
+    private final Stack<Rectangle2> _clips = new Stack<Rectangle2>();
 
     @Override
     public void invalidate() {
@@ -103,5 +107,9 @@ public class RendererRecord extends StateRecord {
 
     public void setDrawBufferTarget(final DrawBufferTarget target) {
         _drawBufferTarget = target;
+    }
+
+    public Stack<Rectangle2> getScissorClips() {
+        return _clips;
     }
 }

@@ -432,4 +432,25 @@ public interface Renderer {
      *            a list/set of ids to remove.
      */
     void deleteDisplayLists(Collection<Integer> collection);
+
+    /**
+     * Add the given rectangle to the clip stack, clipping the rendering area by the given rectangle intersected with
+     * any existing scissor entries. Enable clipping if this is the first rectangle in the stack.
+     * 
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
+    void pushClip(int x, int y, int width, int height);
+
+    /**
+     * Pop the most recent rectangle from the stack and adjust the rendering area accordingly.
+     */
+    void popClip();
+
+    /**
+     * Clear all rectangles from the clip stack and disable clipping.
+     */
+    void clearClips();
 }

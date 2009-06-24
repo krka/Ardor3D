@@ -10,9 +10,12 @@
 
 package com.ardor3d.scene.state.jogl.util;
 
+import java.util.Stack;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.renderer.state.record.RendererRecord;
 
 public abstract class JoglRendererUtil {
@@ -44,6 +47,33 @@ public abstract class JoglRendererUtil {
             gl.glBindBufferARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, id);
             rendRecord.setCurrentElementVboId(id);
             rendRecord.setElementVboValid(true);
+        }
+    }
+
+    public static void applyScissors(final RendererRecord rendRecord) {
+        final GL gl = GLU.getCurrentGL();
+        final Stack<Rectangle2> clips = rendRecord.getScissorClips();
+
+        if (clips.size() > 0) {
+            gl.glEnable(GL.GL_SCISSOR_TEST);
+
+            Rectangle2 init = null;
+            for (final Rectangle2 r : clips) {
+                if (init == null) {
+                    init = new Rectangle2(r);
+                } else {
+                    init.intersect(r, init);
+                }
+                if (init.getWidth() <= 0 || init.getHeight() <= 0) {
+                    init.setWidth(0);
+                    init.setHeight(0);
+                    break;
+                }
+            }
+            gl.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
+        } else {
+            // no clips, so disable
+            gl.glDisable(GL.GL_SCISSOR_TEST);
         }
     }
 }

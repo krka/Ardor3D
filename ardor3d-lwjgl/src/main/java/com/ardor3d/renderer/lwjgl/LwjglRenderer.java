@@ -34,6 +34,7 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.Matrix4;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -1476,5 +1477,29 @@ public class LwjglRenderer extends AbstractRenderer {
 
         // invalidate "current arrays"
         reset();
+    }
+
+    public void clearClips() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().clear();
+
+        LwjglRendererUtil.applyScissors(record);
+    }
+
+    public void popClip() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().pop();
+
+        LwjglRendererUtil.applyScissors(record);
+    }
+
+    public void pushClip(final int x, final int y, final int width, final int height) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().push(new Rectangle2(x, y, width, height));
+
+        LwjglRendererUtil.applyScissors(record);
     }
 }
