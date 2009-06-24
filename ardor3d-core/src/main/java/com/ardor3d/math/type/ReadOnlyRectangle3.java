@@ -12,7 +12,7 @@ package com.ardor3d.math.type;
 
 import com.ardor3d.math.Vector3;
 
-public interface ReadOnlyRectangle {
+public interface ReadOnlyRectangle3 {
     public ReadOnlyVector3 getA();
 
     public ReadOnlyVector3 getB();

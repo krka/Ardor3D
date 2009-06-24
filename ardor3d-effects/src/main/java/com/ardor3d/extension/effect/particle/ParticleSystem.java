@@ -19,7 +19,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Rectangle;
+import com.ardor3d.math.Rectangle3;
 import com.ardor3d.math.Ring;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Triangle;
@@ -69,7 +69,7 @@ public abstract class ParticleSystem extends Node {
     protected ParticleType _particleType;
     protected EmitType _emitType = EmitType.Point;
     protected LineSegment3 _psSegment;
-    protected Rectangle _psRect;
+    protected Rectangle3 _psRect;
     protected Mesh _psGeom;
     protected Ring _psRing;
     protected boolean _cameraFacing = true;
@@ -659,7 +659,7 @@ public abstract class ParticleSystem extends Node {
      * @param rect
      *            New rectangular patch.
      */
-    public void setGeometry(final Rectangle rect) {
+    public void setGeometry(final Rectangle3 rect) {
         _psRect = rect;
         _emitType = EmitType.Rectangle;
     }
@@ -700,7 +700,7 @@ public abstract class ParticleSystem extends Node {
      * 
      * @return current rectangle segment.
      */
-    public Rectangle getRectangle() {
+    public Rectangle3 getRectangle() {
         return _psRect;
     }
 
@@ -1089,7 +1089,7 @@ public abstract class ParticleSystem extends Node {
         _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
 
         _psSegment = (LineSegment3) capsule.readSavable("psSegment", null);
-        _psRect = (Rectangle) capsule.readSavable("psRect", null);
+        _psRect = (Rectangle3) capsule.readSavable("psRect", null);
         _psRing = (Ring) capsule.readSavable("psRing", null);
         _psGeom = (Mesh) capsule.readSavable("psGeom", null);
 

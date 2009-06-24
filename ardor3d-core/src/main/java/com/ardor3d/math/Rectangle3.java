@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import com.ardor3d.math.type.ReadOnlyRectangle;
+import com.ardor3d.math.type.ReadOnlyRectangle3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -25,28 +25,29 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 /**
- * <code>Rectangle</code> defines a finite plane within three dimensional space that is specified via three points (A,
- * B, C). These three points define a triangle with the forth point defining the rectangle ((B + C) - A.
+ *Defines a finite plane within three dimensional space that is specified via three points (A, B, C). These three
+ * points define a triangle with the forth point defining the rectangle ((B + C) - A.
  */
 
-public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRectangle, Poolable {
+public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyRectangle3, Poolable {
     private static final long serialVersionUID = 1L;
 
-    private static final ObjectPool<Rectangle> RECTANGLE_POOL = ObjectPool.create(Rectangle.class, Constants.maxPoolSize);
+    private static final ObjectPool<Rectangle3> RECTANGLE_POOL = ObjectPool.create(Rectangle3.class,
+            Constants.maxPoolSize);
 
     private final Vector3 _a = new Vector3();
     private final Vector3 _b = new Vector3();
     private final Vector3 _c = new Vector3();
 
     /**
-     * Constructor creates a new <code>Rectangle</code> with no defined corners. A, B, and C must be set to define a
+     * Constructor creates a new <code>Rectangle3</code> with no defined corners. A, B, and C must be set to define a
      * valid rectangle.
      * 
      */
-    public Rectangle() {}
+    public Rectangle3() {}
 
     /**
-     * Constructor creates a new <code>Rectangle</code> with defined A, B, and C points that define the area of the
+     * Constructor creates a new <code>Rectangle3</code> with defined A, B, and C points that define the area of the
      * rectangle.
      * 
      * @param a
@@ -56,7 +57,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
      * @param c
      *            the third corner of the rectangle.
      */
-    public Rectangle(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final ReadOnlyVector3 c) {
+    public Rectangle3(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final ReadOnlyVector3 c) {
         setA(a);
         setB(b);
         setC(c);
@@ -150,7 +151,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
      */
     @Override
     public String toString() {
-        return "com.ardor3d.math.Rectangle [A: " + _a + " B: " + _b + " C: " + _c + "]";
+        return "com.ardor3d.math.Rectangle3 [A: " + _a + " B: " + _b + " C: " + _c + "]";
     }
 
     /**
@@ -178,10 +179,10 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ReadOnlyRectangle)) {
+        if (!(o instanceof ReadOnlyRectangle3)) {
             return false;
         }
-        final ReadOnlyRectangle comp = (ReadOnlyRectangle) o;
+        final ReadOnlyRectangle3 comp = (ReadOnlyRectangle3) o;
         return _a.equals(comp.getA()) && _b.equals(comp.getB()) && _c.equals(comp.getC());
     }
 
@@ -190,9 +191,9 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
     // /////////////////
 
     @Override
-    public Rectangle clone() {
+    public Rectangle3 clone() {
         try {
-            final Rectangle p = (Rectangle) super.clone();
+            final Rectangle3 p = (Rectangle3) super.clone();
             p._a.set(_a);
             p._b.set(_b);
             p._c.set(_c);
@@ -220,7 +221,7 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
         _c.set((Vector3) capsule.readSavable("c", new Vector3(Vector3.ZERO)));
     }
 
-    public Class<? extends Rectangle> getClassTag() {
+    public Class<? extends Rectangle3> getClassTag() {
         return this.getClass();
     }
 
@@ -260,25 +261,25 @@ public class Rectangle implements Cloneable, Savable, Externalizable, ReadOnlyRe
     // /////////////////
 
     /**
-     * @return An instance of Rectangle that is intended for temporary use in calculations and so forth. Multiple calls
+     * @return An instance of Rectangle3 that is intended for temporary use in calculations and so forth. Multiple calls
      *         to the method should return instances of this class that are not currently in use.
      */
-    public final static Rectangle fetchTempInstance() {
+    public final static Rectangle3 fetchTempInstance() {
         if (Constants.useMathPools) {
             return RECTANGLE_POOL.fetch();
         } else {
-            return new Rectangle();
+            return new Rectangle3();
         }
     }
 
     /**
-     * Releases a Rectangle back to be used by a future call to fetchTempInstance. TAKE CARE: this Rectangle object
-     * should no longer have other classes referencing it or "Bad Things" will happen.
+     * Releases a Rectangle3 back to be used by a future call to fetchTempInstance. TAKE CARE: this object should no
+     * longer have other classes referencing it or "Bad Things" will happen.
      * 
      * @param rectangle
-     *            the Rectangle to release.
+     *            the Rectangle3 to release.
      */
-    public final static void releaseTempInstance(final Rectangle rectangle) {
+    public final static void releaseTempInstance(final Rectangle3 rectangle) {
         if (Constants.useMathPools) {
             RECTANGLE_POOL.release(rectangle);
         }
