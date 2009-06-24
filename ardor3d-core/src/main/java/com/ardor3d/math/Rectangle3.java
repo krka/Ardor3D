@@ -25,7 +25,7 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 /**
- *Defines a finite plane within three dimensional space that is specified via three points (A, B, C). These three
+ * Defines a finite plane within three dimensional space that is specified via three points (A, B, C). These three
  * points define a triangle with the forth point defining the rectangle ((B + C) - A.
  */
 
