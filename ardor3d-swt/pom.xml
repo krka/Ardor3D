@@ -73,6 +73,22 @@
       </dependencies>
     </profile>
     <profile>
+      <id>solaris-x86</id>
+      <activation>
+        <os>
+          <arch>x86</arch>
+          <family>unix</family>
+          <name>SunOS</name>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.swt.gtk.solaris</groupId>
+          <artifactId>x86</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>macosx</id>
       <activation>
         <os>
