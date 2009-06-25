@@ -59,13 +59,13 @@ public class TestPhysicalLayer {
 
         mocks = new Object[] { keyboardWrapper, mouseWrapper, focusWrapper };
 
-        Adown.add(new KeyEvent(Key.A, KeyState.DOWN));
+        Adown.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
 
-        AdownBdown.add(new KeyEvent(Key.A, KeyState.DOWN));
-        AdownBdown.add(new KeyEvent(Key.B, KeyState.DOWN));
+        AdownBdown.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
+        AdownBdown.add(new KeyEvent(Key.B, KeyState.DOWN, 'b'));
 
-        AdownAup.add(new KeyEvent(Key.A, KeyState.DOWN));
-        AdownAup.add(new KeyEvent(Key.A, KeyState.UP));
+        AdownAup.add(new KeyEvent(Key.A, KeyState.DOWN, 'a'));
+        AdownAup.add(new KeyEvent(Key.A, KeyState.UP, 'a'));
 
         buttonDown.add(new MouseState(0, 0, 0, 0, 0, MouseButton.makeMap(ButtonState.DOWN, ButtonState.UP,
                 ButtonState.UP), null));
@@ -313,8 +313,8 @@ public class TestPhysicalLayer {
     }
 
     private static class NeverEndingKeyIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
-        final KeyEvent aUp = new KeyEvent(Key.A, KeyState.UP);
-        final KeyEvent aDown = new KeyEvent(Key.A, KeyState.DOWN);
+        final KeyEvent aUp = new KeyEvent(Key.A, KeyState.UP, 'a');
+        final KeyEvent aDown = new KeyEvent(Key.A, KeyState.DOWN, 'a');
 
         int count = 0;
 

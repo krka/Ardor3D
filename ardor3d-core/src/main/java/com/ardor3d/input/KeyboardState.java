@@ -21,15 +21,18 @@ import com.ardor3d.annotation.Immutable;
  */
 @Immutable
 public class KeyboardState {
+    public static final KeyboardState NOTHING = new KeyboardState(EnumSet.noneOf(Key.class), '0');
+
     private final EnumSet<Key> _keysDown;
     private final Set<Key> _keysDownView;
-    public static final KeyboardState NOTHING = new KeyboardState(EnumSet.noneOf(Key.class));
+    private final char _eventKeyCharacter;
 
-    public KeyboardState(final EnumSet<Key> keysDown) {
+    public KeyboardState(final EnumSet<Key> keysDown, char eventKeyCharacter) {
         // keeping the keysDown as an EnumSet rather than as an unmodifiableSet in order to get
         // the performance benefit of working with the fast implementations of contains(),
         // removeAll(), etc., in EnumSet. The intention is that the keysDown set should never change.
         _keysDown = keysDown;
+        _eventKeyCharacter = eventKeyCharacter;
         _keysDownView = Collections.unmodifiableSet(keysDown);
     }
 
@@ -39,6 +42,9 @@ public class KeyboardState {
 
     public Set<Key> getKeysDown() {
         return _keysDownView;
+    }
+    public char getEventKeyCharacter() {
+        return _eventKeyCharacter;
     }
 
     public EnumSet<Key> getKeysReleasedSince(final KeyboardState previous) {
@@ -69,6 +75,10 @@ public class KeyboardState {
 
     @Override
     public String toString() {
-        return "KeyboardState{" + "keysDown=" + _keysDown + '}';
+        return "KeyboardState{" +
+                "_keysDown=" + _keysDown +
+                ", _eventKeyCharacter=" + _eventKeyCharacter +
+                '}';
     }
+
 }

@@ -64,6 +64,8 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
             return;
         }
 
+        final char keyChar = event.character;
+
         if (_lastKeyPressedCode != -1) {
             // if this is a different key to the last key that was pressed, then
             // add an 'up' even for the previous one - SWT doesn't send an 'up' event for the
@@ -71,16 +73,16 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
             // 1. key 1 down
             // 2. key 2 down
             // 3. key 1 up
-            _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(_lastKeyPressedCode), KeyState.UP));
+            _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(_lastKeyPressedCode), KeyState.UP, keyChar));
         }
 
         _lastKeyPressedCode = event.keyCode;
-        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.DOWN));
+        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.DOWN, keyChar));
     }
 
     public synchronized void keyReleased(final org.eclipse.swt.events.KeyEvent event) {
         // System.out.println("keyReleased(" + SwtKey.findByCode(event.keyCode) + ")");
-        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.UP));
+        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.UP, event.character));
         _lastKeyPressedCode = -1;
     }
 

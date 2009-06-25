@@ -26,13 +26,13 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 
 public class TestStandardConditions {
-    final KeyboardState ks = new KeyboardState(EnumSet.noneOf(Key.class));
+    final KeyboardState ks = new KeyboardState(EnumSet.noneOf(Key.class), '0');
     final MouseState ms = new MouseState(0, 0, 0, 0, 0, MouseButton.makeMap(ButtonState.UP, ButtonState.UP,
             ButtonState.UP), null);
     InputState is1, is2, is3, is4, is5;
 
-    KeyboardState aDown = new KeyboardState(EnumSet.of(Key.A));
-    KeyboardState bDown = new KeyboardState(EnumSet.of(Key.B));
+    KeyboardState aDown = new KeyboardState(EnumSet.of(Key.A), 'a');
+    KeyboardState bDown = new KeyboardState(EnumSet.of(Key.B), 'b');
 
     EnumMap<MouseButton, ButtonState> bothUp = MouseButton.makeMap(ButtonState.UP, ButtonState.UP, ButtonState.UP);
     EnumMap<MouseButton, ButtonState> upDown = MouseButton.makeMap(ButtonState.UP, ButtonState.DOWN, ButtonState.UP);

@@ -52,10 +52,11 @@ public class LwjglKeyboardWrapper implements KeyboardWrapper {
 
             final int keyCode = Keyboard.getEventKey();
             final boolean pressed = Keyboard.getEventKeyState();
+            final char keyChar = Keyboard.getEventCharacter();
 
             final Key k = Key.findByCode(keyCode);
 
-            return new KeyEvent(k, pressed ? KeyState.DOWN : KeyState.UP);
+            return new KeyEvent(k, pressed ? KeyState.DOWN : KeyState.UP, keyChar);
         }
     }
 }

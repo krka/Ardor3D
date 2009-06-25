@@ -19,10 +19,12 @@ import com.ardor3d.annotation.Immutable;
 public class KeyEvent {
     private final Key _key;
     private final KeyState _state;
+    private final char _keyChar;
 
-    public KeyEvent(final Key key, final KeyState state) {
+    public KeyEvent(final Key key, final KeyState state, char keyChar) {
         _key = key;
         _state = state;
+        _keyChar = keyChar;
     }
 
     public Key getKey() {
@@ -31,5 +33,18 @@ public class KeyEvent {
 
     public KeyState getState() {
         return _state;
+    }
+
+    public char getKeyChar() {
+        return _keyChar;
+    }
+
+    @Override
+    public String toString() {
+        return "KeyEvent{" +
+                "_key=" + _key +
+                ", _state=" + _state +
+                ", _keyChar=" + _keyChar +
+                '}';
     }
 }

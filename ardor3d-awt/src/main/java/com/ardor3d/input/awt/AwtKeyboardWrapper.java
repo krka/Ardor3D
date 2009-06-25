@@ -56,11 +56,11 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final java.awt.event.KeyEvent e) {
-        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.DOWN));
+        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.DOWN, e.getKeyChar()));
     }
 
     public synchronized void keyReleased(final java.awt.event.KeyEvent e) {
-        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.UP));
+        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.UP, e.getKeyChar()));
     }
 
     private class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {

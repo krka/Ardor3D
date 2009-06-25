@@ -22,8 +22,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysReleased1() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B));
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.E));
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'a');
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.E), 'e');
 
         final EnumSet<Key> released = ks2.getKeysReleasedSince(ks1);
 
@@ -33,8 +33,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysReleased2() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B));
-        ks2 = new KeyboardState(EnumSet.noneOf(Key.class));
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'b');
+        ks2 = new KeyboardState(EnumSet.noneOf(Key.class), (char) 0);
 
         final EnumSet<Key> released = ks2.getKeysReleasedSince(ks1);
 
@@ -45,8 +45,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysPressed1() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B));
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D));
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'b');
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
 
         final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
 
@@ -57,8 +57,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysPressed2() throws Exception {
-        ks1 = new KeyboardState(EnumSet.noneOf(Key.class));
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D));
+        ks1 = new KeyboardState(EnumSet.noneOf(Key.class), (char) 0);
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
 
         final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
 
@@ -66,6 +66,16 @@ public class TestKeyboardState {
         assertTrue("a pressed", pressed.contains(Key.A));
         assertTrue("c pressed", pressed.contains(Key.C));
         assertTrue("d pressed", pressed.contains(Key.D));
+    }
+
+    @Test
+    public void testKeysPressed3() throws Exception {
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
+        ks2 = new KeyboardState(EnumSet.of(Key.A), (char) 0);
+
+        final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
+
+        assertEquals("0 key", 0, pressed.size());
     }
 
 }

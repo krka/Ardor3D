@@ -21,6 +21,7 @@ import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseState;
+import com.ardor3d.input.InputState;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -30,6 +31,7 @@ import com.ardor3d.input.logical.MouseButtonCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -196,6 +198,13 @@ public class RotatingCubeGame implements Updater {
             }
         }));
 
+        logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
+            public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
+                final InputState current = inputStates.getCurrent();
+
+                System.out.println("Key character pressed: " + current.getKeyboardState().getEventKeyCharacter());
+            }
+        }));
     }
 
     private void lookAtZero(final Canvas source) {

@@ -46,6 +46,7 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -531,6 +532,12 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                         }
                     }
                 }));
+
+        _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
+            public void perform(Canvas source, TwoInputStates inputState, double tpf) {
+                System.out.println("Key character pressed: " + inputState.getCurrent().getKeyboardState().getEventKeyCharacter());
+            }
+        }));
 
     }
 }

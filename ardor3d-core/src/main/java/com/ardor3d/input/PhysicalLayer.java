@@ -133,7 +133,7 @@ public class PhysicalLayer {
             keysDown.remove(keyEvent.getKey());
         }
 
-        _currentKeyboardState = new KeyboardState(keysDown);
+        _currentKeyboardState = new KeyboardState(keysDown, keyEvent.getKeyChar());
     }
 
     /**
