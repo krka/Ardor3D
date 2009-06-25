@@ -20,7 +20,7 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://ardorlabs-svn.cvsdude.com/Ardor3Dv1/trunk</connection>
+    <connection>scm:svn:http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk</connection>
   </scm>
   
   <repositories>
