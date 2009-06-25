@@ -17,6 +17,7 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -156,10 +157,10 @@ public interface TextureRenderer {
     void enforceState(final RenderState state);
 
     /**
-     * @param state
-     *            state to clear
+     * @param type
+     *            state type to clear
      */
-    void clearEnforcedState(final RenderState state);
+    void clearEnforcedState(final StateType type);
 
     /**
      * Clear all enforced states on this texture renderer.

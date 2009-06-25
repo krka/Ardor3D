@@ -23,6 +23,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Spatial;
 
 public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
@@ -223,8 +224,8 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         _enforcedStates.put(state.getType(), state);
     }
 
-    public void clearEnforcedState(final RenderState state) {
-        _enforcedStates.remove(state.getType());
+    public void clearEnforcedState(final StateType type) {
+        _enforcedStates.remove(type);
     }
 
     public void clearEnforcedStates() {
