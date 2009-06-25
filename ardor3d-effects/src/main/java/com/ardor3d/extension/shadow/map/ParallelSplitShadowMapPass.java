@@ -46,6 +46,7 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
@@ -165,6 +166,9 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** Debug drawing shader. */
     private boolean _drawShaderDebug = false;
+
+    /** True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested textures. */
+    private boolean _useSceneTexturing = false;
 
     /**
      * Create a pssm shadow map pass casting shadows from a light with the direction given.
@@ -306,12 +310,14 @@ public class ParallelSplitShadowMapPass extends Pass {
 
         // Enforce performance enhancing states on the renderer.
         _shadowMapRenderer.enforceState(_noClip);
-        _shadowMapRenderer.enforceState(_noTexture);
         _shadowMapRenderer.enforceState(_colorDisabled);
         _shadowMapRenderer.enforceState(_cullFrontFace);
         _shadowMapRenderer.enforceState(_noLights);
         _shadowMapRenderer.enforceState(_flat);
         _shadowMapRenderer.enforceState(_shadowOffsetState);
+        if (!isUseSceneTexturing()) {
+            _shadowMapRenderer.enforceState(_noTexture);
+        }
     }
 
     /**
@@ -533,9 +539,13 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            shadow map texture index to update
      */
     private void updateShadowMap(final int index) {
-        Mesh.RENDER_VERTEX_ONLY = true;
+        if (!_useSceneTexturing) {
+            Mesh.RENDER_VERTEX_ONLY = true;
+        }
         _shadowMapRenderer.render(_occluderNodes, _shadowMapTexture[index], true);
-        Mesh.RENDER_VERTEX_ONLY = false;
+        if (!_useSceneTexturing) {
+            Mesh.RENDER_VERTEX_ONLY = false;
+        }
     }
 
     /**
@@ -795,6 +805,29 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     public void setDrawShaderDebug(final boolean drawShaderDebug) {
         _drawShaderDebug = drawShaderDebug;
+    }
+
+    /**
+     * @return the useSceneTexturing
+     */
+    public boolean isUseSceneTexturing() {
+        return _useSceneTexturing;
+    }
+
+    /**
+     * @param useSceneTexturing
+     *            the useSceneTexturing to set
+     */
+    public void setUseSceneTexturing(final boolean useSceneTexturing) {
+        _useSceneTexturing = useSceneTexturing;
+        if (_shadowMapRenderer != null) {
+            if (!_useSceneTexturing) {
+                _shadowMapRenderer.enforceState(_noTexture);
+            } else {
+                _shadowMapRenderer.clearEnforcedState(RenderState.StateType.Texture);
+            }
+        }
+
     }
 
     // TODO: Move to debugger
