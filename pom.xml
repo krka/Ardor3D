@@ -167,6 +167,11 @@
         <version>${swt.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.swt.gtk.solaris</groupId>
+        <artifactId>x86</artifactId>
+        <version>${swt.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.swt.carbon</groupId>
         <artifactId>macosx</artifactId>
         <version>${swt.version}</version>
