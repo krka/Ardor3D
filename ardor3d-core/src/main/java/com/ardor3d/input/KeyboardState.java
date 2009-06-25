@@ -58,6 +58,15 @@ public class KeyboardState {
 
     }
 
+    public EnumSet<Key> getKeysHeldSince(final KeyboardState previous) {
+        final EnumSet<Key> result = EnumSet.copyOf(_keysDown);
+
+        result.retainAll(previous._keysDown);
+
+        return result;
+
+    }
+
     @Override
     public String toString() {
         return "KeyboardState{" + "keysDown=" + _keysDown + '}';
