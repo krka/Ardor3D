@@ -38,6 +38,7 @@ import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.control.FirstPersonControl;
+import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -46,7 +47,6 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -91,6 +91,8 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
     protected final LogicalLayer _logicalLayer;
+
+    protected PhysicalLayer _physicalLayer;
 
     protected final Node _root = new Node();
 
@@ -382,6 +384,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         frameWork.addCanvas(canvas);
 
         gameThread._canvas = canvas;
+        gameThread._physicalLayer = physicalLayer;
 
         gameThread.start();
     }
@@ -534,8 +537,9 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
                 }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-            public void perform(Canvas source, TwoInputStates inputState, double tpf) {
-                System.out.println("Key character pressed: " + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                System.out.println("Key character pressed: "
+                        + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
             }
         }));
 
