@@ -11,6 +11,7 @@
 package com.ardor3d.ui.text;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -161,6 +162,197 @@ public class BMFont {
 
     public int getOutlineWidth() {
         return _info.outline;
+    }
+
+    /**
+     * Writes the XML for this font out to the OutputStream provided.
+     * 
+     * @param outputStream
+     *            the OutputStream to which the XML for this font will be written to
+     * @throws IOException
+     *             thrown if there is any problem writing out to the OutputStream
+     */
+    public void writeXML(final OutputStream outputStream) throws IOException {
+        final StringBuilder xml = new StringBuilder();
+
+        xml.append("<?xml version=\"1.0\"?>\n");
+        xml.append("<font>\n");
+        xml.append(generateInfoXML());
+        xml.append(generateCommonXML());
+        xml.append(generatePagesXML());
+        xml.append(generateCharsXML());
+        xml.append(generateKerningsXML());
+        xml.append("</font>");
+
+        // Write out to the output stream now
+        outputStream.write(xml.toString().getBytes());
+        outputStream.flush();
+
+        return;
+    }
+
+    private String generateInfoXML() {
+        final StringBuilder xml = new StringBuilder();
+
+        xml.append("  <info face=\"");
+        xml.append(_info.face);
+        xml.append("\" size=\"");
+        xml.append(_info.size);
+        xml.append("\" bold=\"");
+        xml.append(_info.bold ? "1" : "0");
+        xml.append("\" italic=\"");
+        xml.append(_info.italic ? "1" : "0");
+        xml.append("\" charset=\"");
+        xml.append(_info.charset);
+        xml.append("\" unicode=\"");
+        xml.append(_info.unicode ? "1" : "0");
+        xml.append("\" stretchH=\"");
+        xml.append(_info.stretchH);
+        xml.append("\" smooth=\"");
+        xml.append(_info.smooth ? "1" : "0");
+        xml.append("\" aa=\"");
+        xml.append(_info.aa ? "1" : "0");
+        xml.append("\" padding=\"");
+
+        for (int i = 0; i < _info.padding.length; i++) {
+            xml.append(_info.padding[i]);
+
+            if (i < (_info.padding.length - 1)) {
+                xml.append(",");
+            }
+        }
+
+        xml.append("\" spacing=\"");
+
+        for (int i = 0; i < _info.spacing.length; i++) {
+            xml.append(_info.spacing[i]);
+
+            if (i < (_info.spacing.length - 1)) {
+                xml.append(",");
+            }
+        }
+
+        xml.append("\" outline=\"");
+        xml.append(_info.outline);
+        xml.append("\"/>\n");
+
+        return xml.toString();
+    }
+
+    private String generateCommonXML() {
+        final StringBuilder xml = new StringBuilder();
+
+        xml.append("  <common lineHeight=\"");
+        xml.append(_common.lineHeight);
+        xml.append("\" base=\"");
+        xml.append(_common.base);
+        xml.append("\" scaleW=\"");
+        xml.append(_common.scaleW);
+        xml.append("\" scaleH=\"");
+        xml.append(_common.scaleH);
+        xml.append("\" pages=\"");
+        xml.append(_common.pages);
+        xml.append("\" packed=\"");
+        xml.append(_common.packed ? "1" : "0");
+        xml.append("\" alphaChnl=\"");
+        xml.append(_common.alphaChnl);
+        xml.append("\" redChnl=\"");
+        xml.append(_common.redChnl);
+        xml.append("\" greenChnl=\"");
+        xml.append(_common.greenChnl);
+        xml.append("\" blueChnl=\"");
+        xml.append(_common.blueChnl);
+        xml.append("\"/>\n");
+
+        return xml.toString();
+    }
+
+    private String generatePagesXML() {
+        final StringBuilder xml = new StringBuilder();
+
+        xml.append("  <pages>\n");
+
+        for (final Iterator<Page> iterator = _pages.iterator(); iterator.hasNext();) {
+            final Page page = iterator.next();
+
+            xml.append("    <page id=\"");
+            xml.append(page.id);
+            xml.append("\" file=\"");
+            xml.append(page.file);
+            xml.append("\" />\n");
+        }
+
+        xml.append("  </pages>\n");
+
+        return xml.toString();
+    }
+
+    private String generateCharsXML() {
+        final StringBuilder xml = new StringBuilder();
+
+        xml.append("  <chars count=\"");
+        xml.append(_charMap.size());
+        xml.append("\">\n");
+
+        for (final Iterator<Integer> iterator = _charMap.keySet().iterator(); iterator.hasNext();) {
+            final Integer key = iterator.next();
+            final Char character = _charMap.get(key);
+
+            xml.append("    <char id=\"");
+            xml.append(character.id);
+            xml.append("\" x=\"");
+            xml.append(character.x);
+            xml.append("\" y=\"");
+            xml.append(character.y);
+            xml.append("\" width=\"");
+            xml.append(character.width);
+            xml.append("\" height=\"");
+            xml.append(character.height);
+            xml.append("\" xoffset=\"");
+            xml.append(character.xoffset);
+            xml.append("\" yoffset=\"");
+            xml.append(character.yoffset);
+            xml.append("\" xadvance=\"");
+            xml.append(character.xadvance);
+            xml.append("\" page=\"");
+            xml.append(character.page);
+            xml.append("\" chnl=\"");
+            xml.append(character.chnl);
+            xml.append("\" />\n");
+        }
+
+        xml.append("  </chars>\n");
+
+        return xml.toString();
+    }
+
+    private String generateKerningsXML() {
+        final StringBuilder xml = new StringBuilder();
+        int count = 0;
+
+        for (final Iterator<Integer> iterator = _kernMap.keySet().iterator(); iterator.hasNext();) {
+            final Integer first = iterator.next();
+            final HashMap<Integer, Integer> amtHash = _kernMap.get(first);
+
+            for (final Iterator<Integer> iterator2 = amtHash.keySet().iterator(); iterator2.hasNext();) {
+                final Integer second = iterator2.next();
+                final Integer amount = amtHash.get(second);
+
+                xml.append("    <kerning first=\"");
+                xml.append(first);
+                xml.append("\" second=\"");
+                xml.append(second);
+                xml.append("\" amount=\"");
+                xml.append(amount);
+                xml.append("\" />\n");
+
+                count++;
+            }
+        }
+
+        final String xmlString = "  <kernings count=\"" + count + "\">\n" + xml.toString() + "  </kernings>\n";
+
+        return xmlString;
     }
 
     /**
