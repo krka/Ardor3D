@@ -535,7 +535,7 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         _logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
             public void perform(Canvas source, TwoInputStates inputState, double tpf) {
-                System.out.println("Key character pressed: " + inputState.getCurrent().getKeyboardState().getEventKeyCharacter());
+                System.out.println("Key character pressed: " + inputState.getCurrent().getKeyboardState().getKeyEvent().getKeyChar());
             }
         }));
 

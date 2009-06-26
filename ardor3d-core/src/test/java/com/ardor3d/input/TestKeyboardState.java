@@ -22,8 +22,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysReleased1() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'a');
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.E), 'e');
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), KeyEvent.NOTHING);
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.E), KeyEvent.NOTHING);
 
         final EnumSet<Key> released = ks2.getKeysReleasedSince(ks1);
 
@@ -33,8 +33,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysReleased2() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'b');
-        ks2 = new KeyboardState(EnumSet.noneOf(Key.class), (char) 0);
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), KeyEvent.NOTHING);
+        ks2 = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
 
         final EnumSet<Key> released = ks2.getKeysReleasedSince(ks1);
 
@@ -45,8 +45,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysPressed1() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), 'b');
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.B), KeyEvent.NOTHING);
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), KeyEvent.NOTHING);
 
         final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
 
@@ -57,8 +57,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysPressed2() throws Exception {
-        ks1 = new KeyboardState(EnumSet.noneOf(Key.class), (char) 0);
-        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
+        ks1 = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
+        ks2 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), KeyEvent.NOTHING);
 
         final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
 
@@ -70,8 +70,8 @@ public class TestKeyboardState {
 
     @Test
     public void testKeysPressed3() throws Exception {
-        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), 'd');
-        ks2 = new KeyboardState(EnumSet.of(Key.A), (char) 0);
+        ks1 = new KeyboardState(EnumSet.of(Key.A, Key.C, Key.D), KeyEvent.NOTHING);
+        ks2 = new KeyboardState(EnumSet.of(Key.A), KeyEvent.NOTHING);
 
         final EnumSet<Key> pressed = ks2.getKeysPressedSince(ks1);
 

@@ -31,6 +31,7 @@ import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.KeyEvent;
 import com.google.common.base.Predicate;
 
 /**
@@ -69,7 +70,7 @@ public class TestLogicalLayer {
 
         ll.registerInput(canvas, pl);
 
-        ks = new KeyboardState(EnumSet.noneOf(Key.class), (char) 0);
+        ks = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
         ms = new MouseState(0, 0, 0, 0, 0, MouseButton.makeMap(ButtonState.UP, ButtonState.UP, ButtonState.UP), null);
 
         mocks = new Object[] { pl, ta1, ta2, p1, p2, canvas };

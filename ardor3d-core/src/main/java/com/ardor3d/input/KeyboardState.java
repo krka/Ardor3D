@@ -17,22 +17,27 @@ import java.util.Set;
 import com.ardor3d.annotation.Immutable;
 
 /**
- * A keyboard state at some point in time.
+ * A keyboard state at some point in time. Contains an EnumSet of the keys that are down, as well
+ * as a KeyEvent that describes the latest event (a key being pressed or released).
  */
 @Immutable
 public class KeyboardState {
-    public static final KeyboardState NOTHING = new KeyboardState(EnumSet.noneOf(Key.class), '0');
+    public static final KeyboardState NOTHING = new KeyboardState(EnumSet.noneOf(Key.class), KeyEvent.NOTHING);
 
     private final EnumSet<Key> _keysDown;
     private final Set<Key> _keysDownView;
-    private final char _eventKeyCharacter;
+    private final KeyEvent _keyEvent;
 
-    public KeyboardState(final EnumSet<Key> keysDown, char eventKeyCharacter) {
+    public KeyboardState(final EnumSet<Key> keysDown, KeyEvent keyEvent) {
         // keeping the keysDown as an EnumSet rather than as an unmodifiableSet in order to get
         // the performance benefit of working with the fast implementations of contains(),
         // removeAll(), etc., in EnumSet. The intention is that the keysDown set should never change.
+        // The reason why the performance benefits are lost when using an unmodifiableSet is that
+        // methods like containsAll(), etc., are not symmetrical in the EnumSet implementations.
+        // So typically, unmodifiableSet.containsAll(EnumSet) will be faster than
+        // enumSet.containsAll(unmodifiableSet).
         _keysDown = keysDown;
-        _eventKeyCharacter = eventKeyCharacter;
+        _keyEvent = keyEvent;
         _keysDownView = Collections.unmodifiableSet(keysDown);
     }
 
@@ -43,8 +48,9 @@ public class KeyboardState {
     public Set<Key> getKeysDown() {
         return _keysDownView;
     }
-    public char getEventKeyCharacter() {
-        return _eventKeyCharacter;
+
+    public KeyEvent getKeyEvent() {
+        return _keyEvent;
     }
 
     public EnumSet<Key> getKeysReleasedSince(final KeyboardState previous) {
@@ -77,7 +83,7 @@ public class KeyboardState {
     public String toString() {
         return "KeyboardState{" +
                 "_keysDown=" + _keysDown +
-                ", _eventKeyCharacter=" + _eventKeyCharacter +
+                ", _keyEvent=" + _keyEvent +
                 '}';
     }
 

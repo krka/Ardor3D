@@ -202,7 +202,7 @@ public class RotatingCubeGame implements Updater {
             public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
                 final InputState current = inputStates.getCurrent();
 
-                System.out.println("Key character pressed: " + current.getKeyboardState().getEventKeyCharacter());
+                System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
             }
         }));
     }
