@@ -55,7 +55,6 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
     }
 
     public int getTupleCount() {
-        // TODO Auto-generated method stub
         return getBufferLimit() / _valuesPerTuple;
     }
 
