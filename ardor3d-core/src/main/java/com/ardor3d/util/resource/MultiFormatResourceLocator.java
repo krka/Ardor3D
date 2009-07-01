@@ -17,23 +17,31 @@ import java.net.URL;
 import java.util.Arrays;
 
 /**
- * This class extends the behavior of the {@link SimpleResourceLocator} by appending different file extensions to the
- * resource name, if it cannot find a resource with the extension specified in the path name.
+ * This class extends the behavior of the {@link SimpleResourceLocator} by replacing the resource's file extension with
+ * different various provided extensions. If none of these work, it will try the original resource name as-is. You can
+ * choose to have the original file searched for first, or last using {@link #setTrySpecifiedFormatFirst(boolean)}.
  */
 public class MultiFormatResourceLocator extends SimpleResourceLocator {
 
     private final String[] _extensions;
     private boolean _trySpecifiedFormatFirst = false;
 
-    public MultiFormatResourceLocator(final URI baseDir) {
-        this(baseDir, ".dds", ".tga", ".png", ".jpg", ".gif");
-    }
-
-    public MultiFormatResourceLocator(final URL baseDir) throws URISyntaxException {
-        this(baseDir, ".dds", ".tga", ".png", ".jpg", ".gif");
-    }
-
-    public MultiFormatResourceLocator(final URI baseDir, final String... extensions) {
+    /**
+     * Construct a new MultiFormatResourceLocator using the given URI as our context and the list of possible extensions
+     * as extensions to try during file search.
+     * 
+     * @param baseDir
+     *            our base context. This is meant to be a "directory" wherein we will search for resources. Therefore,
+     *            if it does not end in /, a / will be added to ensure we are talking about children of the given
+     *            baseDir.
+     * @param extensions
+     *            an array of extensions (eg. ".png", ".dds", ".tga", etc.) to try while searching for a resource with
+     *            this locator. This is done by replacing any existing extension in the resource name with each of the
+     *            given extensions.
+     * @throws URISyntaxException
+     *             if the given URI does not end in / and we can not make a new URI with a trailing / from it.
+     */
+    public MultiFormatResourceLocator(final URI baseDir, final String... extensions) throws URISyntaxException {
         super(baseDir);
 
         if (extensions == null) {
@@ -42,6 +50,22 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
         _extensions = extensions;
     }
 
+    /**
+     * Construct a new MultiFormatResourceLocator using the given URL as our context and the list of possible extensions
+     * as extensions to try during file search.
+     * 
+     * @param baseDir
+     *            our base context. This is converted to a URI. This is meant to be a "directory" wherein we will search
+     *            for resources. Therefore, if it does not end in /, a / will be added to ensure we are talking about
+     *            children of the given baseDir.
+     * @param extensions
+     *            an array of extensions (eg. ".png", ".dds", ".tga", etc.) to try while searching for a resource with
+     *            this locator. This is done by replacing any existing extension in the resource name with each of the
+     *            given extensions.
+     * @throws URISyntaxException
+     *             if this URL can not be converted to a URI, or if the converted URI does not end in / and we can not
+     *             make a new URI with a trailing / from it.
+     */
     public MultiFormatResourceLocator(final URL baseDir, final String... extensions) throws URISyntaxException {
         this(baseDir.toURI(), extensions);
     }
@@ -93,7 +117,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof MultiFormatResourceLocator) {
-            return _baseDir.equals(((MultiFormatResourceLocator) obj)._baseDir)
+            return getBaseDir().equals(((MultiFormatResourceLocator) obj).getBaseDir())
                     && Arrays.equals(_extensions, ((MultiFormatResourceLocator) obj)._extensions);
         }
         return super.equals(obj);

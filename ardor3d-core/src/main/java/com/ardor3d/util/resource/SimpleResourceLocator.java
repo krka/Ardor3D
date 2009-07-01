@@ -17,26 +17,54 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 /**
- * This locator takes a base URL for finding resources specified with a relative path. If it cannot find the path
- * relative to the URL, it successively omits the starting components of the relative path until it can find a resources
- * with such a trimmed path. If no resource is found with this method null is returned.
+ * This locator takes a base location for finding resources specified with a relative path. If it cannot find the path
+ * relative to the location, it successively omits the starting components of the relative path until it can find a
+ * resources with such a trimmed path. If no resource is found with this method null is returned.
  */
 public class SimpleResourceLocator implements ResourceLocator {
 
-    protected URI _baseDir;
+    private final URI _baseDir;
 
-    public SimpleResourceLocator(final URI baseDir) {
+    /**
+     * Construct a new SimpleResourceLocator using the given URI as our context.
+     * 
+     * @param baseDir
+     *            our base context. This is meant to be a "directory" wherein we will search for resources. Therefore,
+     *            if it does not end in /, a / will be added to ensure we are talking about children of the given
+     *            baseDir.
+     * @throws URISyntaxException
+     *             if the given URI does not end in / and we can not make a new URI with a trailing / from it.
+     */
+    public SimpleResourceLocator(final URI baseDir) throws URISyntaxException {
         if (baseDir == null) {
             throw new NullPointerException("baseDir can not be null.");
         }
-        _baseDir = baseDir;
+
+        final String uri = baseDir.toString();
+        if (!uri.endsWith("/")) {
+            _baseDir = new URI(baseDir.toString() + "/");
+        } else {
+            _baseDir = baseDir;
+        }
     }
 
+    /**
+     * Construct a new SimpleResourceLocator using the given URL as our context.
+     * 
+     * @param baseDir
+     *            our base context. This is converted to a URI. This is meant to be a "directory" wherein we will search
+     *            for resources. Therefore, if it does not end in /, a / will be added to ensure we are talking about
+     *            children of the given baseDir.
+     * @throws URISyntaxException
+     *             if this URL can not be converted to a URI, or if the converted URI does not end in / and we can not
+     *             make a new URI with a trailing / from it.
+     */
     public SimpleResourceLocator(final URL baseDir) throws URISyntaxException {
-        if (baseDir == null) {
-            throw new NullPointerException("baseDir can not be null.");
-        }
-        _baseDir = baseDir.toURI();
+        this(baseDir.toURI());
+    }
+
+    public URI getBaseDir() {
+        return _baseDir;
     }
 
     public URL locateResource(String resourceName) {
