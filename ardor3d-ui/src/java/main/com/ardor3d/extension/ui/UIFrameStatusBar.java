@@ -1,0 +1,168 @@
+/**
+ * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it 
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
+
+package com.ardor3d.extension.ui;
+
+import com.ardor3d.extension.ui.event.DragAndDropListener;
+import com.ardor3d.input.InputState;
+
+/**
+ * This panel extension defines a frame status bar (used at the bottom of a frame) with a text label and resize handle.
+ */
+public class UIFrameStatusBar extends UIPanel {
+
+    /** Our text label. */
+    private final UILabel _statusLabel;
+
+    /** Resize handle, used to drag out this content's size when the frame is set as resizeable. */
+    private final FrameResizeButton _resizeButton;
+
+    /** A drag and drop listener used to perform resize operations on this frame. */
+    private final ResizeListener _resizeListener = new ResizeListener();
+
+    /**
+     * Construct a new status bar
+     */
+    public UIFrameStatusBar() {
+        _statusLabel = new UILabel("");
+        add(_statusLabel);
+
+        _resizeButton = new FrameResizeButton();
+        add(_resizeButton);
+    }
+
+    public FrameResizeButton getResizeButton() {
+        return _resizeButton;
+    }
+
+    public UILabel getStatusLabel() {
+        return _statusLabel;
+    }
+
+    @Override
+    public void attachedToHud() {
+        super.attachedToHud();
+        final UIHud hud = getHud();
+        if (hud != null) {
+            hud.addDnDListener(_resizeListener);
+        }
+    }
+
+    @Override
+    public void detachedFromHud() {
+        super.detachedFromHud();
+        final UIHud hud = getHud();
+        if (hud != null) {
+            hud.removeDnDListener(_resizeListener);
+        }
+    }
+
+    private final class ResizeListener implements DragAndDropListener {
+        private int _oldX = 0;
+        private int _oldY = 0;
+
+        public void startDrag(final int mouseX, final int mouseY) {
+            _oldX = mouseX;
+            _oldY = mouseY;
+        }
+
+        public void drag(final int mouseX, final int mouseY) {
+            final UIFrame frame = getParentFrame();
+
+            // Set the new width to the current width + the change in mouse x position.
+            int newWidth = frame.getComponentWidth() + (int) ((mouseX - _oldX) / getWorldScale().getX());
+            if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
+                // don't let us get smaller than min size
+                newWidth = UIFrame.MIN_FRAME_WIDTH;
+            }
+
+            // Set the new height to the current width + the change in mouse y position.
+            int heightDif = mouseY - _oldY;
+            int newHeight = frame.getComponentHeight() + (int) ((_oldY - mouseY) / getWorldScale().getY());
+            if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
+                // don't let us get smaller than min size
+                newHeight = UIFrame.MIN_FRAME_HEIGHT;
+                heightDif = frame.getComponentHeight() - newHeight;
+            }
+
+            frame.setComponentSize(newWidth, newHeight);
+            frame.addTranslation(0, heightDif, 0);
+            frame.layout();
+
+            _oldX = mouseX;
+            _oldY = mouseY;
+        }
+
+        public void drop(final UIComponent component, final int mouseX, final int mouseY) {}
+
+        public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
+            return component == _resizeButton;
+        }
+    }
+
+    class FrameResizeButton extends UIButton {
+
+        // custom states
+        private final LabelState _pressedState = new MyPressedState();
+        private final LabelState _defaultState = new MyDefaultState();
+        private final LabelState _mouseOverState = new MyMouseOverState();
+
+        public FrameResizeButton() {
+            super("...");
+            setLayoutResizeableXY(false);
+            switchState(_defaultState);
+        }
+
+        @Override
+        public LabelState getPressedState() {
+            return _pressedState;
+        }
+
+        @Override
+        public LabelState getDefaultState() {
+            return _defaultState;
+        }
+
+        @Override
+        public LabelState getMouseOverState() {
+            return _mouseOverState;
+        }
+
+        class MyPressedState extends UIButton.PressedState {
+            @Override
+            public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
+                super.mouseDeparted(mouseX, mouseY, state);
+                // TODO: Reset mouse cursor.
+            }
+        }
+
+        class MyDefaultState extends UIButton.DefaultState {
+            @Override
+            public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
+                super.mouseEntered(mouseX, mouseY, state);
+                // TODO: Set mouse cursor to resize.
+            }
+
+            @Override
+            public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
+                super.mouseDeparted(mouseX, mouseY, state);
+                // TODO: Reset mouse cursor.
+            }
+        }
+
+        class MyMouseOverState extends UIButton.MouseOverState {
+            @Override
+            public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
+                super.mouseDeparted(mouseX, mouseY, state);
+                // TODO: Reset mouse cursor.
+            }
+        }
+    }
+}
