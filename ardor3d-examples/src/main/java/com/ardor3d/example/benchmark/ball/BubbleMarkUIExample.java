@@ -1,0 +1,247 @@
+/**
+ * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ *
+ * This file is part of Ardor3D.
+ *
+ * Ardor3D is free software: you can redistribute it and/or modify it 
+ * under the terms of its license which may be found in the accompanying
+ * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
+ */
+
+package com.ardor3d.example.benchmark.ball;
+
+import com.ardor3d.example.ExampleBase;
+import com.ardor3d.extension.ui.UIButton;
+import com.ardor3d.extension.ui.UIContainer;
+import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIHud;
+import com.ardor3d.extension.ui.UILabel;
+import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
+import com.ardor3d.extension.ui.event.ActionListener;
+import com.ardor3d.extension.ui.layout.AnchorLayout;
+import com.ardor3d.extension.ui.layout.AnchorLayoutData;
+import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.extension.ui.util.ButtonGroup;
+import com.ardor3d.extension.ui.util.SubTex;
+import com.ardor3d.framework.FrameHandler;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.Image.Format;
+import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.TextureManager;
+import com.google.inject.Inject;
+
+/**
+ * Bubblemark test - using ardor3d-ui
+ */
+public class BubbleMarkUIExample extends ExampleBase {
+
+    private BallComponent[] balls;
+
+    private BasicText frameRateLabel;
+
+    private int frames = 0;
+    private long startTime = System.currentTimeMillis();
+
+    private UIHud hud;
+
+    private UIFrame _ballFrame;
+
+    private UIFrame _configFrame;
+
+    private boolean skipBallCollide = false;
+
+    public static void main(final String[] args) {
+        start(BubbleMarkUIExample.class);
+    }
+
+    @Inject
+    public BubbleMarkUIExample(final LogicalLayer layer, final FrameHandler frameWork) {
+        super(layer, frameWork);
+    }
+
+    /**
+     * Initialize our scene.
+     */
+    @Override
+    protected void initExample() {
+        _canvas.setTitle("BubbleMarkUIExample");
+        final int width = _canvas.getCanvasRenderer().getCamera().getWidth();
+        final int height = _canvas.getCanvasRenderer().getCamera().getHeight();
+
+        hud = new UIHud();
+
+        // Add Frame for balls
+        _ballFrame = new UIFrame("Bubbles");
+        _ballFrame.updateMinimumSizeFromContents();
+        _ballFrame.pack(500, 300);
+        _ballFrame.layout();
+        _ballFrame.setResizeable(false);
+        _ballFrame.setHudXY(5, 5);
+        _ballFrame.setUseStandin(false);
+        hud.add(_ballFrame);
+
+        // Add background
+        _ballFrame.getContentPanel().setBackdrop(new SolidBackdrop(ColorRGBA.WHITE));
+
+        // Add Frame for config
+        buildConfigFrame(width, height);
+        hud.add(_configFrame);
+
+        resetBalls(16);
+        _root.attachChild(hud);
+
+        // Add fps display
+        frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
+        frameRateLabel.setTranslation(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
+                - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTextColor(ColorRGBA.WHITE);
+        frameRateLabel.getSceneHints().setOrthoOrder(-1);
+        _root.attachChild(frameRateLabel);
+
+        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+    }
+
+    private void buildConfigFrame(final int width, final int height) {
+        _configFrame = new UIFrame("Config");
+        _configFrame.updateMinimumSizeFromContents();
+        _configFrame.pack(300, 180);
+        _configFrame.setUseStandin(true);
+        _configFrame.setHudXY(width - _configFrame.getComponentWidth() - 5, height - _configFrame.getComponentHeight()
+                - 5);
+
+        _configFrame.getContentPanel().setLayout(new AnchorLayout());
+
+        final UIButton vsync = new UIButton("vsync");
+        vsync.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, _configFrame.getContentPanel(),
+                Alignment.TOP_LEFT, 5, -5));
+        vsync.setSelectable(true);
+        vsync.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                _canvas.setVSyncEnabled(vsync.isSelected());
+            }
+        });
+        _configFrame.getContentPanel().add(vsync);
+
+        final UIButton collide = new UIButton("collide");
+        collide.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vsync, Alignment.BOTTOM_LEFT, 0, -5));
+        collide.setSelectable(true);
+        collide.setSelected(!skipBallCollide);
+        collide.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                skipBallCollide = !collide.isSelected();
+            }
+        });
+        _configFrame.getContentPanel().add(collide);
+
+        final UILabel ballsLabel = new UILabel("# of balls:");
+        ballsLabel.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, collide, Alignment.BOTTOM_LEFT, 0, -15));
+        _configFrame.getContentPanel().add(ballsLabel);
+
+        final ButtonGroup ballsGroup = new ButtonGroup();
+
+        final UIButton balls16 = new UIButton("16");
+        balls16.setLayoutData(new AnchorLayoutData(Alignment.LEFT, ballsLabel, Alignment.RIGHT, 5, 0));
+        balls16.setSelectable(true);
+        balls16.setSelected(true);
+        balls16.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                resetBalls(16);
+            }
+        });
+        balls16.setGroup(ballsGroup);
+        _configFrame.getContentPanel().add(balls16);
+
+        final UIButton balls32 = new UIButton("32");
+        balls32.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls16, Alignment.RIGHT, 5, 0));
+        balls32.setSelectable(true);
+        balls32.setSelected(true);
+        balls32.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                resetBalls(32);
+            }
+        });
+        balls32.setGroup(ballsGroup);
+        _configFrame.getContentPanel().add(balls32);
+
+        final UIButton balls64 = new UIButton("64");
+        balls64.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls32, Alignment.RIGHT, 5, 0));
+        balls64.setSelectable(true);
+        balls64.setSelected(true);
+        balls64.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                resetBalls(64);
+            }
+        });
+        balls64.setGroup(ballsGroup);
+        _configFrame.getContentPanel().add(balls64);
+
+        final UIButton balls128 = new UIButton("128");
+        balls128.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls64, Alignment.RIGHT, 5, 0));
+        balls128.setSelectable(true);
+        balls128.setSelected(true);
+        balls128.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                resetBalls(128);
+            }
+        });
+        balls128.setGroup(ballsGroup);
+        _configFrame.getContentPanel().add(balls128);
+
+        _configFrame.layout();
+    }
+
+    @Override
+    protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+        hud.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
+    }
+
+    private void resetBalls(final int ballCount) {
+        final UIContainer container = _ballFrame.getContentPanel();
+        container.setLayout(null);
+        container.detachAllChildren();
+
+        balls = new BallComponent[ballCount];
+
+        // Create a texture for our balls to use.
+        final SubTex tex = new SubTex(TextureManager.load("images/ball.png",
+                Texture.MinificationFilter.NearestNeighborNoMipMaps, Format.Guess, true));
+
+        // Add balls
+        for (int i = 0; i < balls.length; i++) {
+            final BallComponent ballComp = new BallComponent("ball", tex, Ball.radius * 2, Ball.radius * 2, container
+                    .getContentWidth(), container.getContentHeight());
+            container.add(ballComp);
+            balls[i] = ballComp;
+        }
+
+        _ballFrame.setTitle("Bubbles  - " + ballCount + " balls");
+    }
+
+    @Override
+    protected void updateExample(final ReadOnlyTimer timer) {
+
+        final long now = System.currentTimeMillis();
+        final long dt = now - startTime;
+        if (dt > 2000) {
+            final int fps = (int) (1e3 * frames / dt);
+            frameRateLabel.setText(fps + " fps");
+
+            startTime = now;
+            frames = 0;
+        }
+
+        if (!skipBallCollide) {
+            // Check collisions
+            for (int i = 0; i < balls.length; i++) {
+                for (int j = i + 1; j < balls.length; j++) {
+                    balls[i].getBall().doCollide(balls[j].getBall());
+                }
+            }
+        }
+
+        frames++;
+    }
+}
