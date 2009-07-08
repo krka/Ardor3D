@@ -130,8 +130,6 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private final Matrix4 _transformMatrix = new Matrix4();
 
-    private final IntBuffer _idBuff = BufferUtils.createIntBuffer(16);
-
     private boolean glTexSubImage2DSupported = true;
 
     /**
@@ -423,10 +421,10 @@ public class LwjglRenderer extends AbstractRenderer {
 
         buffer.removeVBOID(context.getGlContextRep());
 
-        _idBuff.clear();
-        _idBuff.put(id);
-        _idBuff.rewind();
-        ARBBufferObject.glDeleteBuffersARB(_idBuff);
+        final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
+        idBuff.put(id);
+        idBuff.flip();
+        ARBBufferObject.glDeleteBuffersARB(idBuff);
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -455,10 +453,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         // Determine the original texture configuration, so that this method can
         // restore the texture configuration to its original state.
-        GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D, _idBuff);
-        final int origTexBinding = _idBuff.get(0);
-        GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, _idBuff);
-        final int origAlignment = _idBuff.get(0);
+        final IntBuffer idBuff = BufferUtils.createIntBuffer(16);
+        GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D, idBuff);
+        final int origTexBinding = idBuff.get(0);
+        GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, idBuff);
+        final int origAlignment = idBuff.get(0);
         final int origRowLength = 0;
         final int origSkipPixels = 0;
         final int origSkipRows = 0;
@@ -476,7 +475,6 @@ public class LwjglRenderer extends AbstractRenderer {
             rowLength = srcWidth;
         }
         // Consider moving these conversion methods.
-        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(format);
         final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(format);
 
         // Update the texture configuration (when necessary).
@@ -499,42 +497,45 @@ public class LwjglRenderer extends AbstractRenderer {
         }
 
         // Upload the image region into the texture.
-        if (glTexSubImage2DSupported) {
-            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstX, dstY, dstWidth, dstHeight, pixelFormat,
-                    GL11.GL_UNSIGNED_BYTE, data);
+        try {
+            if (glTexSubImage2DSupported) {
+                GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstX, dstY, dstWidth, dstHeight, pixelFormat,
+                        GL11.GL_UNSIGNED_BYTE, data);
 
-            try {
-                Util.checkGLError();
-            } catch (final OpenGLException e) {
-                glTexSubImage2DSupported = false;
-                updateTextureSubImage(dstTexture, data, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth,
-                        dstHeight, format);
+                try {
+                    Util.checkGLError();
+                } catch (final OpenGLException e) {
+                    glTexSubImage2DSupported = false;
+                    updateTextureSubImage(dstTexture, data, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth,
+                            dstHeight, format);
+                }
+            } else {
+                final int internalFormat = LwjglTextureUtil.getGLInternalFormat(format);
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dstWidth, dstHeight, 0, pixelFormat,
+                        GL11.GL_UNSIGNED_BYTE, data);
             }
-        } else {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dstWidth, dstHeight, 0, pixelFormat,
-                    GL11.GL_UNSIGNED_BYTE, data);
-        }
-
-        // Restore the texture configuration (when necessary).
-        // Restore the texture binding.
-        if (origTexBinding != dstTexID) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, origTexBinding);
-        }
-        // Restore alignment.
-        if (origAlignment != alignment) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, origAlignment);
-        }
-        // Restore row length.
-        if (origRowLength != rowLength) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_ROW_LENGTH, origRowLength);
-        }
-        // Restore skip pixels.
-        if (origSkipPixels != srcX) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_PIXELS, origSkipPixels);
-        }
-        // Restore skip rows.
-        if (origSkipRows != srcY) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, origSkipRows);
+        } finally {
+            // Restore the texture configuration (when necessary).
+            // Restore the texture binding.
+            if (origTexBinding != dstTexID) {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, origTexBinding);
+            }
+            // Restore alignment.
+            if (origAlignment != alignment) {
+                GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, origAlignment);
+            }
+            // Restore row length.
+            if (origRowLength != rowLength) {
+                GL11.glPixelStorei(GL11.GL_UNPACK_ROW_LENGTH, origRowLength);
+            }
+            // Restore skip pixels.
+            if (origSkipPixels != srcX) {
+                GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_PIXELS, origSkipPixels);
+            }
+            // Restore skip rows.
+            if (origSkipRows != srcY) {
+                GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, origSkipRows);
+            }
         }
     }
 
@@ -1126,10 +1127,9 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     public int makeVBOId(final RendererRecord rendRecord) {
-        _idBuff.rewind();
-        ARBBufferObject.glGenBuffersARB(_idBuff);
-        final int vboID = _idBuff.get(0);
-        return vboID;
+        final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
+        ARBBufferObject.glGenBuffersARB(idBuff);
+        return idBuff.get(0);
     }
 
     public void unbindVBO() {

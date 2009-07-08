@@ -124,8 +124,6 @@ public class JoglRenderer extends AbstractRenderer {
 
     private final Matrix4 _transformMatrix = new Matrix4();
 
-    private final IntBuffer _idBuff = BufferUtils.createIntBuffer(16);
-
     private boolean glTexSubImage2DSupported = true;
 
     /**
@@ -448,10 +446,10 @@ public class JoglRenderer extends AbstractRenderer {
 
         buffer.removeVBOID(context.getGlContextRep());
 
-        _idBuff.clear();
-        _idBuff.put(id);
-        _idBuff.rewind();
-        gl.glDeleteBuffers(1, _idBuff);
+        final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
+        idBuff.put(id);
+        idBuff.flip();
+        gl.glDeleteBuffers(1, idBuff);
     }
 
     public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
@@ -1200,10 +1198,9 @@ public class JoglRenderer extends AbstractRenderer {
     public int makeVBOId(final RendererRecord rendRecord) {
         final GL gl = GLU.getCurrentGL();
 
-        _idBuff.rewind();
-        gl.glGenBuffersARB(_idBuff.limit(), _idBuff);
-        final int vboID = _idBuff.get(0);
-        return vboID;
+        final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
+        gl.glGenBuffersARB(1, idBuff);
+        return idBuff.get(0);
     }
 
     public void unbindVBO() {
