@@ -222,7 +222,13 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         if (_icon != null) {
             // find bottom most y location of icon based on alignment.
-            y = _alignment.alignY(getContentHeight(), _iconDimensions.getHeight());
+            if (_text != null && _text.getHeight() > _iconDimensions.getHeight()) {
+                final int trailing = _text.getFont().getLineHeight() - _text.getFont().getBaseHeight();
+                y = _alignment.alignY(getContentHeight() - trailing, _iconDimensions.getHeight()) + trailing - 1;
+            } else {
+                y = _alignment.alignY(getContentHeight(), _iconDimensions.getHeight());
+            }
+
             final double dix = getWorldTranslation().getX() + getTotalLeft();
             final double diy = getWorldTranslation().getY() + getTotalBottom();
             // draw icon
