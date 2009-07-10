@@ -352,7 +352,7 @@ public class GenericSkin extends Skin {
         {
             final UIFrameStatusBar statusBar = component.getStatusBar();
             // Make sure exists and is attached
-            if (statusBar != null && statusBar.getParent() == component) {
+            if (statusBar != null && statusBar.getParent() == component.getBasePanel()) {
                 statusBar.setComponentHeight(10);
                 statusBar.setLayoutResizeableY(false);
 
@@ -363,8 +363,11 @@ public class GenericSkin extends Skin {
                         state.setBorder(new EmptyBorder());
                         state.setPadding(new Insets(0, 0, 0, 0));
                         state.setMargin(new Insets(0, 0, 0, 0));
+                        state.setForegroundColor(ColorRGBA.GRAY);
                     }
                     resize.refreshState();
+                    resize.compact();
+                    resize.setLayoutResizeableXY(false);
                 }
             }
         }
