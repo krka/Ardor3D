@@ -109,6 +109,10 @@ public class BMFont {
         return _common.lineHeight;
     }
 
+    public int getBaseHeight() {
+        return _common.base;
+    }
+
     public int getTextureWidth() {
         return _common.scaleW;
     }

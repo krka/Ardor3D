@@ -40,6 +40,8 @@ public class BMText extends Mesh {
     protected double _fontScale = 1.0;
     protected boolean _autoRotate = true;
 
+    protected int _lines = 1;
+
     protected final Vector2 _size = new Vector2(); // width and height of text string
     protected float[] _lineWidths = new float[64]; // size of each line of text
 
@@ -453,7 +455,7 @@ public class BMText extends Mesh {
         float cursorX = 0;
         float cursorY = 0;
         final float lineHeight = _font.getLineHeight();
-        int lineIndex = 0;
+        _lines = 0;
 
         _lineWidths[0] = 0;
         final int strLen = _textString.length();
@@ -461,13 +463,13 @@ public class BMText extends Mesh {
             final int charVal = _textString.charAt(i);
             if (charVal == '\n') { // newline special case
 
-                addToLineSizes(cursorX, lineIndex);
-                lineIndex++;
+                addToLineSizes(cursorX, _lines);
+                _lines++;
                 if (cursorX > _size.getX()) {
                     _size.setX(cursorX);
                 }
                 cursorX = 0;
-                cursorY = lineIndex * lineHeight;
+                cursorY = _lines * lineHeight;
             } else if (charVal == '\t') { // tab special case
                 final float tabStop = _tabSize * _font.getMaxCharAdvance();
                 final float stops = 1 + (float) Math.floor(cursorX / tabStop);
@@ -482,11 +484,13 @@ public class BMText extends Mesh {
                 cursorX += chr.xadvance + kern + _spacing;
             }
         }
-        addToLineSizes(cursorX, lineIndex);
+        addToLineSizes(cursorX, _lines);
         if (cursorX > _size.getX()) {
             _size.setX(cursorX);
         }
+
         _size.setY(cursorY + lineHeight);
+        _lines++;
     }
 
     /**
@@ -712,5 +716,9 @@ public class BMText extends Mesh {
         final double x = offset.getX() * _font.getSize();
         final double y = offset.getY() * _font.getSize();
         _fixedOffset.set(x, y);
+    }
+
+    public int getLineCount() {
+        return _lines;
     }
 }
