@@ -10,7 +10,9 @@
 
 package com.ardor3d.extension.ui;
 
-import com.ardor3d.extension.ui.event.DragAndDropListener;
+import com.ardor3d.extension.ui.event.DragListener;
+import com.ardor3d.extension.ui.layout.BorderLayout;
+import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.input.InputState;
 
 /**
@@ -24,17 +26,21 @@ public class UIFrameStatusBar extends UIPanel {
     /** Resize handle, used to drag out this content's size when the frame is set as resizeable. */
     private final FrameResizeButton _resizeButton;
 
-    /** A drag and drop listener used to perform resize operations on this frame. */
+    /** A drag listener used to perform resize operations on this frame. */
     private final ResizeListener _resizeListener = new ResizeListener();
 
     /**
      * Construct a new status bar
      */
     public UIFrameStatusBar() {
+        super(new BorderLayout());
+
         _statusLabel = new UILabel("");
+        _statusLabel.setLayoutData(BorderLayoutData.CENTER);
         add(_statusLabel);
 
         _resizeButton = new FrameResizeButton();
+        _resizeButton.setLayoutData(BorderLayoutData.EAST);
         add(_resizeButton);
     }
 
@@ -51,7 +57,7 @@ public class UIFrameStatusBar extends UIPanel {
         super.attachedToHud();
         final UIHud hud = getHud();
         if (hud != null) {
-            hud.addDnDListener(_resizeListener);
+            hud.addDragListener(_resizeListener);
         }
     }
 
@@ -60,11 +66,11 @@ public class UIFrameStatusBar extends UIPanel {
         super.detachedFromHud();
         final UIHud hud = getHud();
         if (hud != null) {
-            hud.removeDnDListener(_resizeListener);
+            hud.removeDragListener(_resizeListener);
         }
     }
 
-    private final class ResizeListener implements DragAndDropListener {
+    private final class ResizeListener implements DragListener {
         private int _oldX = 0;
         private int _oldY = 0;
 
@@ -100,7 +106,7 @@ public class UIFrameStatusBar extends UIPanel {
             _oldY = mouseY;
         }
 
-        public void drop(final UIComponent component, final int mouseX, final int mouseY) {}
+        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
 
         public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
             return component == _resizeButton;
@@ -109,30 +115,17 @@ public class UIFrameStatusBar extends UIPanel {
 
     class FrameResizeButton extends UIButton {
 
-        // custom states
-        private final LabelState _pressedState = new MyPressedState();
-        private final LabelState _defaultState = new MyDefaultState();
-        private final LabelState _mouseOverState = new MyMouseOverState();
-
         public FrameResizeButton() {
             super("...");
-            setLayoutResizeableXY(false);
+            _pressedState = new MyPressedState();
+            _defaultState = new MyDefaultState();
+            _mouseOverState = new MyMouseOverState();
             switchState(_defaultState);
         }
 
         @Override
-        public LabelState getPressedState() {
-            return _pressedState;
-        }
-
-        @Override
-        public LabelState getDefaultState() {
-            return _defaultState;
-        }
-
-        @Override
-        public LabelState getMouseOverState() {
-            return _mouseOverState;
+        protected void applySkin() {
+            ; // keep this from happening by default
         }
 
         class MyPressedState extends UIButton.PressedState {

@@ -19,6 +19,7 @@ import com.ardor3d.extension.ui.backdrop.UIBackdrop;
 import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.layout.UILayoutData;
+import com.ardor3d.extension.ui.skin.SkinManager;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
@@ -102,6 +103,11 @@ public abstract class UIComponent extends Node {
 
     /** A blend state to use when drawing components as cached frame contents. */
     private static BlendState _maxAlphaBlend = UIComponent.createMaxAlphaBlend();
+
+    protected void applySkin() {
+        SkinManager.applyCurrentSkin(this);
+        updateMinimumSizeFromContents();
+    }
 
     /**
      * @return true if this component should be considered "enabled"... a concept that is interpreted by each individual
@@ -321,6 +327,69 @@ public abstract class UIComponent extends Node {
             return _minimumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
         } else {
             return getComponentHeight();
+        }
+    }
+
+    /**
+     * Sets the width and height of the content area of this component.
+     * 
+     * @param width
+     *            the new width of the content area
+     * @param height
+     *            the new height of the content area
+     */
+    public void setContentSize(final int width, final int height) {
+        setContentWidth(width);
+        setContentHeight(height);
+    }
+
+    /**
+     * Sets the width of this component's content area.
+     * 
+     * @param width
+     *            the new width of the content area
+     */
+    public void setContentWidth(final int width) {
+        setContentWidth(width, false);
+    }
+
+    /**
+     * Sets the height of this component's content area.
+     * 
+     * @param height
+     *            the new height of the content area
+     */
+    public void setContentHeight(final int height) {
+        setContentHeight(height, false);
+    }
+
+    /**
+     * Sets the width of the content area of this component to that given, if we either choose to ignore the rules, or
+     * the component is set to allow resize on Y.
+     * 
+     * @param height
+     *            the new height
+     * @param obeyResizeRules
+     *            true if we want to obey isLayoutResizeableY.
+     */
+    public void setContentHeight(final int height, final boolean obeyResizeRules) {
+        if (!obeyResizeRules || isLayoutResizeableY()) {
+            _contentsSize.setHeight(height);
+        }
+    }
+
+    /**
+     * Sets the width of the content area of this component to that given, if we either choose to ignore the rules, or
+     * the component is set to allow resize on X.
+     * 
+     * @param width
+     *            the new width
+     * @param obeyResizeRules
+     *            true if we want to obey isLayoutResizeableX.
+     */
+    public void setContentWidth(final int width, final boolean obeyResizeRules) {
+        if (!obeyResizeRules || isLayoutResizeableX()) {
+            _contentsSize.setWidth(width);
         }
     }
 

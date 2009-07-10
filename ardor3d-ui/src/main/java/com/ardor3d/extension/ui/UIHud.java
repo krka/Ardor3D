@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.extension.ui.event.DragAndDropListener;
+import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.input.ButtonState;
@@ -82,13 +82,13 @@ public class UIHud extends Node {
     private int _lastMouseX, _lastMouseY;
 
     /**
-     * List of potential drag and drop handlers. When a drag operation is detected, we will offer it to each item in the
-     * list until one accepts it.
+     * List of potential drag listeners. When a drag operation is detected, we will offer it to each item in the list
+     * until one accepts it.
      */
-    protected final List<WeakReference<DragAndDropListener>> _dndListeners = new ArrayList<WeakReference<DragAndDropListener>>();
+    protected final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
 
-    /** Our current drag listener. When a drop occurs, this is set back to null. */
-    private DragAndDropListener _dragListener = null;
+    /** Our current drag listener. When an drag finished, this is set back to null. */
+    private DragListener _dragListener = null;
 
     /** The component that currently has key focus - key events will be sent to this component. */
     private UIComponent _focusedComponent = null;
@@ -291,24 +291,24 @@ public class UIHud extends Node {
     }
 
     /**
-     * Add the given drag and drop listener to this hud.
+     * Add the given drag listener to this hud.
      * 
      * @param listener
      *            the listener to add
      */
-    public void addDnDListener(final DragAndDropListener listener) {
-        _dndListeners.add(new WeakReference<DragAndDropListener>(listener));
+    public void addDragListener(final DragListener listener) {
+        _dragListeners.add(new WeakReference<DragListener>(listener));
     }
 
     /**
-     * Remove the given drag and drop listener from this hud.
+     * Remove the given drag listener from this hud.
      * 
      * @param listener
      *            the listener to remove
      * @return true if it was found in the pool of listeners and removed.
      */
-    public boolean removeDnDListener(final DragAndDropListener listener) {
-        return _dndListeners.remove(new WeakReference<DragAndDropListener>(listener));
+    public boolean removeDragListener(final DragListener listener) {
+        return _dragListeners.remove(new WeakReference<DragListener>(listener));
     }
 
     /**
@@ -476,8 +476,8 @@ public class UIHud extends Node {
         }
 
         // Check if the component we are pressing on is "draggable"
-        for (final WeakReference<DragAndDropListener> ref : _dndListeners) {
-            final DragAndDropListener listener = ref.get();
+        for (final WeakReference<DragListener> ref : _dragListeners) {
+            final DragListener listener = ref.get();
             if (listener == null) {
                 continue;
             }
@@ -518,7 +518,7 @@ public class UIHud extends Node {
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.drop(over, mouseX, mouseY);
+            _dragListener.endDrag(over, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }

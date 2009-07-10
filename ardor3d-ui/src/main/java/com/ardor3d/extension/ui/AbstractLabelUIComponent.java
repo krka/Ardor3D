@@ -57,8 +57,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         final String textVal = getText();
         if (textVal != null && textVal.length() > 0) {
-            width = (int) (_text.getWidth() + 0.5f);
-            height = (int) (_text.getHeight() + 0.5f);
+            width += (int) (_text.getWidth() + 0.5f);
+            height += (int) (_text.getHeight() + 0.5f);
         }
 
         if (_iconDimensions != null) {
@@ -71,7 +71,12 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
 
         setMinimumContentSize(width, height);
-        compact();
+        if (getContentWidth() < width) {
+            setContentWidth(width);
+        }
+        if (getContentHeight() < height) {
+            setContentHeight(height);
+        }
         fireComponentDirty();
     }
 

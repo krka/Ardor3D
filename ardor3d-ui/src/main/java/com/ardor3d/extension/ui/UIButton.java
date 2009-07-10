@@ -13,13 +13,12 @@ package com.ardor3d.extension.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.extension.ui.border.EmptyBorder;
-import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.MouseButton;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A state based component that can be interacted with via the mouse to trigger actions.
@@ -80,6 +79,8 @@ public class UIButton extends AbstractLabelUIComponent {
     public UIButton(final String text, final SubTex icon) {
         setText(text);
         setIcon(icon);
+
+        applySkin();
 
         switchState(getDefaultState());
     }
@@ -332,9 +333,6 @@ public class UIButton extends AbstractLabelUIComponent {
     // Button UI states that handles switching to other states based on mouse events.
 
     class DefaultState extends LabelState {
-        public DefaultState() {
-            setBorder(new EmptyBorder());
-        }
 
         @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
@@ -349,9 +347,6 @@ public class UIButton extends AbstractLabelUIComponent {
     }
 
     class MouseOverState extends LabelState {
-        public MouseOverState() {
-            setBorder(new SolidBorder(1, 1, 1, 1));
-        }
 
         @Override
         public void mouseDeparted(final int mouseX, final int mouseY, final InputState state) {
@@ -412,5 +407,11 @@ public class UIButton extends AbstractLabelUIComponent {
             fireActionEvent();
             return true;
         }
+    }
+
+    @Override
+    public ImmutableSet<UIState> getStates() {
+        return ImmutableSet.of((UIState) _defaultState, _disabledState, _pressedState, _selectedState,
+                _disabledSelectedState, _mouseOverState, _mouseOverSelectedState);
     }
 }

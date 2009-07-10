@@ -215,7 +215,7 @@ public class SubTexUtil {
         final float startX = subTex.getStartX();
         final float startY = subTex.getStartY();
 
-        // Set up texture coords based on vertical flip
+        // Set up texture coordinates based on vertical flip
         if (!flipVertical) {
             SubTexUtil._texc[0] = startX;
             SubTexUtil._texc[1] = endY;

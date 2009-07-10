@@ -13,9 +13,9 @@ package com.ardor3d.extension.ui.event;
 import com.ardor3d.extension.ui.UIComponent;
 
 /**
- * Classes interested in processing drag and drop events should implement this interface.
+ * Classes interested in processing drag events should implement this interface.
  */
-public interface DragAndDropListener {
+public interface DragListener {
 
     /**
      * Ask if the given component and coordinates indicate a drag handle for the implementor. For example, a scroll bar
@@ -32,8 +32,8 @@ public interface DragAndDropListener {
     public boolean isDragHandle(UIComponent component, int mouseX, int mouseY);
 
     /**
-     * Let the implementor know that we've accepted this as our current drag and drop target. This is called by the hud
-     * if a drag action is detected and isDragHandle has returned true.
+     * Let the implementor know that we've accepted this as our current drag target. This is called by the hud if a drag
+     * action is detected and isDragHandle has returned true.
      * 
      * @param mouseX
      *            the x mouse coordinate
@@ -53,15 +53,15 @@ public interface DragAndDropListener {
     public void drag(int mouseX, int mouseY);
 
     /**
-     * Do a drop. This is called when the button is released after initDrag.
+     * End our drag. This is called when the button is released after initDrag.
      * 
      * @param component
-     *            the UIComponent we were dropped onto.
+     *            the UIComponent our drag ended over.
      * @param mouseX
      *            the x mouse coordinate
      * @param mouseY
      *            the y mouse coordinate
      */
-    public void drop(UIComponent component, int mouseX, int mouseY);
+    public void endDrag(UIComponent component, int mouseX, int mouseY);
 
 }

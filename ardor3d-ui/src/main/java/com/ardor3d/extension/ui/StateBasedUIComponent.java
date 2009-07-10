@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * StateBasedUIComponent describes a component that acts as a state machine, containing multiple states, one of which is
@@ -142,4 +143,9 @@ public abstract class StateBasedUIComponent extends UIComponent {
         getCurrentState().lostFocus();
         super.lostFocus();
     }
+
+    /**
+     * @return an ImmutableSet of possible states for this component.
+     */
+    public abstract ImmutableSet<UIState> getStates();
 }

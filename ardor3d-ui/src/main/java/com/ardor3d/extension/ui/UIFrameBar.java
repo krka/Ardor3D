@@ -13,10 +13,7 @@ package com.ardor3d.extension.ui;
 import java.util.EnumSet;
 
 import com.ardor3d.extension.ui.UIFrame.FrameButtons;
-import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.event.ActionListener;
-import com.ardor3d.extension.ui.util.Insets;
-import com.ardor3d.math.ColorRGBA;
 
 /**
  * This panel extension defines a standard frame title bar with optional buttons you might find in a typical windowing
@@ -99,9 +96,6 @@ public class UIFrameBar extends UIPanel {
         // Generate a standardized button.
         final UIButton rVal = new UIButton(string);
         rVal.setLayoutResizeableXY(false);
-        rVal.getDefaultState().setBorder(new EmptyBorder(1, 1, 1, 1));
-        rVal.getDefaultState().setForegroundColor(ColorRGBA.BLACK);
-        rVal.getDefaultState().setPadding(new Insets(0, 0, 0, 0));
         rVal.refreshState();
         rVal.compact();
         return rVal;

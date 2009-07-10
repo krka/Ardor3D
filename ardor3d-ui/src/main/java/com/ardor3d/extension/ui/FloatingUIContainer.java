@@ -25,5 +25,16 @@ public class FloatingUIContainer extends UIFrame {
         getContentPanel().setBorder(new EmptyBorder());
         getContentPanel().setLayout(new RowLayout(false));
         setBackdrop(null);
+
+        applySuperSkin();
+    }
+
+    protected void applySuperSkin() {
+        super.applySkin();
+    }
+
+    @Override
+    protected void applySkin() {
+        ;
     }
 }

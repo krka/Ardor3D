@@ -176,36 +176,6 @@ public abstract class UIContainer extends UIComponent {
         }
     }
 
-    /**
-     * Push a clip onto the clip stack of the given renderer such that the component is trimmed down to the content area
-     * of this container.
-     * 
-     * @param component
-     *            the component being clipped
-     * @param renderer
-     *            the renderer to push a clip on
-     */
-    public final void clipContents(final UIComponent component, final Renderer renderer) {
-
-        final int x = component.getHudX();
-        final int y = component.getHudY();
-
-        int width = getContentWidth();
-        int height = getContentHeight();
-
-        // use the component's width if it is smaller than our content width
-        if (component.getComponentWidth() + component.getLocalX() < width) {
-            width = component.getComponentWidth();
-        }
-
-        // use the component's height if it is smaller than our content height
-        if (component.getComponentHeight() + component.getLocalY() < height) {
-            height = component.getComponentHeight();
-        }
-
-        renderer.pushClip(x, y, (int) (width * getWorldScale().getX()), (int) (height * getWorldScale().getY()));
-    }
-
     @Override
     public UIComponent getUIComponent(final int hudX, final int hudY) {
         if (!getSceneHints().isPickingHintEnabled(PickingHint.Pickable) || !insideMargin(hudX, hudY)) {
@@ -232,19 +202,18 @@ public abstract class UIContainer extends UIComponent {
 
     @Override
     protected void drawComponent(final Renderer renderer) {
-
-        Spatial child;
-        for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
-            child = getChild(i);
-            if (child != null) {
-                if (child instanceof UIComponent) {
-                    clipContents((UIComponent) child, renderer);
-                    child.onDraw(renderer);
-                    renderer.popClip();
-                } else {
+        if (getNumberOfChildren() > 0) {
+            // Clip to just the internal region of this container.
+            renderer.pushClip(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
+                    getContentHeight());
+            Spatial child;
+            for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
+                child = getChild(i);
+                if (child != null) {
                     child.onDraw(renderer);
                 }
             }
+            renderer.popClip();
         }
     }
 }

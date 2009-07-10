@@ -13,15 +13,17 @@ package com.ardor3d.example.ui;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.ui.UIButton;
+import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
-import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
-import com.ardor3d.extension.ui.border.SolidBorder;
+import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.extension.ui.layout.RowLayout;
+import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.framework.FrameHandler;
@@ -84,26 +86,44 @@ public class SimpleUIExample extends ExampleBase {
 
         final UIPanel panel = new UIPanel();
         panel.setForegroundColor(ColorRGBA.DARK_GRAY);
-        panel.setBackdrop(new ImageBackdrop(new SubTex(tex)));
-        panel.setBorder(new SolidBorder(3, 3, 3, 3));
         panel.setLayout(new BorderLayout());
-        panel.setTooltipText("Hi!");
 
-        final UIButton button = new UIButton("Hello World!");
+        final UIButton button = new UIButton("Button A");
         button.setIcon(new SubTex(tex));
         button.setIconDimensions(new Dimension(26, 26));
         button.setGap(10);
-        button.setBorder(new SolidBorder(2, 5, 2, 5));
         button.setLayoutData(BorderLayoutData.NORTH);
+        button.setTooltipText("This is a tooltip!");
         panel.add(button);
+
+        final RowLayout rowLay = new RowLayout(false);
+        rowLay.setExpands(false);
+        final UIPanel centerPanel = new UIPanel(rowLay);
+        centerPanel.setLayoutData(BorderLayoutData.CENTER);
+        panel.add(centerPanel);
+
+        final UICheckBox check1 = new UICheckBox("Hello");
+        check1.setSelected(true);
+        check1.setEnabled(false);
+        centerPanel.add(check1);
+        final UICheckBox check2 = new UICheckBox("World");
+        centerPanel.add(check2);
+
+        final ButtonGroup group = new ButtonGroup();
+        final UIRadioButton radio1 = new UIRadioButton("option A");
+        radio1.setGroup(group);
+        centerPanel.add(radio1);
+        final UIRadioButton radio2 = new UIRadioButton("option B");
+        radio2.setGroup(group);
+        centerPanel.add(radio2);
 
         bar = new UIProgressBar("Loading: ", true);
         bar.setPercentFilled(0);
-        bar.setLayoutData(BorderLayoutData.CENTER);
-        panel.add(bar);
+        bar.setComponentWidth(250);
+        bar.setLayoutResizeableX(false);
+        centerPanel.add(bar);
 
         fpslabel = new UILabel("FPS");
-        fpslabel.setBorder(new SolidBorder(1, 1, 1, 1));
         fpslabel.setLayoutData(BorderLayoutData.SOUTH);
         panel.add(fpslabel);
 
@@ -114,7 +134,7 @@ public class SimpleUIExample extends ExampleBase {
         frame.pack();
 
         frame.setUseStandin(true);
-        UIFrame.setUseTransparency(true);
+        UIFrame.setUseTransparency(false);
         frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
 
@@ -149,6 +169,7 @@ public class SimpleUIExample extends ExampleBase {
             System.out.printf("%7.1f FPS\n", fps);
             fpslabel.setText(fps + " FPS");
             bar.setPercentFilled(timer.getTimeInSeconds() / 15);
+            bar.updateMinimumSizeFromContents();
         }
         hud.updateGeometricState(timer.getTimePerFrame());
     }

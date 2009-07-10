@@ -11,11 +11,12 @@
 package com.ardor3d.example.benchmark.ball;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.extension.ui.UIButton;
+import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
+import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
@@ -107,14 +108,14 @@ public class BubbleMarkUIExample extends ExampleBase {
     private void buildConfigFrame(final int width, final int height) {
         _configFrame = new UIFrame("Config");
         _configFrame.updateMinimumSizeFromContents();
-        _configFrame.pack(300, 180);
+        _configFrame.pack(320, 240);
         _configFrame.setUseStandin(true);
         _configFrame.setHudXY(width - _configFrame.getComponentWidth() - 5, height - _configFrame.getComponentHeight()
                 - 5);
 
         _configFrame.getContentPanel().setLayout(new AnchorLayout());
 
-        final UIButton vsync = new UIButton("vsync");
+        final UICheckBox vsync = new UICheckBox("Enable vsync");
         vsync.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, _configFrame.getContentPanel(),
                 Alignment.TOP_LEFT, 5, -5));
         vsync.setSelectable(true);
@@ -125,7 +126,7 @@ public class BubbleMarkUIExample extends ExampleBase {
         });
         _configFrame.getContentPanel().add(vsync);
 
-        final UIButton collide = new UIButton("collide");
+        final UICheckBox collide = new UICheckBox("Enable ball-ball collision");
         collide.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vsync, Alignment.BOTTOM_LEFT, 0, -5));
         collide.setSelectable(true);
         collide.setSelected(!skipBallCollide);
@@ -142,7 +143,7 @@ public class BubbleMarkUIExample extends ExampleBase {
 
         final ButtonGroup ballsGroup = new ButtonGroup();
 
-        final UIButton balls16 = new UIButton("16");
+        final UIRadioButton balls16 = new UIRadioButton("16");
         balls16.setLayoutData(new AnchorLayoutData(Alignment.LEFT, ballsLabel, Alignment.RIGHT, 5, 0));
         balls16.setSelectable(true);
         balls16.setSelected(true);
@@ -154,8 +155,8 @@ public class BubbleMarkUIExample extends ExampleBase {
         balls16.setGroup(ballsGroup);
         _configFrame.getContentPanel().add(balls16);
 
-        final UIButton balls32 = new UIButton("32");
-        balls32.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls16, Alignment.RIGHT, 5, 0));
+        final UIRadioButton balls32 = new UIRadioButton("32");
+        balls32.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, balls16, Alignment.BOTTOM_LEFT, 0, -5));
         balls32.setSelectable(true);
         balls32.setSelected(true);
         balls32.addActionListener(new ActionListener() {
@@ -166,8 +167,8 @@ public class BubbleMarkUIExample extends ExampleBase {
         balls32.setGroup(ballsGroup);
         _configFrame.getContentPanel().add(balls32);
 
-        final UIButton balls64 = new UIButton("64");
-        balls64.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls32, Alignment.RIGHT, 5, 0));
+        final UIRadioButton balls64 = new UIRadioButton("64");
+        balls64.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, balls32, Alignment.BOTTOM_LEFT, 0, -5));
         balls64.setSelectable(true);
         balls64.setSelected(true);
         balls64.addActionListener(new ActionListener() {
@@ -178,8 +179,8 @@ public class BubbleMarkUIExample extends ExampleBase {
         balls64.setGroup(ballsGroup);
         _configFrame.getContentPanel().add(balls64);
 
-        final UIButton balls128 = new UIButton("128");
-        balls128.setLayoutData(new AnchorLayoutData(Alignment.LEFT, balls64, Alignment.RIGHT, 5, 0));
+        final UIRadioButton balls128 = new UIRadioButton("128");
+        balls128.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, balls64, Alignment.BOTTOM_LEFT, 0, -5));
         balls128.setSelectable(true);
         balls128.setSelected(true);
         balls128.addActionListener(new ActionListener() {

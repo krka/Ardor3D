@@ -10,12 +10,10 @@
 
 package com.ardor3d.extension.ui;
 
-import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.util.Insets;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.hint.PickingHint;
 
 /**
@@ -67,17 +65,18 @@ public class UIProgressBar extends UIPanel {
 
         _mainPanel = new UIPanel(new BorderLayout());
         _mainPanel.setLayoutData(BorderLayoutData.CENTER);
-        _mainPanel.setBackdrop(new SolidBackdrop(new ColorRGBA(.8f, .8f, .8f, .5f)));
         add(_mainPanel);
 
         _bar = new UIPanel(new BorderLayout());
         _bar.setLayoutData(BorderLayoutData.CENTER);
-        _bar.setBackdrop(new SolidBackdrop(ColorRGBA.BLUE));
         _mainPanel.add(_bar);
 
         _barLabel = new UILabel("");
         _barLabel.setLayoutData(BorderLayoutData.CENTER);
         _mainPanel.add(_barLabel);
+
+        applySkin();
+
         updateMinimumSizeFromContents();
         compact();
 

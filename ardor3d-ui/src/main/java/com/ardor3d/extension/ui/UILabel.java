@@ -11,14 +11,15 @@
 package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.util.SubTex;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Basic implementation of {@link AbstractLabelUIComponent}.
  */
 public class UILabel extends AbstractLabelUIComponent {
 
-    private final LabelState disabledState = new LabelState();
-    private final LabelState defaultState = new LabelState();
+    private final LabelState _disabledState = new LabelState();
+    private final LabelState _defaultState = new LabelState();
 
     /**
      * @param text
@@ -38,16 +39,23 @@ public class UILabel extends AbstractLabelUIComponent {
     public UILabel(final String text, final SubTex icon) {
         setText(text);
         setIcon(icon);
+
+        applySkin();
         switchState(getDefaultState());
     }
 
     @Override
     public LabelState getDefaultState() {
-        return defaultState;
+        return _defaultState;
     }
 
     @Override
     public LabelState getDisabledState() {
-        return disabledState;
+        return _disabledState;
+    }
+
+    @Override
+    public ImmutableSet<UIState> getStates() {
+        return ImmutableSet.of((UIState) _defaultState, _disabledState);
     }
 }

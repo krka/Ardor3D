@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
-import com.ardor3d.extension.ui.event.DragAndDropListener;
+import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.util.UIQuad;
@@ -86,8 +86,8 @@ public class UIFrame extends UIContainer {
     /** If true, use a cached texture to display this frame (on a simple quad) instead of drawing all of its components. */
     private boolean _useStandin = false;
 
-    /** The drag and drop listener responsible for allowing repositioning of the frame by dragging the title label. */
-    private final FrameDNDListener _dndListener = new FrameDNDListener();
+    /** The drag listener responsible for allowing repositioning of the frame by dragging the title label. */
+    private final FrameDragListener _dragListener = new FrameDragListener();
 
     /** The quad used to draw the cached texture version of this frame, if set to use one. */
     private UIQuad _standin = null;
@@ -129,13 +129,14 @@ public class UIFrame extends UIContainer {
 
         _titleBar = new UIFrameBar(buttons);
         _titleBar.setLayoutData(BorderLayoutData.NORTH);
-        _titleBar.setBackdrop(new SolidBackdrop(ColorRGBA.LIGHT_GRAY));
         setTitle(title);
         add(_titleBar);
 
         _statusBar = new UIFrameStatusBar();
         _statusBar.setLayoutData(BorderLayoutData.SOUTH);
         _basePanel.add(_statusBar);
+
+        applySkin();
     }
 
     /**
@@ -225,8 +226,8 @@ public class UIFrame extends UIContainer {
             throw new IllegalStateException("UIFrame is not attached to a hud.");
         }
 
-        // Remove our dnd listener
-        hud.removeDnDListener(_dndListener);
+        // Remove our drag listener
+        hud.removeDragListener(_dragListener);
 
         // When a frame closes, close any open tooltip
         hud.getTooltip().setVisible(false);
@@ -545,7 +546,7 @@ public class UIFrame extends UIContainer {
     public void attachedToHud() {
         super.attachedToHud();
         // add our drag listener to the hud
-        getHud().addDnDListener(_dndListener);
+        getHud().addDragListener(_dragListener);
     }
 
     @Override
@@ -554,7 +555,7 @@ public class UIFrame extends UIContainer {
 
         // Remove our drag listener from the hud
         if (getHud() != null) {
-            getHud().removeDnDListener(_dndListener);
+            getHud().removeDragListener(_dragListener);
         }
 
         // clean up visuals created for this frame
@@ -683,7 +684,7 @@ public class UIFrame extends UIContainer {
     /**
      * The drag listener responsible for allowing a frame to be moved around the screen with the mouse.
      */
-    private final class FrameDNDListener implements DragAndDropListener {
+    private final class FrameDragListener implements DragListener {
         int oldX = 0;
         int oldY = 0;
 
@@ -718,7 +719,7 @@ public class UIFrame extends UIContainer {
             return getComponentWidth() <= dispWidth && getComponentHeight() <= dispHeight;
         }
 
-        public void drop(final UIComponent component, final int mouseX, final int mouseY) {}
+        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
 
         public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
             return component == _titleBar.getTitleLabel();
