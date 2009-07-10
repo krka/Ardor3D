@@ -105,11 +105,8 @@ public class BMFont {
         return Math.abs(_info.size);
     }
 
-    /**
-     * The average of _common.base and _common.lineHeight seems to be the best general purpose value
-     */
     public int getLineHeight() {
-        return (_common.base + _common.lineHeight) / 2;
+        return _common.lineHeight;
     }
 
     public int getTextureWidth() {
