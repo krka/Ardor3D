@@ -946,7 +946,7 @@ public abstract class UIComponent extends Node {
         if (UIComponent._defaultFont == null) {
             try {
                 UIComponent._defaultFont = new BMFont(BasicText.class.getClassLoader().getResource(
-                        "com/ardor3d/ui/text/arial-24-bold-regular.fnt"), true);
+                        "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt"), true);
             } catch (final Exception ex) {
                 UIComponent.logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
             }
