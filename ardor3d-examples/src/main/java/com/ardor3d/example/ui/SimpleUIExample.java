@@ -58,6 +58,7 @@ public class SimpleUIExample extends ExampleBase {
 
     @Override
     protected void initExample() {
+        _canvas.setTitle("Simple UI Example");
 
         // Add a spinning 3D box to show behind UI.
         final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
