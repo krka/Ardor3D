@@ -87,7 +87,7 @@ import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.Stage;
 
-public abstract class ExampleBase extends Thread implements Updater, Scene, Exit {
+public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
     protected final LogicalLayer _logicalLayer;
@@ -132,7 +132,6 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         _frameHandler = frameHandler;
     }
 
-    @Override
     public void run() {
         try {
             _frameHandler.init();
@@ -366,14 +365,14 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
 
         final LogicalLayer ll = injector.getInstance(LogicalLayer.class);
         final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
-        final ExampleBase gameThread = injector.getInstance(ExampleBase.class);
+        final ExampleBase gameRunnable = injector.getInstance(ExampleBase.class);
         final NativeCanvas canvas = injector.getInstance(NativeCanvas.class);
         final Updater updater = injector.getInstance(Updater.class);
         final PhysicalLayer physicalLayer = new PhysicalLayer(injector.getInstance(KeyboardWrapper.class), injector
                 .getInstance(MouseWrapper.class), injector.getInstance(FocusWrapper.class));
 
         // set the mouse manager member. It's a bit of a hack to do that this way.
-        gameThread._mouseManager = injector.getInstance(MouseManager.class);
+        gameRunnable._mouseManager = injector.getInstance(MouseManager.class);
 
         ll.registerInput(canvas, physicalLayer);
 
@@ -383,10 +382,10 @@ public abstract class ExampleBase extends Thread implements Updater, Scene, Exit
         // Make a native canvas and register it.
         frameWork.addCanvas(canvas);
 
-        gameThread._canvas = canvas;
-        gameThread._physicalLayer = physicalLayer;
+        gameRunnable._canvas = canvas;
+        gameRunnable._physicalLayer = physicalLayer;
 
-        gameThread.start();
+        new Thread(gameRunnable).start();
     }
 
     protected static PropertiesGameSettings getAttributes(final PropertiesGameSettings settings) {
