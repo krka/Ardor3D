@@ -10,6 +10,8 @@
 
 package com.ardor3d.extension.ui.skin.generic;
 
+import java.net.URL;
+
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIFrame;
@@ -43,13 +45,31 @@ public class GenericSkin extends Skin {
     protected Texture _sharedTex;
 
     public GenericSkin() {
-        loadTexture();
+        loadTexture("/com/ardor3d/extension/ui/skin/generic/genericSkin.png");
     }
 
-    protected void loadTexture() {
+    public GenericSkin(final String skinTexture) {
+        loadTexture(skinTexture);
+    }
+
+    protected void loadTexture(final String skinTexture) {
         try {
-            _sharedTex = TextureManager.load("/com/ardor3d/extension/ui/skin/generic/genericSkin.png",
-                    MinificationFilter.Trilinear, Format.GuessNoCompression, false);
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear, Format.GuessNoCompression,
+                    false);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public GenericSkin(final URL skinTexture) {
+        loadTexture(skinTexture);
+    }
+
+    protected void loadTexture(final URL skinTexture) {
+        try {
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear, Format.GuessNoCompression,
+                    false);
         } catch (final Exception e) {
             e.printStackTrace();
         }
