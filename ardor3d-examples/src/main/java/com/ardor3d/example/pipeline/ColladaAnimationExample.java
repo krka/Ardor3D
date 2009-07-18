@@ -10,16 +10,14 @@
 
 package com.ardor3d.example.pipeline;
 
+import com.ardor3d.animations.runtime.AnimationRegistry;
+import com.ardor3d.animations.runtime.AnimationSystem;
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.extension.model.collada.ColladaImporter;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.animations.runtime.AnimationSystem;
-import com.ardor3d.animations.runtime.AnimationRegistry;
-import com.ardor3d.animations.runtime.AnimatableInstance;
+import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
@@ -39,32 +37,37 @@ public class ColladaAnimationExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Ardor3D - Collada Import");
+        _canvas.setTitle("Ardor3D - Animation -- NOT CURRENTLY IMPLEMENTED");
 
         _animationSystem = new AnimationSystem(new AnimationRegistry());
 
-        // Load collada model
-        try {
-            _colladaNode = ColladaImporter.readColladaScene("/HC_Medium_Char_Skin.dae", _animationSystem.getAnimationRegistry());
-            _root.attachChild(_colladaNode);
+        final BasicText text = BasicText.createDefaultTextLabel("", "Placeholder - Not yet fully implemented.");
+        _root.attachChild(text);
 
-            // ensure that the skeletons are shown
-
-            for (AnimatableInstance animatableInstance : _animationSystem.getAnimationRegistry().getAnimatableInstances()) {
-                for (Spatial spatial : animatableInstance.getAnimatable().getBindShape()) {
-                    animatableInstance.getNode().attachChild(spatial);
-                }
-            }
-        } catch (final Exception ex) {
-            ex.printStackTrace();
-        }
+        // // Load collada model
+        // try {
+        // _colladaNode = ColladaImporter.readColladaScene("/HC_Medium_Char_Skin.dae",
+        // _animationSystem.getAnimationRegistry());
+        // _root.attachChild(_colladaNode);
+        //
+        // // ensure that the skeletons are shown
+        //
+        // for (AnimatableInstance animatableInstance :
+        // _animationSystem.getAnimationRegistry().getAnimatableInstances()) {
+        // for (Spatial spatial : animatableInstance.getAnimatable().getBindShape()) {
+        // animatableInstance.getNode().attachChild(spatial);
+        // }
+        // }
+        // } catch (final Exception ex) {
+        // ex.printStackTrace();
+        // }
 
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 50, 150));
     }
 
     @Override
-    protected void updateExample(ReadOnlyTimer timer) {
-        // update skeleton instances
-        // update animation instance meshes based on skeleton positions
+    protected void updateExample(final ReadOnlyTimer timer) {
+    // update skeleton instances
+    // update animation instance meshes based on skeleton positions
     }
 }
