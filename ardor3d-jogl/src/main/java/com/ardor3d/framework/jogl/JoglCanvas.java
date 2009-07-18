@@ -107,7 +107,8 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         }
 
         // Validate bit depth.
-        if ((_settings.getColorDepth() != 32) && (_settings.getColorDepth() != 16) && (_settings.getColorDepth() != 24)) {
+        if ((_settings.getColorDepth() != 32) && (_settings.getColorDepth() != 16) && (_settings.getColorDepth() != 24)
+                && (_settings.getColorDepth() != -1)) {
             throw new Ardor3dException("Invalid pixel depth: " + _settings.getColorDepth());
         }
 
