@@ -347,9 +347,15 @@ public final class PropertiesDialog extends JDialog {
         display = display.substring(display.indexOf(" x ") + 3);
         final int height = Integer.parseInt(display);
 
-        final String depthString = (String) colorDepthCombo.getSelectedItem();
-        final int depth = depthString == null ? 0 : Integer
-                .parseInt(depthString.substring(0, depthString.indexOf(' ')));
+        String depthString = (String) colorDepthCombo.getSelectedItem();
+        int depth = 0;
+        if (depthString != null) {
+            depthString = depthString.substring(0, depthString.indexOf(' '));
+            if (depthString.equals("?")) {
+                depth = DisplayMode.BIT_DEPTH_MULTI;
+            }
+            depth = Integer.parseInt(depthString);
+        }
 
         final String freqString = (String) displayFreqCombo.getSelectedItem();
         int freq = -1;
@@ -451,7 +457,7 @@ public final class PropertiesDialog extends JDialog {
         final String resolution = (String) displayResCombo.getSelectedItem();
         String colorDepth = (String) colorDepthCombo.getSelectedItem();
         if (colorDepth == null) {
-            colorDepth = source.getDepth() + " bpp";
+            colorDepth = (source.getDepth() != DisplayMode.BIT_DEPTH_MULTI) ? source.getDepth() + " bpp" : "? bpp";
         }
         String displayFreq = (String) displayFreqCombo.getSelectedItem();
         if (displayFreq == null) {
@@ -538,15 +544,14 @@ public final class PropertiesDialog extends JDialog {
             }
         });
         for (int i = 0; i < modes.length; i++) {
-            // Filter out all bit depths lower than 16 - Java incorrectly
-            // reports
-            // them as valid depths though the monitor does not support them
-            if (modes[i].getBitDepth() < 16) {
+            // Filter out modes with bit depths that we don't care about.
+            if (modes[i].getBitDepth() < 16 && modes[i].getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) {
                 continue;
             }
 
             final String res = modes[i].getWidth() + " x " + modes[i].getHeight();
-            final String depth = modes[i].getBitDepth() + " bpp";
+            final String depth = (modes[i].getBitDepth() != DisplayMode.BIT_DEPTH_MULTI) ? modes[i].getBitDepth()
+                    + " bpp" : "? bpp";
             if (res.equals(resolution) && !depths.contains(depth)) {
                 depths.add(depth);
             }
