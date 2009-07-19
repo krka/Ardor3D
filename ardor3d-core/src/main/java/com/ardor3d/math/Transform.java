@@ -780,6 +780,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
         store.put(_translation.getX());
         store.put(_translation.getY());
         store.put(_translation.getZ());
+        store.put(1);
         store.rewind();
     }
 
