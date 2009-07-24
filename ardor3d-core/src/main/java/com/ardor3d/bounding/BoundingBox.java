@@ -160,9 +160,9 @@ public class BoundingBox extends BoundingVolume {
             maxZ = Math.max(maxZ, curZ);
         }
 
-        final double ctrX = (maxX + minX) * 0.5f;
-        final double ctrY = (maxY + minY) * 0.5f;
-        final double ctrZ = (maxZ + minZ) * 0.5f;
+        final double ctrX = (maxX + minX) * 0.5;
+        final double ctrY = (maxY + minY) * 0.5;
+        final double ctrZ = (maxZ + minZ) * 0.5;
 
         box._center.set(ctrX, ctrY, ctrZ);
         box._xExtent = maxX - ctrX;
@@ -328,7 +328,7 @@ public class BoundingBox extends BoundingVolume {
         Vector3.releaseTempInstance(compVect);
 
         _center.set(minX + maxX, minY + maxY, minZ + maxZ);
-        _center.multiplyLocal(0.5f);
+        _center.multiplyLocal(0.5);
 
         setXExtent(maxX - _center.getX());
         setYExtent(maxY - _center.getY());
@@ -588,7 +588,7 @@ public class BoundingBox extends BoundingVolume {
             compVect2.setZ(boxCenter.getZ() + boxZ);
         }
 
-        _center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5f);
+        _center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5);
 
         setXExtent(compVect2.getX() - _center.getX());
         setYExtent(compVect2.getY() - _center.getY());
