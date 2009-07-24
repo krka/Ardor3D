@@ -12,8 +12,8 @@ package com.ardor3d.extension.ui.backdrop;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.Alignment;
-import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.extension.ui.util.SubTex;
+import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
@@ -93,8 +93,8 @@ public class ImageBackdrop extends UIBackdrop {
         double width = 0;
         double height = 0;
 
-        final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp) + 0.5;
-        final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp) + 0.5;
+        final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp);
+        final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp);
 
         switch (_axis) {
             case Both:

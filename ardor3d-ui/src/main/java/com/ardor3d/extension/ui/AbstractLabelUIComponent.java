@@ -57,8 +57,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         final String textVal = getText();
         if (textVal != null && textVal.length() > 0) {
-            width += (int) (_text.getWidth() + 0.5f);
-            height += (int) (_text.getHeight() + 0.5f);
+            width += Math.round(_text.getWidth());
+            height += Math.round(_text.getHeight());
         }
 
         if (_iconDimensions != null) {
@@ -214,7 +214,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
 
         if (getText() != null) {
-            width += (int) (_text.getWidth() + 0.5f);
+            width += Math.round(_text.getWidth());
         }
 
         // find left most x location of content (icon+text) based on alignment.
@@ -240,7 +240,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         if (getText() != null) {
             // find bottom most y location of text based on alignment.
-            y = _alignment.alignY(getContentHeight(), (int) (_text.getHeight() + 0.5f)) * getWorldScale().getY();
+            y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight())) * getWorldScale().getY();
 
             // set our text location
             _text.setWorldTranslation(x + getWorldTranslation().getX() + getTotalLeft() * getWorldScale().getX(), y

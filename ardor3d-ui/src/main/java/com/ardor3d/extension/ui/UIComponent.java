@@ -652,14 +652,14 @@ public abstract class UIComponent extends Node {
      * @return current screen x coordinate of this component's origin (usually its lower left corner.)
      */
     public int getHudX() {
-        return (int) (getWorldTranslation().getX() + 0.5);
+        return (int) Math.round(getWorldTranslation().getX());
     }
 
     /**
      * @return current screen y coordinate of this component's origin (usually its lower left corner.)
      */
     public int getHudY() {
-        return (int) (getWorldTranslation().getY() + 0.5);
+        return (int) Math.round(getWorldTranslation().getY());
     }
 
     /**
@@ -696,14 +696,14 @@ public abstract class UIComponent extends Node {
      * @return a local x translation from the parent component's content area.
      */
     public int getLocalX() {
-        return (int) (getTranslation().getX() + 0.5);
+        return (int) Math.round(getTranslation().getX());
     }
 
     /**
      * @return a local y translation from the parent component's content area.
      */
     public int getLocalY() {
-        return (int) (getTranslation().getY() + 0.5);
+        return (int) Math.round(getTranslation().getY());
     }
 
     /**

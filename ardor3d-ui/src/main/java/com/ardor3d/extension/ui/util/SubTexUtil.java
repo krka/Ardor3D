@@ -130,8 +130,8 @@ public class SubTexUtil {
      */
     public static void drawStretchedIcon(final Renderer renderer, final SubTex subTex, final double x, final double y,
             final double width, final double height) {
-        SubTexUtil.drawStretchedIcon(renderer, subTex, (int) (x + 0.5), (int) (y + 0.5), (int) (width + 0.5),
-                (int) (height + 0.5), 0, false);
+        SubTexUtil.drawStretchedIcon(renderer, subTex, (int) Math.round(x), (int) Math.round(y), (int) Math
+                .round(width), (int) Math.round(height), 0, false);
     }
 
     /**
