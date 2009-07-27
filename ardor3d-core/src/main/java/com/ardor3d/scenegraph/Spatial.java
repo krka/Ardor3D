@@ -88,7 +88,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     protected final SceneHints _sceneHints;
 
     /** The render delegates to use for this Spatial, mapped by glContext reference. */
-    protected final transient Map<Object, RenderDelegate> _delegateMap = new MapMaker().weakKeys().makeMap();
+    protected transient Map<Object, RenderDelegate> _delegateMap = null;
     private static final Object defaultDelegateRef = new Object();
 
     /**
@@ -139,6 +139,13 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      *            is used when this Spatial is rendered in a RenderContext tied to the given glContextRef.
      */
     public void setRenderDelegate(final RenderDelegate delegate, final Object glContextRef) {
+        if (_delegateMap == null) {
+            if (delegate == null) {
+                return;
+            } else {
+                _delegateMap = new MapMaker().weakKeys().makeMap();
+            }
+        }
         if (delegate != null) {
             if (glContextRef == null) {
                 _delegateMap.put(defaultDelegateRef, delegate);
@@ -151,6 +158,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
             } else {
                 _delegateMap.remove(glContextRef);
             }
+            if (_delegateMap.isEmpty()) {
+                _delegateMap = null;
+            }
         }
     }
 
@@ -162,6 +172,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * @return delegate as described.
      */
     public RenderDelegate getRenderDelegate(final Object glContextRef) {
+        if (_delegateMap == null) {
+            return null;
+        }
         if (glContextRef == null) {
             return _delegateMap.get(defaultDelegateRef);
         } else {
@@ -599,7 +612,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      */
     protected RenderDelegate getCurrentRenderDelegate() {
         // short circuit... ignore if no delegates at all.
-        if (_delegateMap.isEmpty()) {
+        if (_delegateMap == null || _delegateMap.isEmpty()) {
             return null;
         }
 
