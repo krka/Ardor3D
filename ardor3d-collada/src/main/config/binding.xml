@@ -332,6 +332,15 @@
     <value style="text" set-method="setTextData" get-method="getTextData"/>
   </mapping>
 
+  <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeDoubleArray" abstract="true" pre-set="postsetSpecifiedInAbstract"
+           post-set="validate">
+    <value name="count" field="count" style="attribute"/>
+    <value name="id" set-method="setId" get-method="getId" style="attribute" usage="optional"/>
+    <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
+    <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
+    <value style="text" set-method="setTextData" get-method="getTextData"/>
+  </mapping>
+
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeAccessor" abstract="true" pre-set="postsetSpecifiedInAbstract">
     <value name="count" field="count" style="attribute"/>
     <value name="offset" field="offset" style="attribute" usage="optional"/>
