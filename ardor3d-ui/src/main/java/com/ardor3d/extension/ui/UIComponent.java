@@ -101,6 +101,9 @@ public abstract class UIComponent extends Node {
     /** The current future task set to show a tooltip in the near future. */
     private FutureTask<Void> _showTask;
 
+    /** The system time when the tool tip should show up next (if currently being timed.) */
+    private long _toolDone;
+
     /** A blend state to use when drawing components as cached frame contents. */
     private static BlendState _maxAlphaBlend = UIComponent.createMaxAlphaBlend();
 
@@ -806,7 +809,8 @@ public abstract class UIComponent extends Node {
 
     /**
      * @param ms
-     *            the amount of time in ms to wait before showing a tooltip for this component.
+     *            the amount of time in ms to wait before showing a tooltip for this component. This is only granular to
+     *            a tenth of a second (or 100ms)
      */
     public void setTooltipPopTime(final int ms) {
         _tooltipPopTime = ms;
@@ -818,6 +822,7 @@ public abstract class UIComponent extends Node {
     protected void cancelTooltipTimer() {
         if (_showTask != null && !_showTask.isDone()) {
             _showTask.cancel(true);
+            _showTask = null;
         }
     }
 
@@ -1011,11 +1016,24 @@ public abstract class UIComponent extends Node {
      *            the current tracked state of the input system.
      */
     public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
+        scheduleToolTip();
+    }
+
+    /**
+     * 
+     */
+    private void scheduleToolTip() {
         final UIHud hud = getHud();
         if (hud != null && getTooltipText() != null) {
             final Callable<Void> show = new Callable<Void>() {
                 public Void call() throws Exception {
-                    Thread.sleep(getTooltipPopTime());
+
+                    while (true) {
+                        if (System.currentTimeMillis() >= _toolDone) {
+                            break;
+                        }
+                        Thread.sleep(100);
+                    }
 
                     final UITooltip ttip = hud.getTooltip();
 
@@ -1057,6 +1075,7 @@ public abstract class UIComponent extends Node {
                 }
             };
             cancelTooltipTimer();
+            resetToolTipTime();
             _showTask = new FutureTask<Void>(show);
             final Thread t = new Thread() {
                 @Override
@@ -1138,12 +1157,18 @@ public abstract class UIComponent extends Node {
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean mouseMoved(final int mouseX, final int mouseY, final InputState state) {
+        resetToolTipTime();
+
         // default is to offer event to parent, if it is a UIComponent
         if (getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).mouseMoved(mouseX, mouseY, state);
         } else {
             return false;
         }
+    }
+
+    private void resetToolTipTime() {
+        _toolDone = System.currentTimeMillis() + getTooltipPopTime();
     }
 
     /**
