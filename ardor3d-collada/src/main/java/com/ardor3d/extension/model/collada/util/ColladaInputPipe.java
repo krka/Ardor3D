@@ -41,7 +41,7 @@ public class ColladaInputPipe {
     private FloatBuffer _buffer;
 
     enum Type {
-        VERTEX, NORMAL, TEXCOORD, UNKNOWN
+        VERTEX, NORMAL, TEXCOORD, COLOR, UNKNOWN
     }
 
     public ColladaInputPipe(final DaeInputShared input, final Collada rootNode) {
@@ -109,6 +109,10 @@ public class ColladaInputPipe {
                 _buffer = BufferUtils.createFloatBuffer(size);
                 meshData.setTextureCoords(new FloatBufferData(_buffer, _params.size()), _set);
                 break;
+            case COLOR:
+                _buffer = BufferUtils.createFloatBuffer(size);
+                meshData.setColorBuffer(_buffer);
+                break;
             default:
         }
     }
@@ -127,7 +131,12 @@ public class ColladaInputPipe {
                 if (param.getType() == DaeParamType.FLOAT) {
                     _buffer.put(_source.getFloatArray().getData()[index]);
                 } else if (param.getType() == DaeParamType.DOUBLE) {
-                    _buffer.put((float) _source.getDoubleArray().getData()[index]);
+                    if (_source.getDoubleArray() != null) {
+                        _buffer.put((float) _source.getDoubleArray().getData()[index]);
+                    } else {
+                        // Fall back to double... seems some exporters ask for double, but use float sources. :(
+                        _buffer.put(_source.getFloatArray().getData()[index]);
+                    }
                 } else if (param.getType() == DaeParamType.INT) {
                     _buffer.put(_source.getIntArray().getData()[index]);
                 }
