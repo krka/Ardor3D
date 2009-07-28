@@ -307,6 +307,7 @@
     <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
     <structure name="Name_array" field="nameArray" usage="optional" type="com.ardor3d.extension.model.collada.binding.core.DaeNameArray"/>
     <structure name="float_array" field="floatArray" usage="optional" type="com.ardor3d.extension.model.collada.binding.core.DaeFloatArray"/>
+    <structure name="double_array" field="doubleArray" usage="optional" type="com.ardor3d.extension.model.collada.binding.core.DaeDoubleArray"/>
     <structure name="int_array" field="intArray" usage="optional" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray"/>
     <structure name="technique_common">
       <structure name="accessor" field="commonAccessor" type="com.ardor3d.extension.model.collada.binding.core.DaeAccessor"/>

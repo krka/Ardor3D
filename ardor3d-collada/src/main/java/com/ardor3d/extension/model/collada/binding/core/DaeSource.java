@@ -15,12 +15,11 @@ import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
 public class DaeSource extends DaeTreeNode {
     private DaeNameArray nameArray;
     private DaeFloatArray floatArray;
+    private DaeDoubleArray doubleArray;
     private DaeSimpleIntegerArray intArray;
     private DaeAccessor commonAccessor;
 
-    public DaeSource() {
-    }
-
+    public DaeSource() {}
 
     public DaeNameArray getNameArray() {
         return nameArray;
@@ -28,6 +27,10 @@ public class DaeSource extends DaeTreeNode {
 
     public DaeFloatArray getFloatArray() {
         return floatArray;
+    }
+
+    public DaeDoubleArray getDoubleArray() {
+        return doubleArray;
     }
 
     public DaeSimpleIntegerArray getIntArray() {
@@ -38,16 +41,16 @@ public class DaeSource extends DaeTreeNode {
         return commonAccessor;
     }
 
-    public static DaeSource createNameArraySource(DaeNameArray nameArray) {
-        DaeSource result = new DaeSource();
+    public static DaeSource createNameArraySource(final DaeNameArray nameArray) {
+        final DaeSource result = new DaeSource();
 
         result.nameArray = nameArray;
 
         return result;
     }
 
-    public static DaeSource createFloatArraySource(DaeFloatArray floatArray) {
-        DaeSource result = new DaeSource();
+    public static DaeSource createFloatArraySource(final DaeFloatArray floatArray) {
+        final DaeSource result = new DaeSource();
 
         result.floatArray = floatArray;
 

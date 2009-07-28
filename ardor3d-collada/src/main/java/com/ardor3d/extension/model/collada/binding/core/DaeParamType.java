@@ -11,5 +11,5 @@
 package com.ardor3d.extension.model.collada.binding.core;
 
 public enum DaeParamType {
-    INT, BOOL, FLOAT, IDREF, NAME, FLOAT4X4
+    INT, BOOL, FLOAT, DOUBLE, IDREF, NAME, FLOAT4X4
 }

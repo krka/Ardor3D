@@ -14,9 +14,9 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
+import com.ardor3d.extension.model.collada.binding.ColladaException;
 import com.ardor3d.extension.model.collada.binding.DaeList;
 import com.ardor3d.extension.model.collada.binding.DaeTreeNode;
-import com.ardor3d.extension.model.collada.binding.ColladaException;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputShared;
 import com.ardor3d.extension.model.collada.binding.core.DaeInputUnshared;
@@ -24,8 +24,8 @@ import com.ardor3d.extension.model.collada.binding.core.DaeParam;
 import com.ardor3d.extension.model.collada.binding.core.DaeParamType;
 import com.ardor3d.extension.model.collada.binding.core.DaeSource;
 import com.ardor3d.extension.model.collada.binding.core.DaeVertices;
-import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class ColladaInputPipe {
@@ -126,6 +126,8 @@ public class ColladaInputPipe {
             if (param.getName() != null) {
                 if (param.getType() == DaeParamType.FLOAT) {
                     _buffer.put(_source.getFloatArray().getData()[index]);
+                } else if (param.getType() == DaeParamType.DOUBLE) {
+                    _buffer.put((float) _source.getDoubleArray().getData()[index]);
                 } else if (param.getType() == DaeParamType.INT) {
                     _buffer.put(_source.getIntArray().getData()[index]);
                 }
