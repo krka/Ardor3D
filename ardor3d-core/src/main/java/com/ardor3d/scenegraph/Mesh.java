@@ -18,6 +18,7 @@ import java.util.Stack;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -103,6 +104,8 @@ public class Mesh extends Spatial implements Renderable {
      * @return the mesh data object
      */
     public void setMeshData(final MeshData meshData) {
+        // invalidate collision tree cache
+        CollisionTreeManager.INSTANCE.removeCollisionTree(this);
         _meshData = meshData;
     }
 
