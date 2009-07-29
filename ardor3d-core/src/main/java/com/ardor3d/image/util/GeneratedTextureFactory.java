@@ -13,9 +13,13 @@ package com.ardor3d.image.util;
 import java.nio.ByteBuffer;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture.MagnificationFilter;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.util.TextureKey;
+import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class GeneratedTextureFactory {
 
@@ -91,5 +95,75 @@ public abstract class GeneratedTextureFactory {
         ts.setTexture(tex);
 
         return ts;
+    }
+
+    private static final Image blackImagex3;
+    private static final Image blackImagex4;
+    static {
+        final ByteBuffer blackDatax4 = BufferUtils.createByteBuffer(32 * 32 * 4);
+        for (int i = 32 * 32 * 4; i > 0; i--) {
+            blackDatax4.put((byte) 0);
+        }
+        blackDatax4.rewind();
+        blackImagex4 = new Image(Image.Format.RGBA8, 32, 32, blackDatax4);
+
+        final ByteBuffer blackDatax3 = BufferUtils.createByteBuffer(32 * 32 * 3);
+        for (int i = 32 * 32 * 3; i > 0; i--) {
+            blackDatax3.put((byte) 0);
+        }
+        blackDatax3.rewind();
+        blackImagex3 = new Image(Image.Format.RGBA8, 32, 32, blackDatax3);
+    }
+
+    /**
+     * Creates a 32x32 plain color Texture, of data type byte.
+     * 
+     * The image data is static and shared.
+     */
+    public static Texture2D createColorRGBBlack(final int components) {
+        final Image.Format fmt = (components == 4) ? Image.Format.RGBA8 : Image.Format.RGB8;
+        final TextureKey tkey = TextureKey.getKey(null, false, fmt, Texture.MinificationFilter.BilinearNoMipMaps);
+
+        final Texture2D texture = new Texture2D();
+        texture.setTextureKey(tkey);
+        texture.setMinificationFilter(tkey.getMinificationFilter());
+        texture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        texture.setImage((components == 4) ? blackImagex4 : blackImagex3);
+        return texture;
+    }
+
+    /**
+     * Creates a 32x32 plain color Texture, of data type byte.
+     * 
+     * @param color
+     * @param components
+     * @return Texture
+     */
+    public static Texture2D createColorRGBPlain(final ReadOnlyColorRGBA color, final int components) {
+        final Image.Format fmt = (components == 4) ? Image.Format.RGBA8 : Image.Format.RGB8;
+        final TextureKey tkey = TextureKey.getKey(null, false, fmt, Texture.MinificationFilter.BilinearNoMipMaps);
+
+        final ByteBuffer data = BufferUtils.createByteBuffer(32 * 32 * components);
+        for (int i = 0; i < 32 * 32 * components;) {
+            data.put((byte) (color.getRed() * 255f));
+            i++;
+            data.put((byte) (color.getGreen() * 255f));
+            i++;
+            data.put((byte) (color.getBlue() * 255f));
+            i++;
+            if (components > 3) {
+                data.put((byte) (color.getAlpha() * 255f));
+                i++;
+            }
+        }
+        data.rewind();
+        final Image image = new Image(fmt, 32, 32, data);
+
+        final Texture2D texture = new Texture2D();
+        texture.setTextureKey(tkey);
+        texture.setMinificationFilter(tkey.getMinificationFilter());
+        texture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        texture.setImage(image);
+        return texture;
     }
 }
