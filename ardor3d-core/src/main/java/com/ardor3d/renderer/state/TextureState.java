@@ -45,6 +45,7 @@ public class TextureState extends RenderState {
     public static final int MAX_TEXTURES = 32;
 
     protected static Texture _defaultTexture = null;
+    protected static boolean defaultTextureLoaded = false;
 
     public enum CorrectionType {
         /**
@@ -78,12 +79,16 @@ public class TextureState extends RenderState {
      * Constructor instantiates a new <code>TextureState</code> object.
      */
     public TextureState() {
-        if (_defaultTexture == null) {
-            try {
-                _defaultTexture = TextureManager.load(TextureState.class.getResource("notloaded.tga"),
-                        Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true);
-            } catch (final Exception e) {
-                logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
+        if (!defaultTextureLoaded) {
+            synchronized (logger) {
+                defaultTextureLoaded = true;
+
+                try {
+                    _defaultTexture = TextureManager.load(TextureState.class.getResource("notloaded.tga"),
+                            Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true);
+                } catch (final Exception e) {
+                    logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
+                }
             }
         }
     }
