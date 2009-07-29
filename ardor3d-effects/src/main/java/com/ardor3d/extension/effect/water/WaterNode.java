@@ -186,7 +186,7 @@ public class WaterNode extends Node {
      * @param r
      */
     private void initialize(final Renderer r) {
-        if (initialized) {
+        if (cam == null || initialized) {
             return;
         }
         initialized = true;
@@ -595,8 +595,10 @@ public class WaterNode extends Node {
             renderList = new ArrayList<Spatial>();
         }
         renderList.clear();
-        renderList.add(renderNode);
-        renderNode.setRenderState(clipState);
+        if (renderNode != null) {
+            renderList.add(renderNode);
+            renderNode.setRenderState(clipState);
+        }
     }
 
     /**
