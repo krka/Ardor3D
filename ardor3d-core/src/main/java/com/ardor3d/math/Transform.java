@@ -677,7 +677,10 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
         final Matrix3 newMatrix = result._matrix.set(_matrix);
         if (_rotationMatrix) {
             if (_uniformScale) {
-                newMatrix.transposeLocal().multiplyLocal(1.0 / _scale.getX());
+                final double sx = _scale.getX();
+                if (sx != 1) {
+                    newMatrix.transposeLocal().multiplyLocal(1.0 / sx);
+                }
             } else {
                 newMatrix.multiplyDiagonalPost(_scale, newMatrix).invertLocal();
             }
