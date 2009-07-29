@@ -35,6 +35,7 @@ public class AWTImageLoader implements ImageLoader {
     public static void registerLoader() {
         final AWTImageLoader loader = new AWTImageLoader();
         ImageLoaderUtil.registerHandler(".JPG", loader);
+        ImageLoaderUtil.registerHandler(".JPEG", loader);
         ImageLoaderUtil.registerHandler(".GIF", loader);
         ImageLoaderUtil.registerHandler(".PNG", loader);
         ImageLoaderUtil.registerHandler(".BMP", loader);
