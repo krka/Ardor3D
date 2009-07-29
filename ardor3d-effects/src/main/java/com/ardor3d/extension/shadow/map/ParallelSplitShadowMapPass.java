@@ -53,7 +53,6 @@ import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
@@ -526,27 +525,11 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
         for (final Spatial spat : _spatials) {
-            onDraw(spat, r);
+            spat.onDraw(r);
         }
         r.renderBuckets();
 
         _context.popEnforcedStates();
-    }
-
-    protected void onDraw(final Spatial spat, final Renderer r) {
-        if (spat instanceof Node) {
-            final List<Spatial> children = ((Node) spat).getChildren();
-            if (children != null) {
-                for (int i = 0; i < children.size(); i++) {
-                    onDraw(children.get(i), r);
-                }
-            }
-        } else {
-            final Mesh mesh = (Mesh) spat;
-            if (mesh.isCastsShadows()) {
-                mesh.onDraw(r);
-            }
-        }
     }
 
     /**
