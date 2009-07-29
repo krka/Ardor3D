@@ -25,6 +25,7 @@ import com.ardor3d.renderer.state.TextureState;
 public abstract class ImageLoaderUtil {
     private static final Logger logger = Logger.getLogger(ImageLoaderUtil.class.getName());
 
+    private static ImageLoader defaultLoader;
     private static Map<String, ImageLoader> loaders = Collections.synchronizedMap(new HashMap<String, ImageLoader>());
 
     static {
@@ -68,7 +69,10 @@ public abstract class ImageLoaderUtil {
 
         Image imageData = null;
         try {
-            final ImageLoader loader = loaders.get(fileExt.toLowerCase());
+            ImageLoader loader = loaders.get(fileExt.toLowerCase());
+            if (loader == null) {
+                loader = defaultLoader;
+            }
             if (loader != null) {
                 imageData = loader.load(stream, flipped);
             } else {
@@ -101,5 +105,9 @@ public abstract class ImageLoaderUtil {
 
     public static void unregisterHandler(final String format) {
         loaders.remove(format.toLowerCase());
+    }
+
+    public static void registerDefaultHandler(ImageLoader handler) {
+        defaultLoader = handler;
     }
 }
