@@ -42,6 +42,10 @@ public abstract class ObjectPool<T extends Poolable> {
     }
 
     public final void release(final T object) {
+        if (object == null) {
+            throw new RuntimeException("Should not release null objects into ObjectPool.");
+        }
+
         final List<T> objects = _pool.get();
         if (objects.size() < _maxSize) {
             reset(object);
