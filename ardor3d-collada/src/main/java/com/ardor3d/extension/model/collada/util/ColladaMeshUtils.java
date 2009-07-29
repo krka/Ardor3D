@@ -282,8 +282,9 @@ public class ColladaMeshUtils {
         int offset = 0;
         final int[] vals = polys.getPEntry().getData();
         for (final int length : polys.getVCount().getData()) {
-            final int[] currentVal = new int[length];
+            final int[] currentVal = new int[interval];
 
+            // first add the first two entries to the buffers.
             final int first = firstIndex + 0;
             System.arraycopy(vals, ((offset + 0) * interval), currentVal, 0, interval);
             ColladaInputPipe.processPipes(pipes, currentVal);
@@ -291,8 +292,6 @@ public class ColladaMeshUtils {
             int prev = firstIndex + 1;
             System.arraycopy(vals, ((offset + 1) * interval), currentVal, 0, interval);
             ColladaInputPipe.processPipes(pipes, currentVal);
-
-            // first add the first two entries to the buffers.
 
             // Now go through remaining entries and create a polygon as a triangle fan.
             for (int j = 2, max = length; j < max; j++) {
