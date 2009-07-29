@@ -176,6 +176,7 @@
   <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeSampler" abstract="true" post-set="postsetSpecifiedInAbstract">
     <value name="source" field="source"/>
     <value name="wrap_s" field="wrapS" usage="optional"/>
+    <value name="wrap_t" field="wrapT" usage="optional"/>
     <value name="minfilter" field="minfilter" usage="optional"/>
     <value name="magfilter" field="magfilter" usage="optional"/>
     <structure name="mipfilter" usage="optional"/>

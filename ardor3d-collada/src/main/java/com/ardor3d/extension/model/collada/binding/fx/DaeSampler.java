@@ -69,6 +69,7 @@ public abstract class DaeSampler extends DaeTreeNode {
 
     private String source;
     private DaeWrapMode wrapS;
+    private DaeWrapMode wrapT;
     private DaeMinFilter minfilter;
     private DaeMagFilter magfilter;
 
@@ -81,6 +82,13 @@ public abstract class DaeSampler extends DaeTreeNode {
      */
     public DaeWrapMode getWrapS() {
         return wrapS;
+    }
+
+    /**
+     * @return the wrapT
+     */
+    public DaeWrapMode getWrapT() {
+        return wrapT;
     }
 
     /**

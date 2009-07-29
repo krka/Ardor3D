@@ -224,6 +224,9 @@ public class ColladaMaterialUtils {
         if (sampler.getWrapS() != null) {
             texture.setWrap(WrapAxis.S, sampler.getWrapS().getArdor3dWrapMode());
         }
+        if (sampler.getWrapT() != null) {
+            texture.setWrap(WrapAxis.T, sampler.getWrapT().getArdor3dWrapMode());
+        }
 
         if (sampler instanceof DaeSampler2D) {
             final DaeSampler2D sampler2d = (DaeSampler2D) sampler;
