@@ -27,7 +27,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
  * </p>
  * 
  * <pre>
- * BlendState blend = DisplaySystem.getDisplaySystem().getRenderer().createBlendState();
+ * BlendState blend = new BlendState();
  * blend.setBlendEnabled(true);
  * blend.setSourceFunction(SourceFunction.SourceAlpha);
  * blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);

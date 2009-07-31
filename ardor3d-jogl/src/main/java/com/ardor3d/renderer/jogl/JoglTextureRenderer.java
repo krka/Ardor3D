@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -28,6 +27,7 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
@@ -39,17 +39,22 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * This class is used by JOGL to render textures. Users should <b>not </b> create this class directly. Instead, allow
- * DisplaySystem to create it for you.
+ * <p>
+ * This class is used by Ardor3D's JOGL implementation to render textures. Users should <b>not</b> create this class
+ * directly.
+ * </p>
+ * <p>
+ * TODO: Support multisample
+ * </p>
  * 
- * @see com.ardor3d.system.DisplaySystem#createTextureRenderer
+ * @see TextureRendererFactory
  */
 public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     private static final Logger logger = Logger.getLogger(JoglTextureRenderer.class.getName());
 
-    public JoglTextureRenderer(final DisplaySettings settings, final Target target, final Renderer parentRenderer,
-            final ContextCapabilities caps) {
-        super(settings, target, parentRenderer, caps);
+    public JoglTextureRenderer(final int width, final int height, final int depthBits, final int samples,
+            final Renderer parentRenderer, final ContextCapabilities caps) {
+        super(width, height, depthBits, samples, parentRenderer, caps);
 
         if (caps.getMaxFBOColorAttachments() > 1) {
             _attachBuffer = BufferUtils.createIntBuffer(caps.getMaxFBOColorAttachments());
@@ -352,7 +357,23 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             gl.glGenRenderbuffersEXT(buffer.limit(), buffer); // TODO Check <size> // generate id
             _depthRBID = buffer.get(0);
             gl.glBindRenderbufferEXT(GL.GL_RENDERBUFFER_EXT, _depthRBID);
-            gl.glRenderbufferStorageEXT(GL.GL_RENDERBUFFER_EXT, GL.GL_DEPTH_COMPONENT, _width, _height);
+            int format = GL.GL_DEPTH_COMPONENT;
+            if (_supportsDepthTexture && _depthBits > 0) {
+                switch (_depthBits) {
+                    case 16:
+                        format = GL.GL_DEPTH_COMPONENT16_ARB;
+                        break;
+                    case 24:
+                        format = GL.GL_DEPTH_COMPONENT24_ARB;
+                        break;
+                    case 32:
+                        format = GL.GL_DEPTH_COMPONENT32_ARB;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported depth: " + _depthBits);
+                }
+            }
+            gl.glRenderbufferStorageEXT(GL.GL_RENDERBUFFER_EXT, format, _width, _height);
         }
 
         if (_active == 0) {

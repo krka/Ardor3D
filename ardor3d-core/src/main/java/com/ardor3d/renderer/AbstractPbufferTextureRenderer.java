@@ -42,18 +42,16 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
     protected int _width = 0, _height = 0;
 
     protected final Renderer _parentRenderer;
-    protected final Target _target;
     protected final DisplaySettings _settings;
 
-    public AbstractPbufferTextureRenderer(final DisplaySettings settings, final Target target,
-            final Renderer parentRenderer) {
+    public AbstractPbufferTextureRenderer(final DisplaySettings settings, final Renderer parentRenderer,
+            final ContextCapabilities caps) {
         _parentRenderer = parentRenderer;
-        _target = target;
         _settings = settings;
 
         int width = settings.getWidth();
         int height = settings.getHeight();
-        if (true) { // !caps.isNonPowerOfTwoTextureSupported()) {
+        if (!caps.isNonPowerOfTwoTextureSupported()) {
             // Check if we have non-power of two sizes. If so, find the smallest power of two size that is greater than
             // the provided size.
             if (!MathUtils.isPowerOfTwo(width)) {

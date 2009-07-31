@@ -13,7 +13,6 @@ package com.ardor3d.util.stat.graph;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -46,9 +45,7 @@ public abstract class AbstractStatGrapher implements StatListener {
         _gWidth = width;
         _gHeight = height;
         // prepare our TextureRenderer
-        final DisplaySettings settings = new DisplaySettings(width, height, 0, 0, 0, 8, 0, 0, false, false);
-        _textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer, caps,
-                TextureRenderer.Target.Texture2D);
+        _textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, renderer, caps);
 
         if (_textureRenderer != null) {
             _textureRenderer.setBackgroundColor(new ColorRGBA(ColorRGBA.BLACK));

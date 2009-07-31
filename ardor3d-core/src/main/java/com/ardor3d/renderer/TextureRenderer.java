@@ -26,10 +26,6 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public interface TextureRenderer {
 
-    public enum Target {
-        Texture1D, Texture2D, TextureCubeMap,
-    }
-
     /**
      * <code>getCamera</code> retrieves the camera this renderer is using.
      * 

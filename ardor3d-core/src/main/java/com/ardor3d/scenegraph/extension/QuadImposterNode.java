@@ -16,7 +16,6 @@ import java.nio.FloatBuffer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
@@ -161,9 +160,8 @@ public class QuadImposterNode extends Node {
     }
 
     private void init(final Renderer renderer) {
-        final DisplaySettings settings = new DisplaySettings(_twidth, _theight, 0, 0, 0, 8, 0, 0, false, false);
-        _tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer, ContextManager
-                .getCurrentContext().getCapabilities(), TextureRenderer.Target.Texture2D);
+        _tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_twidth, _theight, renderer, ContextManager
+                .getCurrentContext().getCapabilities());
 
         _tRenderer.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
         resetTexture();

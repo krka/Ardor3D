@@ -29,11 +29,13 @@ import org.lwjgl.opengl.RenderTexture;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
@@ -45,10 +47,12 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * This class is used by LWJGL to render textures. Users should <b>not </b> create this class directly. Instead, allow
- * DisplaySystem to create it for you.
+ * <p>
+ * This class is used by Ardor3D's LWJGL implementation to render textures. Users should <b>not </b> create this class
+ * directly.
+ * </p>
  * 
- * @see com.ardor3d.system.DisplaySystem#createTextureRenderer
+ * @see TextureRendererFactory
  */
 public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private static final Logger logger = Logger.getLogger(LwjglPbufferTextureRenderer.class.getName());
@@ -56,31 +60,19 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     /* Pbuffer instance */
     private Pbuffer _pbuffer;
 
-    final int _caps;
-
     private RenderTexture _texture;
 
-    public LwjglPbufferTextureRenderer(final DisplaySettings settings, final TextureRenderer.Target target,
-            final Renderer parentRenderer) {
-        super(settings, target, parentRenderer);
-
-        _caps = Pbuffer.getCapabilities();
+    public LwjglPbufferTextureRenderer(final DisplaySettings settings, final Renderer parentRenderer,
+            final ContextCapabilities caps) {
+        super(settings, parentRenderer, caps);
 
         int pTarget = RenderTexture.RENDER_TEXTURE_2D;
 
-        // Support this?
-        // pTarget = RenderTexture.RENDER_TEXTURE_RECTANGLE;
-
-        switch (target) {
-            case Texture1D:
-                pTarget = RenderTexture.RENDER_TEXTURE_1D;
-                break;
-            case TextureCubeMap:
-                pTarget = RenderTexture.RENDER_TEXTURE_CUBE_MAP;
-                break;
+        if (!MathUtils.isPowerOfTwo(_width) || !MathUtils.isPowerOfTwo(_height)) {
+            pTarget = RenderTexture.RENDER_TEXTURE_RECTANGLE;
         }
 
-        // boolean useRGB, boolean useRGBA, boolean useDepth, boolean isRectangle, int target, int mipmaps
+        // signature: boolean useRGB, boolean useRGBA, boolean useDepth, boolean isRectangle, int target, int mipmaps
         _texture = new RenderTexture(false, true, true, pTarget == RenderTexture.RENDER_TEXTURE_RECTANGLE, pTarget, 0);
 
         setMultipleTargets(false);
@@ -383,7 +375,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 ContextManager.removeContext(_pbuffer);
             }
         } else {
-            if ((_caps & Pbuffer.RENDER_TEXTURE_SUPPORTED) != 0) {
+            if ((Pbuffer.getCapabilities() & Pbuffer.RENDER_TEXTURE_SUPPORTED) != 0) {
                 logger.fine("Render to Texture Pbuffer supported!");
                 if (_texture == null) {
                     logger.fine("No RenderTexture used in init, falling back to Copy Texture PBuffer.");

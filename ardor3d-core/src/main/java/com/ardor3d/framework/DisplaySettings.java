@@ -23,6 +23,20 @@ public class DisplaySettings {
     private final boolean _stereo;
     private final CanvasRenderer _shareContext;
 
+    public DisplaySettings(final int width, final int height, final int depthBits, final int samples) {
+        _width = width;
+        _height = height;
+        _colorDepth = 0;
+        _frequency = 0;
+        _alphaBits = 0;
+        _depthBits = depthBits;
+        _stencilBits = 0;
+        _samples = samples;
+        _fullScreen = false;
+        _stereo = false;
+        _shareContext = null;
+    }
+
     public DisplaySettings(final int width, final int height, final int colorDepth, final int frequency,
             final boolean fullScreen) {
         _width = width;

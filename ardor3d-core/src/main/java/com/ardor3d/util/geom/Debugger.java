@@ -17,7 +17,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
@@ -545,9 +544,8 @@ public final class Debugger {
         bufTexture.setRenderToTextureFormat(rttFormat);
 
         if (bufTexRend == null) {
-            final DisplaySettings settings = new DisplaySettings(256, 256, 0, 0, 0, 8, 0, 0, false, false);
-            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, ContextManager
-                    .getCurrentContext().getCapabilities(), TextureRenderer.Target.Texture2D);
+            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(256, 256, r, ContextManager
+                    .getCurrentContext().getCapabilities());
             bufTexRend.setupTexture(bufTexture);
         }
         int width = cam.getWidth();

@@ -113,8 +113,8 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     private void initRtt(final Renderer renderer) {
         inited = true;
 
-        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, renderer, ContextManager
-                .getCurrentContext().getCapabilities(), TextureRenderer.Target.Texture2D);
+        textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_settings, false, renderer,
+                ContextManager.getCurrentContext().getCapabilities());
 
         if (textureRenderer == null) {
             final BasicText t = BasicText.createDefaultTextLabel("Text", "RTT not supported on this computer.");

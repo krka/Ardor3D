@@ -26,10 +26,11 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
@@ -40,6 +41,14 @@ import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * <p>
+ * This class is used by Ardor3D's JOGL implementation to render textures. Users should <b>not </b> create this class
+ * directly.
+ * </p>
+ * 
+ * @see TextureRendererFactory
+ */
 public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     private static final Logger logger = Logger.getLogger(JoglPbufferTextureRenderer.class.getName());
 
@@ -51,9 +60,9 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
     // HACK: needed to get the parent context in here somehow...
     public static GLContext _parentContext;
 
-    public JoglPbufferTextureRenderer(final DisplaySettings settings, final TextureRenderer.Target target,
-            final Renderer parentRenderer) {
-        super(settings, target, parentRenderer);
+    public JoglPbufferTextureRenderer(final DisplaySettings settings, final Renderer parentRenderer,
+            final ContextCapabilities caps) {
+        super(settings, parentRenderer, caps);
         setMultipleTargets(false);
     }
 
@@ -240,6 +249,13 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             // Make our GLPbuffer...
             final GLDrawableFactory fac = GLDrawableFactory.getFactory();
             final GLCapabilities caps = new GLCapabilities();
+            caps.setHardwareAccelerated(true);
+            caps.setDoubleBuffered(true);
+            caps.setAlphaBits(_settings.getAlphaBits());
+            caps.setDepthBits(_settings.getDepthBits());
+            caps.setNumSamples(_settings.getSamples());
+            caps.setSampleBuffers(_settings.getSamples() != 0);
+            caps.setStencilBits(_settings.getStencilBits());
             caps.setDoubleBuffered(false);
             _pbuffer = fac.createGLPbuffer(caps, null, _width, _height, _parentContext);
             _context = _pbuffer.getContext();

@@ -11,11 +11,24 @@
 package com.ardor3d.renderer;
 
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.renderer.TextureRenderer.Target;
 
 public interface TextureRendererProvider {
 
-    TextureRenderer createTextureRenderer(DisplaySettings settings, Renderer renderer, ContextCapabilities caps,
-            Target target);
+    /**
+     * @see TextureRendererFactory#createTextureRenderer(int, int, Renderer, ContextCapabilities)
+     */
+    TextureRenderer createTextureRenderer(int width, int height, Renderer renderer, ContextCapabilities caps);
+
+    /**
+     * @see TextureRendererFactory#createTextureRenderer(int, int, int, int, Renderer, ContextCapabilities)
+     */
+    TextureRenderer createTextureRenderer(int width, int height, int depthBits, int samples, Renderer renderer,
+            ContextCapabilities caps);
+
+    /**
+     * @see TextureRendererFactory#createTextureRenderer(DisplaySettings, boolean, Renderer, ContextCapabilities)
+     */
+    TextureRenderer createTextureRenderer(DisplaySettings settings, boolean forcePbuffer, Renderer renderer,
+            ContextCapabilities caps);
 
 }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -207,10 +206,9 @@ public class WaterNode extends Node {
         }
 
         if (isSupported()) {
-            final DisplaySettings settings = new DisplaySettings(cam.getWidth() / renderScale, cam.getHeight()
-                    / renderScale, 0, 0, 0, 8, 0, 0, false, false);
-            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, caps,
-                    TextureRenderer.Target.Texture2D);
+            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth() / renderScale, cam
+                    .getHeight()
+                    / renderScale, r, caps);
 
             tRenderer.setMultipleTargets(true);
             tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));

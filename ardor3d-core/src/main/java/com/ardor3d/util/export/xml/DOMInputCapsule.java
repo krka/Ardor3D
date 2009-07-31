@@ -797,7 +797,6 @@ public class DOMInputCapsule implements InputCapsule {
         TextureState ret = null;
         try {
             ret = (TextureState) readSavableFromCurrentElem(null);
-            // Renderer r = DisplaySystem.getDisplaySystem().getRenderer();
             final Savable[] savs = readSavableArray("texture", new Texture[0]);
             for (int i = 0; i < savs.length; i++) {
                 Texture t = (Texture) savs[i];
@@ -1226,6 +1225,7 @@ public class DOMInputCapsule implements InputCapsule {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T[] readEnumArray(final String name, final Class<T> enumType, final T[] defVal)
             throws IOException {
         final String[] eVals = readStringArray(name, null);

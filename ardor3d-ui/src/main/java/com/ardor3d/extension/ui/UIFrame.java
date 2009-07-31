@@ -21,7 +21,6 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.util.UIQuad;
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.MagnificationFilter;
@@ -34,7 +33,6 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
-import com.ardor3d.renderer.TextureRenderer.Target;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -495,10 +493,8 @@ public class UIFrame extends UIContainer {
         // Check for and create a texture renderer if none exists yet.
         if (UIFrame._textureRenderer == null) {
             final Camera cam = Camera.getCurrentCamera();
-            final DisplaySettings settings = new DisplaySettings(cam.getWidth(), cam.getHeight(), 0, 0, 8, 16, 0, 0,
-                    false, false);
-            UIFrame._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, renderer,
-                    ContextManager.getCurrentContext().getCapabilities(), Target.Texture2D);
+            UIFrame._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth(), cam
+                    .getHeight(), renderer, ContextManager.getCurrentContext().getCapabilities());
             UIFrame._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 0f, 1f, 0f));
             UIFrame._textureRenderer.setMultipleTargets(true);
         }

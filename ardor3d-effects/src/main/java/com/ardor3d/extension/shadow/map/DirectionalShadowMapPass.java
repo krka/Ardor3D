@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -275,10 +274,8 @@ public class DirectionalShadowMapPass extends Pass {
         _shadowMapTexture.setDepthMode(DepthTextureMode.Intensity);
 
         // configure the texture renderer to output to the texture
-        final DisplaySettings settings = new DisplaySettings(_shadowMapSize, _shadowMapSize, 0, 0, 0, 8, 0, 0, false,
-                false);
-        _shadowMapRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, r, caps,
-                TextureRenderer.Target.Texture2D);
+        _shadowMapRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_shadowMapSize, _shadowMapSize, r,
+                caps);
         _shadowMapRenderer.setupTexture(_shadowMapTexture);
 
         // render state to apply the shadow map texture

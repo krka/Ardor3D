@@ -53,7 +53,7 @@ public interface NativeCanvas extends Canvas {
     void setTitle(String title);
 
     /**
-     * Sets one or more icons for the DisplaySystem.
+     * Sets one or more icons for the Canvas.
      * <p>
      * As a reference for usual platforms on number of icons and their sizes:
      * <ul>

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -39,50 +38,49 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected int _active;
 
-    protected int _fboID = 0, _depthRBID = 0, _width = 0, _height = 0;
+    protected int _fboID = 0, _depthRBID = 0, _width = 0, _height = 0, _samples = 0, _depthBits = 0;
 
     protected IntBuffer _attachBuffer = null;
     protected boolean _usingDepthRB = false;
+    protected final boolean _supportsDepthTexture;
 
     protected final Renderer _parentRenderer;
-    protected final Target _target;
 
-    protected int _samples = 0;
-
-    public AbstractFBOTextureRenderer(final DisplaySettings settings, final Target target,
+    public AbstractFBOTextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         _parentRenderer = parentRenderer;
-        _target = target;
-        _samples = settings.getSamples();
+        _samples = samples;
+        _depthBits = depthBits;
+        _supportsDepthTexture = caps.isDepthTextureSupported();
 
-        int width = settings.getWidth();
-        int height = settings.getHeight();
+        int w = width;
+        int h = height;
         if (!caps.isNonPowerOfTwoTextureSupported()) {
             // Check if we have non-power of two sizes. If so, find the smallest power of two size that is greater than
             // the provided size.
-            if (!MathUtils.isPowerOfTwo(width)) {
+            if (!MathUtils.isPowerOfTwo(w)) {
                 int newWidth = 2;
                 do {
                     newWidth <<= 1;
 
-                } while (newWidth < width);
-                width = newWidth;
+                } while (newWidth < w);
+                w = newWidth;
             }
 
-            if (!MathUtils.isPowerOfTwo(height)) {
+            if (!MathUtils.isPowerOfTwo(h)) {
                 int newHeight = 2;
                 do {
                     newHeight <<= 1;
 
-                } while (newHeight < height);
-                height = newHeight;
+                } while (newHeight < h);
+                h = newHeight;
             }
         }
 
-        logger.fine("Creating FBO sized: " + width + " x " + height);
+        logger.fine("Creating FBO sized: " + w + " x " + h);
 
-        _width = width;
-        _height = height;
+        _width = w;
+        _height = h;
 
         _camera.resize(_width, _height);
         _camera.setFrustum(1.0f, 1000.0f, -0.50f, 0.50f, 0.50f, -0.50f);
@@ -206,10 +204,6 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     public int getHeight() {
         return _height;
-    }
-
-    public int getSamples() {
-        return _samples;
     }
 
     public Renderer getParentRenderer() {

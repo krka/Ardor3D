@@ -428,8 +428,8 @@ public final class PropertiesDialog extends JDialog {
     }
 
     /**
-     * <code>setUpRendererChooser</code> sets the list of available renderers. Data is obtained from the
-     * <code>DisplaySystem</code> class. The renderer specified by GameSettings is used as the default value.
+     * <code>setUpRendererChooser</code> sets the list of available renderers. The renderer specified by GameSettings is
+     * used as the default value.
      * 
      * @return the list of renderers.
      */
@@ -640,8 +640,6 @@ public final class PropertiesDialog extends JDialog {
             } else if ("JOGL".equals(renderer)) {
                 // TODO: can we implement this?
             }
-            // final DisplaySystem disp = DisplaySystem.initDisplaySystem(renderer);
-            // valid = (disp != null) ? disp.isValidDisplayMode(width, height, depth, freq) : false;
             ready = true;
         }
 
