@@ -124,6 +124,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         caps.setNumSamples(_settings.getSamples());
         caps.setSampleBuffers(_settings.getSamples() != 0);
         caps.setStereo(_settings.isStereo());
+        caps.setStencilBits(_settings.getStencilBits());
 
         // Create the OpenGL canvas,
         _glCanvas = new GLCanvas(caps);
