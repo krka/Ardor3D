@@ -390,8 +390,7 @@ public class JoglTextureStateUtil {
 
                             for (int m = 0; m < max; m++) {
                                 final int width = Math.max(1, image.getWidth() >> m);
-                                final int height = type != Type.OneDimensional ? Math.max(1, image.getHeight() >> m)
-                                        : 0;
+                                final int height = Math.max(1, image.getHeight() >> m);
 
                                 data.position(pos);
                                 data.limit(pos + mipSizes[m]);

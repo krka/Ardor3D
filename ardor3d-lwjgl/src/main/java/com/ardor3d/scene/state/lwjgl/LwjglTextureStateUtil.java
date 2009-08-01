@@ -398,8 +398,7 @@ public abstract class LwjglTextureStateUtil {
 
                             for (int m = 0; m < max; m++) {
                                 final int width = Math.max(1, image.getWidth() >> m);
-                                final int height = type != Type.OneDimensional ? Math.max(1, image.getHeight() >> m)
-                                        : 0;
+                                final int height = Math.max(1, image.getHeight() >> m);
 
                                 data.position(pos);
                                 data.limit(pos + mipSizes[m]);
@@ -584,6 +583,9 @@ public abstract class LwjglTextureStateUtil {
                 if (textureId == 0) {
                     // texture not yet loaded.
                     // this will load and bind and set the records...
+                    if (texture.getType() != Type.TwoDimensional) {
+                        System.err.println("hi");
+                    }
                     load(texture, i);
                     textureId = texture.getTextureIdForContext(context.getGlContextRep());
                     if (textureId == 0) {
