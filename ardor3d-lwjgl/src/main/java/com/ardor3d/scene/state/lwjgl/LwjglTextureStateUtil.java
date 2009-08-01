@@ -583,9 +583,6 @@ public abstract class LwjglTextureStateUtil {
                 if (textureId == 0) {
                     // texture not yet loaded.
                     // this will load and bind and set the records...
-                    if (texture.getType() != Type.TwoDimensional) {
-                        System.err.println("hi");
-                    }
                     load(texture, i);
                     textureId = texture.getTextureIdForContext(context.getGlContextRep());
                     if (textureId == 0) {
