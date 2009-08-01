@@ -16,11 +16,14 @@ package com.ardor3d.spline;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyQuaternion;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 
@@ -31,10 +34,10 @@ import com.ardor3d.scenegraph.Point;
 public class Curve {
 
     /** @see #setControlPoints(List) */
-    private List<ControlPoint> _controlPoints;
+    private List<ControlPoint> _controlPoints = Collections.emptyList();
 
     /** @see #setSpline(Spline) */
-    private Spline _spline;
+    private Spline _spline = new CatmullRomSpline();
 
     /**
      * Creates a new instance of <code>Curve</code>.
@@ -61,7 +64,7 @@ public class Curve {
      * @return A <code>Point</code> containing all the curve points, will not be <code>null</code>.
      */
     public Point toRenderablePoint(final boolean includeEndPoints) {
-        final Collection<Vector3> points = getPoints(includeEndPoints);
+        final Collection<ReadOnlyVector3> points = getPoints(includeEndPoints);
 
         final Vector3[] pointsArray = new Vector3[points.size()];
 
@@ -118,11 +121,20 @@ public class Curve {
         return new Line("curve", vertex, normal, color, texture);
     }
 
-    public List<Vector3> getPoints(final boolean includeEndPoints) {
-        final List<Vector3> points = new ArrayList<Vector3>();
+    /**
+     * Returns all the points that make up this curve.
+     * 
+     * @param includeEndPoints
+     *            <code>true</code> to include the end control points, <code>false</code> to just include the actual
+     *            points making up this curve.
+     * @return A list of control points, will not be <code>null</code> but may be empty if this curve has no control
+     *         points.
+     */
+    public List<ReadOnlyVector3> getPoints(final boolean includeEndPoints) {
+        final List<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
 
         for (final ControlPoint cp : getControlPoints()) {
-            points.add((Vector3) cp.getPoint()); // TODO: Potentially unsafe cast here
+            points.add(cp.getPoint());
         }
 
         if (!includeEndPoints && points.size() >= 2) {
@@ -133,18 +145,67 @@ public class Curve {
         return points;
     }
 
+    /**
+     * Returns all the rotations that make up this curve.
+     * 
+     * @param includeEndRotations
+     *            <code>true</code> to include the end rotations, <code>false</code> to just include the actual
+     *            rotations making up this curve.
+     * @return A list of rotations, will not be <code>null</code> but may be empty if this curve has no rotations.
+     */
+    public List<ReadOnlyQuaternion> getRotations(final boolean includeEndRotations) {
+        final List<ReadOnlyQuaternion> rotations = new ArrayList<ReadOnlyQuaternion>();
+
+        for (final ControlPoint cp : getControlPoints()) {
+            rotations.add(cp.getRotation());
+        }
+
+        if (!includeEndRotations && rotations.size() >= 2) {
+            rotations.remove(0);
+            rotations.remove(rotations.size() - 1);
+        }
+
+        return rotations;
+    }
+
+    /**
+     * @param controlPoints
+     *            The new control points, can not be <code>null</code>.
+     * @see #getControlPoints()
+     */
     public void setControlPoints(final List<ControlPoint> controlPoints) {
+        if (null == controlPoints) {
+            throw new IllegalArgumentException("controlPoints can not be null!");
+        }
+
         _controlPoints = controlPoints;
     }
 
+    /**
+     * @return The control points making up this curve, will not be <code>null</code>.
+     * @see #setControlPoints(List)
+     */
     public List<ControlPoint> getControlPoints() {
         return _controlPoints;
     }
 
+    /**
+     * @param spline
+     *            The new spline, can not be <code>null</code>.
+     * @see #getSpline()
+     */
     public void setSpline(final Spline spline) {
+        if (null == spline) {
+            throw new IllegalArgumentException("spline can not be null!");
+        }
+
         _spline = spline;
     }
 
+    /**
+     * @return The spline, will not be <code>null</code>.
+     * @see #setSpline(Spline)
+     */
     public Spline getSpline() {
         return _spline;
     }
