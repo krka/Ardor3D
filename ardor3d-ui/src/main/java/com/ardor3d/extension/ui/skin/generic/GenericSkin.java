@@ -22,7 +22,9 @@ import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UIState;
+import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITooltip;
+import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.backdrop.GradientBackdrop;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
@@ -74,6 +76,151 @@ public class GenericSkin extends Skin {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    protected void applyToTab(final UITab component) {
+
+        component.getMargin().set(1, 1, 1, 1);
+        component.getPadding().set(2, 14, 2, 14);
+
+        // State values...
+        final UIBorder defaultBorder = new ImageBorder(
+        // left
+                component.getPlacement() != TabPlacement.EAST ? new SubTex(_sharedTex, 47, 11, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // right
+                component.getPlacement() != TabPlacement.WEST ? new SubTex(_sharedTex, 77, 11, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top
+                component.getPlacement() != TabPlacement.SOUTH ? new SubTex(_sharedTex, 51, 7, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // bottom
+                component.getPlacement() != TabPlacement.NORTH ? new SubTex(_sharedTex, 51, 21, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top left
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 7, 4, 4)
+                        : null,
+                // top right
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 7, 4, 4)
+                        : null,
+                // bottom left
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 21, 4, 4)
+                        : null,
+                // bottom right
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 21, 4, 4)
+                        : null);
+
+        final UIBorder overBorder = new ImageBorder(
+        // left
+                component.getPlacement() != TabPlacement.EAST ? new SubTex(_sharedTex, 47, 33, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // right
+                component.getPlacement() != TabPlacement.WEST ? new SubTex(_sharedTex, 77, 33, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top
+                component.getPlacement() != TabPlacement.SOUTH ? new SubTex(_sharedTex, 51, 29, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // bottom
+                component.getPlacement() != TabPlacement.NORTH ? new SubTex(_sharedTex, 51, 43, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top left
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 29, 4, 4)
+                        : null,
+                // top right
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 29, 4, 4)
+                        : null,
+                // bottom left
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 43, 4, 4)
+                        : null,
+                // bottom right
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 43, 4, 4)
+                        : null);
+
+        final UIBorder pressedBorder = new ImageBorder(
+        // left
+                component.getPlacement() != TabPlacement.EAST ? new SubTex(_sharedTex, 47, 55, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // right
+                component.getPlacement() != TabPlacement.WEST ? new SubTex(_sharedTex, 77, 55, 4, 10) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top
+                component.getPlacement() != TabPlacement.SOUTH ? new SubTex(_sharedTex, 51, 51, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // bottom
+                component.getPlacement() != TabPlacement.NORTH ? new SubTex(_sharedTex, 51, 65, 26, 4) : new SubTex(
+                        _sharedTex, 0, 0, 0, 0),
+                // top left
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 51, 4, 4)
+                        : null,
+                // top right
+                component.getPlacement() != TabPlacement.SOUTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 51, 4, 4)
+                        : null,
+                // bottom left
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.EAST ? new SubTex(
+                        _sharedTex, 47, 65, 4, 4)
+                        : null,
+                // bottom right
+                component.getPlacement() != TabPlacement.NORTH && component.getPlacement() != TabPlacement.WEST ? new SubTex(
+                        _sharedTex, 77, 65, 4, 4)
+                        : null);
+
+        final ColorRGBA upTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
+        final ColorRGBA upBottom = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
+        final GradientBackdrop upBack = new GradientBackdrop(upTop, upTop, upBottom, upBottom);
+        final ColorRGBA downTop = new ColorRGBA(181 / 255f, 181 / 255f, 181 / 255f, 1);
+        final ColorRGBA downBottom = new ColorRGBA(232 / 255f, 232 / 255f, 232 / 255f, 1);
+        final GradientBackdrop downBack = new GradientBackdrop(downTop, downTop, downBottom, downBottom);
+        // DEFAULT
+        {
+            component.getDefaultState().setBorder(defaultBorder);
+            component.getDefaultState().setBackdrop(upBack);
+            component.getDefaultState().setForegroundColor(ColorRGBA.BLACK);
+        }
+        // DISABLED
+        {
+            component.getDisabledState().setBorder(defaultBorder);
+            component.getDisabledState().setBackdrop(upBack);
+            component.getDisabledState().setForegroundColor(ColorRGBA.GRAY);
+
+            component.getDisabledSelectedState().setBorder(pressedBorder);
+            component.getDisabledSelectedState().setBackdrop(downBack);
+            component.getDisabledSelectedState().setForegroundColor(ColorRGBA.GRAY);
+        }
+        // MOUSE OVER
+        {
+            final ColorRGBA top = new ColorRGBA(241 / 255f, 241 / 255f, 241 / 255f, 1);
+            final ColorRGBA bottom = new ColorRGBA(216 / 255f, 216 / 255f, 216 / 255f, 1);
+            final GradientBackdrop back = new GradientBackdrop(top, top, bottom, bottom);
+
+            component.getMouseOverState().setBorder(overBorder);
+            component.getMouseOverState().setBackdrop(back);
+            component.getMouseOverState().setForegroundColor(ColorRGBA.BLACK);
+        }
+        // PRESSED AND SELECTED
+        {
+            component.getPressedState().setBorder(pressedBorder);
+            component.getPressedState().setBackdrop(downBack);
+            component.getPressedState().setForegroundColor(ColorRGBA.BLACK);
+
+            component.getSelectedState().setBorder(pressedBorder);
+            component.getSelectedState().setBackdrop(downBack);
+            component.getSelectedState().setForegroundColor(ColorRGBA.BLACK);
+
+            component.getMouseOverSelectedState().setBorder(pressedBorder);
+            component.getMouseOverSelectedState().setBackdrop(downBack);
+            component.getMouseOverSelectedState().setForegroundColor(ColorRGBA.GRAY);
+        }
     }
 
     @Override

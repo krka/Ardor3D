@@ -18,6 +18,7 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITooltip;
 
 public abstract class Skin {
@@ -26,7 +27,9 @@ public abstract class Skin {
         // NOTE: Test for subclasses first, then parent class
 
         // 1. BUTTON TYPES
-        if (component instanceof UICheckBox) {
+        if (component instanceof UITab) {
+            applyToTab((UITab) component);
+        } else if (component instanceof UICheckBox) {
             applyToCheckBox((UICheckBox) component);
         } else if (component instanceof UIRadioButton) {
             applyToRadioButton((UIRadioButton) component);
@@ -53,6 +56,8 @@ public abstract class Skin {
             applyToFrame((UIFrame) component);
         }
     }
+
+    protected abstract void applyToTab(UITab component);
 
     protected abstract void applyToCheckBox(UICheckBox component);
 

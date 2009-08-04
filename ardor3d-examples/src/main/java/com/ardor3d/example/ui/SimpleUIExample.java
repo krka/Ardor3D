@@ -20,6 +20,8 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UITabbedPane;
+import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
@@ -128,8 +130,12 @@ public class SimpleUIExample extends ExampleBase {
         fpslabel.setLayoutData(BorderLayoutData.SOUTH);
         panel.add(fpslabel);
 
+        final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
+        pane.add(panel, "panel 1");
+        pane.add(new UILabel("You are on panel two."), "panel 2");
+
         final UIFrame frame = new UIFrame("Sample");
-        frame.setContentPanel(panel);
+        frame.setContentPanel(pane);
         frame.updateMinimumSizeFromContents();
         frame.layout();
         frame.pack();
