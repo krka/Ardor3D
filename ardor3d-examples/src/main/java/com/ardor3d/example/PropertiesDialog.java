@@ -353,8 +353,9 @@ public final class PropertiesDialog extends JDialog {
             depthString = depthString.substring(0, depthString.indexOf(' '));
             if (depthString.equals("?")) {
                 depth = DisplayMode.BIT_DEPTH_MULTI;
+            } else {
+                depth = Integer.parseInt(depthString);
             }
-            depth = Integer.parseInt(depthString);
         }
 
         final String freqString = (String) displayFreqCombo.getSelectedItem();
