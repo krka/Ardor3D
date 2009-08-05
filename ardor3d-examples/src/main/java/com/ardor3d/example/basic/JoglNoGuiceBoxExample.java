@@ -89,6 +89,7 @@ public class JoglNoGuiceBoxExample implements Scene {
             _canvas.draw(null);
             Thread.yield();
         }
+        _canvas.getCanvasRenderer().setCurrentContext();
 
         // Done, do cleanup
         ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
@@ -103,8 +104,6 @@ public class JoglNoGuiceBoxExample implements Scene {
     private JoglCanvas initJogl() {
         final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
         final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
-        // set us to single canvas mode for best speed
-        JoglCanvasRenderer.MULTI_CANVAS_MODE = false;
         return new JoglCanvas(canvasRenderer, settings);
     }
 
