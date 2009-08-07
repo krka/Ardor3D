@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.scenegraph.controllers.interpolation;
+package com.ardor3d.scenegraph.controller.interpolation;
 
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.type.ReadOnlyQuaternion;

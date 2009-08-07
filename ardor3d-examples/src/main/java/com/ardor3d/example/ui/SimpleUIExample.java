@@ -38,7 +38,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;

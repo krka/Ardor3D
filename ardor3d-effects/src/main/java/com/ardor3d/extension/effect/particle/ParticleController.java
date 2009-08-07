@@ -18,7 +18,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
-import com.ardor3d.scenegraph.ComplexSpatialController;
+import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;

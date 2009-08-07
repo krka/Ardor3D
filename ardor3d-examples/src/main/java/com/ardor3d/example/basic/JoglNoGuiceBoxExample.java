@@ -30,7 +30,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.TextureManager;

@@ -30,7 +30,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.PQTorus;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;

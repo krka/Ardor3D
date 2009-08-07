@@ -13,7 +13,7 @@ package com.ardor3d.example.interpolation;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Quaternion;
-import com.ardor3d.scenegraph.controllers.interpolation.QuaternionInterpolationController;
+import com.ardor3d.scenegraph.controller.interpolation.QuaternionInterpolationController;
 import com.google.inject.Inject;
 
 /**

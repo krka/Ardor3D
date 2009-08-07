@@ -24,7 +24,7 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;

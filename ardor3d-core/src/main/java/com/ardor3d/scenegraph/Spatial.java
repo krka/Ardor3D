@@ -33,6 +33,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.event.DirtyEventListener;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -918,7 +919,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * 
      * @param controller
      *            The SpatialController to add
-     * @see com.ardor3d.scenegraph.SpatialController
+     * @see com.ardor3d.scenegraph.controller.SpatialController
      */
     public void addController(final SpatialController<?> controller) {
         if (_controllers == null) {
@@ -933,7 +934,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * @param controller
      *            The SpatialController to remove
      * @return True if the SpatialController was in the list to remove.
-     * @see com.ardor3d.scenegraph.SpatialController
+     * @see com.ardor3d.scenegraph.controller.SpatialController
      */
     public boolean removeController(final SpatialController<?> controller) {
         if (_controllers == null) {
@@ -948,7 +949,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * @param index
      *            The index of the controller to remove
      * @return The SpatialController removed or null if nothing was removed.
-     * @see com.ardor3d.scenegraph.SpatialController
+     * @see com.ardor3d.scenegraph.controller.SpatialController
      */
     public SpatialController<?> removeController(final int index) {
         if (_controllers == null) {
@@ -960,7 +961,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * Removes all Controllers from this Spatial's list of controllers.
      * 
-     * @see com.ardor3d.scenegraph.SpatialController
+     * @see com.ardor3d.scenegraph.controller.SpatialController
      */
     public void clearControllers() {
         if (_controllers != null) {
@@ -974,7 +975,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * @param i
      *            The index to get a controller from.
      * @return The controller at index i.
-     * @see com.ardor3d.scenegraph.SpatialController
+     * @see com.ardor3d.scenegraph.controller.SpatialController
      */
     public SpatialController<?> getController(final int i) {
         if (_controllers == null) {

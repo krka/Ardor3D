@@ -13,7 +13,7 @@ package com.ardor3d.util.stat.graph;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.SpatialController;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.CullHint;
 
 /**

@@ -14,7 +14,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.scenegraph.controllers.interpolation.DefaultColorInterpolationController;
+import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
 import com.google.inject.Inject;
 
 /**

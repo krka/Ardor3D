@@ -8,12 +8,13 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.scenegraph;
+package com.ardor3d.scenegraph.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;

@@ -8,13 +8,13 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.scenegraph.controllers.interpolation;
+package com.ardor3d.scenegraph.controller.interpolation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.scenegraph.ComplexSpatialController;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 
 /**
  * InterpolationController class is an abstract class containing all the stuff common to controllers interpolating

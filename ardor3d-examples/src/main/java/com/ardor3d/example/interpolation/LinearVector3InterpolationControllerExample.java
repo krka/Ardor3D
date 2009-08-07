@@ -16,8 +16,8 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
-import com.ardor3d.scenegraph.controllers.interpolation.LinearVector3InterpolationController;
-import com.ardor3d.scenegraph.controllers.interpolation.Vector3InterpolationController.UpdateField;
+import com.ardor3d.scenegraph.controller.interpolation.LinearVector3InterpolationController;
+import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationController.UpdateField;
 import com.google.inject.Inject;
 
 /**
