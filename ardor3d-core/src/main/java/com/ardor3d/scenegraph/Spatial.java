@@ -396,6 +396,10 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         _worldTransform.setRotation(rotation);
     }
 
+    public void setWorldRotation(final ReadOnlyQuaternion rotation) {
+        _worldTransform.setRotation(rotation);
+    }
+
     public void setWorldScale(final ReadOnlyVector3 scale) {
         _worldTransform.setScale(scale);
     }
