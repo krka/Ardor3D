@@ -54,7 +54,7 @@ public interface Spline {
      *            <code>p2</code>, a value in between will return an interpolated vector between the two.
      * @param result
      *            The interpolated values will be added to this vector.
-     * @return The result vector passed int.
+     * @return The result vector passed in.
      */
     public Vector3 interpolate(ReadOnlyVector3 p0, ReadOnlyVector3 p1, ReadOnlyVector3 p2, ReadOnlyVector3 p3,
             double t, Vector3 result);

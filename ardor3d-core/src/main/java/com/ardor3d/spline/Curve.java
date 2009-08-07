@@ -14,27 +14,25 @@
 
 package com.ardor3d.spline;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 
 /**
- * Curve class contains a list of control points and a spline. It also contains method for visualising itself as a
+ * Curve class contains a list of control points and a spline. It also contains method for visualizing itself as a
  * renderable series of points or a line.
  */
 public class Curve {
 
     /** @see #setControlPoints(List) */
-    private List<ControlPoint> _controlPoints = Collections.emptyList();
+    private List<ReadOnlyVector3> _controlPoints;
 
     /** @see #setSpline(Spline) */
     private Spline _spline = new CatmullRomSpline();
@@ -47,7 +45,7 @@ public class Curve {
      * @param spline
      *            see {@link #setSpline(Spline)}
      */
-    public Curve(final List<ControlPoint> controlPoints, final Spline spline) {
+    public Curve(final List<ReadOnlyVector3> controlPoints, final Spline spline) {
         super();
 
         setControlPoints(controlPoints);
@@ -64,11 +62,22 @@ public class Curve {
      * @return A <code>Point</code> containing all the curve points, will not be <code>null</code>.
      */
     public Point toRenderablePoint(final boolean includeEndPoints) {
-        final Collection<ReadOnlyVector3> points = getPoints(includeEndPoints);
+        final Collection<ReadOnlyVector3> points = getControlPoints();
 
-        final Vector3[] pointsArray = new Vector3[points.size()];
+        final int size = includeEndPoints ? points.size() : points.size() - 2;
 
-        points.toArray(pointsArray);
+        Vector3[] allPoints = new Vector3[points.size()];
+        Vector3[] pointsArray;
+
+        allPoints = points.toArray(allPoints);
+
+        if (includeEndPoints) {
+            pointsArray = allPoints;
+        } else {
+            pointsArray = new Vector3[size];
+
+            System.arraycopy(allPoints, 1, pointsArray, 0, size);
+        }
 
         return new Point("point", pointsArray, null, null, null);
     }
@@ -91,7 +100,7 @@ public class Curve {
 
         final int vertices = (getControlPoints().size() * steps) - (3 * steps);
 
-        final Vector3[] vertex = new Vector3[vertices * 2];
+        final Vector3[] vertex = new Vector3[vertices];
         final Vector3[] normal = null;
         final ColorRGBA[] color = null;
         final Vector2[] texture = null;
@@ -99,73 +108,21 @@ public class Curve {
         int index = 0;
 
         for (int i = 0; i < vertices; i++) {
-            final int even = i % 2;
-
             final int is = i % steps;
 
-            if (0 != even || 0 == is) {
-                if (0 == is && i > 0) {
-                    index++;
-                }
-
-                final double t = is / (steps - 1.0);
-
-                vertex[i] = getSpline().interpolate(getControlPoints().get(index).getPoint(),
-                        getControlPoints().get(index + 1).getPoint(), getControlPoints().get(index + 2).getPoint(),
-                        getControlPoints().get(index + 3).getPoint(), t);
-            } else {
-                vertex[i] = vertex[i - 1];
+            if (0 == is && i > 0) {
+                index++;
             }
+
+            final double t = is / (steps - 1.0);
+
+            vertex[i] = getSpline().interpolate(getControlPoints().get(index), getControlPoints().get(index + 1),
+                    getControlPoints().get(index + 2), getControlPoints().get(index + 3), t);
         }
 
-        return new Line("curve", vertex, normal, color, texture);
-    }
-
-    /**
-     * Returns all the points that make up this curve.
-     * 
-     * @param includeEndPoints
-     *            <code>true</code> to include the end control points, <code>false</code> to just include the actual
-     *            points making up this curve.
-     * @return A list of control points, will not be <code>null</code> but may be empty if this curve has no control
-     *         points.
-     */
-    public List<ReadOnlyVector3> getPoints(final boolean includeEndPoints) {
-        final List<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
-
-        for (final ControlPoint cp : getControlPoints()) {
-            points.add(cp.getPoint());
-        }
-
-        if (!includeEndPoints && points.size() >= 2) {
-            points.remove(0);
-            points.remove(points.size() - 1);
-        }
-
-        return points;
-    }
-
-    /**
-     * Returns all the rotations that make up this curve.
-     * 
-     * @param includeEndRotations
-     *            <code>true</code> to include the end rotations, <code>false</code> to just include the actual
-     *            rotations making up this curve.
-     * @return A list of rotations, will not be <code>null</code> but may be empty if this curve has no rotations.
-     */
-    public List<ReadOnlyQuaternion> getRotations(final boolean includeEndRotations) {
-        final List<ReadOnlyQuaternion> rotations = new ArrayList<ReadOnlyQuaternion>();
-
-        for (final ControlPoint cp : getControlPoints()) {
-            rotations.add(cp.getRotation());
-        }
-
-        if (!includeEndRotations && rotations.size() >= 2) {
-            rotations.remove(0);
-            rotations.remove(rotations.size() - 1);
-        }
-
-        return rotations;
+        final Line line = new Line("curve", vertex, normal, color, texture);
+        line.getMeshData().setIndexMode(IndexMode.LineStrip);
+        return line;
     }
 
     /**
@@ -173,9 +130,12 @@ public class Curve {
      *            The new control points, can not be <code>null</code>.
      * @see #getControlPoints()
      */
-    public void setControlPoints(final List<ControlPoint> controlPoints) {
+    public void setControlPoints(final List<ReadOnlyVector3> controlPoints) {
         if (null == controlPoints) {
             throw new IllegalArgumentException("controlPoints can not be null!");
+        }
+        if (controlPoints.size() < 4) {
+            throw new IllegalArgumentException("controlPoints must contain at least 4 elements for this class to work!");
         }
 
         _controlPoints = controlPoints;
@@ -185,7 +145,10 @@ public class Curve {
      * @return The control points making up this curve, will not be <code>null</code>.
      * @see #setControlPoints(List)
      */
-    public List<ControlPoint> getControlPoints() {
+    public List<ReadOnlyVector3> getControlPoints() {
+        assert (null != _controlPoints) : "_controlPoints was null, it must be set before use!";
+        assert (_controlPoints.size() >= 4) : "_controlPoints contained less than 4 elements, it must be contain at least 4 for this class to work!";
+
         return _controlPoints;
     }
 
@@ -203,6 +166,8 @@ public class Curve {
     }
 
     /**
+     * The default is a {@link CatmullRomSpline}.
+     * 
      * @return The spline, will not be <code>null</code>.
      * @see #setSpline(Spline)
      */
