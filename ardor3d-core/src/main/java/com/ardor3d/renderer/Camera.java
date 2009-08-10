@@ -517,6 +517,15 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     /**
+     * @param location
+     *            the new location or position of the camera.
+     */
+    public void setLocation(final double x, final double y, final double z) {
+        _location.set(x, y, z);
+        onFrameChange();
+    }
+
+    /**
      * Sets the new direction this camera is facing. This does not change left or up axes, so make sure those vectors
      * are properly set as well.
      * 
@@ -693,7 +702,26 @@ public class Camera implements Savable, Externalizable, Cloneable {
      *            {@link Vector3#UNIT_Z})
      */
     public void lookAt(final ReadOnlyVector3 pos, final ReadOnlyVector3 worldUpVector) {
-        _newDirection.set(pos).subtractLocal(_location).normalizeLocal();
+        lookAt(pos.getX(), pos.getY(), pos.getZ(), worldUpVector);
+    }
+
+    /**
+     * A convenience method for auto-setting the frame based on a world position the user desires the camera to look at.
+     * It points the camera towards the given position using the difference between that position and the current camera
+     * location as a direction vector and the general worldUpVector to compute up and left camera vectors.
+     * 
+     * @param x
+     *            where to look at in terms of world coordinates (x)
+     * @param y
+     *            where to look at in terms of world coordinates (y)
+     * @param z
+     *            where to look at in terms of world coordinates (z)
+     * @param worldUpVector
+     *            a normalized vector indicating the up direction of the world. (often {@link Vector3#UNIT_Y} or
+     *            {@link Vector3#UNIT_Z})
+     */
+    public void lookAt(final double x, final double y, final double z, final ReadOnlyVector3 worldUpVector) {
+        _newDirection.set(x, y, z).subtractLocal(_location).normalizeLocal();
 
         // check to see if we haven't really updated camera -- no need to call
         // sets.
