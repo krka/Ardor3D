@@ -509,7 +509,7 @@ public abstract class Texture implements Savable {
      * @param color
      *            the new blend color (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
      */
-    public void setBlendColor(final ColorRGBA color) {
+    public void setBlendColor(final ReadOnlyColorRGBA color) {
         _blendColor.set(color);
     }
 
