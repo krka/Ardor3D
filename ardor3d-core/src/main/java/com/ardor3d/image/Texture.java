@@ -1228,7 +1228,10 @@ public abstract class Texture implements Savable {
      * @return Texture
      */
     public Texture createSimpleClone(final Texture rVal) {
+        rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
         rVal.setApply(_apply);
+        rVal.setBlendColor(_blendColor);
+        rVal.setBorderColor(_blendColor);
         rVal.setCombineFuncAlpha(_combineFuncAlpha);
         rVal.setCombineFuncRGB(_combineFuncRGB);
         rVal.setCombineOp0Alpha(_combineOp0Alpha);
@@ -1245,20 +1248,23 @@ public abstract class Texture implements Savable {
         rVal.setCombineSrc1RGB(_combineSrc1RGB);
         rVal.setCombineSrc2Alpha(_combineSrc2Alpha);
         rVal.setCombineSrc2RGB(_combineSrc2RGB);
+        rVal.setDepthCompareFunc(_depthCompareFunc);
+        rVal.setDepthCompareMode(_depthCompareMode);
+        rVal.setDepthMode(_depthMode);
         rVal.setEnvironmentalMapMode(_envMapMode);
         rVal.setEnvPlaneS(_envPlaneS);
         rVal.setEnvPlaneT(_envPlaneT);
         rVal.setEnvPlaneR(_envPlaneR);
         rVal.setEnvPlaneQ(_envPlaneQ);
+        rVal.setHasBorder(_hasBorder);
+        rVal.setImage(_image); // NOT CLONED.
+        rVal.setImageLocation(_imageLocation);
+        rVal.setLodBias(_lodBias);
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
-        rVal.setHasBorder(_hasBorder);
-        rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
-        rVal.setLodBias(_lodBias);
-        rVal.setImage(_image); // NOT CLONED.
+        rVal.setRenderToTextureFormat(_rttFormat);
+        rVal.setStoreTexture(_storeTexture);
         rVal._memReq = _memReq;
-        rVal.setImageLocation(_imageLocation);
-        rVal.setBlendColor(_blendColor != null ? _blendColor.clone() : null);
         rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
             rVal.setTextureKey(getTextureKey());
