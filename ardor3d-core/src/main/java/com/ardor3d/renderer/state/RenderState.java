@@ -84,7 +84,6 @@ public abstract class RenderState implements Savable {
         _quickCompare.add(StateType.FragmentProgram);
         _quickCompare.add(StateType.GLSLShader);
         _quickCompare.add(StateType.ColorMask);
-        _quickCompare.add(StateType.Clip);
         _quickCompare.add(StateType.Offset);
     }
 
