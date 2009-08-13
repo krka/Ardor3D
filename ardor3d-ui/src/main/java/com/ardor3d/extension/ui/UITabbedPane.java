@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
@@ -45,6 +46,9 @@ public class UITabbedPane extends UIPanel {
     /** The currently viewed tab index. -1 indicates no current view (empty tab pane) */
     private int _currentTabIndex = -1;
 
+    /** Our center panel - will hold the currently viewed content item. */
+    final UIPanel _center = new UIPanel(new BorderLayout());
+
     /**
      * Construct a new Tabbed Pane with the given tab placement.
      * 
@@ -55,6 +59,10 @@ public class UITabbedPane extends UIPanel {
         super(new BorderLayout());
 
         _placement = placement;
+
+        // Setup our center content panel
+        _center.setLayoutData(BorderLayoutData.CENTER);
+        super.add(_center);
 
         // Create a panel that will hold our tab buttons
         final RowLayout layout = new RowLayout(_placement.isHorizontal());
@@ -98,12 +106,9 @@ public class UITabbedPane extends UIPanel {
 
     @Override
     public void layout() {
-        getLayout().layoutContents(this);
+        super.layout();
 
-        /**
-         * Make sure all of our contents are properly resized.
-         */
-        _tabsPanel.layout();
+        // Make sure all of our visible and non-visible contents are properly resized.
         if (_contents != null) {
             for (int x = 0, max = _contents.size(); x < max; x++) {
                 final Spatial child = _contents.get(x);
@@ -251,7 +256,7 @@ public class UITabbedPane extends UIPanel {
         // set our new contents
         final UIComponent centerComp = _contents.get(_currentTabIndex);
         centerComp.setLayoutData(BorderLayoutData.CENTER);
-        super.add(centerComp);
+        _center.add(centerComp);
 
         // Update our buttons
         final ArrayList<UITab> buttons = getTabs();
@@ -282,25 +287,7 @@ public class UITabbedPane extends UIPanel {
      * Remove the currently viewed component from view. Usually the is done in preparation for setting a new view.
      */
     private void clearViewedComponent() {
-        // Locate the currently viewed center component. In this case we want the actual viewed object, so we'll look
-        // for it in the children.
-        UIComponent centerComp = null;
-        for (int x = 0; x < getNumberOfChildren(); x++) {
-            final Spatial child = getChild(x);
-            if (child instanceof UIComponent) {
-                final UIComponent tempComp = (UIComponent) child;
-                if (BorderLayoutData.CENTER.equals(tempComp.getLayoutData())) {
-                    // Found a child that's attached and has a CENTER layout data, so that's it!
-                    centerComp = tempComp;
-                    break;
-                }
-            }
-        }
-
-        // Remove it!
-        if (centerComp != null) {
-            remove(centerComp);
-        }
+        _center.removeAllComponents();
     }
 
     /**
