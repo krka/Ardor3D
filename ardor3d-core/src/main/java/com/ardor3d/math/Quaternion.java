@@ -1129,6 +1129,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
         zAxis.cross(xAxis, yAxis);
 
         fromAxes(xAxis, yAxis, zAxis);
+        normalizeLocal();
 
         Vector3.releaseTempInstance(xAxis);
         Vector3.releaseTempInstance(yAxis);
