@@ -38,18 +38,33 @@ public class SolidBackdrop extends UIBackdrop {
         setColor(color);
     }
 
+    /**
+     * @return the color of this back drop.
+     */
     public ReadOnlyColorRGBA getColor() {
         return _color;
     }
 
+    /**
+     * Set the color of this back drop.
+     * 
+     * @param color
+     *            the color to use
+     */
     public void setColor(final ReadOnlyColorRGBA color) {
-        _color.set(color);
+        if (color != null) {
+            _color.set(color);
+        }
     }
 
     @Override
     public void draw(final Renderer renderer, final UIComponent comp) {
 
         final float oldA = _color.getAlpha();
+        if (oldA == 0) {
+            // no need to draw.
+            return;
+        }
 
         _color.setAlpha(oldA * UIFrame.getCurrentOpacity());
         SolidBackdrop._standin.setDefaultColor(_color);

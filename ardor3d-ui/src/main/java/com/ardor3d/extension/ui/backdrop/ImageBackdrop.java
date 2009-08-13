@@ -15,14 +15,13 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
 
 /**
- * This backdrop paint a single image on a colored plane behind the component, stretching it and aligning it to the
+ * This backdrop paints a single image on a colored plane behind the component, stretching it and aligning it to the
  * component based on given settings.
  */
-public class ImageBackdrop extends UIBackdrop {
+public class ImageBackdrop extends SolidBackdrop {
 
     public enum StretchAxis {
         /** Stretch the image on both axis */
@@ -35,8 +34,6 @@ public class ImageBackdrop extends UIBackdrop {
         None;
     }
 
-    /** The base color of our backdrop plane. */
-    private final ColorRGBA _color = new ColorRGBA(ColorRGBA.WHITE);
     /** The image to draw. */
     private SubTex _image = null;
     /** The axis to stretch the image on. */
@@ -50,6 +47,7 @@ public class ImageBackdrop extends UIBackdrop {
      * @param image
      */
     public ImageBackdrop(final SubTex image) {
+        super(ColorRGBA.BLACK_NO_ALPHA);
         setImage(image);
     }
 
@@ -62,31 +60,13 @@ public class ImageBackdrop extends UIBackdrop {
      *            the color of the backdrop
      */
     public ImageBackdrop(final SubTex image, final ColorRGBA color) {
+        super(color);
         setImage(image);
-        setColor(color);
-    }
-
-    /**
-     * @return the color of this back drop.
-     */
-    public ReadOnlyColorRGBA getColor() {
-        return _color;
-    }
-
-    /**
-     * Set the color of this back drop.
-     * 
-     * @param color
-     *            the color to use
-     */
-    public void setColor(final ReadOnlyColorRGBA color) {
-        if (color != null) {
-            _color.set(color);
-        }
     }
 
     @Override
     public void draw(final Renderer renderer, final UIComponent comp) {
+        super.draw(renderer, comp);
 
         double x = 0;
         double y = 0;
