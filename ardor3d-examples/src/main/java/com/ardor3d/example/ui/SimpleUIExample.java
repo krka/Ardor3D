@@ -22,9 +22,12 @@ import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
+import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
+import com.ardor3d.extension.ui.backdrop.ImageBackdrop.StretchAxis;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
+import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
@@ -130,9 +133,16 @@ public class SimpleUIExample extends ExampleBase {
         fpslabel.setLayoutData(BorderLayoutData.SOUTH);
         panel.add(fpslabel);
 
+        final UIPanel panel2 = new UIPanel();
+        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex), new ColorRGBA(1, 1, 1, 1));
+        imgBD.setAlignment(Alignment.BOTTOM_LEFT);
+        imgBD.setStretch(StretchAxis.None);
+        panel2.setBackdrop(imgBD);
+        panel2.add(new UILabel("You are on panel two."));
+
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
         pane.add(panel, "panel 1");
-        pane.add(new UILabel("You are on panel two."), "panel 2");
+        pane.add(panel2, "panel 2");
 
         final UIFrame frame = new UIFrame("Sample");
         frame.setContentPanel(pane);
