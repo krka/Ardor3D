@@ -15,6 +15,7 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
 
 /**
@@ -59,7 +60,7 @@ public class ImageBackdrop extends SolidBackdrop {
      * @param color
      *            the color of the backdrop
      */
-    public ImageBackdrop(final SubTex image, final ColorRGBA color) {
+    public ImageBackdrop(final SubTex image, final ReadOnlyColorRGBA color) {
         super(color);
         setImage(image);
     }
@@ -140,7 +141,7 @@ public class ImageBackdrop extends SolidBackdrop {
         y += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder().getBottom())
                 * comp.getWorldScale().getY();
 
-        SubTexUtil.drawStretchedIcon(renderer, _image, x, y, width, height);
+        SubTexUtil.drawSubTex(renderer, _image, x, y, width, height);
     }
 
     public SubTex getImage() {
