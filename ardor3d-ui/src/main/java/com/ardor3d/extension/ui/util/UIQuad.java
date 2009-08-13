@@ -52,7 +52,7 @@ public class UIQuad extends Mesh {
     public UIQuad(final String name, final double width, final double height) {
         super(name);
         initialize();
-        resize(1, 1);
+        resize(width, height);
     }
 
     /**
