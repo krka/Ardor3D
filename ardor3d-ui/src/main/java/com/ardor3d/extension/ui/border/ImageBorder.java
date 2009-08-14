@@ -11,8 +11,8 @@
 package com.ardor3d.extension.ui.border;
 
 import com.ardor3d.extension.ui.UIComponent;
-import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.extension.ui.util.SubTex;
+import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.renderer.Renderer;
 
 /**
@@ -162,7 +162,7 @@ public class ImageBorder extends UIBorder {
             double y = dY;
             double width = scaleX * (borderWidth - leftwidth - rightwidth);
             double height = scaleY * _bottomEdge.getHeight();
-            SubTexUtil.drawStretchedIcon(renderer, _bottomEdge, x, y, width, height);
+            SubTexUtil.drawSubTex(renderer, _bottomEdge, x, y, width, height);
 
             // draw top - stretched to fit
             leftwidth = _topLeftCorner != null ? _topLeftCorner.getWidth() : 0;
@@ -171,7 +171,7 @@ public class ImageBorder extends UIBorder {
             y = dY + (borderHeight - _topEdge.getHeight()) * scaleY;
             width = scaleX * (borderWidth - leftwidth - rightwidth);
             height = scaleY * _topEdge.getHeight();
-            SubTexUtil.drawStretchedIcon(renderer, _topEdge, x, y, width, height);
+            SubTexUtil.drawSubTex(renderer, _topEdge, x, y, width, height);
         }
 
         {
@@ -182,7 +182,7 @@ public class ImageBorder extends UIBorder {
             double y = dY + bottomHeight * scaleY;
             double width = scaleX * _leftEdge.getWidth();
             double height = scaleY * (borderHeight - bottomHeight - topHeight);
-            SubTexUtil.drawStretchedIcon(renderer, _leftEdge, x, y, width, height);
+            SubTexUtil.drawSubTex(renderer, _leftEdge, x, y, width, height);
 
             // draw right - stretched to fit
             bottomHeight = _bottomRightCorner != null ? _bottomRightCorner.getHeight() : _bottomEdge.getHeight();
@@ -191,24 +191,26 @@ public class ImageBorder extends UIBorder {
             y = dY + bottomHeight * scaleY;
             width = scaleX * _rightEdge.getWidth();
             height = scaleY * (borderHeight - bottomHeight - topHeight);
-            SubTexUtil.drawStretchedIcon(renderer, _rightEdge, x, y, width, height);
+            SubTexUtil.drawSubTex(renderer, _rightEdge, x, y, width, height);
         }
 
         // draw corners - not stretched
         if (_topLeftCorner != null) {
-            SubTexUtil.drawIcon(renderer, _topLeftCorner, dX, dY + (borderHeight - _topLeftCorner.getHeight()) * scaleY, scaleX,
-                    scaleY);
+            SubTexUtil.drawSubTex(renderer, _topLeftCorner, dX, dY + (borderHeight - _topLeftCorner.getHeight())
+                    * scaleY, _topLeftCorner.getWidth() * scaleX, _topLeftCorner.getHeight() * scaleY);
         }
         if (_bottomLeftCorner != null) {
-            SubTexUtil.drawIcon(renderer, _bottomLeftCorner, dX, dY, scaleX, scaleY);
+            SubTexUtil.drawSubTex(renderer, _bottomLeftCorner, dX, dY, _bottomLeftCorner.getWidth() * scaleX,
+                    _bottomLeftCorner.getHeight() * scaleY);
         }
         if (_topRightCorner != null) {
-            SubTexUtil.drawIcon(renderer, _topRightCorner, dX + (borderWidth - _topRightCorner.getWidth()) * scaleX, dY
-                    + (borderHeight - _topRightCorner.getHeight()) * scaleY, scaleX, scaleY);
+            SubTexUtil.drawSubTex(renderer, _topRightCorner, dX + (borderWidth - _topRightCorner.getWidth()) * scaleX,
+                    dY + (borderHeight - _topRightCorner.getHeight()) * scaleY, _topRightCorner.getWidth() * scaleX,
+                    _topRightCorner.getHeight() * scaleY);
         }
         if (_bottomRightCorner != null) {
-            SubTexUtil.drawIcon(renderer, _bottomRightCorner, dX + (borderWidth - _bottomRightCorner.getWidth()) * scaleX, dY,
-                    scaleX, scaleY);
+            SubTexUtil.drawSubTex(renderer, _bottomRightCorner, dX + (borderWidth - _bottomRightCorner.getWidth())
+                    * scaleX, dY, _bottomRightCorner.getWidth() * scaleX, _bottomRightCorner.getHeight() * scaleY);
         }
 
     }

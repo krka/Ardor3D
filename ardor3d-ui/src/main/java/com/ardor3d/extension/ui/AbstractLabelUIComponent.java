@@ -232,7 +232,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             final double dix = getWorldTranslation().getX() + getTotalLeft();
             final double diy = getWorldTranslation().getY() + getTotalBottom();
             // draw icon
-            SubTexUtil.drawStretchedIcon(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth()
+            SubTexUtil.drawSubTex(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth()
                     * getWorldScale().getX(), _iconDimensions.getHeight() * getWorldScale().getY());
             // shift X over by width of icon and gap
             x += (_iconDimensions.getWidth() + _gap) * getWorldScale().getX();

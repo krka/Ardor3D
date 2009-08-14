@@ -23,6 +23,7 @@ import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
+import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop.StretchAxis;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
@@ -31,6 +32,7 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
+import com.ardor3d.extension.ui.util.TransformedSubTex;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -38,27 +40,33 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
 public class SimpleUIExample extends ExampleBase {
     UIHud hud;
     UILabel fpslabel;
     UIProgressBar bar;
+    Timer timer;
 
     public static void main(final String[] args) {
         start(SimpleUIExample.class);
     }
 
     @Inject
-    public SimpleUIExample(final LogicalLayer layer, final FrameHandler frameWork) {
+    public SimpleUIExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
+        this.timer = timer;
     }
 
     @Override
@@ -134,15 +142,18 @@ public class SimpleUIExample extends ExampleBase {
         panel.add(fpslabel);
 
         final UIPanel panel2 = new UIPanel();
-        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex), new ColorRGBA(1, 1, 1, 1));
+        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex), ColorRGBA.WHITE);
         imgBD.setAlignment(Alignment.BOTTOM_LEFT);
         imgBD.setStretch(StretchAxis.None);
         panel2.setBackdrop(imgBD);
         panel2.add(new UILabel("You are on panel two."));
 
+        final UIPanel panel3 = makeClockPanel();
+
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
         pane.add(panel, "panel 1");
         pane.add(panel2, "panel 2");
+        pane.add(panel3, "clock");
 
         final UIFrame frame = new UIFrame("Sample");
         frame.setContentPanel(pane);
@@ -150,14 +161,59 @@ public class SimpleUIExample extends ExampleBase {
         frame.layout();
         frame.pack();
 
-        frame.setUseStandin(true);
+        frame.setUseStandin(false);
         UIFrame.setUseTransparency(false);
+        frame.setFrameOpacity(1f);
         frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
 
         hud = new UIHud();
         hud.add(frame);
         hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+    }
+
+    private UIPanel makeClockPanel() {
+        final UIPanel clockPanel = new UIPanel();
+        final MultiImageBackdrop multiImgBD = new MultiImageBackdrop(ColorRGBA.BLACK_NO_ALPHA);
+        clockPanel.setBackdrop(multiImgBD);
+
+        final Texture clockTex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear,
+                Format.GuessNoCompression, false);
+
+        final TransformedSubTex clockBack = new TransformedSubTex(new SubTex(clockTex, 64, 65, 446, 446));
+
+        final double scale = .333;
+        clockBack.setPivot(new Vector2(.5, .5));
+        clockBack.getTransform().setScale(scale);
+        clockBack.setAlignment(Alignment.MIDDLE);
+        clockBack.setPriority(0);
+        multiImgBD.addImage(clockBack);
+
+        final TransformedSubTex hour = new TransformedSubTex(new SubTex(clockTex, 27, 386, 27, 126));
+        hour.setPivot(new Vector2(.5, 14 / 126f));
+        hour.getTransform().setScale(scale);
+        hour.setAlignment(Alignment.MIDDLE);
+        hour.setPriority(1);
+        multiImgBD.addImage(hour);
+
+        final TransformedSubTex minute = new TransformedSubTex(new SubTex(clockTex, 0, 338, 27, 174));
+        minute.setPivot(new Vector2(.5, 14 / 174f));
+        minute.getTransform().setScale(scale);
+        minute.setAlignment(Alignment.MIDDLE);
+        minute.setPriority(2);
+        multiImgBD.addImage(minute);
+
+        clockPanel.addController(new SpatialController<Spatial>() {
+            public void update(final double time, final Spatial caller) {
+                final double angle1 = timer.getTimeInSeconds() % MathUtils.TWO_PI;
+                final double angle2 = (timer.getTimeInSeconds() / 12.) % MathUtils.TWO_PI;
+
+                minute.getTransform().setRotation(new Quaternion().fromAngleAxis(angle1, Vector3.NEG_UNIT_Z));
+                hour.getTransform().setRotation(new Quaternion().fromAngleAxis(angle2, Vector3.NEG_UNIT_Z));
+                clockPanel.fireComponentDirty();
+            };
+        });
+        return clockPanel;
     }
 
     @Override

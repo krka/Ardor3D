@@ -23,9 +23,9 @@ public class SubTex {
 
     private final Texture _texture;
 
-    /** The x location, in pixels, of our lower left corner */
+    /** The x location, in pixels, of our upper left corner */
     private int _x;
-    /** The y location, in pixels, of our lower left corner */
+    /** The y location, in pixels, of our upper left corner */
     private int _y;
 
     /** The width, in pixels, of our part of the texture */
@@ -52,9 +52,9 @@ public class SubTex {
      * @param texture
      *            the master texture we are a part of
      * @param x
-     *            the x location, in pixels, of our lower left corner.
+     *            the x location, in pixels, of our upper left corner.
      * @param y
-     *            the y location, in pixels, of our lower left corner.
+     *            the y location, in pixels, of our upper left corner.
      * @param width
      *            the width, in pixels, of our part of the texture.
      * @param height
