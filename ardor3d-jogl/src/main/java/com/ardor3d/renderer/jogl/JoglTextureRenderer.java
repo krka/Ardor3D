@@ -108,16 +108,16 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         logger.fine("setup fbo tex with id " + textureId + ": " + _width + "," + _height);
     }
 
-    public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
-        render(null, spat, texs, doClear);
+    public void render(final Spatial spat, final List<Texture> texs, final int clear) {
+        render(null, spat, texs, clear);
     }
 
-    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final boolean doClear) {
-        render(spat, null, texs, doClear);
+    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
+        render(spat, null, texs, clear);
     }
 
     private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
-            final boolean doClear) {
+            final int clear) {
         final GL gl = GLU.getCurrentGL();
 
         final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
@@ -129,7 +129,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 for (int i = 0; i < texs.size(); i++) {
                     final Texture tex = texs.get(i);
 
-                    setupForSingleTexDraw(tex, doClear);
+                    setupForSingleTexDraw(tex, clear);
 
                     if (toDrawA != null) {
                         doDraw(toDrawA);
@@ -140,8 +140,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     takedownForSingleTexDraw(tex);
                 }
             } catch (final Exception e) {
-                logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception",
-                        e);
+                logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, int)", "Exception", e);
             } finally {
                 deactivate();
             }
@@ -196,7 +195,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                 // Check FBO complete
                 checkFBOComplete();
 
-                switchCameraIn(doClear);
+                switchCameraIn(clear);
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
@@ -216,14 +215,15 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             }
 
         } catch (final Exception e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture)", "Exception", e);
+            logger.logp(Level.SEVERE, this.getClass().toString(),
+                    "render(List<? extends Spatial>, Spatial, List<Texture>, int)", "Exception", e);
         } finally {
             deactivate();
         }
     }
 
     @Override
-    protected void setupForSingleTexDraw(final Texture tex, final boolean doClear) {
+    protected void setupForSingleTexDraw(final Texture tex, final int clear) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
@@ -254,7 +254,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         // Check FBO complete
         checkFBOComplete();
 
-        switchCameraIn(doClear);
+        switchCameraIn(clear);
     }
 
     private void setReadBuffer(final int attachVal) {
@@ -337,11 +337,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
-    protected void clearBuffers() {
+    protected void clearBuffers(final int clear) {
         final GL gl = GLU.getCurrentGL();
 
         gl.glDisable(GL.GL_SCISSOR_TEST);
-        _parentRenderer.clearBuffers();
+        _parentRenderer.clearBuffers(clear);
     }
 
     @Override
@@ -370,7 +370,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                         format = GL.GL_DEPTH_COMPONENT32_ARB;
                         break;
                     default:
-                        throw new IllegalArgumentException("Unsupported depth: " + _depthBits);
+                        // stick with the "undefined" GL_DEPTH_COMPONENT
                 }
             }
             gl.glRenderbufferStorageEXT(GL.GL_RENDERBUFFER_EXT, format, _width, _height);

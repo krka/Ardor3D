@@ -89,22 +89,22 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
 
     protected RenderContext _oldContext;
 
-    protected void switchCameraIn(final boolean doClear) {
+    protected void switchCameraIn(final int clear) {
         // Note: no need for storing and replacing old camera since pbuffer is a separate context.
 
         // swap to rtt settings
         _parentRenderer.getQueue().pushBuckets();
 
         // clear the scene
-        if (doClear) {
-            clearBuffers();
+        if (clear != 0) {
+            clearBuffers(clear);
         }
 
         getCamera().update();
         getCamera().apply(_parentRenderer);
     }
 
-    protected abstract void clearBuffers();
+    protected abstract void clearBuffers(int clear);
 
     protected void switchCameraOut() {
         _parentRenderer.flushFrame(false);

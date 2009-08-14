@@ -40,6 +40,32 @@ import com.ardor3d.util.Ardor3dException;
 public interface Renderer {
 
     /**
+     * No buffer.
+     */
+    public static final int BUFFER_NONE = 0x00;
+    /**
+     * A buffer storing color information generally for display to the user.
+     */
+    public static final int BUFFER_COLOR = 0x01;
+    /**
+     * A depth buffer allows sorting of pixels by depth or distance from the view port.
+     */
+    public static final int BUFFER_DEPTH = 0x02;
+    /**
+     * Often a higher precision buffer used to gather rendering results over time.
+     */
+    public static final int BUFFER_ACCUMULATION = 0x04;
+    /**
+     * A buffer used for masking out areas of the screen to prevent drawing.
+     */
+    public static final int BUFFER_STENCIL = 0x08;
+
+    /**
+     * Convenience for those that find it too hard to do bitwise or. :)
+     */
+    public static final int BUFFER_COLOR_AND_DEPTH = BUFFER_COLOR | BUFFER_DEPTH;
+
+    /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set
      * via typical rendering operations.
      * 
@@ -56,36 +82,30 @@ public interface Renderer {
     ReadOnlyColorRGBA getBackgroundColor();
 
     /**
-     * <code>clearZBuffer</code> clears the depth buffer of the renderer. The Z buffer allows sorting of pixels by depth
-     * or distance from the view port. Clearing this buffer prepares it for the next frame.
+     * <code>clearBuffers</code> clears the given buffers (specified as a bitwise &).
      * 
+     * @param buffers
+     *            the buffers to clear.
+     * @see #BUFFER_COLOR
+     * @see #BUFFER_DEPTH
+     * @see #BUFFER_ACCUMULATION
+     * @see #BUFFER_STENCIL
      */
-    void clearZBuffer();
+    void clearBuffers(int buffers);
 
     /**
-     * <code>clearBackBuffer</code> clears the back buffer of the renderer. The backbuffer is the buffer being rendered
-     * to before it is displayed to the screen. Clearing this buffer frees it for rendering the next frame.
+     * <code>clearBuffers</code> clears the given buffers (specified as a bitwise &).
      * 
+     * @param buffers
+     *            the buffers to clear.
+     * @param strict
+     *            if true, we'll limit the clearing to just the viewport area specified by the current camera.
+     * @see #BUFFER_COLOR
+     * @see #BUFFER_DEPTH
+     * @see #BUFFER_ACCUMULATION
+     * @see #BUFFER_STENCIL
      */
-    void clearColorBuffer();
-
-    /**
-     * <code>clearStencilBuffer</code> clears the stencil buffer of the renderer.
-     */
-    void clearStencilBuffer();
-
-    /**
-     * <code>clearBuffers</code> clears both the depth buffer and the back buffer.
-     * 
-     */
-    void clearBuffers();
-
-    /**
-     * <code>clearStrictBuffers</code> clears both the depth buffer and the back buffer restricting the clear to the
-     * rectangle defined by the width and height of the renderer.
-     * 
-     */
-    void clearStrictBuffers();
+    void clearBuffers(int buffers, boolean strict);
 
     /**
      * <code>flushFrame</code> handles rendering any items still remaining in the render buckets and optionally swaps

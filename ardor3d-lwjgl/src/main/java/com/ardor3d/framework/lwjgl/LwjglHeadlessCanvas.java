@@ -172,7 +172,7 @@ public class LwjglHeadlessCanvas {
 
         // clear buffers
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        _renderer.clearBuffers();
+        _renderer.clearBuffers(Renderer.BUFFER_COLOR | Renderer.BUFFER_DEPTH);
 
         // draw our scene
         _scene.renderUnto(_renderer);

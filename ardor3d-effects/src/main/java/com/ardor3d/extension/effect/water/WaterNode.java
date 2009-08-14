@@ -517,7 +517,7 @@ public class WaterNode extends Node {
             // tRenderer.render(renderList, texArray);
             // context.clearEnforcedState(RenderState.StateType.Fog);
         } else {
-            tRenderer.render(renderList, texArray, true);
+            tRenderer.render(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
 
         if (skyBox != null) {
@@ -562,7 +562,7 @@ public class WaterNode extends Node {
             // tRenderer.render(renderList, texArray, true);
             // context.clearEnforcedState(RenderState.StateType.Fog);
         } else {
-            tRenderer.render(renderList, texArray, true);
+            tRenderer.render(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
 
         if (skyBox != null) {

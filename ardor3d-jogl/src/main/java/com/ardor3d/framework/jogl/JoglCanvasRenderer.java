@@ -153,7 +153,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
             _camera.apply(_renderer);
         }
-        _renderer.clearBuffers();
+        _renderer.clearBuffers(Renderer.BUFFER_COLOR_AND_DEPTH);
 
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);

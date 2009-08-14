@@ -103,7 +103,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
 
         // render our "imposter"
         if (textureRenderer != null) {
-            textureRenderer.render(sphere, fakeTex, true);
+            textureRenderer.render(sphere, fakeTex, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
 
         // draw the root node...

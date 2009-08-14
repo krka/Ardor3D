@@ -412,7 +412,7 @@ public class UIFrame extends UIContainer {
                 // Set our opacity to 1.0 for the cached texture
                 setFrameOpacity(1.0f);
                 // render the frame to a texture
-                UIFrame._textureRenderer.render(this, _fakeTexture, true);
+                UIFrame._textureRenderer.render(this, _fakeTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
                 // return our old transparency
                 setFrameOpacity(op);
                 UIFrame._drawingStandin = false;

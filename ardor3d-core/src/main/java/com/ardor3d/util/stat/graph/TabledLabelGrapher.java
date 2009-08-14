@@ -198,16 +198,16 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
             _bgQuad.updateGeometricState(0, true);
 
             // - Draw our bg quad
-            _textureRenderer.render(_bgQuad, _texture, true);
+            _textureRenderer.render(_bgQuad, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
 
             // - Now, draw to texture via a TextureRenderer
-            _textureRenderer.render(_graphRoot, _texture, false);
+            _textureRenderer.render(_graphRoot, _texture, Renderer.BUFFER_NONE);
         } else {
             bgColor.setAlpha(1);
             _textureRenderer.setBackgroundColor(bgColor);
 
             // - Now, draw to texture via a TextureRenderer
-            _textureRenderer.render(_graphRoot, _texture, true);
+            _textureRenderer.render(_graphRoot, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
         }
         ColorRGBA.releaseTempInstance(bgColor);
 

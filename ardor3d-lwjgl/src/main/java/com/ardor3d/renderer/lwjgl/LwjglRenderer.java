@@ -46,6 +46,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.BlendState;
@@ -166,50 +167,56 @@ public class LwjglRenderer extends AbstractRenderer {
         _queue.clearBuckets();
     }
 
-    public void clearZBuffer() {
-        if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+    public void clearBuffers(final int buffers) {
+        clearBuffers(buffers, false);
+    }
+
+    public void clearBuffers(final int buffers, final boolean strict) {
+
+        int clear = 0;
+
+        if ((buffers & Renderer.BUFFER_COLOR) != 0) {
+            clear |= GL11.GL_COLOR_BUFFER_BIT;
         }
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-    }
 
-    public void clearColorBuffer() {
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-    }
+        if ((buffers & Renderer.BUFFER_DEPTH) != 0) {
+            clear |= GL11.GL_DEPTH_BUFFER_BIT;
 
-    public void clearStencilBuffer() {
-        // grab our camera to get width and height info.
-        final Camera cam = Camera.getCurrentCamera();
-
-        // Clear the stencil buffer
-        GL11.glClearStencil(0);
-        GL11.glStencilMask(~0);
-        GL11.glDisable(GL11.GL_DITHER);
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor(0, 0, cam.getWidth(), cam.getHeight());
-        GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
-    }
-
-    public void clearBuffers() {
-        // make sure no funny business is going on in the z before clearing.
-        if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
-            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            // make sure no funny business is going on in the z before clearing.
+            if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
+                defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
+                doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            }
         }
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-    }
 
-    public void clearStrictBuffers() {
-        // grab our camera to get width and height info.
-        final Camera cam = Camera.getCurrentCamera();
+        if ((buffers & Renderer.BUFFER_STENCIL) != 0) {
+            clear |= GL11.GL_STENCIL_BUFFER_BIT;
 
-        GL11.glDisable(GL11.GL_DITHER);
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor(0, 0, cam.getWidth(), cam.getHeight());
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        GL11.glEnable(GL11.GL_DITHER);
+            GL11.glClearStencil(_stencilClearValue);
+            GL11.glStencilMask(~0);
+            GL11.glClear(GL11.GL_STENCIL_BUFFER_BIT);
+        }
+
+        if ((buffers & Renderer.BUFFER_ACCUMULATION) != 0) {
+            clear |= GL11.GL_ACCUM_BUFFER_BIT;
+        }
+
+        if (strict) {
+            // grab our camera to get width and height info.
+            final Camera cam = Camera.getCurrentCamera();
+
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            GL11.glScissor(0, 0, cam.getWidth(), cam.getHeight());
+        }
+
+        GL11.glClear(clear);
+
+        if (strict) {
+            // put us back.
+            final RenderContext context = ContextManager.getCurrentContext();
+            final RendererRecord record = context.getRendererRecord();
+            LwjglRendererUtil.applyScissors(record);
+        }
     }
 
     public void flushFrame(final boolean doSwap) {

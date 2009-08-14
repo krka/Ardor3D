@@ -121,16 +121,15 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         logger.fine("setup pbuffer tex" + textureId + ": " + _width + "," + _height);
     }
 
-    public void render(final Spatial spat, final Texture tex, final boolean doClear) {
-        render(null, spat, tex, doClear);
+    public void render(final Spatial spat, final Texture tex, final int clear) {
+        render(null, spat, tex, clear);
     }
 
-    public void render(final List<? extends Spatial> spat, final Texture tex, final boolean doClear) {
-        render(spat, null, tex, doClear);
+    public void render(final List<? extends Spatial> spat, final Texture tex, final int clear) {
+        render(spat, null, tex, clear);
     }
 
-    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Texture tex,
-            final boolean doClear) {
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Texture tex, final int clear) {
         // clear the current states since we are rendering into a new location
         // and can not rely on states still being set.
         try {
@@ -147,7 +146,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
                 activate();
-                switchCameraIn(doClear);
+                switchCameraIn(clear);
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
@@ -162,7 +161,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
             } else {
                 // render and copy to a texture
                 activate();
-                switchCameraIn(doClear);
+                switchCameraIn(clear);
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
@@ -182,16 +181,16 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         }
     }
 
-    public void render(final Spatial spat, final List<Texture> texs, final boolean doClear) {
-        render(null, spat, texs, doClear);
+    public void render(final Spatial spat, final List<Texture> texs, final int clear) {
+        render(null, spat, texs, clear);
     }
 
-    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final boolean doClear) {
-        render(spat, null, texs, doClear);
+    public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
+        render(spat, null, texs, clear);
     }
 
     private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
-            final boolean doClear) {
+            final int clear) {
         // clear the current states since we are rendering into a new location
         // and can not rely on states still being set.
         try {
@@ -208,7 +207,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 // setup and render directly to a 2d texture.
                 LwjglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();
-                switchCameraIn(doClear);
+                switchCameraIn(clear);
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
 
                 if (toDrawA != null) {
@@ -224,7 +223,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
             } else {
                 // render and copy to a texture
                 activate();
-                switchCameraIn(doClear);
+                switchCameraIn(clear);
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
@@ -253,9 +252,9 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     }
 
     @Override
-    protected void clearBuffers() {
+    protected void clearBuffers(final int clear) {
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        _parentRenderer.clearBuffers();
+        _parentRenderer.clearBuffers(clear);
     }
 
     private void initPbuffer() {

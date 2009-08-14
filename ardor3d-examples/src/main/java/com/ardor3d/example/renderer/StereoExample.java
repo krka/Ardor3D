@@ -132,9 +132,9 @@ public class StereoExample extends ExampleBase {
             if (!_sideBySide && !_useAnaglyph) {
                 // Set left back buffer
                 renderer.setDrawBuffer(DrawBufferTarget.BackLeft);
-                renderer.clearBuffers();
+                renderer.clearBuffers(Renderer.BUFFER_COLOR | Renderer.BUFFER_DEPTH);
             } else if (_useAnaglyph) {
-                renderer.clearBuffers();
+                renderer.clearBuffers(Renderer.BUFFER_COLOR | Renderer.BUFFER_DEPTH);
                 ContextManager.getCurrentContext().enforceState(redOnly);
             }
 
@@ -152,9 +152,9 @@ public class StereoExample extends ExampleBase {
             if (!_sideBySide && !_useAnaglyph) {
                 // Set right back buffer
                 renderer.setDrawBuffer(DrawBufferTarget.BackRight);
-                renderer.clearBuffers();
+                renderer.clearBuffers(Renderer.BUFFER_COLOR | Renderer.BUFFER_DEPTH);
             } else if (_useAnaglyph) {
-                renderer.clearZBuffer();
+                renderer.clearBuffers(Renderer.BUFFER_DEPTH);
                 ContextManager.getCurrentContext().enforceState(noRed);
             }
 

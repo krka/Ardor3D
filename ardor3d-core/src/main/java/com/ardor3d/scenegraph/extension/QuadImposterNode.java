@@ -353,7 +353,7 @@ public class QuadImposterNode extends Node {
     }
 
     public void renderImposter() {
-        _tRenderer.render(_targetScene, _texture, true);
+        _tRenderer.render(_targetScene, _texture, Renderer.BUFFER_COLOR_AND_DEPTH);
     }
 
     public Vector3 getWorldUpVector() {

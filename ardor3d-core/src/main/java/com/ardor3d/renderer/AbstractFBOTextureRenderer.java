@@ -108,11 +108,11 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         return _backgroundColor;
     }
 
-    public void render(final Spatial toDraw, final Texture tex, final boolean doClear) {
+    public void render(final Spatial toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
-            setupForSingleTexDraw(tex, doClear);
+            setupForSingleTexDraw(tex, clear);
 
             doDraw(toDraw);
 
@@ -124,11 +124,11 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         }
     }
 
-    public void render(final List<? extends Spatial> toDraw, final Texture tex, final boolean doClear) {
+    public void render(final List<? extends Spatial> toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
-            setupForSingleTexDraw(tex, doClear);
+            setupForSingleTexDraw(tex, clear);
 
             doDraw(toDraw);
 
@@ -143,7 +143,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected abstract void activate();
 
-    protected abstract void setupForSingleTexDraw(Texture tex, boolean doClear);
+    protected abstract void setupForSingleTexDraw(Texture tex, int clear);
 
     protected abstract void takedownForSingleTexDraw(Texture tex);
 
@@ -151,7 +151,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     private Camera _oldCamera;
 
-    protected void switchCameraIn(final boolean doClear) {
+    protected void switchCameraIn(final int clear) {
         // grab non-rtt settings
         _oldCamera = Camera.getCurrentCamera();
 
@@ -159,15 +159,15 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         _parentRenderer.getQueue().pushBuckets();
 
         // clear the scene
-        if (doClear) {
-            clearBuffers();
+        if (clear != 0) {
+            clearBuffers(clear);
         }
 
         getCamera().update();
         getCamera().apply(_parentRenderer);
     }
 
-    protected abstract void clearBuffers();
+    protected abstract void clearBuffers(int clear);
 
     protected void switchCameraOut() {
         _parentRenderer.flushFrame(false);

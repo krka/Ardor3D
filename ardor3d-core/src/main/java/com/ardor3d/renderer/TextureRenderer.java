@@ -41,10 +41,11 @@ public interface TextureRenderer {
      *            the scene to render.
      * @param tex
      *            the Texture to render to.
-     * @param doClear
-     *            if true, we'll call a clear buffers before rendering.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
      */
-    void render(Spatial spat, Texture tex, boolean doClear);
+    void render(Spatial spat, Texture tex, int clear);
 
     /**
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
@@ -54,10 +55,11 @@ public interface TextureRenderer {
      *            the scene to render.
      * @param tex
      *            a list of Textures to render to.
-     * @param doClear
-     *            if true, we'll call a clear buffers before rendering.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
      */
-    void render(Spatial spat, List<Texture> texs, boolean doClear);
+    void render(Spatial spat, List<Texture> texs, int clear);
 
     /**
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
@@ -67,10 +69,11 @@ public interface TextureRenderer {
      *            an array of Spatials to render.
      * @param tex
      *            the Texture to render to.
-     * @param doClear
-     *            if true, we'll call a clear buffers before rendering.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
      */
-    void render(final List<? extends Spatial> spats, Texture tex, final boolean doClear);
+    void render(List<? extends Spatial> spats, Texture tex, int clear);
 
     /**
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
@@ -80,10 +83,11 @@ public interface TextureRenderer {
      *            an array of Spatials to render.
      * @param tex
      *            a list of Textures to render to.
-     * @param doClear
-     *            if true, we'll call a clear buffers before rendering.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
      */
-    void render(final List<? extends Spatial> spats, final List<Texture> texs, final boolean doClear);
+    void render(List<? extends Spatial> spats, List<Texture> texs, int clear);
 
     /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set
@@ -150,13 +154,13 @@ public interface TextureRenderer {
      * @param state
      *            state to enforce
      */
-    void enforceState(final RenderState state);
+    void enforceState(RenderState state);
 
     /**
      * @param type
      *            state type to clear
      */
-    void clearEnforcedState(final StateType type);
+    void clearEnforcedState(StateType type);
 
     /**
      * Clear all enforced states on this texture renderer.

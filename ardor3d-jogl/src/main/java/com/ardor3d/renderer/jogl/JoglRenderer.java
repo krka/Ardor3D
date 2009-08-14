@@ -41,6 +41,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.DrawBufferTarget;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.BlendState;
@@ -161,60 +162,57 @@ public class JoglRenderer extends AbstractRenderer {
         _queue.clearBuckets();
     }
 
-    public void clearZBuffer() {
+    public void clearBuffers(final int buffers) {
+        clearBuffers(buffers, false);
+    }
+
+    public void clearBuffers(final int buffers, final boolean strict) {
         final GL gl = GLU.getCurrentGL();
 
-        if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+        int clear = 0;
+
+        if ((buffers & Renderer.BUFFER_COLOR) != 0) {
+            clear |= GL.GL_COLOR_BUFFER_BIT;
         }
-        gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-    }
 
-    public void clearColorBuffer() {
-        final GL gl = GLU.getCurrentGL();
+        if ((buffers & Renderer.BUFFER_DEPTH) != 0) {
+            clear |= GL.GL_DEPTH_BUFFER_BIT;
 
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-    }
-
-    public void clearStencilBuffer() {
-        final GL gl = GLU.getCurrentGL();
-
-        // grab our camera to get width and height info.
-        final Camera cam = Camera.getCurrentCamera();
-
-        // Clear the stencil buffer
-        gl.glClearStencil(0);
-        gl.glStencilMask(~0);
-        gl.glDisable(GL.GL_DITHER);
-        gl.glEnable(GL.GL_SCISSOR_TEST);
-        gl.glScissor(0, 0, cam.getWidth(), cam.getHeight());
-        gl.glClear(GL.GL_STENCIL_BUFFER_BIT);
-        gl.glDisable(GL.GL_SCISSOR_TEST);
-    }
-
-    public void clearBuffers() {
-        final GL gl = GLU.getCurrentGL();
-
-        // make sure no funny business is going on in the z before clearing.
-        if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
-            defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
-            doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            // make sure no funny business is going on in the z before clearing.
+            if (defaultStateList.containsKey(RenderState.StateType.ZBuffer)) {
+                defaultStateList.get(RenderState.StateType.ZBuffer).setNeedsRefresh(true);
+                doApplyState(defaultStateList.get(RenderState.StateType.ZBuffer));
+            }
         }
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-    }
 
-    public void clearStrictBuffers() {
-        final GL gl = GLU.getCurrentGL();
+        if ((buffers & Renderer.BUFFER_STENCIL) != 0) {
+            clear |= GL.GL_STENCIL_BUFFER_BIT;
 
-        // grab our camera to get width and height info.
-        final Camera cam = Camera.getCurrentCamera();
+            gl.glClearStencil(_stencilClearValue);
+            gl.glStencilMask(~0);
+            gl.glClear(GL.GL_STENCIL_BUFFER_BIT);
+        }
 
-        gl.glDisable(GL.GL_DITHER);
-        gl.glEnable(GL.GL_SCISSOR_TEST);
-        gl.glScissor(0, 0, cam.getWidth(), cam.getHeight());
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        gl.glDisable(GL.GL_SCISSOR_TEST);
-        gl.glEnable(GL.GL_DITHER);
+        if ((buffers & Renderer.BUFFER_ACCUMULATION) != 0) {
+            clear |= GL.GL_ACCUM_BUFFER_BIT;
+        }
+
+        if (strict) {
+            // grab our camera to get width and height info.
+            final Camera cam = Camera.getCurrentCamera();
+
+            gl.glEnable(GL.GL_SCISSOR_TEST);
+            gl.glScissor(0, 0, cam.getWidth(), cam.getHeight());
+        }
+
+        gl.glClear(clear);
+
+        if (strict) {
+            // put us back.
+            final RenderContext context = ContextManager.getCurrentContext();
+            final RendererRecord record = context.getRendererRecord();
+            JoglRendererUtil.applyScissors(record);
+        }
     }
 
     public void flushFrame(final boolean doSwap) {

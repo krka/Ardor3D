@@ -539,7 +539,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = true;
         }
-        _shadowMapRenderer.render(_occluderNodes, _shadowMapTexture[index], true);
+        _shadowMapRenderer.render(_occluderNodes, _shadowMapTexture[index], Renderer.BUFFER_COLOR_AND_DEPTH);
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = false;
         }
