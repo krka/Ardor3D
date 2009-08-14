@@ -336,8 +336,20 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      * @return this transform for chaining.
      */
     public Transform translate(final double x, final double y, final double z) {
-        _identity = _identity && (x == y && y == z && z == 0.0);
         _translation.addLocal(x, y, z);
+        _identity = _identity && (_translation.equals(Vector3.ZERO));
+        return this;
+    }
+
+    /**
+     * Locally adds to the translation of this transform.
+     * 
+     * @param vec
+     * @return this transform for chaining.
+     */
+    public Transform translate(final ReadOnlyVector3 vec) {
+        _translation.addLocal(vec);
+        _identity = _identity && (_translation.equals(Vector3.ZERO));
         return this;
     }
 
