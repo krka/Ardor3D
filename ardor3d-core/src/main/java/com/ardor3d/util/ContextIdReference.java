@@ -22,7 +22,7 @@ import com.google.common.collect.MapMaker;
 public class ContextIdReference<T> extends PhantomReference<T> {
 
     /**
-     * Keep a string reference to these objects until their reference is cleared.
+     * Keep a strong reference to these objects until their reference is cleared.
      */
     @SuppressWarnings("unchecked")
     private static final List<ContextIdReference> REFS = new LinkedList<ContextIdReference>();
