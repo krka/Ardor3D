@@ -255,10 +255,14 @@ final public class TextureManager {
 
         // Walk through the cached items and delete those too.
         for (final TextureKey key : _tCache.keySet()) {
-            final Set<Object> contextObjects = key.getContextObjects();
-            for (final Object o : contextObjects) {
-                // Add id to map
-                idMap.put(o, key.getTextureIdForContext(o));
+            if (Constants.useMultipleContexts) {
+                final Set<Object> contextObjects = key.getContextObjects();
+                for (final Object o : contextObjects) {
+                    // Add id to map
+                    idMap.put(o, key.getTextureIdForContext(o));
+                }
+            } else {
+                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), key.getTextureIdForContext(null));
             }
         }
 
@@ -283,10 +287,14 @@ final public class TextureManager {
         // Pull all expired textures from ref queue and add to an id multimap.
         ContextIdReference<TextureKey> ref;
         while ((ref = (ContextIdReference<TextureKey>) _textureRefQueue.poll()) != null) {
-            final Set<Object> contextObjects = ref.getContextObjects();
-            for (final Object o : contextObjects) {
-                // Add id to map
-                idMap.put(o, ref.get(o));
+            if (Constants.useMultipleContexts) {
+                final Set<Object> contextObjects = ref.getContextObjects();
+                for (final Object o : contextObjects) {
+                    // Add id to map
+                    idMap.put(o, ref.get(o));
+                }
+            } else {
+                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), ref.get(null));
             }
             ref.clear();
         }

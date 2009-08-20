@@ -36,7 +36,7 @@ import com.google.common.collect.MapMaker;
  */
 public class MeshData implements Cloneable, Savable {
 
-    private final transient Map<Object, Integer> _vboIdCache = new MapMaker().weakKeys().makeMap();
+    private transient Map<Object, Integer> _vboIdCache = null;
 
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -1044,7 +1044,7 @@ public class MeshData implements Cloneable, Savable {
      * @return the vbo id of a vbo in the given context. If the vbo is not found in the given context, 0 is returned.
      */
     public int getVBOInterleavedID(final Object glContext) {
-        if (_vboIdCache.containsKey(glContext)) {
+        if (_vboIdCache != null && _vboIdCache.containsKey(glContext)) {
             return _vboIdCache.get(glContext);
         }
         return 0;
@@ -1066,6 +1066,9 @@ public class MeshData implements Cloneable, Savable {
             throw new IllegalArgumentException("vboId must be > 0");
         }
 
+        if (_vboIdCache == null) {
+            _vboIdCache = new MapMaker().initialCapacity(1).weakKeys().makeMap();
+        }
         _vboIdCache.put(glContext, vboId);
     }
 

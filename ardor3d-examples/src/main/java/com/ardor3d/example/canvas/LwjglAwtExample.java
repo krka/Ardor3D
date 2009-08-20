@@ -58,6 +58,7 @@ public class LwjglAwtExample {
     static Map<Canvas, Boolean> _showCursor1 = new HashMap<Canvas, Boolean>();
 
     public static void main(final String[] args) throws Exception {
+        System.setProperty("ardor3d.useMultipleContexts", "true");
 
         final Module ardorModule = new ArdorModule();
         // final Module systemModule = new LwjglAwtModule();

@@ -19,6 +19,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextIdReference;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.google.common.collect.ArrayListMultimap;
@@ -27,7 +28,7 @@ import com.google.common.collect.Multimap;
 
 public abstract class AbstractBufferData<T extends Buffer> {
 
-    private static Map<AbstractBufferData<?>, Object> _bufferCache = new MapMaker().weakKeys().makeMap();
+    private static Map<AbstractBufferData<?>, Object> _identityCache = new MapMaker().weakKeys().makeMap();
     private static final Object STATIC_REF = new Object();
 
     private static ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<AbstractBufferData<?>>();
@@ -50,7 +51,7 @@ public abstract class AbstractBufferData<T extends Buffer> {
     protected boolean needsRefresh = false;
 
     AbstractBufferData() {
-        _bufferCache.put(this, STATIC_REF);
+        _identityCache.put(this, STATIC_REF);
     }
 
     /**
@@ -113,7 +114,7 @@ public abstract class AbstractBufferData<T extends Buffer> {
     /**
      * Sets the id for a vbo based on this buffer's data in regards to the given OpenGL context.
      * 
-     * @param glContext
+     * @param glContextRep
      *            the object representing the OpenGL context a vbo belongs to. See
      *            {@link RenderContext#getGlContextRep()}
      * @param vboId
@@ -121,12 +122,12 @@ public abstract class AbstractBufferData<T extends Buffer> {
      * @throws IllegalArgumentException
      *             if vboId is less than or equal to 0.
      */
-    public void setVBOID(final Object glContext, final int vboId) {
+    public void setVBOID(final Object glContextRep, final int vboId) {
         if (vboId <= 0) {
             throw new IllegalArgumentException("vboId must be > 0");
         }
 
-        _vboIdCache.put(glContext, vboId);
+        _vboIdCache.put(glContextRep, vboId);
     }
 
     public VBOAccessMode getVboAccessMode() {
@@ -152,11 +153,15 @@ public abstract class AbstractBufferData<T extends Buffer> {
         gatherGCdIds(idMap);
 
         // Walk through the cached items and delete those too.
-        for (final AbstractBufferData<?> buf : _bufferCache.keySet()) {
-            final Set<Object> contextObjects = buf._vboIdCache.getContextObjects();
-            for (final Object o : contextObjects) {
-                // Add id to map
-                idMap.put(o, buf.getVBOID(o));
+        for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
+            if (Constants.useMultipleContexts) {
+                final Set<Object> contextObjects = buf._vboIdCache.getContextObjects();
+                for (final Object o : contextObjects) {
+                    // Add id to map
+                    idMap.put(o, buf.getVBOID(o));
+                }
+            } else {
+                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getVBOID(null));
             }
         }
 
@@ -178,10 +183,14 @@ public abstract class AbstractBufferData<T extends Buffer> {
         // Pull all expired vbos from ref queue and add to an id multimap.
         ContextIdReference<AbstractBufferData<?>> ref;
         while ((ref = (ContextIdReference<AbstractBufferData<?>>) _vboRefQueue.poll()) != null) {
-            final Set<Object> contextObjects = ref.getContextObjects();
-            for (final Object o : contextObjects) {
-                // Add id to map
-                idMap.put(o, ref.get(o));
+            if (Constants.useMultipleContexts) {
+                final Set<Object> contextObjects = ref.getContextObjects();
+                for (final Object o : contextObjects) {
+                    // Add id to map
+                    idMap.put(o, ref.get(o));
+                }
+            } else {
+                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), ref.get(null));
             }
             ref.clear();
         }

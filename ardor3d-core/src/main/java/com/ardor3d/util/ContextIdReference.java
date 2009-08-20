@@ -27,31 +27,59 @@ public class ContextIdReference<T> extends PhantomReference<T> {
     @SuppressWarnings("unchecked")
     private static final List<ContextIdReference> REFS = new LinkedList<ContextIdReference>();
 
-    private final Map<Object, Integer> _idCache = new MapMaker().weakKeys().makeMap();
+    private final Map<Object, Integer> _idCache;
+    private int _singleContextId;
 
     public ContextIdReference(final T reference, final ReferenceQueue<? super T> queue) {
         super(reference, queue);
+        if (Constants.useMultipleContexts) {
+            _idCache = new MapMaker().initialCapacity(2).weakKeys().makeMap();
+        } else {
+            _idCache = null;
+        }
         REFS.add(this);
     }
 
     public boolean containsKey(final Object glContext) {
-        return _idCache.containsKey(glContext);
+        if (Constants.useMultipleContexts) {
+            return _idCache.containsKey(glContext);
+        } else {
+            return true;
+        }
     }
 
     public int get(final Object glContext) {
-        return _idCache.get(glContext);
+        if (Constants.useMultipleContexts) {
+            return _idCache.get(glContext);
+        } else {
+            return _singleContextId;
+        }
     }
 
     public int remove(final Object glContext) {
-        return _idCache.remove(glContext);
+        if (Constants.useMultipleContexts) {
+            return _idCache.remove(glContext);
+        } else {
+            final int r = _singleContextId;
+            _singleContextId = 0;
+            return r;
+        }
     }
 
     public void put(final Object glContext, final int id) {
-        _idCache.put(glContext, id);
+        if (Constants.useMultipleContexts) {
+            _idCache.put(glContext, id);
+        } else {
+            _singleContextId = id;
+        }
     }
 
     public Set<Object> getContextObjects() {
-        return _idCache.keySet();
+        if (Constants.useMultipleContexts) {
+            return _idCache.keySet();
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -25,7 +25,7 @@ import com.google.common.collect.Multimap;
 
 public class DisplayListDelegate implements RenderDelegate {
 
-    private static Map<DisplayListDelegate, Object> _bufferCache = new MapMaker().weakKeys().makeMap();
+    private static Map<DisplayListDelegate, Object> _identityCache = new MapMaker().weakKeys().makeMap();
     private static final Object STATIC_REF = new Object();
 
     private static ReferenceQueue<DisplayListDelegate> _refQueue = new ReferenceQueue<DisplayListDelegate>();
@@ -34,7 +34,7 @@ public class DisplayListDelegate implements RenderDelegate {
 
     public DisplayListDelegate(final int id, final Object glContext) {
         _id = new SimpleContextIdReference<DisplayListDelegate>(this, _refQueue, id, glContext);
-        _bufferCache.put(this, STATIC_REF);
+        _identityCache.put(this, STATIC_REF);
     }
 
     public void render(final Spatial spatial, final Renderer renderer) {
@@ -55,7 +55,7 @@ public class DisplayListDelegate implements RenderDelegate {
         gatherGCdIds(idMap);
 
         // Walk through the cached items and delete those too.
-        for (final DisplayListDelegate buf : _bufferCache.keySet()) {
+        for (final DisplayListDelegate buf : _identityCache.keySet()) {
             // Add id to map
             idMap.put(buf._id.getGlContext(), buf._id.getId());
         }

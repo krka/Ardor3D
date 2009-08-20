@@ -57,6 +57,7 @@ public class JoglSwtExample {
     private static int i = 0;
 
     public static void main(final String[] args) {
+        System.setProperty("ardor3d.useMultipleContexts", "true");
 
         final Module ardorModule = new ArdorModule();
 
