@@ -25,6 +25,9 @@ public abstract class UIContainer extends UIComponent {
     /** Layout responsible for managing the size and position of this container's contents. */
     private UILayout _layout = new RowLayout(true);
 
+    /** Toggles whether or not we add our content bounds to the current clip space during draw. */
+    private boolean _doClip = true;
+
     /**
      * Checks to see if a given UIComponent is in this container.
      * 
@@ -203,9 +206,13 @@ public abstract class UIContainer extends UIComponent {
     @Override
     protected void drawComponent(final Renderer renderer) {
         if (getNumberOfChildren() > 0) {
-            // Clip to just the internal region of this container.
-            renderer.pushClip(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
-                    getContentHeight());
+            // If asked, clip to just the internal region of this container.
+            boolean needsPop = false;
+            if (_doClip) {
+                renderer.pushClip(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
+                        getContentHeight());
+                needsPop = true;
+            }
             Spatial child;
             for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
                 child = getChild(i);
@@ -213,7 +220,23 @@ public abstract class UIContainer extends UIComponent {
                     child.onDraw(renderer);
                 }
             }
-            renderer.popClip();
+            if (needsPop) {
+                renderer.popClip();
+            }
         }
+    }
+
+    /**
+     * 
+     * @param doClip
+     *            true (default) if we want this container to clip the drawing of its contents to the dimensions of its
+     *            content area.
+     */
+    public void setDoClip(final boolean doClip) {
+        _doClip = doClip;
+    }
+
+    public boolean isDoClip() {
+        return _doClip;
     }
 }
