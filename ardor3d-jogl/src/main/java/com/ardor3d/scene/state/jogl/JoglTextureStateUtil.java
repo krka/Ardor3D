@@ -1121,7 +1121,13 @@ public class JoglTextureStateUtil {
                 }
                 break;
             case NormalMap:
-                // generate spherical texture coordinates
+                // generate normals based texture coordinates
+                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_NORMAL_MAP) {
+                    checkAndSetUnit(unit, record, caps);
+                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
+                    unitRecord.textureGenRMode = GL.GL_NORMAL_MAP;
+                }
+
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_NORMAL_MAP) {
                     checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
@@ -1131,12 +1137,6 @@ public class JoglTextureStateUtil {
                 if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_NORMAL_MAP) {
                     checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
-                    unitRecord.textureGenTMode = GL.GL_NORMAL_MAP;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_NORMAL_MAP) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
                     unitRecord.textureGenTMode = GL.GL_NORMAL_MAP;
                 }
 
@@ -1162,7 +1162,13 @@ public class JoglTextureStateUtil {
                 }
                 break;
             case ReflectionMap:
-                // generate spherical texture coordinates
+                // generate reflection texture coordinates
+                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_REFLECTION_MAP) {
+                    checkAndSetUnit(unit, record, caps);
+                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
+                    unitRecord.textureGenRMode = GL.GL_REFLECTION_MAP;
+                }
+
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_REFLECTION_MAP) {
                     checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
@@ -1172,12 +1178,6 @@ public class JoglTextureStateUtil {
                 if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_REFLECTION_MAP) {
                     checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
-                    unitRecord.textureGenTMode = GL.GL_REFLECTION_MAP;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_REFLECTION_MAP) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
                     unitRecord.textureGenTMode = GL.GL_REFLECTION_MAP;
                 }
 
@@ -1227,14 +1227,14 @@ public class JoglTextureStateUtil {
                     unitRecord.textureGenTMode = GL.GL_EYE_LINEAR;
                 }
 
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 gl.glTexGenfv(GL.GL_T, GL.GL_EYE_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     gl.glEnable(GL.GL_TEXTURE_GEN_Q);
@@ -1260,12 +1260,12 @@ public class JoglTextureStateUtil {
                 // generate object linear texture coordinates
                 if (!unitRecord.isValid() || unitRecord.textureGenQMode != GL.GL_OBJECT_LINEAR) {
                     gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenSMode = GL.GL_OBJECT_LINEAR;
+                    unitRecord.textureGenQMode = GL.GL_OBJECT_LINEAR;
                 }
 
                 if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_OBJECT_LINEAR) {
                     gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenTMode = GL.GL_OBJECT_LINEAR;
+                    unitRecord.textureGenRMode = GL.GL_OBJECT_LINEAR;
                 }
 
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_OBJECT_LINEAR) {
@@ -1278,14 +1278,14 @@ public class JoglTextureStateUtil {
                     unitRecord.textureGenTMode = GL.GL_OBJECT_LINEAR;
                 }
 
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 gl.glTexGenfv(GL.GL_S, GL.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 gl.glTexGenfv(GL.GL_T, GL.GL_OBJECT_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     gl.glEnable(GL.GL_TEXTURE_GEN_Q);
@@ -1307,7 +1307,7 @@ public class JoglTextureStateUtil {
         }
     }
 
-    // If we support multtexturing, specify the unit we are affecting.
+    // If we support multitexturing, specify the unit we are affecting.
     public static void checkAndSetUnit(final int unit, final TextureStateRecord record, final ContextCapabilities caps) {
         final GL gl = GLU.getCurrentGL();
 

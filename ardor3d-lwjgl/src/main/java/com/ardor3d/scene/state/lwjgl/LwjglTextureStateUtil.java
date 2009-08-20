@@ -1125,7 +1125,13 @@ public abstract class LwjglTextureStateUtil {
                 }
                 break;
             case NormalMap:
-                // generate spherical texture coordinates
+                // generate normals based texture coordinates
+                if (!unitRecord.isValid() || unitRecord.textureGenRMode != ARBTextureCubeMap.GL_NORMAL_MAP_ARB) {
+                    checkAndSetUnit(unit, record, caps);
+                    GL11.glTexGeni(GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_NORMAL_MAP_ARB);
+                    unitRecord.textureGenRMode = ARBTextureCubeMap.GL_NORMAL_MAP_ARB;
+                }
+
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != ARBTextureCubeMap.GL_NORMAL_MAP_ARB) {
                     checkAndSetUnit(unit, record, caps);
                     GL11.glTexGeni(GL11.GL_S, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_NORMAL_MAP_ARB);
@@ -1135,12 +1141,6 @@ public abstract class LwjglTextureStateUtil {
                 if (!unitRecord.isValid() || unitRecord.textureGenTMode != ARBTextureCubeMap.GL_NORMAL_MAP_ARB) {
                     checkAndSetUnit(unit, record, caps);
                     GL11.glTexGeni(GL11.GL_T, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_NORMAL_MAP_ARB);
-                    unitRecord.textureGenTMode = ARBTextureCubeMap.GL_NORMAL_MAP_ARB;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != ARBTextureCubeMap.GL_NORMAL_MAP_ARB) {
-                    checkAndSetUnit(unit, record, caps);
-                    GL11.glTexGeni(GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_NORMAL_MAP_ARB);
                     unitRecord.textureGenTMode = ARBTextureCubeMap.GL_NORMAL_MAP_ARB;
                 }
 
@@ -1166,7 +1166,13 @@ public abstract class LwjglTextureStateUtil {
                 }
                 break;
             case ReflectionMap:
-                // generate spherical texture coordinates
+                // generate reflection texture coordinates
+                if (!unitRecord.isValid() || unitRecord.textureGenRMode != ARBTextureCubeMap.GL_REFLECTION_MAP_ARB) {
+                    checkAndSetUnit(unit, record, caps);
+                    GL11.glTexGeni(GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_REFLECTION_MAP_ARB);
+                    unitRecord.textureGenRMode = ARBTextureCubeMap.GL_REFLECTION_MAP_ARB;
+                }
+
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != ARBTextureCubeMap.GL_REFLECTION_MAP_ARB) {
                     checkAndSetUnit(unit, record, caps);
                     GL11.glTexGeni(GL11.GL_S, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_REFLECTION_MAP_ARB);
@@ -1176,12 +1182,6 @@ public abstract class LwjglTextureStateUtil {
                 if (!unitRecord.isValid() || unitRecord.textureGenTMode != ARBTextureCubeMap.GL_REFLECTION_MAP_ARB) {
                     checkAndSetUnit(unit, record, caps);
                     GL11.glTexGeni(GL11.GL_T, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_REFLECTION_MAP_ARB);
-                    unitRecord.textureGenTMode = ARBTextureCubeMap.GL_REFLECTION_MAP_ARB;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != ARBTextureCubeMap.GL_REFLECTION_MAP_ARB) {
-                    checkAndSetUnit(unit, record, caps);
-                    GL11.glTexGeni(GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, ARBTextureCubeMap.GL_REFLECTION_MAP_ARB);
                     unitRecord.textureGenTMode = ARBTextureCubeMap.GL_REFLECTION_MAP_ARB;
                 }
 
@@ -1231,14 +1231,14 @@ public abstract class LwjglTextureStateUtil {
                     unitRecord.textureGenTMode = GL11.GL_EYE_LINEAR;
                 }
 
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_EYE_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 GL11.glTexGen(GL11.GL_S, GL11.GL_EYE_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 GL11.glTexGen(GL11.GL_T, GL11.GL_EYE_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                GL11.glTexGen(GL11.GL_R, GL11.GL_EYE_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     GL11.glEnable(GL11.GL_TEXTURE_GEN_Q);
@@ -1264,12 +1264,12 @@ public abstract class LwjglTextureStateUtil {
                 // generate object linear texture coordinates
                 if (!unitRecord.isValid() || unitRecord.textureGenQMode != GL11.GL_OBJECT_LINEAR) {
                     GL11.glTexGeni(GL11.GL_Q, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenSMode = GL11.GL_OBJECT_LINEAR;
+                    unitRecord.textureGenQMode = GL11.GL_OBJECT_LINEAR;
                 }
 
                 if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL11.GL_OBJECT_LINEAR) {
                     GL11.glTexGeni(GL11.GL_R, GL11.GL_TEXTURE_GEN_MODE, GL11.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenTMode = GL11.GL_OBJECT_LINEAR;
+                    unitRecord.textureGenRMode = GL11.GL_OBJECT_LINEAR;
                 }
 
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL11.GL_OBJECT_LINEAR) {
@@ -1282,14 +1282,14 @@ public abstract class LwjglTextureStateUtil {
                     unitRecord.textureGenTMode = GL11.GL_OBJECT_LINEAR;
                 }
 
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_OBJECT_PLANE, record.plane);
 
                 if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
                     GL11.glEnable(GL11.GL_TEXTURE_GEN_Q);
