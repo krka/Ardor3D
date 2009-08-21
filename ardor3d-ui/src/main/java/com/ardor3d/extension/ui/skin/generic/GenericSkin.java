@@ -376,7 +376,7 @@ public class GenericSkin extends Skin {
 
     @Override
     protected void applyToFrame(final UIFrame component) {
-        component.setFrameOpacity(1.0f);
+        component.setOpacity(1.0f);
         // TITLE BAR
         {
             final UIFrameBar titleBar = component.getTitleBar();
@@ -610,6 +610,6 @@ public class GenericSkin extends Skin {
         component.setBackdrop(new SolidBackdrop(ColorRGBA.LIGHT_GRAY));
         component.setBorder(new SolidBorder(1, 1, 1, 1));
         component.setForegroundColor(ColorRGBA.BLACK);
-        component.setFrameOpacity(1.0f);
+        component.setOpacity(1.0f);
     }
 }

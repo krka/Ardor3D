@@ -11,12 +11,13 @@
 package com.ardor3d.extension.ui.backdrop;
 
 import com.ardor3d.extension.ui.UIComponent;
-import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.util.UIQuad;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 
 /**
  * This backdrop paints a solid rectangle of color behind a UI component.
@@ -66,7 +67,7 @@ public class SolidBackdrop extends UIBackdrop {
             return;
         }
 
-        _color.setAlpha(oldA * UIFrame.getCurrentOpacity());
+        _color.setAlpha(oldA * UIComponent.getCurrentOpacity());
         SolidBackdrop._standin.setDefaultColor(_color);
 
         SolidBackdrop._standin.setWorldTranslation(
@@ -89,8 +90,8 @@ public class SolidBackdrop extends UIBackdrop {
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         quad.setRenderState(blend);
         quad.updateWorldRenderStates(false);
 

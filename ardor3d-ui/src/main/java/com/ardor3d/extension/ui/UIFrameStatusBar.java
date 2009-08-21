@@ -80,7 +80,7 @@ public class UIFrameStatusBar extends UIPanel {
         }
 
         public void drag(final int mouseX, final int mouseY) {
-            final UIFrame frame = getParentFrame();
+            final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
 
             // Set the new width to the current width + the change in mouse x position.
             int newWidth = frame.getComponentWidth() + (int) ((mouseX - _oldX) / getWorldScale().getX());

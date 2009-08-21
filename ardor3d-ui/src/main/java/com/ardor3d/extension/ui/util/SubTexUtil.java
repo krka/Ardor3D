@@ -10,13 +10,15 @@
 
 package com.ardor3d.extension.ui.util;
 
-import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
@@ -131,10 +133,10 @@ public class SubTexUtil {
         final ColorRGBA defaultColor = ColorRGBA.fetchTempInstance();
         if (subTex.getTint() != null) {
             defaultColor.set(subTex.getTint());
-            defaultColor.setAlpha(UIFrame.getCurrentOpacity() * subTex.getTint().getAlpha());
+            defaultColor.setAlpha(UIComponent.getCurrentOpacity() * subTex.getTint().getAlpha());
         } else {
             defaultColor.set(ColorRGBA.WHITE);
-            defaultColor.setAlpha(UIFrame.getCurrentOpacity());
+            defaultColor.setAlpha(UIComponent.getCurrentOpacity());
         }
         SubTexUtil._mesh.setDefaultColor(defaultColor);
         ColorRGBA.releaseTempInstance(defaultColor);
@@ -229,10 +231,10 @@ public class SubTexUtil {
         final ColorRGBA defaultColor = ColorRGBA.fetchTempInstance();
         if (subTex.getTint() != null) {
             defaultColor.set(subTex.getTint());
-            defaultColor.setAlpha(UIFrame.getCurrentOpacity() * subTex.getTint().getAlpha());
+            defaultColor.setAlpha(UIComponent.getCurrentOpacity() * subTex.getTint().getAlpha());
         } else {
             defaultColor.set(ColorRGBA.WHITE);
-            defaultColor.setAlpha(UIFrame.getCurrentOpacity());
+            defaultColor.setAlpha(UIComponent.getCurrentOpacity());
         }
         SubTexUtil._mesh.setDefaultColor(defaultColor);
         ColorRGBA.releaseTempInstance(defaultColor);
@@ -304,8 +306,8 @@ public class SubTexUtil {
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         mesh.setRenderState(blend);
 
         mesh.updateWorldRenderStates(false);

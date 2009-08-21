@@ -11,13 +11,14 @@
 package com.ardor3d.extension.ui.border;
 
 import com.ardor3d.extension.ui.UIComponent;
-import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ShadingState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -124,7 +125,7 @@ public class SolidBorder extends UIBorder {
     public void draw(final Renderer renderer, final UIComponent comp) {
         // draw this border using a triangle-strip of 8 triangles.
 
-        final float pAlpha = UIFrame.getCurrentOpacity();
+        final float pAlpha = UIComponent.getCurrentOpacity();
 
         SolidBorder._mesh.setWorldTranslation((int) (comp.getWorldTranslation().getX() + comp.getMargin().getLeft())
                 * comp.getWorldScale().getX(), (int) (comp.getWorldTranslation().getY() + comp.getMargin().getBottom())
@@ -193,8 +194,8 @@ public class SolidBorder extends UIBorder {
         // set up alpha blending.
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         mesh.setRenderState(blend);
 
         // use flat shade so our borders will have a solid color.

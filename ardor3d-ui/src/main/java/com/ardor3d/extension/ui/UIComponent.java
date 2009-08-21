@@ -30,11 +30,12 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.BlendEquation;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -46,6 +47,12 @@ import com.ardor3d.ui.text.BasicText;
  */
 public abstract class UIComponent extends Node {
     private static Logger logger = Logger.getLogger(UIComponent.class.getName());
+
+    /** If true, use opacity settings to blend the components. Default is false. */
+    private static boolean _useTransparency = false;
+
+    /** The opacity of the component currently being rendered. */
+    private static float _currentOpacity = 1f;
 
     /** The internal contents portion of this component. */
     private final Dimension _contentsSize = new Dimension(10, 10);
@@ -89,6 +96,9 @@ public abstract class UIComponent extends Node {
     /** If false, this component may optionally disable input to it and its children (as applicable). */
     private boolean _enabled = true;
 
+    /** The opacity of this component. 0 is fully transparent and 1 is fully opaque. The default is 1. */
+    private float _opacity = 1.0f;
+
     /** If we are selected for key focus, we'll redirect that focus to this target if not null. */
     private UIComponent _keyFocusTarget = null;
 
@@ -104,8 +114,9 @@ public abstract class UIComponent extends Node {
     /** The system time when the tool tip should show up next (if currently being timed.) */
     private long _toolDone;
 
-    /** A blend state to use when drawing components as cached frame contents. */
-    private static BlendState _maxAlphaBlend = UIComponent.createMaxAlphaBlend();
+    /** Blend states to use when drawing components as cached container contents. */
+    private static BlendState _srcRGBmaxAlphaBlend = UIComponent.createSrcRGBMaxAlphaBlend();
+    private static BlendState _blendRGBmaxAlphaBlend = UIComponent.createBlendRGBMaxAlphaBlend();
 
     protected void applySkin() {
         SkinManager.applyCurrentSkin(this);
@@ -467,7 +478,7 @@ public abstract class UIComponent extends Node {
      * Override this to perform actual layout.
      */
     public void layout() {
-        // Let our frame know we are sullied...
+        // Let our containers know we are sullied...
         fireComponentDirty();
     }
 
@@ -614,14 +625,23 @@ public abstract class UIComponent extends Node {
     }
 
     /**
-     * @return the first instance of UIFrame found in this Component's UIComponent ancestry or null if none are found.
+     * @return true if our parent is a UIHud.
      */
-    public UIFrame getParentFrame() {
+    public boolean isAttachedToHUD() {
+        return getParent() instanceof UIHud;
+    }
+
+    /**
+     * @return the first instance of UIComponent found in this Component's UIComponent ancestry that is attached to the
+     *         hud, or null if none are found. Returns "this" component if it is directly attached to the hud.
+     */
+    public UIComponent getTopLevelComponent() {
+        if (isAttachedToHUD()) {
+            return this;
+        }
         final Node parent = getParent();
-        if (parent instanceof UIFrame) {
-            return (UIFrame) parent;
-        } else if (parent instanceof UIComponent) {
-            return ((UIComponent) parent).getParentFrame();
+        if (parent instanceof UIComponent) {
+            return ((UIComponent) parent).getTopLevelComponent();
         } else {
             return null;
         }
@@ -642,12 +662,12 @@ public abstract class UIComponent extends Node {
     }
 
     /**
-     * Override to provide an action to take when this component or its parent frame are attached to a UIHud.
+     * Override to provide an action to take when this component or its top level component are attached to a UIHud.
      */
     public void attachedToHud() {}
 
     /**
-     * Override to provide an action to take when this component or its parent frame are removed to a UIHud.
+     * Override to provide an action to take when this component or its top level component are removed to a UIHud.
      */
     public void detachedFromHud() {}
 
@@ -859,19 +879,21 @@ public abstract class UIComponent extends Node {
         return null;
     }
 
-    /**
-     * Tell our parent frame, if any, that it should update itself and any cached graphical representation.
-     */
-    public void fireComponentDirty() {
-        final UIFrame parent = getParentFrame();
-        if (parent != null) {
-            parent.setDirty(true);
-        }
-    }
-
     @Override
     public void updateWorldTransform(final boolean recurse) {
-        super.updateWorldTransform(false);
+        updateWorldTransform(recurse, true);
+    }
+
+    /**
+     * Allow skipping updating our own world transform.
+     * 
+     * @param recurse
+     * @param self
+     */
+    protected void updateWorldTransform(final boolean recurse, final boolean self) {
+        if (self) {
+            super.updateWorldTransform(false);
+        }
 
         final Node parent = getParent();
         if (parent instanceof UIComponent) {
@@ -899,13 +921,19 @@ public abstract class UIComponent extends Node {
         }
 
         boolean clearAlpha = false;
-        // If we are drawing this component as part of cached frame contents, we have to use max alpha to prevent holes.
-        final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-        if (UIFrame.isDrawingStandin() && caps.isBlendEquationSupported() && caps.isMinMaxBlendEquationsSupported()) {
+        // If we are drawing this component as part of cached container contents, we need to alter the blending to get a
+        // texture with the correct color and alpha.
+        if (UIContainer.isDrawingStandin()) {
             if (getParent() instanceof UIComponent && !((UIComponent) getParent()).hasVirginContentArea()) {
-                ContextManager.getCurrentContext().enforceState(UIComponent._maxAlphaBlend);
-                clearAlpha = true;
+                // we are drawing a sub component onto a surface that already has color, so do a alpha based color blend
+                // and use the max alpha value.
+                ContextManager.getCurrentContext().enforceState(UIComponent._blendRGBmaxAlphaBlend);
+            } else {
+                // we are drawing a top level component onto an empty texture surface, so use the source color modulated
+                // by the source alpha and the source alpha value.
+                ContextManager.getCurrentContext().enforceState(UIComponent._srcRGBmaxAlphaBlend);
             }
+            clearAlpha = true;
         }
 
         // Call any predraw operation
@@ -963,16 +991,98 @@ public abstract class UIComponent extends Node {
      * @return a blend state that does alpha blending and writes the max alpha value (source or destination) back to the
      *         color buffer.
      */
-    private static BlendState createMaxAlphaBlend() {
+    private static BlendState createSrcRGBMaxAlphaBlend() {
         final BlendState state = new BlendState();
         state.setBlendEnabled(true);
-        state.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        state.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-        state.setTestFunction(BlendState.TestFunction.GreaterThan);
-        state.setReference(0.0f);
-        state.setTestEnabled(true);
+        state.setSourceFunctionRGB(SourceFunction.SourceAlpha);
+        state.setDestinationFunctionRGB(DestinationFunction.Zero);
+        state.setBlendEquationRGB(BlendEquation.Add);
+        state.setSourceFunctionAlpha(SourceFunction.One);
+        state.setDestinationFunctionAlpha(DestinationFunction.One);
         state.setBlendEquationAlpha(BlendEquation.Max);
         return state;
+    }
+
+    /**
+     * @return a blend state that does alpha blending and writes the max alpha value (source or destination) back to the
+     *         color buffer.
+     */
+    private static BlendState createBlendRGBMaxAlphaBlend() {
+        final BlendState state = new BlendState();
+        state.setBlendEnabled(true);
+        state.setSourceFunctionRGB(SourceFunction.SourceAlpha);
+        state.setDestinationFunctionRGB(DestinationFunction.OneMinusSourceAlpha);
+        state.setBlendEquationRGB(BlendEquation.Add);
+        state.setSourceFunctionAlpha(SourceFunction.One);
+        state.setDestinationFunctionAlpha(DestinationFunction.Zero);
+        state.setBlendEquationAlpha(BlendEquation.Add);
+        return state;
+    }
+
+    /**
+     * @return the opacity level set on this component in [0,1], where 0 means completely transparent and 1 is
+     *         completely opaque. If useTransparency is false, this will always return 1.
+     */
+    public float getCombinedOpacity() {
+        if (UIComponent._useTransparency) {
+            if (getParent() instanceof UIComponent) {
+                return _opacity * ((UIComponent) getParent()).getCombinedOpacity();
+            } else {
+                return _opacity;
+            }
+        } else {
+            return 1.0f;
+        }
+    }
+
+    /**
+     * @return the opacity set on this component directly, not accounting for parent opacity levels.
+     */
+    public float getLocalOpacity() {
+        return _opacity;
+    }
+
+    /**
+     * Set the opacity level of this component.
+     * 
+     * @param opacity
+     *            value in [0,1], where 0 means completely transparent and 1 is completely opaque.
+     */
+    public void setOpacity(final float opacity) {
+        _opacity = opacity;
+    }
+
+    /**
+     * Tell all ancestors that use standins, if any, that they need to update any cached graphical representation.
+     */
+    public void fireComponentDirty() {
+        if (getParent() instanceof UIComponent) {
+            ((UIComponent) getParent()).fireComponentDirty();
+        }
+    }
+
+    /**
+     * @return true if all components should use their opacity value to blend against other components (and/or the 3d
+     *         background scene.)
+     */
+    public static boolean isUseTransparency() {
+        return UIComponent._useTransparency;
+    }
+
+    /**
+     * @param useTransparency
+     *            true if all components should use their opacity value to blend against the 3d scene (and each other)
+     */
+    public static void setUseTransparency(final boolean useTransparency) {
+        UIComponent._useTransparency = useTransparency;
+    }
+
+    /**
+     * @return the currently rendering component's opacity level. Used by the renderer to alter alpha values based of
+     *         component elements.
+     */
+    public static float getCurrentOpacity() {
+        return UIComponent._currentOpacity;
     }
 
     /**
@@ -985,7 +1095,9 @@ public abstract class UIComponent extends Node {
      * 
      * @param renderer
      */
-    protected void predrawComponent(final Renderer renderer) {}
+    protected void predrawComponent(final Renderer renderer) {
+        UIComponent._currentOpacity = getCombinedOpacity();
+    }
 
     /**
      * Perform any post-draw operations on this component.

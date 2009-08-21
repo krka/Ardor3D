@@ -11,12 +11,13 @@
 package com.ardor3d.extension.ui.backdrop;
 
 import com.ardor3d.extension.ui.UIComponent;
-import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -90,7 +91,7 @@ public class GradientBackdrop extends UIBackdrop {
     @Override
     public void draw(final Renderer renderer, final UIComponent comp) {
 
-        final float pAlpha = UIFrame.getCurrentOpacity();
+        final float pAlpha = UIComponent.getCurrentOpacity();
 
         GradientBackdrop.mesh.setWorldTranslation(comp.getWorldTranslation().getX() + comp.getMargin().getLeft()
                 + comp.getBorder().getLeft(), comp.getWorldTranslation().getY() + comp.getMargin().getBottom()
@@ -143,8 +144,8 @@ public class GradientBackdrop extends UIBackdrop {
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         mesh.setRenderState(blend);
         mesh.updateWorldRenderStates(false);
 

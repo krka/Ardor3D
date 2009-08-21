@@ -134,37 +134,37 @@ public class UIHud extends Node {
     }
 
     /**
-     * Add the given frame to this hud.
+     * Add the given component to this hud.
      * 
-     * @param frame
-     *            the frame to add
+     * @param component
+     *            the component to add
      */
-    public void add(final UIFrame frame) {
-        attachChild(frame);
-        frame.attachedToHud();
+    public void add(final UIComponent component) {
+        attachChild(component);
+        component.attachedToHud();
     }
 
     /**
-     * Remove the given frame from the hud
+     * Remove the given component from the hud
      * 
-     * @param frame
-     *            the frame to remove
+     * @param component
+     *            the component to remove
      */
-    public void remove(final UIFrame frame) {
-        frame.detachedFromHud();
-        detachChild(frame);
+    public void remove(final UIComponent component) {
+        component.detachedFromHud();
+        detachChild(component);
     }
 
     /**
-     * Overridden to force frame detachments to go through {@link #remove(UIFrame)}
+     * Overridden to force component detachments to go through {@link #remove(UIComponent)}
      */
     @Override
     public void detachAllChildren() {
         if (getNumberOfChildren() > 0) {
             for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
                 final Spatial spat = getChild(i);
-                if (spat instanceof UIFrame) {
-                    remove((UIFrame) spat);
+                if (spat instanceof UIComponent) {
+                    remove((UIComponent) spat);
                 } else {
                     detachChildAt(i);
                 }
@@ -173,14 +173,14 @@ public class UIHud extends Node {
     }
 
     /**
-     * Reorder the frames so that the given frame is drawn last and is therefore "on top" of any others.
+     * Reorder the components so that the given component is drawn last and is therefore "on top" of any others.
      * 
-     * @param frame
-     *            the frame to bring to front
+     * @param component
+     *            the component to bring to front
      */
-    public void bringToFront(final UIFrame frame) {
-        getChildren().remove(frame);
-        getChildren().add(frame);
+    public void bringToFront(final UIComponent component) {
+        getChildren().remove(component);
+        getChildren().add(component);
     }
 
     /**
@@ -264,7 +264,7 @@ public class UIHud extends Node {
     }
 
     /**
-     * Override to force setting ortho before drawing and to specifically handle draw order of frames and tool tip.
+     * Override to force setting ortho before drawing and to specifically handle draw order of components and tool tip.
      */
     @Override
     public void draw(final Renderer r) {
@@ -369,7 +369,7 @@ public class UIHud extends Node {
     }
 
     /**
-     * Parse a given set of input states for UI events and pass these events to the UI frames contained in this hud.
+     * Parse a given set of input states for UI events and pass these events to the UI components contained in this hud.
      * 
      * @param inputStates
      *            our two InputState objects, detailing a before and after snapshot of the input system.
@@ -490,10 +490,10 @@ public class UIHud extends Node {
             }
         }
 
-        // bring any clicked frames to front
-        final UIFrame frame = over.getParentFrame();
-        if (frame != null && frame.isAttachedToHUD()) {
-            bringToFront(frame);
+        // bring any clicked components to front
+        final UIComponent component = over.getTopLevelComponent();
+        if (component != null) {
+            bringToFront(component);
         }
         return consumed;
     }

@@ -10,23 +10,71 @@
 
 package com.ardor3d.extension.ui;
 
+import java.nio.FloatBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.layout.UILayout;
+import com.ardor3d.extension.ui.util.UIQuad;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.Texture.MagnificationFilter;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRenderer;
+import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
+import com.ardor3d.scenegraph.hint.TextureCombineMode;
 
 /**
  * Defines a component that can hold and manage other components or containers, using a layout manager to position and
  * potentially resize them.
  */
 public abstract class UIContainer extends UIComponent {
+    private static final Logger _logger = Logger.getLogger(UIContainer.class.getName());
 
     /** Layout responsible for managing the size and position of this container's contents. */
     private UILayout _layout = new RowLayout(true);
 
     /** Toggles whether or not we add our content bounds to the current clip space during draw. */
     private boolean _doClip = true;
+
+    /** Flag indicating whether a current render operation is drawing a "cached" version of a container. */
+    private static boolean _drawingStandin = false;
+
+    /**
+     * A flag indicating that some part of this container needs repainting. On the next draw call, we should update our
+     * cached texture, if using one.
+     */
+    private boolean _dirty = true;
+    /**
+     * If true, use a cached texture to display this container (on a simple quad) instead of drawing all of its
+     * components.
+     */
+    private boolean _useStandin = false;
+
+    /** The quad used to draw the cached texture version of this container, if set to use one. */
+    private UIQuad _standin = null;
+    /** The texture used to store the contents of this container. */
+    private Texture2D _fakeTexture;
+
+    /** A texture renderer to use for cache operations. */
+    protected static TextureRenderer _textureRenderer;
 
     /**
      * Checks to see if a given UIComponent is in this container.
@@ -177,6 +225,9 @@ public abstract class UIContainer extends UIComponent {
                 }
             }
         }
+
+        // clean up visuals created for this container
+        clearStandin();
     }
 
     @Override
@@ -226,6 +277,226 @@ public abstract class UIContainer extends UIComponent {
         }
     }
 
+    @Override
+    public synchronized void draw(final Renderer renderer) {
+
+        // if we are not using standins, just draw as a normal Node.
+        if (!_useStandin) {
+            super.draw(renderer);
+            return;
+        }
+
+        final int width = getComponentWidth();
+        final int height = getComponentHeight();
+        final int dispWidth = Camera.getCurrentCamera().getWidth();
+        final int dispHeight = Camera.getCurrentCamera().getHeight();
+
+        // If we are currently in the process of rendering this container to a texture...
+        if (UIContainer._drawingStandin) {
+            renderer.setOrtho();
+
+            // hold onto our old translation
+            final ReadOnlyVector3 wTrans = getWorldTranslation();
+            final double x = wTrans.getX(), y = wTrans.getY(), z = wTrans.getZ();
+
+            // set our new translation so that we are drawn in the bottom left corner of the texture.
+            double newX = 0, newY = 0;
+            if (width > dispWidth && x < 0) {
+                newX = x;
+            }
+            if (height > dispHeight && y < 0) {
+                newY = y;
+            }
+            setWorldTranslation(newX, newY, 0);
+            updateWorldTransform(true, false);
+
+            // draw to texture
+            super.draw(renderer);
+
+            // replace our old translation
+            setWorldTranslation(x, y, z);
+            updateWorldTransform(true);
+
+            renderer.unsetOrtho();
+
+            // exit
+            return;
+        }
+
+        // Calculate our standin's translation (and size) so that we are drawn in the bottom left corner of the texture.
+        // Take into account containers that are bigger than the screen.
+        int newWidth = width, newHeight = height;
+        int x = getHudX();
+        int y = getHudY();
+        if (width > dispWidth && x < 0) {
+            newWidth += getHudX();
+            x = 0;
+        }
+        if (height > dispHeight && y < 0) {
+            newHeight += getHudY();
+            y = 0;
+        }
+
+        // Otherwise we are not rendering to texture and we are using standins...
+        // So check if we are dirty.
+        if (isDirty()) {
+            renderer.unsetOrtho();
+            // Check if we have a standin yet
+            if (_standin == null) {
+                try {
+                    buildStandin(renderer);
+                } catch (final Exception e) {
+                    UIContainer._logger.warning("Unable to create standin: " + e.getMessage());
+                    UIContainer._logger.logp(Level.SEVERE, getClass().getName(), "draw(Renderer)", "Exception", e);
+                }
+            }
+
+            // Check if we have a texture renderer yet before going further
+            if (UIContainer._textureRenderer != null) {
+                UIContainer._drawingStandin = true;
+                // Save aside our opacity
+                final float op = getLocalOpacity();
+                // Set our opacity to 1.0 for the cached texture
+                setOpacity(1.0f);
+                // render the container to a texture
+                UIContainer._textureRenderer.render(this, _fakeTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
+                // return our old transparency
+                setOpacity(op);
+                UIContainer._drawingStandin = false;
+
+                // Prepare the texture coordinates for our container.
+                float dW = newWidth / (float) UIContainer._textureRenderer.getWidth();
+                if (dW > 1) {
+                    dW = 1;
+                }
+                float dH = newHeight / (float) UIContainer._textureRenderer.getHeight();
+                if (dH > 1) {
+                    dH = 1;
+                }
+                final FloatBuffer tbuf = _standin.getMeshData().getTextureBuffer(0);
+                tbuf.clear();
+                tbuf.put(0).put(dH);
+                tbuf.put(0).put(0);
+                tbuf.put(dW).put(0);
+                tbuf.put(dW).put(dH);
+                tbuf.rewind();
+
+                _dirty = false;
+            }
+            renderer.setOrtho();
+        }
+
+        // Now, render the standin quad.
+        if (_standin != null) {
+            // See if we need to change the dimensions of our standin quad.
+
+            if (newWidth != _standin.getWidth() || newHeight != _standin.getHeight()) {
+                _standin.resize(newWidth, newHeight);
+            }
+
+            // Prepare our default color with the correct alpha value for opacity.
+            final ColorRGBA color = ColorRGBA.fetchTempInstance();
+            color.set(1, 1, 1, getCombinedOpacity());
+            _standin.setDefaultColor(color);
+            ColorRGBA.releaseTempInstance(color);
+
+            // Position standin quad properly
+            _standin.setWorldTranslation(x, y, getWorldTranslation().getZ());
+
+            final boolean clipTest = renderer.isClipTestEnabled();
+            renderer.setClipTestEnabled(false);
+            // draw our standin quad with cached container texture.
+            _standin.draw(renderer);
+            renderer.setClipTestEnabled(clipTest);
+        }
+    }
+
+    /**
+     * Build our standin quad and (as necessary) a texture renderer.
+     * 
+     * @param renderer
+     *            the renderer to use if we need to generate a texture renderer
+     */
+    private void buildStandin(final Renderer renderer) {
+        _standin = new UIQuad("container_standin", 1, 1);
+        // no frustum culling checks
+        _standin.getSceneHints().setCullHint(CullHint.Never);
+        // no lighting
+        _standin.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        // a single texture
+        _standin.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        // immediate mode
+        _standin.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+
+        // Add an alpha blend state
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
+        // throw out fragments with alpha of 0.
+        blend.setTestFunction(TestFunction.GreaterThan);
+        blend.setReference(0.0f);
+        blend.setTestEnabled(true);
+        _standin.setRenderState(blend);
+
+        // Check for and create a texture renderer if none exists yet.
+        if (UIContainer._textureRenderer == null) {
+            final Camera cam = Camera.getCurrentCamera();
+            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth(), cam
+                    .getHeight(), renderer, ContextManager.getCurrentContext().getCapabilities());
+            UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
+            UIContainer._textureRenderer.setMultipleTargets(true);
+        }
+
+        // create a texture to cache the contents to
+        _fakeTexture = new Texture2D();
+        _fakeTexture.setMagnificationFilter(MagnificationFilter.Bilinear);
+        _fakeTexture.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
+        _fakeTexture.setRenderToTextureFormat(Format.RGBA8);
+        _fakeTexture.setWrap(WrapMode.EdgeClamp);
+        UIContainer._textureRenderer.setupTexture(_fakeTexture);
+
+        // Set a texturestate on the standin, using the fake texture
+        final TextureState ts = new TextureState();
+        ts.setTexture(_fakeTexture);
+        _standin.setRenderState(ts);
+
+        // Update the standin, getting states, etc. all set.
+        _standin.updateGeometricState(0);
+    }
+
+    /**
+     * @return true if this container has had recent content changes that would require a repaint.
+     */
+    public boolean isDirty() {
+        return _dirty;
+    }
+
+    /**
+     * @param dirty
+     *            true if this container has had recent content changes that would require a repaint.
+     */
+    void setDirty(final boolean dirty) {
+        _dirty = dirty;
+    }
+
+    /**
+     * Set ourselves dirty.
+     */
+    @Override
+    public void fireComponentDirty() {
+        super.fireComponentDirty();
+        setDirty(true);
+    }
+
+    /**
+     * Release our standin and cached texture for gc. If needed again, they will be created from scratch.
+     */
+    public void clearStandin() {
+        _fakeTexture = null;
+        _standin = null;
+    }
+
     /**
      * 
      * @param doClip
@@ -238,5 +509,34 @@ public abstract class UIContainer extends UIComponent {
 
     public boolean isDoClip() {
         return _doClip;
+    }
+
+    /**
+     * @param use
+     *            if true, we will draw the container's contents to a cached texture and use that to display this
+     *            container (on a simple quad) instead of drawing all of its components each time. When the container is
+     *            marked as dirty, we will update the contents of the texture.
+     */
+    public void setUseStandin(final boolean use) {
+        _useStandin = use;
+        if (!_useStandin) {
+            clearStandin();
+        }
+    }
+
+    /**
+     * 
+     * @return true if we should use a cached texture copy to draw this container.
+     * @see #setUseStandin(boolean)
+     */
+    public boolean isUseStandin() {
+        return _useStandin;
+    }
+
+    /**
+     * @return true if we are currently rendering a container to texture.
+     */
+    public static boolean isDrawingStandin() {
+        return UIContainer._drawingStandin;
     }
 }

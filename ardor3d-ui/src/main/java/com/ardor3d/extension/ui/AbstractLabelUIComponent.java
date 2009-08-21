@@ -22,6 +22,9 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.BlendState.DestinationFunction;
+import com.ardor3d.renderer.state.BlendState.SourceFunction;
+import com.ardor3d.renderer.state.BlendState.TestFunction;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.ui.text.BMFont;
@@ -250,7 +253,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             // draw text using current foreground color and alpha.
             final ColorRGBA color = ColorRGBA.fetchTempInstance();
             color.set(getForegroundColor());
-            color.setAlpha(color.getAlpha() * UIFrame.getCurrentOpacity());
+            color.setAlpha(color.getAlpha() * UIComponent.getCurrentOpacity());
             _text.setTextColor(color);
             _text.render(renderer);
             ColorRGBA.releaseTempInstance(color);
@@ -277,11 +280,11 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+        blend.setSourceFunction(SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
         blend.setTestEnabled(true);
         blend.setReference(0f);
-        blend.setTestFunction(BlendState.TestFunction.GreaterThan);
+        blend.setTestFunction(TestFunction.GreaterThan);
         tComp.setRenderState(blend);
 
         tComp.getSceneHints().setLightCombineMode(LightCombineMode.Off);
