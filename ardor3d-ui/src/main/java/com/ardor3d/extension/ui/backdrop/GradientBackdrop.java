@@ -63,7 +63,7 @@ public class GradientBackdrop extends UIBackdrop {
         _bottomLeft.set(color);
     }
 
-    public ColorRGBA getBottomRight() {
+    public ReadOnlyColorRGBA getBottomRight() {
         return _bottomRight;
     }
 
