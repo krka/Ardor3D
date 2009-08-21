@@ -14,6 +14,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
+import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
@@ -72,6 +73,8 @@ public class SimpleUIExample extends ExampleBase {
     @Override
     protected void initExample() {
         _canvas.setTitle("Simple UI Example");
+
+        UIComponent.setUseTransparency(true);
 
         // Add a spinning 3D box to show behind UI.
         final Box box = new Box("Box", new Vector3(0, 0, 0), 5, 5, 5);
@@ -161,9 +164,8 @@ public class SimpleUIExample extends ExampleBase {
         frame.layout();
         frame.pack();
 
-        frame.setUseStandin(false);
-        UIFrame.setUseTransparency(false);
-        frame.setFrameOpacity(1f);
+        frame.setUseStandin(true);
+        frame.setOpacity(1f);
         frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
 
