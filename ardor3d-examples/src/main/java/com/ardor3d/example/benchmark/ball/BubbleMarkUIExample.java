@@ -227,7 +227,7 @@ public class BubbleMarkUIExample extends ExampleBase {
         final long now = System.currentTimeMillis();
         final long dt = now - startTime;
         if (dt > 2000) {
-            final int fps = (int) (1e3 * frames / dt);
+            final long fps = Math.round(1e3 * frames / dt);
             frameRateLabel.setText(fps + " fps");
 
             startTime = now;
