@@ -49,7 +49,7 @@ public abstract class LwjglRendererUtil {
         final Stack<Rectangle2> clips = rendRecord.getScissorClips();
 
         if (clips.size() > 0) {
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            setClippingEnabled(rendRecord, true);
 
             Rectangle2 init = null;
             for (final Rectangle2 r : clips) {
@@ -67,7 +67,18 @@ public abstract class LwjglRendererUtil {
             GL11.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
         } else {
             // no clips, so disable
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            setClippingEnabled(rendRecord, false);
         }
+    }
+
+    public static void setClippingEnabled(final RendererRecord rendRecord, final boolean enabled) {
+        if (enabled && (!rendRecord.isClippingTestValid() || !rendRecord.isClippingTestEnabled())) {
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            rendRecord.setClippingTestEnabled(true);
+        } else if (!enabled && (!rendRecord.isClippingTestValid() || rendRecord.isClippingTestEnabled())) {
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            rendRecord.setClippingTestEnabled(false);
+        }
+        rendRecord.setClippingTestValid(true);
     }
 }

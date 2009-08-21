@@ -1509,4 +1509,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         LwjglRendererUtil.applyScissors(record);
     }
+
+    public void setClipTestEnabled(final boolean enabled) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+
+        LwjglRendererUtil.setClippingEnabled(record, enabled);
+    }
 }

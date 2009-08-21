@@ -1577,4 +1577,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         JoglRendererUtil.applyScissors(record);
     }
+
+    public void setClipTestEnabled(final boolean enabled) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+
+        JoglRendererUtil.setClippingEnabled(record, enabled);
+    }
 }

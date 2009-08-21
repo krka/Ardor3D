@@ -473,4 +473,15 @@ public interface Renderer {
      * Clear all rectangles from the clip stack and disable clipping.
      */
     void clearClips();
+
+    /**
+     * @param enabled
+     *            toggle clipping without effecting the current clip stack.
+     */
+    void setClipTestEnabled(boolean enabled);
+
+    /**
+     * @return true if the renderer believes clipping is enabled
+     */
+    boolean isClipTestEnabled();
 }

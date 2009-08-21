@@ -76,4 +76,17 @@ public abstract class JoglRendererUtil {
             gl.glDisable(GL.GL_SCISSOR_TEST);
         }
     }
+
+    public static void setClippingEnabled(final RendererRecord rendRecord, final boolean enabled) {
+        final GL gl = GLU.getCurrentGL();
+
+        if (enabled && (!rendRecord.isClippingTestValid() || !rendRecord.isClippingTestEnabled())) {
+            gl.glEnable(GL.GL_SCISSOR_TEST);
+            rendRecord.setClippingTestEnabled(true);
+        } else if (!enabled && (!rendRecord.isClippingTestValid() || rendRecord.isClippingTestEnabled())) {
+            gl.glDisable(GL.GL_SCISSOR_TEST);
+            rendRecord.setClippingTestEnabled(false);
+        }
+        rendRecord.setClippingTestValid(true);
+    }
 }

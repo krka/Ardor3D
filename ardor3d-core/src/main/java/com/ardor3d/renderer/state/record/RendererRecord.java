@@ -22,6 +22,8 @@ public class RendererRecord extends StateRecord {
     private boolean _matrixValid;
     private boolean _vboValid;
     private boolean _elementVboValid;
+    private boolean _clippingTestValid;
+    private boolean _clippingTestEnabled;
     private transient final ColorRGBA _tempColor = new ColorRGBA();
     private DrawBufferTarget _drawBufferTarget = null;
     private final Stack<Rectangle2> _clips = new Stack<Rectangle2>();
@@ -31,6 +33,7 @@ public class RendererRecord extends StateRecord {
         invalidateMatrix();
         invalidateVBO();
         _drawBufferTarget = null;
+        _clippingTestValid = false;
     }
 
     @Override
@@ -111,5 +114,21 @@ public class RendererRecord extends StateRecord {
 
     public Stack<Rectangle2> getScissorClips() {
         return _clips;
+    }
+
+    public boolean isClippingTestEnabled() {
+        return _clippingTestEnabled;
+    }
+
+    public void setClippingTestEnabled(final boolean enabled) {
+        _clippingTestEnabled = enabled;
+    }
+
+    public boolean isClippingTestValid() {
+        return _clippingTestValid;
+    }
+
+    public void setClippingTestValid(final boolean valid) {
+        _clippingTestValid = valid;
     }
 }

@@ -19,6 +19,7 @@ import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.stat.StatCollector;
@@ -166,5 +167,11 @@ public abstract class AbstractRenderer implements Renderer {
 
     public void setStencilClearValue(final int stencilClearValue) {
         _stencilClearValue = stencilClearValue;
+    }
+
+    public boolean isClipTestEnabled() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        return record.isClippingTestEnabled();
     }
 }
