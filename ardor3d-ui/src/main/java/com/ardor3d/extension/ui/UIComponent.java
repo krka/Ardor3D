@@ -997,8 +997,8 @@ public abstract class UIComponent extends Node {
         state.setSourceFunctionRGB(SourceFunction.SourceAlpha);
         state.setDestinationFunctionRGB(DestinationFunction.Zero);
         state.setBlendEquationRGB(BlendEquation.Add);
-        state.setSourceFunctionAlpha(SourceFunction.One);
-        state.setDestinationFunctionAlpha(DestinationFunction.One);
+        state.setSourceFunctionAlpha(SourceFunction.SourceAlpha);
+        state.setDestinationFunctionAlpha(DestinationFunction.DestinationAlpha);
         state.setBlendEquationAlpha(BlendEquation.Max);
         return state;
     }
@@ -1013,9 +1013,9 @@ public abstract class UIComponent extends Node {
         state.setSourceFunctionRGB(SourceFunction.SourceAlpha);
         state.setDestinationFunctionRGB(DestinationFunction.OneMinusSourceAlpha);
         state.setBlendEquationRGB(BlendEquation.Add);
-        state.setSourceFunctionAlpha(SourceFunction.One);
-        state.setDestinationFunctionAlpha(DestinationFunction.Zero);
-        state.setBlendEquationAlpha(BlendEquation.Add);
+        state.setSourceFunctionAlpha(SourceFunction.SourceAlpha);
+        state.setDestinationFunctionAlpha(DestinationFunction.DestinationAlpha);
+        state.setBlendEquationAlpha(BlendEquation.Max);
         return state;
     }
 
