@@ -21,7 +21,6 @@ public class FloatingUIContainer extends UIFrame {
     public FloatingUIContainer() {
         super(null);
         setDecorated(false);
-        setFrameOpacity(.5f);
         getContentPanel().setBorder(new EmptyBorder());
         getContentPanel().setLayout(new RowLayout(false));
         setBackdrop(null);
