@@ -15,7 +15,6 @@ import java.io.IOException;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
@@ -94,15 +93,17 @@ public class OrientedBox extends Mesh {
      * Sets the correct indices array for the box.
      */
     private void setIndexData() {
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 36));
+        if (_meshData.getIndexBuffer() == null) {
+            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(36));
 
-        for (int i = 0; i < 6; i++) {
-            _meshData.getIndexBuffer().put(i * 4 + 0);
-            _meshData.getIndexBuffer().put(i * 4 + 1);
-            _meshData.getIndexBuffer().put(i * 4 + 3);
-            _meshData.getIndexBuffer().put(i * 4 + 1);
-            _meshData.getIndexBuffer().put(i * 4 + 2);
-            _meshData.getIndexBuffer().put(i * 4 + 3);
+            for (int i = 0; i < 6; i++) {
+                _meshData.getIndexBuffer().put(i * 4 + 0);
+                _meshData.getIndexBuffer().put(i * 4 + 1);
+                _meshData.getIndexBuffer().put(i * 4 + 3);
+                _meshData.getIndexBuffer().put(i * 4 + 1);
+                _meshData.getIndexBuffer().put(i * 4 + 2);
+                _meshData.getIndexBuffer().put(i * 4 + 3);
+            }
         }
     }
 
@@ -110,8 +111,8 @@ public class OrientedBox extends Mesh {
      * Sets the correct texture array for the box.
      */
     private void setTextureData() {
-        if (_meshData.getTextureCoords(0) == null) {
-            _meshData.setTextureCoords(new FloatBufferData(BufferUtils.createVector2Buffer(24), 2), 0);
+        if (_meshData.getTextureBuffer(0) == null) {
+            _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(24), 0);
 
             for (int x = 0; x < 6; x++) {
                 _meshData.getTextureCoords(0).getBuffer().put(_texTopRight.getXf()).put(_texTopRight.getYf());
@@ -126,7 +127,9 @@ public class OrientedBox extends Mesh {
      * Sets the correct normal array for the box.
      */
     private void setNormalData() {
-        _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), 24));
+        if (_meshData.getNormalBuffer() == null) {
+            _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(24));
+        }
 
         // top
         _meshData.getNormalBuffer().put(_yAxis.getXf()).put(_yAxis.getYf()).put(_yAxis.getZf());
@@ -170,7 +173,9 @@ public class OrientedBox extends Mesh {
      */
     private void setVertexData() {
         computeCorners();
-        _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), 24));
+        if (_meshData.getVertexBuffer() == null) {
+            _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(24));
+        }
 
         // Top
         _meshData.getVertexBuffer().put(_vectorStore[0].getXf()).put(_vectorStore[0].getYf()).put(

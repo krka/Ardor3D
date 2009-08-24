@@ -144,7 +144,10 @@ public class Box extends Mesh implements Savable {
      * the minimum and maximum point.
      */
     private void setVertexData() {
-        _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), 24));
+        if (_meshData.getVertexBuffer() == null) {
+            _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(24));
+        }
+
         final Vector3[] vert = computeVertices(); // returns 8
 
         // Back

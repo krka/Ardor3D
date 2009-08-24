@@ -15,6 +15,7 @@ import java.io.IOException;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -147,13 +148,28 @@ public class Sphere extends Mesh {
     private void setGeometryData() {
         // allocate vertices
         final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
-        _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), verts));
+        final FloatBufferData vertsData = _meshData.getVertexCoords();
+        if (vertsData == null) {
+            _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
+        } else {
+            vertsData.setBuffer(BufferUtils.createVector3Buffer(vertsData.getBuffer(), verts));
+        }
 
         // allocate normals if requested
-        _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(_meshData.getNormalBuffer(), verts));
+        final FloatBufferData normsData = _meshData.getNormalCoords();
+        if (normsData == null) {
+            _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(verts));
+        } else {
+            normsData.setBuffer(BufferUtils.createVector3Buffer(normsData.getBuffer(), verts));
+        }
 
         // allocate texture coordinates
-        _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
+        final FloatBufferData texData = _meshData.getTextureCoords(0);
+        if (texData == null) {
+            _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
+        } else {
+            texData.setBuffer(BufferUtils.createVector2Buffer(texData.getBuffer(), verts));
+        }
 
         // generate geometry
         final double fInvRS = 1.0 / _radialSamples;
