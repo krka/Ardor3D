@@ -448,7 +448,7 @@ public abstract class Texture implements Savable {
 
     // texture attributes.
     private Image _image = null;
-    private final ColorRGBA _blendColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
+    private final ColorRGBA _constantColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
     private final ColorRGBA _borderColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
 
     private final Matrix4 _texMatrix = new Matrix4();
@@ -505,13 +505,13 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * <code>setBlendColor</code> sets a color that is used with CombinerSource.Constant
+     * sets a color that is used with CombinerSource.Constant
      * 
      * @param color
-     *            the new blend color (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
+     *            the new constant color (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
      */
-    public void setBlendColor(final ReadOnlyColorRGBA color) {
-        _blendColor.set(color);
+    public void setConstantColor(final ReadOnlyColorRGBA color) {
+        _constantColor.set(color);
     }
 
     /**
@@ -648,11 +648,11 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * @return the color set to be used with CombinerSource.Constant for this texture (as applicable) If null, black is
-     *         assumed.
+     * @return the color set to be used with CombinerSource.Constant for this texture (as applicable) If null,
+     *         BLACK_NO_ALPHA is assumed.
      */
-    public ReadOnlyColorRGBA getBlendColor() {
-        return _blendColor;
+    public ReadOnlyColorRGBA getConstantColor() {
+        return _constantColor;
     }
 
     /**
@@ -1211,7 +1211,7 @@ public abstract class Texture implements Savable {
         if (getMinificationFilter() != that.getMinificationFilter()) {
             return false;
         }
-        if (!_blendColor.equals(that._blendColor)) {
+        if (!_constantColor.equals(that._constantColor)) {
             return false;
         }
         if (!_borderColor.equals(that._borderColor)) {
@@ -1231,8 +1231,8 @@ public abstract class Texture implements Savable {
     public Texture createSimpleClone(final Texture rVal) {
         rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
         rVal.setApply(_apply);
-        rVal.setBlendColor(_blendColor);
-        rVal.setBorderColor(_blendColor);
+        rVal.setConstantColor(_constantColor);
+        rVal.setBorderColor(_constantColor);
         rVal.setCombineFuncAlpha(_combineFuncAlpha);
         rVal.setCombineFuncRGB(_combineFuncRGB);
         rVal.setCombineOp0Alpha(_combineOp0Alpha);
@@ -1333,7 +1333,7 @@ public abstract class Texture implements Savable {
         if (_storeImage) {
             capsule.write(_image, "image", null);
         }
-        capsule.write(_blendColor, "blendColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
+        capsule.write(_constantColor, "constantColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
         capsule.write(_borderColor, "borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
         capsule.write(_texMatrix, "texMatrix", new Matrix4(Matrix4.IDENTITY));
         capsule.write(_hasBorder, "hasBorder", false);
@@ -1382,7 +1382,7 @@ public abstract class Texture implements Savable {
                 TextureManager.loadFromKey(_key, null, this);
             }
         }
-        _blendColor.set((ColorRGBA) capsule.readSavable("blendColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
+        _constantColor.set((ColorRGBA) capsule.readSavable("constantColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _borderColor.set((ColorRGBA) capsule.readSavable("borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _texMatrix.set((Matrix4) capsule.readSavable("texMatrix", new Matrix4(Matrix4.IDENTITY)));
         _hasBorder = capsule.readBoolean("hasBorder", false);
