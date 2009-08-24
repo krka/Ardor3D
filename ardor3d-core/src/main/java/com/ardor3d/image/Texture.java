@@ -21,6 +21,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector4;
 import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -41,7 +42,7 @@ import com.ardor3d.util.export.Savable;
 public abstract class Texture implements Savable {
     private static final long serialVersionUID = -3642148179543729674L;
 
-    public static boolean DEFAULT_STORE_TEXTURE = false;
+    public static boolean DEFAULT_STORE_TEXTURE = Constants.storeSavableImages;
 
     public enum Type {
         /**
@@ -490,7 +491,7 @@ public abstract class Texture implements Savable {
     private CombinerScale _combineScaleAlpha = CombinerScale.One;
 
     private TextureKey _key = null;
-    private transient boolean _storeTexture = DEFAULT_STORE_TEXTURE;
+    private transient boolean _storeImage = DEFAULT_STORE_TEXTURE;
 
     private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
     private DepthTextureCompareFunc _depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
@@ -1263,7 +1264,7 @@ public abstract class Texture implements Savable {
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
         rVal.setRenderToTextureFormat(_rttFormat);
-        rVal.setStoreTexture(_storeTexture);
+        rVal.setStoreImage(_storeImage);
         rVal._memReq = _memReq;
         rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
@@ -1329,7 +1330,7 @@ public abstract class Texture implements Savable {
 
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_imageLocation, "imageLocation", null);
-        if (_storeTexture) {
+        if (_storeImage) {
             capsule.write(_image, "image", null);
         }
         capsule.write(_blendColor, "blendColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA));
@@ -1364,7 +1365,7 @@ public abstract class Texture implements Savable {
         capsule.write(_combineOp2Alpha, "combineOp2Alpha", CombinerOperandAlpha.SourceAlpha);
         capsule.write(_combineScaleRGB, "combineScaleRGB", CombinerScale.One);
         capsule.write(_combineScaleAlpha, "combineScaleAlpha", CombinerScale.One);
-        if (!_storeTexture) {
+        if (!_storeImage) {
             capsule.write(_key, "textureKey", null);
         }
     }
@@ -1431,12 +1432,12 @@ public abstract class Texture implements Savable {
         return _key;
     }
 
-    public boolean isStoreTexture() {
-        return _storeTexture;
+    public boolean isStoreImage() {
+        return _storeImage;
     }
 
-    public void setStoreTexture(final boolean storeTexture) {
-        _storeTexture = storeTexture;
+    public void setStoreImage(final boolean store) {
+        _storeImage = store;
     }
 
     public boolean hasBorder() {
