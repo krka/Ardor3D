@@ -33,8 +33,7 @@ public abstract class AbstractBufferData<T extends Buffer> {
 
     private static ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<AbstractBufferData<?>>();
 
-    protected final transient ContextIdReference<AbstractBufferData<T>> _vboIdCache = new ContextIdReference<AbstractBufferData<T>>(
-            this, _vboRefQueue);
+    protected transient ContextIdReference<AbstractBufferData<T>> _vboIdCache;
 
     /** Buffer holding the data. */
     protected T _buffer;
@@ -93,7 +92,7 @@ public abstract class AbstractBufferData<T extends Buffer> {
      * @return the vbo id of a vbo in the given context. If the vbo is not found in the given context, 0 is returned.
      */
     public int getVBOID(final Object glContext) {
-        if (_vboIdCache.containsKey(glContext)) {
+        if (_vboIdCache != null && _vboIdCache.containsKey(glContext)) {
             return _vboIdCache.get(glContext);
         }
         return 0;
@@ -108,7 +107,11 @@ public abstract class AbstractBufferData<T extends Buffer> {
      * @return the id removed
      */
     public int removeVBOID(final Object glContext) {
-        return _vboIdCache.remove(glContext);
+        if (_vboIdCache != null) {
+            return _vboIdCache.remove(glContext);
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -127,6 +130,9 @@ public abstract class AbstractBufferData<T extends Buffer> {
             throw new IllegalArgumentException("vboId must be > 0");
         }
 
+        if (_vboIdCache == null) {
+            _vboIdCache = new ContextIdReference<AbstractBufferData<T>>(this, _vboRefQueue);
+        }
         _vboIdCache.put(glContextRep, vboId);
     }
 
@@ -154,14 +160,16 @@ public abstract class AbstractBufferData<T extends Buffer> {
 
         // Walk through the cached items and delete those too.
         for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
-            if (Constants.useMultipleContexts) {
-                final Set<Object> contextObjects = buf._vboIdCache.getContextObjects();
-                for (final Object o : contextObjects) {
-                    // Add id to map
-                    idMap.put(o, buf.getVBOID(o));
+            if (buf._vboIdCache != null) {
+                if (Constants.useMultipleContexts) {
+                    final Set<Object> contextObjects = buf._vboIdCache.getContextObjects();
+                    for (final Object o : contextObjects) {
+                        // Add id to map
+                        idMap.put(o, buf.getVBOID(o));
+                    }
+                } else {
+                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getVBOID(null));
                 }
-            } else {
-                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getVBOID(null));
             }
         }
 

@@ -58,7 +58,12 @@ public class ContextIdReference<T> extends PhantomReference<T> {
 
     public int remove(final Object glContext) {
         if (Constants.useMultipleContexts) {
-            return _idCache.remove(glContext);
+            final Integer i = _idCache.remove(glContext);
+            if (i == null) {
+                return -1;
+            } else {
+                return i;
+            }
         } else {
             final int r = _singleContextId;
             _singleContextId = 0;
