@@ -42,7 +42,7 @@ import com.ardor3d.util.export.Savable;
 public abstract class Texture implements Savable {
     private static final long serialVersionUID = -3642148179543729674L;
 
-    public static boolean DEFAULT_STORE_TEXTURE = Constants.storeSavableImages;
+    public static boolean DEFAULT_STORE_IMAGE = Constants.storeSavableImages;
 
     public enum Type {
         /**
@@ -491,7 +491,7 @@ public abstract class Texture implements Savable {
     private CombinerScale _combineScaleAlpha = CombinerScale.One;
 
     private TextureKey _key = null;
-    private transient boolean _storeImage = DEFAULT_STORE_TEXTURE;
+    private transient boolean _storeImage = DEFAULT_STORE_IMAGE;
 
     private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
     private DepthTextureCompareFunc _depthCompareFunc = DepthTextureCompareFunc.GreaterThanEqual;
