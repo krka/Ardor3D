@@ -76,12 +76,12 @@ public abstract class AbstractBufferData<T extends Buffer> {
     }
 
     /**
-     * Set the buffer holding the data. This method should only be used internally.
+     * Set the buffer holding the data.
      * 
      * @param buffer
      *            the buffer to set
      */
-    void setBuffer(final T buffer) {
+    public void setBuffer(final T buffer) {
         _buffer = buffer;
     }
 
