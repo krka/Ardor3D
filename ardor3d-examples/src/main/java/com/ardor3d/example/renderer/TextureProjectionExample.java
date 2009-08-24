@@ -88,7 +88,7 @@ public class TextureProjectionExample extends ExampleBase {
         projectedTexture.setWrap(Texture.WrapMode.BorderClamp);
         projectedTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
         projectedTexture.setApply(ApplyMode.Add);
-        projectedTexture.setBlendColor(ColorRGBA.WHITE);
+        projectedTexture.setConstantColor(ColorRGBA.WHITE);
         _root.setRenderState(ts);
     }
 }

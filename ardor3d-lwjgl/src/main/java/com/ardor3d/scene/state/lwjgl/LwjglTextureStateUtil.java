@@ -994,7 +994,7 @@ public abstract class LwjglTextureStateUtil {
 
     public static void applyBlendColor(final Texture texture, final TextureUnitRecord unitRecord, final int unit,
             final TextureStateRecord record, final ContextCapabilities caps) {
-        final ReadOnlyColorRGBA texBlend = texture.getBlendColor();
+        final ReadOnlyColorRGBA texBlend = texture.getConstantColor();
         if (!unitRecord.isValid() || !unitRecord.blendColor.equals(texBlend)) {
             checkAndSetUnit(unit, record, caps);
             TextureRecord.colorBuffer.clear();

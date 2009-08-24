@@ -984,7 +984,7 @@ public class JoglTextureStateUtil {
             final TextureStateRecord record, final ContextCapabilities caps) {
         final GL gl = GLU.getCurrentGL();
 
-        final ReadOnlyColorRGBA texBlend = texture.getBlendColor();
+        final ReadOnlyColorRGBA texBlend = texture.getConstantColor();
         if (!unitRecord.isValid() || !unitRecord.blendColor.equals(texBlend)) {
             checkAndSetUnit(unit, record, caps);
             TextureRecord.colorBuffer.clear();
