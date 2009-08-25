@@ -15,8 +15,7 @@ import java.util.List;
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.type.ReadOnlyMatrix3;
-import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -121,11 +120,8 @@ public abstract class PickingUtil {
             return false;
         }
 
-        final ReadOnlyMatrix3 worldRotation = testMesh.getWorldRotation();
-        final ReadOnlyVector3 worldTranslation = testMesh.getWorldTranslation();
-        final ReadOnlyVector3 worldScale = testMesh.getWorldScale();
-
-        thisCT.getBounds().transform(worldRotation, worldTranslation, worldScale, thisCT.getWorldBounds());
+        final ReadOnlyTransform worldTransform = testMesh.getWorldTransform();
+        thisCT.getBounds().transform(worldTransform, thisCT.getWorldBounds());
         return thisCT.intersect(checkCT);
     }
 

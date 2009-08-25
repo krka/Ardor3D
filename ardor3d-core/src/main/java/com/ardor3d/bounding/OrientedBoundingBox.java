@@ -18,10 +18,9 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
-import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
@@ -67,31 +66,35 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     @Override
-    public BoundingVolume transform(final ReadOnlyQuaternion rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, final BoundingVolume store) {
-        final Matrix3 tempMa = Matrix3.fetchTempInstance();
-        rotate.toRotationMatrix(tempMa);
-        final BoundingVolume volume = transform(tempMa, translate, scale, store);
-        Matrix3.releaseTempInstance(tempMa);
-        return volume;
-    }
-
-    @Override
-    public BoundingVolume transform(final ReadOnlyMatrix3 rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, BoundingVolume store) {
+    // XXX: HACK, revisit.
+    public BoundingVolume transform(final ReadOnlyTransform transform, BoundingVolume store) {
         if (store == null || store.getType() != Type.OBB) {
             store = new OrientedBoundingBox();
         }
         final OrientedBoundingBox toReturn = (OrientedBoundingBox) store;
-        toReturn._extent.set(Math.abs(_extent.getX() * scale.getX()), Math.abs(_extent.getY() * scale.getY()), Math
-                .abs(_extent.getZ() * scale.getZ()));
-        rotate.applyPost(_xAxis, toReturn._xAxis);
-        rotate.applyPost(_yAxis, toReturn._yAxis);
-        rotate.applyPost(_zAxis, toReturn._zAxis);
-        _center.multiply(scale, toReturn._center);
-        rotate.applyPost(toReturn._center, toReturn._center);
-        toReturn._center.addLocal(translate);
+        final Vector3 helper = new Vector3();
+        helper.set(1, 0, 0);
+        final double scaleX = transform.applyForwardVector(helper).length();
+        helper.set(0, 1, 0);
+        final double scaleY = transform.applyForwardVector(helper).length();
+        helper.set(0, 0, 1);
+        final double scaleZ = transform.applyForwardVector(helper).length();
+        toReturn._extent.set(Math.abs(_extent.getX() * scaleX), Math.abs(_extent.getY() * scaleY), Math.abs(_extent
+                .getZ()
+                * scaleZ));
+
+        transform.getMatrix().applyPost(_xAxis, toReturn._xAxis);
+        transform.getMatrix().applyPost(_yAxis, toReturn._yAxis);
+        transform.getMatrix().applyPost(_zAxis, toReturn._zAxis);
+        if (!transform.isRotationMatrix()) {
+            toReturn._xAxis.normalizeLocal();
+            toReturn._yAxis.normalizeLocal();
+            toReturn._zAxis.normalizeLocal();
+        }
+
+        transform.applyForward(_center, toReturn._center);
         toReturn.correctCorners = false;
+        toReturn.computeCorners();
         return toReturn;
     }
 

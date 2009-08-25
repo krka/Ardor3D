@@ -19,10 +19,9 @@ import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
-import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
@@ -70,8 +69,7 @@ public class BoundingSphere extends BoundingVolume {
     }
 
     @Override
-    public BoundingVolume transform(final ReadOnlyMatrix3 rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, final BoundingVolume store) {
+    public BoundingVolume transform(final ReadOnlyTransform transform, final BoundingVolume store) {
         BoundingSphere sphere;
         if (store == null || store.getType() != BoundingVolume.Type.Sphere) {
             sphere = new BoundingSphere(1, new Vector3(0, 0, 0));
@@ -79,11 +77,22 @@ public class BoundingSphere extends BoundingVolume {
             sphere = (BoundingSphere) store;
         }
 
-        _center.multiply(scale, sphere._center);
-        rotate.applyPost(sphere._center, sphere._center);
-        sphere._center.addLocal(translate);
-        sphere.setRadius(Math.abs(getMaxAxis(scale) * getRadius()) + radiusEpsilon - 1);
+        transform.applyForward(_center, sphere._center);
+
+        if (!transform.isRotationMatrix()) {
+            final Vector3 scale = new Vector3(1, 1, 1);
+            transform.applyForwardVector(scale);
+            sphere.setRadius(Math.abs(maxAxis(scale) * getRadius()) + radiusEpsilon - 1);
+        } else {
+            final ReadOnlyVector3 scale = transform.getScale();
+            sphere.setRadius(Math.abs(maxAxis(scale) * getRadius()) + radiusEpsilon - 1);
+        }
+
         return sphere;
+    }
+
+    private double maxAxis(final ReadOnlyVector3 scale) {
+        return Math.max(Math.abs(scale.getX()), Math.max(Math.abs(scale.getY()), Math.abs(scale.getZ())));
     }
 
     /**
@@ -333,57 +342,6 @@ public class BoundingSphere extends BoundingVolume {
 
         setRadius(Math.sqrt(maxRadiusSqr) + radiusEpsilon - 1f);
 
-    }
-
-    /**
-     * <code>transform</code> modifies the center of the sphere to reflect the change made via a rotation, translation
-     * and scale.
-     * 
-     * @param rotate
-     *            the rotation change.
-     * @param translate
-     *            the translation change.
-     * @param scale
-     *            the size change.
-     * @param store
-     *            sphere to store result in
-     * @return BoundingVolume
-     * @return ref
-     */
-    @Override
-    public BoundingVolume transform(final ReadOnlyQuaternion rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, final BoundingVolume store) {
-        BoundingSphere sphere;
-        if (store == null || store.getType() != BoundingVolume.Type.Sphere) {
-            sphere = new BoundingSphere(1, new Vector3(0, 0, 0));
-        } else {
-            sphere = (BoundingSphere) store;
-        }
-
-        _center.multiply(scale, sphere._center);
-        rotate.apply(sphere._center, sphere._center);
-        sphere._center.addLocal(translate);
-        sphere.setRadius(Math.abs(getMaxAxis(scale) * getRadius()) + radiusEpsilon - 1);
-        return sphere;
-    }
-
-    private double getMaxAxis(final ReadOnlyVector3 scale) {
-        final double x = Math.abs(scale.getX());
-        final double y = Math.abs(scale.getY());
-        final double z = Math.abs(scale.getZ());
-
-        if (x >= y) {
-            if (x >= z) {
-                return x;
-            }
-            return z;
-        }
-
-        if (y >= z) {
-            return y;
-        }
-
-        return z;
     }
 
     /**

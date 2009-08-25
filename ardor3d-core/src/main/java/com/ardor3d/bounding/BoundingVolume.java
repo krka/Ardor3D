@@ -16,9 +16,7 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.intersection.IntersectionRecord;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
-import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -68,54 +66,13 @@ public abstract class BoundingVolume implements Serializable, Savable {
 
     /**
      * 
-     * <code>transform</code> alters the location of the bounding volume by a rotation, translation and a scalar.
-     * 
-     * @param rotate
-     *            the rotation to affect the bound.
-     * @param translate
-     *            the translation to affect the bound.
-     * @param scale
-     *            the scale to resize the bound.
-     * @param store
-     *            sphere to store result in
-     * @return the new bounding volume.
-     */
-    public abstract BoundingVolume transform(ReadOnlyQuaternion rotate, ReadOnlyVector3 translate,
-            ReadOnlyVector3 scale, BoundingVolume store);
-
-    /**
-     * 
-     * <code>transform</code> alters the location of the bounding volume by a rotation, translation and a scalar.
-     * 
-     * @param rotate
-     *            the rotation to affect the bound.
-     * @param translate
-     *            the translation to affect the bound.
-     * @param scale
-     *            the scale to resize the bound.
-     * @param store
-     *            sphere to store result in
-     * @return the new bounding volume.
-     */
-    public abstract BoundingVolume transform(ReadOnlyMatrix3 rotate, ReadOnlyVector3 translate, ReadOnlyVector3 scale,
-            BoundingVolume store);
-
-    /**
-     * 
      * <code>transform</code> alters the location of the bounding volume by a transform.
      * 
      * @param transform
      * @param store
      * @return
      */
-    public BoundingVolume transform(final ReadOnlyTransform transform, final BoundingVolume store) {
-        final ReadOnlyMatrix3 rotation = transform.getMatrix();
-        final ReadOnlyVector3 translation = transform.getTranslation();
-        final ReadOnlyVector3 scale = transform.getScale();
-
-        final BoundingVolume volume = transform(rotation, translation, scale, store);
-        return volume;
-    }
+    public abstract BoundingVolume transform(final ReadOnlyTransform transform, final BoundingVolume store);
 
     /**
      * 

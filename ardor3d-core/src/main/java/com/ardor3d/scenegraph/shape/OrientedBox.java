@@ -129,6 +129,8 @@ public class OrientedBox extends Mesh {
     private void setNormalData() {
         if (_meshData.getNormalBuffer() == null) {
             _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(24));
+        } else {
+            _meshData.getNormalBuffer().rewind();
         }
 
         // top
@@ -175,6 +177,8 @@ public class OrientedBox extends Mesh {
         computeCorners();
         if (_meshData.getVertexBuffer() == null) {
             _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(24));
+        } else {
+            _meshData.getVertexBuffer().rewind();
         }
 
         // Top

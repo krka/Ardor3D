@@ -19,7 +19,6 @@ import com.ardor3d.math.Plane;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyPlane;
-import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyRay3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -114,7 +113,7 @@ public class BoundingBox extends BoundingVolume {
     public BoundingVolume transform(final ReadOnlyTransform transform, final BoundingVolume store) {
 
         if (transform.isRotationMatrix()) {
-            return super.transform(transform, store);
+            return transformRotational(transform, store);
         }
 
         BoundingBox box;
@@ -176,9 +175,11 @@ public class BoundingBox extends BoundingVolume {
         return box;
     }
 
-    @Override
-    public BoundingVolume transform(final ReadOnlyMatrix3 rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, final BoundingVolume store) {
+    public BoundingVolume transformRotational(final ReadOnlyTransform transform, final BoundingVolume store) {
+
+        final ReadOnlyMatrix3 rotate = transform.getMatrix();
+        final ReadOnlyVector3 scale = transform.getScale();
+        final ReadOnlyVector3 translate = transform.getTranslation();
 
         BoundingBox box;
         if (store == null || store.getType() != Type.AABB) {
@@ -333,64 +334,6 @@ public class BoundingBox extends BoundingVolume {
         setXExtent(maxX - _center.getX());
         setYExtent(maxY - _center.getY());
         setZExtent(maxZ - _center.getZ());
-    }
-
-    /**
-     * <code>transform</code> modifies the center of the box to reflect the change made via a rotation, translation and
-     * scale.
-     * 
-     * @param rotate
-     *            the rotation change.
-     * @param translate
-     *            the translation change.
-     * @param scale
-     *            the size change.
-     * @param store
-     *            box to store result in
-     */
-    @Override
-    public BoundingVolume transform(final ReadOnlyQuaternion rotate, final ReadOnlyVector3 translate,
-            final ReadOnlyVector3 scale, final BoundingVolume store) {
-
-        BoundingBox box;
-        if (store == null || store.getType() != Type.AABB) {
-            box = new BoundingBox();
-        } else {
-            box = (BoundingBox) store;
-        }
-
-        _center.multiply(scale, box._center);
-        rotate.apply(box._center, box._center);
-        box._center.addLocal(translate);
-
-        final Vector3 compVect1 = Vector3.fetchTempInstance();
-        final Vector3 compVect2 = Vector3.fetchTempInstance();
-
-        final Matrix3 transMatrix = Matrix3.fetchTempInstance();
-        transMatrix.set(rotate);
-        // Make the rotation matrix all positive to get the maximum x/y/z extent
-        transMatrix.setValue(0, 0, Math.abs(transMatrix.getValue(0, 0)));
-        transMatrix.setValue(0, 1, Math.abs(transMatrix.getValue(0, 1)));
-        transMatrix.setValue(0, 2, Math.abs(transMatrix.getValue(0, 2)));
-        transMatrix.setValue(1, 0, Math.abs(transMatrix.getValue(1, 0)));
-        transMatrix.setValue(1, 1, Math.abs(transMatrix.getValue(1, 1)));
-        transMatrix.setValue(1, 2, Math.abs(transMatrix.getValue(1, 2)));
-        transMatrix.setValue(2, 0, Math.abs(transMatrix.getValue(2, 0)));
-        transMatrix.setValue(2, 1, Math.abs(transMatrix.getValue(2, 1)));
-        transMatrix.setValue(2, 2, Math.abs(transMatrix.getValue(2, 2)));
-
-        compVect1.set(getXExtent() * scale.getX(), getYExtent() * scale.getY(), getZExtent() * scale.getZ());
-        transMatrix.applyPost(compVect1, compVect2);
-        // Assign the biggest rotations after scales.
-        box.setXExtent(Math.abs(compVect2.getX()));
-        box.setYExtent(Math.abs(compVect2.getY()));
-        box.setZExtent(Math.abs(compVect2.getZ()));
-
-        Vector3.releaseTempInstance(compVect1);
-        Vector3.releaseTempInstance(compVect2);
-        Matrix3.releaseTempInstance(transMatrix);
-
-        return box;
     }
 
     /**
