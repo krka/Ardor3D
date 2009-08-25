@@ -1312,8 +1312,8 @@ public abstract class Texture implements Savable {
 
     public void updateMemoryReq() {
         if (_image != null) {
-            final int width = _image.getWidth(), height = _image.getHeight();
-            _memReq = width * height;
+            final int width = _image.getWidth(), height = _image.getHeight(), depth = _image.getDepth();
+            _memReq = width * height * depth;
             final int bpp = Image.getEstimatedByteSize(_image.getFormat());
             _memReq *= bpp;
             if (getMinificationFilter().usesMipMapLevels() || _image.hasMipmaps()) {

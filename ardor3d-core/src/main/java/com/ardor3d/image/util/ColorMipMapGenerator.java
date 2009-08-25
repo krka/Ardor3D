@@ -45,7 +45,7 @@ public abstract class ColorMipMapGenerator {
         }
 
         final int mips = (int) (MathUtils.log(size, 2)) + 1;
-        final Image rVal = new Image(Image.Format.RGBA8, size, size, 0, (List<ByteBuffer>) null);
+        final Image rVal = new Image(Image.Format.RGBA8, size, size, (List<ByteBuffer>) null);
 
         int bufLength = size * size * 4;
         final int[] mipLengths = new int[mips];

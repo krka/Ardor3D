@@ -298,8 +298,7 @@ public class Image implements Serializable, Savable {
      * @param mipMapSizes
      *            the array of mipmap sizes, or null for no mipmaps.
      */
-    public Image(final Format format, final int width, final int height, final int depth, final List<ByteBuffer> data,
-            int[] mipMapSizes) {
+    public Image(final Format format, final int width, final int height, final List<ByteBuffer> data, int[] mipMapSizes) {
 
         if (mipMapSizes != null && mipMapSizes.length <= 1) {
             mipMapSizes = null;
@@ -309,7 +308,7 @@ public class Image implements Serializable, Savable {
         _width = width;
         _height = height;
         _data = data;
-        _depth = depth;
+        _depth = data.size();
         _mipMapSizes = mipMapSizes;
     }
 
@@ -337,6 +336,7 @@ public class Image implements Serializable, Savable {
         setFormat(format);
         _width = width;
         _height = height;
+        _depth = 1;
         _data = new ArrayList<ByteBuffer>(1);
         _data.add(data);
         _mipMapSizes = mipMapSizes;
@@ -355,8 +355,8 @@ public class Image implements Serializable, Savable {
      * @param data
      *            the image data.
      */
-    public Image(final Format format, final int width, final int height, final int depth, final List<ByteBuffer> data) {
-        this(format, width, height, depth, data, null);
+    public Image(final Format format, final int width, final int height, final List<ByteBuffer> data) {
+        this(format, width, height, data, null);
     }
 
     /**

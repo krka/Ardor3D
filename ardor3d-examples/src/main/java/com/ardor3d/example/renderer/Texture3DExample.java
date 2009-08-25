@@ -76,6 +76,7 @@ public class Texture3DExample extends ExampleBase {
         }
         img.setData(data);
         tex.setImage(img);
+        System.err.println(tex.getMemoryReq());
         return tex;
     }
 }

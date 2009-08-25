@@ -40,7 +40,7 @@ public final class DdsLoader implements ImageLoader {
         reader.loadHeader();
         final List<ByteBuffer> data = reader.readData(flip);
 
-        return new Image(reader._pixelFormat, reader._width, reader._height, 0, data, reader._sizes);
+        return new Image(reader._pixelFormat, reader._width, reader._height, data, reader._sizes);
     }
 
     /**
@@ -75,7 +75,7 @@ public final class DdsLoader implements ImageLoader {
 
         private int _width;
         private int _height;
-        private int _depth; // XXX: currently unused
+        private int _depth;
         private int _flags;
         private int _pitchOrSize;
         private int _mipMapCount;
@@ -135,7 +135,7 @@ public final class DdsLoader implements ImageLoader {
             if (is(_caps2, DDSCAPS2_VOLUME)) {
                 throw new IOException("Volume textures not supported");
             } else {
-                _depth = 0;
+                _depth = 1;
             }
 
             final int expectedMipmaps = 1 + (int) Math.ceil(Math.log(Math.max(_height, _width)) / LOG2);
@@ -473,7 +473,7 @@ public final class DdsLoader implements ImageLoader {
                 totalSize += _sizes[i];
             }
 
-            final List<ByteBuffer> allMaps = new ArrayList<ByteBuffer>();
+            final List<ByteBuffer> allMaps = new ArrayList<ByteBuffer>(_depth);
             if (is(_caps2, DDSCAPS2_CUBEMAP)) {
                 for (int i = 0; i < 6; i++) {
                     if (_compressed) {

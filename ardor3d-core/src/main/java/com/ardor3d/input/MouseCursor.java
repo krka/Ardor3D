@@ -10,22 +10,25 @@
 
 package com.ardor3d.input;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.image.Image;
-import static com.google.common.base.Preconditions.checkArgument;
+import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * An immutable representation of a mouse cursor. A mouse cursor consists of an image and a hotspot where clicking is
  * done.
- *
+ * 
  */
 @Immutable
 public class MouseCursor {
     /**
-     * This constant is used to identify that the native operating system's default cursor should be used.
-     * It is not a valid mouse cursor in itself.
+     * This constant is used to identify that the native operating system's default cursor should be used. It is not a
+     * valid mouse cursor in itself.
      */
-    public static final MouseCursor SYSTEM_DEFAULT = new MouseCursor("system default", new Image(Image.Format.Guess, 1, 1, null), 0, 0);
+    public static final MouseCursor SYSTEM_DEFAULT = new MouseCursor("system default", new Image(Image.Format.Guess, 1,
+            1, BufferUtils.createByteBuffer(1)), 0, 0);
 
     private final String _name;
     private final Image _image;
@@ -34,20 +37,26 @@ public class MouseCursor {
 
     /**
      * Instantiates a MouseCursor.
-     *
-     * @param name the name of this cursor, for debugging purposes.
-     * @param image the image that will be shown when this cursor is active.
-     * @param hotspotX the X coordinate of the clicking hotspot, 0 = left side
-     * @param hotspotY the Y coordinate of the clicking hotspot, 0 = bottom
+     * 
+     * @param name
+     *            the name of this cursor, for debugging purposes.
+     * @param image
+     *            the image that will be shown when this cursor is active.
+     * @param hotspotX
+     *            the X coordinate of the clicking hotspot, 0 = left side
+     * @param hotspotY
+     *            the Y coordinate of the clicking hotspot, 0 = bottom
      */
-    public MouseCursor(String name, Image image, final int hotspotX, final int hotspotY) {
+    public MouseCursor(final String name, final Image image, final int hotspotX, final int hotspotY) {
         _name = name;
         _image = image;
         _hotspotX = hotspotX;
         _hotspotY = hotspotY;
 
-        checkArgument(hotspotX >= 0 && hotspotX < image.getWidth(), "hotspot X is out of bounds: 0 <= %s  < " + image.getWidth(), hotspotX);
-        checkArgument(hotspotY >= 0 && hotspotY < image.getHeight(), "hotspot Y is out of bounds: 0 <= %s  < " + image.getHeight(), hotspotY);
+        checkArgument(hotspotX >= 0 && hotspotX < image.getWidth(), "hotspot X is out of bounds: 0 <= %s  < "
+                + image.getWidth(), hotspotX);
+        checkArgument(hotspotY >= 0 && hotspotY < image.getHeight(), "hotspot Y is out of bounds: 0 <= %s  < "
+                + image.getHeight(), hotspotY);
     }
 
     public String getName() {
@@ -76,16 +85,28 @@ public class MouseCursor {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final MouseCursor that = (MouseCursor) o;
 
-        if (_hotspotX != that._hotspotX) return false;
-        if (_hotspotY != that._hotspotY) return false;
-        if (_image != null ? !_image.equals(that._image) : that._image != null) return false;
-        //noinspection RedundantIfStatement
-        if (_name != null ? !_name.equals(that._name) : that._name != null) return false;
+        if (_hotspotX != that._hotspotX) {
+            return false;
+        }
+        if (_hotspotY != that._hotspotY) {
+            return false;
+        }
+        if (_image != null ? !_image.equals(that._image) : that._image != null) {
+            return false;
+        }
+        // noinspection RedundantIfStatement
+        if (_name != null ? !_name.equals(that._name) : that._name != null) {
+            return false;
+        }
 
         return true;
     }
