@@ -144,10 +144,10 @@ public final class JoglContextCapabilities extends ContextCapabilities {
         // Check for S3 texture compression capability.
         _supportsS3TCCompression = gl.isExtensionAvailable("GL_EXT_texture_compression_s3tc");
 
-        // Check for S3 texture compression capability.
-        _supportsTexture3D = gl.isExtensionAvailable("GL_EXT_texture_3d");
+        // Check for 3D texture capability.
+        _supportsTexture3D = _supportsGL1_2;
 
-        // Check for S3 texture compression capability.
+        // Check for cubemap capability.
         _supportsTextureCubeMap = gl.isExtensionAvailable("GL_ARB_texture_cube_map");
 
         // See if we support anisotropic filtering
