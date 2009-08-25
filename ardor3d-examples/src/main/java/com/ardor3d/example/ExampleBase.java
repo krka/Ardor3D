@@ -254,6 +254,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
             renderDebug(renderer);
 
             if (_doShot) {
+                // force any waiting scene elements to be renderer.
+                renderer.renderBuckets();
                 ScreenExporter.exportCurrentScreen(_canvas.getCanvasRenderer().getRenderer(), _screenShotExp);
                 _doShot = false;
             }
