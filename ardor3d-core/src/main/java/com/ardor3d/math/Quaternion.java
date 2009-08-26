@@ -234,7 +234,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      * @param bank
      *            the Euler bank angle in radians. (rotation about the x axis)
      * @return this quaternion for chaining
-     * @see http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
+     * @see <a
+     *      href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm">euclideanspace.com-eulerToQuaternion</a>
      */
     public Quaternion fromEulerAngles(final double heading, final double attitude, final double bank) {
         double angle = heading * 0.5;
@@ -271,7 +272,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      * @return the double[] array, filled with heading, attitude and bank in that order..
      * @throws IllegalArgumentException
      *             if non-null store is not at least length 3
-     * @see http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+     * @see <a
+     *      href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm">euclideanspace.com-quaternionToEuler</a>
      * @see #fromEulerAngles(double, double, double)
      */
     public double[] toEulerAngles(final double[] store) {
