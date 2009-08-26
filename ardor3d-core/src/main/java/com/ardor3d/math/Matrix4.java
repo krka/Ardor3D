@@ -883,7 +883,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created.
      * @return this matrix for chaining.
-     * @see {@link http://en.wikipedia.org/wiki/Transpose}
+     * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
      */
     public Matrix4 transpose(final Matrix4 store) {
         Matrix4 result = store;
@@ -900,7 +900,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * transposes this matrix in place
      * 
      * @return this matrix for chaining.
-     * @see {@link http://en.wikipedia.org/wiki/Transpose}
+     * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
      */
     public Matrix4 transposeLocal() {
         final double m01 = _data[0][1];
@@ -994,7 +994,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param store
      *            The matrix to store the result in. If null, a new matrix is created.
      * @return The adjugate, or classical adjoint, of this matrix
-     * @see {@link http://en.wikipedia.org/wiki/Adjugate_matrix}
+     * @see <a href="http://en.wikipedia.org/wiki/Adjugate_matrix">wikipedia.org-Adjugate_matrix</a>
      */
     public Matrix4 adjugate(final Matrix4 store) {
         Matrix4 result = store;
@@ -1038,7 +1038,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * @return this matrix, modified to represent its adjugate, or classical adjoint
-     * @see {@link http://en.wikipedia.org/wiki/Adjugate_matrix}
+     * @see <a href="http://en.wikipedia.org/wiki/Adjugate_matrix">wikipedia.org-Adjugate_matrix</a>
      */
     public Matrix4 adjugateLocal() {
         return adjugate(this);
@@ -1046,7 +1046,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * @return the determinate of this matrix
-     * @see {@link http://en.wikipedia.org/wiki/Determinant}
+     * @see <a href="http://en.wikipedia.org/wiki/Determinant">wikipedia.org-Determinant</a>
      */
     public double determinant() {
         final double dA0 = _data[0][0] * _data[1][1] - _data[0][1] * _data[1][0];

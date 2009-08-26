@@ -864,7 +864,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param store
      *            a matrix to store the result in. If store is null, a new matrix is created.
      * @return this matrix for chaining.
-     * @see {@link http://en.wikipedia.org/wiki/Transpose}
+     * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
      */
     public Matrix3 transpose(final Matrix3 store) {
         Matrix3 result = store;
@@ -880,7 +880,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * transposes this matrix in place
      * 
      * @return this matrix for chaining.
-     * @see {@link http://en.wikipedia.org/wiki/Transpose}
+     * @see <a href="http://en.wikipedia.org/wiki/Transpose">wikipedia.org-Transpose</a>
      */
     public Matrix3 transposeLocal() {
         final double m01 = _data[0][1];
@@ -944,7 +944,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param store
      *            The matrix to store the result in. If null, a new matrix is created.
      * @return The adjugate, or classical adjoint, of this matrix
-     * @see http://en.wikipedia.org/wiki/Adjugate_matrix
+     * @see <a href="http://en.wikipedia.org/wiki/Adjugate_matrix">wikipedia.org-Adjugate_matrix</a>
      */
     public Matrix3 adjugate(final Matrix3 store) {
         Matrix3 result = store;
@@ -967,7 +967,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * @return this matrix, modified to represent its adjugate, or classical adjoint
-     * @see {@link http://en.wikipedia.org/wiki/Adjugate_matrix}
+     * @see <a href="http://en.wikipedia.org/wiki/Adjugate_matrix">wikipedia.org-Adjugate_matrix</a>
      */
     public Matrix3 adjugateLocal() {
         return adjugate(this);
@@ -1059,7 +1059,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     /**
      * @return the determinate of this matrix
-     * @see {@link http://en.wikipedia.org/wiki/Determinant}
+     * @see <a href="http://en.wikipedia.org/wiki/Determinant">wikipedia.org-Determinant</a>
      */
     public double determinant() {
         final double fCo00 = _data[1][1] * _data[2][2] - _data[1][2] * _data[2][1];
@@ -1072,8 +1072,10 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Modifies this matrix to equal the rotation required to point the z-axis at 'direction' and the y-axis to 'up'.
      * 
-     * @param direction where to 'look' at
-     * @param up a vector indicating the local up direction.
+     * @param direction
+     *            where to 'look' at
+     * @param up
+     *            a vector indicating the local up direction.
      */
     public void lookAt(final ReadOnlyVector3 direction, final Vector3 up) {
         final Vector3 xAxis = Vector3.fetchTempInstance();
@@ -1093,7 +1095,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Check a matrix... if it is null or its doubles are NaN or infinite, return false. Else return true.
      * 
-     * @param matrix the vector to check
+     * @param matrix
+     *            the vector to check
      * @return true or false as stated above.
      */
     public static boolean isValid(final ReadOnlyMatrix3 matrix) {
@@ -1148,7 +1151,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
-     * @param o the object to compare for equality
+     * @param o
+     *            the object to compare for equality
      * @return true if this matrix and the provided matrix have the same double values.
      */
     @Override
@@ -1219,7 +1223,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Used with serialization. Not to be called manually.
      * 
-     * @param in ObjectInput
+     * @param in
+     *            ObjectInput
      * @throws IOException
      * @throws ClassNotFoundException
      */
@@ -1234,7 +1239,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * Used with serialization. Not to be called manually.
      * 
-     * @param out ObjectOutput
+     * @param out
+     *            ObjectOutput
      * @throws IOException
      */
     public void writeExternal(final ObjectOutput out) throws IOException {
@@ -1265,7 +1271,8 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * Releases a Matrix3 back to be used by a future call to fetchTempInstance. TAKE CARE: this Matrix3 object should
      * no longer have other classes referencing it or "Bad Things" will happen.
      * 
-     * @param mat the Matrix3 to release.
+     * @param mat
+     *            the Matrix3 to release.
      */
     public final static void releaseTempInstance(final Matrix3 mat) {
         if (Constants.useMathPools) {
