@@ -944,7 +944,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param store
      *            The matrix to store the result in. If null, a new matrix is created.
      * @return The adjugate, or classical adjoint, of this matrix
-     * @see {@link http://en.wikipedia.org/wiki/Adjugate_matrix}
+     * @see http://en.wikipedia.org/wiki/Adjugate_matrix
      */
     public Matrix3 adjugate(final Matrix3 store) {
         Matrix3 result = store;
