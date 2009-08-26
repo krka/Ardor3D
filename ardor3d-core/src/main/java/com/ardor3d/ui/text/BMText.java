@@ -69,9 +69,9 @@ public class BMText extends Mesh {
     protected AutoScale _autoScale = AutoScale.CapScreenSize;
 
     /**
-     * @see setAutoFadeDistanceRange()
-     * @see setAutoFadeFixedPixelSize()
-     * @see setAutoFadeFalloff()
+     * @see BMText#setAutoFadeDistanceRange(double, double)
+     * @see BMText#setAutoFadeFixedPixelSize(int)
+     * @see BMText#setAutoFadeFalloff(float)
      */
     public enum AutoFade {
         /**

@@ -144,8 +144,9 @@ public class FirstPersonControl {
 
     /**
      * @param layer
-     * @param impl
-     * @return
+     * @param upAxis
+     * @param dragOnly
+     * @return a new FirstPersonControl object
      */
     public static FirstPersonControl setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis,
             final boolean dragOnly) {

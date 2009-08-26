@@ -42,7 +42,8 @@ public enum RenderBucketType {
 
     /**
      * Draw in orthographic mode where the x and y coordinates are in screen space with the origin in the lower left
-     * corner. Uses {@link com.ardor3d.scenegraph.Spatial#getZOrder() Spatial.getZOrder()} to determine draw order.
+     * corner. Uses {@link com.ardor3d.scenegraph.hint.SceneHints#getOrthoOrder() SceneHints.getOrthoOrder()} to
+     * determine draw order.
      */
     Ortho,
 

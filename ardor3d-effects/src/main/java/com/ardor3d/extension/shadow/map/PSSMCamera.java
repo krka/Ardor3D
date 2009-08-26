@@ -89,7 +89,7 @@ public class PSSMCamera extends Camera {
      * @param splitCount
      *            the split count
      * 
-     * @see http://appsrv.cse.cuhk.edu.hk/~fzhang/pssm_vrcia/keypoint1.htm
+     * @see <a href="http://appsrv.cse.cuhk.edu.hk/~fzhang/pssm_vrcia/keypoint1.htm">technique paper</a>
      */
     public void calculateSplitDistances(final int splitCount) {
         // ensure correct size.
