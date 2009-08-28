@@ -10,13 +10,13 @@
 
 package com.ardor3d.example.ui;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
 
 /**
  * Simple hack singleton that loads some font textures and provides easy access.
@@ -55,7 +55,7 @@ public class BMFontLoader {
         for (final FontLoad fl : fontNames) {
             try {
                 final String file = "fonts/" + fl.fontName + ".fnt";
-                final URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
+                final ResourceSource url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
                 final BMFont bmFont = new BMFont(url, fl.useMipMaps);
                 _fontList.add(bmFont);
             } catch (final Throwable t) {

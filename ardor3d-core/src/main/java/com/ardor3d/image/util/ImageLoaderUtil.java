@@ -12,7 +12,6 @@ package com.ardor3d.image.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.util.resource.ResourceSource;
 
 public abstract class ImageLoaderUtil {
     private static final Logger logger = Logger.getLogger(ImageLoaderUtil.class.getName());
@@ -29,31 +29,30 @@ public abstract class ImageLoaderUtil {
     private static Map<String, ImageLoader> loaders = Collections.synchronizedMap(new HashMap<String, ImageLoader>());
 
     static {
-        registerHandler(".DDS", new DdsLoader());
-        registerHandler(".TGA", new TgaLoader());
+        registerHandler(new DdsLoader(), ".DDS"); // dxt image
+        registerHandler(new TgaLoader(), ".TGA"); // targa image
+        registerHandler(new AbiLoader(), ".ABI"); // ardor3d binary image
     }
 
-    public static Image loadImage(final URL file, final boolean flipped) {
-        if (file == null) {
-            logger.warning("loadImage(URL file, boolean flipped): file is null, defaultTexture used.");
+    public static Image loadImage(final ResourceSource src, final boolean flipped) {
+        if (src == null) {
+            logger.warning("loadImage(ResourceSource, boolean): file is null, defaultTexture used.");
             return TextureState.getDefaultTextureImage();
         }
 
-        final String fileName = file.getFile();
-        if (fileName == null) {
-            logger.warning("loadImage(URL file, boolean flipped): fileName is null, defaultTexture used.");
+        final String type = src.getType();
+        if (type == null) {
+            logger.warning("loadImage(ResourceSource, boolean): type is null, defaultTexture used.");
             return TextureState.getDefaultTextureImage();
         }
 
-        final int dot = fileName.lastIndexOf('.');
-        final String fileExt = dot >= 0 ? fileName.substring(dot) : "";
         InputStream is = null;
         try {
-            is = file.openStream();
-            logger.finer("loadImage(URL file, boolean flipped) opened URL: " + file);
-            return loadImage(fileExt, is, flipped);
+            is = src.openStream();
+            logger.log(Level.FINER, "loadImage(ResourceSource, boolean) opened stream: {0}", src);
+            return loadImage(type, is, flipped);
         } catch (final IOException e) {
-            logger.log(Level.WARNING, "loadImage(URL file, boolean flipped): defaultTexture used", e);
+            logger.log(Level.WARNING, "loadImage(ResourceSource, boolean): defaultTexture used", e);
             return TextureState.getDefaultTextureImage();
         } finally {
             if (is != null) {
@@ -65,22 +64,21 @@ public abstract class ImageLoaderUtil {
         }
     }
 
-    public static Image loadImage(final String fileExt, final InputStream stream, final boolean flipped) {
+    public static Image loadImage(final String type, final InputStream stream, final boolean flipped) {
 
         Image imageData = null;
         try {
-            ImageLoader loader = loaders.get(fileExt.toLowerCase());
+            ImageLoader loader = loaders.get(type.toLowerCase());
             if (loader == null) {
                 loader = defaultLoader;
             }
             if (loader != null) {
                 imageData = loader.load(stream, flipped);
             } else {
-                logger.warning("Unable to read image of type: " + fileExt.toLowerCase());
+                logger.log(Level.WARNING, "Unable to read image of type: {0}", type);
             }
             if (imageData == null) {
-                logger
-                        .warning("loadImage(String fileExt, InputStream stream, boolean flipped): no imageData found.  defaultTexture used.");
+                logger.warning("loadImage(String, InputStream, boolean): no imageData found.  defaultTexture used.");
                 imageData = TextureState.getDefaultTextureImage();
             }
         } catch (final IOException e) {
@@ -91,23 +89,28 @@ public abstract class ImageLoaderUtil {
     }
 
     /**
-     * Register an ImageLoader to handle all files with a specific extention. An ImageLoader can be registered to handle
+     * Register an ImageLoader to handle all files with a specific type. An ImageLoader can be registered to handle
      * several formats without problems.
      * 
-     * @param format
-     *            The file extention for the format this ImageLoader will handle. Make sure to include the dot (eg.
-     *            ".BMP"). This value is case insensitive (".Bmp" will register for ".BMP", ".bmp", etc.)
      * @param handler
+     *            the handler to use
+     * @param types
+     *            The type or types for the format this ImageLoader will handle. This value is case insensitive.
+     *            Examples include ".jpeg", ".gif", ".dds", etc.
      */
-    public static void registerHandler(final String format, final ImageLoader handler) {
-        loaders.put(format.toLowerCase(), handler);
+    public static void registerHandler(final ImageLoader handler, final String... types) {
+        for (final String type : types) {
+            loaders.put(type.toLowerCase(), handler);
+        }
     }
 
-    public static void unregisterHandler(final String format) {
-        loaders.remove(format.toLowerCase());
+    public static void unregisterHandler(final String... types) {
+        for (final String type : types) {
+            loaders.remove(type.toLowerCase());
+        }
     }
 
-    public static void registerDefaultHandler(ImageLoader handler) {
+    public static void registerDefaultHandler(final ImageLoader handler) {
         defaultLoader = handler;
     }
 }

@@ -27,18 +27,16 @@ import com.ardor3d.image.Image;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * Image loader that makes use of AWT's ImageIO to load image file data.
+ */
 public class AWTImageLoader implements ImageLoader {
     private static final Logger logger = Logger.getLogger(AWTImageLoader.class.getName());
 
     private static boolean createOnHeap = false;
 
     public static void registerLoader() {
-        final AWTImageLoader loader = new AWTImageLoader();
-        ImageLoaderUtil.registerHandler(".JPG", loader);
-        ImageLoaderUtil.registerHandler(".JPEG", loader);
-        ImageLoaderUtil.registerHandler(".GIF", loader);
-        ImageLoaderUtil.registerHandler(".PNG", loader);
-        ImageLoaderUtil.registerHandler(".BMP", loader);
+        ImageLoaderUtil.registerHandler(new AWTImageLoader(), ".JPG", ".JPEG", ".GIF", ".PNG", ".BMP");
     }
 
     public Image load(final InputStream is, final boolean flipImage) throws IOException {

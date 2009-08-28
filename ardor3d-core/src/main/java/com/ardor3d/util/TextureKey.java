@@ -12,9 +12,7 @@ package com.ardor3d.util;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,28 +27,49 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
+import com.google.common.collect.Lists;
 
 /**
  * <code>TextureKey</code> provides a way for the TextureManager to cache and retrieve <code>Texture</code> objects.
  */
 final public class TextureKey implements Savable {
 
-    protected URL _location = null;
+    /** The source of the image used in this Texture. */
+    protected ResourceSource _source = null;
+
+    /** Whether we had asked the loader of the image to flip vertically. */
     protected boolean _flipped;
+
+    /** The format of our image. */
     protected Image.Format _format = Image.Format.Guess;
-    protected String _fileType;
+
+    /**
+     * An optional id, used to differentiate keys where the rest of the values are the same. RTT operations are a good
+     * example.
+     */
+    protected String _id;
+
+    /**
+     * The minification filter used on our texture (generally determines what mipmaps are created - if any - and how.)
+     */
     protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
+
+    /** cache of opengl context specific texture ids for the associated texture. */
     protected final transient ContextIdReference<TextureKey> _idCache = new ContextIdReference<TextureKey>(this,
             TextureManager.getRefQueue());
-    protected int _code = Integer.MAX_VALUE;
 
-    protected static final List<WeakReference<TextureKey>> _keyCache = new ArrayList<WeakReference<TextureKey>>();
+    /** cached hashcode value. */
+    protected transient int _code = Integer.MAX_VALUE;
+
+    /** cache of texturekey objects allowing us to find an existing texture key. */
+    protected static final List<WeakReference<TextureKey>> _keyCache = Lists.newLinkedList();
+
+    /** RTT code use */
+    private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
 
     /** DO NOT USE. FOR SAVABLE USE ONLY */
     public TextureKey() {}
-
-    private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
 
     /**
      * Get a new unique TextureKey. This is meant for use by RTT and other situations where we know we are making a
@@ -66,34 +85,49 @@ final public class TextureKey implements Savable {
             _uniqueTK.set(Integer.MIN_VALUE);
             val = Integer.MIN_VALUE;
         }
-        return getKey(null, false, Format.Guess, "" + val, minFilter);
+        return getKey(null, false, Format.Guess, "RTT_" + val, minFilter);
     }
 
-    public static synchronized TextureKey getKey(final URL location, final boolean flipped,
+    public static synchronized TextureKey getKey(final ResourceSource source, final boolean flipped,
             final Image.Format imageType, final Texture.MinificationFilter minFilter) {
-        return getKey(location, flipped, imageType, null, minFilter);
+        return getKey(source, flipped, imageType, null, minFilter);
     }
 
-    public static synchronized TextureKey getKey(final URL location, final boolean flipped,
-            final Image.Format imageType, final String fileType, final Texture.MinificationFilter minFilter) {
+    public static synchronized TextureKey getKey(final ResourceSource source, final boolean flipped,
+            final Image.Format imageType, final String id, final Texture.MinificationFilter minFilter) {
         final TextureKey key = new TextureKey();
 
-        key._location = location;
+        key._source = source;
         key._flipped = flipped;
         key._minFilter = minFilter;
         key._format = imageType;
-        key._fileType = fileType;
+        key._id = id;
 
-        final int cacheLoc = _keyCache.indexOf(new WeakReference<TextureKey>(key));
-        if (cacheLoc == -1) {
-            _keyCache.add(new WeakReference<TextureKey>(key));
-            return key;
+        {
+            WeakReference<TextureKey> ref;
+            TextureKey check;
+            for (final Iterator<WeakReference<TextureKey>> it = _keyCache.iterator(); it.hasNext();) {
+                ref = it.next();
+                check = ref.get();
+                if (check == null) {
+                    // found empty, clean up
+                    it.remove();
+                    continue;
+                }
+
+                if (check.equals(key)) {
+                    // found match, return
+                    return check;
+                }
+            }
         }
 
-        return _keyCache.get(cacheLoc).get();
+        // not found
+        _keyCache.add(new WeakReference<TextureKey>(key));
+        return key;
     }
 
-    public static boolean removeKey(final TextureKey key) {
+    public static synchronized boolean clearKey(final TextureKey key) {
         return _keyCache.remove(key);
     }
 
@@ -164,11 +198,11 @@ final public class TextureKey implements Savable {
         }
 
         final TextureKey that = (TextureKey) other;
-        if (_location == null) {
-            if (that._location != null) {
+        if (_source == null) {
+            if (that._source != null) {
                 return false;
             }
-        } else if (!_location.equals(that._location)) {
+        } else if (!_source.equals(that._source)) {
             return false;
         }
 
@@ -178,9 +212,9 @@ final public class TextureKey implements Savable {
         if (_format != that._format) {
             return false;
         }
-        if (_fileType == null && that._fileType != null) {
+        if (_id == null && that._id != null) {
             return false;
-        } else if (_fileType != null && !_fileType.equals(that._fileType)) {
+        } else if (_id != null && !_id.equals(that._id)) {
             return false;
         }
 
@@ -190,15 +224,14 @@ final public class TextureKey implements Savable {
     @Override
     public int hashCode() {
         if (_code == Integer.MAX_VALUE) {
+            _code = 17;
 
+            _code += 31 * _code + (_source != null ? _source.hashCode() : 0);
+            _code += 31 * _code + (_id != null ? _id.hashCode() : 0);
+            _code += 31 * _code + _minFilter.hashCode();
+            _code += 31 * _code + _format.hashCode();
+            _code += 31 * _code + (_flipped ? 1 : 0);
         }
-        _code = 17;
-
-        _code += 31 * _code + (_location != null ? _location.hashCode() : 0);
-        _code += 31 * _code + (_fileType != null ? _fileType.hashCode() : 0);
-        _code += 31 * _code + _minFilter.hashCode();
-        _code += 31 * _code + _format.hashCode();
-        _code += 31 * _code + (_flipped ? 1 : 0);
 
         return _code;
     }
@@ -219,20 +252,20 @@ final public class TextureKey implements Savable {
     }
 
     /**
-     * @return Returns the location.
+     * @return Returns the source.
      */
-    public URL getLocation() {
-        return _location;
+    public ResourceSource getSource() {
+        return _source;
     }
 
-    public String getFileType() {
-        return _fileType;
+    public String getId() {
+        return _id;
     }
 
     @Override
     public String toString() {
-        final String x = "tkey: loc:" + _location + " flip: " + _flipped + " code: " + hashCode() + " imageType: "
-                + _format + " fileType: " + _fileType;
+        final String x = "tkey: src:" + _source + " flip: " + _flipped + " code: " + hashCode() + " imageType: "
+                + _format + " id: " + _id;
         return x;
     }
 
@@ -246,33 +279,19 @@ final public class TextureKey implements Savable {
 
     public void write(final Ardor3DExporter e) throws IOException {
         final OutputCapsule capsule = e.getCapsule(this);
-        if (_location != null) {
-            capsule.write(_location.getProtocol(), "protocol", null);
-            capsule.write(_location.getHost(), "host", null);
-            capsule.write(_location.getFile(), "file", null);
-        }
+        capsule.write(_source, "source", null);
         capsule.write(_flipped, "flipped", false);
         capsule.write(_format, "format", Image.Format.Guess);
         capsule.write(_minFilter, "minFilter", MinificationFilter.Trilinear);
-        capsule.write(_fileType, "fileType", null);
+        capsule.write(_id, "id", null);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        final String protocol = capsule.readString("protocol", null);
-        final String host = capsule.readString("host", null);
-        final String file = capsule.readString("file", null);
-        if (file != null) {
-            _location = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, URLDecoder.decode(file,
-                    "UTF-8"));
-        }
-        if (_location == null && protocol != null && host != null && file != null) {
-            _location = new URL(protocol, host, file);
-        }
-
+        _source = (ResourceSource) capsule.readSavable("source", null);
         _flipped = capsule.readBoolean("flipped", false);
         _format = capsule.readEnum("format", Image.Format.class, Image.Format.Guess);
         _minFilter = capsule.readEnum("minFilter", MinificationFilter.class, MinificationFilter.Trilinear);
-        _fileType = capsule.readString("fileType", null);
+        _id = capsule.readString("id", null);
     }
 }

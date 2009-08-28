@@ -32,7 +32,7 @@ public class ResourceLocatorTool {
 
     private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<String, List<ResourceLocator>>();
 
-    public static URL locateResource(final String resourceType, final String resourceName) {
+    public static ResourceSource locateResource(final String resourceType, final String resourceName) {
         if (resourceName == null) {
             return null;
         }
@@ -41,7 +41,7 @@ public class ResourceLocatorTool {
             if (bases != null) {
                 for (int i = bases.size(); --i >= 0;) {
                     final ResourceLocator loc = bases.get(i);
-                    final URL rVal = loc.locateResource(resourceName);
+                    final ResourceSource rVal = loc.locateResource(resourceName);
                     if (rVal != null) {
                         return rVal;
                     }
@@ -51,7 +51,7 @@ public class ResourceLocatorTool {
             try {
                 final URL u = ResourceLocatorTool.class.getResource(resourceName);
                 if (u != null) {
-                    return u;
+                    return new URLResourceSource(u);
                 }
             } catch (final Exception e) {
                 logger.logp(Level.WARNING, ResourceLocatorTool.class.getName(), "locateResource(String, String)", e

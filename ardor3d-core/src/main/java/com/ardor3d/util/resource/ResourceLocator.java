@@ -10,22 +10,20 @@
 
 package com.ardor3d.util.resource;
 
-import java.net.URL;
-
 /**
  * Interface for locating resources from resource names.
  */
 public interface ResourceLocator {
 
     /**
-     * Locates a resource according to the strategy of the reousrce locator implementation (subclass).
+     * Locates a resource according to the strategy of the resource locator implementation (subclass).
      * 
-     * @see SimpleResourceLocator
-     * @see MultiFormatResourceLocator
      * @param resourceName
      *            the name of the resource to locate; it this is a path it must be slash separated (no backslashes)
-     * @return a URL for the resource, null if the resource was not found
+     * @see SimpleResourceLocator
+     * @see MultiFormatResourceLocator
+     * @return a source for the resource, null if the resource was not found
      */
-    public URL locateResource(String resourceName);
+    public ResourceSource locateResource(String resourceName);
 
 }

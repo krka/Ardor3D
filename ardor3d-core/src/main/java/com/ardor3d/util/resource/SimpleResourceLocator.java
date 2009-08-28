@@ -67,7 +67,7 @@ public class SimpleResourceLocator implements ResourceLocator {
         return _baseDir;
     }
 
-    public URL locateResource(String resourceName) {
+    public ResourceSource locateResource(String resourceName) {
         // Trim off any prepended local dir.
         while (resourceName.startsWith("./") && resourceName.length() > 2) {
             resourceName = resourceName.substring(2);
@@ -86,7 +86,7 @@ public class SimpleResourceLocator implements ResourceLocator {
             // open a stream to see if this is a valid resource
             // XXX: Perhaps this is wasteful? Also, what info will determine validity?
             rVal.openStream().close();
-            return rVal;
+            return new URLResourceSource(rVal);
         } catch (final IOException e) {
             // URL wasn't valid in some way, so try up a path.
         } catch (final IllegalArgumentException e) {

@@ -164,7 +164,7 @@ public class UpdateTextureExample extends ExampleBase {
 
         try {
             img = ImageIO.read(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE,
-                    "images/ardor3d_white_256.jpg"));
+                    "images/ardor3d_white_256.jpg").openStream());
             // FIXME: Check if this is a int[] or byte[]
             final byte data[] = AWTImageLoader.asByteArray(img);
             imageBuffer = BufferUtils.createByteBuffer(data.length);

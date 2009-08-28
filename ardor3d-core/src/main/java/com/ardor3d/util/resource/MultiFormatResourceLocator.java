@@ -71,19 +71,19 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
     }
 
     @Override
-    public URL locateResource(final String resourceName) {
+    public ResourceSource locateResource(final String resourceName) {
         if (_trySpecifiedFormatFirst) {
-            final URL u = super.locateResource(resourceName);
-            if (u != null) {
-                return u;
+            final ResourceSource src = super.locateResource(resourceName);
+            if (src != null) {
+                return src;
             }
         }
 
         final String baseFileName = getBaseFileName(resourceName);
         for (final String extension : _extensions) {
-            final URL u = super.locateResource(baseFileName + extension);
-            if (u != null) {
-                return u;
+            final ResourceSource src = super.locateResource(baseFileName + extension);
+            if (src != null) {
+                return src;
             }
         }
 

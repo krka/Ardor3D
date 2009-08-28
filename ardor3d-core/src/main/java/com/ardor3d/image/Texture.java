@@ -443,9 +443,6 @@ public abstract class Texture implements Savable {
         Intensity
     }
 
-    // Optional String to point to where this texture is located
-    private String _imageLocation = null;
-
     // texture attributes.
     private Image _image = null;
     private final ColorRGBA _constantColor = new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA);
@@ -1095,14 +1092,6 @@ public abstract class Texture implements Savable {
         }
     }
 
-    public String getImageLocation() {
-        return _imageLocation;
-    }
-
-    public void setImageLocation(final String imageLocation) {
-        _imageLocation = imageLocation;
-    }
-
     /**
      * @return the anisotropic filtering level for this texture as a percentage (0.0 - 1.0)
      */
@@ -1259,7 +1248,6 @@ public abstract class Texture implements Savable {
         rVal.setEnvPlaneQ(_envPlaneQ);
         rVal.setHasBorder(_hasBorder);
         rVal.setImage(_image); // NOT CLONED.
-        rVal.setImageLocation(_imageLocation);
         rVal.setLodBias(_lodBias);
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
@@ -1329,7 +1317,6 @@ public abstract class Texture implements Savable {
     public void write(final Ardor3DExporter e) throws IOException {
 
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(_imageLocation, "imageLocation", null);
         if (_storeImage) {
             capsule.write(_image, "image", null);
         }
@@ -1372,13 +1359,12 @@ public abstract class Texture implements Savable {
 
     public void read(final Ardor3DImporter e) throws IOException {
         final InputCapsule capsule = e.getCapsule(this);
-        _imageLocation = capsule.readString("imageLocation", null);
         _minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
                 MinificationFilter.NearestNeighborNoMipMaps);
         _image = (Image) capsule.readSavable("image", null);
         if (_image == null) {
             _key = (TextureKey) capsule.readSavable("textureKey", null);
-            if (_key != null && _key.getLocation() != null) {
+            if (_key != null && _key.getSource() != null) {
                 TextureManager.loadFromKey(_key, null, this);
             }
         }

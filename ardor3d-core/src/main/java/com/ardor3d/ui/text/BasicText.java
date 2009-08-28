@@ -20,6 +20,7 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
+import com.ardor3d.util.resource.URLResourceSource;
 
 public class BasicText extends BMText {
     static Logger logger = Logger.getLogger(BasicText.class.getName());
@@ -30,8 +31,8 @@ public class BasicText extends BMText {
 
     static {
         try {
-            DEFAULT_FONT = new BMFont(BasicText.class.getClassLoader().getResource(
-                    "com/ardor3d/ui/text/arial-24-bold-regular.fnt"), true);
+            DEFAULT_FONT = new BMFont(new URLResourceSource(BasicText.class.getClassLoader().getResource(
+                    "com/ardor3d/ui/text/arial-24-bold-regular.fnt")), true);
         } catch (final Exception ex) {
             logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
         }

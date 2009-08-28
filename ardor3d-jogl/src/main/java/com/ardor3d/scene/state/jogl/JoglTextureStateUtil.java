@@ -1064,159 +1064,64 @@ public class JoglTextureStateUtil {
         switch (texture.getEnvironmentalMapMode()) {
             case None:
                 // No coordinate generation
-                if (!unitRecord.isValid() || unitRecord.textureGenQ) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = false;
-                }
-                if (!unitRecord.isValid() || unitRecord.textureGenR) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = false;
-                }
-                if (!unitRecord.isValid() || unitRecord.textureGenS) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = false;
-                }
-                if (!unitRecord.isValid() || unitRecord.textureGenT) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = false;
-                }
+                setTextureGen(unitRecord, unit, record, caps, false, false, false, false);
                 break;
             case SphereMap:
                 // generate spherical texture coordinates
+                // only look at S as all modes use that and we can be fairly certain all are the same mode.
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_SPHERE_MAP) {
                     checkAndSetUnit(unit, record, caps);
+
                     gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
                     unitRecord.textureGenSMode = GL.GL_SPHERE_MAP;
-                }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_SPHERE_MAP) {
-                    checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP);
                     unitRecord.textureGenTMode = GL.GL_SPHERE_MAP;
                 }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenQ) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = false;
-                }
-                if (!unitRecord.isValid() || unitRecord.textureGenR) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = false;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenS) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenT) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = true;
-                }
+                setTextureGen(unitRecord, unit, record, caps, true, true, false, false);
                 break;
             case NormalMap:
                 // generate normals based texture coordinates
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_NORMAL_MAP) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
-                    unitRecord.textureGenRMode = GL.GL_NORMAL_MAP;
-                }
-
+                // only look at S as all modes use that and we can be fairly certain all are the same mode.
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_NORMAL_MAP) {
                     checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
                     unitRecord.textureGenSMode = GL.GL_NORMAL_MAP;
-                }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_NORMAL_MAP) {
-                    checkAndSetUnit(unit, record, caps);
                     gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
                     unitRecord.textureGenTMode = GL.GL_NORMAL_MAP;
+
+                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_NORMAL_MAP);
+                    unitRecord.textureGenRMode = GL.GL_NORMAL_MAP;
                 }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenQ) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = false;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenR) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenS) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenT) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = true;
-                }
+                setTextureGen(unitRecord, unit, record, caps, true, true, true, false);
                 break;
             case ReflectionMap:
                 // generate reflection texture coordinates
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_REFLECTION_MAP) {
+                // only look at S as all modes use that and we can be fairly certain all are the same mode.
+                if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_REFLECTION_MAP) {
                     checkAndSetUnit(unit, record, caps);
+
+                    gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
+                    unitRecord.textureGenSMode = GL.GL_REFLECTION_MAP;
+
+                    gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
+                    unitRecord.textureGenTMode = GL.GL_REFLECTION_MAP;
+
                     gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
                     unitRecord.textureGenRMode = GL.GL_REFLECTION_MAP;
                 }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_REFLECTION_MAP) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
-                    unitRecord.textureGenSMode = GL.GL_REFLECTION_MAP;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_REFLECTION_MAP) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_REFLECTION_MAP);
-                    unitRecord.textureGenTMode = GL.GL_REFLECTION_MAP;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenQ) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glDisable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = false;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenR) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenS) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenT) {
-                    checkAndSetUnit(unit, record, caps);
-                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = true;
-                }
+                setTextureGen(unitRecord, unit, record, caps, true, true, true, false);
                 break;
             case EyeLinear:
                 // do here because we don't check planes
                 checkAndSetUnit(unit, record, caps);
 
                 // generate eye linear texture coordinates
-                if (!unitRecord.isValid() || unitRecord.textureGenQMode != GL.GL_EYE_LINEAR) {
-                    gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-                    unitRecord.textureGenQMode = GL.GL_EYE_LINEAR;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_EYE_LINEAR) {
-                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
-                    unitRecord.textureGenRMode = GL.GL_EYE_LINEAR;
-                }
-
+                // only look at S as all modes use that and we can be fairly certain all are the same mode.
                 if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_EYE_LINEAR) {
                     gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
                     unitRecord.textureGenSMode = GL.GL_EYE_LINEAR;
@@ -1227,84 +1132,128 @@ public class JoglTextureStateUtil {
                     unitRecord.textureGenTMode = GL.GL_EYE_LINEAR;
                 }
 
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.plane);
+                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_EYE_LINEAR) {
+                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
+                    unitRecord.textureGenRMode = GL.GL_EYE_LINEAR;
+                }
+
+                if (!unitRecord.isValid() || unitRecord.textureGenQMode != GL.GL_EYE_LINEAR) {
+                    gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_EYE_LINEAR);
+                    unitRecord.textureGenQMode = GL.GL_EYE_LINEAR;
+                }
+
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 gl.glTexGenfv(GL.GL_S, GL.GL_EYE_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 gl.glTexGenfv(GL.GL_T, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_EYE_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_EYE_PLANE, record.plane);
 
-                if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenR) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenS) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenT) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = true;
-                }
+                setTextureGen(unitRecord, unit, record, caps, true, true, true, true);
                 break;
             case ObjectLinear:
                 // do here because we don't check planes
                 checkAndSetUnit(unit, record, caps);
 
                 // generate object linear texture coordinates
-                if (!unitRecord.isValid() || unitRecord.textureGenQMode != GL.GL_OBJECT_LINEAR) {
+                // only look at S as all modes use that and we can be fairly certain all are the same mode.
+                if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_OBJECT_LINEAR) {
+                    gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
+                    unitRecord.textureGenSMode = GL.GL_OBJECT_LINEAR;
+
+                    gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
+                    unitRecord.textureGenTMode = GL.GL_OBJECT_LINEAR;
+
+                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
+                    unitRecord.textureGenRMode = GL.GL_OBJECT_LINEAR;
+
                     gl.glTexGeni(GL.GL_Q, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
                     unitRecord.textureGenQMode = GL.GL_OBJECT_LINEAR;
                 }
 
-                if (!unitRecord.isValid() || unitRecord.textureGenRMode != GL.GL_OBJECT_LINEAR) {
-                    gl.glTexGeni(GL.GL_R, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenRMode = GL.GL_OBJECT_LINEAR;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenSMode != GL.GL_OBJECT_LINEAR) {
-                    gl.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenSMode = GL.GL_OBJECT_LINEAR;
-                }
-
-                if (!unitRecord.isValid() || unitRecord.textureGenTMode != GL.GL_OBJECT_LINEAR) {
-                    gl.glTexGeni(GL.GL_T, GL.GL_TEXTURE_GEN_MODE, GL.GL_OBJECT_LINEAR);
-                    unitRecord.textureGenTMode = GL.GL_OBJECT_LINEAR;
-                }
-
-                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
-                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.plane);
-                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
-                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneS(), TextureStateRecord.DEFAULT_S_PLANE);
                 gl.glTexGenfv(GL.GL_S, GL.GL_OBJECT_PLANE, record.plane);
                 record.prepPlane(texture.getEnvPlaneT(), TextureStateRecord.DEFAULT_T_PLANE);
                 gl.glTexGenfv(GL.GL_T, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneR(), TextureStateRecord.DEFAULT_R_PLANE);
+                gl.glTexGenfv(GL.GL_R, GL.GL_OBJECT_PLANE, record.plane);
+                record.prepPlane(texture.getEnvPlaneQ(), TextureStateRecord.DEFAULT_Q_PLANE);
+                gl.glTexGenfv(GL.GL_Q, GL.GL_OBJECT_PLANE, record.plane);
 
-                if (!unitRecord.isValid() || !unitRecord.textureGenQ) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_Q);
-                    unitRecord.textureGenQ = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenR) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_R);
-                    unitRecord.textureGenR = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenS) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
-                    unitRecord.textureGenS = true;
-                }
-                if (!unitRecord.isValid() || !unitRecord.textureGenT) {
-                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
-                    unitRecord.textureGenT = true;
-                }
+                setTextureGen(unitRecord, unit, record, caps, true, true, true, true);
                 break;
         }
+    }
+
+    private static void setTextureGen(final TextureUnitRecord unitRecord, final int unit,
+            final TextureStateRecord record, final ContextCapabilities caps, final boolean genS, final boolean genT,
+            final boolean genR, final boolean genQ) {
+        final GL gl = GLU.getCurrentGL();
+
+        if (!unitRecord.isValid()) {
+            checkAndSetUnit(unit, record, caps);
+
+            if (genS) {
+                gl.glEnable(GL.GL_TEXTURE_GEN_S);
+            } else {
+                gl.glDisable(GL.GL_TEXTURE_GEN_S);
+            }
+            if (genT) {
+                gl.glEnable(GL.GL_TEXTURE_GEN_T);
+            } else {
+                gl.glDisable(GL.GL_TEXTURE_GEN_T);
+            }
+            if (genR) {
+                gl.glEnable(GL.GL_TEXTURE_GEN_R);
+            } else {
+                gl.glDisable(GL.GL_TEXTURE_GEN_R);
+            }
+            if (genQ) {
+                gl.glEnable(GL.GL_TEXTURE_GEN_Q);
+            } else {
+                gl.glDisable(GL.GL_TEXTURE_GEN_Q);
+            }
+        } else {
+            if (genS != unitRecord.textureGenS) {
+                checkAndSetUnit(unit, record, caps);
+                if (genS) {
+                    gl.glEnable(GL.GL_TEXTURE_GEN_S);
+                } else {
+                    gl.glDisable(GL.GL_TEXTURE_GEN_S);
+                }
+            }
+            if (genT != unitRecord.textureGenT) {
+                checkAndSetUnit(unit, record, caps);
+                if (genT) {
+                    gl.glEnable(GL.GL_TEXTURE_GEN_T);
+                } else {
+                    gl.glDisable(GL.GL_TEXTURE_GEN_T);
+                }
+            }
+            if (genR != unitRecord.textureGenR) {
+                checkAndSetUnit(unit, record, caps);
+                if (genR) {
+                    gl.glEnable(GL.GL_TEXTURE_GEN_R);
+                } else {
+                    gl.glDisable(GL.GL_TEXTURE_GEN_R);
+                }
+            }
+            if (genQ != unitRecord.textureGenQ) {
+                checkAndSetUnit(unit, record, caps);
+                if (genQ) {
+                    gl.glEnable(GL.GL_TEXTURE_GEN_Q);
+                } else {
+                    gl.glDisable(GL.GL_TEXTURE_GEN_Q);
+                }
+            }
+        }
+
+        unitRecord.textureGenS = genS;
+        unitRecord.textureGenT = genT;
+        unitRecord.textureGenR = genR;
+        unitRecord.textureGenQ = genQ;
     }
 
     // If we support multitexturing, specify the unit we are affecting.

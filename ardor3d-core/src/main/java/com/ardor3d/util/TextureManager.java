@@ -10,13 +10,10 @@
 
 package com.ardor3d.util;
 
-import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
@@ -29,9 +26,9 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.util.export.Savable;
-import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
+import com.ardor3d.util.resource.URLResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
@@ -53,8 +50,8 @@ final public class TextureManager {
      * <code>loadTexture</code> loads a new texture defined by the parameter string. Filter parameters are used to
      * define the filtering of the texture. If there is an error loading the file, null is returned.
      * 
-     * @param file
-     *            the filename of the texture image.
+     * @param name
+     *            the name of the texture image.
      * @param minFilter
      *            the filter for the near values.
      * @param magFilter
@@ -65,16 +62,49 @@ final public class TextureManager {
      *            If true, the images Y values are flipped.
      * @return the loaded texture. If there is a problem loading the texture, null is returned.
      */
-    public static Texture load(final String file, final Texture.MinificationFilter minFilter,
+    public static Texture load(final String name, final Texture.MinificationFilter minFilter,
             final Image.Format imageType, final boolean flipped) {
-        return load(getTextureURL(file), minFilter, imageType, flipped);
+        return load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, name), minFilter, imageType,
+                flipped);
     }
 
     /**
      * <code>loadTexture</code> loads a new texture defined by the parameter url. Filter parameters are used to define
      * the filtering of the texture. If there is an error loading the file, null is returned.
      * 
-     * @param file
+     * @param source
+     *            the source of the texture image.
+     * @param minFilter
+     *            the filter for the near values.
+     * @param magFilter
+     *            the filter for the far values.
+     * @param imageType
+     *            the image type to use. if Image.Format.Guess, the type is determined by ardor3d. If S3TC/DXT is
+     *            available we use that. if Image.Format.GuessNoCompression, the type is determined by ardor3d without
+     *            using S3TC, even if available. See com.ardor3d.image.Image.Format for possible types.
+     * @param flipped
+     *            If true, the images Y values are flipped.
+     * @return the loaded texture. If there is a problem loading the texture, null is returned.
+     * @see Image.Format
+     */
+    public static Texture load(final ResourceSource source, final Texture.MinificationFilter minFilter,
+            final Image.Format imageType, final boolean flipped) {
+
+        if (null == source) {
+            logger.warning("Could not load image...  source was null. defaultTexture used.");
+            return TextureState.getDefaultTexture();
+        }
+
+        final TextureKey tkey = TextureKey.getKey(source, flipped, imageType, minFilter);
+
+        return loadFromKey(tkey, null, null);
+    }
+
+    /**
+     * <code>loadTexture</code> loads a new texture defined by the parameter url. Filter parameters are used to define
+     * the filtering of the texture. If there is an error loading the file, null is returned.
+     * 
+     * @param loc
      *            the url of the texture image.
      * @param minFilter
      *            the filter for the near values.
@@ -89,21 +119,21 @@ final public class TextureManager {
      * @return the loaded texture. If there is a problem loading the texture, null is returned.
      * @see Image.Format
      */
-    public static Texture load(final URL file, final Texture.MinificationFilter minFilter,
-            final Image.Format imageType, final boolean flipped) {
+    public static Texture load(final URL loc, final Texture.MinificationFilter minFilter, final Image.Format imageType,
+            final boolean flipped) {
 
-        if (null == file) {
+        if (null == loc) {
             logger.warning("Could not load image...  URL was null. defaultTexture used.");
             return TextureState.getDefaultTexture();
         }
 
-        final String fileName = file.getFile();
+        final String fileName = loc.getFile();
         if (fileName == null) {
-            logger.warning("Could not load image...  fileName was null. defaultTexture used.");
+            logger.warning("Could not load image...  URL's fileName was null. defaultTexture used.");
             return TextureState.getDefaultTexture();
         }
 
-        final TextureKey tkey = TextureKey.getKey(file, flipped, imageType, minFilter);
+        final TextureKey tkey = TextureKey.getKey(new URLResourceSource(loc), flipped, imageType, minFilter);
 
         return loadFromKey(tkey, null, null);
     }
@@ -156,12 +186,11 @@ final public class TextureManager {
 
         Image img = imageData;
         if (img == null) {
-            img = loadImage(tkey);
+            img = ImageLoaderUtil.loadImage(tkey.getSource(), tkey.isFlipped());
         }
 
         if (null == img) {
-            logger.warning("(image null) Could not load: "
-                    + (tkey.getLocation() != null ? tkey.getLocation().getFile() : tkey.getFileType()));
+            logger.warning("(image null) Could not load: " + tkey.getSource());
             return TextureState.getDefaultTexture();
         }
 
@@ -177,55 +206,10 @@ final public class TextureManager {
         result.setTextureKey(tkey);
         result.setMinificationFilter(tkey.getMinificationFilter());
         result.setImage(img);
-        if (tkey._location != null) {
-            result.setImageLocation(tkey._location.toString());
-        }
 
         // Cache the no-context version
         addToCache(result);
         return result;
-    }
-
-    private static Image loadImage(final TextureKey key) {
-        if (key == null) {
-            return null;
-        }
-
-        if ("savable".equalsIgnoreCase(key._fileType)) {
-            Savable s;
-            try {
-                s = BinaryImporter.getInstance().load(key._location);
-            } catch (final IOException e) {
-                logger.log(Level.WARNING, "Could not load Savable.", e);
-                return null;
-            }
-            if (s instanceof Image) {
-                return (Image) s;
-            }
-            logger.warning("Savable not of type Image.");
-            return TextureState.getDefaultTextureImage();
-        }
-        return ImageLoaderUtil.loadImage(key._location, key._flipped);
-    }
-
-    /**
-     * Convert the provided String file name into a Texture URL, first attempting to use the {@link ResourceLocatorTool}
-     * , then trying to load it as a direct file path.
-     * 
-     * @param file
-     *            the file name
-     * @return a URL
-     */
-    private static URL getTextureURL(final String file) {
-        URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, file);
-        if (url == null) {
-            try {
-                url = new URL("file:" + file);
-            } catch (final MalformedURLException e) {
-                logger.logp(Level.SEVERE, TextureManager.class.toString(), "getTextureURL(file)", "Exception", e);
-            }
-        }
-        return url;
     }
 
     public static void addToCache(final Texture t) {
@@ -331,13 +315,13 @@ final public class TextureManager {
             if (t == null) {
                 continue;
             }
-            if (t.getTextureKey()._location != null) {
+            if (t.getTextureKey().getSource() != null) {
                 r.loadTexture(t, 0);
             }
         }
     }
 
-    static ReferenceQueue<? super TextureKey> getRefQueue() {
+    static ReferenceQueue<TextureKey> getRefQueue() {
         return _textureRefQueue;
     }
 }

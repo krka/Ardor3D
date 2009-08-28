@@ -11,25 +11,25 @@
 package com.ardor3d.extension.model.collada;
 
 import java.io.InputStreamReader;
-import java.net.URL;
 
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
 import org.jibx.runtime.IUnmarshallingContext;
 
+import com.ardor3d.animations.reference.Animatable;
+import com.ardor3d.animations.reference.Skeleton;
+import com.ardor3d.animations.runtime.AnimationRegistry;
 import com.ardor3d.extension.model.collada.binding.core.Collada;
 import com.ardor3d.extension.model.collada.util.ColladaNodeUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.UrlUtils;
+import com.ardor3d.util.resource.RelativeResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.ardor3d.animations.runtime.AnimationRegistry;
-import com.ardor3d.animations.reference.Animatable;
-import com.ardor3d.animations.reference.Skeleton;
+import com.ardor3d.util.resource.ResourceSource;
 
 public class ColladaImporter {
+
     /**
      * Reads a Collada scene from the given resource and returns it as an Ardor3D Node.
      * 
@@ -42,14 +42,14 @@ public class ColladaImporter {
         return readColladaScene(resource, null);
     }
 
-    public static Node readColladaScene(final String resource, AnimationRegistry animationRegistry) {
-        final URL url = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
+    public static Node readColladaScene(final String resource, final AnimationRegistry animationRegistry) {
+        final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
 
-        if (url == null) {
-            throw new Error("Unable to locate '" + resource + "' on the classpath");
+        if (source == null) {
+            throw new Error("Unable to locate '" + resource + "'");
         }
 
-        return readColladaScene(url, animationRegistry);
+        return readColladaScene(source, animationRegistry);
     }
 
     /**
@@ -59,12 +59,12 @@ public class ColladaImporter {
      *            the name of the resource to find.
      * @return a Node containing the Collada scene.
      */
-    public static Node readColladaScene(final URL resource) {
+    public static Node readColladaScene(final ResourceSource resource) {
         return readColladaScene(resource, null);
 
     }
 
-    public static Node readColladaScene(final URL resource, AnimationRegistry animationRegistry) {
+    public static Node readColladaScene(final ResourceSource resource, final AnimationRegistry animationRegistry) {
 
         // Collada may or may not have a scene.
         // FIXME: We should eventually return the libraries too since you could have those without a scene.
@@ -72,9 +72,8 @@ public class ColladaImporter {
 
         Node scene = null;
         try {
-            final URL parentDir = UrlUtils.resolveRelativeURL(resource, "./");
-            final SimpleResourceLocator srl = new SimpleResourceLocator(parentDir);
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+            final RelativeResourceLocator loc = new RelativeResourceLocator(resource);
+            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
 
             if (collada.getScene() != null) {
                 // It's possible to have a scene that is all physics information...
@@ -84,7 +83,7 @@ public class ColladaImporter {
                 }
             }
 
-            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
+            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
         } catch (final Exception e) {
             throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
         }
@@ -97,10 +96,10 @@ public class ColladaImporter {
      * tools; these will be wrapped in a RuntimeException and rethrown.
      * 
      * @param resource
-     *            the URL to read the resource from
+     *            the ResourceSource to read the resource from
      * @return the Collada tree
      */
-    public static Collada readCollada(final URL resource) {
+    public static Collada readCollada(final ResourceSource resource) {
         try {
             final IBindingFactory bindingFactory = BindingDirectory.getFactory(Collada.class);
 
@@ -108,10 +107,9 @@ public class ColladaImporter {
 
             return (Collada) context.unmarshalDocument(new InputStreamReader(resource.openStream()));
         } catch (final Exception e) {
-            throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
+            throw new RuntimeException("Unable to load collada resource from source: " + resource, e);
         }
     }
-
 
     // just a simple way to test things out without bringing up OpenGL, etc.
     // XXX: Maybe we should move this to a test or something.
@@ -125,11 +123,11 @@ public class ColladaImporter {
 
         printScene(scene);
 
-        for (Animatable animatable : animationRegistry.getAnimatables()) {
+        for (final Animatable animatable : animationRegistry.getAnimatables()) {
             System.out.println(animatable);
         }
 
-        for (Skeleton skeleton : animationRegistry.getSkeletons().values()) {
+        for (final Skeleton skeleton : animationRegistry.getSkeletons().values()) {
             System.out.println(skeleton);
         }
     }
