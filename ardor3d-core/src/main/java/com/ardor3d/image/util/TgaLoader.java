@@ -22,8 +22,8 @@ import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * <code>TextureManager</code> provides static methods for building a <code>Texture</code> object. Typically, the
- * information supplied is the filename and the texture properties.
+ * Loads image files in the Targa format. Handles RLE Targa files. Does not handle Targa files in Black-and-White
+ * format.
  */
 public final class TgaLoader implements ImageLoader {
 
@@ -48,24 +48,23 @@ public final class TgaLoader implements ImageLoader {
     // 11 - run-length encoded, black and white image
     public static final int TYPE_BLACKANDWHITE_RLE = 11;
 
-    // private to enforce use of static methods.
     public TgaLoader() {}
 
     /**
-     * <code>loadImage</code> is a manual image loader which is entirely independent of AWT. OUT: RGB888 or RGBA8888
-     * ardor3d.image.Image object
+     * Load an image from Targa format.
      * 
-     * @return <code>com.ardor3d.image.Image</code> object that contains the image, either as a RGB888 or RGBA8888
-     * @param fis
-     *            InputStream of an uncompressed 24b RGB or 32b RGBA TGA
+     * @param is
+     *            the input stream delivering the targa data.
      * @param flip
-     *            Flip the image vertically
-     * @throws java.io.IOException
+     *            if true, we will flip the given targa image on the vertical axis.
+     * @return the new loaded Image.
+     * @throws IOException
+     *             if an error occurs during read.
      */
-    public Image load(final InputStream fis, boolean flip) throws IOException {
+    public Image load(final InputStream is, boolean flip) throws IOException {
         boolean flipH = false;
         // open a stream to the file
-        final BufferedInputStream bis = new BufferedInputStream(fis, 8192);
+        final BufferedInputStream bis = new BufferedInputStream(is, 8192);
         final DataInputStream dis = new DataInputStream(bis);
         boolean createAlpha = false;
 
@@ -422,7 +421,7 @@ public final class TgaLoader implements ImageLoader {
             }
         }
 
-        fis.close();
+        is.close();
         // Get a pointer to the image memory
         final ByteBuffer scratch = BufferUtils.createByteBuffer(rawData.length);
         scratch.clear();
@@ -479,7 +478,7 @@ public final class TgaLoader implements ImageLoader {
         return (short) (input << 8 | (input & 0xFF00) >>> 8);
     }
 
-    static class ColorMapEntry {
+    private static class ColorMapEntry {
         byte red, green, blue, alpha;
 
         @Override
