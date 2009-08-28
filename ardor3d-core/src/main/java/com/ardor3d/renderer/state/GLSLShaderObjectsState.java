@@ -51,7 +51,7 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt4;
-import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix2;
+import com.ardor3d.util.shader.uniformtypes.ShaderVariableIntArray;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4Array;
@@ -486,9 +486,54 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param value
      *            the new value
      */
-    public void setUniform(final String name, final float[] value) {
+    public void setUniform(final String name, final FloatBuffer value) {
         final ShaderVariableFloatArray shaderUniform = getShaderUniform(name, ShaderVariableFloatArray.class);
         shaderUniform.value = value;
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform variable to change
+     * @param value
+     *            the new value
+     */
+    public void setUniform(final String name, final float[] value) {
+        final ShaderVariableFloatArray shaderUniform = getShaderUniform(name, ShaderVariableFloatArray.class);
+        shaderUniform.value = BufferUtils.createFloatBuffer(value);
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform variable to change
+     * @param value
+     *            the new value
+     */
+    public void setUniform(final String name, final IntBuffer value) {
+        final ShaderVariableIntArray shaderUniform = getShaderUniform(name, ShaderVariableIntArray.class);
+        shaderUniform.value = value;
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an uniform value for this shader object.
+     * 
+     * @param name
+     *            uniform variable to change
+     * @param value
+     *            the new value
+     */
+    public void setUniform(final String name, final int[] value) {
+        final ShaderVariableIntArray shaderUniform = getShaderUniform(name, ShaderVariableIntArray.class);
+        shaderUniform.value = BufferUtils.createIntBuffer(value);
 
         setNeedsRefresh(true);
     }
@@ -576,32 +621,6 @@ public class GLSLShaderObjectsState extends RenderState {
         shaderUniform.value2 = (float) value.getY();
         shaderUniform.value3 = (float) value.getZ();
         shaderUniform.value4 = (float) value.getW();
-
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * Set an uniform value for this shader object.
-     * 
-     * @param name
-     *            uniform variable to change
-     * @param value
-     *            the new value (a float buffer of size 4)
-     * @param rowMajor
-     *            true if is this in row major order
-     */
-    public void setUniform(final String name, final float value[], final boolean rowMajor) {
-        if (value.length != 4) {
-            return;
-        }
-
-        final ShaderVariableMatrix2 shaderUniform = getShaderUniform(name, ShaderVariableMatrix2.class);
-        shaderUniform.matrixBuffer.clear();
-        shaderUniform.matrixBuffer.put(value[0]);
-        shaderUniform.matrixBuffer.put(value[1]);
-        shaderUniform.matrixBuffer.put(value[2]);
-        shaderUniform.matrixBuffer.put(value[3]);
-        shaderUniform.rowMajor = rowMajor;
 
         setNeedsRefresh(true);
     }

@@ -23,10 +23,12 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat4;
+import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloatArray;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableInt4;
+import com.ardor3d.util.shader.uniformtypes.ShaderVariableIntArray;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix2;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix3;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4;
@@ -55,6 +57,8 @@ public abstract class LwjglShaderUtil {
             updateShaderUniform((ShaderVariableInt3) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableInt4) {
             updateShaderUniform((ShaderVariableInt4) shaderVariable);
+        } else if (shaderVariable instanceof ShaderVariableIntArray) {
+            updateShaderUniform((ShaderVariableIntArray) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableFloat) {
             updateShaderUniform((ShaderVariableFloat) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableFloat2) {
@@ -63,6 +67,8 @@ public abstract class LwjglShaderUtil {
             updateShaderUniform((ShaderVariableFloat3) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableFloat4) {
             updateShaderUniform((ShaderVariableFloat4) shaderVariable);
+        } else if (shaderVariable instanceof ShaderVariableFloatArray) {
+            updateShaderUniform((ShaderVariableFloatArray) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableMatrix2) {
             updateShaderUniform((ShaderVariableMatrix2) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableMatrix3) {
@@ -117,6 +123,25 @@ public abstract class LwjglShaderUtil {
                 shaderUniform.value3, shaderUniform.value4);
     }
 
+    private static void updateShaderUniform(final ShaderVariableIntArray shaderUniform) {
+        switch (shaderUniform.size) {
+            case 1:
+                ARBShaderObjects.glUniform1ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 2:
+                ARBShaderObjects.glUniform2ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 3:
+                ARBShaderObjects.glUniform3ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 4:
+                ARBShaderObjects.glUniform4ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            default:
+                throw new IllegalArgumentException("Wrong size: " + shaderUniform.size);
+        }
+    }
+
     private static void updateShaderUniform(final ShaderVariableFloat shaderUniform) {
         ARBShaderObjects.glUniform1fARB(shaderUniform.variableID, shaderUniform.value1);
     }
@@ -133,6 +158,25 @@ public abstract class LwjglShaderUtil {
     private static void updateShaderUniform(final ShaderVariableFloat4 shaderUniform) {
         ARBShaderObjects.glUniform4fARB(shaderUniform.variableID, shaderUniform.value1, shaderUniform.value2,
                 shaderUniform.value3, shaderUniform.value4);
+    }
+
+    private static void updateShaderUniform(final ShaderVariableFloatArray shaderUniform) {
+        switch (shaderUniform.size) {
+            case 1:
+                ARBShaderObjects.glUniform1ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 2:
+                ARBShaderObjects.glUniform2ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 3:
+                ARBShaderObjects.glUniform3ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            case 4:
+                ARBShaderObjects.glUniform4ARB(shaderUniform.variableID, shaderUniform.value);
+                break;
+            default:
+                throw new IllegalArgumentException("Wrong size: " + shaderUniform.size);
+        }
     }
 
     private static void updateShaderUniform(final ShaderVariableMatrix2 shaderUniform) {
