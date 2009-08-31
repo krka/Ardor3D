@@ -24,6 +24,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
@@ -60,7 +61,7 @@ public class UpdateTextureExample extends ExampleBase {
     private Graphics imgGraphics;
     private ByteBuffer imageBuffer;
     private double counter = 0;
-    private boolean updateTexture = true;
+    private int mode = 0;
 
     public static void main(final String[] args) {
         start(UpdateTextureExample.class);
@@ -73,20 +74,35 @@ public class UpdateTextureExample extends ExampleBase {
 
     @Override
     protected void renderExample(final Renderer renderer) {
-        if (updateTexture) {
-            final byte data[] = AWTImageLoader.asByteArray(img);
-            imageBuffer.put(data);
-            imageBuffer.flip();
-            final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
-                    .getTexture();
-            renderer.updateTextureSubImage(prevTexture, imageBuffer, 0, 0, img.getWidth(), img.getHeight(), 0, 0, img
-                    .getWidth(), img.getHeight(), prevTexture.getImage().getFormat());
-        } else {
-            final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
-            final Texture nextTexture = TextureManager.loadFromImage(nextImage, Texture.MinificationFilter.Trilinear,
-                    Image.Format.GuessNoCompression, true);
-            final TextureState ts = (TextureState) _root.getLocalRenderState(RenderState.StateType.Texture);
-            ts.setTexture(nextTexture);
+        switch (mode) {
+            case 0: {
+                final byte data[] = AWTImageLoader.asByteArray(img);
+                imageBuffer.put(data);
+                imageBuffer.flip();
+                final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
+                        .getTexture();
+                renderer.updateTexture2DSubImage((Texture2D) prevTexture, 0, 0, img.getWidth(), img.getHeight(),
+                        imageBuffer, 0, 0, img.getWidth());
+                break;
+            }
+            case 1: {
+                final byte data[] = AWTImageLoader.asByteArray(img);
+                imageBuffer.put(data);
+                imageBuffer.flip();
+                final Texture prevTexture = ((TextureState) _root.getLocalRenderState(RenderState.StateType.Texture))
+                        .getTexture();
+                renderer.updateTexture2DSubImage((Texture2D) prevTexture, 100, 50, 100, 100, imageBuffer, 100, 50, img
+                        .getWidth());
+                break;
+            }
+            case 2: {
+                final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
+                final Texture nextTexture = TextureManager.loadFromImage(nextImage,
+                        Texture.MinificationFilter.Trilinear, Image.Format.GuessNoCompression, false);
+                final TextureState ts = (TextureState) _root.getLocalRenderState(RenderState.StateType.Texture);
+                ts.setTexture(nextTexture);
+                break;
+            }
         }
 
         super.renderExample(renderer);
@@ -126,19 +142,26 @@ public class UpdateTextureExample extends ExampleBase {
     protected void initExample() {
         _canvas.setTitle("Update texture - Example");
 
-        final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Updating texture...");
+        final BasicText keyText = BasicText.createDefaultTextLabel("Text", "[SPACE] Updating existing texture...");
         keyText.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         keyText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        keyText.setTranslation(new Vector3(0, 20, 0));
+        keyText.setTranslation(new Vector3(10, 10, 0));
         _root.attachChild(keyText);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                updateTexture = !updateTexture;
-                if (updateTexture) {
-                    keyText.setText("[SPACE] Updating texture...");
-                } else {
-                    keyText.setText("[SPACE] Recreating texture...");
+                mode++;
+                mode %= 3;
+                switch (mode) {
+                    case 0:
+                        keyText.setText("[SPACE] Updating existing texture...");
+                        break;
+                    case 1:
+                        keyText.setText("[SPACE] Updating just part of the texture...");
+                        break;
+                    case 2:
+                        keyText.setText("[SPACE] Recreating texture from scratch...");
+                        break;
                 }
             }
         }));
@@ -154,7 +177,7 @@ public class UpdateTextureExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+                Format.GuessNoCompression, false));
 
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);

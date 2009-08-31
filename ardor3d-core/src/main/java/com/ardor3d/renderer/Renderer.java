@@ -17,7 +17,9 @@ import java.util.List;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.Texture1D;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -42,28 +44,28 @@ public interface Renderer {
     /**
      * No buffer.
      */
-    public static final int BUFFER_NONE = 0x00;
+    public static int BUFFER_NONE = 0x00;
     /**
      * A buffer storing color information generally for display to the user.
      */
-    public static final int BUFFER_COLOR = 0x01;
+    public static int BUFFER_COLOR = 0x01;
     /**
      * A depth buffer allows sorting of pixels by depth or distance from the view port.
      */
-    public static final int BUFFER_DEPTH = 0x02;
+    public static int BUFFER_DEPTH = 0x02;
     /**
      * Often a higher precision buffer used to gather rendering results over time.
      */
-    public static final int BUFFER_ACCUMULATION = 0x04;
+    public static int BUFFER_ACCUMULATION = 0x04;
     /**
      * A buffer used for masking out areas of the screen to prevent drawing.
      */
-    public static final int BUFFER_STENCIL = 0x08;
+    public static int BUFFER_STENCIL = 0x08;
 
     /**
      * Convenience for those that find it too hard to do bitwise or. :)
      */
-    public static final int BUFFER_COLOR_AND_DEPTH = BUFFER_COLOR | BUFFER_DEPTH;
+    public static int BUFFER_COLOR_AND_DEPTH = BUFFER_COLOR | BUFFER_DEPTH;
 
     /**
      * <code>setBackgroundColor</code> sets the color of window. This color will be shown for any pixel that is not set
@@ -232,41 +234,79 @@ public interface Renderer {
     void unbindVBO();
 
     /**
-     * Updates a region of the content area of the provided texture using the specified region of the given data.
+     * Update all or a portion of an existing one dimensional texture object.
      * 
-     * @param dstTexture
-     *            the texture to be updated
-     * @param dstX
-     *            the x offset relative to the lower-left corner of this texture where the update will be applied
-     * @param dstY
-     *            the y offset relative to the lower-left corner of this texture where the update will be applied
-     * @param srcImage
-     *            the image data to be uploaded to the texture
-     * @param srcX
-     *            the x offset relative to the lower-left corner of the supplied buffer from which to fetch the update
-     *            rectangle
-     * @param srcY
-     *            the y offset relative to the lower-left corner of the supplied buffer from which to fetch the update
-     *            rectangle
-     * @param width
-     *            the width of the region to be updated
-     * @param height
-     *            the height of the region to be updated
-     * @throws Ardor3dException
-     *             if unable to update the texture
-     * @throws UnsupportedOperationException
-     *             if updating for the provided texture type is unsupported
-     * @see com.sun.opengl.util.texture.Texture#updateSubImage(com.sun.opengl.util.texture.TextureData, int, int, int,
-     *      int, int, int, int)
-     * @since 2.0
+     * @param destination
+     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
+     * @param dstOffsetX
+     *            the offset into the destination to start our update.
+     * @param dstWidth
+     *            the width of the region to update.
+     * @param source
+     *            the data to update from.
+     * @param srcOffsetX
+     *            the optional offset into our source data.
      */
-    void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
-            final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
-            UnsupportedOperationException;
+    void updateTexture1DSubImage(Texture1D destination, int dstOffsetX, int dstWidth, ByteBuffer source, int srcOffsetX);
 
-    void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
-            final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
-            final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException;
+    /**
+     * Update all or a portion of an existing two dimensional texture object.
+     * 
+     * @param destination
+     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
+     * @param dstOffsetX
+     *            the x offset into the destination to start our update.
+     * @param dstOffsetY
+     *            the y offset into the destination to start our update.
+     * @param dstWidth
+     *            the width of the region to update.
+     * @param dstHeight
+     *            the height of the region to update.
+     * @param source
+     *            the data to update from.
+     * @param srcOffsetX
+     *            the optional X offset into our source data.
+     * @param srcOffsetY
+     *            the optional Y offset into our source data.
+     * @param srcTotalWidth
+     *            the total width of our source data, so we can properly walk through it.
+     */
+    void updateTexture2DSubImage(Texture2D destination, int dstOffsetX, int dstOffsetY, int dstWidth, int dstHeight,
+            ByteBuffer source, int srcOffsetX, int srcOffsetY, int srcTotalWidth);
+
+    /**
+     * Update all or a portion of an existing one dimensional texture object.
+     * 
+     * @param destination
+     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
+     * @param dstOffsetX
+     *            the x offset into the destination to start our update.
+     * @param dstOffsetY
+     *            the y offset into the destination to start our update.
+     * @param dstOffsetZ
+     *            the z offset into the destination to start our update.
+     * @param dstWidth
+     *            the width of the region to update.
+     * @param dstHeight
+     *            the height of the region to update.
+     * @param dstDepth
+     *            the depth of the region to update. eg. 1 == one slice
+     * @param source
+     *            the data to update from.
+     * @param srcOffsetX
+     *            the optional X offset into our source data.
+     * @param srcOffsetY
+     *            the optional Y offset into our source data.
+     * @param srcOffsetZ
+     *            the optional Z offset into our source data.
+     * @param srcTotalWidth
+     *            the total width of our source data, so we can properly walk through it.
+     * @param srcTotalHeight
+     *            the total height of our source data, so we can properly walk through it.
+     */
+    void updateTexture3DSubImage(Texture3D destination, int dstOffsetX, int dstOffsetY, int dstOffsetZ, int dstWidth,
+            int dstHeight, int dstDepth, ByteBuffer source, int srcOffsetX, int srcOffsetY, int srcOffsetZ,
+            int srcTotalWidth, int srcTotalHeight);
 
     /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.
@@ -282,7 +322,7 @@ public interface Renderer {
      * @param renderable
      *            the text object to be rendered.
      */
-    void draw(final Renderable renderable);
+    void draw(Renderable renderable);
 
     /**
      * <code>doTransforms</code> sets the current transform.
@@ -290,7 +330,7 @@ public interface Renderer {
      * @param transform
      *            transform to apply.
      */
-    boolean doTransforms(final ReadOnlyTransform transform);
+    boolean doTransforms(ReadOnlyTransform transform);
 
     /**
      * <code>undoTransforms</code> reverts the latest transform.
@@ -298,46 +338,45 @@ public interface Renderer {
      * @param transform
      *            transform to revert.
      */
-    void undoTransforms(final Transform transform);
+    void undoTransforms(Transform transform);
 
     // TODO: Arrays
-    void setupVertexData(final FloatBufferData vertexCoords);
+    void setupVertexData(FloatBufferData vertexCoords);
 
-    void setupNormalData(final FloatBufferData normalCoords);
+    void setupNormalData(FloatBufferData normalCoords);
 
-    void setupColorData(final FloatBufferData colorCoords);
+    void setupColorData(FloatBufferData colorCoords);
 
-    void setupFogData(final FloatBufferData fogCoords);
+    void setupFogData(FloatBufferData fogCoords);
 
-    void setupTextureData(final List<FloatBufferData> textureCoords);
+    void setupTextureData(List<FloatBufferData> textureCoords);
 
-    void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes);
+    void drawElements(IntBufferData indices, int[] indexLengths, IndexMode[] indexModes);
 
-    void drawArrays(final FloatBufferData vertexBuffer, final int[] indexLengths, final IndexMode[] indexModes);
+    void drawArrays(FloatBufferData vertexBuffer, int[] indexLengths, IndexMode[] indexModes);
 
-    void applyNormalsMode(final NormalsMode normMode, final ReadOnlyTransform worldTransform);
+    void applyNormalsMode(NormalsMode normMode, ReadOnlyTransform worldTransform);
 
-    void applyDefaultColor(final ReadOnlyColorRGBA defaultColor);
+    void applyDefaultColor(ReadOnlyColorRGBA defaultColor);
 
     // TODO: VBO
-    void setupVertexDataVBO(final FloatBufferData vertexCoords);
+    void setupVertexDataVBO(FloatBufferData vertexCoords);
 
-    void setupNormalDataVBO(final FloatBufferData normalCoords);
+    void setupNormalDataVBO(FloatBufferData normalCoords);
 
-    void setupColorDataVBO(final FloatBufferData colorCoords);
+    void setupColorDataVBO(FloatBufferData colorCoords);
 
-    void setupFogDataVBO(final FloatBufferData fogCoords);
+    void setupFogDataVBO(FloatBufferData fogCoords);
 
-    void setupTextureDataVBO(final List<FloatBufferData> textureCoords);
+    void setupTextureDataVBO(List<FloatBufferData> textureCoords);
 
-    void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
-            final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-            final List<FloatBufferData> textureCoords);
+    void setupInterleavedDataVBO(FloatBufferData interleaved, FloatBufferData vertexCoords,
+            FloatBufferData normalCoords, FloatBufferData colorCoords, List<FloatBufferData> textureCoords);
 
-    void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes);
+    void drawElementsVBO(IntBufferData indices, int[] indexLengths, IndexMode[] indexModes);
 
     // TODO: Display List
-    void renderDisplayList(final int displayListID);
+    void renderDisplayList(int displayListID);
 
     void setProjectionMatrix(Buffer matrix);
 

@@ -28,11 +28,12 @@ import org.lwjgl.opengl.EXTFogCoord;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.OpenGLException;
-import org.lwjgl.opengl.Util;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.Texture1D;
+import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
@@ -130,8 +131,6 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     private final Matrix4 _transformMatrix = new Matrix4();
-
-    private boolean glTexSubImage2DSupported = true;
 
     /**
      * Constructor instantiates a new <code>LwjglRenderer</code> object.
@@ -434,28 +433,35 @@ public class LwjglRenderer extends AbstractRenderer {
         ARBBufferObject.glDeleteBuffersARB(idBuff);
     }
 
-    public void updateTextureSubImage(final Texture dstTexture, final Image srcImage, final int srcX, final int srcY,
-            final int dstX, final int dstY, final int dstWidth, final int dstHeight) throws Ardor3dException,
-            UnsupportedOperationException {
-        final ByteBuffer data = srcImage.getData(0);
-        data.rewind();
-        updateTextureSubImage(dstTexture, data, srcX, srcY, srcImage.getWidth(), srcImage.getHeight(), dstX, dstY,
-                dstWidth, dstHeight, srcImage.getFormat());
+    public void updateTexture1DSubImage(final Texture1D destination, final int dstOffsetX, final int dstWidth,
+            final ByteBuffer source, final int srcOffsetX) {
+        updateTexSubImage(destination, dstOffsetX, 0, 0, dstWidth, 0, 0, source, srcOffsetX, 0, 0, 0, 0);
     }
 
-    public void updateTextureSubImage(final Texture dstTexture, final ByteBuffer data, final int srcX, final int srcY,
-            final int srcWidth, final int srcHeight, final int dstX, final int dstY, final int dstWidth,
-            final int dstHeight, final Format format) throws Ardor3dException, UnsupportedOperationException {
+    public void updateTexture2DSubImage(final Texture2D destination, final int dstOffsetX, final int dstOffsetY,
+            final int dstWidth, final int dstHeight, final ByteBuffer source, final int srcOffsetX,
+            final int srcOffsetY, final int srcTotalWidth) {
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, 0, dstWidth, dstHeight, 0, source, srcOffsetX,
+                srcOffsetY, 0, srcTotalWidth, 0);
+    }
+
+    public void updateTexture3DSubImage(final Texture3D destination, final int dstOffsetX, final int dstOffsetY,
+            final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
+            final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
+            final int srcTotalHeight) {
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight, dstDepth, source,
+                srcOffsetX, srcOffsetY, srcOffsetZ, srcTotalWidth, srcTotalHeight);
+    }
+
+    private void updateTexSubImage(final Texture destination, final int dstOffsetX, final int dstOffsetY,
+            final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
+            final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
+            final int srcTotalHeight) {
 
         // Ignore textures that do not have an id set
-        if (dstTexture.getTextureIdForContext(ContextManager.getCurrentContext().getGlContextRep()) == 0) {
+        if (destination.getTextureIdForContext(ContextManager.getCurrentContext().getGlContextRep()) == 0) {
             logger.warning("Attempting to update a texture that is not currently on the card.");
             return;
-        }
-
-        // Check that the texture type is supported.
-        if (dstTexture.getType() != Texture.Type.TwoDimensional) {
-            throw new UnsupportedOperationException("Unsupported Texture Type: " + dstTexture.getType());
         }
 
         // Determine the original texture configuration, so that this method can
@@ -466,12 +472,15 @@ public class LwjglRenderer extends AbstractRenderer {
         GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, idBuff);
         final int origAlignment = idBuff.get(0);
         final int origRowLength = 0;
+        final int origImageHeight = 0;
         final int origSkipPixels = 0;
         final int origSkipRows = 0;
+        final int origSkipImages = 0;
 
         final int alignment = 1;
+
         int rowLength;
-        if (srcWidth == dstWidth) {
+        if (srcTotalWidth == dstWidth) {
             // When the row length is zero, then the width parameter is used.
             // We use zero in these cases in the hope that we can avoid two
             // unnecessary calls to glPixelStorei.
@@ -479,14 +488,27 @@ public class LwjglRenderer extends AbstractRenderer {
         } else {
             // The number of pixels in a row is different than the number of
             // pixels in the region to be uploaded to the texture.
-            rowLength = srcWidth;
+            rowLength = srcTotalWidth;
         }
+
+        int imageHeight;
+        if (srcTotalHeight == dstHeight) {
+            // When the image height is zero, then the height parameter is used.
+            // We use zero in these cases in the hope that we can avoid two
+            // unnecessary calls to glPixelStorei.
+            imageHeight = 0;
+        } else {
+            // The number of pixels in a row is different than the number of
+            // pixels in the region to be uploaded to the texture.
+            imageHeight = srcTotalHeight;
+        }
+
         // Consider moving these conversion methods.
-        final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(format);
+        final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(destination.getImage().getFormat());
 
         // Update the texture configuration (when necessary).
         final RenderContext context = ContextManager.getCurrentContext();
-        final int dstTexID = dstTexture.getTextureIdForContext(context.getGlContextRep());
+        final int dstTexID = destination.getTextureIdForContext(context.getGlContextRep());
         if (origTexBinding != dstTexID) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, dstTexID);
         }
@@ -496,30 +518,37 @@ public class LwjglRenderer extends AbstractRenderer {
         if (origRowLength != rowLength) {
             GL11.glPixelStorei(GL11.GL_UNPACK_ROW_LENGTH, rowLength);
         }
-        if (origSkipPixels != srcX) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_PIXELS, srcX);
+        if (origSkipPixels != srcOffsetX) {
+            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_PIXELS, srcOffsetX);
         }
-        if (origSkipRows != srcY) {
-            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, srcY);
+        // NOTE: The below will be skipped for texture types that don't support them because we are passing in 0's.
+        if (origSkipRows != srcOffsetY) {
+            GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, srcOffsetY);
+        }
+        if (origImageHeight != imageHeight) {
+            GL11.glPixelStorei(GL12.GL_UNPACK_IMAGE_HEIGHT, imageHeight);
+        }
+        if (origSkipImages != srcOffsetZ) {
+            GL11.glPixelStorei(GL12.GL_UNPACK_SKIP_IMAGES, srcOffsetZ);
         }
 
         // Upload the image region into the texture.
         try {
-            if (glTexSubImage2DSupported) {
-                GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstX, dstY, dstWidth, dstHeight, pixelFormat,
-                        GL11.GL_UNSIGNED_BYTE, data);
-
-                try {
-                    Util.checkGLError();
-                } catch (final OpenGLException e) {
-                    glTexSubImage2DSupported = false;
-                    updateTextureSubImage(dstTexture, data, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth,
-                            dstHeight, format);
-                }
-            } else {
-                final int internalFormat = LwjglTextureUtil.getGLInternalFormat(format);
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, dstWidth, dstHeight, 0, pixelFormat,
-                        GL11.GL_UNSIGNED_BYTE, data);
+            switch (destination.getType()) {
+                case TwoDimensional:
+                    GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, dstOffsetX, dstOffsetY, dstWidth, dstHeight,
+                            pixelFormat, GL11.GL_UNSIGNED_BYTE, source);
+                    break;
+                case OneDimensional:
+                    GL11.glTexSubImage1D(GL11.GL_TEXTURE_1D, 0, dstOffsetX, dstWidth, pixelFormat,
+                            GL11.GL_UNSIGNED_BYTE, source);
+                    break;
+                case ThreeDimensional:
+                    GL12.glTexSubImage3D(GL12.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth,
+                            dstHeight, dstDepth, pixelFormat, GL11.GL_UNSIGNED_BYTE, source);
+                    break;
+                default:
+                    throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());
             }
         } finally {
             // Restore the texture configuration (when necessary).
@@ -536,12 +565,20 @@ public class LwjglRenderer extends AbstractRenderer {
                 GL11.glPixelStorei(GL11.GL_UNPACK_ROW_LENGTH, origRowLength);
             }
             // Restore skip pixels.
-            if (origSkipPixels != srcX) {
+            if (origSkipPixels != srcOffsetX) {
                 GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_PIXELS, origSkipPixels);
             }
             // Restore skip rows.
-            if (origSkipRows != srcY) {
+            if (origSkipRows != srcOffsetY) {
                 GL11.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, origSkipRows);
+            }
+            // Restore image height.
+            if (origImageHeight != imageHeight) {
+                GL11.glPixelStorei(GL12.GL_UNPACK_IMAGE_HEIGHT, origImageHeight);
+            }
+            // Restore skip images.
+            if (origSkipImages != srcOffsetZ) {
+                GL11.glPixelStorei(GL12.GL_UNPACK_SKIP_IMAGES, origSkipImages);
             }
         }
     }
