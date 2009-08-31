@@ -30,6 +30,8 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
+import com.ardor3d.image.TextureCubeMap;
+import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
@@ -452,14 +454,14 @@ public class JoglRenderer extends AbstractRenderer {
 
     public void updateTexture1DSubImage(final Texture1D destination, final int dstOffsetX, final int dstWidth,
             final ByteBuffer source, final int srcOffsetX) {
-        updateTexSubImage(destination, dstOffsetX, 0, 0, dstWidth, 0, 0, source, srcOffsetX, 0, 0, 0, 0);
+        updateTexSubImage(destination, dstOffsetX, 0, 0, dstWidth, 0, 0, source, srcOffsetX, 0, 0, 0, 0, null);
     }
 
     public void updateTexture2DSubImage(final Texture2D destination, final int dstOffsetX, final int dstOffsetY,
             final int dstWidth, final int dstHeight, final ByteBuffer source, final int srcOffsetX,
             final int srcOffsetY, final int srcTotalWidth) {
         updateTexSubImage(destination, dstOffsetX, dstOffsetY, 0, dstWidth, dstHeight, 0, source, srcOffsetX,
-                srcOffsetY, 0, srcTotalWidth, 0);
+                srcOffsetY, 0, srcTotalWidth, 0, null);
     }
 
     public void updateTexture3DSubImage(final Texture3D destination, final int dstOffsetX, final int dstOffsetY,
@@ -467,13 +469,20 @@ public class JoglRenderer extends AbstractRenderer {
             final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
             final int srcTotalHeight) {
         updateTexSubImage(destination, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight, dstDepth, source,
-                srcOffsetX, srcOffsetY, srcOffsetZ, srcTotalWidth, srcTotalHeight);
+                srcOffsetX, srcOffsetY, srcOffsetZ, srcTotalWidth, srcTotalHeight, null);
+    }
+
+    public void updateTextureCubeMapSubImage(final TextureCubeMap destination, final TextureCubeMap.Face dstFace,
+            final int dstOffsetX, final int dstOffsetY, final int dstWidth, final int dstHeight,
+            final ByteBuffer source, final int srcOffsetX, final int srcOffsetY, final int srcTotalWidth) {
+        updateTexSubImage(destination, dstOffsetX, dstOffsetY, 0, dstWidth, dstHeight, 0, source, srcOffsetX,
+                srcOffsetY, 0, srcTotalWidth, 0, dstFace);
     }
 
     private void updateTexSubImage(final Texture destination, final int dstOffsetX, final int dstOffsetY,
             final int dstOffsetZ, final int dstWidth, final int dstHeight, final int dstDepth, final ByteBuffer source,
             final int srcOffsetX, final int srcOffsetY, final int srcOffsetZ, final int srcTotalWidth,
-            final int srcTotalHeight) {
+            final int srcTotalHeight, final Face dstFace) {
 
         final GL gl = GLU.getCurrentGL();
 
@@ -564,6 +573,10 @@ public class JoglRenderer extends AbstractRenderer {
                 case ThreeDimensional:
                     gl.glTexSubImage3D(GL.GL_TEXTURE_3D, 0, dstOffsetX, dstOffsetY, dstOffsetZ, dstWidth, dstHeight,
                             dstDepth, pixelFormat, GL.GL_UNSIGNED_BYTE, source);
+                    break;
+                case CubeMap:
+                    gl.glTexSubImage2D(JoglTextureStateUtil.getGLCubeMapFace(dstFace), 0, dstOffsetX, dstOffsetY,
+                            dstWidth, dstHeight, pixelFormat, GL.GL_UNSIGNED_BYTE, source);
                     break;
                 default:
                     throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());

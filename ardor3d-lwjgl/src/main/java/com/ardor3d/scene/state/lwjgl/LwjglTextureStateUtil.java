@@ -1573,7 +1573,7 @@ public abstract class LwjglTextureStateUtil {
         throw new IllegalArgumentException("invalid texture type: " + type);
     }
 
-    private static int getGLCubeMapFace(final TextureCubeMap.Face face) {
+    public static int getGLCubeMapFace(final TextureCubeMap.Face face) {
         switch (face) {
             case PositiveX:
                 return ARBTextureCubeMap.GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;

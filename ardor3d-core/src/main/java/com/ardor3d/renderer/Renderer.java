@@ -20,6 +20,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
+import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
@@ -307,6 +308,34 @@ public interface Renderer {
     void updateTexture3DSubImage(Texture3D destination, int dstOffsetX, int dstOffsetY, int dstOffsetZ, int dstWidth,
             int dstHeight, int dstDepth, ByteBuffer source, int srcOffsetX, int srcOffsetY, int srcOffsetZ,
             int srcTotalWidth, int srcTotalHeight);
+
+    /**
+     * Update all or a portion of a single two dimensional face on an existing cubemap texture object.
+     * 
+     * @param destination
+     *            the texture to update. Should already have been sent to the card (have a valid texture id.)
+     * @param dstFace
+     *            the face to update.
+     * @param dstOffsetX
+     *            the x offset into the destination to start our update.
+     * @param dstOffsetY
+     *            the y offset into the destination to start our update.
+     * @param dstWidth
+     *            the width of the region to update.
+     * @param dstHeight
+     *            the height of the region to update.
+     * @param source
+     *            the data to update from.
+     * @param srcOffsetX
+     *            the optional X offset into our source data.
+     * @param srcOffsetY
+     *            the optional Y offset into our source data.
+     * @param srcTotalWidth
+     *            the total width of our source data, so we can properly walk through it.
+     */
+    void updateTextureCubeMapSubImage(TextureCubeMap destination, TextureCubeMap.Face dstFace, int dstOffsetX,
+            int dstOffsetY, int dstWidth, int dstHeight, ByteBuffer source, int srcOffsetX, int srcOffsetY,
+            int srcTotalWidth);
 
     /**
      * Check the underlying rendering system (opengl, etc.) for exceptions.
