@@ -260,6 +260,10 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
     }
 
+    public BMText getTextObject() {
+        return _text;
+    }
+
     // Create an instance of BMText for text rendering.
     private static BMText createText(final String text, final BMFont font) {
         final BMText tComp = new BMText("", text, font);
