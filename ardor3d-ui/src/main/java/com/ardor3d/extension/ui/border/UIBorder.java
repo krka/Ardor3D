@@ -49,7 +49,7 @@ public abstract class UIBorder extends Insets {
      *            the component to check against
      * @return the height
      */
-    protected static int getBorderHeight(final UIComponent component) {
+    public static int getBorderHeight(final UIComponent component) {
         return component.getContentHeight() + component.getPadding().getTop() + component.getPadding().getBottom()
                 + component.getBorder().getTop() + component.getBorder().getBottom();
     }
@@ -62,7 +62,7 @@ public abstract class UIBorder extends Insets {
      *            the component to check against
      * @return the width
      */
-    protected static int getBorderWidth(final UIComponent component) {
+    public static int getBorderWidth(final UIComponent component) {
         return component.getContentWidth() + component.getPadding().getRight() + component.getPadding().getLeft()
                 + component.getBorder().getRight() + component.getBorder().getLeft();
     }
