@@ -430,7 +430,7 @@ public class MeshData implements Cloneable, Savable {
      * @param fromIndex
      *            the coordinates to copy.
      * @param toIndex
-     *            the texture unit to set them to.
+     *            the texture unit to set them to. Must not be the same as the fromIndex.
      * @param factor
      *            a multiple to apply when copying
      */
@@ -476,7 +476,7 @@ public class MeshData implements Cloneable, Savable {
      * @param fromIndex
      *            the coordinates to copy.
      * @param toIndex
-     *            the texture unit to set them to.
+     *            the texture unit to set them to. Must not be the same as the fromIndex.
      * @param factorS
      *            a multiple to apply to the S channel when copying
      * @param factorT
