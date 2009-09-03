@@ -101,9 +101,8 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
     public void translateData(final float... translates) {
         _buffer.rewind();
         for (int i = 0; i < _buffer.remaining();) {
-            for (int j = 0; j < translates.length; j++) {
-                _buffer.put(_buffer.get(i++) + translates[j]);
-            }
+            _buffer.put(_buffer.get(i) + translates[i % translates.length]);
+            i++;
         }
         _buffer.rewind();
     }
