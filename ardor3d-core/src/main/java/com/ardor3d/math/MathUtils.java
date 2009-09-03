@@ -293,6 +293,60 @@ public class MathUtils {
     }
 
     /**
+     * plot a given value on the cubic S-curve: 3t^2 - 2t^3
+     * 
+     * @param t
+     *            our input value
+     * @return the plotted value
+     */
+    public static float scurve3(final float t) {
+        final float t2 = t * t;
+        final float t3 = t * t2;
+        return 3f * t2 - 2f * t3;
+    }
+
+    /**
+     * plot a given value on the cubic S-curve: 3t^2 - 2t^3
+     * 
+     * @param t
+     *            our input value
+     * @return the plotted value
+     */
+    public static double scurve3(final double t) {
+        final double t2 = t * t;
+        final double t3 = t * t2;
+        return 3. * t2 - 2. * t3;
+    }
+
+    /**
+     * plot a given value on the quintic S-curve: 6t^5 - 15t^4 + 10t^3
+     * 
+     * @param t
+     *            our input value
+     * @return the plotted value
+     */
+    public static float scurve5(final float t) {
+        final float t3 = t * t * t;
+        final float t4 = t * t3;
+        final float t5 = t * t4;
+        return 6f * t5 - 15f * t4 + 10f * t3;
+    }
+
+    /**
+     * plot a given value on the quintic S-curve: 6t^5 - 15t^4 + 10t^3
+     * 
+     * @param t
+     *            our input value
+     * @return the plotted value
+     */
+    public static double scurve5(final double t) {
+        final double t3 = t * t * t;
+        final double t4 = t * t3;
+        final double t5 = t * t4;
+        return 6. * t5 - 15. * t4 + 10. * t3;
+    }
+
+    /**
      * 
      * @param left
      * @param right
@@ -390,5 +444,17 @@ public class MathUtils {
 
         store.set(side.getX(), up.getX(), -direction.getX(), side.getY(), up.getY(), -direction.getY(), side.getZ(), up
                 .getZ(), -direction.getZ());
+    }
+
+    public static int floor(final float val) {
+        return val > 0 ? (int) val : (int) val - 1;
+    }
+
+    public static long floor(final double val) {
+        return val > 0 ? (long) val : (long) val - 1;
+    }
+
+    public static double clamp(final double val, final double min, final double max) {
+        return (val < min) ? min : (val > max ? max : val);
     }
 }
