@@ -12,6 +12,7 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -73,6 +74,38 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
      */
     void setValuesPerTuple(final int valuesPerTuple) {
         _valuesPerTuple = valuesPerTuple;
+    }
+
+    /**
+     * Scale the data in this buffer by the given value(s)
+     * 
+     * @param scales
+     *            the scale values to use. The Nth buffer element is scaled by the (N % scales.length) scales element.
+     */
+    public void scaleData(final float... scales) {
+        _buffer.rewind();
+        for (int i = 0; i < _buffer.remaining();) {
+            _buffer.put(_buffer.get(i) * scales[i % scales.length]);
+            i++;
+        }
+        _buffer.rewind();
+    }
+
+    /**
+     * Translate the data in this buffer by the given value(s)
+     * 
+     * @param translates
+     *            the translation values to use. The Nth buffer element is translated by the (N % translates.length)
+     *            translates element.
+     */
+    public void translateData(final float... translates) {
+        _buffer.rewind();
+        for (int i = 0; i < _buffer.remaining();) {
+            for (int j = 0; j < translates.length; j++) {
+                _buffer.put(_buffer.get(i++) + translates[j]);
+            }
+        }
+        _buffer.rewind();
     }
 
     public Class<? extends FloatBufferData> getClassTag() {
