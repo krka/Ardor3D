@@ -98,11 +98,11 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     }
 
     public ReadOnlyVector3 getB() {
-        return _pointA;
+        return _pointB;
     }
 
     public ReadOnlyVector3 getC() {
-        return _pointA;
+        return _pointC;
     }
 
     /**
