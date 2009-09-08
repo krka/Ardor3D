@@ -69,32 +69,44 @@ public class ImageBackdrop extends SolidBackdrop {
     public void draw(final Renderer renderer, final UIComponent comp) {
         super.draw(renderer, comp);
 
-        double x = 0;
-        double y = 0;
-        double width = 0;
-        double height = 0;
+        final double[] vals = new double[4];
+        getDimensions(comp, vals);
+        double x = vals[0];
+        double y = vals[1];
+        final double width = vals[2];
+        final double height = vals[3];
+
+        x += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
+                * comp.getWorldScale().getX();
+        y += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder().getBottom())
+                * comp.getWorldScale().getY();
+
+        SubTexUtil.drawSubTex(renderer, _image, x, y, width, height);
+    }
+
+    public void getDimensions(final UIComponent comp, final double[] vals) {
 
         final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp);
         final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp);
 
         switch (_axis) {
             case Both:
-                width = bgwidth;
-                height = bgheight;
+                vals[2] = bgwidth;
+                vals[3] = bgheight;
                 break;
             case None:
             case Horizontal:
             case Vertical:
                 if (_axis.equals(StretchAxis.Horizontal)) {
-                    width = bgwidth;
+                    vals[2] = bgwidth;
                 } else {
-                    width = _image.getWidth();
+                    vals[2] = _image.getWidth();
                 }
 
                 if (_axis.equals(StretchAxis.Vertical)) {
-                    height = bgheight;
+                    vals[3] = bgheight;
                 } else {
-                    height = _image.getHeight();
+                    vals[3] = _image.getHeight();
                 }
 
                 if (!_axis.equals(StretchAxis.Horizontal)) {
@@ -102,17 +114,17 @@ public class ImageBackdrop extends SolidBackdrop {
                         case TOP:
                         case MIDDLE:
                         case BOTTOM:
-                            x = bgwidth / 2 - _image.getWidth() / 2;
+                            vals[0] = bgwidth / 2 - _image.getWidth() / 2;
                             break;
                         case TOP_RIGHT:
                         case RIGHT:
                         case BOTTOM_RIGHT:
-                            x = bgwidth - _image.getWidth();
+                            vals[0] = bgwidth - _image.getWidth();
                             break;
                         case TOP_LEFT:
                         case LEFT:
                         case BOTTOM_LEFT:
-                            x = 0;
+                            vals[0] = 0;
                     }
                 }
 
@@ -121,27 +133,20 @@ public class ImageBackdrop extends SolidBackdrop {
                         case TOP_LEFT:
                         case TOP:
                         case TOP_RIGHT:
-                            y = bgheight - _image.getHeight();
+                            vals[1] = bgheight - _image.getHeight();
                             break;
                         case LEFT:
                         case MIDDLE:
                         case RIGHT:
-                            y = bgheight / 2 - _image.getHeight() / 2;
+                            vals[1] = bgheight / 2 - _image.getHeight() / 2;
                             break;
                         case BOTTOM_LEFT:
                         case BOTTOM:
                         case BOTTOM_RIGHT:
-                            y = 0;
+                            vals[1] = 0;
                     }
                 }
         }
-
-        x += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
-                * comp.getWorldScale().getX();
-        y += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder().getBottom())
-                * comp.getWorldScale().getY();
-
-        SubTexUtil.drawSubTex(renderer, _image, x, y, width, height);
     }
 
     public SubTex getImage() {

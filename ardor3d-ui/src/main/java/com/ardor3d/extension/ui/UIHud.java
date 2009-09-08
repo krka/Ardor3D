@@ -33,6 +33,7 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -621,6 +622,24 @@ public class UIHud extends Node {
             return _focusedComponent.keyReleased(key, currentIS);
         } else {
             return false;
+        }
+    }
+
+    public int getWidth() {
+        final Camera cam = Camera.getCurrentCamera();
+        if (cam != null) {
+            return cam.getWidth();
+        } else {
+            return 1;
+        }
+    }
+
+    public int getHeight() {
+        final Camera cam = Camera.getCurrentCamera();
+        if (cam != null) {
+            return cam.getHeight();
+        } else {
+            return 1;
         }
     }
 }

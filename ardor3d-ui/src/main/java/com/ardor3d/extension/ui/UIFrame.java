@@ -372,8 +372,8 @@ public class UIFrame extends UIContainer {
          * @return true if this frame can be fully contained by the display.
          */
         public boolean smallerThanWindow() {
-            final int dispWidth = Camera.getCurrentCamera().getWidth();
-            final int dispHeight = Camera.getCurrentCamera().getHeight();
+            final int dispWidth = getHud().getWidth();
+            final int dispHeight = getHud().getHeight();
 
             return getComponentWidth() <= dispWidth && getComponentHeight() <= dispHeight;
         }
