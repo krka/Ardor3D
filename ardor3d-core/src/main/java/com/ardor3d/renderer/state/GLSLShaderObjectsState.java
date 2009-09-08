@@ -484,11 +484,15 @@ public class GLSLShaderObjectsState extends RenderState {
      * @param name
      *            uniform variable to change
      * @param value
-     *            the new value
+     *            the new float data
+     * @param size
+     *            the number of components per entry (must be 1, 2, 3, or 4)
      */
-    public void setUniform(final String name, final FloatBuffer value) {
+    public void setUniform(final String name, final FloatBuffer value, final int size) {
+        assert (size >= 1 && size <= 4) : "Size must be 1, 2, 3 or 4";
         final ShaderVariableFloatArray shaderUniform = getShaderUniform(name, ShaderVariableFloatArray.class);
         shaderUniform.value = value;
+        shaderUniform.size = size;
 
         setNeedsRefresh(true);
     }
