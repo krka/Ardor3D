@@ -1153,6 +1153,7 @@ public abstract class UIComponent extends Node {
                     // set contents and size
                     ttip.getLabel().setText(getTooltipText());
                     ttip.updateMinimumSizeFromContents();
+                    ttip.getLabel().compact();
                     ttip.compact();
                     ttip.layout();
 
