@@ -494,8 +494,6 @@ public class JoglRenderer extends AbstractRenderer {
 
         // Determine the original texture configuration, so that this method can
         // restore the texture configuration to its original state.
-        final int origTexBinding[] = new int[1];
-        gl.glGetIntegerv(GL.GL_TEXTURE_BINDING_2D, origTexBinding, 0);
         final int origAlignment[] = new int[1];
         gl.glGetIntegerv(GL.GL_UNPACK_ALIGNMENT, origAlignment, 0);
         final int origRowLength = 0;
@@ -530,15 +528,14 @@ public class JoglRenderer extends AbstractRenderer {
             imageHeight = srcTotalHeight;
         }
 
-        // Consider moving these conversion methods.
+        // Grab pixel format
         final int pixelFormat = JoglTextureUtil.getGLPixelFormat(destination.getImage().getFormat());
 
+        // bind...
+        JoglTextureStateUtil.doTextureBind(destination, 0, false);
+
         // Update the texture configuration (when necessary).
-        final RenderContext context = ContextManager.getCurrentContext();
-        final int dstTexID = destination.getTextureIdForContext(context.getGlContextRep());
-        if (origTexBinding[0] != dstTexID) {
-            gl.glBindTexture(GL.GL_TEXTURE_2D, dstTexID);
-        }
+
         if (origAlignment[0] != alignment) {
             gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, alignment);
         }
@@ -582,11 +579,7 @@ public class JoglRenderer extends AbstractRenderer {
                     throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());
             }
         } finally {
-            // Restore the texture configuration (when necessary).
-            // Restore the texture binding.
-            if (origTexBinding[0] != dstTexID) {
-                gl.glBindTexture(GL.GL_TEXTURE_2D, origTexBinding[0]);
-            }
+            // Restore the texture configuration (when necessary)...
             // Restore alignment.
             if (origAlignment[0] != alignment) {
                 gl.glPixelStorei(GL.GL_UNPACK_ALIGNMENT, origAlignment[0]);

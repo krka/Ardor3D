@@ -476,8 +476,6 @@ public class LwjglRenderer extends AbstractRenderer {
         // Determine the original texture configuration, so that this method can
         // restore the texture configuration to its original state.
         final IntBuffer idBuff = BufferUtils.createIntBuffer(16);
-        GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D, idBuff);
-        final int origTexBinding = idBuff.get(0);
         GL11.glGetInteger(GL11.GL_UNPACK_ALIGNMENT, idBuff);
         final int origAlignment = idBuff.get(0);
         final int origRowLength = 0;
@@ -512,15 +510,14 @@ public class LwjglRenderer extends AbstractRenderer {
             imageHeight = srcTotalHeight;
         }
 
-        // Consider moving these conversion methods.
+        // Grab pixel format
         final int pixelFormat = LwjglTextureUtil.getGLPixelFormat(destination.getImage().getFormat());
 
+        // bind...
+        LwjglTextureStateUtil.doTextureBind(destination, 0, false);
+
         // Update the texture configuration (when necessary).
-        final RenderContext context = ContextManager.getCurrentContext();
-        final int dstTexID = destination.getTextureIdForContext(context.getGlContextRep());
-        if (origTexBinding != dstTexID) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, dstTexID);
-        }
+
         if (origAlignment != alignment) {
             GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, alignment);
         }
@@ -564,11 +561,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     throw new Ardor3dException("Unsupported type for updateTextureSubImage: " + destination.getType());
             }
         } finally {
-            // Restore the texture configuration (when necessary).
-            // Restore the texture binding.
-            if (origTexBinding != dstTexID) {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, origTexBinding);
-            }
+            // Restore the texture configuration (when necessary)...
             // Restore alignment.
             if (origAlignment != alignment) {
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, origAlignment);
