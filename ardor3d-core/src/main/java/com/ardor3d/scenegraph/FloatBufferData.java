@@ -12,7 +12,6 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
