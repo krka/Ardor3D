@@ -116,13 +116,12 @@ public class PhysicalLayer {
             return;
         }
 
-        KeyEvent keyEvent = eventIterator.next();
+        final KeyEvent keyEvent = eventIterator.next();
 
         // EnumSet.copyOf fails if the collection is empty, since it needs at least one object to
         // figure out which type of enum to deal with. Hence the check below.
-        EnumSet<Key> keysDown = _currentKeyboardState.getKeysDown().isEmpty() ?
-                EnumSet.noneOf(Key.class) :
-                EnumSet.copyOf(_currentKeyboardState.getKeysDown());
+        final EnumSet<Key> keysDown = _currentKeyboardState.getKeysDown().isEmpty() ? EnumSet.noneOf(Key.class)
+                : EnumSet.copyOf(_currentKeyboardState.getKeysDown());
 
         if (keyEvent.getState() == KeyState.DOWN) {
             keysDown.add(keyEvent.getKey());
