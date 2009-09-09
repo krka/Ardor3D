@@ -1296,8 +1296,8 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(getX(), "x", 0);
         capsule.write(getY(), "y", 0);
-        capsule.write(getY(), "z", 0);
-        capsule.write(getY(), "w", 1);
+        capsule.write(getZ(), "z", 0);
+        capsule.write(getW(), "w", 1);
     }
 
     public void read(final Ardor3DImporter e) throws IOException {
