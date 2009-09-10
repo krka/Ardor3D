@@ -204,7 +204,7 @@ public class GeneratedTexturesExample extends ExampleBase {
 
         // simplex + FBM - luminance
         setTerrain(srcs[index], terrain, true, false);
-        srcs[index++].setTooltipText("Simplex noise + Fractal Brownian Motion.");
+        srcs[index++].setTooltipText("Simplex noise + Fractional Brownian Motion (fBm).");
 
         // color ramp
         setColors(srcs[index++]);
@@ -418,7 +418,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         final Function3D translatedWood = Functions.translateInput(perturbedWood, 0, 0, 1.5);
         final Function3D rotatedWood = Functions.rotateInput(translatedWood, new Matrix3().fromAngles(
                 MathUtils.DEG_TO_RAD * 6, 0, 0));
-        final Function3D finalWood = new TurbulenceFunction3D(rotatedWood, 1 / 72.0, 3, 2.0);
+        final Function3D finalWood = new TurbulenceFunction3D(rotatedWood, 1 / 512.0, 2, 2.0);
 
         final ReadOnlyColorRGBA[] woodColors = new ReadOnlyColorRGBA[256];
         woodColors[0] = new ColorRGBA(189 / 255f, 94 / 255f, 4 / 255f, 1);
@@ -426,7 +426,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         woodColors[255] = new ColorRGBA(60 / 255f, 10 / 255f, 8 / 255f, 1);
         GeneratedImageFactory.fillInColorTable(woodColors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(finalWood, wside, hside, 1);
+        Image img = GeneratedImageFactory.createLuminance8Image(rotatedWood, wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, woodColors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
