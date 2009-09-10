@@ -96,7 +96,6 @@ public class MandelbrotExplorerExample extends ExampleBase {
                         final MouseState mouse = inputState.getCurrent().getMouseState();
                         final Vector2 add = new Vector2(mouse.getX() - .5 * display.getWidth(), mouse.getY() - .5
                                 * display.getHeight());
-                        System.err.println(add);
                         add.multiplyLocal(scale).multiplyLocal(
                                 new Vector2(2.0 / display.getWidth(), 2.0 / display.getHeight()));
                         trans.addLocal(add.getX(), add.getY());

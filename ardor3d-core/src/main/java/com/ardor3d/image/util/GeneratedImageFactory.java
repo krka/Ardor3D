@@ -144,11 +144,11 @@ public abstract class GeneratedImageFactory {
         // prepare list of image slices.
         final List<ByteBuffer> dataList = new ArrayList<ByteBuffer>(depth);
 
+        final byte[] data = new byte[width * height];
         for (double z = 0; z < depth; z++) {
-            // prepare data slice
-            final ByteBuffer data = BufferUtils.createByteBuffer(width * height);
             // calc our z coordinate, using start and end Z and our current progress along depth
             final double dz = (z / depth) * (endZ - startZ) + startZ;
+            int i = 0;
             for (double y = 0; y < height; y++) {
                 // calc our y coordinate, using start and end Y and our current progress along height
                 final double dy = (y / height) * (endY - startY) + startY;
@@ -164,10 +164,12 @@ public abstract class GeneratedImageFactory {
 
                     // Convert to [0, 255]
                     val = ((val + rangeStart) * rangeDiv) * 255.0;
-                    data.put((byte) MathUtils.floor(val));
+                    data[i++] = (byte) MathUtils.floor(val);
                 }
             }
-            dataList.add(data);
+            final ByteBuffer dataBuf = BufferUtils.createByteBuffer(data.length);
+            dataBuf.put(data);
+            dataList.add(dataBuf);
         }
 
         return new Image(Image.Format.Luminance8, width, height, dataList);
@@ -200,15 +202,18 @@ public abstract class GeneratedImageFactory {
             final ByteBuffer src = lumImage.getData(i);
             final int size = src.capacity();
             final ByteBuffer out = BufferUtils.createByteBuffer(size * (useAlpha ? 4 : 3));
+            final byte[] data = new byte[out.capacity()];
+            int j = 0;
             for (int x = 0; x < size; x++) {
                 c = colorTable[src.get(x) & 0xFF];
-                out.put((byte) (c.getRed() * 255));
-                out.put((byte) (c.getGreen() * 255));
-                out.put((byte) (c.getBlue() * 255));
+                data[j++] = (byte) (c.getRed() * 255);
+                data[j++] = (byte) (c.getGreen() * 255);
+                data[j++] = (byte) (c.getBlue() * 255);
                 if (useAlpha) {
-                    out.put((byte) (c.getAlpha() * 255));
+                    data[j++] = (byte) (c.getAlpha() * 255);
                 }
             }
+            out.put(data);
             dataList.add(out);
         }
 
