@@ -17,12 +17,11 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.image.util.GeneratedTextureFactory;
+import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.state.TextureState;
@@ -67,12 +66,13 @@ public class Texture3DExample extends ExampleBase {
         img.setWidth(32);
         img.setHeight(32);
         img.setDepth(32);
-        img.setFormat(Format.RGBA8);
+        img.setFormat(Format.RGB8);
 
         final List<ByteBuffer> data = Lists.newArrayList();
         for (int i = 0; i < 32; i++) {
-            final Texture2D t = GeneratedTextureFactory.createColorRGBPlain(ColorRGBA.randomColor(null), 4);
-            data.add(t.getImage().getData(0));
+            final Image colorImage = GeneratedImageFactory
+                    .createSolidColorImage(ColorRGBA.randomColor(null), false, 32);
+            data.add(colorImage.getData(0));
         }
         img.setData(data);
         tex.setImage(img);
