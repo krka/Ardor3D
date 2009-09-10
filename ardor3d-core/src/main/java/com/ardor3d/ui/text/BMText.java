@@ -582,7 +582,6 @@ public class BMText extends Mesh {
 
         final FloatBuffer vertices = _vertexBuffer;
         final FloatBuffer texCrds = _texCrdBuffer;
-        final IntBuffer indices = _indexBuffer;
 
         BMFont.Char chr;
         final float txW = _font.getTextureWidth();
@@ -607,12 +606,12 @@ public class BMText extends Mesh {
                 lineIndex++;
                 cursorX = getJustificationXOffset(lineIndex);
                 cursorY += lineHeight;
-                addEmptyCharacter(i, vertices, texCrds, indices);
+                addEmptyCharacter(i, vertices, texCrds);
             } else if (charVal == '\t') { // tab special case
                 final float tabStop = _tabSize * _font.getMaxCharAdvance();
                 final float stops = 1 + (float) Math.floor(cursorX / tabStop);
                 cursorX = stops * tabStop;
-                addEmptyCharacter(i, vertices, texCrds, indices);
+                addEmptyCharacter(i, vertices, texCrds);
             } else { // normal character
                 chr = _font.getChar(charVal);
 
@@ -638,12 +637,6 @@ public class BMText extends Mesh {
                 texCrds.put(r).put(b); // right bottom
                 texCrds.put(r).put(t); // right top
 
-                // -- indices -------------------
-                indices.put(i * 4 + 0);
-                indices.put(i * 4 + 1);
-                indices.put(i * 4 + 2);
-                indices.put(i * 4 + 3);
-
                 int nextVal = 0;
                 if (i < strLen - 1) {
                     nextVal = _textString.charAt(i + 1);
@@ -654,13 +647,12 @@ public class BMText extends Mesh {
         }
         _meshData.setVertexBuffer(vertices);
         _meshData.setTextureBuffer(texCrds, 0);
-        _meshData.setIndexBuffer(indices);
+        _meshData.setIndexBuffer(null);
     }
 
     // this is inefficient yet incredibly convenient
     // used for tab and newline
-    private void addEmptyCharacter(final int i, final FloatBuffer vertices, final FloatBuffer uvs,
-            final IntBuffer indices) {
+    private void addEmptyCharacter(final int i, final FloatBuffer vertices, final FloatBuffer uvs) {
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
@@ -669,10 +661,6 @@ public class BMText extends Mesh {
         uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
-        indices.put(i * 4 + 0);
-        indices.put(i * 4 + 1);
-        indices.put(i * 4 + 2);
-        indices.put(i * 4 + 3);
     }
 
     public String getText() {
