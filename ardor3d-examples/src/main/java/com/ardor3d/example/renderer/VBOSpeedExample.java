@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
@@ -35,6 +36,7 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.visitor.DeleteVBOsVisitor;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
@@ -108,9 +110,16 @@ public class VBOSpeedExample extends ExampleBase {
                 vboMode = (vboMode + 1) % 3;
                 if (vboMode == 0) {
                     t.setText("[SPACE] VBO Off");
-                    final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer().getRenderer());
                     _root.getSceneHints().setDataMode(DataMode.Arrays);
-                    _root.acceptVisitor(viz, false);
+                    // run this in the opengl thread
+                    GameTaskQueueManager.getManager().update(new Callable<Void>() {
+                        public Void call() throws Exception {
+                            final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer()
+                                    .getRenderer());
+                            _root.acceptVisitor(viz, false);
+                            return null;
+                        }
+                    });
                 } else if (vboMode == 1) {
                     t.setText("[SPACE] VBO On");
                     _root.getSceneHints().setDataMode(DataMode.VBO);
