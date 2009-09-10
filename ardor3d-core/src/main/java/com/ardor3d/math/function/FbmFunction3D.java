@@ -59,7 +59,9 @@ public class FbmFunction3D implements Function3D {
         double dx = x * _frequency, dy = y * _frequency, dz = z * _frequency;
         double dPersistence = 1;
         for (int i = 0; i < _octaves; i++) {
-            sum += dPersistence * _source.eval(dx, dy, dz);
+            final double value = getValue(dx, dy, dz);
+
+            sum += dPersistence * value;
 
             dPersistence *= _persistence;
             dx *= _lacunarity;
@@ -67,6 +69,10 @@ public class FbmFunction3D implements Function3D {
             dz *= _lacunarity;
         }
         return sum;
+    }
+
+    protected double getValue(final double dx, final double dy, final double dz) {
+        return _source.eval(dx, dy, dz);
     }
 
     public Function3D getSource() {
