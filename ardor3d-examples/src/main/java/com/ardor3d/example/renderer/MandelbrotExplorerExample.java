@@ -52,6 +52,7 @@ public class MandelbrotExplorerExample extends ExampleBase {
     private final Vector2 trans = new Vector2(-.7, 0);
     private final Vector2 scale = new Vector2(1.5, 1.5);
     private float iterations = 80;
+    private final ReadOnlyColorRGBA[] colors = new ReadOnlyColorRGBA[256];
 
     public static void main(final String[] args) {
         start(MandelbrotExplorerExample.class);
@@ -73,6 +74,15 @@ public class MandelbrotExplorerExample extends ExampleBase {
         display.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         display.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         _root.attachChild(display);
+
+        // set up our color map
+        colors[0] = ColorRGBA.BLUE;
+        colors[30] = ColorRGBA.YELLOW;
+        colors[70] = ColorRGBA.BLUE;
+        colors[140] = ColorRGBA.WHITE;
+        colors[220] = ColorRGBA.BLUE;
+        colors[255] = ColorRGBA.BLACK;
+        GeneratedImageFactory.fillInColorTable(colors);
 
         // set up the texture
         final TextureState ts = new TextureState();
@@ -126,15 +136,6 @@ public class MandelbrotExplorerExample extends ExampleBase {
         final MandelbrotFunction3D mandelBase = new MandelbrotFunction3D(Math.round(iterations));
         final Function3D translatedMandel = Functions.translateInput(mandelBase, trans.getX(), trans.getY(), 0);
         final Function3D finalMandel = Functions.scaleInput(translatedMandel, scale.getX(), scale.getY(), 1);
-
-        final ReadOnlyColorRGBA[] colors = new ReadOnlyColorRGBA[256];
-        colors[0] = ColorRGBA.BLUE;
-        colors[30] = ColorRGBA.YELLOW;
-        colors[70] = ColorRGBA.BLUE;
-        colors[140] = ColorRGBA.WHITE;
-        colors[220] = ColorRGBA.BLUE;
-        colors[255] = ColorRGBA.BLACK;
-        GeneratedImageFactory.fillInColorTable(colors);
 
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
         Image img = GeneratedImageFactory.createLuminance8Image(finalMandel, cam.getWidth(), cam.getHeight(), 1);
