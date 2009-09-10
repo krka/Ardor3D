@@ -37,23 +37,26 @@ public class GeometryClipmapTerrain extends Node {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(GeometryClipmapTerrain.class.getName());
 
-    private List<ClipmapLevel> clips;
-    private int visibleLevels = 0;
-    private final Camera terrainCamera;
-    private final int totalSize;
-    private final int clipSideSize;
-    private final Vector3 lightDirection = new Vector3(1, 1, 2);
+    private List<ClipmapLevel> _clips;
+    private int _visibleLevels = 0;
+    private final Camera _terrainCamera;
+    private final int _totalSize;
+    private final int _clipSideSize;
+    private final Vector3 _lightDirection = new Vector3(1, 1, 2);
 
-    private boolean initialized = false;
+    private boolean _initialized = false;
 
     /** Shader for rendering clipmap geometry with morphing. */
     private GLSLShaderObjectsState _geometryClipmapShader;
 
+    private final float _heightScale;
+
     public GeometryClipmapTerrain(final Camera camera, final HeightmapPyramid heightmapPyramid, final int clipSideSize,
             final float heightScale) {
-        terrainCamera = camera;
-        totalSize = heightmapPyramid.getSize(0);
-        this.clipSideSize = clipSideSize;
+        _terrainCamera = camera;
+        _totalSize = heightmapPyramid.getSize(0);
+        _heightScale = heightScale;
+        _clipSideSize = clipSideSize;
 
         getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
         final CullState cs = new CullState();
@@ -62,11 +65,11 @@ public class GeometryClipmapTerrain extends Node {
         setRenderState(cs);
 
         try {
-            clips = new ArrayList<ClipmapLevel>();
+            _clips = new ArrayList<ClipmapLevel>();
 
             for (int i = 0; i < heightmapPyramid.getHeightmapCount(); i++) {
                 final ClipmapLevel clipmap = new ClipmapLevel(i, camera, clipSideSize, heightScale, heightmapPyramid);
-                clips.add(clipmap);
+                _clips.add(clipmap);
                 attachChild(clipmap);
 
                 clipmap.getSceneHints().setDataMode(DataMode.Arrays);
@@ -89,37 +92,37 @@ public class GeometryClipmapTerrain extends Node {
     protected void updateChildren(final double time) {
         super.updateChildren(time);
 
-        for (int i = clips.size() - 1; i >= 0; i--) {
-            if (!clips.get(i).isReady()) {
-                visibleLevels = i + 1;
+        for (int i = _clips.size() - 1; i >= 0; i--) {
+            if (!_clips.get(i).isReady()) {
+                _visibleLevels = i + 1;
                 break;
             }
         }
 
         // TODO: Only run update and refresh if needed. A clipmap only needs to be updated if the camera location has
         // crossed a gridpoint.
-        // TODO: Check for each level readyness and time to generate. Drop levels if over a threshold. (for example when
+        // TODO: Check for each level readiness and time to generate. Drop levels if over a threshold. (for example when
         // moving faster than data can be downloaded or generated)
 
         // Update vertices.
-        for (int i = clips.size() - 1; i >= visibleLevels; i--) {
-            clips.get(i).updateVertices();
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            _clips.get(i).updateVertices();
         }
 
         // Update indices.
-        for (int i = clips.size() - 1; i >= visibleLevels; i--) {
-            if (i == visibleLevels) {
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            if (i == _visibleLevels) {
                 // Level 0 has no nested level, so pass null as parameter.
-                clips.get(i).updateIndices(null);
+                _clips.get(i).updateIndices(null);
             } else {
                 // All other levels i have the level i-1 nested in.
-                clips.get(i).updateIndices(clips.get(i - 1));
+                _clips.get(i).updateIndices(_clips.get(i - 1));
             }
         }
 
-        for (int i = clips.size() - 1; i >= visibleLevels; i--) {
-            clips.get(i).getMeshData().getVertexCoords().setNeedsRefresh(true);
-            clips.get(i).getMeshData().getIndices().setNeedsRefresh(true);
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            _clips.get(i).getMeshData().getVertexCoords().setNeedsRefresh(true);
+            _clips.get(i).getMeshData().getIndices().setNeedsRefresh(true);
         }
     }
 
@@ -127,19 +130,19 @@ public class GeometryClipmapTerrain extends Node {
     public void draw(final Renderer r) {
         updateShader();
 
-        if (!initialized) {
-            for (int i = clips.size() - 1; i >= visibleLevels; i--) {
-                final ClipmapLevel clip = clips.get(i);
+        if (!_initialized) {
+            for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+                final ClipmapLevel clip = _clips.get(i);
 
                 clip.getMeshData().getIndexBuffer().limit(clip.getMeshData().getIndexBuffer().capacity());
             }
 
-            initialized = true;
+            _initialized = true;
         }
 
         // draw levels from coarse to fine.
-        for (int i = clips.size() - 1; i >= visibleLevels; i--) {
-            final ClipmapLevel clip = clips.get(i);
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            final ClipmapLevel clip = _clips.get(i);
 
             if (clip.getStripIndex() > 0) {
                 clip.draw(r);
@@ -152,8 +155,8 @@ public class GeometryClipmapTerrain extends Node {
      */
     public void updateShader() {
         if (_geometryClipmapShader != null) {
-            _geometryClipmapShader.setUniform("eyePosition", terrainCamera.getLocation());
-            _geometryClipmapShader.setUniform("lightDirection", lightDirection.normalizeLocal());
+            _geometryClipmapShader.setUniform("eyePosition", _terrainCamera.getLocation());
+            _geometryClipmapShader.setUniform("lightDirection", _lightDirection.normalizeLocal());
 
             return;
         }
@@ -172,8 +175,8 @@ public class GeometryClipmapTerrain extends Node {
             _geometryClipmapShader.setUniform("texture", 0);
             _geometryClipmapShader.setUniform("normalMap", 1);
 
-            _geometryClipmapShader.setUniform("texelSize", 1f / totalSize);
-            _geometryClipmapShader.setUniform("clipSideSize", (float) clipSideSize);
+            _geometryClipmapShader.setUniform("texelSize", 1f / _totalSize);
+            _geometryClipmapShader.setUniform("clipSideSize", (float) _clipSideSize);
 
             _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
                 public void applyData(final GLSLShaderObjectsState shader, final Mesh mesh, final Renderer renderer) {
@@ -182,8 +185,8 @@ public class GeometryClipmapTerrain extends Node {
             });
 
             // setRenderState(_geometryClipmapShader);
-            for (int i = clips.size() - 1; i >= 0; i--) {
-                final ClipmapLevel clip = clips.get(i);
+            for (int i = _clips.size() - 1; i >= 0; i--) {
+                final ClipmapLevel clip = _clips.get(i);
                 clip.setRenderState(_geometryClipmapShader);
             }
         }
@@ -194,7 +197,7 @@ public class GeometryClipmapTerrain extends Node {
      * @return the visibleLevels
      */
     public int getVisibleLevels() {
-        return visibleLevels;
+        return _visibleLevels;
     }
 
     /**
@@ -202,7 +205,7 @@ public class GeometryClipmapTerrain extends Node {
      *            the visibleLevels to set
      */
     public void setVisibleLevels(final int visibleLevels) {
-        this.visibleLevels = visibleLevels;
+        _visibleLevels = visibleLevels;
     }
 
     /**
@@ -210,6 +213,10 @@ public class GeometryClipmapTerrain extends Node {
      *            the lightDirection to set
      */
     public void setLightDirection(final ReadOnlyVector3 lightDirection) {
-        this.lightDirection.set(lightDirection);
+        _lightDirection.set(lightDirection);
+    }
+
+    public float getHeightScale() {
+        return _heightScale;
     }
 }
