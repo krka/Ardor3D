@@ -426,7 +426,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         woodColors[255] = new ColorRGBA(60 / 255f, 10 / 255f, 8 / 255f, 1);
         GeneratedImageFactory.fillInColorTable(woodColors);
 
-        Image img = GeneratedImageFactory.createLuminance8Image(rotatedWood, wside, hside, 1);
+        Image img = GeneratedImageFactory.createLuminance8Image(finalWood, wside, hside, 1);
         img = GeneratedImageFactory.createColorImageFromLuminance8(img, false, woodColors);
         tex.setImage(img);
         tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.Trilinear));
