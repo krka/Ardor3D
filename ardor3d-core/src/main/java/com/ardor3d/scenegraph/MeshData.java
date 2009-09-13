@@ -424,7 +424,7 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
-     * <code>copyTextureCoords</code> copys the texture coordinates of a given texture unit to another location. If the
+     * <code>copyTextureCoords</code> copies the texture coordinates of a given texture unit to another location. If the
      * texture unit is not valid, then the coordinates are ignored. Coords are multiplied by the given factor.
      * 
      * @param fromIndex
@@ -470,8 +470,8 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
-     * <code>copyTextureCoords</code> copys the texture coordinates of a given texture unit to another location. If the
-     * texture unit is not valid, then the coordinates are ignored. Coords are multiplied by the given factor.
+     * <code>copyTextureCoords</code> copies the texture coordinates of a given texture unit to another location. If the
+     * texture unit is not valid, then the coordinates are ignored. Coords are multiplied by the given S and T factors.
      * 
      * @param fromIndex
      *            the coordinates to copy.
