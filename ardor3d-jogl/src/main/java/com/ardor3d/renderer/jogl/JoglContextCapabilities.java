@@ -75,6 +75,15 @@ public final class JoglContextCapabilities extends ContextCapabilities {
             } else {
                 _maxFBOColorAttachments = 1;
             }
+
+            // Max multisample samples.
+            if (gl.isExtensionAvailable("GL_EXT_framebuffer_multisample")
+                    && gl.isExtensionAvailable("GL_EXT_framebuffer_blit")) {
+                gl.glGetIntegerv(GL.GL_MAX_SAMPLES_EXT, buf);
+                _maxFBOSamples = buf.get(0);
+            } else {
+                _maxFBOSamples = 0;
+            }
         } else {
             _maxFBOColorAttachments = 0;
         }

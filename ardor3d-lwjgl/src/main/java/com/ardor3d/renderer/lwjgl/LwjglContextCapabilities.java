@@ -16,6 +16,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBMultitexture;
 import org.lwjgl.opengl.ARBVertexShader;
+import org.lwjgl.opengl.EXTFramebufferMultisample;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.opengl.EXTTextureLODBias;
@@ -70,6 +71,14 @@ public class LwjglContextCapabilities extends ContextCapabilities {
                 _maxFBOColorAttachments = buf.get(0);
             } else {
                 _maxFBOColorAttachments = 1;
+            }
+
+            // Max multisample samples.
+            if (caps.GL_EXT_framebuffer_multisample && caps.GL_EXT_framebuffer_blit) {
+                GL11.glGetInteger(EXTFramebufferMultisample.GL_MAX_SAMPLES_EXT, buf);
+                _maxFBOSamples = buf.get(0);
+            } else {
+                _maxFBOSamples = 0;
             }
         } else {
             _maxFBOColorAttachments = 0;

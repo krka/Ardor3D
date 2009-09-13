@@ -38,6 +38,7 @@ public class ContextCapabilities {
 
     protected boolean _fboSupported = false;
     protected int _maxFBOColorAttachments = 1;
+    protected int _maxFBOSamples = 0;
 
     protected boolean _twoSidedStencilSupport = false;
     protected boolean _stencilWrapSupport = false;
@@ -392,7 +393,7 @@ public class ContextCapabilities {
     }
 
     /**
-     * @return if rectangular texture sizes are supported (width != height)
+     * @return true if rectangular texture sizes are supported (width != height)
      */
     public boolean isRectangularTextureSupported() {
         return _supportsRectangular;
@@ -440,6 +441,10 @@ public class ContextCapabilities {
 
     public boolean isTextureEdgeClampSupported() {
         return _supportsEdgeClamp;
+    }
+
+    public int getMaxFBOSamples() {
+        return _maxFBOSamples;
     }
 
 }
