@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.ARBDepthTexture;
 import org.lwjgl.opengl.ARBDrawBuffers;
+import org.lwjgl.opengl.EXTFramebufferBlit;
+import org.lwjgl.opengl.EXTFramebufferMultisample;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 
@@ -46,9 +48,6 @@ import com.ardor3d.util.geom.BufferUtils;
  * <p>
  * This class is used by Ardor3D's LWJGL implementation to render textures. Users should <b>not</b> create this class
  * directly.
- * </p>
- * <p>
- * TODO: Support multisample
  * </p>
  * 
  * @see TextureRendererFactory
@@ -133,16 +132,27 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         // if we only support 1 draw buffer at a time anyway, we'll have to render to each texture individually...
         if (maxDrawBuffers == 1 || texs.size() == 1) {
             try {
-                activate();
+                ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
+
                 for (int i = 0; i < texs.size(); i++) {
                     final Texture tex = texs.get(i);
 
-                    setupForSingleTexDraw(tex, clear);
+                    setupForSingleTexDraw(tex);
 
+                    if (_samples > 0 && _supportsMultisample) {
+                        setMSFBO();
+                    }
+
+                    switchCameraIn(clear);
                     if (toDrawA != null) {
                         doDraw(toDrawA);
                     } else {
                         doDraw(toDrawB);
+                    }
+                    switchCameraOut();
+
+                    if (_samples > 0 && _supportsMultisample) {
+                        blitTo(tex);
                     }
 
                     takedownForSingleTexDraw(tex);
@@ -150,12 +160,12 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             } catch (final Exception e) {
                 logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, int)", "Exception", e);
             } finally {
-                deactivate();
+                ContextManager.getCurrentContext().popFBOTextureRenderer();
             }
             return;
         }
         try {
-            activate();
+            ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
             // Otherwise, we can streamline this by rendering to multiple textures at once.
             // first determine how many groups we need
@@ -170,7 +180,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                 }
             }
             // we can only render to 1 depth texture at a time, so # groups is at minimum == numDepth
-            final int groups = Math.max(depths.size(), (int) (0.999f + (colors.size() / (float) maxDrawBuffers)));
+            final int groups = Math.max(depths.size(), (int) Math.ceil(colors.size() / (float) maxDrawBuffers));
 
             final RenderContext context = ContextManager.getCurrentContext();
             for (int i = 0; i < groups; i++) {
@@ -229,16 +239,14 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             logger.logp(Level.SEVERE, this.getClass().toString(),
                     "render(List<? extends Spatial>, Spatial, List<Texture>, int)", "Exception", e);
         } finally {
-            deactivate();
+            ContextManager.getCurrentContext().popFBOTextureRenderer();
         }
     }
 
     @Override
-    protected void setupForSingleTexDraw(final Texture tex, final int clear) {
+    protected void setupForSingleTexDraw(final Texture tex) {
         final RenderContext context = ContextManager.getCurrentContext();
         final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
-
-        LwjglTextureStateUtil.doTextureBind(tex, 0, true);
 
         if (tex.getRenderToTextureFormat().isDepthFormat()) {
             // Setup depth texture into FBO
@@ -262,8 +270,6 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
         // Check FBO complete
         checkFBOComplete(_fboID);
-
-        switchCameraIn(clear);
     }
 
     private void setReadBuffer(final int attachVal) {
@@ -287,13 +293,28 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
 
     @Override
     protected void takedownForSingleTexDraw(final Texture tex) {
-        switchCameraOut();
-
         // automatically generate mipmaps for our texture.
         if (tex.getMinificationFilter().usesMipMapLevels()) {
             LwjglTextureStateUtil.doTextureBind(tex, 0, true);
             EXTFramebufferObject.glGenerateMipmapEXT(GL11.GL_TEXTURE_2D);
         }
+    }
+
+    @Override
+    protected void setMSFBO() {
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _msfboID);
+    }
+
+    @Override
+    protected void blitTo(final Texture tex) {
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, _msfboID);
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _fboID);
+        EXTFramebufferBlit.glBlitFramebufferEXT(0, 0, _width, _height, 0, 0, _width, _height, GL11.GL_COLOR_BUFFER_BIT
+                | GL11.GL_DEPTH_BUFFER_BIT, GL11.GL_NEAREST);
+
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, 0);
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, 0);
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
     }
 
     /**
@@ -303,34 +324,36 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
      *            an id to use for log messages, particularly if there are any issues.
      */
     public static void checkFBOComplete(final int fboID) {
-        final int framebuffer = EXTFramebufferObject
-                .glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
-        switch (framebuffer) {
+        final int status = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
+        switch (status) {
             case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
                 break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
+                throw new IllegalStateException("FrameBuffer: " + fboID
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
             case EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-                throw new RuntimeException("FrameBuffer: " + fboID
-                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception");
+                throw new IllegalStateException("FrameBuffer: " + fboID
+                        + ", has caused a GL_FRAMEBUFFER_UNSUPPORTED_EXT exception.");
+            case EXTFramebufferMultisample.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
+                throw new IllegalStateException("FrameBuffer: " + fboID
+                        + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT exception.");
             default:
-                throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + framebuffer);
+                throw new IllegalStateException("Unexpected reply from glCheckFramebufferStatusEXT: " + status);
         }
     }
 
@@ -351,9 +374,12 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         // Lazy init
         if (_fboID <= 0) {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
+
+            // Create our texture binding FBO
             EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate id
             _fboID = buffer.get(0);
 
+            // Create a depth renderbuffer to use for RTT use
             EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
             _depthRBID = buffer.get(0);
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _depthRBID);
@@ -375,12 +401,55 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             }
             EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, format, _width,
                     _height);
+
+            // unbind...
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+
+            // If we support it, rustle up a multisample framebuffer + renderbuffers
+            if (_samples != 0 && _supportsMultisample) {
+                // create ms framebuffer object
+                EXTFramebufferObject.glGenFramebuffersEXT(buffer);
+                _msfboID = buffer.get(0);
+
+                // create ms renderbuffers
+                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                _mscolorRBID = buffer.get(0);
+                EXTFramebufferObject.glGenRenderbuffersEXT(buffer); // generate id
+                _msdepthRBID = buffer.get(0);
+
+                // set up renderbuffer properties
+                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _mscolorRBID);
+                EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        _samples, GL11.GL_RGBA, _width, _height);
+
+                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, _msdepthRBID);
+                EXTFramebufferMultisample.glRenderbufferStorageMultisampleEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        _samples, format, _width, _height);
+
+                EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+
+                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _msfboID);
+                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                        EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        _mscolorRBID);
+                EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                        EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT,
+                        _msdepthRBID);
+
+                // check for errors
+                checkFBOComplete(_msfboID);
+
+                // release
+                EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+            }
+
         }
+
         if (_active == 0) {
             GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                     _backgroundColor.getAlpha());
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
-
             ContextManager.getCurrentContext().pushEnforcedStates();
             ContextManager.getCurrentContext().clearEnforcedStates();
             ContextManager.getCurrentContext().enforceStates(_enforcedStates);

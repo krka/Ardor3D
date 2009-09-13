@@ -68,6 +68,7 @@ public class QuadImposterNode extends Node {
     protected Camera _cam;
 
     protected int _twidth, _theight;
+    protected int _depth, _samples;
 
     protected final Vector3 _lastCamDir = new Vector3();
     protected double _lastCamDist;
@@ -94,10 +95,17 @@ public class QuadImposterNode extends Node {
     }
 
     public QuadImposterNode(final String name, final int twidth, final int theight, final Timer timer) {
+        this(name, twidth, theight, 8, 0, timer);
+    }
+
+    public QuadImposterNode(final String name, final int twidth, final int theight, final int depth, final int samples,
+            final Timer timer) {
         super(name);
 
         _twidth = twidth;
         _theight = theight;
+        _depth = depth;
+        _samples = samples;
 
         _timer = timer;
 
@@ -160,8 +168,8 @@ public class QuadImposterNode extends Node {
     }
 
     private void init(final Renderer renderer) {
-        _tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_twidth, _theight, renderer, ContextManager
-                .getCurrentContext().getCapabilities());
+        _tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(_twidth, _theight, _depth, _samples,
+                renderer, ContextManager.getCurrentContext().getCapabilities());
 
         _tRenderer.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
         resetTexture();

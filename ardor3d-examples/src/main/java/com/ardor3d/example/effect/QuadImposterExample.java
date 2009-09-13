@@ -13,6 +13,7 @@ package com.ardor3d.example.effect;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -43,15 +44,18 @@ import com.google.inject.Inject;
 public class QuadImposterExample extends ExampleBase {
     private final Timer _timer;
     private boolean showImposter = true;
+    private final DisplaySettings _settings;
 
     public static void main(final String[] args) {
         start(QuadImposterExample.class);
     }
 
     @Inject
-    public QuadImposterExample(final LogicalLayer logicalLayer, final FrameHandler frameWork, final Timer timer) {
+    public QuadImposterExample(final LogicalLayer logicalLayer, final FrameHandler frameWork,
+            final DisplaySettings settings, final Timer timer) {
         super(logicalLayer, frameWork);
         _timer = timer;
+        _settings = settings;
     }
 
     @Override
@@ -72,7 +76,8 @@ public class QuadImposterExample extends ExampleBase {
         box.setTranslation(new Vector3(0, -10, 0));
         _root.attachChild(box);
 
-        final QuadImposterNode imposter0 = new QuadImposterNode("Imposter1", 256, 256, _timer);
+        final QuadImposterNode imposter0 = new QuadImposterNode("Imposter1", 256, 256, _settings.getDepthBits(),
+                _settings.getSamples(), _timer);
         imposter0.setRedrawRate(0.0); // No timed update
         imposter0.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);
         imposter0.setCameraDistanceThreshold(0.1);
@@ -82,7 +87,8 @@ public class QuadImposterExample extends ExampleBase {
         scene1.setTranslation(0, 0, 0);
         imposter0.attachChild(scene1);
 
-        final QuadImposterNode imposter1 = new QuadImposterNode("Imposter1", 128, 128, _timer);
+        final QuadImposterNode imposter1 = new QuadImposterNode("Imposter1", 128, 128, _settings.getDepthBits(),
+                _settings.getSamples(), _timer);
         imposter1.setRedrawRate(0.0); // No timed update
         imposter1.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);
         imposter1.setCameraDistanceThreshold(0.1);
@@ -92,7 +98,8 @@ public class QuadImposterExample extends ExampleBase {
         scene2.setTranslation(-15, 0, -25);
         imposter1.attachChild(scene2);
 
-        final QuadImposterNode imposter2 = new QuadImposterNode("Imposter2", 64, 64, _timer);
+        final QuadImposterNode imposter2 = new QuadImposterNode("Imposter2", 64, 64, _settings.getDepthBits(),
+                _settings.getSamples(), _timer);
         imposter2.setRedrawRate(0.0); // No timed update
         imposter2.setCameraAngleThreshold(1.0 * MathUtils.DEG_TO_RAD);
         imposter2.setCameraDistanceThreshold(0.1);

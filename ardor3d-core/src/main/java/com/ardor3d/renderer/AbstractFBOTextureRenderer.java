@@ -38,20 +38,24 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected int _active;
 
-    protected int _fboID = 0, _depthRBID = 0, _width = 0, _height = 0, _samples = 0, _depthBits = 0;
+    protected int _fboID = 0, _depthRBID = 0;
+    protected int _msfboID = 0, _msdepthRBID = 0, _mscolorRBID = 0;
+    protected int _width = 0, _height = 0, _samples = 0, _depthBits = 0;
 
     protected IntBuffer _attachBuffer = null;
     protected boolean _usingDepthRB = false;
     protected final boolean _supportsDepthTexture;
+    protected final boolean _supportsMultisample;
 
     protected final Renderer _parentRenderer;
 
     public AbstractFBOTextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         _parentRenderer = parentRenderer;
-        _samples = samples;
+        _samples = Math.min(samples, caps._maxFBOSamples);
         _depthBits = depthBits;
         _supportsDepthTexture = caps.isDepthTextureSupported();
+        _supportsMultisample = caps.getMaxFBOSamples() != 0;
 
         int w = width;
         int h = height;
@@ -112,9 +116,19 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
-            setupForSingleTexDraw(tex, clear);
+            setupForSingleTexDraw(tex);
 
+            if (_samples > 0 && _supportsMultisample) {
+                setMSFBO();
+            }
+
+            switchCameraIn(clear);
             doDraw(toDraw);
+            switchCameraOut();
+
+            if (_samples > 0 && _supportsMultisample) {
+                blitTo(tex);
+            }
 
             takedownForSingleTexDraw(tex);
 
@@ -128,9 +142,19 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
 
-            setupForSingleTexDraw(tex, clear);
+            setupForSingleTexDraw(tex);
 
+            if (_samples > 0 && _supportsMultisample) {
+                setMSFBO();
+            }
+
+            switchCameraIn(clear);
             doDraw(toDraw);
+            switchCameraOut();
+
+            if (_samples > 0 && _supportsMultisample) {
+                blitTo(tex);
+            }
 
             takedownForSingleTexDraw(tex);
 
@@ -143,9 +167,13 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected abstract void activate();
 
-    protected abstract void setupForSingleTexDraw(Texture tex, int clear);
+    protected abstract void setupForSingleTexDraw(Texture tex);
 
     protected abstract void takedownForSingleTexDraw(Texture tex);
+
+    protected abstract void setMSFBO();
+
+    protected abstract void blitTo(Texture tex);
 
     protected abstract void deactivate();
 
@@ -181,8 +209,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     }
 
     protected void doDraw(final Spatial spat) {
-        // Override parent's last frustum test to avoid accidental incorrect
-        // cull
+        // Override parent's last frustum test to avoid accidental incorrect cull
         if (spat.getParent() != null) {
             spat.getParent().setLastFrustumIntersection(Camera.FrustumIntersect.Intersects);
         }
