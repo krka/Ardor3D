@@ -18,14 +18,13 @@ import org.lwjgl.opengl.PixelFormat;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 
 public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
 
     private static final long serialVersionUID = 1L;
 
-    private CanvasRenderer _canvasRenderer;
+    private final LwjglCanvasRenderer _canvasRenderer;
     private boolean _inited = false;
     private final DisplaySettings _settings;
 
@@ -34,18 +33,12 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     // '_updated'
     private CountDownLatch _latch = null;
 
-    public LwjglAwtCanvas(final DisplaySettings settings) throws LWJGLException {
+    public LwjglAwtCanvas(final DisplaySettings settings, final LwjglCanvasRenderer canvasRenderer)
+            throws LWJGLException {
         super(new PixelFormat(settings.getColorDepth(), settings.getAlphaBits(), settings.getDepthBits(), settings
                 .getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
         _settings = settings;
-    }
-
-    public void setCanvasRenderer(final CanvasRenderer canvasRenderer) {
         _canvasRenderer = canvasRenderer;
-    }
-
-    public void init() {
-        privateInit();
     }
 
     public void draw(final CountDownLatch latch) {
@@ -63,7 +56,7 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     @MainThread
     protected void paintGL() {
         if (!_inited) {
-            privateInit();
+            init();
         }
 
         if (!_updated) {
@@ -82,13 +75,13 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
         _latch.countDown();
     }
 
-    private void privateInit() {
+    public void init() {
         _canvasRenderer.init(_settings, false); // false - do not do back buffer swap, awt will do that.
         _canvasRenderer.getCamera().resize(getWidth(), getHeight());
         _inited = true;
     }
 
-    public CanvasRenderer getCanvasRenderer() {
+    public LwjglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }
 }

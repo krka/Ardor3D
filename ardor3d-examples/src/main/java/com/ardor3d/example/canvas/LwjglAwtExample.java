@@ -153,9 +153,8 @@ public class LwjglAwtExample {
         final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(scene);
 
         final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
-        final LwjglAwtCanvas theCanvas = new LwjglAwtCanvas(settings);
+        final LwjglAwtCanvas theCanvas = new LwjglAwtCanvas(settings, canvasRenderer);
 
-        theCanvas.setCanvasRenderer(canvasRenderer);
         frame.add(theCanvas);
 
         _showCursor1.put(theCanvas, true);

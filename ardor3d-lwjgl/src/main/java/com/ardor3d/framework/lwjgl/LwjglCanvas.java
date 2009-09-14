@@ -58,13 +58,8 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     }
 
     @MainThread
-    // hm, seem to have to control the order of initialisation: display first, then keyboard/etc, in native windows
+    // hm, seem to have to control the order of initialization: display first, then keyboard/etc, in native windows
     public void init() {
-        privateInit();
-    }
-
-    @MainThread
-    protected void privateInit() {
         if (_inited) {
             return;
         }
@@ -101,7 +96,7 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     @MainThread
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
-            privateInit();
+            init();
         }
 
         checkFocus();

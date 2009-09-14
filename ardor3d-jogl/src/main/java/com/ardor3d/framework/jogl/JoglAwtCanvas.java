@@ -16,7 +16,6 @@ import javax.media.opengl.GLCanvas;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
@@ -27,10 +26,10 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     private boolean _inited = false;
     private final DisplaySettings _settings;
 
-    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer renderer) {
+    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
         super(CapsUtil.getCapsForSettings(settings));
         _settings = settings;
-        _canvasRenderer = renderer;
+        _canvasRenderer = canvasRenderer;
 
         setFocusable(true);
         requestFocus();
@@ -62,7 +61,7 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         }
     }
 
-    public CanvasRenderer getCanvasRenderer() {
+    public JoglCanvasRenderer getCanvasRenderer() {
         return _canvasRenderer;
     }
 }
