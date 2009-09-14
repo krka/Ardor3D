@@ -65,8 +65,9 @@ public final class GameTaskQueueManager {
     public void moveTasksTo(final GameTaskQueueManager manager) {
         for (final String key : _managedQueues.keySet()) {
             final GameTaskQueue q = manager.getQueue(key);
-            if (q != null && q.size() > 0) {
-                q.enqueueAll(_managedQueues.get(key));
+            final GameTaskQueue mq = _managedQueues.get(key);
+            if (q != null && mq.size() > 0) {
+                q.enqueueAll(mq);
             }
         }
     }

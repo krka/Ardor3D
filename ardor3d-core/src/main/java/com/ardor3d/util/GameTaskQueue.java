@@ -120,7 +120,7 @@ public class GameTaskQueue {
             }
 
             // Inject the Renderer if correct type of Callable.
-            if (renderer != null && task.getCallable() instanceof RendererCallable) {
+            if (renderer != null && task.getCallable() instanceof RendererCallable<?>) {
                 ((RendererCallable<?>) task.getCallable()).setRenderer(renderer);
             }
 
