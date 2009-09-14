@@ -29,8 +29,8 @@ import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.jogl.JoglAwtCanvas;
+import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseCursor;
@@ -51,7 +51,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
-public class LwjglAwtExample {
+public class JoglAwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;
 
@@ -142,7 +142,7 @@ public class LwjglAwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(LwjglAwtExample.class
+        final com.ardor3d.image.Image image = awtImageLoader.load(JoglAwtExample.class
                 .getResourceAsStream(resourceName), true);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
@@ -150,12 +150,11 @@ public class LwjglAwtExample {
 
     private static void addCanvas(final JFrame frame, final ExampleScene scene, final LogicalLayer logicalLayer,
             final FrameHandler frameWork) throws Exception {
-        final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(scene);
+        final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(scene);
 
         final DisplaySettings settings = new DisplaySettings(400, 300, 24, 0, 0, 16, 0, 0, false, false);
-        final LwjglAwtCanvas theCanvas = new LwjglAwtCanvas(settings);
+        final JoglAwtCanvas theCanvas = new JoglAwtCanvas(settings, canvasRenderer);
 
-        theCanvas.setCanvasRenderer(canvasRenderer);
         frame.add(theCanvas);
 
         _showCursor1.put(theCanvas, true);

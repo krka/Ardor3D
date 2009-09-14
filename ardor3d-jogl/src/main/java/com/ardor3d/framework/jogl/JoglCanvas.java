@@ -27,8 +27,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.media.opengl.GLCanvas;
-import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
 
@@ -38,7 +36,6 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.renderer.jogl.JoglPbufferTextureRenderer;
-import com.ardor3d.util.Ardor3dException;
 import com.google.inject.Inject;
 
 /**
@@ -50,18 +47,18 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     private static final Logger logger = Logger.getLogger(JoglCanvas.class.getName());
 
-    private final JoglCanvasRenderer _canvasRenderer;
-
     private final DisplaySettings _settings;
     private boolean _inited = false;
     private boolean _isClosing = false;
 
-    private GLCanvas _glCanvas;
+    private JoglAwtCanvas _glCanvas;
 
     @Inject
     public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
-        _canvasRenderer = canvasRenderer;
         _settings = settings;
+
+        // Create the OpenGL canvas
+        _glCanvas = new JoglAwtCanvas(_settings, canvasRenderer);
     }
 
     @Override
@@ -100,48 +97,11 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             return;
         }
 
-        // Validate window dimensions.
-        if (_settings.getWidth() <= 0 || _settings.getHeight() <= 0) {
-            throw new Ardor3dException("Invalid resolution values: " + _settings.getWidth() + " "
-                    + _settings.getHeight());
-        }
-
-        // Validate bit depth.
-        if ((_settings.getColorDepth() != 32) && (_settings.getColorDepth() != 16) && (_settings.getColorDepth() != 24)
-                && (_settings.getColorDepth() != -1)) {
-            throw new Ardor3dException("Invalid pixel depth: " + _settings.getColorDepth());
-        }
-
-        // Create the OpenGL canvas, and place it within a frame.
-        // frame = new Frame();
-
-        // Create the singleton's status.
-        final GLCapabilities caps = new GLCapabilities();
-        caps.setHardwareAccelerated(true);
-        caps.setDoubleBuffered(true);
-        caps.setAlphaBits(_settings.getAlphaBits());
-        caps.setDepthBits(_settings.getDepthBits());
-        caps.setNumSamples(_settings.getSamples());
-        caps.setSampleBuffers(_settings.getSamples() != 0);
-        caps.setStereo(_settings.isStereo());
-        caps.setStencilBits(_settings.getStencilBits());
-
-        // Create the OpenGL canvas,
-        _glCanvas = new GLCanvas(caps);
-
-        _glCanvas.setFocusable(true);
-        _glCanvas.requestFocus();
-        _glCanvas.setSize(_settings.getWidth(), _settings.getHeight());
-        _glCanvas.setIgnoreRepaint(true);
-        _glCanvas.setAutoSwapBufferMode(false);
-
-        final GLContext glContext = _glCanvas.getContext();
-        _canvasRenderer.setContext(glContext);
-
         // FIXME: remove need for directly setting _parentContext.
-        JoglPbufferTextureRenderer._parentContext = glContext;
+        JoglPbufferTextureRenderer._parentContext = _glCanvas.getContext();
 
         this.add(_glCanvas);
+
         final boolean isDisplayModeModified;
         final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         // Get the current display mode
@@ -261,7 +221,7 @@ public class JoglCanvas extends Frame implements NativeCanvas {
         // Make the window visible to realize the OpenGL surface.
         setVisible(true);
 
-        _canvasRenderer.init(_settings, true); // true - do swap in renderer.
+        _glCanvas.init(); // true - do swap in renderer.
         _inited = true;
     }
 
@@ -270,37 +230,11 @@ public class JoglCanvas extends Frame implements NativeCanvas {
             privateInit();
         }
 
-        checkFocus();
-
-        _canvasRenderer.draw();
-        if (latch != null) {
-            latch.countDown();
-        }
-    }
-
-    private void checkFocus() {
-    // // TODO: might be better to just not do anything if there is no physical layer set as focus listener - possibly,
-    // // people might not
-    // // want to do any input at all.
-    // if (physicalLayer == null) {
-    // throw new IllegalStateException("no physical layer set as focus listener");
-    // }
-    //
-    // final boolean newFocus = Display.isActive() && Display.isVisible();
-    //
-    // if (!hasFocus && newFocus) {
-    // // didn't use to have focus, but now we do
-    // // do nothing for now, just keep track of the fact that we have focus
-    // hasFocus = newFocus;
-    // } else if (hasFocus && !newFocus) {
-    // // had focus, but don't anymore - notify the physical input layer
-    // physicalLayer.lostFocus();
-    // hasFocus = newFocus;
-    // }
+        _glCanvas.draw(latch);
     }
 
     public CanvasRenderer getCanvasRenderer() {
-        return _canvasRenderer;
+        return _glCanvas.getCanvasRenderer();
     }
 
     public void close() {

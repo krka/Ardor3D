@@ -3,12 +3,12 @@
  *
  * This file is part of Ardor3D.
  *
- * Ardor3D is free software: you can redistribute it and/or modify it
+ * Ardor3D is free software: you can redistribute it and/or modify it 
  * under the terms of its license which may be found in the accompanying
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.framework.awt;
+package com.ardor3d.framework.lwjgl;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -21,7 +21,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 
-public class AwtCanvas extends AWTGLCanvas implements Canvas {
+public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +34,7 @@ public class AwtCanvas extends AWTGLCanvas implements Canvas {
     // '_updated'
     private CountDownLatch _latch = null;
 
-    public AwtCanvas(final DisplaySettings settings) throws LWJGLException {
+    public LwjglAwtCanvas(final DisplaySettings settings) throws LWJGLException {
         super(new PixelFormat(settings.getColorDepth(), settings.getAlphaBits(), settings.getDepthBits(), settings
                 .getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
         _settings = settings;
