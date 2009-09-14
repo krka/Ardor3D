@@ -57,6 +57,10 @@ public class URLResourceSource implements ResourceSource {
         return null;
     }
 
+    public URL getURL() {
+        return _url;
+    }
+
     public String getName() {
         return _url.toString();
     }
