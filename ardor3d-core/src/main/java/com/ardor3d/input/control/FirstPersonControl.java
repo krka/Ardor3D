@@ -88,14 +88,21 @@ public class FirstPersonControl {
             strafeLR -= 1;
         }
 
-        final Vector3 loc = _workerStoreA.set(camera.getLocation());
-        if (moveFB != 0) {
-            loc.addLocal(_workerStoreB.set(camera.getDirection()).multiplyLocal(moveFB * _moveSpeed * tpf));
+        if (moveFB != 0 || strafeLR != 0) {
+            final Vector3 loc = _workerStoreA.zero();
+            if (moveFB == 1) {
+                loc.addLocal(camera.getDirection());
+            } else if (moveFB == -1) {
+                loc.subtractLocal(camera.getDirection());
+            }
+            if (strafeLR == 1) {
+                loc.addLocal(camera.getLeft());
+            } else if (strafeLR == -1) {
+                loc.subtractLocal(camera.getLeft());
+            }
+            loc.normalizeLocal().multiplyLocal(_moveSpeed * tpf).addLocal(camera.getLocation());
+            camera.setLocation(loc);
         }
-        if (strafeLR != 0) {
-            loc.addLocal(_workerStoreB.set(camera.getLeft()).multiplyLocal(strafeLR * _moveSpeed * tpf));
-        }
-        camera.setLocation(loc);
 
         // ROTATION
         int rotX = 0, rotY = 0;
@@ -192,8 +199,8 @@ public class FirstPersonControl {
                 return false;
             }
         };
-        final TriggerAction moveAction = new TriggerAction() {
 
+        final TriggerAction moveAction = new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
             }
