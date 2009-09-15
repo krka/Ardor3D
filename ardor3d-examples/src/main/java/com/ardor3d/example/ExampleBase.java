@@ -220,7 +220,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
         GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).getQueue(GameTaskQueue.UPDATE)
                 .execute();
 
-        /** Call simpleUpdate in any derived classes of SimpleGame. */
+        /** Call simpleUpdate in any derived classes of ExampleBase. */
         updateExample(timer);
 
         /** Update controllers/render states/transforms/bounds for rootNode. */

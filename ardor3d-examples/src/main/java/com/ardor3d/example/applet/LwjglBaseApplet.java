@@ -28,26 +28,34 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.lwjgl.LwjglDisplayCanvas;
 import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyReleasedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.MouseButtonPressedCondition;
+import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
+import com.ardor3d.input.lwjgl.LwjglMouseManager;
 import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
@@ -60,10 +68,15 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
     private static final long serialVersionUID = 1L;
 
+    protected DisplaySettings _settings;
     protected LwjglDisplayCanvas _glCanvas;
     protected LogicalLayer _logicalLayer;
     protected PhysicalLayer _physicalLayer;
     protected Canvas _displayCanvas;
+    protected LwjglMouseManager _mouseManager;
+
+    protected FirstPersonControl _controlHandle;
+    protected Vector3 _worldUp = new Vector3(0, 1, 0);
 
     protected Thread _gameThread;
     protected boolean _running = false;
@@ -73,6 +86,7 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
     @Override
     public void init() {
+        _settings = getSettings();
         setLayout(new BorderLayout(0, 0));
         try {
             _displayCanvas = new Canvas() {
@@ -104,6 +118,7 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
                             cam.resize(getWidth(), getHeight());
                             cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(), cam
                                     .getFrustumNear(), cam.getFrustumFar());
+                            appletResized(getWidth(), getHeight());
                             return null;
                         }
                     });
@@ -114,6 +129,10 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
             System.err.println(e);
             throw new RuntimeException("Unable to create display");
         }
+    }
+
+    protected DisplaySettings getSettings() {
+        return new DisplaySettings(getWidth(), getHeight(), 8, 0);
     }
 
     @Override
@@ -175,17 +194,18 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
     }
 
     protected void initGL() throws LWJGLException {
+        TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(this);
-        final DisplaySettings settings = new DisplaySettings(getWidth(), getHeight(), 8, 0);
-        _glCanvas = new LwjglDisplayCanvas(_displayCanvas, settings, canvasRenderer);
+        _glCanvas = new LwjglDisplayCanvas(_displayCanvas, _settings, canvasRenderer);
         _glCanvas.init();
     }
 
     protected void initInput() {
+        _mouseManager = new LwjglMouseManager();
         _logicalLayer = new LogicalLayer();
         _physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(), _glCanvas);
         _logicalLayer.registerInput(_glCanvas, _physicalLayer);
-        FirstPersonControl.setupTriggers(_logicalLayer, Vector3.UNIT_Y, true);
+        _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, _worldUp, true);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.F), new TriggerAction() {
 
@@ -199,13 +219,13 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
                         cam.resize(mode.getWidth(), mode.getHeight());
                         cam.setFrustumPerspective(cam.getFovY(), mode.getWidth() / (float) mode.getHeight(), cam
                                 .getFrustumNear(), cam.getFrustumFar());
+                        appletResized(mode.getWidth(), mode.getHeight());
                     } else {
                         cam.resize(getWidth(), getHeight());
                         cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(),
                                 cam.getFrustumNear(), cam.getFrustumFar());
+                        appletResized(getWidth(), getHeight());
                     }
-
-                    System.err.println("full: " + _glCanvas.isFullScreen());
                 } catch (final LWJGLException ex) {
                     ex.printStackTrace();
                 }
@@ -225,6 +245,26 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
                 _glCanvas.setVSyncEnabled(false);
             }
         }));
+
+        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT),
+                new TriggerAction() {
+                    public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
+                            final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.GRABBED);
+                        }
+                    }
+                }));
+
+        _logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT),
+                new TriggerAction() {
+                    public void perform(final com.ardor3d.framework.Canvas source, final TwoInputStates inputState,
+                            final double tpf) {
+                        if (_mouseManager.isSetGrabbedSupported()) {
+                            _mouseManager.setGrabbed(GrabbedState.NOT_GRABBED);
+                        }
+                    }
+                }));
     }
 
     protected void initBaseScene() {
@@ -267,10 +307,12 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
     protected abstract void initAppletScene();
 
-    protected void updateAppletScene(final Timer timer) {};
+    protected void updateAppletScene(final ReadOnlyTimer timer) {};
 
     protected void renderScene(final Renderer renderer) {
         // Draw the root and all its children.
         renderer.draw(_root);
     }
+
+    protected void appletResized(final int width, final int height) {}
 }
