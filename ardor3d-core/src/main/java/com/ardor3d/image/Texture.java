@@ -35,7 +35,7 @@ import com.ardor3d.util.export.Savable;
  * displayed is defined by the <code>Image</code> class. All attributes required for texture mapping are contained
  * within this class. This includes mipmapping if desired, magnificationFilter options, apply options and correction
  * options. Default values are as follows: minificationFilter - NearestNeighborNoMipMaps, magnificationFilter -
- * NearestNeighbor, wrap - EdgeClamp on S,T and R, apply - Modulate, enivoronment - None.
+ * NearestNeighbor, wrap - EdgeClamp on S,T and R, apply - Modulate, environment - None.
  * 
  * @see com.ardor3d.image.Image
  */
