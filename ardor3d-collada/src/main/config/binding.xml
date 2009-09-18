@@ -130,7 +130,7 @@
     <value name="url" field="url" style="attribute"/>
   </mapping>
 
-  <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeProfileCommon" abstract="true" post-set="postsetSpecifiedInAbstract">
+  <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeProfileCommon" abstract="true" post-set="postset">
     <value name="id" set-method="setId" get-method="getId" style="attribute" usage="optional"/>
     <structure name="asset" usage="optional"/>
     <collection field="newparams" item-type="com.ardor3d.extension.model.collada.binding.fx.DaeNewparam" pre-set="preset"/>
@@ -152,7 +152,7 @@
    </mapping>
   -->
 
-  <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeNewparam" name="newparam" post-set="postset">
+  <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeNewparam" name="newparam" post-set="postsetSpecifiedInAbstract">
     <value name="sid" set-method="setSid" get-method="getSid" style="attribute" usage="optional"/>
     <structure name="surface" field="surface" usage="optional"/>
     <structure field="sampler" usage="optional"/>

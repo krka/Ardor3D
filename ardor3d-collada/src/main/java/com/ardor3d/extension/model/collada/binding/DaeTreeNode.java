@@ -42,7 +42,9 @@ public abstract class DaeTreeNode {
     }
 
     protected void postsetSpecifiedInAbstract(final IUnmarshallingContext ctx) {
-        postset(ctx.getStackObject(1));
+        if (ctx.getStackDepth() > 1) {
+            postset(ctx.getStackObject(1));
+        }
     }
 
     protected void registerParent(final Object parent) {
