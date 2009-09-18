@@ -11,10 +11,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: junit:junit:4.5" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.jibx:jibx-run:1.1.6a" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.jibx:jibx-run:1.2.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.codehaus.woodstox:wstx-asl:3.2.1" level="project" />
     <orderEntry type="library" exported="" name="Maven: stax:stax-api:1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.jibx:jibx-extras:1.1.6a" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.jibx:jibx-extras:1.2.1" level="project" />
     <orderEntry type="module" module-name="ardor3d-core" exported="" />
     <orderEntry type="library" exported="" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: com.google.code.guice:guice:1.0" level="project" />
