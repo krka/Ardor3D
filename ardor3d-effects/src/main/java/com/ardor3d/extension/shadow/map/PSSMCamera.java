@@ -154,7 +154,9 @@ public class PSSMCamera extends Camera {
             optimalCameraNear = Math.min(position.getZ(), optimalCameraNear);
             optimalCameraFar = Math.max(position.getZ(), optimalCameraFar);
         }
+        Vector4.releaseTempInstance(position);
 
+        // XXX: use of getFrustumNear and getFrustumFar seems suspicious...
         optimalCameraNear = Math.min(Math.max(getFrustumNear(), optimalCameraNear), getFrustumFar());
         optimalCameraFar = Math.max(optimalCameraNear, Math.min(getFrustumFar(), optimalCameraFar));
 
@@ -162,8 +164,6 @@ public class PSSMCamera extends Camera {
 
         setFrustumNear(optimalCameraNear);
         setFrustumFar(optimalCameraFar);
-
-        Vector4.releaseTempInstance(position);
     }
 
     /**
@@ -175,11 +175,11 @@ public class PSSMCamera extends Camera {
      *            the far distance
      */
     public void calculateFrustum(final double fNear, final double fFar) {
-        final double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5 / _frustumNear;
-        final double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5 / _frustumNear;
+        final double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5;
+        final double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5;
 
-        final double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5 / _frustumNear;
-        final double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5 / _frustumNear;
+        final double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5;
+        final double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5;
 
         final Vector3 vNearPlaneCenter = Vector3.fetchTempInstance();
         final Vector3 vFarPlaneCenter = Vector3.fetchTempInstance();
