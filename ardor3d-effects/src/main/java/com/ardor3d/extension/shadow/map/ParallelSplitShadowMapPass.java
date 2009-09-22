@@ -38,6 +38,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.pass.Pass;
+import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.ColorMaskState;
@@ -48,6 +49,7 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.Line;
@@ -888,7 +890,12 @@ public class ParallelSplitShadowMapPass extends Pass {
             lineBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
             lineBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
             lineFrustum.setRenderState(lineBlendState);
+
+            final ZBufferState zstate = new ZBufferState();
+            lineFrustum.setRenderState(zstate);
             lineFrustum.updateGeometricState(0.0);
+
+            lineFrustum.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
         }
 
         lineFrustum.setDefaultColor(color);
