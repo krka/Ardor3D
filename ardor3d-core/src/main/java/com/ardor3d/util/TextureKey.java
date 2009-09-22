@@ -102,6 +102,7 @@ final public class TextureKey implements Savable {
         key._minFilter = minFilter;
         key._format = imageType;
         key._id = id;
+        key._code = Integer.MAX_VALUE;
 
         {
             WeakReference<TextureKey> ref;
@@ -232,7 +233,6 @@ final public class TextureKey implements Savable {
             _code += 31 * _code + _format.hashCode();
             _code += 31 * _code + (_flipped ? 1 : 0);
         }
-
         return _code;
     }
 
@@ -293,5 +293,6 @@ final public class TextureKey implements Savable {
         _format = capsule.readEnum("format", Image.Format.class, Image.Format.Guess);
         _minFilter = capsule.readEnum("minFilter", MinificationFilter.class, MinificationFilter.Trilinear);
         _id = capsule.readString("id", null);
+        _code = Integer.MAX_VALUE;
     }
 }

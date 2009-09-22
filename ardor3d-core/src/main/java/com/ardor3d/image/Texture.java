@@ -1363,7 +1363,9 @@ public abstract class Texture implements Savable {
                 MinificationFilter.NearestNeighborNoMipMaps);
         _image = (Image) capsule.readSavable("image", null);
         if (_image == null) {
-            _key = (TextureKey) capsule.readSavable("textureKey", null);
+            TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
+            _key = TextureKey
+                    .getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getMinificationFilter());
             if (_key != null && _key.getSource() != null) {
                 TextureManager.loadFromKey(_key, null, this);
             }
