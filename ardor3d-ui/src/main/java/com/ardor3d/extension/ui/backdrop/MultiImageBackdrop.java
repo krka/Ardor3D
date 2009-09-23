@@ -54,6 +54,10 @@ public class MultiImageBackdrop extends SolidBackdrop {
         return _images.remove(entry);
     }
 
+    public List<TransformedSubTex> getImages() {
+        return _images;
+    }
+
     @Override
     public void draw(final Renderer renderer, final UIComponent comp) {
         super.draw(renderer, comp);
@@ -65,54 +69,57 @@ public class MultiImageBackdrop extends SolidBackdrop {
         final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp);
         final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp);
 
+        final double[] store = new double[2];
         for (final TransformedSubTex entry : _images) {
-            double x = 0;
-            double y = 0;
 
-            switch (entry.getAlignment()) {
-                case TOP:
-                case MIDDLE:
-                case BOTTOM:
-                    x = bgwidth / 2;
-                    break;
-                case TOP_RIGHT:
-                case RIGHT:
-                case BOTTOM_RIGHT:
-                    x = bgwidth;
-                    break;
-                case TOP_LEFT:
-                case LEFT:
-                case BOTTOM_LEFT:
-                    x = 0;
-            }
+            MultiImageBackdrop.getDimensions(entry, comp, bgwidth, bgheight, store);
 
-            switch (entry.getAlignment()) {
-                case TOP_LEFT:
-                case TOP:
-                case TOP_RIGHT:
-                    y = bgheight;
-                    break;
-                case LEFT:
-                case MIDDLE:
-                case RIGHT:
-                    y = bgheight / 2;
-                    break;
-                case BOTTOM_LEFT:
-                case BOTTOM:
-                case BOTTOM_RIGHT:
-                    y = 0;
-            }
-
-            x += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
+            store[0] += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
                     * comp.getWorldScale().getX();
-            y += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder().getBottom())
+            store[1] += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder()
+                    .getBottom())
                     * comp.getWorldScale().getY();
 
-            final double width = entry.getWidth() * comp.getWorldScale().getX();
-            final double height = entry.getHeight() * comp.getWorldScale().getY();
+            SubTexUtil.drawTransformedSubTex(renderer, entry, (int) Math.round(store[0]), (int) Math.round(store[1]),
+                    entry.getWidth(), entry.getHeight(), false);
+        }
+    }
 
-            SubTexUtil.drawTransformedSubTex(renderer, entry, (int) Math.round(x), (int) Math.round(y), (int) Math
-                    .round(width), (int) Math.round(height), false);
+    public static void getDimensions(final TransformedSubTex entry, final UIComponent comp, final double bgwidth,
+            final double bgheight, final double[] store) {
+
+        switch (entry.getAlignment()) {
+            case TOP:
+            case MIDDLE:
+            case BOTTOM:
+                store[0] = bgwidth / 2;
+                break;
+            case TOP_RIGHT:
+            case RIGHT:
+            case BOTTOM_RIGHT:
+                store[0] = bgwidth;
+                break;
+            case TOP_LEFT:
+            case LEFT:
+            case BOTTOM_LEFT:
+                store[0] = 0;
+        }
+
+        switch (entry.getAlignment()) {
+            case TOP_LEFT:
+            case TOP:
+            case TOP_RIGHT:
+                store[1] = bgheight;
+                break;
+            case LEFT:
+            case MIDDLE:
+            case RIGHT:
+                store[1] = bgheight / 2;
+                break;
+            case BOTTOM_LEFT:
+            case BOTTOM:
+            case BOTTOM_RIGHT:
+                store[1] = 0;
         }
     }
 }
