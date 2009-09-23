@@ -101,7 +101,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
 
     protected WireframeState _wireframeState;
 
-    protected static boolean exit = false;
+    protected static volatile boolean _exit = false;
 
     protected static boolean _stereo = false;
 
@@ -135,7 +135,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
         try {
             _frameHandler.init();
 
-            while (!exit) {
+            while (!_exit) {
                 _frameHandler.updateFrame();
                 Thread.yield();
             }
@@ -149,7 +149,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
     }
 
     public void exit() {
-        exit = true;
+        _exit = true;
     }
 
     @MainThread
