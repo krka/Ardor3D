@@ -24,65 +24,64 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * <code>Box</code> provides an extension of <code>Mesh</code>. A <code>Box</code> is defined by a minimal point and a
- * maximum point. The eight vertices that make the box are then computed. They are computed in such a way as to generate
- * an axis-aligned box.
+ * <code>Box</code> is an axis-aligned rectangular prism defined by a center point and x, y, and z extents from that
+ * center (essentially radii.)
  */
 public class Box extends Mesh implements Savable {
-    private static final long serialVersionUID = 1L;
 
-    public double xExtent, yExtent, zExtent;
+    private double _xExtent, _yExtent, _zExtent;
 
-    public final Vector3 center = new Vector3(0, 0, 0);
+    private final Vector3 _center = new Vector3(0, 0, 0);
 
     /**
-     * instantiates a new <code>Box</code> object. All information must be applies later. For internal usage only
+     * Constructs a new 1x1x1 <code>Box</code>.
      */
     public Box() {
-        super("temp");
+        super("unnamed Box");
+        _xExtent = _yExtent = _zExtent = 0.5;
     }
 
     /**
-     * Constructor instantiates a new <code>Box</code> object. Center and vertice information must be supplied later.
+     * Constructs a new 1x1x1 <code>Box</code> with the given name.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name to give this new box. This is required for identification and comparison purposes.
      */
     public Box(final String name) {
         super(name);
+        _xExtent = _yExtent = _zExtent = 0.5;
     }
 
     /**
-     * Constructor instantiates a new <code>Box</code> object. The minimum and maximum point are provided. These two
-     * points define the shape and size of the box, but not it's orientation or position. You should use the
-     * <code>setTranslation</code> and <code>setLocalRotation</code> for those attributes.
+     * Constructs a new <code>Box</code> object using the given two points as opposite corners of the box. These two
+     * points may be in any order.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
-     * @param min
-     *            the minimum point that defines the box.
-     * @param max
-     *            the maximum point that defines the box.
+     *            the name to give this new box. This is required for identification and comparison purposes.
+     * @param pntA
+     *            the first point
+     * @param pntB
+     *            the second point.
      */
-    public Box(final String name, final Vector3 min, final Vector3 max) {
+    public Box(final String name, final ReadOnlyVector3 pntA, final ReadOnlyVector3 pntB) {
         super(name);
-        setData(min, max);
+        setData(pntA, pntB);
     }
 
     /**
-     * Constructs a new box. The box has the given center and extends in the x, y, and z out from the center (+ and -)
-     * by the given amounts. So, for example, a box with extent of .5 would be the unit cube.
+     * Constructs a new <code>Box</code> object using the given center and extents. Since the extents represent the
+     * distance from the center of the box to the edge, the full length of a side is actually 2 * extent.
      * 
      * @param name
-     *            Name of the box.
+     *            the name to give this new box. This is required for identification and comparison purposes.
      * @param center
      *            Center of the box.
      * @param xExtent
-     *            x extent of the box, in both directions.
+     *            x extent of the box
      * @param yExtent
-     *            y extent of the box, in both directions.
+     *            y extent of the box
      * @param zExtent
-     *            z extent of the box, in both directions.
+     *            z extent of the box
      */
     public Box(final String name, final ReadOnlyVector3 center, final double xExtent, final double yExtent,
             final double zExtent) {
@@ -91,46 +90,71 @@ public class Box extends Mesh implements Savable {
     }
 
     /**
-     * Changes the data of the box so that the two opposite corners are minPoint and maxPoint. The other corners are
-     * created from those two points. If update buffers is flagged as true, the vertex/normal/texture/color/index
-     * buffers are updated when the data is changed.
-     * 
-     * @param minPoint
-     *            The new minPoint of the box.
-     * @param maxPoint
-     *            The new maxPoint of the box.
+     * @return the current center of this box.
      */
-    public void setData(final ReadOnlyVector3 minPoint, final ReadOnlyVector3 maxPoint) {
-        center.set(maxPoint).addLocal(minPoint).multiplyLocal(0.5);
-
-        final double x = maxPoint.getX() - center.getX();
-        final double y = maxPoint.getY() - center.getY();
-        final double z = maxPoint.getZ() - center.getZ();
-        setData(center, x, y, z);
+    public ReadOnlyVector3 getCenter() {
+        return _center;
     }
 
     /**
-     * Changes the data of the box so that its center is <code>center</code> and it extends in the x, y, and z
-     * directions by the given extent. Note that the actual sides will be 2x the given extent values because the box
-     * extends in + & - from the center for each extent.
+     * @return the current X extent of this box.
+     */
+    public double getXExtent() {
+        return _xExtent;
+    }
+
+    /**
+     * @return the current Y extent of this box.
+     */
+    public double getYExtent() {
+        return _yExtent;
+    }
+
+    /**
+     * @return the current Z extent of this box.
+     */
+    public double getZExtent() {
+        return _zExtent;
+    }
+
+    /**
+     * Updates the center point and extents of this box to match an axis-aligned box defined by the two given opposite
+     * corners.
+     * 
+     * @param pntA
+     *            the first point
+     * @param pntB
+     *            the second point.
+     */
+    public void setData(final ReadOnlyVector3 pntA, final ReadOnlyVector3 pntB) {
+        _center.set(pntB).addLocal(pntA).multiplyLocal(0.5);
+
+        final double x = Math.abs(pntB.getX() - _center.getX());
+        final double y = Math.abs(pntB.getY() - _center.getY());
+        final double z = Math.abs(pntB.getZ() - _center.getZ());
+        setData(_center, x, y, z);
+    }
+
+    /**
+     * Updates the center point and extents of this box using the defined values.
      * 
      * @param center
      *            The center of the box.
      * @param xExtent
-     *            x extent of the box, in both directions.
+     *            x extent of the box
      * @param yExtent
-     *            y extent of the box, in both directions.
+     *            y extent of the box
      * @param zExtent
-     *            z extent of the box, in both directions.
+     *            z extent of the box
      */
     public void setData(final ReadOnlyVector3 center, final double xExtent, final double yExtent, final double zExtent) {
         if (center != null) {
-            this.center.set(center);
+            _center.set(center);
         }
 
-        this.xExtent = xExtent;
-        this.yExtent = yExtent;
-        this.zExtent = zExtent;
+        _xExtent = xExtent;
+        _yExtent = yExtent;
+        _zExtent = zExtent;
 
         setVertexData();
         setNormalData();
@@ -140,10 +164,10 @@ public class Box extends Mesh implements Savable {
     }
 
     /**
-     * <code>setVertexData</code> sets the vertex positions that define the box. These eight points are determined from
-     * the minimum and maximum point.
+     * <code>setVertexData</code> sets the vertex positions that define the box using the center point and defined
+     * extents.
      */
-    private void setVertexData() {
+    protected void setVertexData() {
         if (_meshData.getVertexBuffer() == null) {
             _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(24));
         }
@@ -264,7 +288,7 @@ public class Box extends Mesh implements Savable {
      */
     @Override
     public Box clone() {
-        final Box rVal = new Box(getName() + "_clone", center.clone(), xExtent, yExtent, zExtent);
+        final Box rVal = new Box(getName() + "_clone", _center.clone(), _xExtent, _yExtent, _zExtent);
         return rVal;
     }
 
@@ -273,49 +297,26 @@ public class Box extends Mesh implements Savable {
      */
     public Vector3[] computeVertices() {
 
-        final Vector3 akEAxis[] = { Vector3.UNIT_X.multiply(xExtent, null), Vector3.UNIT_Y.multiply(yExtent, null),
-                Vector3.UNIT_Z.multiply(zExtent, null) };
-
         final Vector3 rVal[] = new Vector3[8];
-        rVal[0] = center.subtract(akEAxis[0], null).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[1] = center.add(akEAxis[0], null).subtractLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[2] = center.add(akEAxis[0], null).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[3] = center.subtract(akEAxis[0], null).addLocal(akEAxis[1]).subtractLocal(akEAxis[2]);
-        rVal[4] = center.add(akEAxis[0], null).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[5] = center.subtract(akEAxis[0], null).subtractLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[6] = center.add(akEAxis[0], null).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
-        rVal[7] = center.subtract(akEAxis[0], null).addLocal(akEAxis[1]).addLocal(akEAxis[2]);
+        rVal[0] = _center.add(-_xExtent, -_yExtent, -_zExtent, null);
+        rVal[1] = _center.add(_xExtent, -_yExtent, -_zExtent, null);
+        rVal[2] = _center.add(_xExtent, _yExtent, -_zExtent, null);
+        rVal[3] = _center.add(-_xExtent, _yExtent, -_zExtent, null);
+        rVal[4] = _center.add(_xExtent, -_yExtent, _zExtent, null);
+        rVal[5] = _center.add(-_xExtent, -_yExtent, _zExtent, null);
+        rVal[6] = _center.add(_xExtent, _yExtent, _zExtent, null);
+        rVal[7] = _center.add(-_xExtent, _yExtent, _zExtent, null);
         return rVal;
-    }
-
-    /**
-     * Returns the current center of the box.
-     * 
-     * @return The box's center.
-     */
-    public Vector3 getCenter() {
-        return center;
-    }
-
-    /**
-     * Sets the center of the box. Note that even though the center is set, Mesh information is not updated. In most
-     * cases, you'll want to use setData()
-     * 
-     * @param aCenter
-     *            The new center.
-     */
-    public void setCenter(final Vector3 aCenter) {
-        center.set(aCenter);
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(xExtent, "xExtent", 0);
-        capsule.write(yExtent, "yExtent", 0);
-        capsule.write(zExtent, "zExtent", 0);
-        capsule.write(center, "center", new Vector3(Vector3.ZERO));
+        capsule.write(_xExtent, "xExtent", 0);
+        capsule.write(_yExtent, "yExtent", 0);
+        capsule.write(_zExtent, "zExtent", 0);
+        capsule.write(_center, "center", new Vector3(Vector3.ZERO));
 
     }
 
@@ -323,9 +324,9 @@ public class Box extends Mesh implements Savable {
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        xExtent = capsule.readDouble("xExtent", 0);
-        yExtent = capsule.readDouble("yExtent", 0);
-        zExtent = capsule.readDouble("zExtent", 0);
-        center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
+        _xExtent = capsule.readDouble("xExtent", 0);
+        _yExtent = capsule.readDouble("yExtent", 0);
+        _zExtent = capsule.readDouble("zExtent", 0);
+        _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
     }
 }

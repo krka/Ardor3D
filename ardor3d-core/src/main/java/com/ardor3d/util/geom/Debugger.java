@@ -155,8 +155,7 @@ public final class Debugger {
     }
 
     public static void drawBoundingBox(final BoundingBox box, final Renderer r) {
-        boundingBox.getCenter().set(box.getCenter());
-        boundingBox.setData(boundingBox.getCenter(), box.getXExtent(), box.getYExtent(), box.getZExtent());
+        boundingBox.setData(box.getCenter(), box.getXExtent(), box.getYExtent(), box.getZExtent());
         boundingBox.draw(r);
     }
 
