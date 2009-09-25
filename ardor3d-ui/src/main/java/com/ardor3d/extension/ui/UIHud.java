@@ -292,24 +292,41 @@ public class UIHud extends Node {
     }
 
     /**
-     * Add the given drag listener to this hud.
+     * Add the given drag listener to this hud. Expired WeakReferences are also cleaned.
      * 
      * @param listener
      *            the listener to add
      */
     public void addDragListener(final DragListener listener) {
         _dragListeners.add(new WeakReference<DragListener>(listener));
+
+        // Clean list.
+        for (int i = _dragListeners.size(); --i >= 0;) {
+            if (_dragListeners.get(i).get() == null) {
+                _dragListeners.remove(i);
+            }
+        }
     }
 
     /**
-     * Remove the given drag listener from this hud.
+     * Remove any matching drag listener from this hud. Expired WeakReferences are also cleaned.
      * 
      * @param listener
      *            the listener to remove
-     * @return true if it was found in the pool of listeners and removed.
+     * @return true if at least one "equal" DragListener was found in the pool of listeners and removed.
      */
     public boolean removeDragListener(final DragListener listener) {
-        return _dragListeners.remove(new WeakReference<DragListener>(listener));
+        boolean rVal = false;
+        for (int i = _dragListeners.size(); --i >= 0;) {
+            final DragListener dl = _dragListeners.get(i).get();
+            if (dl == null) {
+                _dragListeners.remove(i);
+            } else if (dl.equals(listener)) {
+                _dragListeners.remove(i);
+                rVal = true;
+            }
+        }
+        return rVal;
     }
 
     /**
