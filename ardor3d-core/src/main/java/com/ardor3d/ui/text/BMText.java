@@ -288,7 +288,6 @@ public class BMText extends Mesh {
     }
 
     @Override
-    // -----------------------------------------------------
     public synchronized void draw(final Renderer r) {
         if (_textString.length() > 0) {
             final Camera cam = Camera.getCurrentCamera();
@@ -308,7 +307,6 @@ public class BMText extends Mesh {
      * 
      * @param cam
      */
-    // -----------------------------------------------------
     public void correctTransform(final Camera cam) {
         updateWorldTransform(false);
 
@@ -327,7 +325,6 @@ public class BMText extends Mesh {
      * 
      * @param cam
      */
-    // -----------------------------------------------------
     public void updateScaleAndAlpha(final Camera cam, final Renderer r) {
         // get our depth distance
         _look.set(cam.getLocation());
@@ -392,7 +389,6 @@ public class BMText extends Mesh {
      * @param depthScale
      * @param alphaFallof
      */
-    // -----------------------------------------------------
     protected void screenSizeCapAlphaFade(final double capSize, final double depthScale, final float alphaFallof) {
         if (capSize < depthScale) {
             final float unit = (float) ((depthScale - capSize) / capSize);
@@ -411,7 +407,6 @@ public class BMText extends Mesh {
      * Set transparency based on distance from camera to text. if (distance < range.x) then opaque, if (distance >
      * range.y) then transparent, else lerp
      */
-    // -----------------------------------------------------
     protected void distanceAlphaFade(final ReadOnlyVector2 range, final double distance) {
         float alpha = 1;
         if (distance > range.getY()) {
@@ -447,7 +442,6 @@ public class BMText extends Mesh {
 
     /**
      */
-    // -----------------------------------------------------
     protected void calculateSize(final String text) {
         _size.set(0, 0);
 
@@ -568,7 +562,6 @@ public class BMText extends Mesh {
     /**
      * Set text string and recreate geometry
      */
-    // -----------------------------------------------------
     public synchronized void setText(final String text) {
         if (text == null) {
             _textString = "";
