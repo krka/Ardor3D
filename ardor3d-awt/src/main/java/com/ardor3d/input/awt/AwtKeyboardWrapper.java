@@ -18,6 +18,7 @@ import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.input.KeyEvent;
 import com.ardor3d.input.KeyState;
 import com.ardor3d.input.KeyboardWrapper;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
 import com.google.inject.Inject;
@@ -36,7 +37,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     @Inject
     public AwtKeyboardWrapper(final Component component) {
-        _component = component;
+        _component = Preconditions.checkNotNull(component, "component");
     }
 
     public void init() {
