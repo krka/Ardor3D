@@ -707,7 +707,7 @@ public class GLSLShaderObjectsState extends RenderState {
         final ShaderVariableMatrix4Array shaderUniform = getShaderUniform(name, ShaderVariableMatrix4Array.class);
         // prepare buffer for writing
         FloatBuffer matrixBuffer = shaderUniform.matrixBuffer;
-        if (matrixBuffer == null || matrixBuffer.capacity() > values.length * 16) {
+        if (matrixBuffer == null || matrixBuffer.capacity() < values.length * 16) {
             matrixBuffer = BufferUtils.createFloatBuffer(values.length * 16);
             shaderUniform.matrixBuffer = matrixBuffer;
         }
