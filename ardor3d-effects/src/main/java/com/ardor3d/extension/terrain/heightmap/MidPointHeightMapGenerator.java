@@ -66,9 +66,6 @@ public class MidPointHeightMapGenerator {
      * @return the heightData
      */
     public float[] getHeightData() {
-        // if (!loaded) {
-        // loadHeightmap();
-        // }
         return heightData;
     }
 
@@ -109,7 +106,7 @@ public class MidPointHeightMapGenerator {
                     mi = (i + counter / 2);
                     mj = (j + counter / 2);
 
-                    // displayce the middle point by the average of the
+                    // displace the middle point by the average of the
                     // corners, and a random value.
                     tempBuffer[mi][mj] = (float) ((tempBuffer[i][j] + tempBuffer[ni][j] + tempBuffer[i][nj] + tempBuffer[ni][nj]) / 4 + (Math
                             .random()
@@ -179,8 +176,7 @@ public class MidPointHeightMapGenerator {
     }
 
     /**
-     * <code>setHeightAtPoint</code> sets the height value for a given coordinate. It is recommended that the height
-     * value be within the 0 - 255 range.
+     * <code>setHeightAtPoint</code> sets the height value for a given coordinate.
      * 
      * @param height
      *            the new height for the coordinate.
@@ -194,7 +190,8 @@ public class MidPointHeightMapGenerator {
     }
 
     /**
-     * <code>normalizeTerrain</code> takes the current terrain data and converts it to values between 0 and 255.
+     * <code>normalizeTerrain</code> takes the current terrain data and converts it to values between 0 and
+     * NORMALIZE_RANGE.
      * 
      * @param tempBuffer
      *            the terrain to normalize.

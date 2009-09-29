@@ -457,4 +457,10 @@ public class MathUtils {
     public static double clamp(final double val, final double min, final double max) {
         return (val < min) ? min : (val > max ? max : val);
     }
+
+    public static int moduloPositive(final int value, final int size) {
+        int wrappedValue = value % size;
+        wrappedValue += wrappedValue < 0 ? size : 0;
+        return wrappedValue;
+    }
 }

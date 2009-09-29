@@ -193,6 +193,36 @@ public class GeometryClipmapTerrain extends Node {
         updateWorldRenderStates(false);
     }
 
+    public void regenerate() {
+        for (int i = _clips.size() - 1; i >= 0; i--) {
+            if (!_clips.get(i).isReady()) {
+                _visibleLevels = i + 1;
+                break;
+            }
+        }
+
+        // Update vertices.
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            _clips.get(i).regenerate();
+        }
+
+        // Update indices.
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            if (i == _visibleLevels) {
+                // Level 0 has no nested level, so pass null as parameter.
+                _clips.get(i).updateIndices(null);
+            } else {
+                // All other levels i have the level i-1 nested in.
+                _clips.get(i).updateIndices(_clips.get(i - 1));
+            }
+        }
+
+        for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
+            _clips.get(i).getMeshData().getVertexCoords().setNeedsRefresh(true);
+            _clips.get(i).getMeshData().getIndices().setNeedsRefresh(true);
+        }
+    }
+
     /**
      * @return the visibleLevels
      */
@@ -218,5 +248,12 @@ public class GeometryClipmapTerrain extends Node {
 
     public float getHeightScale() {
         return _heightScale;
+    }
+
+    public void setHeightRange(final float heightRangeMin, final float heightRangeMax) {
+        for (int i = _clips.size() - 1; i >= 0; i--) {
+            final ClipmapLevel clip = _clips.get(i);
+            clip.setHeightRange(heightRangeMin, heightRangeMax);
+        }
     }
 }

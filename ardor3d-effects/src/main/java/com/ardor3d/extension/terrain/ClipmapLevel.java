@@ -65,6 +65,9 @@ public class ClipmapLevel extends Mesh {
      */
     private final float heightScale;
 
+    private float heightRangeMin = 0.0f;
+    private float heightRangeMax = 1.0f;
+
     /**
      * Index to indicate how much vertices are added to the triangle strip.
      */
@@ -77,15 +80,23 @@ public class ClipmapLevel extends Mesh {
     private final HeightmapPyramid heightmapPyramid;
 
     /**
-     * The width and height in vertices of the heightfield.
+     * Number of components for vertices
      */
-    private final int fieldsize;
-
     private static final int VERT_SIZE = 4;
 
+    /**
+     * Camera frustum to test clipmap tiles against for culling
+     */
     private final Camera clipmapTestFrustum;
+
+    /**
+     * Bounding box used for culling
+     */
     private final BoundingBox frustumCheckBounds = new BoundingBox();
 
+    /**
+     * Possible nio speedup when storing indices
+     */
     private int[] tmpIndices;
 
     /**
@@ -118,10 +129,9 @@ public class ClipmapLevel extends Mesh {
         // Apply the values
         this.clipmapTestFrustum = clipmapTestFrustum;
         this.heightmapPyramid = heightmapPyramid;
-        fieldsize = heightmapPyramid.getSize(levelIndex);
 
         this.levelIndex = levelIndex;
-        this.heightScale = heightScale; // default 32
+        this.heightScale = heightScale;
         this.clipSideSize = clipSideSize;
 
         vertexDistance = (int) Math.pow(2, levelIndex);
@@ -172,15 +182,9 @@ public class ClipmapLevel extends Mesh {
      * @param center
      */
     public void updateVertices() {
-        updateVertices((int) clipmapTestFrustum.getLocation().getX(), (int) clipmapTestFrustum.getLocation().getZ());
-    }
+        final int cx = (int) clipmapTestFrustum.getLocation().getX();
+        final int cz = (int) clipmapTestFrustum.getLocation().getZ();
 
-    /**
-     * 
-     * @param cx
-     * @param cz
-     */
-    private void updateVertices(final int cx, final int cz) {
         // Store the old position to be able to recover it if needed
         final int oldX = clipRegion.getX();
         final int oldZ = clipRegion.getY();
@@ -192,10 +196,8 @@ public class ClipmapLevel extends Mesh {
         // Calculate the modulo to doubleVertexDistance of the new position.
         // This makes sure that the current level always fits in the hole of the
         // coarser level. The gridspacing of the coarser level is vertexDistance * 2, so here doubleVertexDistance.
-        int modX = clipRegion.getX() % doubleVertexDistance;
-        int modY = clipRegion.getY() % doubleVertexDistance;
-        modX += modX < 0 ? doubleVertexDistance : 0;
-        modY += modY < 0 ? doubleVertexDistance : 0;
+        final int modX = MathUtils.moduloPositive(clipRegion.getX(), doubleVertexDistance);
+        final int modY = MathUtils.moduloPositive(clipRegion.getY(), doubleVertexDistance);
         clipRegion.setX(clipRegion.getX() + doubleVertexDistance - modX);
         clipRegion.setY(clipRegion.getY() + doubleVertexDistance - modY);
 
@@ -203,6 +205,19 @@ public class ClipmapLevel extends Mesh {
         final int dx = (clipRegion.getX() - oldX);
         final int dz = (clipRegion.getY() - oldZ);
 
+        updateVertices(dx, dz);
+    }
+
+    public void regenerate() {
+        updateVertices(clipRegion.getWidth(), clipRegion.getHeight());
+    }
+
+    /**
+     * 
+     * @param cx
+     * @param cz
+     */
+    private void updateVertices(final int dx, final int dz) {
         // Create some better readable variables.
         // This are just the bounds of the current level (the new region).
         final int xmin = clipRegion.getLeft();
@@ -272,8 +287,8 @@ public class ClipmapLevel extends Mesh {
      */
     private void updateVertex(final int x, final int z) {
         // Map the terraincoordinates to arraycoordinates.
-        final int posx = wrap(x / vertexDistance, clipSideSize);
-        final int posy = wrap(z / vertexDistance, clipSideSize);
+        final int posx = MathUtils.moduloPositive(x / vertexDistance, clipSideSize);
+        final int posy = MathUtils.moduloPositive(z / vertexDistance, clipSideSize);
 
         final FloatBuffer vertices = getMeshData().getVertexBuffer();
 
@@ -283,18 +298,16 @@ public class ClipmapLevel extends Mesh {
         vertices.put(index * VERT_SIZE + 2, z); // z
 
         // Map the terraincoordinates to the heightmap
-        final int wrapX = wrap(x / vertexDistance, fieldsize);
-        final int wrapZ = wrap(z / vertexDistance, fieldsize);
+        final int mapX = x / vertexDistance;
+        final int mapZ = z / vertexDistance;
 
         // Get the height of current coordinates
         // and set both heightvalues to that height.
-        final float height = heightmapPyramid.getHeight(levelIndex, wrapX, wrapZ) * heightScale;
+        final float height = heightmapPyramid.getHeight(levelIndex, mapX, mapZ) * heightScale;
         vertices.put(index * VERT_SIZE + 1, height); // y
         if (levelIndex >= heightmapPyramid.getHeightmapCount() - 1) {
             vertices.put(index * VERT_SIZE + 3, height); // w
         } else {
-            final int lowFieldSize = fieldsize / 2;
-
             // indices of heightvalues we can use
             // for the second height to avoid cracks
             float xLow = (x / vertexDistance);
@@ -306,19 +319,19 @@ public class ClipmapLevel extends Mesh {
                 zLow -= 1.0f;
             }
 
-            int x1 = wrap((int) (xLow / 2.0f), lowFieldSize);
-            int z1 = wrap((int) (zLow / 2.0f), lowFieldSize);
+            final int x1 = (int) (xLow / 2.0f);
+            int z1 = (int) (zLow / 2.0f);
             int x2 = x1;
             int z2 = z1;
 
-            if (((wrapX) % 2) == 0) {
-                if (((wrapZ) % 2) == 0) {
+            if (((mapX) % 2) == 0) {
+                if (((mapZ) % 2) == 0) {
                     //
                 } else {
                     z2++;
                 }
             } else {
-                if (((wrapZ) % 2) == 0) {
+                if (((mapZ) % 2) == 0) {
                     x2++;
                 } else {
                     x2++;
@@ -326,22 +339,11 @@ public class ClipmapLevel extends Mesh {
                 }
             }
 
-            x1 = wrap(x1, lowFieldSize);
-            z1 = wrap(z1, lowFieldSize);
-            x2 = wrap(x2, lowFieldSize);
-            z2 = wrap(z2, lowFieldSize);
-
             // Apply the median of the coarser heightvalues to the W value
             final float coarser1 = heightmapPyramid.getHeight(levelIndex + 1, x1, z1);
             final float coarser2 = heightmapPyramid.getHeight(levelIndex + 1, x2, z2);
             vertices.put(index * VERT_SIZE + 3, (coarser1 + coarser2) * heightScale * 0.5f); // w
         }
-    }
-
-    private int wrap(final int value, final int size) {
-        int wrappedValue = value % size;
-        wrappedValue += wrappedValue < 0 ? size : 0;
-        return wrappedValue;
     }
 
     /**
@@ -510,9 +512,10 @@ public class ClipmapLevel extends Mesh {
     private void fillBlock(int left, int right, int top, int bottom) {
         // Setup the boundingbox of the block to fill.
         // The lowest value is zero, the highest is the scalesize.
-        frustumCheckBounds.setCenter((left + right) * 0.5, heightScale * 0.5, (top + bottom) * 0.5);
+        frustumCheckBounds.setCenter((left + right) * 0.5, (heightRangeMax + heightRangeMin) * heightScale * 0.5,
+                (top + bottom) * 0.5);
         frustumCheckBounds.setXExtent((left - right) * 0.5);
-        frustumCheckBounds.setYExtent((heightScale) * 0.5);
+        frustumCheckBounds.setYExtent((heightRangeMax - heightRangeMin) * heightScale * 0.5);
         frustumCheckBounds.setZExtent((top - bottom) * 0.5);
 
         final int state = clipmapTestFrustum.getPlaneState();
@@ -622,4 +625,8 @@ public class ClipmapLevel extends Mesh {
         return heightmapPyramid.isReady(levelIndex);
     }
 
+    public void setHeightRange(final float heightRangeMin, final float heightRangeMax) {
+        this.heightRangeMin = heightRangeMin;
+        this.heightRangeMax = heightRangeMax;
+    }
 }

@@ -12,24 +12,39 @@ package com.ardor3d.extension.terrain.basic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.ardor3d.extension.terrain.Heightmap;
 import com.ardor3d.extension.terrain.HeightmapPyramid;
+import com.ardor3d.math.MathUtils;
 
 public class BasicHeightmapPyramid implements HeightmapPyramid {
-    private final List<Heightmap> heightmaps = new ArrayList<Heightmap>();
+    private static final Logger logger = Logger.getLogger(BasicHeightmapPyramid.class.getName());
+
+    private final List<BasicHeightmap> heightmaps = new ArrayList<BasicHeightmap>();
+    private boolean doWrap = true;
 
     public BasicHeightmapPyramid() {}
 
-    public BasicHeightmapPyramid(final Heightmap baseHeightmap, final int clipLevelCount) {
+    public BasicHeightmapPyramid(final BasicHeightmap baseHeightmap, final int clipLevelCount) {
         heightmaps.add(0, baseHeightmap);
         buildLevels(clipLevelCount);
     }
 
     // interface
 
-    public float getHeight(final int level, final int x, final int y) {
-        return getHeightmap(level).getHeight(x, y);
+    public float getHeight(final int level, int x, int y) {
+        final Heightmap heightmap = getHeightmap(level);
+        final int size = heightmap.getSize();
+
+        if (doWrap) {
+            x = MathUtils.moduloPositive(x, size);
+            y = MathUtils.moduloPositive(y, size);
+        } else if (x < 0 || x >= size || y < 0 || y >= size) {
+            return -Float.MAX_VALUE;
+        }
+
+        return heightmap.getHeight(x, y);
     }
 
     public int getSize(final int level) {
@@ -46,7 +61,7 @@ public class BasicHeightmapPyramid implements HeightmapPyramid {
 
     // class
 
-    public List<Heightmap> getHeightmaps() {
+    public List<BasicHeightmap> getHeightmaps() {
         return heightmaps;
     }
 
@@ -61,15 +76,21 @@ public class BasicHeightmapPyramid implements HeightmapPyramid {
         }
 
         final int baseSize = heightmaps.get(0).getSize();
-        System.out.println("currentSize: " + baseSize);
+        logger.info("Original heightmap size: " + baseSize);
+
         for (int i = 1; i < levels; i++) {
             final Heightmap parentHeightmap = heightmaps.get(i - 1);
             final int currentSize = (int) (baseSize / Math.pow(2, i));
 
-            final BasicHeightmap heightmap = new BasicHeightmap(currentSize);
-            heightmaps.add(heightmap);
+            BasicHeightmap heightmap = null;
+            if (i >= heightmaps.size()) {
+                heightmap = new BasicHeightmap(currentSize);
+                heightmaps.add(heightmap);
+            } else {
+                heightmap = heightmaps.get(i);
+            }
 
-            System.out.println("currentSize: " + currentSize);
+            logger.info("Building heightmap mipmap of size: " + currentSize);
 
             for (int x = 0; x < currentSize; x++) {
                 for (int y = 0; y < currentSize; y++) {
@@ -78,5 +99,13 @@ public class BasicHeightmapPyramid implements HeightmapPyramid {
             }
 
         }
+    }
+
+    public boolean isDoWrap() {
+        return doWrap;
+    }
+
+    public void setDoWrap(final boolean doWrap) {
+        this.doWrap = doWrap;
     }
 }

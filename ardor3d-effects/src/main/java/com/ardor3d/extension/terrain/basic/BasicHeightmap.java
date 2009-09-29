@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.basic;
 
 import com.ardor3d.extension.terrain.Heightmap;
+import com.ardor3d.math.MathUtils;
 
 public class BasicHeightmap implements Heightmap {
     protected int size;
@@ -33,9 +34,7 @@ public class BasicHeightmap implements Heightmap {
 
     // interface
 
-    public float getHeight(int x, int y) {
-        x = wrap(x, size);
-        y = wrap(y, size);
+    public float getHeight(final int x, final int y) {
         return heightData[y * size + x];
     }
 
@@ -55,14 +54,8 @@ public class BasicHeightmap implements Heightmap {
     }
 
     public void setHeight(int x, int y, final float height) {
-        x = wrap(x, size);
-        y = wrap(y, size);
+        x = MathUtils.moduloPositive(x, size);
+        y = MathUtils.moduloPositive(y, size);
         heightData[y * size + x] = height;
-    }
-
-    private int wrap(final int value, final int size) {
-        int wrappedValue = value % size;
-        wrappedValue += wrappedValue < 0 ? size : 0;
-        return wrappedValue;
     }
 }

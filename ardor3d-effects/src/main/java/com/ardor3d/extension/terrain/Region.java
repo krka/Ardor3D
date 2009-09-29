@@ -97,4 +97,18 @@ public class Region {
     public int getBottom() {
         return bottom;
     }
+
+    /**
+     * @return the width
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * @return the height
+     */
+    public int getHeight() {
+        return height;
+    }
 }
