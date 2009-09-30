@@ -138,16 +138,13 @@ public abstract class AbstractRenderer implements Renderer {
         }
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-            int offset = 0;
             if (ts != null) {
-                offset = ts.getTextureCoordinateOffset();
-
-                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
                     if (textureCoords == null || i >= textureCoords.size()) {
                         continue;
                     }
 
-                    final FloatBufferData textureBufferData = textureCoords.get(i + offset);
+                    final FloatBufferData textureBufferData = textureCoords.get(i);
                     if (textureBufferData != null) {
                         bufferSize += textureBufferData.getBufferLimit() * 4;
                     }

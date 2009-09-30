@@ -68,11 +68,6 @@ public class TextureState extends RenderState {
      */
     private CorrectionType _correctionType = CorrectionType.Perspective;
 
-    /**
-     * offset is used to denote where to begin access of texture coordinates. 0 default
-     */
-    protected int _offset = 0;
-
     public transient TextureKey[] _keyCache = new TextureKey[MAX_TEXTURES];
 
     /**
@@ -229,7 +224,26 @@ public class TextureState extends RenderState {
      * @return the number of textures.
      */
     public int getNumberOfSetTextures() {
-        return _texture.size();
+        int set = 0;
+        for (int i = 0; i < _texture.size(); i++) {
+            if (_texture.get(i) != null) {
+                set++;
+            }
+        }
+        return set;
+    }
+
+    /**
+     * Returns the max index in this TextureState that contains a non-null Texture.
+     * 
+     * @return the max index, or -1 if no textures are contained by this state.
+     */
+    public int getMaxTextureIndexUsed() {
+        int max = _texture.size() - 1;
+        while (max > 0 && _texture.get(max) == null) {
+            max--;
+        }
+        return max;
     }
 
     /**
@@ -250,34 +264,11 @@ public class TextureState extends RenderState {
         return null;
     }
 
-    /**
-     * <code>setTextureCoordinateOffset</code> sets the offset value used to determine which coordinates to use for
-     * texturing Geometry.
-     * 
-     * @param offset
-     *            the offset (default 0).
-     */
-    public void setTextureCoordinateOffset(final int offset) {
-        _offset = offset;
-        setNeedsRefresh(true);
-    }
-
-    /**
-     * <code>setTextureCoordinateOffset</code> gets the offset value used to determine which coordinates to use for
-     * texturing Geometry.
-     * 
-     * @return the offset (default 0).
-     */
-    public int getTextureCoordinateOffset() {
-        return _offset;
-    }
-
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.writeSavableList(_texture, "texture", new ArrayList<Texture>(1));
-        capsule.write(_offset, "offset", 0);
         capsule.write(_correctionType, "correctionType", CorrectionType.Perspective);
 
     }
@@ -287,7 +278,6 @@ public class TextureState extends RenderState {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
         _texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
-        _offset = capsule.readInt("offset", 0);
         _correctionType = capsule.readEnum("correctionType", CorrectionType.class, CorrectionType.Perspective);
     }
 
@@ -334,7 +324,7 @@ public class TextureState extends RenderState {
                     }
 
                     foundEnabled = true;
-                    for (int i = 0, max = pkTState.getNumberOfSetTextures(); i < max; i++) {
+                    for (int i = 0, max = pkTState.getMaxTextureIndexUsed(); i <= max; i++) {
                         final Texture pkText = pkTState.getTexture(i);
                         if (newTState.getTexture(i) == null) {
                             newTState.setTexture(pkText, i);

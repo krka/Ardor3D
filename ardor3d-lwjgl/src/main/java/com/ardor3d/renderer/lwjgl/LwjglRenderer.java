@@ -684,12 +684,9 @@ public class LwjglRenderer extends AbstractRenderer {
         final ContextCapabilities caps = context.getCapabilities();
 
         final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int offset = 0;
         int set = 0;
         if (ts != null) {
-            offset = ts.getTextureCoordinateOffset();
-
-            for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+            for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
                 if (caps.isMultitextureSupported()) {
                     ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                 }
@@ -699,7 +696,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     continue;
                 }
 
-                final FloatBufferData textureBufferData = textureCoords.get(i + offset);
+                final FloatBufferData textureBufferData = textureCoords.get(i);
                 final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
 
                 if (textureBufferData == null) {
@@ -714,11 +711,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
                 _oldTextureBuffers[i] = textureBuffer;
             }
-            set = ts.getNumberOfSetTextures();
+            set = ts.getMaxTextureIndexUsed() + 1;
         }
 
         if (set < _prevTextureNumber) {
-            for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+            for (int i = set; i < _prevTextureNumber; i++) {
                 if (caps.isMultitextureSupported()) {
                     ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                 }
@@ -919,11 +916,8 @@ public class LwjglRenderer extends AbstractRenderer {
         final ContextCapabilities caps = context.getCapabilities();
 
         final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int offset = 0;
         if (ts != null) {
-            offset = ts.getTextureCoordinateOffset();
-
-            for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+            for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
                 if (caps.isMultitextureSupported()) {
                     ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                 }
@@ -933,7 +927,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     continue;
                 }
 
-                final FloatBufferData data = textureCoords.get(i + offset);
+                final FloatBufferData data = textureCoords.get(i);
                 final int vboID = setupVBO(data, context, rendRecord);
 
                 if (vboID > 0) {
@@ -946,8 +940,8 @@ public class LwjglRenderer extends AbstractRenderer {
                 }
             }
 
-            if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
-                for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+            if (ts.getMaxTextureIndexUsed() + 1 < _prevTextureNumber) {
+                for (int i = ts.getMaxTextureIndexUsed() + 1; i < _prevTextureNumber; i++) {
                     if (caps.isMultitextureSupported()) {
                         ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                     }
@@ -955,8 +949,8 @@ public class LwjglRenderer extends AbstractRenderer {
                 }
             }
 
-            _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
-                    .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+            _prevTextureNumber = ts.getMaxTextureIndexUsed() + 1 < caps.getNumberOfFixedTextureUnits() ? ts
+                    .getMaxTextureIndexUsed() + 1 : caps.getNumberOfFixedTextureUnits();
         }
     }
 
@@ -996,11 +990,8 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-            int coordinateOffset = 0;
             if (ts != null) {
-                coordinateOffset = ts.getTextureCoordinateOffset();
-
-                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
                     if (caps.isMultitextureSupported()) {
                         ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                     }
@@ -1010,7 +1001,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         continue;
                     }
 
-                    final FloatBufferData textureBufferData = textureCoords.get(i + coordinateOffset);
+                    final FloatBufferData textureBufferData = textureCoords.get(i);
 
                     if (textureBufferData != null) {
                         updateVBO(textureBufferData, rendRecord, vboID, offset);
@@ -1022,8 +1013,8 @@ public class LwjglRenderer extends AbstractRenderer {
                     }
                 }
 
-                if (ts.getNumberOfSetTextures() < _prevTextureNumber) {
-                    for (int i = ts.getNumberOfSetTextures(); i < _prevTextureNumber; i++) {
+                if (ts.getMaxTextureIndexUsed() + 1 < _prevTextureNumber) {
+                    for (int i = ts.getMaxTextureIndexUsed() + 1; i < _prevTextureNumber; i++) {
                         if (caps.isMultitextureSupported()) {
                             ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                         }
@@ -1031,8 +1022,8 @@ public class LwjglRenderer extends AbstractRenderer {
                     }
                 }
 
-                _prevTextureNumber = ts.getNumberOfSetTextures() < caps.getNumberOfFixedTextureUnits() ? ts
-                        .getNumberOfSetTextures() : caps.getNumberOfFixedTextureUnits();
+                _prevTextureNumber = ts.getMaxTextureIndexUsed() + 1 < caps.getNumberOfFixedTextureUnits() ? ts
+                        .getMaxTextureIndexUsed() + 1 : caps.getNumberOfFixedTextureUnits();
             }
         }
 
@@ -1078,16 +1069,13 @@ public class LwjglRenderer extends AbstractRenderer {
         }
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-            int coordinateOffset = 0;
             if (ts != null) {
-                coordinateOffset = ts.getTextureCoordinateOffset();
-
-                for (int i = 0; i < ts.getNumberOfSetTextures() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
+                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
                     if (textureCoords == null || i >= textureCoords.size()) {
                         continue;
                     }
 
-                    final FloatBufferData textureBufferData = textureCoords.get(i + coordinateOffset);
+                    final FloatBufferData textureBufferData = textureCoords.get(i);
                     final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
                     if (textureBuffer != null) {
                         textureBuffer.rewind();

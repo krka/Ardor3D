@@ -59,7 +59,7 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
                 return 1;
             }
 
-            for (int x = 0, nots = Math.min(ts1.getNumberOfSetTextures(), ts2.getNumberOfSetTextures()); x < nots; x++) {
+            for (int x = 0, maxIndex = Math.min(ts1.getMaxTextureIndexUsed(), ts2.getMaxTextureIndexUsed()); x <= maxIndex; x++) {
 
                 final TextureKey key1 = ts1.getTextureKey(x);
                 final TextureKey key2 = ts2.getTextureKey(x);
@@ -86,8 +86,8 @@ public class OpaqueRenderBucket extends AbstractRenderBucket {
                 }
             }
 
-            if (ts1.getNumberOfSetTextures() != ts2.getNumberOfSetTextures()) {
-                return ts2.getNumberOfSetTextures() - ts1.getNumberOfSetTextures();
+            if (ts1.getMaxTextureIndexUsed() != ts2.getMaxTextureIndexUsed()) {
+                return ts2.getMaxTextureIndexUsed() - ts1.getMaxTextureIndexUsed();
             }
 
             return 0;
