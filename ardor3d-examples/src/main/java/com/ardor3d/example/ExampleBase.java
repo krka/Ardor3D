@@ -26,6 +26,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.FocusWrapper;
@@ -106,8 +107,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
     protected static boolean _stereo = false;
 
     protected boolean _showBounds = false;
-
     protected boolean _showNormals = false;
+    protected boolean _showDepth = false;
 
     protected boolean _doShot = false;
 
@@ -279,6 +280,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
             Debugger.drawTangents(_root, renderer);
         }
 
+        if (_showDepth) {
+            renderer.renderBuckets();
+            Debugger.drawBuffer(Format.Depth16, Debugger.NORTHEAST, renderer);
+        }
     }
 
     public PickResults doPick(final Ray3 pickRay) {
@@ -479,6 +484,12 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
                 _lightState.setEnabled(!_lightState.isEnabled());
                 // Either an update or a markDirty is needed here since we did not touch the affected spatial directly.
                 _root.markDirty(DirtyType.RenderState);
+            }
+        }));
+
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F4), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                _showDepth = !_showDepth;
             }
         }));
 

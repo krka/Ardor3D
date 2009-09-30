@@ -360,12 +360,13 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         }
     }
 
-    public void copyToTexture(final Texture tex, final int width, final int height) {
+    public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
+            final int xoffset, final int yoffset) {
         final GL gl = GLU.getCurrentGL();
 
         JoglTextureStateUtil.doTextureBind(tex, 0, true);
 
-        gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+        gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
     }
 
     @Override

@@ -118,16 +118,26 @@ public interface TextureRenderer {
 
     /**
      * <code>copyToTexture</code> copies the current frame buffer contents to the given Texture. What is copied is based
-     * on the rttFormat of the texture object when it was setup.
+     * on the rttFormat of the texture object when it was setup. Note that the contents are copied with no scaling
+     * applied, so the texture must be big enough such that xoffset + width <= texture's width and yoffset + height <=
+     * texture's height.
      * 
      * @param tex
      *            The Texture to copy into.
+     * @param x
+     *            the x offset into the framebuffer
+     * @param y
+     *            the y offset into the framebuffer
      * @param width
-     *            the width of the texture image
+     *            the width of the rectangle to read from the framebuffer and copy 1:1 to the texture
      * @param height
-     *            the height of the texture image
+     *            the width of the rectangle to read from the framebuffer and copy 1:1 to the texture
+     * @param xoffset
+     *            the x offset into the texture to draw at
+     * @param yoffset
+     *            the y offset into the texture to draw at
      */
-    void copyToTexture(Texture tex, int width, int height);
+    void copyToTexture(Texture tex, int x, int y, int width, int height, int xoffset, int yoffset);
 
     /**
      * Any wrapping up and cleaning up of TextureRenderer information is performed here.

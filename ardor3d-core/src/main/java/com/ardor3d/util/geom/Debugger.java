@@ -542,11 +542,6 @@ public final class Debugger {
 
         bufTexture.setRenderToTextureFormat(rttFormat);
 
-        if (bufTexRend == null) {
-            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(256, 256, r, ContextManager
-                    .getCurrentContext().getCapabilities());
-            bufTexRend.setupTexture(bufTexture);
-        }
         int width = cam.getWidth();
         if (!MathUtils.isPowerOfTwo(width)) {
             int newWidth = 2;
@@ -570,8 +565,12 @@ public final class Debugger {
             bQuad.getMeshData().getTextureBuffer(0).put(7, height / (float) newHeight);
             height = newHeight;
         }
-
-        bufTexRend.copyToTexture(bufTexture, width, height);
+        if (bufTexRend == null) {
+            bufTexRend = TextureRendererFactory.INSTANCE.createTextureRenderer(width, height, r, ContextManager
+                    .getCurrentContext().getCapabilities());
+            bufTexRend.setupTexture(bufTexture);
+        }
+        bufTexRend.copyToTexture(bufTexture, 0, 0, width, height, 0, 0);
 
         final double loc = size * .75;
         switch (location) {
@@ -596,6 +595,7 @@ public final class Debugger {
 
         bQuad.setWorldTranslation(locationX, locationY, 0);
 
+        bQuad.updateGeometricState(0);
         bQuad.onDraw(r);
         r.flushGraphics();
     }

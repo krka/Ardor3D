@@ -280,7 +280,7 @@ public class BloomRenderPass extends Pass {
             return;
         }
 
-        final BlendState as = (BlendState) fullScreenQuad.getWorldRenderState(RenderState.StateType.Blend);
+        final BlendState blend = (BlendState) fullScreenQuad.getWorldRenderState(RenderState.StateType.Blend);
 
         if (sinceLast > throttle) {
             sinceLast = 0;
@@ -290,13 +290,13 @@ public class BloomRenderPass extends Pass {
             tRenderer.getCamera().setUp(cam.getUp());
             tRenderer.getCamera().setLeft(cam.getLeft());
 
-            as.setEnabled(false);
+            blend.setEnabled(false);
             final TextureState ts = (TextureState) fullScreenQuad.getWorldRenderState(RenderState.StateType.Texture);
 
             // see if we should use the current scene to bloom, or only things added to the pass.
             if (useCurrentScene) {
                 // grab backbuffer to texture
-                tRenderer.copyToTexture(screenTexture, cam.getWidth(), cam.getHeight());
+                tRenderer.copyToTexture(screenTexture, 0, 0, tRenderer.getWidth(), tRenderer.getHeight(), 0, 0);
                 ts.setTexture(screenTexture, 0);
             } else {
                 // Render scene to texture
@@ -365,7 +365,7 @@ public class BloomRenderPass extends Pass {
         }
 
         // Final blend
-        as.setEnabled(true);
+        blend.setEnabled(true);
 
         fullScreenQuad.setRenderState(finalShader);
         fullScreenQuad.updateWorldRenderStates(false);

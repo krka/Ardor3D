@@ -150,7 +150,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
 
                 switchCameraOut();
 
-                copyToTexture(tex, _width, _height);
+                copyToTexture(tex, 0, 0, 0, 0, _width, _height);
 
                 deactivate();
             }
@@ -208,7 +208,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 switchCameraOut();
 
                 for (int i = 0; i < texs.size(); i++) {
-                    copyToTexture(texs.get(i), _width, _height);
+                    copyToTexture(texs.get(i), 0, 0, 0, 0, _width, _height);
                 }
 
                 deactivate();
@@ -219,12 +219,13 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         }
     }
 
-    public void copyToTexture(final Texture tex, final int width, final int height) {
-        JoglTextureStateUtil.doTextureBind(tex, 0, true);
-
+    public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
+            final int xoffset, final int yoffset) {
         final GL gl = GLU.getCurrentGL();
 
-        gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+        JoglTextureStateUtil.doTextureBind(tex, 0, true);
+
+        gl.glCopyTexSubImage2D(GL.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
     }
 
     @Override

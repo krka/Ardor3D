@@ -171,7 +171,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
 
                 switchCameraOut();
 
-                copyToTexture(tex, _width, _height);
+                copyToTexture(tex, 0, 0, 0, 0, _width, _height);
 
                 deactivate();
             }
@@ -234,7 +234,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 switchCameraOut();
 
                 for (int i = 0; i < texs.size(); i++) {
-                    copyToTexture(texs.get(i), _width, _height);
+                    copyToTexture(texs.get(i), 0, 0, 0, 0, _width, _height);
                 }
 
                 deactivate();
@@ -245,10 +245,11 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         }
     }
 
-    public void copyToTexture(final Texture tex, final int width, final int height) {
+    public void copyToTexture(final Texture tex, final int x, final int y, final int width, final int height,
+            final int xoffset, final int yoffset) {
         LwjglTextureStateUtil.doTextureBind(tex, 0, true);
 
-        GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
+        GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, xoffset, yoffset, x, y, width, height);
     }
 
     @Override
