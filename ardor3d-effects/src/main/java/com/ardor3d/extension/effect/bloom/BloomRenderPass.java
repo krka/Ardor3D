@@ -52,6 +52,7 @@ public class BloomRenderPass extends Pass {
     private double sinceLast = 1;
 
     private TextureRenderer tRenderer = null;
+    private TextureRenderer fullTRenderer = null;
     private Texture2D mainTexture = null;
     private Texture2D secondTexture = null;
     private Texture2D screenTexture = null;
@@ -154,126 +155,7 @@ public class BloomRenderPass extends Pass {
     @Override
     public void doRender(final Renderer r) {
         if (!initialized) {
-            initialized = true;
-
-            // Test for glsl support
-            final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
-            if (!caps.isGLSLSupported() || !(caps.isPbufferSupported() || caps.isFBOSupported())) {
-                supported = false;
-                return;
-            }
-
-            resetParameters();
-
-            // Create texture renderers and rendertextures(alternating between two not to overwrite pbuffers)
-            final DisplaySettings settings = new DisplaySettings(cam.getWidth() / renderScale, cam.getHeight()
-                    / renderScale, 24, 0, 0, 8, 0, 0, false, false);
-            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, r, ContextManager
-                    .getCurrentContext().getCapabilities());
-
-            if (tRenderer == null) {
-                supported = false;
-                return;
-            }
-            tRenderer.setMultipleTargets(true);
-            tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
-            tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
-                    cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
-
-            mainTexture = new Texture2D();
-            mainTexture.setWrap(Texture.WrapMode.Clamp);
-            mainTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
-            tRenderer.setupTexture(mainTexture);
-
-            secondTexture = new Texture2D();
-            secondTexture.setWrap(Texture.WrapMode.Clamp);
-            secondTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
-            tRenderer.setupTexture(secondTexture);
-
-            screenTexture = new Texture2D();
-            screenTexture.setWrap(Texture.WrapMode.Clamp);
-            screenTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
-            tRenderer.setupTexture(screenTexture);
-
-            extractionShader = new GLSLShaderObjectsState();
-            try {
-                extractionShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_extract.vert"));
-                extractionShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_extract.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-            extractionShader.setUniform("RT", 0);
-
-            // Create blur shader
-            blurShader = new GLSLShaderObjectsState();
-            try {
-                blurShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur.vert"));
-                blurShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-            blurShader.setUniform("RT", 0);
-
-            // Create blur shader horizontal
-            blurShaderHorizontal = new GLSLShaderObjectsState();
-            try {
-                blurShaderHorizontal.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur.vert"));
-                blurShaderHorizontal.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur_horizontal7.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-            blurShaderHorizontal.setUniform("RT", 0);
-
-            // Create blur shader vertical
-            blurShaderVertical = new GLSLShaderObjectsState();
-            try {
-                blurShaderVertical.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur.vert"));
-                blurShaderVertical.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_blur_vertical7.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-            blurShaderVertical.setUniform("RT", 0);
-
-            // Create final shader(basic texturing)
-            finalShader = new GLSLShaderObjectsState();
-            try {
-                finalShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_final.vert"));
-                finalShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
-                        shaderDirectory + "bloom_final.frag"));
-            } catch (final IOException ex) {
-                logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
-            }
-
-            // Create fullscreen quad
-            fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
-            fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
-            fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-
-            fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
-            fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-            fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-
-            final TextureState ts = new TextureState();
-            ts.setEnabled(true);
-            fullScreenQuad.setRenderState(ts);
-
-            final BlendState as = new BlendState();
-            as.setBlendEnabled(true);
-            as.setSourceFunction(BlendState.SourceFunction.One);
-            as.setDestinationFunction(BlendState.DestinationFunction.One);
-            as.setEnabled(true);
-            fullScreenQuad.setRenderState(as);
-
-            fullScreenQuad.updateGeometricState(0.0f, true);
+            doInit(r);
         }
 
         if (!isSupported() || !useCurrentScene && _spatials.size() == 0) {
@@ -296,7 +178,17 @@ public class BloomRenderPass extends Pass {
             // see if we should use the current scene to bloom, or only things added to the pass.
             if (useCurrentScene) {
                 // grab backbuffer to texture
-                tRenderer.copyToTexture(screenTexture, 0, 0, tRenderer.getWidth(), tRenderer.getHeight(), 0, 0);
+                if (screenTexture == null) {
+                    final DisplaySettings settings = new DisplaySettings(cam.getWidth(), cam.getHeight(), 24, 0, 0, 8,
+                            0, 0, false, false);
+                    fullTRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, r,
+                            ContextManager.getCurrentContext().getCapabilities());
+                    screenTexture = new Texture2D();
+                    screenTexture.setWrap(Texture.WrapMode.Clamp);
+                    screenTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+                    fullTRenderer.setupTexture(screenTexture);
+                }
+                fullTRenderer.copyToTexture(screenTexture, 0, 0, cam.getWidth(), cam.getHeight(), 0, 0);
                 ts.setTexture(screenTexture, 0);
             } else {
                 // Render scene to texture
@@ -371,6 +263,124 @@ public class BloomRenderPass extends Pass {
         fullScreenQuad.updateWorldRenderStates(false);
         // fullScreenQuad.states[RenderState.StateType.GLSLShaderObjects.ordinal()] = finalShader;
         r.draw((Renderable) fullScreenQuad);
+    }
+
+    private void doInit(final Renderer r) {
+        initialized = true;
+
+        // Test for glsl support
+        final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
+        if (!caps.isGLSLSupported() || !(caps.isPbufferSupported() || caps.isFBOSupported())) {
+            supported = false;
+            return;
+        }
+
+        resetParameters();
+
+        // Create texture renderers and rendertextures(alternating between two not to overwrite pbuffers)
+        final DisplaySettings settings = new DisplaySettings(cam.getWidth() / renderScale, cam.getHeight()
+                / renderScale, 24, 0, 0, 8, 0, 0, false, false);
+        tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(settings, false, r, ContextManager
+                .getCurrentContext().getCapabilities());
+
+        if (tRenderer == null) {
+            supported = false;
+            return;
+        }
+        tRenderer.setMultipleTargets(true);
+        tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
+        tRenderer.getCamera().setFrustum(cam.getFrustumNear(), cam.getFrustumFar(), cam.getFrustumLeft(),
+                cam.getFrustumRight(), cam.getFrustumTop(), cam.getFrustumBottom());
+
+        mainTexture = new Texture2D();
+        mainTexture.setWrap(Texture.WrapMode.Clamp);
+        mainTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        tRenderer.setupTexture(mainTexture);
+
+        secondTexture = new Texture2D();
+        secondTexture.setWrap(Texture.WrapMode.Clamp);
+        secondTexture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        tRenderer.setupTexture(secondTexture);
+
+        extractionShader = new GLSLShaderObjectsState();
+        try {
+            extractionShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_extract.vert"));
+            extractionShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_extract.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+        extractionShader.setUniform("RT", 0);
+
+        // Create blur shader
+        blurShader = new GLSLShaderObjectsState();
+        try {
+            blurShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur.vert"));
+            blurShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+        blurShader.setUniform("RT", 0);
+
+        // Create blur shader horizontal
+        blurShaderHorizontal = new GLSLShaderObjectsState();
+        try {
+            blurShaderHorizontal.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur.vert"));
+            blurShaderHorizontal.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur_horizontal7.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+        blurShaderHorizontal.setUniform("RT", 0);
+
+        // Create blur shader vertical
+        blurShaderVertical = new GLSLShaderObjectsState();
+        try {
+            blurShaderVertical.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur.vert"));
+            blurShaderVertical.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_blur_vertical7.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+        blurShaderVertical.setUniform("RT", 0);
+
+        // Create final shader(basic texturing)
+        finalShader = new GLSLShaderObjectsState();
+        try {
+            finalShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_final.vert"));
+            finalShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+                    shaderDirectory + "bloom_final.frag"));
+        } catch (final IOException ex) {
+            logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
+        }
+
+        // Create fullscreen quad
+        fullScreenQuad = new Quad("FullScreenQuad", cam.getWidth() / 4, cam.getHeight() / 4);
+        fullScreenQuad.setTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0);
+        fullScreenQuad.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+
+        fullScreenQuad.getSceneHints().setCullHint(CullHint.Never);
+        fullScreenQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        fullScreenQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+
+        final TextureState ts = new TextureState();
+        ts.setEnabled(true);
+        fullScreenQuad.setRenderState(ts);
+
+        final BlendState as = new BlendState();
+        as.setBlendEnabled(true);
+        as.setSourceFunction(BlendState.SourceFunction.One);
+        as.setDestinationFunction(BlendState.DestinationFunction.One);
+        as.setEnabled(true);
+        fullScreenQuad.setRenderState(as);
+
+        fullScreenQuad.updateGeometricState(0.0f, true);
     }
 
     /**
