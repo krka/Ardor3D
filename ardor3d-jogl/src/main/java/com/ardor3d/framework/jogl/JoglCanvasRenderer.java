@@ -52,7 +52,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     // }
     // }
 
-    protected final Scene _scene;
+    protected Scene _scene;
     protected Camera _camera;
     protected boolean _doSwap;
     protected GLContext _context;
@@ -169,6 +169,10 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public Scene getScene() {
         return _scene;
+    }
+
+    public void setScene(final Scene scene) {
+        _scene = scene;
     }
 
     public Renderer getRenderer() {

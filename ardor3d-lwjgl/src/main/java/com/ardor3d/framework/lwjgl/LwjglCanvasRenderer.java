@@ -134,6 +134,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return _scene;
     }
 
+    public void setScene(final Scene scene) {
+        _scene = scene;
+    }
+
     public Renderer getRenderer() {
         return _renderer;
     }

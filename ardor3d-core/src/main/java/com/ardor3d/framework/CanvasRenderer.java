@@ -51,6 +51,14 @@ public interface CanvasRenderer {
     Scene getScene();
 
     /**
+     * Replaces the scene being used by this canvas renderer.
+     * 
+     * @param scene
+     *            the scene to use
+     */
+    void setScene(Scene scene);
+
+    /**
      * Returns the renderer being used by this canvas renderer.
      * 
      * @return the renderer used by this canvas renderer
