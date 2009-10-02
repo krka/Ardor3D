@@ -268,17 +268,22 @@ public class BoundingBox extends BoundingVolume {
     private void checkMinMax(final Vector3 min, final Vector3 max, final ReadOnlyVector3 point) {
         if (point.getX() < min.getX()) {
             min.setX(point.getX());
-        } else if (point.getX() > max.getX()) {
+        }
+        if (point.getX() > max.getX()) {
             max.setX(point.getX());
         }
+
         if (point.getY() < min.getY()) {
             min.setY(point.getY());
-        } else if (point.getY() > max.getY()) {
+        }
+        if (point.getY() > max.getY()) {
             max.setY(point.getY());
         }
+
         if (point.getZ() < min.getZ()) {
             min.setZ(point.getZ());
-        } else if (point.getZ() > max.getZ()) {
+        }
+        if (point.getZ() > max.getZ()) {
             max.setZ(point.getZ());
         }
     }
