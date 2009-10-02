@@ -47,10 +47,12 @@ void main()
 		discard;
 	}
 //	unit = min(unit, validLevels);
+
+	unit = max(unit, 0.0);
 	
 	vec2 offset = sliceOffset[int(unit)];	
 	float frac = unit;
-	frac = max(frac, 0.0);
+//	frac = max(frac, 0.0);
 	frac = exp2(frac);	
 	frac *= 4.0; //Magic number	
 	vec2 texCoord = vVertex/vec2(frac);
@@ -63,7 +65,7 @@ void main()
 	unit2 = min(unit2, validLevels);
 	vec2 offset2 = sliceOffset[int(unit2)];	
 	float frac2 = unit2;
-	frac2 = max(frac2, 0.0);
+//	frac2 = max(frac2, 0.0);
 	frac2 = exp2(frac2);	
 	frac2 *= 4.0; //Magic number	
 	vec2 texCoord2 = vVertex/vec2(frac2);
