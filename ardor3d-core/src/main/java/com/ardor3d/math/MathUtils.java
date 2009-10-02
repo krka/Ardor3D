@@ -463,4 +463,10 @@ public class MathUtils {
         wrappedValue += wrappedValue < 0 ? size : 0;
         return wrappedValue;
     }
+
+    public static float moduloPositive(final float value, final float size) {
+        float wrappedValue = value % size;
+        wrappedValue += wrappedValue < 0 ? size : 0;
+        return wrappedValue;
+    }
 }
