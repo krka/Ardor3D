@@ -163,8 +163,8 @@ public abstract class GeneratedImageFactory {
                     val = MathUtils.clamp(val, rangeStart, rangeEnd);
 
                     // Convert to [0, 255]
-                    val = ((val + rangeStart) * rangeDiv) * 255.0;
-                    data[i++] = (byte) MathUtils.floor(val);
+                    val = ((val - rangeStart) * rangeDiv) * 255.0;
+                    data[i++] = (byte) val;
                 }
             }
             final ByteBuffer dataBuf = BufferUtils.createByteBuffer(data.length);
