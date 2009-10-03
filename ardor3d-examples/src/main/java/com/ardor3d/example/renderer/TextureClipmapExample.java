@@ -161,7 +161,9 @@ public class TextureClipmapExample extends ExampleBase {
     }
 
     private ProceduralTextureStreamer createProceduralStreamer(final int sourceSize, final int textureSliceSize) {
-        final Function3D function = new FbmFunction3D(Functions.simplexNoise(), 5, 0.5, 0.5, 3.14);
+        final double scale = 1.0 / 2048.0;
+        final Function3D function = Functions.scaleInput(
+                new FbmFunction3D(Functions.simplexNoise(), 5, 0.5, 0.5, 3.14), scale, scale, 1);
         final ReadOnlyColorRGBA[] terrainColors = new ReadOnlyColorRGBA[256];
         terrainColors[0] = new ColorRGBA(0, 0, .5f, 1);
         terrainColors[95] = new ColorRGBA(0, 0, 1, 1);
@@ -174,7 +176,7 @@ public class TextureClipmapExample extends ExampleBase {
         GeneratedImageFactory.fillInColorTable(terrainColors);
 
         final ProceduralTextureStreamer streamer = new ProceduralTextureStreamer(sourceSize, textureSliceSize,
-                function, terrainColors, 1.0 / 2048);
+                function, terrainColors);
         return streamer;
     }
 

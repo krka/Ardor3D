@@ -22,25 +22,23 @@ public class ProceduralTextureStreamer implements TextureStreamer {
 
     private final Function3D _function;
     private final ReadOnlyColorRGBA[] _terrainColors;
-    private final double _scale;
 
     public ProceduralTextureStreamer(final int sourceSize, final int textureSliceSize, final Function3D function,
-            final ReadOnlyColorRGBA[] terrainColors, final double scale) {
+            final ReadOnlyColorRGBA[] terrainColors) {
         _textureSliceSize = textureSliceSize;
         _validLevels = powersUpTo(textureSliceSize, sourceSize);
 
         _function = function;
         _terrainColors = terrainColors;
-        _scale = scale;
     }
 
     public void updateLevel(final int unit, final int sX, final int sY) {
-
+        ; // nothing to do?
     }
 
     public void copyImage(final int unit, final ByteBuffer sliceData, final int dX, final int dY, final int sX,
             final int sY, final int w, final int h) {
-        final double scale = Math.pow(2, unit) * _scale;
+        final double scale = Math.pow(2, unit);
         final byte[] color = new byte[3];
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
@@ -51,11 +49,14 @@ public class ProceduralTextureStreamer implements TextureStreamer {
                 // eval our function at the given slice and location
                 double val = _function.eval((sX + x) * scale, (sY + y) * scale, 0);
 
-                // clamp us to [0,255]
-                val = MathUtils.clamp(val, -1.0, 1.0) * 128 + 128;
+                // Keep us in [-1, 1]
+                val = MathUtils.clamp(val, -1, 1);
+
+                // Convert to [0, 255]
+                val = ((val + 1) * 0.5) * 255.0;
 
                 // get us a color
-                final byte colIndex = (byte) MathUtils.floor(val);
+                final byte colIndex = (byte) val;
                 final ReadOnlyColorRGBA c = _terrainColors[colIndex & 0xFF];
 
                 // place color channels in byte array
