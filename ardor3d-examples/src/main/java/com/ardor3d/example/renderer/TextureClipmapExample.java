@@ -78,11 +78,11 @@ public class TextureClipmapExample extends ExampleBase {
         final Box box3 = new Box("box3", new Vector3(10, 0, -10), new Vector3(30, 10, 10));
         _root.attachChild(box3);
 
-        final int textureSliceSize = 512;
+        final int textureSliceSize = 256;
         final ProceduralTextureStreamer streamer = new ProceduralTextureStreamer(65536, textureSliceSize);
         // final InMemoryTextureStreamer streamer = new InMemoryTextureStreamer(4096, textureSliceSize);
         // final SimpleFileTextureStreamer streamer = new SimpleFileTextureStreamer(2048, textureSliceSize);
-        // final CachedFileTextureStreamer streamer = new CachedFileTextureStreamer(2048, textureSliceSize);
+        // final CachedFileTextureStreamer streamer = new CachedFileTextureStreamer(8192, textureSliceSize);
         final int validLevels = streamer.getValidLevels();
         textureClipmap = new TextureClipmap(streamer, textureSliceSize, validLevels, 64);
 

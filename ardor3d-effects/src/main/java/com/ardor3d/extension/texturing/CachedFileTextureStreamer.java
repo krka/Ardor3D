@@ -31,19 +31,25 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     private final int validLevels;
 
     private final int tileSize;
-    private final int cacheSize;
+    private final int cacheCount = 5;
 
     class MemData {
         public int sizeX, sizeY;
         public ByteBuffer imageSource;
 
-        public ByteBuffer cache;
+        public ByteBuffer cache[][];
         public int tileX, tileY;
 
         public AtomicBoolean ready = new AtomicBoolean(true);
 
         public MemData() {
-            cache = BufferUtils.createByteBuffer(cacheSize * cacheSize * 3);
+
+            cache = new ByteBuffer[cacheCount][cacheCount];
+            for (int i = 0; i < cacheCount; i++) {
+                for (int j = 0; j < cacheCount; j++) {
+                    cache[i][j] = BufferUtils.createByteBuffer(tileSize * tileSize * 3);
+                }
+            }
         }
     }
 
@@ -54,7 +60,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         this.textureSize = textureSize;
 
         tileSize = textureSize;
-        cacheSize = tileSize * 3;
 
         validLevels = powersUpTo(textureSize, sourceSize);
         for (int l = 0; l < validLevels; l++) {
@@ -65,7 +70,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
             createMipmaps();
         }
 
-        // write down mipmaps as files. presplit into tiles?
         int currentSize = sourceSize;
         for (int l = 0; l < validLevels; l++) {
             final MemData memData = memDataList.get(l);
@@ -87,6 +91,8 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     }
 
+    private boolean initialized = false;
+
     public void updateLevel(final int unit, final int sX, final int sY) {
         final MemData memData = memDataList.get(unit);
 
@@ -94,11 +100,11 @@ public class CachedFileTextureStreamer implements TextureStreamer {
             return;
         }
 
-        int tileX = (int) Math.floor(sX / tileSize);
-        int tileY = (int) Math.floor(sY / tileSize);
+        final int tileX = (int) Math.floor((float) sX / tileSize);
+        final int tileY = (int) Math.floor((float) sY / tileSize);
 
-        final int diffX = memData.tileX - tileX;
-        final int diffY = memData.tileY - tileY;
+        final int diffX = tileX - memData.tileX;
+        final int diffY = tileY - memData.tileY;
         if (diffX == 0 && diffY == 0) {
             return;
         }
@@ -108,41 +114,47 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         memData.tileX = tileX;
         memData.tileY = tileY;
 
-        tileX += diffX;
-        tileY += diffY;
-        final int startX = tileX * tileSize;
-        final int startY = tileY * tileSize;
+        updateTiles(memData, tileX, tileY, diffX, diffY);
 
-        tileX = MathUtils.moduloPositive(tileX, 3);
-        tileY = MathUtils.moduloPositive(tileY, 3);
+        if (!initialized) {
+            updateTiles(memData, tileX, tileY, cacheCount, cacheCount);
 
-        // System.out.println(tileX + ", " + tileY);
-
-        updateCache(startX, startY, memData, tileX, tileY);
-
+            initialized = true;
+        }
     }
 
-    private void updateCache(final int sX, final int sY, final MemData memData, final int tileX, final int tileY) {
+    private void updateTiles(final MemData memData, final int tileX, final int tileY, final int diffX, final int diffY) {
         new Thread(new Runnable() {
             public void run() {
-                final int sizeX = memData.sizeX;
-                final int sizeY = memData.sizeY;
-                final ByteBuffer imageSource = memData.imageSource;
-                final ByteBuffer cacheData = memData.cache;
+                if (diffX != 0) {
+                    final int sign = (int) Math.signum(diffX);
+                    final int diffSize = Math.abs(diffX);
+                    for (int i = 0; i < cacheCount; i++) {
+                        for (int j = 0; j < diffSize; j++) {
+                            final int startX = (tileX + (2 - j) * sign) * tileSize;
+                            final int startY = (tileY + i - 2) * tileSize;
 
-                for (int y = 0; y < sizeY; y++) {
-                    for (int x = 0; x < sizeX; x++) {
-                        final int sourceX = MathUtils.moduloPositive(sX + x, sizeX);
-                        final int sourceY = MathUtils.moduloPositive(sY + y, sizeY);
-                        final int indexSource = (sourceY * sizeX + sourceX) * 3;
+                            final int tileX2 = MathUtils.moduloPositive(tileX + (2 - j) * sign, cacheCount);
+                            final int tileY2 = MathUtils.moduloPositive(tileY + i - 2, cacheCount);
 
-                        final int destX = MathUtils.moduloPositive(x + tileX * tileSize, cacheSize);
-                        final int destY = MathUtils.moduloPositive(y + tileY * tileSize, cacheSize);
-                        final int indexDest = (destY * cacheSize + destX) * 3;
+                            updateCache(startX, startY, memData, tileX2, tileY2);
+                        }
+                    }
+                }
 
-                        cacheData.put(indexDest, imageSource.get(indexSource));
-                        cacheData.put(indexDest + 1, imageSource.get(indexSource + 1));
-                        cacheData.put(indexDest + 2, imageSource.get(indexSource + 2));
+                if (diffY != 0) {
+                    final int sign = (int) Math.signum(diffY);
+                    final int diffSize = Math.abs(diffY);
+                    for (int i = 0; i < cacheCount; i++) {
+                        for (int j = 0; j < diffSize; j++) {
+                            final int startX = (tileX + i - 2) * tileSize;
+                            final int startY = (tileY + (2 - j) * sign) * tileSize;
+
+                            final int tileX2 = MathUtils.moduloPositive(tileX + i - 2, cacheCount);
+                            final int tileY2 = MathUtils.moduloPositive(tileY + (2 - j) * sign, cacheCount);
+
+                            updateCache(startX, startY, memData, tileX2, tileY2);
+                        }
                     }
                 }
 
@@ -151,16 +163,44 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         }, "updateCache").start();
     }
 
+    private void updateCache(final int sX, final int sY, final MemData memData, final int tileX, final int tileY) {
+        final int sizeX = memData.sizeX;
+        final int sizeY = memData.sizeY;
+        final ByteBuffer imageSource = memData.imageSource;
+        final ByteBuffer cacheData = memData.cache[tileX][tileY];
+
+        for (int y = 0; y < tileSize; y++) {
+            for (int x = 0; x < tileSize; x++) {
+                final int sourceX = MathUtils.moduloPositive(sX + x, sizeX);
+                final int sourceY = MathUtils.moduloPositive(sY + y, sizeY);
+                final int indexSource = (sourceY * sizeX + sourceX) * 3;
+
+                final int destX = MathUtils.moduloPositive(x, tileSize);
+                final int destY = MathUtils.moduloPositive(y, tileSize);
+                final int indexDest = (destY * tileSize + destX) * 3;
+
+                cacheData.put(indexDest, imageSource.get(indexSource));
+                cacheData.put(indexDest + 1, imageSource.get(indexSource + 1));
+                cacheData.put(indexDest + 2, imageSource.get(indexSource + 2));
+            }
+        }
+    }
+
     public void copyImage(final int unit, final ByteBuffer sliceData, final int dX, final int dY, final int sX,
             final int sY, final int w, final int h) {
         final MemData memData = memDataList.get(unit);
-        final ByteBuffer imageSource = memData.cache;
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                final int sourceX = MathUtils.moduloPositive(sX + x, cacheSize);
-                final int sourceY = MathUtils.moduloPositive(sY + y, cacheSize);
-                final int indexSource = (sourceY * cacheSize + sourceX) * 3;
+                int tileX = (int) Math.floor((float) (sX + x) / tileSize);
+                int tileY = (int) Math.floor((float) (sY + y) / tileSize);
+                tileX = MathUtils.moduloPositive(tileX, cacheCount);
+                tileY = MathUtils.moduloPositive(tileY, cacheCount);
+                final ByteBuffer imageSource = memData.cache[tileX][tileY];
+
+                final int sourceX = MathUtils.moduloPositive(sX + x, tileSize);
+                final int sourceY = MathUtils.moduloPositive(sY + y, tileSize);
+                final int indexSource = (sourceY * tileSize + sourceX) * 3;
 
                 final int destX = MathUtils.moduloPositive(dX + x, textureSize);
                 final int destY = MathUtils.moduloPositive(dY + y, textureSize);
