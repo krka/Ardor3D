@@ -12,27 +12,26 @@ package com.ardor3d.extension.texturing;
 
 import java.nio.ByteBuffer;
 
-import com.ardor3d.image.util.GeneratedImageFactory;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.function.FbmFunction3D;
 import com.ardor3d.math.function.Function3D;
-import com.ardor3d.math.function.Functions;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class ProceduralTextureStreamer implements TextureStreamer {
-    private final int sourceSize;
-    private final int textureSize;
-    private final int validLevels;
+    private final int _textureSliceSize;
+    private final int _validLevels;
 
-    Function3D terrain;
+    private final Function3D _function;
+    private final ReadOnlyColorRGBA[] _terrainColors;
+    private final double _scale;
 
-    public ProceduralTextureStreamer(final int sourceSize, final int textureSize) {
-        this.sourceSize = sourceSize;
-        this.textureSize = textureSize;
-        validLevels = powersUpTo(textureSize, sourceSize);
+    public ProceduralTextureStreamer(final int sourceSize, final int textureSliceSize, final Function3D function,
+            final ReadOnlyColorRGBA[] terrainColors, final double scale) {
+        _textureSliceSize = textureSliceSize;
+        _validLevels = powersUpTo(textureSliceSize, sourceSize);
 
-        createFunction();
+        _function = function;
+        _terrainColors = terrainColors;
+        _scale = scale;
     }
 
     public void updateLevel(final int unit, final int sX, final int sY) {
@@ -41,41 +40,34 @@ public class ProceduralTextureStreamer implements TextureStreamer {
 
     public void copyImage(final int unit, final ByteBuffer sliceData, final int dX, final int dY, final int sX,
             final int sY, final int w, final int h) {
+        final double scale = Math.pow(2, unit) * _scale;
+        final byte[] color = new byte[3];
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                final int destX = MathUtils.moduloPositive(dX + x, textureSize);
-                final int destY = MathUtils.moduloPositive(dY + y, textureSize);
-                final int indexDest = (destY * textureSize + destX) * 3;
+                final int destX = MathUtils.moduloPositive(dX + x, _textureSliceSize);
+                final int destY = MathUtils.moduloPositive(dY + y, _textureSliceSize);
+                final int indexDest = (destY * _textureSliceSize + destX) * 3;
 
-                double val = terrain.eval((sX + x) * Math.pow(2, unit) / 2048.0, (sY + y) * Math.pow(2, unit) / 2048.0,
-                        0);
-                val = val * 128 + 128;
+                // eval our function at the given slice and location
+                double val = _function.eval((sX + x) * scale, (sY + y) * scale, 0);
+
+                // clamp us to [0,255]
+                val = MathUtils.clamp(val, -1.0, 1.0) * 128 + 128;
+
+                // get us a color
                 final byte colIndex = (byte) MathUtils.floor(val);
-                final ReadOnlyColorRGBA c = terrainColors[colIndex & 0xFF];
+                final ReadOnlyColorRGBA c = _terrainColors[colIndex & 0xFF];
 
-                sliceData.put(indexDest, (byte) (c.getRed() * 255));
-                sliceData.put(indexDest + 1, (byte) (c.getGreen() * 255));
-                sliceData.put(indexDest + 2, (byte) (c.getBlue() * 255));
+                // place color channels in byte array
+                color[0] = (byte) (c.getRed() * 255);
+                color[1] = (byte) (c.getGreen() * 255);
+                color[2] = (byte) (c.getBlue() * 255);
+
+                // Place array into byte buffer
+                sliceData.position(indexDest);
+                sliceData.put(color);
             }
         }
-    }
-
-    ReadOnlyColorRGBA[] terrainColors;
-
-    private void createFunction() {
-        terrain = Functions.scaleInput(Functions.simplexNoise(), 2, 2, 1);
-        terrainColors = new ReadOnlyColorRGBA[256];
-        terrainColors[0] = new ColorRGBA(0, 0, .5f, 1);
-        terrainColors[95] = new ColorRGBA(0, 0, 1, 1);
-        terrainColors[127] = new ColorRGBA(0, .5f, 1, 1);
-        terrainColors[137] = new ColorRGBA(240 / 255f, 240 / 255f, 64 / 255f, 1);
-        terrainColors[143] = new ColorRGBA(32 / 255f, 160 / 255f, 0, 1);
-        terrainColors[175] = new ColorRGBA(224 / 255f, 224 / 255f, 0, 1);
-        terrainColors[223] = new ColorRGBA(128 / 255f, 128 / 255f, 128 / 255f, 1);
-        terrainColors[255] = ColorRGBA.WHITE;
-        GeneratedImageFactory.fillInColorTable(terrainColors);
-
-        terrain = new FbmFunction3D(terrain, 5, 0.5, 0.5, 3.14);
     }
 
     private int powersUpTo(int value, final int max) {
@@ -87,7 +79,7 @@ public class ProceduralTextureStreamer implements TextureStreamer {
     }
 
     public int getValidLevels() {
-        return validLevels;
+        return _validLevels;
     }
 
     public boolean isReady(final int unit) {
