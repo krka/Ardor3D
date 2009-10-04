@@ -31,10 +31,8 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(TexturedGeometryClipmapTerrain.class.getName());
 
-    private final int sourceSize;
     private final int textureSize;
     private final int validLevels;
-
     private final int cacheCount = 5;
 
     class MemData {
@@ -61,7 +59,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     private final List<MemData> memDataList = Lists.newArrayList();
 
     public CachedFileTextureStreamer(final String fileName, final int sourceSize, final int textureSize) {
-        this.sourceSize = sourceSize;
         this.textureSize = textureSize;
 
         validLevels = powersUpTo(textureSize, sourceSize);

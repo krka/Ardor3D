@@ -32,7 +32,11 @@ import com.ardor3d.math.function.Functions;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
@@ -43,7 +47,10 @@ public class TextureClipmapExample extends ExampleBase {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(TextureClipmapExample.class.getName());
 
-    TextureClipmap textureClipmap;
+    /** Text fields used to present info about the example. */
+    private final BasicText _exampleInfo[] = new BasicText[9];
+
+    private TextureClipmap textureClipmap;
 
     public static void main(final String[] args) {
         start(TextureClipmapExample.class);
@@ -98,6 +105,22 @@ public class TextureClipmapExample extends ExampleBase {
         box3.setRenderState(textureClipmap.getShaderState());
         box3.setRenderState(textureClipmap.getTextureState());
 
+        // Setup labels for presenting example info.
+        final Node textNodes = new Node("Text");
+        _root.attachChild(textNodes);
+        textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
+        textNodes.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+
+        final double infoStartY = _canvas.getCanvasRenderer().getCamera().getHeight() / 2;
+        for (int i = 0; i < _exampleInfo.length; i++) {
+            _exampleInfo[i] = BasicText.createDefaultTextLabel("Text", "", 16);
+            _exampleInfo[i].setTranslation(new Vector3(10, infoStartY - i * 20, 0));
+            textNodes.attachChild(_exampleInfo[i]);
+        }
+
+        textNodes.updateGeometricState(0.0);
+        updateText();
+
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 textureClipmap.reloadShader();
@@ -112,6 +135,7 @@ public class TextureClipmapExample extends ExampleBase {
                 textureClipmap.reloadShader();
                 box1.setRenderState(textureClipmap.getShaderState());
                 box3.setRenderState(textureClipmap.getShaderState());
+                updateText();
             }
         }));
 
@@ -121,6 +145,7 @@ public class TextureClipmapExample extends ExampleBase {
                 textureClipmap.reloadShader();
                 box1.setRenderState(textureClipmap.getShaderState());
                 box3.setRenderState(textureClipmap.getShaderState());
+                updateText();
             }
         }));
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
@@ -129,35 +154,28 @@ public class TextureClipmapExample extends ExampleBase {
                 textureClipmap.reloadShader();
                 box1.setRenderState(textureClipmap.getShaderState());
                 box3.setRenderState(textureClipmap.getShaderState());
+                updateText();
             }
         }));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ONE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 _controlHandle.setMoveSpeed(10);
+                updateText();
             }
         }));
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 _controlHandle.setMoveSpeed(100);
+                updateText();
             }
         }));
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.THREE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 _controlHandle.setMoveSpeed(500);
+                updateText();
             }
         }));
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.FOUR), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                _controlHandle.setMoveSpeed(1000);
-            }
-        }));
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.FIVE), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                _controlHandle.setMoveSpeed(2000);
-            }
-        }));
-
     }
 
     private ProceduralTextureStreamer createProceduralStreamer(final int sourceSize, final int textureSliceSize) {
@@ -180,4 +198,12 @@ public class TextureClipmapExample extends ExampleBase {
         return streamer;
     }
 
+    /**
+     * Update text information.
+     */
+    private void updateText() {
+        _exampleInfo[0].setText("[1-3] Move speed: " + _controlHandle.getMoveSpeed());
+        _exampleInfo[1].setText("[Space] Show debug: " + textureClipmap.isShowDebug());
+        _exampleInfo[2].setText("[U/J] Scale up/down");
+    }
 }
