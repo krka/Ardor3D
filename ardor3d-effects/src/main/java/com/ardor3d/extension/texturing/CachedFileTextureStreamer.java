@@ -18,7 +18,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
+import com.ardor3d.extension.terrain.TexturedGeometryClipmapTerrain;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.function.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -26,6 +28,9 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
 public class CachedFileTextureStreamer implements TextureStreamer {
+    /** The Constant logger. */
+    private static final Logger logger = Logger.getLogger(TexturedGeometryClipmapTerrain.class.getName());
+
     private final int sourceSize;
     private final int textureSize;
     private final int validLevels;
@@ -63,10 +68,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         for (int l = 0; l < validLevels; l++) {
             memDataList.add(new MemData());
         }
-
-        // if (!new File("texture0").exists()) {
-        // createMipmaps();
-        // }
 
         int currentSize = sourceSize;
         for (int l = 0; l < validLevels; l++) {
@@ -203,7 +204,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     private static int powersUpTo(int value, final int max) {
         int powers = 0;
         for (; value <= max; value *= 2, powers++) {
-            System.out.println("value:" + value + " powers: " + powers);
         }
         return powers;
     }
@@ -212,6 +212,8 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     public static void createTexture(final String fileName, final Function3D function,
             final ReadOnlyColorRGBA[] terrainColors, final int sourceSize, final int textureSize) {
+        logger.info("Creating texture files...");
+
         final int validLevels = powersUpTo(textureSize, sourceSize);
 
         int currentSize = sourceSize;
@@ -222,6 +224,8 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         int diff = 1;
         for (int l = 0; l < validLevels; l++) {
             try {
+                logger.info("Writing texture file for level: " + l + ", size: " + currentSize + ", name: " + fileName
+                        + l + ", expected size: " + (currentSize * currentSize * 3));
                 final FileChannel out = new FileOutputStream(fileName + l).getChannel();
 
                 final int nrTiles = currentSize / textureSize;

@@ -42,7 +42,6 @@ public class TexturedGeometryClipmapTerrain extends Node {
     private List<ClipmapLevel> _clips;
     private int _visibleLevels = 0;
     private final Camera _terrainCamera;
-    private final int _totalSize;
     private final int _clipSideSize;
     private final Vector3 _lightDirection = new Vector3(1, 1, 2);
 
@@ -59,7 +58,6 @@ public class TexturedGeometryClipmapTerrain extends Node {
             final HeightmapPyramid heightmapPyramid, final int clipSideSize, final float heightScale) {
         _textureClipmap = textureClipmap;
         _terrainCamera = camera;
-        _totalSize = heightmapPyramid.getSize(0);
         _heightScale = heightScale;
         _clipSideSize = clipSideSize;
 
@@ -189,14 +187,7 @@ public class TexturedGeometryClipmapTerrain extends Node {
 
             _geometryClipmapShader.setUniform("clipSideSize", (float) _clipSideSize);
 
-            _geometryClipmapShader.setUniform("scale", 1f / _textureClipmap.getScale());
-            _geometryClipmapShader.setUniform("textureSize", (float) _textureClipmap.getTextureSize());
-            _geometryClipmapShader.setUniform("texelSize", 1f / _textureClipmap.getTextureSize());
-
-            _geometryClipmapShader.setUniform("levels", (float) _textureClipmap.getTextureLevels());
-            _geometryClipmapShader.setUniform("validLevels", (float) _textureClipmap.getValidLevels() - 1);
-
-            _geometryClipmapShader.setUniform("showDebug", _textureClipmap.isShowDebug() ? 1.0f : 0.0f);
+            reloadShaderParameters();
 
             _geometryClipmapShader.setShaderDataLogic(new GLSLShaderDataLogic() {
                 public void applyData(final GLSLShaderObjectsState shader, final Mesh mesh, final Renderer renderer) {
@@ -213,6 +204,17 @@ public class TexturedGeometryClipmapTerrain extends Node {
             _textureClipmap.setShaderState(_geometryClipmapShader);
         }
         updateWorldRenderStates(false);
+    }
+
+    public void reloadShaderParameters() {
+        _geometryClipmapShader.setUniform("scale", 1f / _textureClipmap.getScale());
+        _geometryClipmapShader.setUniform("textureSize", (float) _textureClipmap.getTextureSize());
+        _geometryClipmapShader.setUniform("texelSize", 1f / _textureClipmap.getTextureSize());
+
+        _geometryClipmapShader.setUniform("levels", (float) _textureClipmap.getTextureLevels());
+        _geometryClipmapShader.setUniform("validLevels", (float) _textureClipmap.getValidLevels() - 1);
+
+        _geometryClipmapShader.setUniform("showDebug", _textureClipmap.isShowDebug() ? 1.0f : 0.0f);
     }
 
     public void regenerate() {
@@ -277,5 +279,9 @@ public class TexturedGeometryClipmapTerrain extends Node {
             final ClipmapLevel clip = _clips.get(i);
             clip.setHeightRange(heightRangeMin, heightRangeMax);
         }
+    }
+
+    public TextureClipmap getTextureClipmap() {
+        return _textureClipmap;
     }
 }

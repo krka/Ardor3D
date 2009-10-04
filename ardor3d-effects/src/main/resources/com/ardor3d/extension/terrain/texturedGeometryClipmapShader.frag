@@ -103,7 +103,8 @@ void main()
 	unit2 /= levels;	
 	unit2 = clamp(unit2, 0.0, 0.99);
 
-	//vec4 tex = texture3D(texture, vec3(texCoord.x, texCoord.y, unit));
+//	vec4 tex = texture3D(texture, vec3(texCoord.x, texCoord.y, unit));
+//	vec4 tex2 = texture3D(texture, vec3(texCoord2.x, texCoord2.y, unit2));
 	vec4 tex = texture3DBilinear(texture, vec3(texCoord.x, texCoord.y, unit), offset);
 	vec4 tex2 = texture3DBilinear(texture, vec3(texCoord2.x, texCoord2.y, unit2), offset2);
 
