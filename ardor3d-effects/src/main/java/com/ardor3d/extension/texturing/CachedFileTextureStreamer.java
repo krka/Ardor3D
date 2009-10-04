@@ -10,17 +10,17 @@
 
 package com.ardor3d.extension.texturing;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.ardor3d.extension.effect.water.ImprovedNoise;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.function.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -30,24 +30,24 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     private final int textureSize;
     private final int validLevels;
 
-    private final int tileSize;
     private final int cacheCount = 5;
 
     class MemData {
         public int sizeX, sizeY;
-        public ByteBuffer imageSource;
+        public FileChannel channel;
 
         public ByteBuffer cache[][];
         public int tileX, tileY;
 
         public AtomicBoolean ready = new AtomicBoolean(true);
 
-        public MemData() {
+        public boolean initialized = false;
 
+        public MemData() {
             cache = new ByteBuffer[cacheCount][cacheCount];
             for (int i = 0; i < cacheCount; i++) {
                 for (int j = 0; j < cacheCount; j++) {
-                    cache[i][j] = BufferUtils.createByteBuffer(tileSize * tileSize * 3);
+                    cache[i][j] = BufferUtils.createByteBuffer(textureSize * textureSize * 3);
                 }
             }
         }
@@ -55,20 +55,18 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     private final List<MemData> memDataList = Lists.newArrayList();
 
-    public CachedFileTextureStreamer(final int sourceSize, final int textureSize) {
+    public CachedFileTextureStreamer(final String fileName, final int sourceSize, final int textureSize) {
         this.sourceSize = sourceSize;
         this.textureSize = textureSize;
-
-        tileSize = textureSize;
 
         validLevels = powersUpTo(textureSize, sourceSize);
         for (int l = 0; l < validLevels; l++) {
             memDataList.add(new MemData());
         }
 
-        if (!new File("texture0").exists()) {
-            createMipmaps();
-        }
+        // if (!new File("texture0").exists()) {
+        // createMipmaps();
+        // }
 
         int currentSize = sourceSize;
         for (int l = 0; l < validLevels; l++) {
@@ -78,10 +76,7 @@ public class CachedFileTextureStreamer implements TextureStreamer {
             memData.sizeY = currentSize;
 
             try {
-                // Create a read-only memory-mapped file
-                final FileChannel roChannel = new RandomAccessFile("texture" + l, "r").getChannel();
-                final ByteBuffer roBuf = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int) roChannel.size());
-                memData.imageSource = roBuf;
+                memData.channel = new FileInputStream(fileName + l).getChannel();
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -91,8 +86,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     }
 
-    private boolean initialized = false;
-
     public void updateLevel(final int unit, final int sX, final int sY) {
         final MemData memData = memDataList.get(unit);
 
@@ -100,8 +93,8 @@ public class CachedFileTextureStreamer implements TextureStreamer {
             return;
         }
 
-        final int tileX = (int) Math.floor((float) sX / tileSize);
-        final int tileY = (int) Math.floor((float) sY / tileSize);
+        final int tileX = (int) Math.floor((float) sX / textureSize);
+        final int tileY = (int) Math.floor((float) sY / textureSize);
 
         final int diffX = tileX - memData.tileX;
         final int diffY = tileY - memData.tileY;
@@ -114,12 +107,12 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         memData.tileX = tileX;
         memData.tileY = tileY;
 
-        updateTiles(memData, tileX, tileY, diffX, diffY);
-
-        if (!initialized) {
+        if (memData.initialized) {
+            updateTiles(memData, tileX, tileY, diffX, diffY);
+        } else {
             updateTiles(memData, tileX, tileY, cacheCount, cacheCount);
 
-            initialized = true;
+            memData.initialized = true;
         }
     }
 
@@ -131,13 +124,10 @@ public class CachedFileTextureStreamer implements TextureStreamer {
                     final int diffSize = Math.abs(diffX);
                     for (int i = 0; i < cacheCount; i++) {
                         for (int j = 0; j < diffSize; j++) {
-                            final int startX = (tileX + (2 - j) * sign) * tileSize;
-                            final int startY = (tileY + i - 2) * tileSize;
+                            final int startX = (tileX + (2 - j) * sign);
+                            final int startY = (tileY + i - 2);
 
-                            final int tileX2 = MathUtils.moduloPositive(tileX + (2 - j) * sign, cacheCount);
-                            final int tileY2 = MathUtils.moduloPositive(tileY + i - 2, cacheCount);
-
-                            updateCache(startX, startY, memData, tileX2, tileY2);
+                            updateCache(startX, startY, memData);
                         }
                     }
                 }
@@ -147,13 +137,10 @@ public class CachedFileTextureStreamer implements TextureStreamer {
                     final int diffSize = Math.abs(diffY);
                     for (int i = 0; i < cacheCount; i++) {
                         for (int j = 0; j < diffSize; j++) {
-                            final int startX = (tileX + i - 2) * tileSize;
-                            final int startY = (tileY + (2 - j) * sign) * tileSize;
+                            final int startX = (tileX + i - 2);
+                            final int startY = (tileY + (2 - j) * sign);
 
-                            final int tileX2 = MathUtils.moduloPositive(tileX + i - 2, cacheCount);
-                            final int tileY2 = MathUtils.moduloPositive(tileY + (2 - j) * sign, cacheCount);
-
-                            updateCache(startX, startY, memData, tileX2, tileY2);
+                            updateCache(startX, startY, memData);
                         }
                     }
                 }
@@ -163,26 +150,26 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         }, "updateCache").start();
     }
 
-    private void updateCache(final int sX, final int sY, final MemData memData, final int tileX, final int tileY) {
+    private void updateCache(final int tileX, final int tileY, final MemData memData) {
         final int sizeX = memData.sizeX;
         final int sizeY = memData.sizeY;
-        final ByteBuffer imageSource = memData.imageSource;
-        final ByteBuffer cacheData = memData.cache[tileX][tileY];
+        final FileChannel channel = memData.channel;
 
-        for (int y = 0; y < tileSize; y++) {
-            for (int x = 0; x < tileSize; x++) {
-                final int sourceX = MathUtils.moduloPositive(sX + x, sizeX);
-                final int sourceY = MathUtils.moduloPositive(sY + y, sizeY);
-                final int indexSource = (sourceY * sizeX + sourceX) * 3;
+        final int tileX2 = MathUtils.moduloPositive(tileX, cacheCount);
+        final int tileY2 = MathUtils.moduloPositive(tileY, cacheCount);
+        final ByteBuffer cacheData = memData.cache[tileX2][tileY2];
 
-                final int destX = MathUtils.moduloPositive(x, tileSize);
-                final int destY = MathUtils.moduloPositive(y, tileSize);
-                final int indexDest = (destY * tileSize + destX) * 3;
-
-                cacheData.put(indexDest, imageSource.get(indexSource));
-                cacheData.put(indexDest + 1, imageSource.get(indexSource + 1));
-                cacheData.put(indexDest + 2, imageSource.get(indexSource + 2));
+        try {
+            final int nrTiles = sizeX / textureSize;
+            final int wrappedTileX = MathUtils.moduloPositive(tileX, nrTiles);
+            final int wrappedTileY = MathUtils.moduloPositive(tileY, nrTiles);
+            synchronized (channel) {
+                channel.position((wrappedTileY * nrTiles + wrappedTileX) * textureSize * textureSize * 3);
+                cacheData.rewind();
+                channel.read(cacheData);
             }
+        } catch (final IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -192,15 +179,15 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                int tileX = (int) Math.floor((float) (sX + x) / tileSize);
-                int tileY = (int) Math.floor((float) (sY + y) / tileSize);
+                int tileX = (int) Math.floor((float) (sX + x) / textureSize);
+                int tileY = (int) Math.floor((float) (sY + y) / textureSize);
                 tileX = MathUtils.moduloPositive(tileX, cacheCount);
                 tileY = MathUtils.moduloPositive(tileY, cacheCount);
                 final ByteBuffer imageSource = memData.cache[tileX][tileY];
 
-                final int sourceX = MathUtils.moduloPositive(sX + x, tileSize);
-                final int sourceY = MathUtils.moduloPositive(sY + y, tileSize);
-                final int indexSource = (sourceY * tileSize + sourceX) * 3;
+                final int sourceX = MathUtils.moduloPositive(sX + x, textureSize);
+                final int sourceY = MathUtils.moduloPositive(sY + y, textureSize);
+                final int indexSource = (sourceY * textureSize + sourceX) * 3;
 
                 final int destX = MathUtils.moduloPositive(dX + x, textureSize);
                 final int destY = MathUtils.moduloPositive(dY + y, textureSize);
@@ -213,7 +200,7 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         }
     }
 
-    private int powersUpTo(int value, final int max) {
+    private static int powersUpTo(int value, final int max) {
         int powers = 0;
         for (; value <= max; value *= 2, powers++) {
             System.out.println("value:" + value + " powers: " + powers);
@@ -223,30 +210,64 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     ReadOnlyColorRGBA[] terrainColors;
 
-    private void createMipmaps() {
+    public static void createTexture(final String fileName, final Function3D function,
+            final ReadOnlyColorRGBA[] terrainColors, final int sourceSize, final int textureSize) {
+        final int validLevels = powersUpTo(textureSize, sourceSize);
+
         int currentSize = sourceSize;
+
+        final ByteBuffer destBuffer = BufferUtils.createByteBuffer(textureSize * textureSize * 3);
+        final byte[] color = new byte[3];
 
         int diff = 1;
         for (int l = 0; l < validLevels; l++) {
-            ByteBuffer destBuffer = null;
             try {
-                destBuffer = new RandomAccessFile("texture" + l, "rw").getChannel().map(FileChannel.MapMode.READ_WRITE,
-                        0, currentSize * currentSize * 3);
+                final FileChannel out = new FileOutputStream(fileName + l).getChannel();
+
+                final int nrTiles = currentSize / textureSize;
+
+                for (int i = 0; i < nrTiles; i++) {
+                    for (int j = 0; j < nrTiles; j++) {
+                        destBuffer.rewind();
+                        for (int x = 0; x < textureSize; x++) {
+                            for (int y = 0; y < textureSize; y++) {
+                                final int xx = i * textureSize + x;
+                                final int yy = j * textureSize + y;
+
+                                // final byte noise = (byte) ((int) (ImprovedNoise.noise(xx * diff * 0.01, yy * diff
+                                // * 0.01, 0) * 255) & 0xff);
+
+                                // eval our function at the given slice and location
+                                double val = function.eval(xx * diff, yy * diff, 0);
+
+                                // Keep us in [-1, 1]
+                                val = MathUtils.clamp(val, -1, 1);
+
+                                // Convert to [0, 255]
+                                val = ((val + 1) * 0.5) * 255.0;
+
+                                // get us a color
+                                final byte colIndex = (byte) val;
+                                final ReadOnlyColorRGBA c = terrainColors[colIndex & 0xFF];
+
+                                // place color channels in byte array
+                                color[0] = (byte) (c.getRed() * 255);
+                                color[1] = (byte) (c.getGreen() * 255);
+                                color[2] = (byte) (c.getBlue() * 255);
+
+                                destBuffer.put(color);
+                            }
+                        }
+                        destBuffer.rewind();
+                        out.write(destBuffer);
+                    }
+                }
+
+                out.close();
             } catch (final FileNotFoundException ex) {
                 ex.printStackTrace();
             } catch (final IOException ex) {
                 ex.printStackTrace();
-            }
-
-            for (int y = 0; y < currentSize; y++) {
-                for (int x = 0; x < currentSize; x++) {
-                    final int destIndex = (y * currentSize + x) * 3;
-
-                    final byte noise = (byte) ((int) (ImprovedNoise.noise(x * diff * 0.01, y * diff * 0.01, 0) * 255) & 0xff);
-                    destBuffer.put(destIndex, noise);
-                    destBuffer.put(destIndex + 1, noise);
-                    destBuffer.put(destIndex + 2, noise);
-                }
             }
 
             currentSize /= 2;

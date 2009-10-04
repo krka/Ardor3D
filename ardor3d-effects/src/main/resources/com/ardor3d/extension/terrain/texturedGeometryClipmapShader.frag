@@ -10,7 +10,7 @@
  
  uniform sampler3D texture;
 uniform float levels;
-uniform vec2 sliceOffset[8];
+uniform vec2 sliceOffset[16];
 //uniform float maxLevel;
 uniform float validLevels;
 uniform float textureSize; 

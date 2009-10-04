@@ -62,11 +62,13 @@ public class TextureClipmap {
         this.textureSize = textureSize;
 
         validLevels = levels;
-        System.out.println("texture size: " + textureSize);
-        System.out.println("validLevels: " + validLevels);
 
         textureLevels = roundUpPowerTwo(validLevels);
         this.scale = scale;
+
+        System.out.println("texture size: " + textureSize);
+        System.out.println("validLevels: " + validLevels);
+        System.out.println("total number of levels: " + textureLevels);
 
         sliceDataBuffer = BufferUtils.createFloatBuffer(textureLevels * 2);
 
