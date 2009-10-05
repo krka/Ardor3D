@@ -388,6 +388,7 @@
       <structure name="input" type="com.ardor3d.extension.model.collada.binding.core.DaeInputShared"/>
     </collection>
     <structure field="pEntry" name="p" usage="optional"/>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeLinestrips" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -400,6 +401,7 @@
     <collection field="pEntries">
       <structure name="p" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray"/>
     </collection>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaePolygons" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -412,6 +414,7 @@
     <collection field="pEntries">
       <structure name="p" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray"/>
     </collection>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaePolylist" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -423,6 +426,7 @@
     </collection>
     <structure field="vCount" name="vcount" usage="optional"/>
     <structure field="pEntry" name="p" usage="optional"/>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeTriangles" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -433,6 +437,7 @@
       <structure name="input" type="com.ardor3d.extension.model.collada.binding.core.DaeInputShared"/>
     </collection>
     <structure field="pEntry" name="p" usage="optional"/>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeTrifans" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -445,6 +450,7 @@
     <collection field="pEntries">
       <structure name="p" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray"/>
     </collection>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeTristrips" abstract="true" post-set="postsetSpecifiedInAbstract">
@@ -457,6 +463,7 @@
     <collection field="pEntries">
       <structure name="p" type="com.ardor3d.extension.model.collada.binding.core.DaeSimpleIntegerArray"/>
     </collection>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <!-- /Mesh types -->
