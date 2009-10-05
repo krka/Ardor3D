@@ -40,7 +40,7 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         public FileChannel channel;
 
         public ByteBuffer cache[][];
-        public int tileX, tileY;
+        public int tileX = Integer.MAX_VALUE, tileY = Integer.MAX_VALUE;
 
         public AtomicBoolean ready = new AtomicBoolean(true);
 
@@ -106,7 +106,13 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         memData.tileY = tileY;
 
         if (memData.initialized) {
-            updateTiles(memData, tileX, tileY, diffX, diffY);
+            new Thread(new Runnable() {
+                public void run() {
+                    updateTiles(memData, tileX, tileY, diffX, diffY);
+
+                    // memData.ready.set(true);
+                }
+            }, "updateCache").start();
         } else {
             updateTiles(memData, tileX, tileY, cacheCount, cacheCount);
 
@@ -115,37 +121,31 @@ public class CachedFileTextureStreamer implements TextureStreamer {
     }
 
     private void updateTiles(final MemData memData, final int tileX, final int tileY, final int diffX, final int diffY) {
-        new Thread(new Runnable() {
-            public void run() {
-                if (diffX != 0) {
-                    final int sign = (int) Math.signum(diffX);
-                    final int diffSize = Math.abs(diffX);
-                    for (int i = 0; i < cacheCount; i++) {
-                        for (int j = 0; j < diffSize; j++) {
-                            final int startX = (tileX + (2 - j) * sign);
-                            final int startY = (tileY + i - 2);
+        if (diffX != 0) {
+            final int sign = (int) Math.signum(diffX);
+            final int diffSize = Math.abs(diffX);
+            for (int i = 0; i < cacheCount; i++) {
+                for (int j = 0; j < diffSize; j++) {
+                    final int startX = (tileX + (2 - j) * sign);
+                    final int startY = (tileY + i - 2);
 
-                            updateCache(startX, startY, memData);
-                        }
-                    }
+                    updateCache(startX, startY, memData);
                 }
-
-                if (diffY != 0) {
-                    final int sign = (int) Math.signum(diffY);
-                    final int diffSize = Math.abs(diffY);
-                    for (int i = 0; i < cacheCount; i++) {
-                        for (int j = 0; j < diffSize; j++) {
-                            final int startX = (tileX + i - 2);
-                            final int startY = (tileY + (2 - j) * sign);
-
-                            updateCache(startX, startY, memData);
-                        }
-                    }
-                }
-
-                // memData.ready.set(true);
             }
-        }, "updateCache").start();
+        }
+
+        if (diffY != 0) {
+            final int sign = (int) Math.signum(diffY);
+            final int diffSize = Math.abs(diffY);
+            for (int i = 0; i < cacheCount; i++) {
+                for (int j = 0; j < diffSize; j++) {
+                    final int startX = (tileX + i - 2);
+                    final int startY = (tileY + (2 - j) * sign);
+
+                    updateCache(startX, startY, memData);
+                }
+            }
+        }
     }
 
     private void updateCache(final int tileX, final int tileY, final MemData memData) {
@@ -204,8 +204,6 @@ public class CachedFileTextureStreamer implements TextureStreamer {
         }
         return powers;
     }
-
-    ReadOnlyColorRGBA[] terrainColors;
 
     public static void createTexture(final String fileName, final Function3D function,
             final ReadOnlyColorRGBA[] terrainColors, final int sourceSize, final int textureSize) {
