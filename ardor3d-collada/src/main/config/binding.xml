@@ -606,13 +606,20 @@
     <value name="name" set-method="setName" get-method="getName" style="attribute" usage="optional"/>
     <value name="target" field="target" style="attribute"/>
     <value name="symbol" field="symbol" style="attribute"/>
+    <collection field="binds" item-type="com.ardor3d.extension.model.collada.binding.fx.DaeBind" pre-set="postsetSpecifiedInAbstract"/>
     <collection field="bindVertexInputs" item-type="com.ardor3d.extension.model.collada.binding.fx.DaeBindVertexInput" pre-set="postsetSpecifiedInAbstract"/>
+    <structure name="extra" usage="optional"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeBindVertexInput" name="bind_vertex_input" post-set="postset">
     <value name="semantic" field="semantic" style="attribute"/>
     <value name="input_semantic" field="inputSemantic" style="attribute"/>
     <value name="input_set" field="inputSet" style="attribute" usage="optional"/>
+  </mapping>
+
+  <mapping class="com.ardor3d.extension.model.collada.binding.fx.DaeBind" name="bind" post-set="postset">
+    <value name="semantic" field="semantic" style="attribute" usage="optional"/>
+    <value name="target" field="target" style="attribute"/>
   </mapping>
 
   <mapping class="com.ardor3d.extension.model.collada.binding.core.DaeInstanceNode" abstract="true" post-set="postsetSpecifiedInAbstract">
