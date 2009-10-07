@@ -236,11 +236,6 @@ public class SimpleUIExample extends ExampleBase {
             };
         });
 
-        final Matrix3 rotate = new Matrix3();
-        final Vector3 axis = new Vector3(0, 0, 1).normalizeLocal();
-        rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
-        clockPanel.setRotation(rotate);
-
         return clockPanel;
     }
 
