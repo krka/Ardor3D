@@ -96,7 +96,7 @@ public class SimpleUIExample extends ExampleBase {
         final TextureState ts = new TextureState();
 
         final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, false);
+                Format.GuessNoCompression, true);
         ts.setTexture(tex);
         box.setRenderState(ts);
         _root.attachChild(box);
@@ -106,7 +106,9 @@ public class SimpleUIExample extends ExampleBase {
         panel.setLayout(new BorderLayout());
 
         final UIButton button = new UIButton("Button A");
-        button.setIcon(new SubTex(tex));
+        final Texture tex2 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+                Format.GuessNoCompression, false);
+        button.setIcon(new SubTex(tex2));
         button.setIconDimensions(new Dimension(26, 26));
         button.setGap(10);
         button.setLayoutData(BorderLayoutData.NORTH);
@@ -145,7 +147,7 @@ public class SimpleUIExample extends ExampleBase {
         panel.add(fpslabel);
 
         final UIPanel panel2 = new UIPanel();
-        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex), ColorRGBA.WHITE);
+        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex2), ColorRGBA.WHITE);
         imgBD.setAlignment(Alignment.BOTTOM_LEFT);
         imgBD.setStretch(StretchAxis.None);
         panel2.setBackdrop(imgBD);
@@ -154,8 +156,8 @@ public class SimpleUIExample extends ExampleBase {
         final UIPanel panel3 = makeClockPanel();
 
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
-        pane.add(panel, "panel 1");
-        pane.add(panel2, "panel 2");
+        pane.add(panel, "widgets");
+        pane.add(panel2, "image bg");
         pane.add(panel3, "clock");
 
         final UIFrame frame = new UIFrame("Sample");
@@ -168,6 +170,24 @@ public class SimpleUIExample extends ExampleBase {
         frame.setOpacity(1f);
         frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
+
+        // Uncomment #1...
+        // final Matrix3 rotate = new Matrix3();
+        // final Vector3 axis = new Vector3(0, 0, 1).normalizeLocal();
+        // rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
+        // frame.setRotation(rotate);
+
+        // Uncomment #2... (needs 1)
+        // frame.addController(new SpatialController<UIFrame>() {
+        // double angle = 0;
+        // public void update(final double time, final UIFrame caller) {
+        // angle += time * 10;
+        // angle %= 360;
+        // rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
+        // caller.setRotation(rotate);
+        // caller.fireComponentDirty();
+        // }
+        // });
 
         hud = new UIHud();
         hud.add(frame);
@@ -215,6 +235,12 @@ public class SimpleUIExample extends ExampleBase {
                 clockPanel.fireComponentDirty();
             };
         });
+
+        final Matrix3 rotate = new Matrix3();
+        final Vector3 axis = new Vector3(0, 0, 1).normalizeLocal();
+        rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
+        clockPanel.setRotation(rotate);
+
         return clockPanel;
     }
 
