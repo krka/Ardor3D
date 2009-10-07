@@ -74,14 +74,11 @@ public class MultiImageBackdrop extends SolidBackdrop {
 
             MultiImageBackdrop.getDimensions(entry, comp, bgwidth, bgheight, store);
 
-            store[0] += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
-                    * comp.getWorldScale().getX();
-            store[1] += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder()
-                    .getBottom())
-                    * comp.getWorldScale().getY();
+            store[0] += comp.getMargin().getLeft() + comp.getBorder().getLeft();
+            store[1] += comp.getMargin().getBottom() + comp.getBorder().getBottom();
 
             SubTexUtil.drawTransformedSubTex(renderer, entry, (int) Math.round(store[0]), (int) Math.round(store[1]),
-                    entry.getWidth(), entry.getHeight(), false);
+                    entry.getWidth(), entry.getHeight(), false, comp.getWorldTransform());
         }
     }
 

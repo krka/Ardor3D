@@ -12,6 +12,8 @@ package com.ardor3d.extension.ui.border;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
@@ -127,10 +129,18 @@ public class SolidBorder extends UIBorder {
 
         final float pAlpha = UIComponent.getCurrentOpacity();
 
-        SolidBorder._mesh.setWorldTranslation((int) (comp.getWorldTranslation().getX() + comp.getMargin().getLeft())
-                * comp.getWorldScale().getX(), (int) (comp.getWorldTranslation().getY() + comp.getMargin().getBottom())
-                * comp.getWorldScale().getY(), (int) comp.getWorldTranslation().getZ());
-        SolidBorder._mesh.setWorldScale(comp.getWorldScale());
+        final Vector3 v = Vector3.fetchTempInstance();
+        v.set(comp.getMargin().getLeft() + comp.getBorder().getLeft(), comp.getMargin().getBottom()
+                + comp.getBorder().getBottom(), 0);
+
+        final Transform t = Transform.fetchTempInstance();
+        t.set(comp.getWorldTransform());
+        t.applyForwardVector(v);
+        t.translate(v);
+        Vector3.releaseTempInstance(v);
+
+        SolidBorder._mesh.setWorldTransform(t);
+        Transform.releaseTempInstance(t);
 
         final int height = UIBorder.getBorderHeight(comp);
         final int width = UIBorder.getBorderWidth(comp);

@@ -17,6 +17,8 @@ import com.ardor3d.extension.ui.util.SubTexUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -117,6 +119,14 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
 
         updateMinimumSizeFromContents();
+    }
+
+    @Override
+    protected void updateChildren(final double time) {
+        super.updateChildren(time);
+        if (_text != null) {
+            _text.updateGeometricState(time);
+        }
     }
 
     @Override
@@ -232,11 +242,12 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
                 y = _alignment.alignY(getContentHeight(), _iconDimensions.getHeight());
             }
 
-            final double dix = getWorldTranslation().getX() + getTotalLeft();
-            final double diy = getWorldTranslation().getY() + getTotalBottom();
+            final double dix = getTotalLeft();
+            final double diy = getTotalBottom();
             // draw icon
-            SubTexUtil.drawSubTex(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth()
-                    * getWorldScale().getX(), _iconDimensions.getHeight() * getWorldScale().getY());
+            SubTexUtil
+                    .drawSubTex(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth() * getWorldScale().getX(),
+                            _iconDimensions.getHeight() * getWorldScale().getY(), getWorldTransform());
             // shift X over by width of icon and gap
             x += (_iconDimensions.getWidth() + _gap) * getWorldScale().getX();
         }
@@ -246,9 +257,26 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight())) * getWorldScale().getY();
 
             // set our text location
-            _text.setWorldTranslation(x + getWorldTranslation().getX() + getTotalLeft() * getWorldScale().getX(), y
-                    + getWorldTranslation().getY() + getTotalBottom() * getWorldScale().getY(), getWorldTranslation()
-                    .getZ());
+            final Vector3 v = Vector3.fetchTempInstance();
+            v.set(x + getTotalLeft(), y + getTotalBottom(), 0);
+
+            final Transform t = Transform.fetchTempInstance();
+            final Matrix3 m = Matrix3.fetchTempInstance();
+            t.set(getWorldTransform());
+            t.applyForwardVector(v);
+
+            // Add correction matrix to put text into XY plane.
+            t.getMatrix().multiply(AbstractLabelUIComponent.textCorrectionMat, m);
+            if (t.isRotationMatrix()) {
+                t.setRotation(m);
+            } else {
+                t.setMatrix(m);
+            }
+            t.translate(v);
+            Vector3.releaseTempInstance(v);
+
+            _text.setWorldTransform(t);
+            Transform.releaseTempInstance(t);
 
             // draw text using current foreground color and alpha.
             final ColorRGBA color = ColorRGBA.fetchTempInstance();
@@ -264,6 +292,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         return _text;
     }
 
+    static Matrix3 textCorrectionMat = new Matrix3().fromAngles(MathUtils.HALF_PI, 0, 0);
+
     // Create an instance of BMText for text rendering.
     private static BMText createText(final String text, final BMFont font) {
         final BMText tComp = new BMText("", text, font);
@@ -271,7 +301,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         tComp.setAutoScale(AutoScale.Off);
         tComp.setAutoRotate(false);
         tComp.setFontScale(font.getSize());
-        tComp.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
+        tComp.setRotation(AbstractLabelUIComponent.textCorrectionMat);
 
         final ZBufferState zState = new ZBufferState();
         zState.setEnabled(false);

@@ -76,12 +76,10 @@ public class ImageBackdrop extends SolidBackdrop {
         final double width = vals[2];
         final double height = vals[3];
 
-        x += (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
-                * comp.getWorldScale().getX();
-        y += (comp.getWorldTranslation().getY() + comp.getMargin().getBottom() + comp.getBorder().getBottom())
-                * comp.getWorldScale().getY();
+        x += comp.getMargin().getLeft() + comp.getBorder().getLeft();
+        y += comp.getMargin().getBottom() + comp.getBorder().getBottom();
 
-        SubTexUtil.drawSubTex(renderer, _image, x, y, width, height);
+        SubTexUtil.drawSubTex(renderer, _image, x, y, width, height, comp.getWorldTransform());
     }
 
     public void getDimensions(final UIComponent comp, final double[] vals) {

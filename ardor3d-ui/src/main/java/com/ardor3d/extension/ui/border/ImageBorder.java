@@ -143,35 +143,32 @@ public class ImageBorder extends UIBorder {
     @Override
     public void draw(final Renderer renderer, final UIComponent comp) {
 
-        final double scaleX = comp.getWorldScale().getX();
-        final double scaleY = comp.getWorldScale().getY();
-
         // get our general width and height
         final int borderWidth = UIBorder.getBorderWidth(comp);
         final int borderHeight = UIBorder.getBorderHeight(comp);
 
         // Figure out our bottom left corner
-        final double dX = comp.getWorldTranslation().getX() + comp.getMargin().getLeft() * scaleX;
-        final double dY = comp.getWorldTranslation().getY() + comp.getMargin().getBottom() * scaleY;
+        final double dX = comp.getMargin().getLeft();
+        final double dY = comp.getMargin().getBottom();
 
         {
             // draw bottom - stretched to fit
             double leftwidth = _bottomLeftCorner != null ? _bottomLeftCorner.getWidth() : 0;
             double rightwidth = _bottomRightCorner != null ? _bottomRightCorner.getWidth() : 0;
-            double x = dX + leftwidth * scaleX;
+            double x = dX + leftwidth;
             double y = dY;
-            double width = scaleX * (borderWidth - leftwidth - rightwidth);
-            double height = scaleY * _bottomEdge.getHeight();
-            SubTexUtil.drawSubTex(renderer, _bottomEdge, x, y, width, height);
+            double width = borderWidth - leftwidth - rightwidth;
+            double height = _bottomEdge.getHeight();
+            SubTexUtil.drawSubTex(renderer, _bottomEdge, x, y, width, height, comp.getWorldTransform());
 
             // draw top - stretched to fit
             leftwidth = _topLeftCorner != null ? _topLeftCorner.getWidth() : 0;
             rightwidth = _topRightCorner != null ? _topRightCorner.getWidth() : 0;
-            x = dX + leftwidth * scaleX;
-            y = dY + (borderHeight - _topEdge.getHeight()) * scaleY;
-            width = scaleX * (borderWidth - leftwidth - rightwidth);
-            height = scaleY * _topEdge.getHeight();
-            SubTexUtil.drawSubTex(renderer, _topEdge, x, y, width, height);
+            x = dX + leftwidth;
+            y = dY + (borderHeight - _topEdge.getHeight());
+            width = borderWidth - leftwidth - rightwidth;
+            height = _topEdge.getHeight();
+            SubTexUtil.drawSubTex(renderer, _topEdge, x, y, width, height, comp.getWorldTransform());
         }
 
         {
@@ -179,38 +176,38 @@ public class ImageBorder extends UIBorder {
             int bottomHeight = _bottomLeftCorner != null ? _bottomLeftCorner.getHeight() : _bottomEdge.getHeight();
             int topHeight = _topLeftCorner != null ? _topLeftCorner.getHeight() : _topEdge.getHeight();
             double x = dX;
-            double y = dY + bottomHeight * scaleY;
-            double width = scaleX * _leftEdge.getWidth();
-            double height = scaleY * (borderHeight - bottomHeight - topHeight);
-            SubTexUtil.drawSubTex(renderer, _leftEdge, x, y, width, height);
+            double y = dY + bottomHeight;
+            double width = _leftEdge.getWidth();
+            double height = borderHeight - bottomHeight - topHeight;
+            SubTexUtil.drawSubTex(renderer, _leftEdge, x, y, width, height, comp.getWorldTransform());
 
             // draw right - stretched to fit
             bottomHeight = _bottomRightCorner != null ? _bottomRightCorner.getHeight() : _bottomEdge.getHeight();
             topHeight = _topRightCorner != null ? _topRightCorner.getHeight() : _topEdge.getHeight();
-            x = dX + (borderWidth - _rightEdge.getWidth()) * scaleX;
-            y = dY + bottomHeight * scaleY;
-            width = scaleX * _rightEdge.getWidth();
-            height = scaleY * (borderHeight - bottomHeight - topHeight);
-            SubTexUtil.drawSubTex(renderer, _rightEdge, x, y, width, height);
+            x = dX + (borderWidth - _rightEdge.getWidth());
+            y = dY + bottomHeight;
+            width = _rightEdge.getWidth();
+            height = borderHeight - bottomHeight - topHeight;
+            SubTexUtil.drawSubTex(renderer, _rightEdge, x, y, width, height, comp.getWorldTransform());
         }
 
         // draw corners - not stretched
         if (_topLeftCorner != null) {
-            SubTexUtil.drawSubTex(renderer, _topLeftCorner, dX, dY + (borderHeight - _topLeftCorner.getHeight())
-                    * scaleY, _topLeftCorner.getWidth() * scaleX, _topLeftCorner.getHeight() * scaleY);
+            SubTexUtil.drawSubTex(renderer, _topLeftCorner, dX, dY + (borderHeight - _topLeftCorner.getHeight()),
+                    _topLeftCorner.getWidth(), _topLeftCorner.getHeight(), comp.getWorldTransform());
         }
         if (_bottomLeftCorner != null) {
-            SubTexUtil.drawSubTex(renderer, _bottomLeftCorner, dX, dY, _bottomLeftCorner.getWidth() * scaleX,
-                    _bottomLeftCorner.getHeight() * scaleY);
+            SubTexUtil.drawSubTex(renderer, _bottomLeftCorner, dX, dY, _bottomLeftCorner.getWidth(), _bottomLeftCorner
+                    .getHeight(), comp.getWorldTransform());
         }
         if (_topRightCorner != null) {
-            SubTexUtil.drawSubTex(renderer, _topRightCorner, dX + (borderWidth - _topRightCorner.getWidth()) * scaleX,
-                    dY + (borderHeight - _topRightCorner.getHeight()) * scaleY, _topRightCorner.getWidth() * scaleX,
-                    _topRightCorner.getHeight() * scaleY);
+            SubTexUtil.drawSubTex(renderer, _topRightCorner, dX + (borderWidth - _topRightCorner.getWidth()), dY
+                    + (borderHeight - _topRightCorner.getHeight()), _topRightCorner.getWidth(), _topRightCorner
+                    .getHeight(), comp.getWorldTransform());
         }
         if (_bottomRightCorner != null) {
-            SubTexUtil.drawSubTex(renderer, _bottomRightCorner, dX + (borderWidth - _bottomRightCorner.getWidth())
-                    * scaleX, dY, _bottomRightCorner.getWidth() * scaleX, _bottomRightCorner.getHeight() * scaleY);
+            SubTexUtil.drawSubTex(renderer, _bottomRightCorner, dX + (borderWidth - _bottomRightCorner.getWidth()), dY,
+                    _bottomRightCorner.getWidth(), _bottomRightCorner.getHeight(), comp.getWorldTransform());
         }
 
     }

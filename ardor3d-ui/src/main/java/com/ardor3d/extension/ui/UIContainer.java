@@ -23,6 +23,7 @@ import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
@@ -75,6 +76,9 @@ public abstract class UIContainer extends UIComponent {
 
     /** A texture renderer to use for cache operations. */
     protected static TextureRenderer _textureRenderer;
+
+    /** The minification filter to use for standin (if used) */
+    private MinificationFilter _minificationFilter = MinificationFilter.BilinearNoMipMaps;
 
     /**
      * Checks to see if a given UIComponent is in this container.
@@ -298,6 +302,7 @@ public abstract class UIContainer extends UIComponent {
             // hold onto our old translation
             final ReadOnlyVector3 wTrans = getWorldTranslation();
             final double x = wTrans.getX(), y = wTrans.getY(), z = wTrans.getZ();
+            final Matrix3 rot = Matrix3.fetchTempInstance().set(getWorldRotation());
 
             // set our new translation so that we are drawn in the bottom left corner of the texture.
             double newX = 0, newY = 0;
@@ -308,6 +313,7 @@ public abstract class UIContainer extends UIComponent {
                 newY = y;
             }
             setWorldTranslation(newX, newY, 0);
+            setWorldRotation(Matrix3.IDENTITY);
             updateWorldTransform(true, false);
 
             // draw to texture
@@ -315,6 +321,7 @@ public abstract class UIContainer extends UIComponent {
 
             // replace our old translation
             setWorldTranslation(x, y, z);
+            setWorldRotation(rot);
             updateWorldTransform(true);
 
             renderer.unsetOrtho();
@@ -402,6 +409,7 @@ public abstract class UIContainer extends UIComponent {
 
             // Position standin quad properly
             _standin.setWorldTranslation(x, y, getWorldTranslation().getZ());
+            _standin.setWorldRotation(getWorldRotation());
 
             final boolean clipTest = renderer.isClipTestEnabled();
             renderer.setClipTestEnabled(false);
@@ -448,10 +456,18 @@ public abstract class UIContainer extends UIComponent {
             UIContainer._textureRenderer.setMultipleTargets(true);
         }
 
+        // Update our standin's texture
+        resetFakeTexture();
+
+        // Update the standin, getting states, etc. all set.
+        _standin.updateGeometricState(0);
+    }
+
+    private void resetFakeTexture() {
         // create a texture to cache the contents to
         _fakeTexture = new Texture2D();
         _fakeTexture.setMagnificationFilter(MagnificationFilter.Bilinear);
-        _fakeTexture.setMinificationFilter(MinificationFilter.NearestNeighborNoMipMaps);
+        _fakeTexture.setMinificationFilter(_minificationFilter);
         _fakeTexture.setRenderToTextureFormat(Format.RGBA8);
         _fakeTexture.setWrap(WrapMode.EdgeClamp);
         UIContainer._textureRenderer.setupTexture(_fakeTexture);
@@ -460,9 +476,6 @@ public abstract class UIContainer extends UIComponent {
         final TextureState ts = new TextureState();
         ts.setTexture(_fakeTexture);
         _standin.setRenderState(ts);
-
-        // Update the standin, getting states, etc. all set.
-        _standin.updateGeometricState(0);
     }
 
     /**
@@ -538,5 +551,24 @@ public abstract class UIContainer extends UIComponent {
      */
     public static boolean isDrawingStandin() {
         return UIContainer._drawingStandin;
+    }
+
+    /**
+     * Set the minification filter for the standin.
+     * 
+     * @param filter
+     */
+    public void setMinificationFilter(final MinificationFilter filter) {
+        _minificationFilter = filter;
+        if (_fakeTexture != null) {
+            resetFakeTexture();
+        }
+    }
+
+    /**
+     * @return the minification filter used for standin.
+     */
+    public MinificationFilter getMinificationFilter() {
+        return _minificationFilter;
     }
 }

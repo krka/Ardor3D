@@ -13,6 +13,8 @@ package com.ardor3d.extension.ui.backdrop;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.UIQuad;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
@@ -70,12 +72,18 @@ public class SolidBackdrop extends UIBackdrop {
         _color.setAlpha(oldA * UIComponent.getCurrentOpacity());
         SolidBackdrop._standin.setDefaultColor(_color);
 
-        SolidBackdrop._standin.setWorldTranslation(
-                (comp.getWorldTranslation().getX() + comp.getMargin().getLeft() + comp.getBorder().getLeft())
-                        * comp.getWorldScale().getX(), (comp.getWorldTranslation().getY()
-                        + comp.getMargin().getBottom() + comp.getBorder().getBottom())
-                        * comp.getWorldScale().getY(), comp.getWorldTranslation().getZ());
-        SolidBackdrop._standin.setWorldScale(comp.getWorldScale());
+        final Vector3 v = Vector3.fetchTempInstance();
+        v.set(comp.getMargin().getLeft() + comp.getBorder().getLeft(), comp.getMargin().getBottom()
+                + comp.getBorder().getBottom(), 0);
+
+        final Transform t = Transform.fetchTempInstance();
+        t.set(comp.getWorldTransform());
+        t.applyForwardVector(v);
+        t.translate(v);
+        Vector3.releaseTempInstance(v);
+
+        SolidBackdrop._standin.setWorldTransform(t);
+        Transform.releaseTempInstance(t);
 
         final float width = UIBackdrop.getBackdropWidth(comp);
         final float height = UIBackdrop.getBackdropHeight(comp);

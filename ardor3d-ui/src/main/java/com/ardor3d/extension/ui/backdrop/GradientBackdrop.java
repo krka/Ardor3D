@@ -12,6 +12,8 @@ package com.ardor3d.extension.ui.backdrop;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
@@ -31,7 +33,7 @@ public class GradientBackdrop extends UIBackdrop {
     private final ColorRGBA _bottomLeft = new ColorRGBA(ColorRGBA.GRAY);
     private final ColorRGBA _bottomRight = new ColorRGBA(ColorRGBA.DARK_GRAY);
 
-    private static Mesh mesh = GradientBackdrop.createMesh();
+    private static Mesh _mesh = GradientBackdrop.createMesh();
     private static final float[] _vals = new float[12];
     private static final float[] _cVals = new float[16];
 
@@ -93,10 +95,18 @@ public class GradientBackdrop extends UIBackdrop {
 
         final float pAlpha = UIComponent.getCurrentOpacity();
 
-        GradientBackdrop.mesh.setWorldTranslation(comp.getWorldTranslation().getX() + comp.getMargin().getLeft()
-                + comp.getBorder().getLeft(), comp.getWorldTranslation().getY() + comp.getMargin().getBottom()
-                + comp.getBorder().getBottom(), comp.getWorldTranslation().getZ());
-        GradientBackdrop.mesh.setWorldScale(comp.getWorldScale());
+        final Vector3 v = Vector3.fetchTempInstance();
+        v.set(comp.getMargin().getLeft() + comp.getBorder().getLeft(), comp.getMargin().getBottom()
+                + comp.getBorder().getBottom(), 0);
+
+        final Transform t = Transform.fetchTempInstance();
+        t.set(comp.getWorldTransform());
+        t.applyForwardVector(v);
+        t.translate(v);
+        Vector3.releaseTempInstance(v);
+
+        GradientBackdrop._mesh.setWorldTransform(t);
+        Transform.releaseTempInstance(t);
 
         final int width = UIBackdrop.getBackdropWidth(comp);
         final int height = UIBackdrop.getBackdropHeight(comp);
@@ -127,13 +137,13 @@ public class GradientBackdrop extends UIBackdrop {
         GradientBackdrop._cVals[14] = _topLeft.getBlue();
         GradientBackdrop._cVals[15] = _topLeft.getAlpha() * pAlpha;
 
-        GradientBackdrop.mesh.getMeshData().getVertexBuffer().rewind();
-        GradientBackdrop.mesh.getMeshData().getVertexBuffer().put(GradientBackdrop._vals);
+        GradientBackdrop._mesh.getMeshData().getVertexBuffer().rewind();
+        GradientBackdrop._mesh.getMeshData().getVertexBuffer().put(GradientBackdrop._vals);
 
-        GradientBackdrop.mesh.getMeshData().getColorBuffer().rewind();
-        GradientBackdrop.mesh.getMeshData().getColorBuffer().put(GradientBackdrop._cVals);
+        GradientBackdrop._mesh.getMeshData().getColorBuffer().rewind();
+        GradientBackdrop._mesh.getMeshData().getColorBuffer().put(GradientBackdrop._cVals);
 
-        GradientBackdrop.mesh.render(renderer);
+        GradientBackdrop._mesh.render(renderer);
     }
 
     private static Mesh createMesh() {

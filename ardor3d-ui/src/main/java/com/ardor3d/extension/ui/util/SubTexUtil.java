@@ -13,6 +13,8 @@ package com.ardor3d.extension.ui.util;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.BlendState;
@@ -47,7 +49,7 @@ public class SubTexUtil {
      *            the y coordinate of the screen location to draw at
      */
     public static void drawSubTex(final Renderer renderer, final SubTex subTex, final int x, final int y) {
-        SubTexUtil.drawSubTex(renderer, subTex, x, y, subTex.getWidth(), subTex.getHeight(), false);
+        SubTexUtil.drawSubTex(renderer, subTex, x, y, subTex.getWidth(), subTex.getHeight(), false, null);
     }
 
     /**
@@ -66,10 +68,37 @@ public class SubTexUtil {
      *            the width in screen pixels to use when drawing the SubTex.
      * @param height
      *            the height in screen pixels to use when drawing the SubTex.
+     * @param appliedTransform
+     *            an optional transform to apply to the rendered subtex
      */
     public static void drawSubTex(final Renderer renderer, final SubTex subTex, final int x, final int y,
-            final int width, final int height) {
-        SubTexUtil.drawSubTex(renderer, subTex, x, y, width, height, false);
+            final int width, final int height, final ReadOnlyTransform appliedTransform) {
+        SubTexUtil.drawSubTex(renderer, subTex, x, y, width, height, false, appliedTransform);
+    }
+
+    /**
+     * Draw the given SubTex to the screen at the given location. Use the given width and height instead of those
+     * supplied in the SubTex.
+     * 
+     * @param renderer
+     *            the renderer to use
+     * @param subTex
+     *            the SubTex to draw
+     * @param x
+     *            the x coordinate of the screen location to draw at
+     * @param y
+     *            the y coordinate of the screen location to draw at
+     * @param width
+     *            the width in screen pixels to use when drawing the SubTex.
+     * @param height
+     *            the height in screen pixels to use when drawing the SubTex.
+     * @param appliedTransform
+     *            an optional transform to apply to the rendered subtex
+     */
+    public static void drawSubTex(final Renderer renderer, final SubTex subTex, final double x, final double y,
+            final double width, final double height, final ReadOnlyTransform appliedTransform) {
+        SubTexUtil.drawSubTex(renderer, subTex, (int) Math.round(x), (int) Math.round(y), (int) Math.round(width),
+                (int) Math.round(height), false, appliedTransform);
     }
 
     /**
@@ -92,7 +121,7 @@ public class SubTexUtil {
     public static void drawSubTex(final Renderer renderer, final SubTex subTex, final double x, final double y,
             final double width, final double height) {
         SubTexUtil.drawSubTex(renderer, subTex, (int) Math.round(x), (int) Math.round(y), (int) Math.round(width),
-                (int) Math.round(height), false);
+                (int) Math.round(height), false, null);
     }
 
     /**
@@ -104,18 +133,20 @@ public class SubTexUtil {
      * @param subTex
      *            the SubTex to draw
      * @param x
-     *            the x coordinate of the screen location to draw at
+     *            the x offset to draw at
      * @param y
-     *            the y coordinate of the screen location to draw at
+     *            the y offset to draw at
      * @param width
      *            the width in screen pixels to use when drawing the SubTex.
      * @param height
      *            the height in screen pixels to use when drawing the SubTex.
      * @param flipVertical
      *            if true, invert the image vertically before drawing
+     * @param appliedTransform
+     *            an optional transform to apply to the rendered subtex
      */
     public static void drawSubTex(final Renderer renderer, final SubTex subTex, final int x, final int y,
-            final int width, final int height, final boolean flipVertical) {
+            final int width, final int height, final boolean flipVertical, final ReadOnlyTransform appliedTransform) {
 
         if (width == 0 || height == 0 || subTex == null || subTex.getTexture() == null) {
             return; // no need to draw
@@ -177,9 +208,15 @@ public class SubTexUtil {
         SubTexUtil._vals[6] = 0;
         SubTexUtil._vals[7] = height;
 
-        // set screen space offsets
-        SubTexUtil._mesh.setWorldTransform(Transform.IDENTITY);
-        SubTexUtil._mesh.setWorldTranslation(x, y, 0);
+        // Set our transform
+        final ReadOnlyTransform worldT = appliedTransform != null ? appliedTransform : Transform.IDENTITY;
+        final Vector3 v = Vector3.fetchTempInstance();
+        v.set(x, y, 0);
+        SubTexUtil._helperT.set(worldT);
+        SubTexUtil._helperT.applyForwardVector(v);
+        SubTexUtil._helperT.translate(v);
+        Vector3.releaseTempInstance(v);
+        SubTexUtil._mesh.setWorldTransform(SubTexUtil._helperT);
 
         // set our vertices into the mesh
         SubTexUtil._mesh.getMeshData().getVertexBuffer().rewind();
@@ -211,9 +248,12 @@ public class SubTexUtil {
      *            the height in screen pixels to use when drawing the TransformedSubTex.
      * @param flipVertical
      *            if true, invert the image vertically before drawing
+     * @param appliedTransform
+     *            an optional transform to apply to the rendered subtex
      */
     public static void drawTransformedSubTex(final Renderer renderer, final TransformedSubTex subTex, final int x,
-            final int y, final int width, final int height, final boolean flipVertical) {
+            final int y, final int width, final int height, final boolean flipVertical,
+            final ReadOnlyTransform appliedTransform) {
 
         if (width == 0 || height == 0 || subTex == null || subTex.getTexture() == null) {
             return; // no need to draw
@@ -279,9 +319,14 @@ public class SubTexUtil {
         SubTexUtil._vals[6] = leftW;
         SubTexUtil._vals[7] = rightH;
 
-        // set screen space offsets
-        SubTexUtil._helperT.set(subTex.getTransform());
-        SubTexUtil._helperT.translate(x, y, 0);
+        // Set our transform
+        final ReadOnlyTransform worldT = appliedTransform != null ? appliedTransform : Transform.IDENTITY;
+        final Vector3 v = Vector3.fetchTempInstance();
+        v.set(x, y, 0);
+        worldT.applyForwardVector(v);
+        worldT.multiply(subTex.getTransform(), SubTexUtil._helperT);
+        SubTexUtil._helperT.translate(v);
+        Vector3.releaseTempInstance(v);
         SubTexUtil._mesh.setWorldTransform(SubTexUtil._helperT);
 
         // set our vertices into the mesh

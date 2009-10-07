@@ -27,6 +27,7 @@ import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
@@ -856,8 +857,13 @@ public abstract class UIComponent extends Node {
      *         at the border level or deeper.)
      */
     public boolean insideMargin(final int hudX, final int hudY) {
-        final int x = hudX - getMargin().getLeft() - getHudX();
-        final int y = hudY - getMargin().getBottom() - getHudY();
+        final Vector3 vec = Vector3.fetchTempInstance();
+        vec.set(hudX, hudY, 0);
+        getWorldTransform().applyInverse(vec);
+
+        final double x = vec.getX() - getMargin().getLeft();
+        final double y = vec.getY() - getMargin().getBottom();
+        Vector3.releaseTempInstance(vec);
 
         return x >= 0
                 && x < (getComponentWidth() - getMargin().getLeft() - getMargin().getRight()) * getWorldScale().getX()
@@ -898,13 +904,18 @@ public abstract class UIComponent extends Node {
 
         final Node parent = getParent();
         if (parent instanceof UIComponent) {
-            // only translate.
             final UIComponent gPar = (UIComponent) parent;
+            final Vector3 v = Vector3.fetchTempInstance();
+            v.set(gPar.getTotalLeft(), gPar.getTotalBottom(), 0);
+
             final Transform t = Transform.fetchTempInstance();
             t.set(getWorldTransform());
-            t.translate(gPar.getTotalLeft() * gPar.getWorldScale().getX(), gPar.getTotalBottom()
-                    * gPar.getWorldScale().getY(), 0);
+            t.applyForwardVector(v);
+            t.translate(v);
+            Vector3.releaseTempInstance(v);
+
             setWorldTransform(t);
+
             Transform.releaseTempInstance(t);
         }
         if (recurse) {

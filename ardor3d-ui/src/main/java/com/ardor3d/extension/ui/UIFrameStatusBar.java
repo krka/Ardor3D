@@ -14,6 +14,7 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.input.InputState;
+import com.ardor3d.math.Vector3;
 
 /**
  * This panel extension defines a frame status bar (used at the bottom of a frame) with a text label and resize handle.
@@ -75,23 +76,35 @@ public class UIFrameStatusBar extends UIPanel {
         private int _oldY = 0;
 
         public void startDrag(final int mouseX, final int mouseY) {
-            _oldX = mouseX;
-            _oldY = mouseY;
+            final Vector3 vec = Vector3.fetchTempInstance();
+            vec.set(mouseX, mouseY, 0);
+            getWorldTransform().applyInverse(vec);
+
+            _oldX = Math.round(vec.getXf());
+            _oldY = Math.round(vec.getYf());
+            Vector3.releaseTempInstance(vec);
         }
 
         public void drag(final int mouseX, final int mouseY) {
+            final Vector3 vec = Vector3.fetchTempInstance();
+            vec.set(mouseX, mouseY, 0);
+            getWorldTransform().applyInverse(vec);
+
+            final int x = Math.round(vec.getXf());
+            final int y = Math.round(vec.getYf());
+
             final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
 
             // Set the new width to the current width + the change in mouse x position.
-            int newWidth = frame.getComponentWidth() + (int) ((mouseX - _oldX) / getWorldScale().getX());
+            int newWidth = frame.getComponentWidth() + x - _oldX;
             if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
                 // don't let us get smaller than min size
                 newWidth = UIFrame.MIN_FRAME_WIDTH;
             }
 
             // Set the new height to the current width + the change in mouse y position.
-            int heightDif = mouseY - _oldY;
-            int newHeight = frame.getComponentHeight() + (int) ((_oldY - mouseY) / getWorldScale().getY());
+            int heightDif = y - _oldY;
+            int newHeight = frame.getComponentHeight() + _oldY - y;
             if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
                 // don't let us get smaller than min size
                 newHeight = UIFrame.MIN_FRAME_HEIGHT;
@@ -99,11 +112,16 @@ public class UIFrameStatusBar extends UIPanel {
             }
 
             frame.setComponentSize(newWidth, newHeight);
-            frame.addTranslation(0, heightDif, 0);
+
+            vec.set(0, heightDif, 0);
+            getWorldTransform().applyForwardVector(vec);
+            frame.addTranslation(vec);
+            Vector3.releaseTempInstance(vec);
+
             frame.layout();
 
-            _oldX = mouseX;
-            _oldY = mouseY;
+            _oldX = x;
+            _oldY = y - heightDif;
         }
 
         public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
