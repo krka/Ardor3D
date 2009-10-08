@@ -50,8 +50,14 @@ public abstract class UIBorder extends Insets {
      * @return the height
      */
     public static int getBorderHeight(final UIComponent component) {
-        return component.getContentHeight() + component.getPadding().getTop() + component.getPadding().getBottom()
-                + component.getBorder().getTop() + component.getBorder().getBottom();
+        int height = component.getContentHeight();
+        if (component.getPadding() != null) {
+            height += component.getPadding().getTop() + component.getPadding().getBottom();
+        }
+        if (component.getBorder() != null) {
+            height += component.getBorder().getTop() + component.getBorder().getBottom();
+        }
+        return height;
     }
 
     /**
@@ -63,8 +69,13 @@ public abstract class UIBorder extends Insets {
      * @return the width
      */
     public static int getBorderWidth(final UIComponent component) {
-        return component.getContentWidth() + component.getPadding().getRight() + component.getPadding().getLeft()
-                + component.getBorder().getRight() + component.getBorder().getLeft();
+        int height = component.getContentWidth();
+        if (component.getPadding() != null) {
+            height += component.getPadding().getLeft() + component.getPadding().getRight();
+        }
+        if (component.getBorder() != null) {
+            height += component.getBorder().getLeft() + component.getBorder().getRight();
+        }
+        return height;
     }
-
 }

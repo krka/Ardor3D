@@ -81,8 +81,8 @@ public class GenericSkin extends Skin {
     @Override
     protected void applyToTab(final UITab component) {
 
-        component.getMargin().set(1, 1, 1, 1);
-        component.getPadding().set(2, 14, 2, 14);
+        component.setMargin(new Insets(1, 1, 1, 1));
+        component.setPadding(new Insets(2, 14, 2, 14));
 
         // State values...
         final UIBorder defaultBorder = new ImageBorder(
@@ -226,8 +226,8 @@ public class GenericSkin extends Skin {
     @Override
     protected void applyToButton(final UIButton component) {
 
-        component.getMargin().set(1, 1, 1, 1);
-        component.getPadding().set(2, 14, 2, 14);
+        component.setMargin(new Insets(1, 1, 1, 1));
+        component.setPadding(new Insets(2, 14, 2, 14));
 
         // State values...
         final UIBorder defaultBorder = new ImageBorder(
@@ -335,8 +335,8 @@ public class GenericSkin extends Skin {
     @Override
     protected void applyToCheckBox(final UICheckBox component) {
 
-        component.getMargin().set(1, 1, 1, 1);
-        component.getPadding().set(1, 1, 1, 1);
+        component.setMargin(new Insets(1, 1, 1, 1));
+        component.setPadding(new Insets(1, 1, 1, 1));
         component.setBorder(new EmptyBorder());
         component.setBackdrop(new EmptyBackdrop());
         component.setAlignment(Alignment.LEFT);
@@ -566,8 +566,8 @@ public class GenericSkin extends Skin {
     @Override
     protected void applyToRadioButton(final UIRadioButton component) {
 
-        component.getMargin().set(1, 1, 1, 1);
-        component.getPadding().set(1, 1, 1, 1);
+        component.setMargin(new Insets(1, 1, 1, 1));
+        component.setPadding(new Insets(1, 1, 1, 1));
         component.setBorder(new EmptyBorder());
         component.setBackdrop(new EmptyBackdrop());
         component.setAlignment(Alignment.LEFT);

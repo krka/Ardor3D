@@ -37,7 +37,11 @@ public abstract class UIBackdrop {
      * @return the height as described above
      */
     public static int getBackdropHeight(final UIComponent component) {
-        return component.getContentHeight() + component.getPadding().getTop() + component.getPadding().getBottom();
+        if (component.getPadding() == null) {
+            return component.getContentHeight();
+        } else {
+            return component.getContentHeight() + component.getPadding().getTop() + component.getPadding().getBottom();
+        }
     }
 
     /**
@@ -49,6 +53,10 @@ public abstract class UIBackdrop {
      * @return the width as described above
      */
     public static int getBackdropWidth(final UIComponent component) {
-        return component.getContentWidth() + component.getPadding().getRight() + component.getPadding().getLeft();
+        if (component.getPadding() == null) {
+            return component.getContentWidth();
+        } else {
+            return component.getContentWidth() + component.getPadding().getRight() + component.getPadding().getLeft();
+        }
     }
 }
