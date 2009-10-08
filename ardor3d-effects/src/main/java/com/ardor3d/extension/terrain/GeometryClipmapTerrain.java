@@ -86,6 +86,7 @@ public class GeometryClipmapTerrain extends Node {
         } catch (final Exception ex) {
             ex.printStackTrace();
         }
+        updateShader();
     }
 
     @Override
@@ -255,5 +256,13 @@ public class GeometryClipmapTerrain extends Node {
             final ClipmapLevel clip = _clips.get(i);
             clip.setHeightRange(heightRangeMin, heightRangeMax);
         }
+    }
+
+    public GLSLShaderObjectsState getGeometryClipmapShader() {
+        return _geometryClipmapShader;
+    }
+
+    public void setGeometryClipmapShader(final GLSLShaderObjectsState shaderState) {
+        _geometryClipmapShader = shaderState;
     }
 }
