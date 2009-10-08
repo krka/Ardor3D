@@ -183,14 +183,16 @@ public class GeometryClipmapTerrain extends Node {
                     shader.setUniform("vertexDistance", (float) ((ClipmapLevel) mesh).getVertexDistance());
                 }
             });
-
-            // setRenderState(_geometryClipmapShader);
-            for (int i = _clips.size() - 1; i >= 0; i--) {
-                final ClipmapLevel clip = _clips.get(i);
-                clip.setRenderState(_geometryClipmapShader);
-            }
+            applyToClips();
         }
         updateWorldRenderStates(false);
+    }
+
+    protected void applyToClips() {
+        for (int i = _clips.size() - 1; i >= 0; i--) {
+            final ClipmapLevel clip = _clips.get(i);
+            clip.setRenderState(_geometryClipmapShader);
+        }
     }
 
     public void regenerate() {
@@ -263,5 +265,6 @@ public class GeometryClipmapTerrain extends Node {
 
     public void setGeometryClipmapShader(final GLSLShaderObjectsState shaderState) {
         _geometryClipmapShader = shaderState;
+        applyToClips();
     }
 }
