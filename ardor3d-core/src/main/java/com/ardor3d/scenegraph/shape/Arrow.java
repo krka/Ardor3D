@@ -12,9 +12,9 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -95,7 +95,7 @@ public class Arrow extends Node {
         _width = width;
     }
 
-    public void setSolidColor(final ColorRGBA color) {
+    public void setSolidColor(final ReadOnlyColorRGBA color) {
         for (int x = 0; x < getNumberOfChildren(); x++) {
             if (getChild(x) instanceof Mesh) {
                 ((Mesh) getChild(x)).setSolidColor(color);
@@ -103,7 +103,7 @@ public class Arrow extends Node {
         }
     }
 
-    public void setDefaultColor(final ColorRGBA color) {
+    public void setDefaultColor(final ReadOnlyColorRGBA color) {
         for (int x = 0; x < getNumberOfChildren(); x++) {
             if (getChild(x) instanceof Mesh) {
                 ((Mesh) getChild(x)).setDefaultColor(color);
