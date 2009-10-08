@@ -23,11 +23,12 @@ import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
-import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
-import com.ardor3d.extension.ui.backdrop.ImageBackdrop.StretchAxis;
+import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.extension.ui.layout.GridLayout;
+import com.ardor3d.extension.ui.layout.GridLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
@@ -101,14 +102,88 @@ public class SimpleUIExample extends ExampleBase {
         box.setRenderState(ts);
         _root.attachChild(box);
 
+        final UIPanel panel = makeWidgetPanel();
+
+        final UIPanel panel2 = makeLoginPanel();
+
+        final UIPanel panel3 = makeClockPanel();
+
+        final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
+        pane.add(panel, "widgets");
+        pane.add(panel2, "grid");
+        pane.add(panel3, "clock");
+
+        final UIFrame frame = new UIFrame("Sample");
+        frame.setContentPanel(pane);
+        frame.updateMinimumSizeFromContents();
+        frame.layout();
+        frame.pack();
+
+        frame.setUseStandin(true);
+        frame.setOpacity(1f);
+        frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
+        frame.setName("sample");
+
+        // Uncomment #1...
+        // final Matrix3 rotate = new Matrix3();
+        // final Vector3 axis = new Vector3(0, 0, 1).normalizeLocal();
+        // rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
+        // frame.setRotation(rotate);
+
+        // Uncomment #2... (needs 1)
+        // frame.addController(new SpatialController<UIFrame>() {
+        // double angle = 0;
+        // public void update(final double time, final UIFrame caller) {
+        // angle += time * 10;
+        // angle %= 360;
+        // rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
+        // caller.setRotation(rotate);
+        // caller.fireComponentDirty();
+        // }
+        // });
+
+        hud = new UIHud();
+        hud.add(frame);
+        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+    }
+
+    private UIPanel makeLoginPanel() {
+        final UIPanel pLogin = new UIPanel(new GridLayout());
+        final UILabel lHeader = new UILabel("Log in to server xyz");
+        lHeader.setLayoutData(new GridLayoutData(2, true, true));
+        final UILabel lName = new UILabel("Name");
+        // will be replaced by a text field
+        final UILabel tfName = new UILabel("player1");
+        tfName.setLayoutData(GridLayoutData.WrapAndGrow);
+        final UILabel lPassword = new UILabel("Password");
+        // will be replaced by a password field
+        final UILabel tfPassword = new UILabel("*********");
+        tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
+        final UIButton btLogin = new UIButton("login");
+        btLogin.addActionListener(new ActionListener() {
+            public void actionPerformed() {
+                System.out.println("login pressed!");
+            }
+        });
+        pLogin.add(lHeader);
+        pLogin.add(lName);
+        pLogin.add(tfName);
+        pLogin.add(lPassword);
+        pLogin.add(tfPassword);
+        pLogin.add(btLogin);
+        return pLogin;
+    }
+
+    private UIPanel makeWidgetPanel() {
+
         final UIPanel panel = new UIPanel();
         panel.setForegroundColor(ColorRGBA.DARK_GRAY);
         panel.setLayout(new BorderLayout());
 
         final UIButton button = new UIButton("Button A");
-        final Texture tex2 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
+        final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.GuessNoCompression, false);
-        button.setIcon(new SubTex(tex2));
+        button.setIcon(new SubTex(tex));
         button.setIconDimensions(new Dimension(26, 26));
         button.setGap(10);
         button.setLayoutData(BorderLayoutData.NORTH);
@@ -145,53 +220,7 @@ public class SimpleUIExample extends ExampleBase {
         fpslabel = new UILabel("FPS");
         fpslabel.setLayoutData(BorderLayoutData.SOUTH);
         panel.add(fpslabel);
-
-        final UIPanel panel2 = new UIPanel();
-        final ImageBackdrop imgBD = new ImageBackdrop(new SubTex(tex2), ColorRGBA.WHITE);
-        imgBD.setAlignment(Alignment.BOTTOM_LEFT);
-        imgBD.setStretch(StretchAxis.None);
-        panel2.setBackdrop(imgBD);
-        panel2.add(new UILabel("You are on panel two."));
-
-        final UIPanel panel3 = makeClockPanel();
-
-        final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
-        pane.add(panel, "widgets");
-        pane.add(panel2, "image bg");
-        pane.add(panel3, "clock");
-
-        final UIFrame frame = new UIFrame("Sample");
-        frame.setContentPanel(pane);
-        frame.updateMinimumSizeFromContents();
-        frame.layout();
-        frame.pack();
-
-        frame.setUseStandin(true);
-        frame.setOpacity(1f);
-        frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
-        frame.setName("sample");
-
-        // Uncomment #1...
-        // final Matrix3 rotate = new Matrix3();
-        // final Vector3 axis = new Vector3(0, 0, 1).normalizeLocal();
-        // rotate.fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, axis);
-        // frame.setRotation(rotate);
-
-        // Uncomment #2... (needs 1)
-        // frame.addController(new SpatialController<UIFrame>() {
-        // double angle = 0;
-        // public void update(final double time, final UIFrame caller) {
-        // angle += time * 10;
-        // angle %= 360;
-        // rotate.fromAngleNormalAxis(angle * MathUtils.DEG_TO_RAD, axis);
-        // caller.setRotation(rotate);
-        // caller.fireComponentDirty();
-        // }
-        // });
-
-        hud = new UIHud();
-        hud.add(frame);
-        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        return panel;
     }
 
     private UIPanel makeClockPanel() {
