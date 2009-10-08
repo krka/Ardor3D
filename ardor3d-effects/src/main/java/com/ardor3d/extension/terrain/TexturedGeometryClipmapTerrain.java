@@ -284,4 +284,12 @@ public class TexturedGeometryClipmapTerrain extends Node {
     public TextureClipmap getTextureClipmap() {
         return _textureClipmap;
     }
+
+    public GLSLShaderObjectsState getGeometryClipmapShader() {
+        return _geometryClipmapShader;
+    }
+
+    public void setGeometryClipmapShader(final GLSLShaderObjectsState shaderState) {
+        _geometryClipmapShader = shaderState;
+    }
 }
