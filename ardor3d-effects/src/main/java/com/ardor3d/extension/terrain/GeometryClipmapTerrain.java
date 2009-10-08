@@ -86,7 +86,6 @@ public class GeometryClipmapTerrain extends Node {
         } catch (final Exception ex) {
             ex.printStackTrace();
         }
-        updateShader();
     }
 
     @Override
