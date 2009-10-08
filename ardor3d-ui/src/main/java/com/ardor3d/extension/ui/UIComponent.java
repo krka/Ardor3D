@@ -865,10 +865,8 @@ public abstract class UIComponent extends Node {
         final double y = vec.getY() - getMargin().getBottom();
         Vector3.releaseTempInstance(vec);
 
-        return x >= 0
-                && x < (getComponentWidth() - getMargin().getLeft() - getMargin().getRight()) * getWorldScale().getX()
-                && y >= 0
-                && y < (getComponentHeight() - getMargin().getBottom() - getMargin().getTop()) * getWorldScale().getY();
+        return x >= 0 && x < getComponentWidth() - getMargin().getLeft() - getMargin().getRight() && y >= 0
+                && y < getComponentHeight() - getMargin().getBottom() - getMargin().getTop();
     }
 
     /**
