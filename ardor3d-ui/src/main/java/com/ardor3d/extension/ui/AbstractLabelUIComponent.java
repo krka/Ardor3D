@@ -214,6 +214,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         double x = 0;
         double y = 0;
         int width = 0;
+        final boolean hasText = _text != null && _text.getText() != null;
 
         // Gather our width... check for icon and text and gap.
         if (_icon != null) {
@@ -221,12 +222,12 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             if (getText() != null && getText().length() > 0) {
                 width += _gap;
             }
-        } else if (getText() == null) {
-            // not text OR icon, so no content to render.
+        } else if (!hasText) {
+            // no text OR icon, so no content to render.
             return;
         }
 
-        if (getText() != null) {
+        if (hasText) {
             width += Math.round(_text.getWidth());
         }
 
@@ -235,7 +236,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         if (_icon != null) {
             // find bottom most y location of icon based on alignment.
-            if (_text != null && _text.getHeight() > _iconDimensions.getHeight()) {
+            if (hasText && _text.getHeight() > _iconDimensions.getHeight()) {
                 final int trailing = _text.getFont().getLineHeight() - _text.getFont().getBaseHeight();
                 y = _alignment.alignY(getContentHeight() - trailing, _iconDimensions.getHeight()) + trailing - 1;
             } else {
@@ -252,7 +253,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             x += (_iconDimensions.getWidth() + _gap) * getWorldScale().getX();
         }
 
-        if (getText() != null) {
+        if (hasText) {
             // find bottom most y location of text based on alignment.
             y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight())) * getWorldScale().getY();
 
