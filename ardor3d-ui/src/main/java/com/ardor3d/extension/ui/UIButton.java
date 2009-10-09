@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
@@ -53,6 +54,9 @@ public class UIButton extends AbstractLabelUIComponent {
 
     /** ButtonGroup this button belongs to. */
     private ButtonGroup _group = null;
+
+    /** Configurable action command */
+    private String _actionCommand = null;
 
     /**
      * Construct a new, blank button
@@ -131,8 +135,9 @@ public class UIButton extends AbstractLabelUIComponent {
         if (!isEnabled()) {
             return;
         }
+        final ActionEvent event = new ActionEvent(this);
         for (final ActionListener l : _listeners) {
-            l.actionPerformed();
+            l.actionPerformed(event);
         }
     }
 
@@ -321,6 +326,18 @@ public class UIButton extends AbstractLabelUIComponent {
         getMouseOverSelectedState().setIcon(icon);
         getPressedState().setIcon(icon);
         getSelectedState().setIcon(icon);
+    }
+
+    public String getActionCommand() {
+        if (_actionCommand == null) {
+            return getText();
+        } else {
+            return _actionCommand;
+        }
+    }
+
+    public void setActionCommand(final String actionCommand) {
+        _actionCommand = actionCommand;
     }
 
     /**

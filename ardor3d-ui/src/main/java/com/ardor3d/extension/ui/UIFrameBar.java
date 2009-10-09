@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui;
 import java.util.EnumSet;
 
 import com.ardor3d.extension.ui.UIFrame.FrameButtons;
+import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 
 /**
@@ -46,7 +47,7 @@ public class UIFrameBar extends UIPanel {
         if (buttons.contains(FrameButtons.HELP)) {
             _helpButton = createFrameButton("?");
             _helpButton.addActionListener(new ActionListener() {
-                public void actionPerformed() {
+                public void actionPerformed(final ActionEvent event) {
                 // TODO: Implement
                 }
             });
@@ -58,7 +59,7 @@ public class UIFrameBar extends UIPanel {
         if (buttons.contains(FrameButtons.MINIMIZE)) {
             _minimizeButton = createFrameButton("_");
             _minimizeButton.addActionListener(new ActionListener() {
-                public void actionPerformed() {
+                public void actionPerformed(final ActionEvent event) {
                 // TODO: Implement
                 }
             });
@@ -70,7 +71,7 @@ public class UIFrameBar extends UIPanel {
         if (buttons.contains(FrameButtons.MAXIMIZE)) {
             _maximizeButton = createFrameButton("^");
             _maximizeButton.addActionListener(new ActionListener() {
-                public void actionPerformed() {
+                public void actionPerformed(final ActionEvent event) {
                 // TODO: Implement
                 }
             });
@@ -82,7 +83,7 @@ public class UIFrameBar extends UIPanel {
         if (buttons.contains(FrameButtons.CLOSE)) {
             _closeButton = createFrameButton("x");
             _closeButton.addActionListener(new ActionListener() {
-                public void actionPerformed() {
+                public void actionPerformed(final ActionEvent event) {
                     ((UIFrame) getParent()).close();
                 }
             });

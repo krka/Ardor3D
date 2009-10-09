@@ -19,6 +19,6 @@ public interface ActionListener {
     /**
      * Implement this method to perform your action
      */
-    public void actionPerformed();
+    public void actionPerformed(ActionEvent event);
 
 }

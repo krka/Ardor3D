@@ -24,6 +24,7 @@ import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
+import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
@@ -161,7 +162,7 @@ public class SimpleUIExample extends ExampleBase {
         tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
         final UIButton btLogin = new UIButton("login");
         btLogin.addActionListener(new ActionListener() {
-            public void actionPerformed() {
+            public void actionPerformed(final ActionEvent event) {
                 System.out.println("login pressed!");
             }
         });

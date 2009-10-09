@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
@@ -301,7 +302,7 @@ public class UITabbedPane extends UIPanel {
     private UITab makeTab(final String label, final SubTex icon) {
         final UITab button = new UITab(label, icon, _placement);
         button.addActionListener(new ActionListener() {
-            public void actionPerformed() {
+            public void actionPerformed(final ActionEvent event) {
                 setCurrentTab(button);
             }
         });
