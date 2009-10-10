@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
+import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -36,20 +37,92 @@ public class GridLayout extends UILayout {
     private final int rightMargin;
     private final int topMargin;
     private final int bottomMargin;
+    private final Alignment verticalAlignment;
+    private final boolean fillVerticalSpace;
     private final Logger logger = Logger.getLogger(GridLayout.class.getCanonicalName());
 
+    /**
+     * Create a GridLayout with the following defaults: 15 pixels horizontal cell spacing, 5 vertical cell spacing, 10
+     * pixels left, top and right margin, 0 bottom margin, vertical alignment is top and the vertical space won't be
+     * distributed between rows
+     */
     public GridLayout() {
-        this(15, 5, 10, 10, 10, 0);
+        this(15, 5, 10, 10, 10, 0, Alignment.TOP, false);
     }
 
+    /**
+     * Ê Ê Ê* Create a GridLayout with the specified parameters and a vertical alignment to top and no distribution of
+     * vertical Ê Ê Ê* space Ê Ê Ê* Ê Ê Ê* @param interCellSpacingHorizontal Ê Ê Ê* @param interCellSpacingVertical Ê Ê
+     * Ê* @param leftMargin Ê Ê Ê* @param topMargin Ê Ê Ê* @param rightMargin Ê Ê Ê* @param bottomMargin Ê Ê Ê
+     */
     public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
             final int topMargin, final int rightMargin, final int bottomMargin) {
+        this(interCellSpacingHorizontal, interCellSpacingVertical, leftMargin, topMargin, rightMargin, bottomMargin,
+                Alignment.TOP, false);
+    }
+
+    /**
+     * Create a Gridlayout with the specified parameters. If vertical space is distributed the vertical alignment does
+     * not matter.
+     * 
+     * @param interCellSpacingHorizontal
+     * @param interCellSpacingVertical
+     * @param leftMargin
+     * @param topMargin
+     * @param rightMargin
+     * @param bottomMargin
+     * @param fillVerticalSpace
+     */
+    public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
+            final int topMargin, final int rightMargin, final int bottomMargin, final boolean fillVerticalSpace) {
+        this(interCellSpacingHorizontal, interCellSpacingVertical, leftMargin, topMargin, rightMargin, bottomMargin,
+                Alignment.TOP, fillVerticalSpace);
+    }
+
+    /**
+     * Create a GridLayout with the specified parameters. Any additional vertical space won't be distributed betweeen
+     * rows.
+     * 
+     * @param interCellSpacingHorizontal
+     * @param interCellSpacingVertical
+     * @param leftMargin
+     * @param topMargin
+     * @param rightMargin
+     * @param bottomMargin
+     * @param verticalAlignment
+     *            Ê Ê Ê Ê Ê Ê only TOP, MIDDLE and BOTTOM are meaningful
+     */
+    public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
+            final int topMargin, final int rightMargin, final int bottomMargin, final Alignment verticalAlignment) {
+        this(interCellSpacingHorizontal, interCellSpacingVertical, leftMargin, topMargin, rightMargin, bottomMargin,
+                verticalAlignment, false);
+    }
+
+    /**
+     * Create a GridLayout with the specified parameters. Note that the vertical alignment does not matter if you choose
+     * to distribute any additional space between rows.
+     * 
+     * @param interCellSpacingHorizontal
+     * @param interCellSpacingVertical
+     * @param leftMargin
+     * @param topMargin
+     * @param rightMargin
+     * @param bottomMargin
+     * @param verticalAlignment
+     *            Ê Ê Ê Ê Ê Ê only TOP, MIDDLE and BOTTOM are meaningful
+     * @param fillVerticalSpace
+     */
+    public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
+            final int topMargin, final int rightMargin, final int bottomMargin, final Alignment verticalAlignment,
+            final boolean fillVerticalSpace) {
         this.interCellSpacingHorizontal = interCellSpacingHorizontal;
         this.interCellSpacingVertical = interCellSpacingVertical;
         this.leftMargin = leftMargin;
         this.topMargin = topMargin;
         this.rightMargin = rightMargin;
         this.bottomMargin = bottomMargin;
+        this.verticalAlignment = verticalAlignment;
+        this.fillVerticalSpace = fillVerticalSpace;
     }
 
     @Override
@@ -57,11 +130,28 @@ public class GridLayout extends UILayout {
         rebuildGrid(container);
         grid.updateMinimalSize();
         final int height = grid.minHeight;
+        final int heightDiff = container.getContentHeight() > height ? container.getContentHeight() - height : 0;
+        int rowHeightDiff = heightDiff;
+        switch (verticalAlignment) {
+            case TOP:
+                rowHeightDiff = heightDiff;
+                break;
+            case MIDDLE:
+                rowHeightDiff = heightDiff / 2;
+                break;
+            case BOTTOM:
+                rowHeightDiff = 0;
+                break;
+            default:
+                rowHeightDiff = heightDiff;
+        }
         for (final LayoutComponent lc : grid.components) {
-            lc.component.setLocalXY(grid.columnOffsets[lc.firstColumn], height - grid.rowOffsets[lc.firstRow]
-                    - lc.getComponentHeight());
+            if (fillVerticalSpace) {
+                rowHeightDiff = Math.round(heightDiff * (1f - (float) lc.firstRow / grid.maxRow));
+            }
+            lc.component.setLocalXY(grid.columnOffsets[lc.firstColumn], rowHeightDiff + height
+                    - grid.rowOffsets[lc.firstRow] - lc.getComponentHeight());
             if (lc.grow) {
-                logger.info("GROW: set width to " + grid.getCellsWidth(lc.firstColumn, lc.lastColumn));
                 lc.component.setComponentWidth(grid.getCellsWidth(lc.firstColumn, lc.lastColumn));
             }
         }
