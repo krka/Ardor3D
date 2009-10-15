@@ -17,8 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.texturing.TextureClipmap;
-import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -27,6 +26,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.GLSLShaderDataLogic;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -43,7 +43,6 @@ public class TexturedGeometryClipmapTerrain extends Node {
     private int _visibleLevels = 0;
     private final Camera _terrainCamera;
     private final int _clipSideSize;
-    private final Vector3 _lightDirection = new Vector3(1, 1, 2);
 
     private boolean _initialized = false;
 
@@ -66,6 +65,13 @@ public class TexturedGeometryClipmapTerrain extends Node {
         cs.setEnabled(true);
         cs.setCullFace(CullState.Face.Front);
         setRenderState(cs);
+
+        final MaterialState materialState = new MaterialState();
+        materialState.setAmbient(new ColorRGBA(1, 1, 1, 1));
+        materialState.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+        materialState.setSpecular(new ColorRGBA(1, 1, 1, 1));
+        materialState.setShininess(64.0f);
+        setRenderState(materialState);
 
         try {
             _clips = new ArrayList<ClipmapLevel>();
@@ -167,11 +173,14 @@ public class TexturedGeometryClipmapTerrain extends Node {
     public void updateShader() {
         if (_geometryClipmapShader != null) {
             _geometryClipmapShader.setUniform("eyePosition", _terrainCamera.getLocation());
-            _geometryClipmapShader.setUniform("lightDirection", _lightDirection.normalizeLocal());
 
             return;
         }
 
+        reloadShader();
+    }
+
+    public void reloadShader() {
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
@@ -198,8 +207,9 @@ public class TexturedGeometryClipmapTerrain extends Node {
             applyToClips();
 
             _textureClipmap.setShaderState(_geometryClipmapShader);
+
+            updateWorldRenderStates(false);
         }
-        updateWorldRenderStates(false);
     }
 
     protected void applyToClips() {
@@ -263,14 +273,6 @@ public class TexturedGeometryClipmapTerrain extends Node {
      */
     public void setVisibleLevels(final int visibleLevels) {
         _visibleLevels = visibleLevels;
-    }
-
-    /**
-     * @param lightDirection
-     *            the lightDirection to set
-     */
-    public void setLightDirection(final ReadOnlyVector3 lightDirection) {
-        _lightDirection.set(lightDirection);
     }
 
     public float getHeightScale() {

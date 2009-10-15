@@ -16,7 +16,7 @@ uniform float clipSideSize;     // Clip-Size
 
 varying vec2 texCoord;
 varying vec4 diffuse,ambient;
-varying vec3 lightDir;
+varying vec3 lightDir,eyeVec;
 varying vec3 eyeSpacePosition;
 
 void main(void){	    
@@ -43,12 +43,16 @@ void main(void){
 	lightDir.x = dot(tmpVec, t);
 	lightDir.y = dot(tmpVec, b);
 	lightDir.z = dot(tmpVec, n);
+
+	eyeSpacePosition = (gl_ModelViewMatrix * position).xyz;
+	tmpVec = -eyeSpacePosition;
+	eyeVec.x = dot(tmpVec, t);
+	eyeVec.y = dot(tmpVec, b);
+	eyeVec.z = dot(tmpVec, n);
     	
 	diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
 	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 	ambient += gl_LightModel.ambient * gl_FrontMaterial.ambient;
     
     gl_Position = gl_ModelViewProjectionMatrix * position;
-    
-    eyeSpacePosition = (gl_ModelViewMatrix * position).xyz;
 }
