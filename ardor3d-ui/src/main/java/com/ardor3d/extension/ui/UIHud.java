@@ -531,7 +531,7 @@ public class UIHud extends Node {
         final UIComponent over = getUIComponent(mouseX, mouseY);
 
         // if we're over a pickable component, send it the mouse release
-        if (over != null && _mouseDownComponent == over) {
+        if (over != null) {
             consumed |= over.mouseReleased(button, currentIS);
         }
 
