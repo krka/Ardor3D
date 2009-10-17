@@ -55,6 +55,7 @@ public class HeightmapPyramidPicker {
 
         _tracer.startWalk(_workRay);
 
+        // FIXME: allow for this.
         if (_tracer.isRayPerpendicularToGrid()) {
             // no intersection
             return null;
