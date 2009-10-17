@@ -375,15 +375,19 @@ public class LightState extends RenderState {
         return lightState;
     }
 
-    private void copyLightState(final LightState pkLState, final LightState lightState) {
-        lightState.setTwoSidedLighting(pkLState.getTwoSidedLighting());
-        lightState.setLocalViewer(pkLState.getLocalViewer());
-        lightState.setSeparateSpecular(pkLState.getSeparateSpecular());
-        lightState.setEnabled(pkLState.isEnabled());
-        for (int i = 0, maxL = pkLState.getLightList().size(); i < maxL; i++) {
-            final Light pkLight = pkLState.get(i);
+    private static void copyLightState(final LightState source, final LightState destination) {
+        destination.setTwoSidedLighting(source.getTwoSidedLighting());
+        destination.setLocalViewer(source.getLocalViewer());
+        destination.setSeparateSpecular(source.getSeparateSpecular());
+        destination.setEnabled(source.isEnabled());
+        destination.setGlobalAmbient(source.getGlobalAmbient());
+        destination.setLightMask(source.getLightMask());
+        destination.setNeedsRefresh(true);
+
+        for (int i = 0, maxL = source.getLightList().size(); i < maxL; i++) {
+            final Light pkLight = source.get(i);
             if (pkLight != null) {
-                lightState.attach(pkLight);
+                destination.attach(pkLight);
             }
         }
     }
