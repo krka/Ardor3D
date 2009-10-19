@@ -325,6 +325,13 @@ public abstract class StatCollector {
         return historical;
     }
 
+    public static MultiStatSample lastStats() {
+        if (historical.size() == 0) {
+            return null;
+        }
+        return historical.get(historical.size() - 1);
+    }
+
     public static boolean isIgnoreStats() {
         return ignoreStats;
     }
