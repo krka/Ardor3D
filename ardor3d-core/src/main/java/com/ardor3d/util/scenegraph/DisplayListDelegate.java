@@ -39,13 +39,18 @@ public class DisplayListDelegate implements RenderDelegate {
 
     public void render(final Spatial spatial, final Renderer renderer) {
         // do transforms
-        renderer.doTransforms(spatial.getWorldTransform());
+        final boolean transformed = renderer.doTransforms(spatial.getWorldTransform());
 
         // render display list.
         renderer.renderDisplayList(_id.getId());
 
         // Our states are in an unknown state at this point, so invalidate tracking.
         ContextManager.getCurrentContext().invalidateStates();
+
+        // undo transforms
+        if (transformed) {
+            renderer.undoTransforms(spatial.getWorldTransform());
+        }
     }
 
     public static void cleanAllDisplayLists(final Renderer deleter) {

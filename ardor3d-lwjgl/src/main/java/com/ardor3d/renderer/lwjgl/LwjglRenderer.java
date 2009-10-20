@@ -38,7 +38,6 @@ import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Rectangle2;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -617,7 +616,7 @@ public class LwjglRenderer extends AbstractRenderer {
         return false;
     }
 
-    public void undoTransforms(final Transform transform) {
+    public void undoTransforms(final ReadOnlyTransform transform) {
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         LwjglRendererUtil.switchMode(matRecord, GL11.GL_MODELVIEW);
         GL11.glPopMatrix();

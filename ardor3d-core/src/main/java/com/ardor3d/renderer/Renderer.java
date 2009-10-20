@@ -21,7 +21,6 @@ import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.queue.RenderQueue;
@@ -367,7 +366,7 @@ public interface Renderer {
      * @param transform
      *            transform to revert.
      */
-    void undoTransforms(Transform transform);
+    void undoTransforms(ReadOnlyTransform transform);
 
     // TODO: Arrays
     void setupVertexData(FloatBufferData vertexCoords);

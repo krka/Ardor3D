@@ -34,7 +34,6 @@ import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureCubeMap.Face;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Rectangle2;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -643,7 +642,7 @@ public class JoglRenderer extends AbstractRenderer {
         return false;
     }
 
-    public void undoTransforms(final Transform transform) {
+    public void undoTransforms(final ReadOnlyTransform transform) {
         final GL gl = GLU.getCurrentGL();
 
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
