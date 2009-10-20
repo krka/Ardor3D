@@ -24,12 +24,16 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
 import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
+import com.ardor3d.light.DirectionalLight;
+import com.ardor3d.light.Light;
+import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -153,6 +157,9 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Special camera with functionality for packing frustum etc. */
     protected PSSMCamera _pssmCam;
 
+    /** Light that casts the shadow. */
+    protected Light _light;
+
     /** Shader for rendering pssm shadows in one pass. */
     private GLSLShaderObjectsState _pssmShader;
 
@@ -179,7 +186,8 @@ public class ParallelSplitShadowMapPass extends Pass {
      * @param numOfSplits
      *            the num of splits
      */
-    public ParallelSplitShadowMapPass(final int shadowMapSize, final int numOfSplits) {
+    public ParallelSplitShadowMapPass(final Light light, final int shadowMapSize, final int numOfSplits) {
+        _light = light;
         _shadowMapSize = shadowMapSize;
         setNumOfSplits(numOfSplits);
         _pssmCam = new PSSMCamera();
@@ -235,8 +243,8 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowOffsetState = new OffsetState();
         _shadowOffsetState.setEnabled(true);
         _shadowOffsetState.setTypeEnabled(OffsetType.Fill, true);
-        _shadowOffsetState.setFactor(-1.1f);
-        _shadowOffsetState.setUnits(-4.0f);
+        _shadowOffsetState.setFactor(1.1f);
+        _shadowOffsetState.setUnits(4.0f);
 
         _flat = new ShadingState();
         _flat.setShadingMode(ShadingMode.Flat);
@@ -316,6 +324,10 @@ public class ParallelSplitShadowMapPass extends Pass {
         _shadowMapRenderer.enforceState(_shadowOffsetState);
         if (!isUseSceneTexturing()) {
             _shadowMapRenderer.enforceState(_noTexture);
+        }
+
+        if (_light instanceof DirectionalLight) {
+            _shadowMapRenderer.getCamera().setParallelProjection(true);
         }
     }
 
@@ -430,14 +442,41 @@ public class ParallelSplitShadowMapPass extends Pass {
      * @param center
      *            the center
      */
-    private void calculateOptimalLightFrustum(final Vector3[] frustumCorners, final Vector3 center) {
+    private void calculateOptimalLightFrustum(final Vector3[] frustumCorners, final ReadOnlyVector3 center) {
         final Camera shadowCam = _shadowMapRenderer.getCamera();
 
-        // Point light at split center
-        shadowCam.lookAt(center, Vector3.UNIT_Y);
-        // Reset frustum
-        final double distance = center.subtractLocal(shadowCam.getLocation()).length();
-        shadowCam.setFrustum(1, distance, -1, 1, 1, -1);
+        double distance = _minimumLightDistance;
+
+        final Vector3 tmpVec = Vector3.fetchTempInstance();
+
+        // Update shadow camera from light
+        if (_light instanceof PointLight) {
+            final PointLight pl = (PointLight) _light;
+
+            shadowCam.setLocation(pl.getLocation());
+
+            // Point light at split center
+            shadowCam.lookAt(center, Vector3.UNIT_Y);
+
+            // Reset frustum
+            distance = center.subtract(shadowCam.getLocation(), tmpVec).length();
+            shadowCam.setFrustum(1, distance, -1, 1, 1, -1);
+        } else if (_light instanceof DirectionalLight) {
+            final DirectionalLight dl = (DirectionalLight) _light;
+
+            tmpVec.set(dl.getDirection());
+            // tmpVec.negateLocal();
+            tmpVec.multiplyLocal(distance);
+            tmpVec.addLocal(center);
+            shadowCam.setLocation(tmpVec);
+
+            // Point light at split center
+            shadowCam.lookAt(center, Vector3.UNIT_Y);
+
+            // Reset frustum
+            // distance = center.subtract(shadowCam.getLocation(), tmpVec).length();
+            shadowCam.setFrustum(-1, 1, -1, 1, 1, -1);
+        }
 
         double fMinX = Double.POSITIVE_INFINITY;
         double fMaxX = Double.NEGATIVE_INFINITY;
@@ -467,26 +506,53 @@ public class ParallelSplitShadowMapPass extends Pass {
             fMaxZ = Math.max(position.getZ(), fMaxZ);
         }
 
-        fMinX = clamp(fMinX, -1.0, 1.0);
-        fMaxX = clamp(fMaxX, -1.0, 1.0);
-        fMinY = clamp(fMinY, -1.0, 1.0);
-        fMaxY = clamp(fMaxY, -1.0, 1.0);
+        double width = 0;
+        double height = 0;
+        if (_light instanceof PointLight) {
+            fMinX = clamp(fMinX, -1.0, 1.0);
+            fMaxX = clamp(fMaxX, -1.0, 1.0);
+            fMinY = clamp(fMinY, -1.0, 1.0);
+            fMaxY = clamp(fMaxY, -1.0, 1.0);
 
-        // Make sure the minimum z is at least a specified distance from
-        // the target.
-        fMinZ = Math.min(fMinZ, distance - _minimumLightDistance);
-        fMinZ = Math.max(10.0, fMinZ);
+            // Make sure the minimum z is at least a specified distance from
+            // the target.
+            fMinZ = Math.min(fMinZ, distance - _minimumLightDistance);
+            fMinZ = Math.max(10.0, fMinZ);
 
-        final double width = fMinZ * (fMaxX - fMinX) * 0.5;
-        final double height = fMinZ * (fMaxY - fMinY) * 0.5;
+            width = fMinZ * (fMaxX - fMinX) * 0.5;
+            height = fMinZ * (fMaxY - fMinY) * 0.5;
 
-        final Vector3 newCenter = Vector3.fetchTempInstance();
-        position.set((fMinX + fMaxX) * 0.5, (fMinY + fMaxY) * 0.5, 1.0, 1);
-        shadowCam.getModelViewProjectionInverseMatrix().applyPre(position, position);
-        position.divideLocal(position.getW());
-        newCenter.set(position.getX(), position.getY(), position.getZ());
-        shadowCam.lookAt(newCenter, Vector3.UNIT_Y);
-        Vector3.releaseTempInstance(newCenter);
+            final Vector3 newCenter = Vector3.fetchTempInstance();
+            position.set((fMinX + fMaxX) * 0.5, (fMinY + fMaxY) * 0.5, 1.0, 1);
+            shadowCam.getModelViewProjectionInverseMatrix().applyPre(position, position);
+            position.divideLocal(position.getW());
+            newCenter.set(position.getX(), position.getY(), position.getZ());
+
+            shadowCam.lookAt(newCenter, Vector3.UNIT_Y);
+
+            Vector3.releaseTempInstance(newCenter);
+
+        } else if (_light instanceof DirectionalLight) {
+            width = (fMaxX - fMinX) * 0.5;
+            height = (fMaxY - fMinY) * 0.5;
+
+            final Vector3 newCenter = Vector3.fetchTempInstance();
+            position.set((fMinX + fMaxX) * 0.5, (fMinY + fMaxY) * 0.5, 1.0, 1);
+            shadowCam.getModelViewProjectionInverseMatrix().applyPre(position, position);
+            position.divideLocal(position.getW());
+            newCenter.set(position.getX(), position.getY(), position.getZ());
+
+            newCenter.subtractLocal(center);
+
+            final double length = newCenter.dot(shadowCam.getDirection());
+            fMinZ -= length;
+            fMaxZ -= length;
+            fMinZ = Math.min(fMinZ, distance - _minimumLightDistance);
+            fMinZ = Math.max(10.0, fMinZ);
+
+            newCenter.addLocal(shadowCam.getLocation());
+            shadowCam.setLocation(newCenter);
+        }
 
         shadowCam.setFrustum(fMinZ, fMaxZ, -width, width, height, -height);
         shadowCam.update();
@@ -593,18 +659,6 @@ public class ParallelSplitShadowMapPass extends Pass {
                 }
             }
         }
-    }
-
-    /**
-     * Gets the camera.
-     * 
-     * @return the camera
-     */
-    public Camera getCamera() {
-        if (_shadowMapRenderer != null) {
-            return _shadowMapRenderer.getCamera();
-        }
-        return null;
     }
 
     /**

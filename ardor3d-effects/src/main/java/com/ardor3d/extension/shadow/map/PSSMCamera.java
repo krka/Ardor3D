@@ -175,11 +175,19 @@ public class PSSMCamera extends Camera {
      *            the far distance
      */
     public void calculateFrustum(final double fNear, final double fFar) {
-        final double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5;
-        final double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5;
+        double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5;
+        double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5;
 
-        final double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5;
-        final double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5;
+        double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5;
+        double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5;
+
+        if (isParallelProjection()) {
+            fNearPlaneHeight = (_frustumTop - _frustumBottom) * 0.5;
+            fNearPlaneWidth = (_frustumRight - _frustumLeft) * 0.5;
+
+            fFarPlaneHeight = (_frustumTop - _frustumBottom) * 0.5;
+            fFarPlaneWidth = (_frustumRight - _frustumLeft) * 0.5;
+        }
 
         final Vector3 vNearPlaneCenter = Vector3.fetchTempInstance();
         final Vector3 vFarPlaneCenter = Vector3.fetchTempInstance();
