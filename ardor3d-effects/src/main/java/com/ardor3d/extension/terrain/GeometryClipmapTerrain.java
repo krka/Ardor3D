@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -47,6 +48,8 @@ public class GeometryClipmapTerrain extends Node {
 
     /** Shader for rendering clipmap geometry with morphing. */
     private GLSLShaderObjectsState _geometryClipmapShader;
+
+    private final Vector3 transformedFrustumPos = new Vector3();
 
     private final float _heightScale;
 
@@ -161,7 +164,9 @@ public class GeometryClipmapTerrain extends Node {
      */
     public void updateShader() {
         if (_geometryClipmapShader != null) {
-            _geometryClipmapShader.setUniform("eyePosition", _terrainCamera.getLocation());
+            getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
+            _geometryClipmapShader.setUniform("eyePosition", getWorldTransform().applyInverse(
+                    _terrainCamera.getLocation(), transformedFrustumPos));
 
             return;
         }

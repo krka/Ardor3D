@@ -15,6 +15,7 @@ import java.nio.IntBuffer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
@@ -88,6 +89,8 @@ public class ClipmapLevel extends Mesh {
      * Camera frustum to test clipmap tiles against for culling
      */
     private final Camera clipmapTestFrustum;
+
+    private final Vector3 transformedFrustumPos = new Vector3();
 
     /**
      * Bounding box used for culling
@@ -182,8 +185,9 @@ public class ClipmapLevel extends Mesh {
      * @param center
      */
     public void updateVertices() {
-        final int cx = (int) clipmapTestFrustum.getLocation().getX();
-        final int cz = (int) clipmapTestFrustum.getLocation().getZ();
+        getWorldTransform().applyInverse(clipmapTestFrustum.getLocation(), transformedFrustumPos);
+        final int cx = (int) transformedFrustumPos.getX();
+        final int cz = (int) transformedFrustumPos.getZ();
 
         // Store the old position to be able to recover it if needed
         final int oldX = clipRegion.getX();
@@ -517,6 +521,8 @@ public class ClipmapLevel extends Mesh {
         frustumCheckBounds.setXExtent((left - right) * 0.5);
         frustumCheckBounds.setYExtent((heightRangeMax - heightRangeMin) * heightScale * 0.5);
         frustumCheckBounds.setZExtent((top - bottom) * 0.5);
+
+        frustumCheckBounds.transform(getWorldTransform(), frustumCheckBounds);
 
         final int state = clipmapTestFrustum.getPlaneState();
 

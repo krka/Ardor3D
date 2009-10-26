@@ -41,7 +41,7 @@ public class BasicHeightmapPyramid implements HeightmapPyramid {
             x = MathUtils.moduloPositive(x, size);
             y = MathUtils.moduloPositive(y, size);
         } else if (x < 0 || x >= size || y < 0 || y >= size) {
-            return -Float.MAX_VALUE;
+            return Float.NEGATIVE_INFINITY;
         }
 
         return heightmap.getHeight(x, y);
