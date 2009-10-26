@@ -47,9 +47,9 @@ public enum AwtKey {
             KeyEvent.VK_F10, Key.F10), AWT_KEY_NUMLOCK(KeyEvent.VK_NUM_LOCK, Key.NUMLOCK), AWT_KEY_SCROLL(
             KeyEvent.VK_SCROLL_LOCK, Key.SCROLL), AWT_KEY_NUMPAD7(KeyEvent.VK_NUMPAD7, Key.NUMPAD7), AWT_KEY_NUMPAD8(
             KeyEvent.VK_NUMPAD8, Key.NUMPAD8), AWT_KEY_NUMPAD9(KeyEvent.VK_NUMPAD9, Key.NUMPAD9), AWT_KEY_SUBTRACT(
-            KeyEvent.VK_SUBTRACT, Key.SUBTRACT), AWT_KEY_NUMPAD4(KeyEvent.VK_NUMPAD4, Key.NUMPAD4), AWT_KEY_NUMPAD5(
+            KeyEvent.VK_SUBTRACT, Key.NUMPADSUBTRACT), AWT_KEY_NUMPAD4(KeyEvent.VK_NUMPAD4, Key.NUMPAD4), AWT_KEY_NUMPAD5(
             KeyEvent.VK_NUMPAD5, Key.NUMPAD5), AWT_KEY_NUMPAD6(KeyEvent.VK_NUMPAD6, Key.NUMPAD6), AWT_KEY_ADD(
-            KeyEvent.VK_ADD, Key.ADD), AWT_KEY_NUMPAD1(KeyEvent.VK_NUMPAD1, Key.NUMPAD1), AWT_KEY_NUMPAD2(
+            KeyEvent.VK_ADD, Key.NUMPADADD), AWT_KEY_NUMPAD1(KeyEvent.VK_NUMPAD1, Key.NUMPAD1), AWT_KEY_NUMPAD2(
             KeyEvent.VK_NUMPAD2, Key.NUMPAD2), AWT_KEY_NUMPAD3(KeyEvent.VK_NUMPAD3, Key.NUMPAD3), AWT_KEY_NUMPAD0(
             KeyEvent.VK_NUMPAD0, Key.NUMPAD0), AWT_KEY_DECIMAL(KeyEvent.VK_DECIMAL, Key.DECIMAL), AWT_KEY_F11(
             KeyEvent.VK_F11, Key.F11), AWT_KEY_F12(KeyEvent.VK_F12, Key.F12), AWT_KEY_F13(KeyEvent.VK_F13, Key.F13), AWT_KEY_F14(
@@ -65,7 +65,7 @@ public enum AwtKey {
             Key.RIGHT), AWT_KEY_END(KeyEvent.VK_END, Key.END), AWT_KEY_DOWN(KeyEvent.VK_DOWN, Key.DOWN), AWT_KEY_NEXT(
             KeyEvent.VK_PAGE_DOWN, Key.NEXT), AWT_KEY_INSERT(KeyEvent.VK_INSERT, Key.INSERT), AWT_KEY_DELETE(
             KeyEvent.VK_DELETE, Key.DELETE), AWT_KEY_LMENU(KeyEvent.VK_ALT, Key.LMENU), AWT_KEY_RMENU(KeyEvent.VK_ALT,
-            Key.RMENU), AWT_COMMAND(KeyEvent.VK_META, Key.LMETA);
+            Key.RMENU), AWT_COMMAND(KeyEvent.VK_META, Key.LMETA), AWT_KEY_SYSRQ(KeyEvent.VK_PRINTSCREEN, Key.SYSRQ);
 
     private final int _awtCode;
     private final Key _key;

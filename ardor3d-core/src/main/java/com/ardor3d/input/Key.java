@@ -314,7 +314,7 @@ public enum Key {
     /**
      * - key (num pad).
      */
-    NUMBADSUBTRACT(0x4A),
+    NUMPADSUBTRACT(0x4A),
     /**
      * 4 key (num pad).
      */
@@ -330,7 +330,7 @@ public enum Key {
     /**
      * + key (num pad).
      */
-    NUMBADADD(0x4E),
+    NUMPADADD(0x4E),
     /**
      * 1 key (num pad).
      */
