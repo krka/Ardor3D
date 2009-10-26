@@ -353,6 +353,7 @@ public abstract class UIContainer extends UIComponent {
                 try {
                     buildStandin(renderer);
                 } catch (final Exception e) {
+                    _useStandin = false;
                     UIContainer._logger.warning("Unable to create standin: " + e.getMessage());
                     UIContainer._logger.logp(Level.SEVERE, getClass().getName(), "draw(Renderer)", "Exception", e);
                 }
@@ -426,6 +427,21 @@ public abstract class UIContainer extends UIComponent {
      *            the renderer to use if we need to generate a texture renderer
      */
     private void buildStandin(final Renderer renderer) {
+        // Check for and create a texture renderer if none exists yet.
+        if (UIContainer._textureRenderer == null) {
+            final Camera cam = Camera.getCurrentCamera();
+            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth(), cam
+                    .getHeight(), renderer, ContextManager.getCurrentContext().getCapabilities());
+            if (UIContainer._textureRenderer != null) {
+                UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
+                UIContainer._textureRenderer.setMultipleTargets(true);
+            } else {
+                // Can't make standin.
+                _useStandin = false;
+                return;
+            }
+        }
+
         _standin = new UIQuad("container_standin", 1, 1);
         // no frustum culling checks
         _standin.getSceneHints().setCullHint(CullHint.Never);
@@ -446,15 +462,6 @@ public abstract class UIContainer extends UIComponent {
         blend.setReference(0.0f);
         blend.setTestEnabled(true);
         _standin.setRenderState(blend);
-
-        // Check for and create a texture renderer if none exists yet.
-        if (UIContainer._textureRenderer == null) {
-            final Camera cam = Camera.getCurrentCamera();
-            UIContainer._textureRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth(), cam
-                    .getHeight(), renderer, ContextManager.getCurrentContext().getCapabilities());
-            UIContainer._textureRenderer.setBackgroundColor(new ColorRGBA(0f, 1f, 0f, 0f));
-            UIContainer._textureRenderer.setMultipleTargets(true);
-        }
 
         // Update our standin's texture
         resetFakeTexture();
