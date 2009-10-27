@@ -496,7 +496,7 @@ public abstract class UIContainer extends UIComponent {
      * @param dirty
      *            true if this container has had recent content changes that would require a repaint.
      */
-    void setDirty(final boolean dirty) {
+    public void setDirty(final boolean dirty) {
         _dirty = dirty;
     }
 

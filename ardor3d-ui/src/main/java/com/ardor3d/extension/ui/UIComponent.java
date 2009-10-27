@@ -739,6 +739,7 @@ public abstract class UIComponent extends Node {
      */
     public void setLocalXY(final int x, final int y) {
         setTranslation(x, y, getTranslation().getZ());
+        fireComponentDirty();
     }
 
     /**
@@ -749,6 +750,7 @@ public abstract class UIComponent extends Node {
     public void setLocalX(final int x) {
         final ReadOnlyVector3 translation = getTranslation();
         setTranslation(x, translation.getY(), translation.getZ());
+        fireComponentDirty();
     }
 
     /**
@@ -759,6 +761,7 @@ public abstract class UIComponent extends Node {
     public void setLocalY(final int y) {
         final ReadOnlyVector3 translation = getTranslation();
         setTranslation(translation.getX(), y, translation.getZ());
+        fireComponentDirty();
     }
 
     /**
@@ -798,6 +801,7 @@ public abstract class UIComponent extends Node {
         } else {
             _foregroundColor.set(color);
         }
+        fireComponentDirty();
     }
 
     /**
