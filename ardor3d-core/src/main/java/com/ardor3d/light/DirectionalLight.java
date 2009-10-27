@@ -47,8 +47,20 @@ public class DirectionalLight extends Light {
      * @param direction
      *            the direction the light is traveling in.
      */
-    public void setDirection(final Vector3 direction) {
+    public void setDirection(final ReadOnlyVector3 direction) {
         _direction.set(direction);
+    }
+
+    /**
+     * @param x
+     *            the direction the light is traveling in on the x axis.
+     * @param y
+     *            the direction the light is traveling in on the y axis.
+     * @param z
+     *            the direction the light is traveling in on the z axis.
+     */
+    public void setDirection(final double x, final double y, final double z) {
+        _direction.set(x, y, z);
     }
 
     /**
