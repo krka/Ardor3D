@@ -36,32 +36,33 @@ import com.google.common.collect.MapMaker;
  */
 public class MeshData implements Cloneable, Savable {
 
-    private transient Map<Object, Integer> _vboIdCache = null;
-
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
+
+    /** A cache of ids for interleaved use. */
+    private transient Map<Object, Integer> _vboIdCache = null;
 
     /** Number of vertices represented by this data. */
     protected int _vertexCount;
 
     /** Number of primitives represented by this data. */
-    protected int[] _primitiveCounts = new int[1];
+    protected transient int[] _primitiveCounts = new int[1];
 
     /** Buffer data holding buffers and number of coordinates per vertex */
-    protected transient FloatBufferData _vertexCoords;
-    protected transient FloatBufferData _normalCoords;
-    protected transient FloatBufferData _colorCoords;
-    protected transient FloatBufferData _fogCoords;
-    protected transient FloatBufferData _tangentCoords;
-    protected transient List<FloatBufferData> _textureCoords = new ArrayList<FloatBufferData>(1);
+    protected FloatBufferData _vertexCoords;
+    protected FloatBufferData _normalCoords;
+    protected FloatBufferData _colorCoords;
+    protected FloatBufferData _fogCoords;
+    protected FloatBufferData _tangentCoords;
+    protected List<FloatBufferData> _textureCoords = new ArrayList<FloatBufferData>(1);
 
     /** Interleaved data (for VBO id use). */
-    protected transient FloatBufferData _interleaved;
+    protected FloatBufferData _interleaved;
 
     /** Index data. */
-    protected transient IntBufferData _indexBuffer;
-    protected transient int[] _indexLengths;
-    protected transient IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
+    protected IntBufferData _indexBuffer;
+    protected int[] _indexLengths;
+    protected IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
 
     /**
      * Gets the vertex count.
