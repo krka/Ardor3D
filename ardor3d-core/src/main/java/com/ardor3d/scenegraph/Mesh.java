@@ -73,7 +73,7 @@ public class Mesh extends Spatial implements Renderable {
     protected boolean _castsShadows = true;
 
     /**
-     * Constructs a new Spatial.
+     * Constructs a new Mesh.
      */
     public Mesh() {
         super();
@@ -101,7 +101,8 @@ public class Mesh extends Spatial implements Renderable {
     /**
      * Sets the mesh data object for this mesh.
      * 
-     * @return the mesh data object
+     * @param meshData
+     *            the mesh data object
      */
     public void setMeshData(final MeshData meshData) {
         // invalidate collision tree cache
