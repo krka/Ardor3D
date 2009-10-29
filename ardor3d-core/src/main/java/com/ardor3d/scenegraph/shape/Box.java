@@ -37,8 +37,7 @@ public class Box extends Mesh implements Savable {
      * Constructs a new 1x1x1 <code>Box</code>.
      */
     public Box() {
-        super("unnamed Box");
-        _xExtent = _yExtent = _zExtent = 0.5;
+        this("unnamed Box");
     }
 
     /**
@@ -49,7 +48,7 @@ public class Box extends Mesh implements Savable {
      */
     public Box(final String name) {
         super(name);
-        _xExtent = _yExtent = _zExtent = 0.5;
+        setData(Vector3.ZERO, 0.5, 0.5, 0.5);
     }
 
     /**
