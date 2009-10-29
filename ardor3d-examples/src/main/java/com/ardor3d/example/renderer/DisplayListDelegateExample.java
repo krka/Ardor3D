@@ -8,10 +8,11 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.example;
+package com.ardor3d.example.renderer;
 
 import java.util.Random;
 
+import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
