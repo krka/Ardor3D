@@ -1099,6 +1099,23 @@ public final class BufferUtils {
     }
 
     /**
+     * Generate a new ShortBuffer using the given array of short primitives.
+     * 
+     * @param data
+     *            array of short primitives to place into a new ShortBuffer
+     */
+    public static ShortBuffer createShortBuffer(final short... data) {
+        if (data == null) {
+            return null;
+        }
+        final ShortBuffer buff = createShortBuffer(data.length);
+        buff.clear();
+        buff.put(data);
+        buff.flip();
+        return buff;
+    }
+
+    /**
      * Create a new ShortBuffer of an appropriate size to hold the specified number of shorts only if the given buffer
      * if not already the right size.
      * 
