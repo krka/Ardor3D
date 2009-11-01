@@ -1077,7 +1077,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
      * @param up
      *            a vector indicating the local up direction.
      */
-    public void lookAt(final ReadOnlyVector3 direction, final Vector3 up) {
+    public void lookAt(final ReadOnlyVector3 direction, final ReadOnlyVector3 up) {
         final Vector3 xAxis = Vector3.fetchTempInstance();
         final Vector3 yAxis = Vector3.fetchTempInstance();
         final Vector3 zAxis = Vector3.fetchTempInstance();

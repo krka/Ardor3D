@@ -40,7 +40,7 @@ public class Pyramid extends Mesh {
      * Constructor instantiates a new <code>Pyramid</code> object. The base width and the height are provided.
      * 
      * @param name
-     *            the name of the scene element. This is required for identification and comparision purposes.
+     *            the name of the scene element. This is required for identification and comparison purposes.
      * @param width
      *            the base width of the pyramid.
      * @param height
