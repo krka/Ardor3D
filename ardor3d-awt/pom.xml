@@ -17,12 +17,6 @@
       <artifactId>ardor3d-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO: is it really right/necessary for AWT to depend on LWJGL? It's due to the Canvas class, I think / Petter -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ardor3d-lwjgl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
