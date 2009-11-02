@@ -203,6 +203,10 @@ public class Mesh extends Spatial implements Renderable {
     }
 
     public void render(final Renderer renderer) {
+        render(renderer, getMeshData());
+    }
+
+    public void render(final Renderer renderer, final MeshData meshData) {
         // Set up MeshData in GLSLShaderObjectsState if necessary
         // XXX: considered a hack until we settle on our shader model.
         final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) _states.get(RenderState.StateType.GLSLShader);
@@ -231,17 +235,17 @@ public class Mesh extends Spatial implements Renderable {
         if ((getSceneHints().getDataMode() == DataMode.VBO || getSceneHints().getDataMode() == DataMode.VBOInterleaved)
                 && caps.isVBOSupported()) {
             if (getSceneHints().getDataMode() == DataMode.VBOInterleaved) {
-                if (_meshData.getColorCoords() == null) {
+                if (meshData.getColorCoords() == null) {
                     renderer.applyDefaultColor(_defaultColor);
                 }
                 renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
                 // Make sure we have a FBD to hold our id.
-                if (_meshData.getInterleavedData() == null) {
+                if (meshData.getInterleavedData() == null) {
                     final FloatBufferData interleaved = new FloatBufferData(FloatBuffer.allocate(0), 1);
-                    _meshData.setInterleavedData(interleaved);
+                    meshData.setInterleavedData(interleaved);
                 }
-                renderer.setupInterleavedDataVBO(_meshData.getInterleavedData(), _meshData.getVertexCoords(), _meshData
-                        .getNormalCoords(), _meshData.getColorCoords(), _meshData.getTextureCoords());
+                renderer.setupInterleavedDataVBO(meshData.getInterleavedData(), meshData.getVertexCoords(), meshData
+                        .getNormalCoords(), meshData.getColorCoords(), meshData.getTextureCoords());
             } else {
                 if (RENDER_VERTEX_ONLY) {
                     renderer.applyNormalsMode(NormalsMode.Off, null);
@@ -252,34 +256,32 @@ public class Mesh extends Spatial implements Renderable {
                 } else {
                     renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
                     if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
-                        renderer.setupNormalDataVBO(_meshData.getNormalCoords());
+                        renderer.setupNormalDataVBO(meshData.getNormalCoords());
                     } else {
                         renderer.setupNormalDataVBO(null);
                     }
 
-                    if (_meshData.getColorCoords() != null) {
-                        renderer.setupColorDataVBO(_meshData.getColorCoords());
+                    if (meshData.getColorCoords() != null) {
+                        renderer.setupColorDataVBO(meshData.getColorCoords());
                     } else {
                         renderer.applyDefaultColor(_defaultColor);
                         renderer.setupColorDataVBO(null);
                     }
 
-                    renderer.setupTextureDataVBO(_meshData.getTextureCoords());
+                    renderer.setupTextureDataVBO(meshData.getTextureCoords());
                 }
-                renderer.setupVertexDataVBO(_meshData.getVertexCoords());
+                renderer.setupVertexDataVBO(meshData.getVertexCoords());
             }
 
-            if (_meshData.getIndexBuffer() != null) {
+            if (meshData.getIndexBuffer() != null) {
                 // TODO: Maybe ask for the IndexBuffer's dynamic/static type and fall back to arrays for indices?
-                renderer
-                        .drawElementsVBO(_meshData.getIndices(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+                renderer.drawElementsVBO(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes());
             } else {
-                renderer
-                        .drawArrays(_meshData.getVertexCoords(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+                renderer.drawArrays(meshData.getVertexCoords(), meshData.getIndexLengths(), meshData.getIndexModes());
             }
 
             if (Constants.stats) {
-                StatCollector.addStat(StatType.STAT_VERTEX_COUNT, _meshData.getVertexCount());
+                StatCollector.addStat(StatType.STAT_VERTEX_COUNT, meshData.getVertexCount());
                 StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
             }
         } else {
@@ -297,31 +299,30 @@ public class Mesh extends Spatial implements Renderable {
             } else {
                 renderer.applyNormalsMode(getSceneHints().getNormalsMode(), _worldTransform);
                 if (getSceneHints().getNormalsMode() != NormalsMode.Off) {
-                    renderer.setupNormalData(_meshData.getNormalCoords());
+                    renderer.setupNormalData(meshData.getNormalCoords());
                 } else {
                     renderer.setupNormalData(null);
                 }
 
-                if (_meshData.getColorCoords() != null) {
-                    renderer.setupColorData(_meshData.getColorCoords());
+                if (meshData.getColorCoords() != null) {
+                    renderer.setupColorData(meshData.getColorCoords());
                 } else {
                     renderer.applyDefaultColor(_defaultColor);
                     renderer.setupColorData(null);
                 }
 
-                renderer.setupTextureData(_meshData.getTextureCoords());
+                renderer.setupTextureData(meshData.getTextureCoords());
             }
-            renderer.setupVertexData(_meshData.getVertexCoords());
+            renderer.setupVertexData(meshData.getVertexCoords());
 
-            if (_meshData.getIndexBuffer() != null) {
-                renderer.drawElements(_meshData.getIndices(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+            if (meshData.getIndexBuffer() != null) {
+                renderer.drawElements(meshData.getIndices(), meshData.getIndexLengths(), meshData.getIndexModes());
             } else {
-                renderer
-                        .drawArrays(_meshData.getVertexCoords(), _meshData.getIndexLengths(), _meshData.getIndexModes());
+                renderer.drawArrays(meshData.getVertexCoords(), meshData.getIndexLengths(), meshData.getIndexModes());
             }
 
             if (Constants.stats) {
-                StatCollector.addStat(StatType.STAT_VERTEX_COUNT, _meshData.getVertexCount());
+                StatCollector.addStat(StatType.STAT_VERTEX_COUNT, meshData.getVertexCount());
                 StatCollector.addStat(StatType.STAT_MESH_COUNT, 1);
             }
         }
