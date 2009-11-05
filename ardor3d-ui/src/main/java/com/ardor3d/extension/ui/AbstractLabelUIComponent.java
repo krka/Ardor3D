@@ -246,16 +246,15 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
             final double dix = getTotalLeft();
             final double diy = getTotalBottom();
             // draw icon
-            SubTexUtil
-                    .drawSubTex(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth() * getWorldScale().getX(),
-                            _iconDimensions.getHeight() * getWorldScale().getY(), getWorldTransform());
+            SubTexUtil.drawSubTex(renderer, _icon, dix + x, diy + y, _iconDimensions.getWidth(), _iconDimensions
+                    .getHeight(), getWorldTransform());
             // shift X over by width of icon and gap
-            x += (_iconDimensions.getWidth() + _gap) * getWorldScale().getX();
+            x += _iconDimensions.getWidth() + _gap;
         }
 
         if (hasTextObject) {
             // find bottom most y location of text based on alignment.
-            y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight())) * getWorldScale().getY();
+            y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight()));
 
             // set our text location
             final Vector3 v = Vector3.fetchTempInstance();

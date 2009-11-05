@@ -66,8 +66,8 @@ public class MultiImageBackdrop extends SolidBackdrop {
             Collections.sort(_images);
         }
 
-        final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp);
-        final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp);
+        final double bgwidth = UIBackdrop.getBackdropWidth(comp);
+        final double bgheight = UIBackdrop.getBackdropHeight(comp);
 
         final double[] store = new double[2];
         for (final TransformedSubTex entry : _images) {

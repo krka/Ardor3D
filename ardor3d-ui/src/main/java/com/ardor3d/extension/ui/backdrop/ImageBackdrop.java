@@ -84,8 +84,8 @@ public class ImageBackdrop extends SolidBackdrop {
 
     public void getDimensions(final UIComponent comp, final double[] vals) {
 
-        final double bgwidth = comp.getWorldScale().getX() * UIBackdrop.getBackdropWidth(comp);
-        final double bgheight = comp.getWorldScale().getY() * UIBackdrop.getBackdropHeight(comp);
+        final double bgwidth = UIBackdrop.getBackdropWidth(comp);
+        final double bgheight = UIBackdrop.getBackdropHeight(comp);
 
         switch (_axis) {
             case Both:
