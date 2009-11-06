@@ -420,7 +420,7 @@ public class BMFont {
             doc.getDocumentElement().normalize();
             recurse(doc.getFirstChild());
 
-            db.reset();
+            // db.reset();
         } catch (final Throwable t) {
             final IOException ex = new IOException("Error loading font file " + source.toString());
             ex.initCause(t);
