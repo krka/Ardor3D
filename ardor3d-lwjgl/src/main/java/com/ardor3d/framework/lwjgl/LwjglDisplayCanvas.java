@@ -88,7 +88,14 @@ public class LwjglDisplayCanvas implements Canvas, FocusWrapper {
 
         try {
             Display.setParent(_canvas);
-            Display.create(format);
+            // NOTE: Workaround for possible lwjgl "pixel not accelerated" bug, as suggested by user "faust"
+            try {
+                Display.create(format);
+            } catch (final LWJGLException e) {
+                // failed to create Display, apply workaround (sleep for 1 second) and try again
+                Thread.sleep(1000);
+                Display.create(format);
+            }
         } catch (final Exception e) {
             logger.severe("Cannot create window");
             logger.logp(Level.SEVERE, this.getClass().toString(), "initDisplay()", "Exception", e);
