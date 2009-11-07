@@ -136,8 +136,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
     }
 
     @Override
-    public void stop() {
-        stopLWJGL();
+    public void destroy() {
+        remove(_displayCanvas);
     }
 
     protected void startLWJGL() {
