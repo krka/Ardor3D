@@ -14,7 +14,9 @@ import java.util.List;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
+import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.scenegraph.Spatial;
+import com.google.common.collect.Lists;
 
 /**
  * This layout places components in either a horizontal or vertical row, ordered as they are placed in their container.
@@ -23,8 +25,10 @@ import com.ardor3d.scenegraph.Spatial;
  */
 public class RowLayout extends UILayout {
 
-    private boolean _horizontal = true;
-    private boolean _expands = true;
+    private static final int MAX_LOOPS = 50;
+    private final boolean _horizontal;
+    private final boolean _expandsHorizontally;
+    private final boolean _expandsVertically;
 
     /**
      * Construct a new RowLayout
@@ -33,7 +37,7 @@ public class RowLayout extends UILayout {
      *            true if we should lay out horizontally, false if vertically
      */
     public RowLayout(final boolean horizontal) {
-        _horizontal = horizontal;
+        this(horizontal, true, true);
     }
 
     /**
@@ -41,13 +45,17 @@ public class RowLayout extends UILayout {
      * 
      * @param horizontal
      *            true if we should lay out horizontally, false if vertically
-     * @param expands
-     *            true (the default) if free space in the container should be divided up among the resizeable child
+     * @param expandsHorizontally
+     *            true (the default) if horizontal free space in the container should be divided up among the child
+     *            components.
+     * @param expandsVertically
+     *            true (the default) if vertical free space in the container should be divided up among the child
      *            components.
      */
-    public RowLayout(final boolean horizontal, final boolean expands) {
+    public RowLayout(final boolean horizontal, final boolean expandsHorizontally, final boolean expandsVertically) {
         _horizontal = horizontal;
-        _expands = expands;
+        _expandsHorizontally = expandsHorizontally;
+        _expandsVertically = expandsVertically;
     }
 
     /**
@@ -58,55 +66,98 @@ public class RowLayout extends UILayout {
     }
 
     /**
-     * @return true if free space in the container should be divided up among the resizeable child components.
+     * @return true (the default) if horizontal free space in the container should be divided up among the child
+     *         components.
      */
-    public boolean isExpands() {
-        return _expands;
+    public boolean isExpandsHorizontally() {
+        return _expandsHorizontally;
     }
 
-    public void setExpands(final boolean autoExpands) {
-        _expands = autoExpands;
+    /**
+     * 
+     * @return true (the default) if vertical free space in the container should be divided up among the child
+     *         components.
+     */
+    public boolean isExpandsVertically() {
+        return _expandsVertically;
     }
 
     @Override
     public void layoutContents(final UIContainer container) {
 
         final List<Spatial> content = container.getChildren();
+        final BoundingRectangle storeA = new BoundingRectangle();
+        final BoundingRectangle storeB = new BoundingRectangle();
 
-        // Determine how much space we feel we need.
-        final int reqSpace = _horizontal ? getSumOfAllWidths(content) : getSumOfAllHeights(content);
-
-        int freeSpacePerComp = _horizontal ? container.getContentWidth() : container.getContentHeight();
-
-        int expandableComponents = 0;
-
-        // look for expandable components.
-        if (_expands && content != null) {
-            for (final Spatial s : content) {
-                if (!(s instanceof UIComponent)) {
-                    continue;
+        // list of components
+        final List<UIComponent> comps = Lists.newArrayList();
+        for (int i = 0; i < content.size(); i++) {
+            final Spatial spat = content.get(i);
+            if (spat instanceof UIComponent) {
+                final UIComponent comp = (UIComponent) spat;
+                final BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
+                final BoundingRectangle minRect = comp.getMinGlobalComponentBounds(storeB);
+                if (_horizontal) {
+                    comp.fitComponentIn(minRect.getWidth(), rect.getHeight());
+                } else {
+                    comp.fitComponentIn(rect.getWidth(), minRect.getHeight());
                 }
-                final UIComponent c = (UIComponent) s;
-                if (_horizontal ? c.isLayoutResizeableX() : c.isLayoutResizeableY()) {
-                    expandableComponents++;
-                }
-            }
-            // extra space to add to each UIComponent
-            if (expandableComponents > 0 && _expands) {
-                freeSpacePerComp = (freeSpacePerComp - reqSpace) / expandableComponents;
+                comps.add(comp);
             }
         }
 
-        // container is not big enough for contents.
-        if (freeSpacePerComp < 0) {
-            freeSpacePerComp = 0;
-        }
+        if (content != null && comps.size() > 0) {
 
-        int x = 0;
-        int y = (expandableComponents == 0 || !_expands) && !_horizontal ? freeSpacePerComp - reqSpace : 0;
+            // Determine how much space we feel we need.
+            final int reqSpace = _horizontal ? getSumOfAllWidths(content) : getSumOfAllHeights(content);
 
-        if (content != null) {
-            // go through children and set location and size.
+            // How much space do we actually have?
+            int freeSpace = (_horizontal ? container.getContentWidth() : container.getContentHeight()) - reqSpace;
+
+            // container is not big enough for contents.
+            if (freeSpace < 0) {
+                freeSpace = 0;
+            }
+
+            int loops = 0;
+            do {
+                final UIComponent comp = comps.remove(0);
+                BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
+                final BoundingRectangle origRect = storeB.set(rect);
+                final int extraSize = freeSpace / (comps.size() + 1);
+                if (_horizontal) {
+                    final int height = _expandsVertically ? container.getContentHeight() : rect.getHeight();
+                    final int width = (_expandsHorizontally ? extraSize : 0) + rect.getWidth();
+                    if (height == rect.getHeight() && width == rect.getWidth()) {
+                        continue;
+                    }
+
+                    comp.fitComponentIn(width, height);
+                    rect = comp.getGlobalComponentBounds(storeA);
+                    if (Math.abs(rect.getWidth() - width) <= 1) {
+                        comps.add(comp);
+                    }
+                    freeSpace -= rect.getWidth() - origRect.getWidth();
+                } else {
+                    final int width = _expandsHorizontally ? container.getContentWidth() : rect.getWidth();
+                    final int height = (_expandsVertically ? extraSize : 0) + rect.getHeight();
+                    if (height == rect.getHeight() && width == rect.getWidth()) {
+                        continue;
+                    }
+
+                    comp.fitComponentIn(width, height);
+                    rect = comp.getGlobalComponentBounds(storeA);
+                    if (Math.abs(rect.getHeight() - height) <= 1) {
+                        comps.add(comp);
+                    }
+                    freeSpace -= rect.getHeight() - origRect.getHeight();
+                }
+            } while (freeSpace > 1 && comps.size() > 0 && ++loops <= RowLayout.MAX_LOOPS);
+
+            int x = 0;
+            int y = !_expandsVertically && !_horizontal ? container.getContentHeight() - reqSpace : 0;
+
+            // Now, go through children and set proper location.
             for (int i = 0; i < content.size(); i++) {
                 final Spatial spat = _horizontal ? content.get(i) : content.get(content.size() - i - 1);
 
@@ -114,23 +165,16 @@ public class RowLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) spat;
+                final BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
 
                 if (_horizontal) {
-
-                    comp.setComponentHeight(container.getContentHeight(), true);
-                    comp.setComponentWidth((comp.isLayoutResizeableX() && _expands ? freeSpacePerComp : 0)
-                            + comp.getMinimumComponentWidth(true), true);
-
-                    comp.setLocalXY(x, container.getContentHeight() / 2 - comp.getComponentHeight() / 2);
-                    x += comp.getComponentWidth();
+                    comp.setLocalXY(x - rect.getX(), Math.max(container.getContentHeight() / 2 - rect.getHeight() / 2
+                            - rect.getY(), 0));
+                    x += rect.getWidth();
                 } else {
-
-                    comp.setComponentHeight(container.getContentWidth(), true);
-                    comp.setComponentHeight((comp.isLayoutResizeableY() && _expands ? freeSpacePerComp : 0)
-                            + comp.getMinimumComponentHeight(true), true);
-
-                    comp.setLocalXY(container.getContentWidth() / 2 - comp.getComponentWidth() / 2, y);
-                    y += comp.getComponentHeight();
+                    comp.setLocalXY(Math.max(container.getContentWidth() / 2 - rect.getWidth() / 2 - rect.getX(), 0), y
+                            - rect.getY());
+                    y += rect.getHeight();
                 }
             }
         }
@@ -144,34 +188,24 @@ public class RowLayout extends UILayout {
         if (container.getNumberOfChildren() > 0) {
             final List<Spatial> content = container.getChildren();
 
-            // compute the min width of the container
+            // compute the min width and height of the container
+            final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
+                final BoundingRectangle rect = comp.getMinGlobalComponentBounds(store);
                 if (_horizontal) {
-                    minW += comp.getMinimumComponentWidth(true);
-                } else {
-                    if (minW < comp.getMinimumComponentWidth(true)) {
-                        minW = comp.getMinimumComponentWidth(true);
-                    }
-                }
-            }
-
-            // compute the min height of the container
-            for (final Spatial s : content) {
-                if (!(s instanceof UIComponent)) {
-                    continue;
-                }
-                final UIComponent comp = (UIComponent) s;
-
-                if (_horizontal) {
-                    if (minH < comp.getMinimumComponentHeight(true)) {
-                        minH = comp.getMinimumComponentHeight(true);
+                    minW += rect.getWidth();
+                    if (minH < rect.getHeight()) {
+                        minH = rect.getHeight();
                     }
                 } else {
-                    minH += comp.getMinimumComponentHeight(true);
+                    if (minW < rect.getWidth()) {
+                        minW = rect.getWidth();
+                    }
+                    minH += rect.getHeight();
                 }
             }
         }
@@ -181,9 +215,11 @@ public class RowLayout extends UILayout {
     private int getSumOfAllHeights(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
+            final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    sum += ((UIComponent) spat).getMinimumComponentHeight(true);
+                    final BoundingRectangle rect = ((UIComponent) spat).getMinGlobalComponentBounds(store);
+                    sum += rect.getHeight();
                 }
             }
         }
@@ -193,9 +229,11 @@ public class RowLayout extends UILayout {
     private int getSumOfAllWidths(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
+            final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    sum += ((UIComponent) spat).getMinimumComponentWidth(true);
+                    final BoundingRectangle rect = ((UIComponent) spat).getMinGlobalComponentBounds(store);
+                    sum += rect.getWidth();
                 }
             }
         }

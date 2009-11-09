@@ -17,6 +17,7 @@ import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -176,10 +177,12 @@ public class UIFrame extends UIContainer {
      *            the component to center on.
      */
     public void setLocationRelativeTo(final UIComponent comp) {
-        int x = (comp.getComponentWidth() - getComponentWidth()) / 2;
-        int y = (comp.getComponentHeight() - getComponentHeight()) / 2;
-        x += comp.getHudX();
-        y += comp.getHudY();
+        final BoundingRectangle rectA = comp.getGlobalComponentBounds(null);
+        final BoundingRectangle rectB = getGlobalComponentBounds(null);
+        int x = (rectA.getWidth() - rectB.getWidth()) / 2;
+        int y = (rectA.getHeight() - rectB.getHeight()) / 2;
+        x += comp.getHudX() - rectA.getX() + rectB.getX();
+        y += comp.getHudY() - rectA.getY() + rectB.getY();
         setHudXY(x, y);
         updateGeometricState(0);
     }
@@ -191,8 +194,11 @@ public class UIFrame extends UIContainer {
      *            the camera to center on.
      */
     public void setLocationRelativeTo(final Camera cam) {
-        final int x = (cam.getWidth() - getComponentWidth()) / 2;
-        final int y = (cam.getHeight() - getComponentHeight()) / 2;
+        final BoundingRectangle rectA = getGlobalComponentBounds(null);
+        int x = (cam.getWidth() - rectA.getWidth()) / 2;
+        int y = (cam.getHeight() - rectA.getHeight()) / 2;
+        x -= rectA.getX();
+        y -= rectA.getY();
         setHudXY(x, y);
         updateGeometricState(0);
     }
@@ -284,7 +290,7 @@ public class UIFrame extends UIContainer {
      */
     public void pack() {
         _contentPanel.updateMinimumSizeFromContents();
-        pack(_contentPanel.getMinimumComponentWidth(true), _contentPanel.getMinimumComponentHeight(true));
+        pack(_contentPanel.getMinimumLocalComponentWidth(), _contentPanel.getMinimumLocalComponentHeight());
     }
 
     /**
@@ -294,16 +300,16 @@ public class UIFrame extends UIContainer {
         int width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
         int height = contentHeight + _basePanel.getTotalTop() + _basePanel.getTotalBottom();
         if (isDecorated()) {
-            height += _statusBar.getComponentHeight() + _titleBar.getComponentHeight();
+            height += _statusBar.getLocalComponentHeight() + _titleBar.getLocalComponentHeight();
         }
-        setComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
+        setLocalComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
         layout();
         width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
         height = contentHeight + _basePanel.getTotalTop() + _basePanel.getTotalBottom();
         if (isDecorated()) {
-            height += _statusBar.getComponentHeight() + _titleBar.getComponentHeight();
+            height += _statusBar.getLocalComponentHeight() + _titleBar.getLocalComponentHeight();
         }
-        setComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
+        setLocalComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
     }
 
     /**
@@ -369,13 +375,13 @@ public class UIFrame extends UIContainer {
         }
 
         /**
-         * @return true if this frame can be fully contained by the display.
+         * @return true if this frame can be fully contained by the hud.
          */
         public boolean smallerThanWindow() {
             final int dispWidth = getHud().getWidth();
             final int dispHeight = getHud().getHeight();
-
-            return getComponentWidth() <= dispWidth && getComponentHeight() <= dispHeight;
+            final BoundingRectangle rect = getGlobalComponentBounds(null);
+            return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
         }
 
         public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}

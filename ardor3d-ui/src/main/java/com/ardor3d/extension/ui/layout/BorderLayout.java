@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
+import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -37,26 +38,28 @@ public class BorderLayout extends UILayout {
         final List<Spatial> content = container.getChildren();
 
         // Go through each component in the given container and determine the width and height of our edges.
+        final BoundingRectangle store = new BoundingRectangle();
         for (final Spatial s : content) {
             if (!(s instanceof UIComponent)) {
                 continue;
             }
             final UIComponent comp = (UIComponent) s;
+            comp.getMinGlobalComponentBounds(store);
 
             final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
             if (data != null) {
                 switch (data) {
                     case NORTH:
-                        heightNorth = comp.getMinimumComponentHeight(true);
+                        heightNorth = store.getHeight();
                         break;
                     case SOUTH:
-                        heightSouth = comp.getMinimumComponentHeight(true);
+                        heightSouth = store.getHeight();
                         break;
                     case EAST:
-                        widthEast = comp.getMinimumComponentWidth(true);
+                        widthEast = store.getWidth();
                         break;
                     case WEST:
-                        widthWest = comp.getMinimumComponentWidth(true);
+                        widthWest = store.getWidth();
                         break;
                     case CENTER:
                         // nothing to do
@@ -71,35 +74,39 @@ public class BorderLayout extends UILayout {
                 continue;
             }
             final UIComponent comp = (UIComponent) s;
+            comp.getMinGlobalComponentBounds(store);
 
             final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
+
             if (data != null) {
                 switch (data) {
                     case NORTH:
-                        comp.setLocalXY(0, container.getContentHeight() - heightNorth);
-                        comp.setComponentWidth(container.getContentWidth(), true);
-                        comp.setComponentHeight(comp.getMinimumComponentHeight(true), true);
+                        comp.fitComponentIn(container.getContentWidth(), store.getHeight());
+                        comp.getGlobalComponentBounds(store);
+                        comp.setLocalXY(-store.getX(), container.getContentHeight() - heightNorth - store.getY());
                         break;
                     case SOUTH:
-                        comp.setLocalXY(0, 0);
-                        comp.setComponentWidth(container.getContentWidth(), true);
-                        comp.setComponentHeight(comp.getMinimumComponentHeight(true), true);
+                        comp.fitComponentIn(container.getContentWidth(), store.getHeight());
+                        comp.getGlobalComponentBounds(store);
+                        comp.setLocalXY(-store.getX(), -store.getY());
                         break;
                     case EAST:
-                        comp.setLocalXY(container.getContentWidth() - comp.getMinimumComponentWidth(true) - 1,
-                                heightSouth);
-                        comp.setComponentWidth(comp.getMinimumComponentWidth(true), true);
-                        comp.setComponentHeight(container.getContentHeight() - heightNorth - heightSouth, true);
+                        comp.fitComponentIn(store.getWidth(), container.getContentHeight() - heightNorth - heightSouth);
+                        comp.getGlobalComponentBounds(store);
+                        comp.setLocalXY(container.getContentWidth() - store.getWidth() - 1 - store.getX(), heightSouth
+                                - store.getY());
                         break;
                     case WEST:
-                        comp.setLocalXY(0, heightSouth);
-                        comp.setComponentWidth(comp.getMinimumComponentWidth(true), true);
-                        comp.setComponentHeight(container.getContentHeight() - heightNorth - heightSouth, true);
+                        comp.fitComponentIn(store.getWidth(), container.getContentHeight() - heightNorth - heightSouth);
+                        comp.getGlobalComponentBounds(store);
+                        comp.setLocalXY(-store.getX(), heightSouth - store.getY());
                         break;
                     case CENTER:
-                        comp.setLocalXY(widthWest, heightSouth);
-                        comp.setComponentWidth(container.getContentWidth() - widthEast - widthWest, true);
-                        comp.setComponentHeight(container.getContentHeight() - heightSouth - heightNorth, true);
+                        comp.fitComponentIn(container.getContentWidth() - widthEast - widthWest, container
+                                .getContentHeight()
+                                - heightSouth - heightNorth);
+                        comp.getGlobalComponentBounds(store);
+                        comp.setLocalXY(widthWest - store.getX(), heightSouth - store.getY());
                 }
             }
         }
@@ -115,19 +122,21 @@ public class BorderLayout extends UILayout {
         int minH = 0;
         int maxEWCH = 0;
         if (content != null) {
+            final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
+                comp.getMinGlobalComponentBounds(store);
                 final BorderLayoutData bld = (BorderLayoutData) comp.getLayoutData();
                 if (bld == null) {
                     continue;
                 }
                 if (bld == BorderLayoutData.SOUTH || bld == BorderLayoutData.NORTH) {
-                    minH += comp.getMinimumComponentHeight(true);
+                    minH += store.getHeight();
                 } else {
-                    final int h = comp.getMinimumComponentHeight(true);
+                    final int h = store.getHeight();
                     if (h > maxEWCH) {
                         maxEWCH = h;
                     }
@@ -142,17 +151,19 @@ public class BorderLayout extends UILayout {
         int minWidth = 0;
         int maxNSWidth = 0;
         if (content != null) {
+            final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
+                comp.getMinGlobalComponentBounds(store);
                 final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
                 if (data == BorderLayoutData.EAST || data == BorderLayoutData.WEST || data == BorderLayoutData.CENTER
                         || data == null) {
-                    minWidth += comp.getMinimumComponentWidth(true);
+                    minWidth += store.getWidth();
                 } else {
-                    final int width = comp.getMinimumComponentWidth(true);
+                    final int width = store.getWidth();
                     if (width > maxNSWidth) {
                         maxNSWidth = width;
                     }

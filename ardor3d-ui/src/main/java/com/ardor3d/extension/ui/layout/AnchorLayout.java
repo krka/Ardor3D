@@ -11,15 +11,16 @@
 package com.ardor3d.extension.ui.layout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.scenegraph.Spatial;
+import com.google.common.collect.Maps;
 
 /**
  * <p>
@@ -50,7 +51,7 @@ import com.ardor3d.scenegraph.Spatial;
 public class AnchorLayout extends UILayout {
 
     /** map used to track anchor relationship during layout. */
-    private final Map<UIComponent, AnchorRecord> _records = new HashMap<UIComponent, AnchorRecord>();
+    private final Map<UIComponent, AnchorRecord> _records = Maps.newHashMap();
 
     // Various min/max values set and used during a layout operation.
     private int _maxX = 0;
@@ -120,16 +121,18 @@ public class AnchorLayout extends UILayout {
         // get the anchor record (if any) for this component
         final AnchorRecord aRecord = _records.get(toVisit);
         if (aRecord != null) {
+            final BoundingRectangle rect = new BoundingRectangle();
             for (int x = aRecord.dependants.size(); --x >= 0;) {
                 final UIComponent dep = aRecord.dependants.get(x);
                 if (dep.getLayoutData() instanceof AnchorLayoutData) {
+                    dep.getGlobalComponentBounds(rect);
                     AnchorLayout.applyAnchor(dep, (AnchorLayoutData) dep.getLayoutData());
 
                     // update min/max
-                    final int posX = (int) (dep.getTranslation().getX() + dep.getComponentWidth());
-                    final int negX = (int) dep.getTranslation().getX();
-                    final int posY = (int) (dep.getTranslation().getY() + dep.getComponentHeight());
-                    final int negY = (int) dep.getTranslation().getY();
+                    final int posX = Math.round(dep.getTranslation().getXf()) + rect.getWidth() - rect.getX();
+                    final int negX = Math.round(dep.getTranslation().getXf()) - rect.getX();
+                    final int posY = Math.round(dep.getTranslation().getYf()) + rect.getHeight() - rect.getY();
+                    final int negY = Math.round(dep.getTranslation().getYf()) - rect.getY();
                     if (posX > _maxX) {
                         _maxX = posX;
                     }
@@ -166,33 +169,35 @@ public class AnchorLayout extends UILayout {
             store = new Vector2();
         }
 
+        final BoundingRectangle rect = new BoundingRectangle();
+        comp.getGlobalComponentBounds(rect);
         switch (point) {
             case TOP_LEFT:
-                store.set(0, comp.getComponentHeight());
+                store.set(rect.getX(), rect.getHeight() + rect.getY());
                 break;
             case TOP:
-                store.set(comp.getComponentWidth() / 2f, comp.getComponentHeight());
+                store.set(rect.getWidth() / 2f + rect.getX(), rect.getHeight() + rect.getY());
                 break;
             case TOP_RIGHT:
-                store.set(comp.getComponentWidth(), comp.getComponentHeight());
+                store.set(rect.getWidth() + rect.getX(), rect.getHeight() + rect.getY());
                 break;
             case LEFT:
-                store.set(0, comp.getComponentHeight() / 2f);
+                store.set(rect.getX(), rect.getHeight() / 2f + rect.getY());
                 break;
             case MIDDLE:
-                store.set(comp.getComponentWidth() / 2f, comp.getComponentHeight() / 2f);
+                store.set(rect.getWidth() / 2f + rect.getX(), rect.getHeight() / 2f + rect.getY());
                 break;
             case RIGHT:
-                store.set(comp.getComponentWidth(), comp.getComponentHeight() / 2f);
+                store.set(rect.getWidth() + rect.getX(), rect.getHeight() / 2f + rect.getY());
                 break;
             case BOTTOM_LEFT:
-                store.set(0, 0);
+                store.set(rect.getX(), rect.getY());
                 break;
             case BOTTOM:
-                store.set(comp.getComponentWidth() / 2f, 0);
+                store.set(rect.getWidth() / 2f + rect.getX(), rect.getY());
                 break;
             case BOTTOM_RIGHT:
-                store.set(comp.getComponentWidth(), 0);
+                store.set(rect.getWidth() + rect.getX(), rect.getY());
                 break;
         }
 

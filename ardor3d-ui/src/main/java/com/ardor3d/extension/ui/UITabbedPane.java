@@ -65,8 +65,7 @@ public class UITabbedPane extends UIPanel {
         super.add(_center);
 
         // Create a panel that will hold our tab buttons
-        final RowLayout layout = new RowLayout(_placement.isHorizontal());
-        layout.setExpands(false);
+        final RowLayout layout = new RowLayout(_placement.isHorizontal(), false, false);
         _tabsPanel = new UIPanel(layout);
         _tabsPanel.setLayoutData(_placement.getLayoutData());
         super.add(_tabsPanel);
@@ -114,8 +113,8 @@ public class UITabbedPane extends UIPanel {
                 final Spatial child = _contents.get(x);
                 if (child instanceof UIComponent) {
                     final UIComponent comp = (UIComponent) child;
-                    comp.setComponentSize(getViewedComponent().getComponentWidth(), getViewedComponent()
-                            .getComponentHeight());
+                    comp.setLocalComponentSize(getViewedComponent().getLocalComponentWidth(), getViewedComponent()
+                            .getLocalComponentHeight());
                     comp.layout();
                 }
             }

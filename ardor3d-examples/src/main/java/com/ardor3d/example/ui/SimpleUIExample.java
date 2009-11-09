@@ -191,8 +191,7 @@ public class SimpleUIExample extends ExampleBase {
         button.setTooltipText("This is a tooltip!");
         panel.add(button);
 
-        final RowLayout rowLay = new RowLayout(false);
-        rowLay.setExpands(false);
+        final RowLayout rowLay = new RowLayout(false, false, false);
         final UIPanel centerPanel = new UIPanel(rowLay);
         centerPanel.setLayoutData(BorderLayoutData.CENTER);
         panel.add(centerPanel);
@@ -214,8 +213,8 @@ public class SimpleUIExample extends ExampleBase {
 
         bar = new UIProgressBar("Loading: ", true);
         bar.setPercentFilled(0);
-        bar.setComponentWidth(250);
-        bar.setLayoutResizeableX(false);
+        bar.setLocalComponentWidth(250);
+        bar.setMaximumContentWidth(bar.getContentWidth());
         centerPanel.add(bar);
 
         fpslabel = new UILabel("FPS");

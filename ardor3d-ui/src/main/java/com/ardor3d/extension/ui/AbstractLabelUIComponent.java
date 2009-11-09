@@ -258,7 +258,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
             // set our text location
             final Vector3 v = Vector3.fetchTempInstance();
-            v.set(1, 1, 0);
+            v.set(x + getTotalLeft(), y + getTotalBottom(), 0);
 
             final Transform t = Transform.fetchTempInstance();
             final Matrix3 m = Matrix3.fetchTempInstance();
@@ -273,7 +273,6 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
                 t.setMatrix(m);
             }
             t.translate(v);
-            t.translate(x + getTotalLeft(), y + getTotalBottom(), 0);
             Vector3.releaseTempInstance(v);
 
             _text.setWorldTransform(t);

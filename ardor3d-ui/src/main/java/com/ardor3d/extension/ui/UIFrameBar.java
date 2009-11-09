@@ -96,9 +96,10 @@ public class UIFrameBar extends UIPanel {
     private UIButton createFrameButton(final String string) {
         // Generate a standardized button.
         final UIButton rVal = new UIButton(string);
-        rVal.setLayoutResizeableXY(false);
         rVal.refreshState();
         rVal.compact();
+        rVal.setMinimumContentSize(rVal.getContentWidth(), rVal.getContentHeight());
+        rVal.setMaximumContentSize(rVal.getContentWidth(), rVal.getContentHeight());
         return rVal;
     }
 

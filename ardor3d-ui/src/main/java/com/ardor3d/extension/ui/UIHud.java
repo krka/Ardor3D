@@ -73,12 +73,6 @@ public class UIHud extends Node {
     /** Tracks the previous component our mouse was over so we can properly handle mouse entered and departed events. */
     private UIComponent _lastMouseOverComponent;
 
-    /**
-     * Tracks the previous component our mouse button was pressed on so we can properly handle mouse pressed and
-     * released events.
-     */
-    private UIComponent _mouseDownComponent;
-
     /** Tracks last mouse location so we can detect movement. */
     private int _lastMouseX, _lastMouseY;
 
@@ -483,7 +477,6 @@ public class UIHud extends Node {
         boolean consumed = false;
         final int mouseX = currentIS.getMouseState().getX(), mouseY = currentIS.getMouseState().getY();
         final UIComponent over = getUIComponent(mouseX, mouseY);
-        _mouseDownComponent = over;
 
         setFocusedComponent(over);
 

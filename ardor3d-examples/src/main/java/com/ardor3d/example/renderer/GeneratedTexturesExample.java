@@ -152,7 +152,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         // Set up the frames
         for (int i = 0; i < views.length; i++) {
             views[i] = new UIPanel();
-            views[i].setComponentSize(wside, hside);
+            views[i].setLocalComponentSize(wside, hside);
             views[i].layout();
             hud.add(views[i]);
         }
@@ -273,7 +273,7 @@ public class GeneratedTexturesExample extends ExampleBase {
                 // use an scurve to smoothly zoom
                 final float sCurve = MathUtils.scurve5(ratio);
                 final float size = sCurve * (_canvas.getCanvasRenderer().getCamera().getHeight() - hside) + hside;
-                parent.setComponentSize((int) (size * hside / wside), (int) size);
+                parent.setLocalComponentSize((int) (size * hside / wside), (int) size);
 
                 // use an scurve to smoothly shift origin
                 parent.setHudXY(Math.round(MathUtils.lerp(sCurve, originX, endX)), Math.round(MathUtils.lerp(sCurve,

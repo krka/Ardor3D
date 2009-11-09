@@ -96,7 +96,7 @@ public class UIFrameStatusBar extends UIPanel {
             final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
 
             // Set the new width to the current width + the change in mouse x position.
-            int newWidth = frame.getComponentWidth() + x - _oldX;
+            int newWidth = frame.getLocalComponentWidth() + x - _oldX;
             if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
                 // don't let us get smaller than min size
                 newWidth = UIFrame.MIN_FRAME_WIDTH;
@@ -104,14 +104,14 @@ public class UIFrameStatusBar extends UIPanel {
 
             // Set the new height to the current width + the change in mouse y position.
             int heightDif = y - _oldY;
-            int newHeight = frame.getComponentHeight() + _oldY - y;
+            int newHeight = frame.getLocalComponentHeight() + _oldY - y;
             if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
                 // don't let us get smaller than min size
                 newHeight = UIFrame.MIN_FRAME_HEIGHT;
-                heightDif = frame.getComponentHeight() - newHeight;
+                heightDif = frame.getLocalComponentHeight() - newHeight;
             }
 
-            frame.setComponentSize(newWidth, newHeight);
+            frame.setLocalComponentSize(newWidth, newHeight);
 
             vec.set(0, heightDif, 0);
             getWorldTransform().applyForwardVector(vec);

@@ -415,7 +415,10 @@ public class GenericSkin extends Skin {
                     final UIButton closeButton = titleBar.getCloseButton();
                     if (closeButton != null) {
                         closeButton.setButtonText("");
-                        closeButton.setLayoutResizeableXY(false);
+                        closeButton
+                                .setMinimumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
+                        closeButton
+                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                         closeButton.setButtonIcon(new SubTex(_sharedTex, 94, 76, 16, 16));
                         closeButton.getPressedState().setIcon(new SubTex(_sharedTex, 94, 94, 16, 16));
                         for (final UIState state : closeButton.getStates()) {
@@ -433,7 +436,10 @@ public class GenericSkin extends Skin {
                     final UIButton minimizeButton = titleBar.getMinimizeButton();
                     if (minimizeButton != null) {
                         minimizeButton.setButtonText("");
-                        minimizeButton.setLayoutResizeableXY(false);
+                        minimizeButton.setMinimumContentSize(minimizeButton.getContentWidth(), minimizeButton
+                                .getContentHeight());
+                        minimizeButton.setMaximumContentSize(minimizeButton.getContentWidth(), minimizeButton
+                                .getContentHeight());
                         minimizeButton.setButtonIcon(new SubTex(_sharedTex, 113, 76, 16, 16));
                         minimizeButton.getPressedState().setIcon(new SubTex(_sharedTex, 113, 94, 16, 16));
                         for (final UIState state : minimizeButton.getStates()) {
@@ -451,7 +457,10 @@ public class GenericSkin extends Skin {
                     final UIButton expandButton = titleBar.getExpandButton();
                     if (expandButton != null) {
                         expandButton.setButtonText("");
-                        expandButton.setLayoutResizeableXY(false);
+                        expandButton.setMinimumContentSize(expandButton.getContentWidth(), expandButton
+                                .getContentHeight());
+                        expandButton.setMaximumContentSize(expandButton.getContentWidth(), expandButton
+                                .getContentHeight());
                         expandButton.setButtonIcon(new SubTex(_sharedTex, 132, 76, 16, 16));
                         expandButton.getPressedState().setIcon(new SubTex(_sharedTex, 132, 94, 16, 16));
                         for (final UIState state : expandButton.getStates()) {
@@ -469,7 +478,8 @@ public class GenericSkin extends Skin {
                     final UIButton helpButton = titleBar.getHelpButton();
                     if (helpButton != null) {
                         helpButton.setButtonText("");
-                        helpButton.setLayoutResizeableXY(false);
+                        helpButton.setMinimumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
+                        helpButton.setMaximumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
                         helpButton.setButtonIcon(new SubTex(_sharedTex, 151, 76, 16, 16));
                         helpButton.getPressedState().setIcon(new SubTex(_sharedTex, 151, 94, 16, 16));
                         for (final UIState state : helpButton.getStates()) {
@@ -520,8 +530,8 @@ public class GenericSkin extends Skin {
             final UIFrameStatusBar statusBar = component.getStatusBar();
             // Make sure exists and is attached
             if (statusBar != null && statusBar.getParent() == component.getBasePanel()) {
-                statusBar.setComponentHeight(10);
-                statusBar.setLayoutResizeableY(false);
+                statusBar.setLocalComponentHeight(12);
+                statusBar.setMaximumContentHeight(statusBar.getContentHeight());
 
                 final UIButton resize = statusBar.getResizeButton();
                 if (resize != null && resize.getParent() == statusBar) {
@@ -534,7 +544,8 @@ public class GenericSkin extends Skin {
                     }
                     resize.refreshState();
                     resize.compact();
-                    resize.setLayoutResizeableXY(false);
+                    resize.setMinimumContentSize(resize.getContentWidth(), resize.getContentHeight());
+                    resize.setMaximumContentSize(resize.getContentWidth(), resize.getContentHeight());
                 }
             }
         }

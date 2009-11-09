@@ -27,6 +27,8 @@ import com.ardor3d.scenegraph.Spatial;
  * content plus some inter-cell spacing. The components should be added from top to down and left to right. Set the
  * layout data of the last component in a row to wrap, e.g. by setLayoutData(GridLayoutData.Wrap); You can specify a
  * horizontal span bigger than one to specify that a component should use multiple cells in the current row.
+ * 
+ * XXX: Note that this class does not currently support layout of rotated components.
  */
 public class GridLayout extends UILayout {
 
@@ -152,7 +154,7 @@ public class GridLayout extends UILayout {
             lc.component.setLocalXY(grid.columnOffsets[lc.firstColumn], rowHeightDiff + height
                     - grid.rowOffsets[lc.firstRow] - lc.getComponentHeight());
             if (lc.grow) {
-                lc.component.setComponentWidth(grid.getCellsWidth(lc.firstColumn, lc.lastColumn));
+                lc.component.setLocalComponentWidth(grid.getCellsWidth(lc.firstColumn, lc.lastColumn));
             }
         }
     }
@@ -276,11 +278,11 @@ public class GridLayout extends UILayout {
         }
 
         public int getComponentWidth() {
-            return Math.max(component.getComponentWidth(), component.getMinimumComponentWidth(true));
+            return Math.max(component.getLocalComponentWidth(), component.getMinimumLocalComponentWidth());
         }
 
         public int getComponentHeight() {
-            return Math.max(component.getComponentHeight(), component.getMinimumComponentHeight(true));
+            return Math.max(component.getLocalComponentHeight(), component.getMinimumLocalComponentHeight());
         }
 
         @Override

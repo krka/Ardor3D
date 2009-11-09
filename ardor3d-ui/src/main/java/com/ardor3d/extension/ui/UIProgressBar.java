@@ -97,9 +97,9 @@ public class UIProgressBar extends UIPanel {
         super.layout();
 
         if (isHorizontal()) {
-            _bar.setComponentWidth((int) (_percentFilled * _bar.getComponentWidth()));
+            _bar.setLocalComponentWidth((int) (_percentFilled * _bar.getLocalComponentWidth()));
         } else {
-            _bar.setComponentHeight((int) (_percentFilled * _bar.getComponentHeight()));
+            _bar.setLocalComponentHeight((int) (_percentFilled * _bar.getLocalComponentHeight()));
         }
     }
 

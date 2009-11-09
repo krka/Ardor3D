@@ -20,6 +20,7 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.layout.UILayoutData;
 import com.ardor3d.extension.ui.skin.SkinManager;
+import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
@@ -29,6 +30,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
@@ -60,17 +62,14 @@ public abstract class UIComponent extends Node {
     private final Dimension _contentsSize = new Dimension(10, 10);
     /** The absolute minimum size of the internal contents portion of this component. */
     private final Dimension _minimumContentsSize = new Dimension(10, 10);
+    /** The absolute maximum size of the internal contents portion of this component. */
+    private final Dimension _maximumContentsSize = new Dimension(10000, 10000);
     /** A spacing between the component's border and its inner content area. */
     private Insets _padding = new Insets(0, 0, 0, 0);
     /** A border around this component. */
     private UIBorder _border = new EmptyBorder();
     /** A spacing between the component's border and other content outside this component. Used during layout. */
     private Insets _margin = new Insets(0, 0, 0, 0);
-
-    /** If false, the contents part of this component is not allowed to be resized on the X axis by layouts. */
-    private boolean _layoutX = true;
-    /** If false, the contents part of this component is not allowed to be resized on the Y axis by layouts. */
-    private boolean _layoutY = true;
 
     /** The renderer responsible for drawing this component's backdrop. */
     private UIBackdrop _backdrop = new EmptyBackdrop();
@@ -158,45 +157,6 @@ public abstract class UIComponent extends Node {
     }
 
     /**
-     * @return true if the layout is allowed to change the width of this component.
-     */
-    public boolean isLayoutResizeableX() {
-        return _layoutX;
-    }
-
-    /**
-     * @param resizeable
-     *            true if the layout is allowed to change the width of this component.
-     */
-    public void setLayoutResizeableX(final boolean resizeable) {
-        _layoutX = resizeable;
-    }
-
-    /**
-     * @return true if the layout is allowed to change the height of this component.
-     */
-    public boolean isLayoutResizeableY() {
-        return _layoutY;
-    }
-
-    /**
-     * @param resizeable
-     *            true if the layout is allowed to change the height of this component.
-     */
-    public void setLayoutResizeableY(final boolean resizeable) {
-        _layoutY = resizeable;
-    }
-
-    /**
-     * @param resizeable
-     *            true if the layout is allowed to change the width AND height of this component.
-     */
-    public void setLayoutResizeableXY(final boolean resizeable) {
-        setLayoutResizeableX(resizeable);
-        setLayoutResizeableY(resizeable);
-    }
-
-    /**
      * Used primarily during rendering to determine how alpha blending should be done.
      * 
      * @return true if nothing has been drawn by this component or its ancestors yet that would affect its content area.
@@ -263,17 +223,85 @@ public abstract class UIComponent extends Node {
     }
 
     /**
-     * @return the width of this entire component as a whole, including all margins, borders, padding and content.
+     * @return the width of this entire component as a whole, including all margins, borders, padding and content (in
+     *         the component's coordinate space.)
      */
-    public int getComponentWidth() {
+    public int getLocalComponentWidth() {
         return _contentsSize.getWidth() + getTotalLeft() + getTotalRight();
     }
 
     /**
-     * @return the height of this entire component as a whole, including all margins, borders, padding and content.
+     * @return the height of this entire component as a whole, including all margins, borders, padding and content (in
+     *         the component's coordinate space.)
      */
-    public int getComponentHeight() {
+    public int getLocalComponentHeight() {
         return _contentsSize.getHeight() + getTotalTop() + getTotalBottom();
+    }
+
+    public BoundingRectangle getMinGlobalComponentBounds(final BoundingRectangle store) {
+        BoundingRectangle rVal = store;
+        if (rVal == null) {
+            rVal = new BoundingRectangle();
+        }
+        final int height = getMinimumLocalComponentHeight();
+        final int width = getMinimumLocalComponentWidth();
+        return getGlobalComponentBounds(rVal, width, height);
+    }
+
+    public BoundingRectangle getMaxGlobalComponentBounds(final BoundingRectangle store) {
+        BoundingRectangle rVal = store;
+        if (rVal == null) {
+            rVal = new BoundingRectangle();
+        }
+        final int height = getMaximumLocalComponentHeight();
+        final int width = getMaximumLocalComponentWidth();
+        return getGlobalComponentBounds(rVal, width, height);
+    }
+
+    public BoundingRectangle getGlobalComponentBounds(final BoundingRectangle store) {
+        BoundingRectangle rVal = store;
+        if (rVal == null) {
+            rVal = new BoundingRectangle();
+        }
+        final int height = getLocalComponentHeight();
+        final int width = getLocalComponentWidth();
+        return getGlobalComponentBounds(rVal, width, height);
+    }
+
+    private BoundingRectangle getGlobalComponentBounds(final BoundingRectangle store, final int width, final int height) {
+        final ReadOnlyTransform local = getTransform();
+        if (local.isIdentity() || local.getMatrix().isIdentity()) {
+            store.set(0, 0, width, height);
+        } else {
+            float minX, maxX, minY, maxY;
+            final Vector3 t = Vector3.fetchTempInstance();
+
+            t.set(width, height, 0);
+            local.applyForwardVector(t);
+            minX = Math.min(t.getXf(), 0);
+            maxX = Math.max(t.getXf(), 0);
+            minY = Math.min(t.getYf(), 0);
+            maxY = Math.max(t.getYf(), 0);
+
+            t.set(0, height, 0);
+            local.applyForwardVector(t);
+            minX = Math.min(t.getXf(), minX);
+            maxX = Math.max(t.getXf(), maxX);
+            minY = Math.min(t.getYf(), minY);
+            maxY = Math.max(t.getYf(), maxY);
+
+            t.set(width, 0, 0);
+            local.applyForwardVector(t);
+            minX = Math.min(t.getXf(), minX);
+            maxX = Math.max(t.getXf(), maxX);
+            minY = Math.min(t.getYf(), minY);
+            maxY = Math.max(t.getYf(), maxY);
+
+            Vector3.releaseTempInstance(t);
+            store.set(Math.round(minX), Math.round(minY), Math.round(maxX - minX), Math.round(maxY - minY));
+        }
+
+        return store;
     }
 
     /**
@@ -285,65 +313,37 @@ public abstract class UIComponent extends Node {
      * @param height
      *            the new height of the component
      */
-    public void setComponentSize(final int width, final int height) {
-        setComponentWidth(width);
-        setComponentHeight(height);
+    public void setLocalComponentSize(final int width, final int height) {
+        setLocalComponentWidth(width);
+        setLocalComponentHeight(height);
     }
 
     /**
-     * Sets the width of this component by forcing the content area to be of a proper width such that when the padding,
-     * margin and border are added, the total component's width matches that given.
-     * 
-     * @param width
-     *            the new width of the component
+     * @return the width contained in _minimumContentsSize + the margin, border and padding values for left and right.
      */
-    public void setComponentWidth(final int width) {
-        setComponentWidth(width, false);
+    public int getMinimumLocalComponentWidth() {
+        return _minimumContentsSize.getWidth() + getTotalLeft() + getTotalRight();
     }
 
     /**
-     * Sets the height of this component by forcing the content area to be of a proper height such that when the
-     * padding, margin and border are added, the total component's height matches that given.
-     * 
-     * @param height
-     *            the new height of the component
+     * @return the height contained in _minimumContentsSize + the margin, border and padding values for top and bottom.
      */
-    public void setComponentHeight(final int height) {
-        setComponentHeight(height, false);
+    public int getMinimumLocalComponentHeight() {
+        return _minimumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
     }
 
     /**
-     * If this component does not want us to resize it and we've chosen to listen to that (via passing true) then this
-     * method returns the current component width. Otherwise, it returns the width contained in _minimumContentsSize +
-     * the margin, border and padding values for left and right.
-     * 
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableX.
-     * @return the width as described.
+     * @return the width contained in _maximumContentsSize + the margin, border and padding values for left and right.
      */
-    public int getMinimumComponentWidth(final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableX()) {
-            return _minimumContentsSize.getWidth() + getTotalLeft() + getTotalRight();
-        } else {
-            return getComponentWidth();
-        }
+    public int getMaximumLocalComponentWidth() {
+        return _maximumContentsSize.getWidth() + getTotalLeft() + getTotalRight();
     }
 
     /**
-     * If this component does not want us to resize it and we've chosen to listen to that (via passing true) then this
-     * method returns the current component height. Otherwise, it returns the height contained in _minimumContentsSize +
-     * the margin, border and padding values for top and bottom.
-     * 
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableY.
-     * @return the height as described.
+     * @return the height contained in _maximumContentsSize + the margin, border and padding values for top and bottom.
      */
-    public int getMinimumComponentHeight(final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableY()) {
-            return _minimumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
-        } else {
-            return getComponentHeight();
-        }
+    public int getMaximumLocalComponentHeight() {
+        return _maximumContentsSize.getHeight() + getTotalTop() + getTotalBottom();
     }
 
     /**
@@ -360,83 +360,47 @@ public abstract class UIComponent extends Node {
     }
 
     /**
-     * Sets the width of this component's content area.
-     * 
-     * @param width
-     *            the new width of the content area
-     */
-    public void setContentWidth(final int width) {
-        setContentWidth(width, false);
-    }
-
-    /**
-     * Sets the height of this component's content area.
+     * Sets the height of the content area of this component to that given, as long as we're between min and max content
+     * height.
      * 
      * @param height
-     *            the new height of the content area
+     *            the new height
      */
     public void setContentHeight(final int height) {
-        setContentHeight(height, false);
+        _contentsSize.setHeight(Math.max(Math.min(height, _maximumContentsSize.getHeight()), _minimumContentsSize
+                .getHeight()));
     }
 
     /**
-     * Sets the width of the content area of this component to that given, if we either choose to ignore the rules, or
-     * the component is set to allow resize on Y.
-     * 
-     * @param height
-     *            the new height
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableY.
-     */
-    public void setContentHeight(final int height, final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableY()) {
-            _contentsSize.setHeight(height);
-        }
-    }
-
-    /**
-     * Sets the width of the content area of this component to that given, if we either choose to ignore the rules, or
-     * the component is set to allow resize on X.
+     * Sets the width of the content area of this component to that given, as long as we're between min and max content
+     * width.
      * 
      * @param width
      *            the new width
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableX.
      */
-    public void setContentWidth(final int width, final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableX()) {
-            _contentsSize.setWidth(width);
-        }
+    public void setContentWidth(final int width) {
+        _contentsSize.setWidth(Math.max(Math.min(width, _maximumContentsSize.getWidth()), _minimumContentsSize
+                .getWidth()));
     }
 
     /**
-     * Sets the current component height to that given, if we either choose to ignore the rules, or the component is set
-     * to allow resize on Y.
+     * Sets the current component height to that given, as long as it would not violate min and max content height.
      * 
      * @param height
      *            the new height
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableY.
      */
-    public void setComponentHeight(final int height, final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableY()) {
-            _contentsSize.setHeight(height - getTotalTop() - getTotalBottom());
-        }
+    public void setLocalComponentHeight(final int height) {
+        setContentHeight(height - getTotalTop() - getTotalBottom());
     }
 
     /**
-     * Sets the current component width to that given, if we either choose to ignore the rules, or the component is set
-     * to allow resize on X.
+     * Sets the current component width to that given, as long as it would not violate min and max content width.
      * 
      * @param width
      *            the new width
-     * @param obeyResizeRules
-     *            true if we want to obey isLayoutResizeableX.
      */
-    public void setComponentWidth(final int width, final boolean obeyResizeRules) {
-        if (!obeyResizeRules || isLayoutResizeableX()) {
-            _contentsSize.setWidth(width - getTotalLeft() - getTotalRight());
-        }
+    public void setLocalComponentWidth(final int width) {
+        setContentWidth(width - getTotalLeft() - getTotalRight());
     }
 
     /**
@@ -454,6 +418,34 @@ public abstract class UIComponent extends Node {
     }
 
     /**
+     * Sets the maximum content size of this component to the values given.
+     * 
+     * @param width
+     * @param height
+     */
+    public void setMaximumContentSize(final int width, final int height) {
+        _maximumContentsSize.set(width, height);
+    }
+
+    /**
+     * Sets the maximum content width of this component to the value given.
+     * 
+     * @param width
+     */
+    public void setMaximumContentWidth(final int width) {
+        _maximumContentsSize.setWidth(width);
+    }
+
+    /**
+     * Sets the maximum content height of this component to the value given.
+     * 
+     * @param height
+     */
+    public void setMaximumContentHeight(final int height) {
+        _maximumContentsSize.setHeight(height);
+    }
+
+    /**
      * Sets the minimum content size of this component to the values given.
      * 
      * @param width
@@ -464,15 +456,56 @@ public abstract class UIComponent extends Node {
     }
 
     /**
+     * Sets the minimum content width of this component to the value given.
+     * 
+     * @param width
+     */
+    public void setMinimumContentWidth(final int width) {
+        _minimumContentsSize.setWidth(width);
+    }
+
+    /**
+     * Sets the minimum content height of this component to the value given.
+     * 
+     * @param height
+     */
+    public void setMinimumContentHeight(final int height) {
+        _minimumContentsSize.setHeight(height);
+    }
+
+    /**
      * Sets the size of the content area of this component to the current width and height set on _minimumContentsSize
      * (if component is set to allow such resizing.)
      */
     public void compact() {
-        if (isLayoutResizeableX()) {
-            _contentsSize.setWidth(_minimumContentsSize.getWidth());
+        setContentSize(_minimumContentsSize.getWidth(), _minimumContentsSize.getHeight());
+    }
+
+    /**
+     * 
+     * @param width
+     * @param height
+     */
+    public void fitComponentIn(final int width, final int height) {
+        final ReadOnlyTransform local = getTransform();
+        if (local.isIdentity() || local.getMatrix().isIdentity()) {
+            setLocalComponentSize(width, height);
+            return;
         }
-        if (isLayoutResizeableY()) {
-            _contentsSize.setHeight(_minimumContentsSize.getHeight());
+
+        final Vector3 temp = Vector3.fetchTempInstance();
+        temp.set(1, 0, 0);
+        local.applyForwardVector(temp);
+        if (Math.abs(temp.getX()) >= 0.99999) {
+            setLocalComponentSize(width, height);
+        } else if (Math.abs(temp.getY()) >= 0.99999) {
+            setLocalComponentSize(height, width);
+        } else {
+            final BoundingRectangle rect = getMinGlobalComponentBounds(null);
+            final float ratio = Math.min((float) width / rect.getWidth(), (float) height / rect.getHeight());
+
+            setLocalComponentSize(Math.round(getMinimumLocalComponentWidth() * ratio), Math
+                    .round(getMinimumLocalComponentHeight() * ratio));
         }
     }
 
@@ -869,8 +902,8 @@ public abstract class UIComponent extends Node {
         final double y = vec.getY() - getMargin().getBottom();
         Vector3.releaseTempInstance(vec);
 
-        return x >= 0 && x < getComponentWidth() - getMargin().getLeft() - getMargin().getRight() && y >= 0
-                && y < getComponentHeight() - getMargin().getBottom() - getMargin().getTop();
+        return x >= 0 && x < getLocalComponentWidth() - getMargin().getLeft() - getMargin().getRight() && y >= 0
+                && y < getLocalComponentHeight() - getMargin().getBottom() - getMargin().getTop();
     }
 
     /**
@@ -1181,13 +1214,13 @@ public abstract class UIComponent extends Node {
 
                         if (x < 0) {
                             x = 0;
-                        } else if (x + ttip.getComponentWidth() > displayWidth) {
-                            x = displayWidth - ttip.getComponentWidth();
+                        } else if (x + ttip.getLocalComponentWidth() > displayWidth) {
+                            x = displayWidth - ttip.getLocalComponentWidth();
                         }
                         if (y < 0) {
                             y = 0;
-                        } else if (y + ttip.getComponentHeight() > displayHeight) {
-                            y = displayHeight - ttip.getComponentHeight();
+                        } else if (y + ttip.getLocalComponentHeight() > displayHeight) {
+                            y = displayHeight - ttip.getLocalComponentHeight();
                         }
                     }
                     ttip.setHudXY(x, y);

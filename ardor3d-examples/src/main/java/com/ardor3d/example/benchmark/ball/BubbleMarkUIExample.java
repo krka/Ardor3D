@@ -30,6 +30,9 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -111,8 +114,8 @@ public class BubbleMarkUIExample extends ExampleBase {
         _configFrame.updateMinimumSizeFromContents();
         _configFrame.pack(320, 240);
         _configFrame.setUseStandin(true);
-        _configFrame.setHudXY(width - _configFrame.getComponentWidth() - 5, height - _configFrame.getComponentHeight()
-                - 5);
+        _configFrame.setHudXY(width - _configFrame.getLocalComponentWidth() - 5, height
+                - _configFrame.getLocalComponentHeight() - 5);
 
         _configFrame.getContentPanel().setLayout(new AnchorLayout());
 
@@ -153,6 +156,8 @@ public class BubbleMarkUIExample extends ExampleBase {
                 resetBalls(16);
             }
         });
+        balls16.setRotation(new Matrix3().fromAngleNormalAxis(45 * MathUtils.DEG_TO_RAD, new Vector3(0, 0, 1)));
+        balls16.setBackdrop(new SolidBackdrop(ColorRGBA.GREEN));
         balls16.setGroup(ballsGroup);
         _configFrame.getContentPanel().add(balls16);
 

@@ -290,8 +290,8 @@ public abstract class UIContainer extends UIComponent {
             return;
         }
 
-        final int width = getComponentWidth();
-        final int height = getComponentHeight();
+        final int width = getLocalComponentWidth();
+        final int height = getLocalComponentHeight();
         final int dispWidth = Camera.getCurrentCamera().getWidth();
         final int dispHeight = Camera.getCurrentCamera().getHeight();
 
