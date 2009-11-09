@@ -44,7 +44,7 @@ public class BorderLayout extends UILayout {
                 continue;
             }
             final UIComponent comp = (UIComponent) s;
-            comp.getMinGlobalComponentBounds(store);
+            comp.getRelativeMinComponentBounds(store);
 
             final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
             if (data != null) {
@@ -74,7 +74,7 @@ public class BorderLayout extends UILayout {
                 continue;
             }
             final UIComponent comp = (UIComponent) s;
-            comp.getMinGlobalComponentBounds(store);
+            comp.getRelativeMinComponentBounds(store);
 
             final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
 
@@ -82,30 +82,30 @@ public class BorderLayout extends UILayout {
                 switch (data) {
                     case NORTH:
                         comp.fitComponentIn(container.getContentWidth(), store.getHeight());
-                        comp.getGlobalComponentBounds(store);
+                        comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(-store.getX(), container.getContentHeight() - heightNorth - store.getY());
                         break;
                     case SOUTH:
                         comp.fitComponentIn(container.getContentWidth(), store.getHeight());
-                        comp.getGlobalComponentBounds(store);
+                        comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(-store.getX(), -store.getY());
                         break;
                     case EAST:
                         comp.fitComponentIn(store.getWidth(), container.getContentHeight() - heightNorth - heightSouth);
-                        comp.getGlobalComponentBounds(store);
+                        comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(container.getContentWidth() - store.getWidth() - 1 - store.getX(), heightSouth
                                 - store.getY());
                         break;
                     case WEST:
                         comp.fitComponentIn(store.getWidth(), container.getContentHeight() - heightNorth - heightSouth);
-                        comp.getGlobalComponentBounds(store);
+                        comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(-store.getX(), heightSouth - store.getY());
                         break;
                     case CENTER:
                         comp.fitComponentIn(container.getContentWidth() - widthEast - widthWest, container
                                 .getContentHeight()
                                 - heightSouth - heightNorth);
-                        comp.getGlobalComponentBounds(store);
+                        comp.getRelativeComponentBounds(store);
                         comp.setLocalXY(widthWest - store.getX(), heightSouth - store.getY());
                 }
             }
@@ -128,7 +128,7 @@ public class BorderLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
-                comp.getMinGlobalComponentBounds(store);
+                comp.getRelativeMinComponentBounds(store);
                 final BorderLayoutData bld = (BorderLayoutData) comp.getLayoutData();
                 if (bld == null) {
                     continue;
@@ -157,7 +157,7 @@ public class BorderLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
-                comp.getMinGlobalComponentBounds(store);
+                comp.getRelativeMinComponentBounds(store);
                 final BorderLayoutData data = (BorderLayoutData) comp.getLayoutData();
                 if (data == BorderLayoutData.EAST || data == BorderLayoutData.WEST || data == BorderLayoutData.CENTER
                         || data == null) {

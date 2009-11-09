@@ -177,8 +177,8 @@ public class UIFrame extends UIContainer {
      *            the component to center on.
      */
     public void setLocationRelativeTo(final UIComponent comp) {
-        final BoundingRectangle rectA = comp.getGlobalComponentBounds(null);
-        final BoundingRectangle rectB = getGlobalComponentBounds(null);
+        final BoundingRectangle rectA = comp.getRelativeComponentBounds(null);
+        final BoundingRectangle rectB = getRelativeComponentBounds(null);
         int x = (rectA.getWidth() - rectB.getWidth()) / 2;
         int y = (rectA.getHeight() - rectB.getHeight()) / 2;
         x += comp.getHudX() - rectA.getX() + rectB.getX();
@@ -194,7 +194,7 @@ public class UIFrame extends UIContainer {
      *            the camera to center on.
      */
     public void setLocationRelativeTo(final Camera cam) {
-        final BoundingRectangle rectA = getGlobalComponentBounds(null);
+        final BoundingRectangle rectA = getRelativeComponentBounds(null);
         int x = (cam.getWidth() - rectA.getWidth()) / 2;
         int y = (cam.getHeight() - rectA.getHeight()) / 2;
         x -= rectA.getX();
@@ -380,7 +380,7 @@ public class UIFrame extends UIContainer {
         public boolean smallerThanWindow() {
             final int dispWidth = getHud().getWidth();
             final int dispHeight = getHud().getHeight();
-            final BoundingRectangle rect = getGlobalComponentBounds(null);
+            final BoundingRectangle rect = getRelativeComponentBounds(null);
             return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
         }
 

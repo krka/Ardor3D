@@ -125,7 +125,7 @@ public class AnchorLayout extends UILayout {
             for (int x = aRecord.dependants.size(); --x >= 0;) {
                 final UIComponent dep = aRecord.dependants.get(x);
                 if (dep.getLayoutData() instanceof AnchorLayoutData) {
-                    dep.getGlobalComponentBounds(rect);
+                    dep.getRelativeComponentBounds(rect);
                     AnchorLayout.applyAnchor(dep, (AnchorLayoutData) dep.getLayoutData());
 
                     // update min/max
@@ -170,7 +170,7 @@ public class AnchorLayout extends UILayout {
         }
 
         final BoundingRectangle rect = new BoundingRectangle();
-        comp.getGlobalComponentBounds(rect);
+        comp.getRelativeComponentBounds(rect);
         switch (point) {
             case TOP_LEFT:
                 store.set(rect.getX(), rect.getHeight() + rect.getY());

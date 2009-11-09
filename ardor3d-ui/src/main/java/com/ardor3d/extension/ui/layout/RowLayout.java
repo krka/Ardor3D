@@ -95,8 +95,8 @@ public class RowLayout extends UILayout {
             final Spatial spat = content.get(i);
             if (spat instanceof UIComponent) {
                 final UIComponent comp = (UIComponent) spat;
-                final BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
-                final BoundingRectangle minRect = comp.getMinGlobalComponentBounds(storeB);
+                final BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
+                final BoundingRectangle minRect = comp.getRelativeMinComponentBounds(storeB);
                 if (_horizontal) {
                     comp.fitComponentIn(minRect.getWidth(), rect.getHeight());
                 } else {
@@ -122,7 +122,7 @@ public class RowLayout extends UILayout {
             int loops = 0;
             do {
                 final UIComponent comp = comps.remove(0);
-                BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
+                BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
                 final BoundingRectangle origRect = storeB.set(rect);
                 final int extraSize = freeSpace / (comps.size() + 1);
                 if (_horizontal) {
@@ -133,7 +133,7 @@ public class RowLayout extends UILayout {
                     }
 
                     comp.fitComponentIn(width, height);
-                    rect = comp.getGlobalComponentBounds(storeA);
+                    rect = comp.getRelativeComponentBounds(storeA);
                     if (Math.abs(rect.getWidth() - width) <= 1) {
                         comps.add(comp);
                     }
@@ -146,7 +146,7 @@ public class RowLayout extends UILayout {
                     }
 
                     comp.fitComponentIn(width, height);
-                    rect = comp.getGlobalComponentBounds(storeA);
+                    rect = comp.getRelativeComponentBounds(storeA);
                     if (Math.abs(rect.getHeight() - height) <= 1) {
                         comps.add(comp);
                     }
@@ -165,7 +165,7 @@ public class RowLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) spat;
-                final BoundingRectangle rect = comp.getGlobalComponentBounds(storeA);
+                final BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
 
                 if (_horizontal) {
                     comp.setLocalXY(x - rect.getX(), Math.max(container.getContentHeight() / 2 - rect.getHeight() / 2
@@ -195,7 +195,7 @@ public class RowLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
-                final BoundingRectangle rect = comp.getMinGlobalComponentBounds(store);
+                final BoundingRectangle rect = comp.getRelativeMinComponentBounds(store);
                 if (_horizontal) {
                     minW += rect.getWidth();
                     if (minH < rect.getHeight()) {
@@ -218,7 +218,7 @@ public class RowLayout extends UILayout {
             final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    final BoundingRectangle rect = ((UIComponent) spat).getMinGlobalComponentBounds(store);
+                    final BoundingRectangle rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
                     sum += rect.getHeight();
                 }
             }
@@ -232,7 +232,7 @@ public class RowLayout extends UILayout {
             final BoundingRectangle store = new BoundingRectangle();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    final BoundingRectangle rect = ((UIComponent) spat).getMinGlobalComponentBounds(store);
+                    final BoundingRectangle rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
                     sum += rect.getWidth();
                 }
             }

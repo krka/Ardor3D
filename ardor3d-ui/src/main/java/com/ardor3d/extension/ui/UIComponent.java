@@ -238,37 +238,55 @@ public abstract class UIComponent extends Node {
         return _contentsSize.getHeight() + getTotalTop() + getTotalBottom();
     }
 
-    public BoundingRectangle getMinGlobalComponentBounds(final BoundingRectangle store) {
+    /**
+     * 
+     * @param store
+     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     * @return
+     */
+    public BoundingRectangle getRelativeMinComponentBounds(final BoundingRectangle store) {
         BoundingRectangle rVal = store;
         if (rVal == null) {
             rVal = new BoundingRectangle();
         }
         final int height = getMinimumLocalComponentHeight();
         final int width = getMinimumLocalComponentWidth();
-        return getGlobalComponentBounds(rVal, width, height);
+        return getRelativeComponentBounds(rVal, width, height);
     }
 
-    public BoundingRectangle getMaxGlobalComponentBounds(final BoundingRectangle store) {
+    /**
+     * 
+     * @param store
+     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     * @return
+     */
+    public BoundingRectangle getRelativeMaxComponentBounds(final BoundingRectangle store) {
         BoundingRectangle rVal = store;
         if (rVal == null) {
             rVal = new BoundingRectangle();
         }
         final int height = getMaximumLocalComponentHeight();
         final int width = getMaximumLocalComponentWidth();
-        return getGlobalComponentBounds(rVal, width, height);
+        return getRelativeComponentBounds(rVal, width, height);
     }
 
-    public BoundingRectangle getGlobalComponentBounds(final BoundingRectangle store) {
+    /**
+     * 
+     * @param store
+     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     * @return the current bounds of this component, in the coordinate space of its parent.
+     */
+    public BoundingRectangle getRelativeComponentBounds(final BoundingRectangle store) {
         BoundingRectangle rVal = store;
         if (rVal == null) {
             rVal = new BoundingRectangle();
         }
         final int height = getLocalComponentHeight();
         final int width = getLocalComponentWidth();
-        return getGlobalComponentBounds(rVal, width, height);
+        return getRelativeComponentBounds(rVal, width, height);
     }
 
-    private BoundingRectangle getGlobalComponentBounds(final BoundingRectangle store, final int width, final int height) {
+    private BoundingRectangle getRelativeComponentBounds(final BoundingRectangle store, final int width, final int height) {
         final ReadOnlyTransform local = getTransform();
         if (local.isIdentity() || local.getMatrix().isIdentity()) {
             store.set(0, 0, width, height);
@@ -501,7 +519,7 @@ public abstract class UIComponent extends Node {
         } else if (Math.abs(temp.getY()) >= 0.99999) {
             setLocalComponentSize(height, width);
         } else {
-            final BoundingRectangle rect = getMinGlobalComponentBounds(null);
+            final BoundingRectangle rect = getRelativeMinComponentBounds(null);
             final float ratio = Math.min((float) width / rect.getWidth(), (float) height / rect.getHeight());
 
             setLocalComponentSize(Math.round(getMinimumLocalComponentWidth() * ratio), Math
