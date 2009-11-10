@@ -143,7 +143,7 @@ public class JoglAwtExample {
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
         final com.ardor3d.image.Image image = awtImageLoader.load(JoglAwtExample.class
-                .getResourceAsStream(resourceName), true);
+                .getResourceAsStream(resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

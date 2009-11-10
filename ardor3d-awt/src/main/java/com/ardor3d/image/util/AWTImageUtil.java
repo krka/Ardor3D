@@ -56,7 +56,7 @@ public abstract class AWTImageUtil {
                     argb;
                     for (int x = 0; x < width; x++) {
                         for (int y = 0; y < height; y++) {
-                            index = (alpha ? 4 : 3) * ((height - y - 1) * width + x);
+                            index = (alpha ? 4 : 3) * (y * width + x);
                             r = (int) (((data.get(index + 0))) * tRed);
                             g = (int) (((data.get(index + 1))) * tGreen);
                             b = (int) (((data.get(index + 2))) * tBlue);

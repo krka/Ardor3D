@@ -156,7 +156,7 @@ public class MouseManagerExample extends ExampleBase {
 
     private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final Image image = awtImageLoader.load(getClass().getResourceAsStream(resourceName), true);
+        final Image image = awtImageLoader.load(getClass().getResourceAsStream(resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
