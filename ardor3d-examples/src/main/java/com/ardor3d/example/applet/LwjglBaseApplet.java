@@ -112,16 +112,17 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
             _displayCanvas.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(final ComponentEvent e) {
-                    GameTaskQueueManager.getManager().update(new Callable<Void>() {
-                        public Void call() throws Exception {
-                            final Camera cam = _glCanvas.getCanvasRenderer().getCamera();
-                            cam.resize(getWidth(), getHeight());
-                            cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(), cam
-                                    .getFrustumNear(), cam.getFrustumFar());
-                            appletResized(getWidth(), getHeight());
-                            return null;
-                        }
-                    });
+                    GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext()).update(
+                            new Callable<Void>() {
+                                public Void call() throws Exception {
+                                    final Camera cam = _glCanvas.getCanvasRenderer().getCamera();
+                                    cam.resize(getWidth(), getHeight());
+                                    cam.setFrustumPerspective(cam.getFovY(), getWidth() / (float) getHeight(), cam
+                                            .getFrustumNear(), cam.getFrustumFar());
+                                    appletResized(getWidth(), getHeight());
+                                    return null;
+                                }
+                            });
                 }
             });
             setVisible(true);

@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
-import com.ardor3d.renderer.RenderContext;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -24,26 +23,17 @@ import com.google.common.collect.MapMaker;
  */
 public final class GameTaskQueueManager {
 
-    private static final Map<RenderContext, GameTaskQueueManager> _managers = new MapMaker().weakKeys().makeMap();
-    private static final RenderContext DEFAULT_CONTEXT = new RenderContext(null, null);
+    private static final Map<Object, GameTaskQueueManager> _managers = new MapMaker().weakKeys().makeMap();
 
     private final ConcurrentMap<String, GameTaskQueue> _managedQueues = new ConcurrentHashMap<String, GameTaskQueue>(2);
 
-    public static GameTaskQueueManager getManager() {
-        return getManager(DEFAULT_CONTEXT);
-    }
-
-    public static GameTaskQueueManager getManager(final RenderContext context) {
-        final RenderContext key = context != null ? context : DEFAULT_CONTEXT;
+    public static GameTaskQueueManager getManager(final Object key) {
 
         synchronized (_managers) {
             GameTaskQueueManager manager = _managers.get(key);
             if (manager == null) {
                 manager = new GameTaskQueueManager();
                 _managers.put(key, manager);
-            }
-            if (key != DEFAULT_CONTEXT && _managers.containsKey(DEFAULT_CONTEXT)) {
-                _managers.get(DEFAULT_CONTEXT).moveTasksTo(manager);
             }
             return manager;
         }

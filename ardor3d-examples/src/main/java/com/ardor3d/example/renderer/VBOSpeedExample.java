@@ -112,14 +112,15 @@ public class VBOSpeedExample extends ExampleBase {
                     t.setText("[SPACE] VBO Off");
                     _root.getSceneHints().setDataMode(DataMode.Arrays);
                     // run this in the opengl thread
-                    GameTaskQueueManager.getManager().update(new Callable<Void>() {
-                        public Void call() throws Exception {
-                            final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer()
-                                    .getRenderer());
-                            _root.acceptVisitor(viz, false);
-                            return null;
-                        }
-                    });
+                    GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).update(
+                            new Callable<Void>() {
+                                public Void call() throws Exception {
+                                    final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer()
+                                            .getRenderer());
+                                    _root.acceptVisitor(viz, false);
+                                    return null;
+                                }
+                            });
                 } else if (vboMode == 1) {
                     t.setText("[SPACE] VBO On");
                     _root.getSceneHints().setDataMode(DataMode.VBO);

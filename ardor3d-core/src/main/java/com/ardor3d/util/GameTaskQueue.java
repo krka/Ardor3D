@@ -19,8 +19,9 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 
 /**
- * <code>GameTaskQueue</code> is a simple queuing system to enqueue tasks that need to be accomplished in the OpenGL
- * thread and get back a Future object to be able to retrieve a return from the Callable that was passed in.
+ * <code>GameTaskQueue</code> is a simple queuing system to enqueue tasks that need to be accomplished in a specific
+ * thread or phase of the application execution (for example, the OpenGL rendering thread.) Upon sending in a task, the
+ * caller gets back a Future object useful for retrieving a return from the Callable that was passed in.
  * 
  * @see Future
  * @see Callable

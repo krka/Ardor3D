@@ -316,7 +316,7 @@ public class UIFrame extends UIContainer {
      * Causes our shared texture renderer - used to draw cached versions of all frames - to be recreated on the next
      * render loop.
      */
-    public static void resetTextureRenderer() {
+    public static void resetTextureRenderer(final Object queueKey) {
         final Callable<Void> exe = new Callable<Void>() {
             public Void call() {
                 if (UIContainer._textureRenderer != null) {
@@ -326,7 +326,7 @@ public class UIFrame extends UIContainer {
                 return null;
             }
         };
-        GameTaskQueueManager.getManager().render(exe);
+        GameTaskQueueManager.getManager(queueKey).render(exe);
     }
 
     /**
