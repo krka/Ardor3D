@@ -60,12 +60,13 @@ public enum AwtKey {
             KeyEvent.VK_UNDERSCORE, Key.UNDERLINE), AWT_KEY_STOP(KeyEvent.VK_STOP, Key.STOP), AWT_KEY_NUMPADENTER(
             KeyEvent.VK_ENTER, Key.NUMPADENTER), AWT_KEY_RCONTROL(KeyEvent.VK_CONTROL, Key.RCONTROL), AWT_KEY_NUMPADCOMMA(
             KeyEvent.VK_COMMA, Key.NUMPADCOMMA), AWT_KEY_DIVIDE(KeyEvent.VK_DIVIDE, Key.DIVIDE), AWT_KEY_PAUSE(
-            KeyEvent.VK_PAUSE, Key.PAUSE), AWT_KEY_HOME(KeyEvent.VK_HOME, Key.HOME), AWT_KEY_UP(KeyEvent.VK_UP, Key.UP), AWT_KEY_PRIOR(
-            KeyEvent.VK_PAGE_UP, Key.PRIOR), AWT_KEY_LEFT(KeyEvent.VK_LEFT, Key.LEFT), AWT_KEY_RIGHT(KeyEvent.VK_RIGHT,
-            Key.RIGHT), AWT_KEY_END(KeyEvent.VK_END, Key.END), AWT_KEY_DOWN(KeyEvent.VK_DOWN, Key.DOWN), AWT_KEY_NEXT(
-            KeyEvent.VK_PAGE_DOWN, Key.NEXT), AWT_KEY_INSERT(KeyEvent.VK_INSERT, Key.INSERT), AWT_KEY_DELETE(
-            KeyEvent.VK_DELETE, Key.DELETE), AWT_KEY_LMENU(KeyEvent.VK_ALT, Key.LMENU), AWT_KEY_RMENU(KeyEvent.VK_ALT,
-            Key.RMENU), AWT_COMMAND(KeyEvent.VK_META, Key.LMETA), AWT_KEY_SYSRQ(KeyEvent.VK_PRINTSCREEN, Key.SYSRQ);
+            KeyEvent.VK_PAUSE, Key.PAUSE), AWT_KEY_HOME(KeyEvent.VK_HOME, Key.HOME), AWT_KEY_UP(KeyEvent.VK_UP, Key.UP), AWT_KEY_PAGEUP_PRIOR(
+            KeyEvent.VK_PAGE_UP, Key.PAGEUP_PRIOR), AWT_KEY_LEFT(KeyEvent.VK_LEFT, Key.LEFT), AWT_KEY_RIGHT(
+            KeyEvent.VK_RIGHT, Key.RIGHT), AWT_KEY_END(KeyEvent.VK_END, Key.END), AWT_KEY_DOWN(KeyEvent.VK_DOWN,
+            Key.DOWN), AWT_KEY_PAGEDOWN_NEXT(KeyEvent.VK_PAGE_DOWN, Key.PAGEDOWN_NEXT), AWT_KEY_INSERT(
+            KeyEvent.VK_INSERT, Key.INSERT), AWT_KEY_DELETE(KeyEvent.VK_DELETE, Key.DELETE), AWT_KEY_LMENU(
+            KeyEvent.VK_ALT, Key.LMENU), AWT_KEY_RMENU(KeyEvent.VK_ALT, Key.RMENU), AWT_COMMAND(KeyEvent.VK_META,
+            Key.LMETA), AWT_KEY_SYSRQ(KeyEvent.VK_PRINTSCREEN, Key.SYSRQ);
 
     private final int _awtCode;
     private final Key _key;

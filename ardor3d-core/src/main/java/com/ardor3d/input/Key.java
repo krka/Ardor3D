@@ -460,14 +460,9 @@ public enum Key {
      */
     UP(0xC8),
     /**
-     * PgUp key.
+     * PageUp/Prior key.
      */
-    PRIOR(0xC9),
-    /**
-     * PgUp key.
-     */
-    PGUP(PRIOR.code),
-
+    PAGEUP_PRIOR(0xC9),
     /**
      * left arrow key.
      */
@@ -485,14 +480,9 @@ public enum Key {
      */
     DOWN(0xD0),
     /**
-     * PgDn key.
+     * PageDown/Next key.
      */
-    NEXT(0xD1),
-    /**
-     * PgDn key.
-     */
-    PGDN(NEXT.code),
-
+    PAGEDOWN_NEXT(0xD1),
     /**
      * insert key.
      */
