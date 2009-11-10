@@ -130,8 +130,7 @@ public class SolidBorder extends UIBorder {
         final float pAlpha = UIComponent.getCurrentOpacity();
 
         final Vector3 v = Vector3.fetchTempInstance();
-        v.set(comp.getMargin().getLeft() + comp.getBorder().getLeft(), comp.getMargin().getBottom()
-                + comp.getBorder().getBottom(), 0);
+        v.set(comp.getMargin().getLeft(), comp.getMargin().getBottom(), 0);
 
         final Transform t = Transform.fetchTempInstance();
         t.set(comp.getWorldTransform());
