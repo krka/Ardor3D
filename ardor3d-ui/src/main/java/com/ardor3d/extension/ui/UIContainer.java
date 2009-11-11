@@ -263,7 +263,7 @@ public abstract class UIContainer extends UIComponent {
         if (getNumberOfChildren() > 0) {
             // If asked, clip to just the internal region of this container.
             boolean needsPop = false;
-            if (_doClip) {
+            if (_doClip && getWorldRotation().isIdentity()) {
                 renderer.pushClip(getHudX() + getTotalLeft(), getHudY() + getTotalBottom(), getContentWidth(),
                         getContentHeight());
                 needsPop = true;

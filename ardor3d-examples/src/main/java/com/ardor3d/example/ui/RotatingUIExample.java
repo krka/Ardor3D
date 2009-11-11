@@ -60,7 +60,7 @@ public class RotatingUIExample extends ExampleBase {
         frame.layout();
         frame.pack(300, 200);
 
-        frame.setUseStandin(true);
+        frame.setUseStandin(false);
         frame.setOpacity(1f);
         frame.setLocationRelativeTo(_canvas.getCanvasRenderer().getCamera());
         frame.setName("sample");
