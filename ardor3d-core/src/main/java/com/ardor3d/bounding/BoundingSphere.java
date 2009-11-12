@@ -160,11 +160,10 @@ public class BoundingSphere extends BoundingVolume {
      *            The points to calculate the minimum bounds from.
      */
     public void calcWelzl(final FloatBuffer points) {
-        final FloatBuffer buf = BufferUtils.createFloatBuffer(points.limit());
+        final float[] buf = new float[points.limit()];
         points.rewind();
-        buf.put(points);
-        buf.flip();
-        recurseMini(buf, buf.limit() / 3, 0, 0);
+        points.get(buf);
+        recurseMini(buf, buf.length / 3, 0, 0);
     }
 
     /**
@@ -179,7 +178,7 @@ public class BoundingSphere extends BoundingVolume {
      * @param ap
      *            A variable simulating pointer arithmetic from C++, and offset in <code>points</code>.
      */
-    private void recurseMini(final FloatBuffer points, final int p, final int pnts, final int ap) {
+    private void recurseMini(final float[] points, final int p, final int pnts, final int ap) {
         final Vector3 tempA = Vector3.fetchTempInstance();
         final Vector3 tempB = Vector3.fetchTempInstance();
         final Vector3 tempC = Vector3.fetchTempInstance();
@@ -190,25 +189,25 @@ public class BoundingSphere extends BoundingVolume {
                 break;
             case 1:
                 setRadius(1f - radiusEpsilon);
-                BufferUtils.populateFromBuffer(_center, points, ap - 1);
+                populateFromBuffer(_center, points, ap - 1);
                 break;
             case 2:
-                BufferUtils.populateFromBuffer(tempA, points, ap - 1);
-                BufferUtils.populateFromBuffer(tempB, points, ap - 2);
+                populateFromBuffer(tempA, points, ap - 1);
+                populateFromBuffer(tempB, points, ap - 2);
                 setSphere(tempA, tempB);
                 break;
             case 3:
-                BufferUtils.populateFromBuffer(tempA, points, ap - 1);
-                BufferUtils.populateFromBuffer(tempB, points, ap - 2);
-                BufferUtils.populateFromBuffer(tempC, points, ap - 3);
+                populateFromBuffer(tempA, points, ap - 1);
+                populateFromBuffer(tempB, points, ap - 2);
+                populateFromBuffer(tempC, points, ap - 3);
                 setSphere(tempA, tempB, tempC);
                 break;
             case 4:
                 final Vector3 tempD = Vector3.fetchTempInstance();
-                BufferUtils.populateFromBuffer(tempA, points, ap - 1);
-                BufferUtils.populateFromBuffer(tempB, points, ap - 2);
-                BufferUtils.populateFromBuffer(tempC, points, ap - 3);
-                BufferUtils.populateFromBuffer(tempD, points, ap - 4);
+                populateFromBuffer(tempA, points, ap - 1);
+                populateFromBuffer(tempB, points, ap - 2);
+                populateFromBuffer(tempC, points, ap - 3);
+                populateFromBuffer(tempD, points, ap - 4);
                 setSphere(tempA, tempB, tempC, tempD);
                 Vector3.releaseTempInstance(tempA);
                 Vector3.releaseTempInstance(tempB);
@@ -217,13 +216,13 @@ public class BoundingSphere extends BoundingVolume {
                 return;
         }
         for (int i = 0; i < p; i++) {
-            BufferUtils.populateFromBuffer(tempA, points, i + ap);
+            populateFromBuffer(tempA, points, i + ap);
             if (tempA.distanceSquared(_center) - (getRadius() * getRadius()) > radiusEpsilon - 1f) {
                 for (int j = i; j > 0; j--) {
-                    BufferUtils.populateFromBuffer(tempB, points, j + ap);
-                    BufferUtils.populateFromBuffer(tempC, points, j - 1 + ap);
-                    BufferUtils.setInBuffer(tempC, points, j + ap);
-                    BufferUtils.setInBuffer(tempB, points, j - 1 + ap);
+                    populateFromBuffer(tempB, points, j + ap);
+                    populateFromBuffer(tempC, points, j - 1 + ap);
+                    setInBuffer(tempC, points, j + ap);
+                    setInBuffer(tempB, points, j - 1 + ap);
                 }
                 recurseMini(points, i, pnts + 1, ap + 1);
             }
@@ -231,6 +230,27 @@ public class BoundingSphere extends BoundingVolume {
         Vector3.releaseTempInstance(tempA);
         Vector3.releaseTempInstance(tempB);
         Vector3.releaseTempInstance(tempC);
+    }
+
+    public static void populateFromBuffer(final Vector3 vector, final float[] buf, final int index) {
+        vector.setX(buf[index * 3]);
+        vector.setY(buf[index * 3 + 1]);
+        vector.setZ(buf[index * 3 + 2]);
+    }
+
+    public static void setInBuffer(final ReadOnlyVector3 vector, final float[] buf, final int index) {
+        if (buf == null) {
+            return;
+        }
+        if (vector == null) {
+            buf[index * 3] = 0;
+            buf[(index * 3) + 1] = 0;
+            buf[(index * 3) + 2] = 0;
+        } else {
+            buf[index * 3] = vector.getXf();
+            buf[(index * 3) + 1] = vector.getYf();
+            buf[(index * 3) + 2] = vector.getZf();
+        }
     }
 
     /**
