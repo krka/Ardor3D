@@ -151,14 +151,17 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     /**
      * Resets this transform to identity and resets all flags.
+     * 
+     * @return this Transform for chaining.
      */
-    public void setIdentity() {
+    public Transform setIdentity() {
         _matrix.set(Matrix3.IDENTITY);
         _scale.set(Vector3.ONE);
         _translation.set(Vector3.ZERO);
         _identity = true;
         _rotationMatrix = true;
         _uniformScale = true;
+        return this;
     }
 
     /**
