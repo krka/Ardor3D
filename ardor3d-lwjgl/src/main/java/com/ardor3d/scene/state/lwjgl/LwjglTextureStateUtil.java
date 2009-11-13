@@ -138,21 +138,35 @@ public abstract class LwjglTextureStateUtil {
         // texture output, and constants to modify fragments via the
         // texture units.
         if (image != null) {
-            if (!caps.isNonPowerOfTwoTextureSupported()
-                    && (!MathUtils.isPowerOfTwo(image.getWidth()) || !MathUtils.isPowerOfTwo(image.getHeight()))) {
-                logger.warning("(card unsupported) Attempted to apply texture with size that is not power of 2: "
-                        + image.getWidth() + " x " + image.getHeight());
+            final int maxSize = caps.getMaxTextureSize();
+            final int actualWidth = image.getWidth();
+            final int actualHeight = image.getHeight();
 
-                final int maxSize = caps.getMaxTextureSize();
+            final boolean needsPowerOfTwo = !caps.isNonPowerOfTwoTextureSupported()
+                    && (!MathUtils.isPowerOfTwo(image.getWidth()) || !MathUtils.isPowerOfTwo(image.getHeight()));
+            if (actualWidth > maxSize || actualHeight > maxSize || needsPowerOfTwo) {
+                if (needsPowerOfTwo) {
+                    logger.warning("(card unsupported) Attempted to apply texture with size that is not power of 2: "
+                            + image.getWidth() + " x " + image.getHeight());
+                }
+                if (actualWidth > maxSize || actualHeight > maxSize) {
+                    logger
+                            .warning("(card unsupported) Attempted to apply texture with size bigger than max texture size ["
+                                    + maxSize + "]: " + image.getWidth() + " x " + image.getHeight());
+                }
 
-                final int actualWidth = image.getWidth();
-                int w = MathUtils.nearestPowerOfTwo(actualWidth);
+                int w = actualWidth;
+                if (needsPowerOfTwo) {
+                    w = MathUtils.nearestPowerOfTwo(actualWidth);
+                }
                 if (w > maxSize) {
                     w = maxSize;
                 }
 
-                final int actualHeight = image.getHeight();
-                int h = MathUtils.nearestPowerOfTwo(actualHeight);
+                int h = actualHeight;
+                if (needsPowerOfTwo) {
+                    h = MathUtils.nearestPowerOfTwo(actualHeight);
+                }
                 if (h > maxSize) {
                     h = maxSize;
                 }
