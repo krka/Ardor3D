@@ -10,7 +10,9 @@
 
 package com.ardor3d.util.resource;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +34,17 @@ public class ResourceLocatorTool {
 
     private static final Map<String, List<ResourceLocator>> _locatorMap = new HashMap<String, List<ResourceLocator>>();
 
-    public static ResourceSource locateResource(final String resourceType, final String resourceName) {
+    public static ResourceSource locateResource(final String resourceType, String resourceName) {
         if (resourceName == null) {
             return null;
         }
+
+        try {
+            resourceName = URLDecoder.decode(resourceName, "UTF-8");
+        } catch (final UnsupportedEncodingException ex) {
+            ex.printStackTrace();
+        }
+
         synchronized (_locatorMap) {
             final List<ResourceLocator> bases = _locatorMap.get(resourceType);
             if (bases != null) {
