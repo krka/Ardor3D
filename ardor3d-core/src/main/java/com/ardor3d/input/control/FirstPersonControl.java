@@ -34,7 +34,6 @@ public class FirstPersonControl {
     private double _keyRotateSpeed = 2.25;
     private final Matrix3 _workerMatrix = new Matrix3();
     private final Vector3 _workerStoreA = new Vector3();
-    private final Vector3 _workerStoreB = new Vector3();
 
     public FirstPersonControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
