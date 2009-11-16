@@ -86,6 +86,14 @@ public class UIFrameStatusBar extends UIPanel {
         }
 
         public void drag(final int mouseX, final int mouseY) {
+            resizeFrameByPosition(mouseX, mouseY);
+        }
+
+        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {
+            resizeFrameByPosition(mouseX, mouseY);
+        }
+
+        private void resizeFrameByPosition(final int mouseX, final int mouseY) {
             final Vector3 vec = Vector3.fetchTempInstance();
             vec.set(mouseX, mouseY, 0);
             getWorldTransform().applyInverse(vec);
@@ -123,8 +131,6 @@ public class UIFrameStatusBar extends UIPanel {
             _oldX = x;
             _oldY = y - heightDif;
         }
-
-        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
 
         public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
             return component == _resizeButton;

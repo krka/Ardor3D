@@ -294,22 +294,28 @@ public class UIFrame extends UIContainer {
     }
 
     /**
-     * Resize the frame to fit its content area to the given dimensions
+     * Resize the frame to fit its content panel to the given dimensions
+     * 
+     * @param contentWidth
+     *            our desired content panel width
+     * @param contentHeight
+     *            our desired content panel height
      */
     public void pack(final int contentWidth, final int contentHeight) {
-        int width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
+        // grab the desired width and height of the frame.
+        final int width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
         int height = contentHeight + _basePanel.getTotalTop() + _basePanel.getTotalBottom();
+
+        // add in our frame chrome, if it is enabled.
         if (isDecorated()) {
             height += _statusBar.getLocalComponentHeight() + _titleBar.getLocalComponentHeight();
         }
+
+        // Set our size, obeying min sizes.
         setLocalComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
+
+        // Layout the panel
         layout();
-        width = contentWidth + _basePanel.getTotalLeft() + _basePanel.getTotalRight();
-        height = contentHeight + _basePanel.getTotalTop() + _basePanel.getTotalBottom();
-        if (isDecorated()) {
-            height += _statusBar.getLocalComponentHeight() + _titleBar.getLocalComponentHeight();
-        }
-        setLocalComponentSize(Math.max(width, UIFrame.MIN_FRAME_WIDTH), Math.max(height, UIFrame.MIN_FRAME_HEIGHT));
     }
 
     /**
