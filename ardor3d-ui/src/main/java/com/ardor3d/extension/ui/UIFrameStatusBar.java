@@ -114,8 +114,12 @@ public class UIFrameStatusBar extends UIPanel {
             int heightDif = y - _oldY;
             int newHeight = frame.getLocalComponentHeight() + _oldY - y;
             if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
-                // don't let us get smaller than min size
+                // don't let us get smaller than absolute min size
                 newHeight = UIFrame.MIN_FRAME_HEIGHT;
+                heightDif = frame.getLocalComponentHeight() - newHeight;
+            } else if (newHeight < frame.getMinimumLocalComponentHeight()) {
+                // don't let us get smaller than frame min size
+                newHeight = frame.getMinimumLocalComponentHeight();
                 heightDif = frame.getLocalComponentHeight() - newHeight;
             }
 
