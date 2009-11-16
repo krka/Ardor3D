@@ -23,15 +23,9 @@ public enum TransparencyType {
     OnePass,
 
     /**
-     * Two passes, one with CullState enforced to Front and another with it enforced to Back. No information will be
-     * written to the depth buffer.
-     */
-    TwoPass,
-
-    /**
      * Two passes, one with CullState enforced to Front and another with it enforced to Back. The back face pass will
      * not write to depth buffer. The front face will use the ZBufferState from the scene or enforced on the context.
      */
-    TwoPass_UseSceneZState;
+    TwoPass;
 
 }

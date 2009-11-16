@@ -71,8 +71,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
                     final Mesh mesh = (Mesh) spatial;
 
                     // check if we have a Cull state set or enforced. If one is explicitly set and is not Face.None,
-                    // we'll
-                    // not do two-pass transparency.
+                    // we'll not do two-pass transparency.
                     RenderState setState = context.getEnforcedState(StateType.Cull);
                     if (setState == null) {
                         setState = mesh.getWorldRenderState(RenderState.StateType.Cull);
@@ -93,25 +92,15 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
                         _tranparentCull.setCullFace(CullState.Face.Front);
                         mesh.draw(_renderer);
 
-                        if (renderType == TransparencyType.TwoPass_UseSceneZState) {
-                            // revert z state
-                            context.clearEnforcedState(StateType.ZBuffer);
-                            if (oldZState != null) {
-                                context.enforceState(oldZState);
-                            }
+                        // revert z state
+                        context.clearEnforcedState(StateType.ZBuffer);
+                        if (oldZState != null) {
+                            context.enforceState(oldZState);
                         }
 
                         // render front-facing tris
                         _tranparentCull.setCullFace(CullState.Face.Back);
                         mesh.draw(_renderer);
-
-                        if (renderType == TransparencyType.TwoPass) {
-                            // revert z state
-                            context.clearEnforcedState(StateType.ZBuffer);
-                            if (oldZState != null) {
-                                context.enforceState(oldZState);
-                            }
-                        }
 
                         // revert cull state
                         if (oldCullState != null) {
