@@ -70,6 +70,11 @@ public class SceneHints implements Savable {
      */
     private final Hintable _source;
 
+    /**
+     * Type of transparency to do.
+     */
+    private TransparencyType _transpType = TransparencyType.Inherit;
+
     public SceneHints(final Hintable source) {
         _source = source;
     }
@@ -385,6 +390,40 @@ public class SceneHints implements Savable {
         _orthoOrder = orthoOrder;
     }
 
+    /**
+     * Returns the transparency rendering type. If the mode is set to inherit, then we get its type from the given
+     * source's hintable parent. If no parent, we'll default to OnePass.
+     * 
+     * @return The transparency rendering type to use.
+     */
+    public TransparencyType getTransparencyType() {
+        if (_transpType != TransparencyType.Inherit) {
+            return _transpType;
+        }
+
+        final Hintable parent = _source.getParentHintable();
+        if (parent != null) {
+            return parent.getSceneHints().getTransparencyType();
+        }
+
+        return TransparencyType.OnePass;
+    }
+
+    /**
+     * @return the exact transparency rendering type set.
+     */
+    public TransparencyType getLocalTransparencyType() {
+        return _transpType;
+    }
+
+    /**
+     * @param type
+     *            the new transparency rendering type to set on this SceneHints
+     */
+    public void setTransparencyType(final TransparencyType type) {
+        _transpType = type;
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
@@ -403,6 +442,7 @@ public class SceneHints implements Savable {
                 TextureCombineMode.Inherit);
         _normalsMode = capsule.readEnum("normalsMode", NormalsMode.class, NormalsMode.Inherit);
         _dataMode = capsule.readEnum("dataMode", DataMode.class, DataMode.Inherit);
+        _transpType = capsule.readEnum("transpType", TransparencyType.class, TransparencyType.Inherit);
         final PickingHint[] pickHints = capsule.readEnumArray("pickingHints", PickingHint.class, null);
         _pickingHints.clear();
         if (pickHints != null) {
@@ -427,5 +467,6 @@ public class SceneHints implements Savable {
         capsule.write(_normalsMode, "normalsMode", NormalsMode.Inherit);
         capsule.write(_dataMode, "dataMode", DataMode.Inherit);
         capsule.write(_pickingHints.toArray(new PickingHint[] {}), "pickingHints");
+        capsule.write(_transpType, "transpType", TransparencyType.Inherit);
     }
 }

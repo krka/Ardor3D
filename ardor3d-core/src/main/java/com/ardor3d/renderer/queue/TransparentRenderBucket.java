@@ -22,6 +22,7 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.TransparencyType;
 
 public class TransparentRenderBucket extends AbstractRenderBucket {
     /** CullState for two pass transparency rendering. */
@@ -29,9 +30,6 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
     /** ZBufferState for two pass transparency rendering. */
     private final ZBufferState _transparentZBuff;
-
-    /** boolean for enabling / disabling two pass transparency rendering. */
-    private boolean _twoPassTransparent = true;
 
     public TransparentRenderBucket(final Renderer renderer) {
         super(renderer);
@@ -54,71 +52,81 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
         for (int i = 0; i < _currentListSize; i++) {
             spatial = _currentList[i];
 
-            // If we're set up to use two-pass transparency and this is a Mesh.
-            if (_twoPassTransparent && spatial instanceof Mesh) {
+            // make sure we have a real spatial
+            if (spatial == null) {
+                continue;
+            }
 
-                // get handle to Mesh
-                final Mesh mesh = (Mesh) spatial;
+            // we only care about altering the Mesh... perhaps could be altered later to some interface shared by Mesh
+            // and other leaf nodes.
+            if (spatial instanceof Mesh) {
 
-                // check if we have a Cull state set or enforced. If one is explicitly set and is not Face.None, we'll
-                // not do two-pass transparency.
-                RenderState setState = context.getEnforcedState(StateType.Cull);
-                if (setState == null) {
-                    setState = mesh.getWorldRenderState(RenderState.StateType.Cull);
-                }
+                // get our transparency rendering type.
+                final TransparencyType renderType = spatial.getSceneHints().getTransparencyType();
 
-                // Do the described check.
-                if (setState == null || ((CullState) setState).getCullFace() == Face.None) {
+                // check for one of the two pass types...
+                if (renderType != TransparencyType.OnePass) {
 
-                    // pull any currently enforced cull or zstate. We'll put them back afterwards
-                    final RenderState oldCullState = context.getEnforcedState(StateType.Cull);
-                    final RenderState oldZState = context.getEnforcedState(StateType.ZBuffer);
+                    // get handle to Mesh
+                    final Mesh mesh = (Mesh) spatial;
 
-                    // enforce our cull and zstate. The zstate is setup to respect depth, but not write to it.
-                    context.enforceState(_tranparentCull);
-                    context.enforceState(_transparentZBuff);
-
-                    // first render back-facing tris only
-                    _tranparentCull.setCullFace(CullState.Face.Front);
-                    mesh.draw(_renderer);
-
-                    // render front-facing tris
-                    _tranparentCull.setCullFace(CullState.Face.Back);
-                    mesh.draw(_renderer);
-
-                    // clear enforced states
-                    context.clearEnforcedState(StateType.Cull);
-                    context.clearEnforcedState(StateType.ZBuffer);
-
-                    // reset enforced states
-                    if (oldCullState != null) {
-                        context.enforceState(oldCullState);
+                    // check if we have a Cull state set or enforced. If one is explicitly set and is not Face.None,
+                    // we'll
+                    // not do two-pass transparency.
+                    RenderState setState = context.getEnforcedState(StateType.Cull);
+                    if (setState == null) {
+                        setState = mesh.getWorldRenderState(RenderState.StateType.Cull);
                     }
-                    if (oldZState != null) {
-                        context.enforceState(oldZState);
+
+                    // Do the described check.
+                    if (setState == null || ((CullState) setState).getCullFace() == Face.None) {
+
+                        // pull any currently enforced cull or zstate. We'll put them back afterwards
+                        final RenderState oldCullState = context.getEnforcedState(StateType.Cull);
+                        final RenderState oldZState = context.getEnforcedState(StateType.ZBuffer);
+
+                        // enforce our cull and zstate. The zstate is setup to respect depth, but not write to it.
+                        context.enforceState(_tranparentCull);
+                        context.enforceState(_transparentZBuff);
+
+                        // first render back-facing tris only
+                        _tranparentCull.setCullFace(CullState.Face.Front);
+                        mesh.draw(_renderer);
+
+                        if (renderType == TransparencyType.TwoPass_UseSceneZState) {
+                            // revert z state
+                            context.clearEnforcedState(StateType.ZBuffer);
+                            if (oldZState != null) {
+                                context.enforceState(oldZState);
+                            }
+                        }
+
+                        // render front-facing tris
+                        _tranparentCull.setCullFace(CullState.Face.Back);
+                        mesh.draw(_renderer);
+
+                        if (renderType == TransparencyType.TwoPass) {
+                            // revert z state
+                            context.clearEnforcedState(StateType.ZBuffer);
+                            if (oldZState != null) {
+                                context.enforceState(oldZState);
+                            }
+                        }
+
+                        // revert cull state
+                        if (oldCullState != null) {
+                            context.enforceState(oldCullState);
+                        } else {
+                            context.clearEnforcedState(StateType.Cull);
+                        }
+                        continue;
                     }
-                    continue;
                 }
             }
 
             // go ahead and draw as usual
             spatial.draw(_renderer);
         }
-    }
-
-    public boolean isTwoPassTransparency() {
-        return _twoPassTransparent;
-    }
-
-    /**
-     * 
-     * @param twoPassTransparent
-     *            true to enable two pass drawing. In this mode, the Spatial will be draw twice, first with only back
-     *            faces showing and second with only front faces showing. This results in more accurate and
-     *            artifact-free results, but takes more drawing time and is not necessary for planar surfaces.
-     */
-    public void setTwoPassTransparency(final boolean twoPassTransparent) {
-        _twoPassTransparent = twoPassTransparent;
     }
 
     private class TransparentComparator implements Comparator<Spatial> {
