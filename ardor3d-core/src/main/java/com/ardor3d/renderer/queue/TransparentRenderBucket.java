@@ -50,7 +50,9 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
         final RenderContext context = ContextManager.getCurrentContext();
 
         // go through our bucket contents
-        for (final Spatial spatial : _currentList) {
+        Spatial spatial;
+        for (int i = 0; i < _currentListSize; i++) {
+            spatial = _currentList[i];
 
             // If we're set up to use two-pass transparency and this is a Mesh.
             if (_twoPassTransparent && spatial instanceof Mesh) {
