@@ -10,9 +10,12 @@
 
 package com.ardor3d.util.resource;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.logging.Level;
@@ -49,8 +52,14 @@ public class URLResourceSource implements ResourceSource {
         try {
             final URL texUrl = UrlUtils.resolveRelativeURL(_url, "./" + name);
             if (texUrl != null) {
-                return new URLResourceSource(texUrl);
+                // check if the URL points to an existing file
+                final URI uri = texUrl.toURI();
+                final File file = new File(uri);
+                if (file.exists()) {
+                    return new URLResourceSource(texUrl);
+                }
             }
+        } catch (final URISyntaxException ex) {
         } catch (final MalformedURLException ex) {
         }
         logger.log(Level.WARNING, "Unable to find relative file '{0}' from '{1}'.", new Object[] { name, _url });
