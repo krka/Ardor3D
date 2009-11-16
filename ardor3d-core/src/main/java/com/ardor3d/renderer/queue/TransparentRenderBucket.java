@@ -18,6 +18,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -45,16 +46,33 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
     @Override
     public void render() {
+        // Grab our render context - used to enforce renderstates
         final RenderContext context = ContextManager.getCurrentContext();
-        for (int i = 0; i < _currentListSize; i++) {
-            final Spatial spatial = _currentList[i];
 
+        // go through our bucket contents
+        for (final Spatial spatial : _currentList) {
+
+            // If we're set up to use two-pass transparency and this is a Mesh.
             if (_twoPassTransparent && spatial instanceof Mesh) {
+
+                // get handle to Mesh
                 final Mesh mesh = (Mesh) spatial;
-                if (mesh.getWorldRenderState(RenderState.StateType.Cull) == null) {
+
+                // check if we have a Cull state set or enforced. If one is explicitly set and is not Face.None, we'll
+                // not do two-pass transparency.
+                RenderState setState = context.getEnforcedState(StateType.Cull);
+                if (setState == null) {
+                    setState = mesh.getWorldRenderState(RenderState.StateType.Cull);
+                }
+
+                // Do the described check.
+                if (setState == null || ((CullState) setState).getCullFace() == Face.None) {
+
+                    // pull any currently enforced cull or zstate. We'll put them back afterwards
                     final RenderState oldCullState = context.getEnforcedState(StateType.Cull);
                     final RenderState oldZState = context.getEnforcedState(StateType.ZBuffer);
 
+                    // enforce our cull and zstate. The zstate is setup to respect depth, but not write to it.
                     context.enforceState(_tranparentCull);
                     context.enforceState(_transparentZBuff);
 
@@ -62,24 +80,26 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
                     _tranparentCull.setCullFace(CullState.Face.Front);
                     mesh.draw(_renderer);
 
-                    // then render front-facing tris only
-                    // reset enforced zstate
-                    if (oldZState != null) {
-                        context.enforceState(oldZState);
-                    } else {
-                        context.clearEnforcedState(StateType.ZBuffer);
-                    }
+                    // render front-facing tris
                     _tranparentCull.setCullFace(CullState.Face.Back);
                     mesh.draw(_renderer);
-                    // reset enforced cull state
+
+                    // clear enforced states
+                    context.clearEnforcedState(StateType.Cull);
+                    context.clearEnforcedState(StateType.ZBuffer);
+
+                    // reset enforced states
                     if (oldCullState != null) {
                         context.enforceState(oldCullState);
-                    } else {
-                        context.clearEnforcedState(StateType.Cull);
+                    }
+                    if (oldZState != null) {
+                        context.enforceState(oldZState);
                     }
                     continue;
                 }
             }
+
+            // go ahead and draw as usual
             spatial.draw(_renderer);
         }
     }
