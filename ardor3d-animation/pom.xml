@@ -7,19 +7,14 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>ardor3d-collada</artifactId>
+  <artifactId>ardor3d-animation</artifactId>
   <packaging>jar</packaging>
-  <name>Ardor 3D Collada Importer</name>
+  <name>Ardor3D Skinning and Animation System</name>
 
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ardor3d-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ardor3d-animation</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
