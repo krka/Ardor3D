@@ -150,9 +150,15 @@ public class ColladaAnimUtils {
                     } else {
                         found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@sid='" + name + "']");
                     }
+
+                    // Last resorts (bad exporters)
+                    if (found == null) {
+                        found = ColladaDOMUtil.findTargetWithId(name);
+                    }
                     if (found == null) {
                         found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@name='" + name + "']");
                     }
+
                     if (found != null) {
                         break;
                     }
@@ -164,16 +170,31 @@ public class ColladaAnimUtils {
                         found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@sid='" + name
                                 + "']");
                     }
+
+                    // Last resorts (bad exporters)
+                    if (found == null) {
+                        found = ColladaDOMUtil.findTargetWithId(name);
+                    }
                     if (found == null) {
                         found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@name='"
                                 + name + "']");
                     }
+
                     if (found == null) {
                         throw new ColladaException("Unable to find joint with " + searcher + ": " + name, skin);
                     }
                 }
                 if (found.getParentElement() != null) {
-                    final String parName = found.getParentElement().getAttributeValue(searcher);
+                    String parName = found.getParentElement().getAttributeValue(searcher);
+
+                    // Last resort (bad exporters)
+                    if (parName == null) {
+                        parName = found.getParentElement().getAttributeValue("id");
+                    }
+                    if (parName == null) {
+                        parName = found.getParentElement().getAttributeValue("name");
+                    }
+
                     if (parName != null) {
                         final int index = jointNames.indexOf(parName);
                         if (index >= 0) {
