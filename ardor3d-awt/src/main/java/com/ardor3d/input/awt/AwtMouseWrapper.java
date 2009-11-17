@@ -25,7 +25,9 @@ import java.util.LinkedList;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
@@ -50,13 +52,18 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     private final Component _component;
     private final Frame _frame;
+    private final MouseManager _manager;
 
     private final Multiset<MouseButton> _clicks = EnumMultiset.create(MouseButton.class);
     private final EnumMap<MouseButton, Long> _lastClickTime = Maps.newEnumMap(MouseButton.class);
     private final EnumSet<MouseButton> _clickArmed = EnumSet.noneOf(MouseButton.class);
 
+    private int _ignoreX = Integer.MAX_VALUE;
+    private int _ignoreY = Integer.MAX_VALUE;
+
     @Inject
-    public AwtMouseWrapper(final Component component) {
+    public AwtMouseWrapper(final Component component, final MouseManager manager) {
+        _manager = manager;
         if (component instanceof Frame) {
             _frame = (Frame) (_component = component);
         } else {
@@ -92,11 +99,6 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
                 }
             }
         }
-    }
-
-    public synchronized void mouseClicked(final MouseEvent e) {
-    // Yes, we could use the click count here, but in the interests of this working the same way as SWT and Native, we
-    // will do it the same way they do it.
     }
 
     public synchronized void mousePressed(final MouseEvent e) {
@@ -136,15 +138,8 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         addNewState(e, buttons, null);
     }
 
-    public synchronized void mouseEntered(final MouseEvent e) {
-    // ignore this
-    }
-
-    public synchronized void mouseExited(final MouseEvent e) {
-    // ignore this
-    }
-
     public synchronized void mouseDragged(final MouseEvent e) {
+        // forward to mouseMoved.
         mouseMoved(e);
     }
 
@@ -152,9 +147,53 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         _clickArmed.clear();
         _clicks.clear();
 
+        // check that we have a valid _lastState
         initState(e);
 
+        // remember our current ardor3d position
+        final int oldX = _lastState.getX(), oldY = _lastState.getY();
+
+        // check the state against the "ignore next" values
+        if (_ignoreX != Integer.MAX_VALUE // shortcut to prevent dx/dy calculations
+                && (_ignoreX == getDX(e) && _ignoreY == getDY(e))) {
+
+            // we matched, so we'll consider this a "mouse pointer reset move"
+            // so reset ignore to let the next move event through.
+            _ignoreX = Integer.MAX_VALUE;
+            _ignoreY = Integer.MAX_VALUE;
+
+            // exit without adding an event to our queue
+            return;
+        }
+
+        // save our old "last state."
+        final MouseState _savedState = _lastState;
+
+        // Add our latest state info to the queue
         addNewState(e, _lastState.getButtonStates(), null);
+
+        // If we have a valid move... should always be the case, but occasionally something slips through.
+        if (_lastState.getDx() != 0 || _lastState.getDy() != 0) {
+
+            // Ask our manager if we're currently "captured"
+            if (_manager.getGrabbed() == GrabbedState.GRABBED) {
+
+                // if so, set "ignore next" to the inverse of this move
+                _ignoreX = -_lastState.getDx();
+                _ignoreY = -_lastState.getDy();
+
+                // Move us back to our last position.
+                _manager.setPosition(oldX, oldY);
+
+                // And finally, revert our _lastState.
+                _lastState = _savedState;
+            } else {
+                // otherwise, set us to not ignore anything. This may be unnecessary, but prevents any possible
+                // "ignore" bleeding.
+                _ignoreX = Integer.MAX_VALUE;
+                _ignoreY = Integer.MAX_VALUE;
+            }
+        }
     }
 
     public void mouseWheelMoved(final MouseWheelEvent e) {
@@ -173,17 +212,34 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
-        // changing the y value, since for AWT, y = 0 at the top of the screen
-        final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
-                : _component.getHeight();
-        final int fixedY = height - mouseEvent.getY();
+        final int fixedY = getArdor3DY(mouseEvent);
 
-        final MouseState newState = new MouseState(mouseEvent.getX(), fixedY, mouseEvent.getX() - _lastState.getX(),
-                fixedY - _lastState.getY(), (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent)
-                        .getWheelRotation() : 0), enumMap, clicks);
+        final MouseState newState = new MouseState(mouseEvent.getX(), fixedY, getDX(mouseEvent), getDY(mouseEvent),
+                (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent).getWheelRotation() : 0),
+                enumMap, clicks);
 
         _upcomingEvents.add(newState);
         _lastState = newState;
+    }
+
+    private int getDX(final MouseEvent e) {
+        return e.getX() - _lastState.getX();
+    }
+
+    private int getDY(final MouseEvent e) {
+        return getArdor3DY(e) - _lastState.getY();
+    }
+
+    /**
+     * @param e
+     *            our mouseEvent
+     * @return the Y coordinate of the event, flipped relative to the component since we expect an origin in the lower
+     *         left corner.
+     */
+    private int getArdor3DY(final MouseEvent e) {
+        final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
+                : _component.getHeight();
+        return height - e.getY();
     }
 
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
@@ -223,4 +279,20 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
         }
     }
+
+    // -- The following interface methods are not used. --
+
+    public synchronized void mouseClicked(final MouseEvent e) {
+    // Yes, we could use the click count here, but in the interests of this working the same way as SWT and Native, we
+    // will do it the same way they do it.
+    }
+
+    public synchronized void mouseEntered(final MouseEvent e) {
+    // ignore this
+    }
+
+    public synchronized void mouseExited(final MouseEvent e) {
+    // ignore this
+    }
+
 }

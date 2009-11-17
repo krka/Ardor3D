@@ -19,6 +19,7 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
@@ -43,6 +44,12 @@ public class AwtMouseManager implements MouseManager {
 
     private final Component _component;
     private Robot _robot;
+
+    /** our current grabbed state */
+    private GrabbedState _grabbedState;
+
+    /** Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed" */
+    private Cursor _pregrabCursor;
 
     @Inject
     public AwtMouseManager(final Component component) {
@@ -80,29 +87,30 @@ public class AwtMouseManager implements MouseManager {
             throw new UnsupportedOperationException();
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Component c = _component;
-                if (c instanceof Frame && ((Frame) c).getComponentCount() > 0) {
-                    c = ((Frame) c).getComponent(0);
-                }
-                final Point p = new Point(x, c.getHeight() - y);
-                SwingUtilities.convertPointToScreen(p, c);
-                _robot.mouseMove(p.x, p.y);
+        try {
+            // Only queue up if we are not already in the event thread.
+            if (java.awt.EventQueue.isDispatchThread()) {
+                setMousePosition(x, y);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        setMousePosition(x, y);
+                    }
+                });
             }
-        });
+        } catch (final InterruptedException ex) {
+        } catch (final InvocationTargetException ex) {
+        }
     }
 
-    private void recenterMouse() {
-        if (!isSetPositionSupported()) {
-            throw new UnsupportedOperationException();
-        }
-
+    private void setMousePosition(final int ardorX, final int ardorY) {
         Component c = _component;
         if (c instanceof Frame && ((Frame) c).getComponentCount() > 0) {
             c = ((Frame) c).getComponent(0);
         }
-        setPosition(c.getWidth() / 2, c.getHeight() / 2);
+        final Point p = new Point(ardorX, c.getHeight() - ardorY);
+        SwingUtilities.convertPointToScreen(p, c);
+        _robot.mouseMove(p.x, p.y);
     }
 
     public void setGrabbed(final GrabbedState grabbedState) {
@@ -110,13 +118,18 @@ public class AwtMouseManager implements MouseManager {
             throw new UnsupportedOperationException();
         }
 
+        // remember our grabbed state mode.
+        _grabbedState = grabbedState;
+
         if (grabbedState == GrabbedState.GRABBED) {
+            // remember our old cursor
+            _pregrabCursor = _component.getCursor();
+
+            // set our cursor to be invisible
             _component.setCursor(getTransparentCursor());
         } else {
-            _component.setCursor(null);
-            if (isSetPositionSupported()) {
-                recenterMouse();
-            }
+            // restore our old cursor
+            _component.setCursor(_pregrabCursor);
         }
     }
 
@@ -136,5 +149,9 @@ public class AwtMouseManager implements MouseManager {
 
     public boolean isSetGrabbedSupported() {
         return _robot != null;
+    }
+
+    public GrabbedState getGrabbed() {
+        return _grabbedState;
     }
 }

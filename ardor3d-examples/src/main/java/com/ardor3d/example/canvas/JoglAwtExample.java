@@ -162,10 +162,10 @@ public class JoglAwtExample {
         theCanvas.setSize(new Dimension(400, 300));
         theCanvas.setVisible(true);
 
-        final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(theCanvas);
         final AwtKeyboardWrapper keyboardWrapper = new AwtKeyboardWrapper(theCanvas);
         final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(theCanvas);
         final AwtMouseManager mouseManager = new AwtMouseManager(theCanvas);
+        final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(theCanvas, mouseManager);
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 
