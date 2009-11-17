@@ -62,7 +62,10 @@ public class URLResourceSource implements ResourceSource {
         } catch (final URISyntaxException ex) {
         } catch (final MalformedURLException ex) {
         }
-        logger.log(Level.WARNING, "Unable to find relative file '{0}' from '{1}'.", new Object[] { name, _url });
+        if (logger.isLoggable(Level.WARNING)) {
+            logger.logp(Level.WARNING, getClass().getName(), "getRelativeSource(String)",
+                    "Unable to find relative file {0} from {1}.", new Object[] { name, _url });
+        }
         return null;
     }
 
