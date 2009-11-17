@@ -53,9 +53,15 @@ public class GridLayout extends UILayout {
     }
 
     /**
-     * Ê Ê Ê* Create a GridLayout with the specified parameters and a vertical alignment to top and no distribution of
-     * vertical Ê Ê Ê* space Ê Ê Ê* Ê Ê Ê* @param interCellSpacingHorizontal Ê Ê Ê* @param interCellSpacingVertical Ê Ê
-     * Ê* @param leftMargin Ê Ê Ê* @param topMargin Ê Ê Ê* @param rightMargin Ê Ê Ê* @param bottomMargin Ê Ê Ê
+     * Create a GridLayout with the specified parameters and a vertical alignment to top and no distribution of vertical
+     * space.
+     * 
+     * @param interCellSpacingHorizontal
+     * @param interCellSpacingVertical
+     * @param leftMargin
+     * @param topMargin
+     * @param rightMargin
+     * @param bottomMargin
      */
     public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
             final int topMargin, final int rightMargin, final int bottomMargin) {
@@ -82,7 +88,7 @@ public class GridLayout extends UILayout {
     }
 
     /**
-     * Create a GridLayout with the specified parameters. Any additional vertical space won't be distributed betweeen
+     * Create a GridLayout with the specified parameters. Any additional vertical space won't be distributed between
      * rows.
      * 
      * @param interCellSpacingHorizontal
@@ -92,7 +98,7 @@ public class GridLayout extends UILayout {
      * @param rightMargin
      * @param bottomMargin
      * @param verticalAlignment
-     *            Ê Ê Ê Ê Ê Ê only TOP, MIDDLE and BOTTOM are meaningful
+     *            only TOP, MIDDLE and BOTTOM are meaningful
      */
     public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
             final int topMargin, final int rightMargin, final int bottomMargin, final Alignment verticalAlignment) {
@@ -111,7 +117,7 @@ public class GridLayout extends UILayout {
      * @param rightMargin
      * @param bottomMargin
      * @param verticalAlignment
-     *            Ê Ê Ê Ê Ê Ê only TOP, MIDDLE and BOTTOM are meaningful
+     *            only TOP, MIDDLE and BOTTOM are meaningful
      * @param fillVerticalSpace
      */
     public GridLayout(final int interCellSpacingHorizontal, final int interCellSpacingVertical, final int leftMargin,
