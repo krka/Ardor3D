@@ -47,12 +47,6 @@ import javax.swing.UIManager;
 
 import com.ardor3d.util.Ardor3dException;
 
-/**
- * <code>PropertiesDialog</code> provides an interface to make use of the <code>GameSettings</code> class. The
- * <code>GameSettings</code> object is still created by the client application, and passed during construction.
- * 
- * @see com.ardor3d.system.GameSettings
- */
 public final class PropertiesDialog extends JDialog {
     private static final Logger logger = Logger.getLogger(PropertiesDialog.class.getName());
 

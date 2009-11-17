@@ -839,7 +839,7 @@ public class PropertiesGameSettings {
     /**
      * @param inName
      *            Must be non-null
-     * @returns normalized name. All lower-case with no shell meta-characters.
+     * @return normalized name. All lower-case with no shell meta-characters.
      */
     protected static String normalizeName(final String inName) {
         final StringBuilder sb = new StringBuilder();

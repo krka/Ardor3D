@@ -147,7 +147,8 @@ public class BMTextExample extends ExampleBase {
     /**
      * 
      * @param text
-     * @return
+     *            the text object
+     * @return the proper contents to use for our text object.
      */
     // -----------------------------------------------------
     String testDisplayString(final BMText text) {
