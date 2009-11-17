@@ -217,7 +217,7 @@ public class ColladaExample extends ExampleBase {
             cam.setLocation(vec);
             cam.lookAt(center, upAxis);
             final double near = Math.max(radius / 500.0, 0.25);
-            final double far = Math.min(radius * 3, 10000.0);
+            final double far = Math.min(radius * 5, 10000.0);
             cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), near, far);
             cam.update();
 
