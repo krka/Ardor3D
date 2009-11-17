@@ -150,6 +150,9 @@ public class ColladaAnimUtils {
                     } else {
                         found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@sid='" + name + "']");
                     }
+                    if (found == null) {
+                        found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@name='" + name + "']");
+                    }
                     if (found != null) {
                         break;
                     }
@@ -158,7 +161,12 @@ public class ColladaAnimUtils {
                     if (paramType == ParamType.idref_param) {
                         found = ColladaDOMUtil.findTargetWithId(name);
                     } else {
-                        found = (Element) ColladaDOMUtil.selectSingleNode(geometry, ".//*[@sid='" + name + "']");
+                        found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@sid='" + name
+                                + "']");
+                    }
+                    if (found == null) {
+                        found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@name='"
+                                + name + "']");
                     }
                     if (found == null) {
                         throw new ColladaException("Unable to find joint with " + searcher + ": " + name, skin);
