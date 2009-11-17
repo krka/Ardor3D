@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
 <provider id="org.eclipse.team.svn.core.svnnature">
-<project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-animations,ardor3d-animations"/>
+<project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-animation,ardor3d-animation"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-awt,ardor3d-awt"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-core,ardor3d-core"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-collada,ardor3d-collada"/>
