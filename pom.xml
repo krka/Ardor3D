@@ -82,6 +82,7 @@
   <!-- these properties help simplify specifying some commonly occurring variables -->
   <properties>
     <lwjgl.version>ardor3d-2.1.0</lwjgl.version>
+    <jdom.version>ardor3d-1.1.1</jdom.version>
     <swt.version>ardor3d-3448</swt.version>
   </properties>
 
@@ -146,6 +147,21 @@
         <groupId>org.lwjgl</groupId>
         <artifactId>lwjgl_util</artifactId>
         <version>${lwjgl.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jdom</artifactId>
+        <version>${jdom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>${jdom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>saxpath</artifactId>
+        <version>${jdom.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.swt.gtk.linux</groupId>
