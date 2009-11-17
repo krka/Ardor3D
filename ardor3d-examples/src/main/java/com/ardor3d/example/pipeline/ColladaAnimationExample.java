@@ -51,7 +51,7 @@ import com.google.inject.Inject;
 public class ColladaAnimationExample extends ExampleBase {
 
     private static final boolean UPDATE_BOUNDS = false;
-    private static final double UPDATE_RATE = 1.0 / 60;
+    private static final double UPDATE_RATE = 1.0 / 30.0;
     private Node colladaNode;
     private ColladaStorage colladaStorage;
     private boolean showSkeleton = false, showMesh = true;
