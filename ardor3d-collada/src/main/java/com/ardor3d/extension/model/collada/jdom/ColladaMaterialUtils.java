@@ -128,7 +128,12 @@ public class ColladaMaterialUtils {
                         final Element propertyValue = (Element) property.getChildren().get(0);
                         if ("float".equals(propertyValue.getName())) {
                             float shininess = Float.parseFloat(propertyValue.getText());
-                            if (shininess < 0 || shininess > 128) {
+                            if (shininess >= 0.0f && shininess <= 1.0f) {
+                                final float oldShininess = shininess;
+                                shininess *= 128;
+                                ColladaMaterialUtils.logger.finest("Shininess - " + oldShininess
+                                        + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
+                            } else if (shininess < 0 || shininess > 128) {
                                 final float oldShininess = shininess;
                                 shininess = (float) MathUtils.clamp(shininess, 0, 128);
                                 ColladaMaterialUtils.logger.warning("Shininess must be between 0 and 128. Shininess "
