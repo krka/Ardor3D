@@ -131,10 +131,6 @@ public class PropertiesGameSettings {
         load();
     }
 
-    /* REMAINING METHODS COMPLETE IMPLEMENTATION OF GameSettings INTERFACE */
-    /**
-     * @see GameSettings#clear()
-     */
     public void clear() {
         prop.clear();
     }
@@ -150,9 +146,6 @@ public class PropertiesGameSettings {
         return prop.getProperty(key);
     }
 
-    /**
-     * @see GameSettings#get(String, String)
-     */
     public String get(final String name, final String defaultValue) {
         final String value = get(name);
         return (value == null) ? defaultValue : value;
@@ -161,7 +154,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#getAlphaBits()
      * @throws InternalError
      *             in all cases
      */
@@ -170,17 +162,11 @@ public class PropertiesGameSettings {
         return (s == null) ? defaultAlphaBits : Integer.parseInt(s);
     }
 
-    /**
-     * @see GameSettings#getBoolean(String, boolean)
-     */
     public boolean getBoolean(final String name, final boolean defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : Boolean.parseBoolean(stringValue);
     }
 
-    /**
-     * @see GameSettings#getByteArray(String, byte[])
-     */
     public byte[] getByteArray(final String name, final byte[] defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : stringValue.getBytes();
@@ -211,7 +197,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#getDepthBits()
      * @throws InternalError
      *             in all cases
      */
@@ -220,17 +205,11 @@ public class PropertiesGameSettings {
         return (s == null) ? defaultDepthBits : Integer.parseInt(s);
     }
 
-    /**
-     * @see GameSettings#getDouble(String, double)
-     */
     public double getDouble(final String name, final double defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : Double.parseDouble(stringValue);
     }
 
-    /**
-     * @see GameSettings#getFloat(String, float)
-     */
     public float getFloat(final String name, final float defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : Float.parseFloat(stringValue);
@@ -239,7 +218,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#getFramerate()
      * @throws InternalError
      *             in all cases
      */
@@ -252,7 +230,6 @@ public class PropertiesGameSettings {
      * <code>getFrequency</code> returns the frequency of the monitor as read from the properties file. If the
      * properties file does not contain frequency or was not read properly the default frequency is returned.
      * 
-     * @see GameSettings#getFrequency()
      * @return the frequency determined by the properties file, or the default.
      */
     public int getFrequency() {
@@ -290,25 +267,16 @@ public class PropertiesGameSettings {
         return Integer.parseInt(h);
     }
 
-    /**
-     * @see GameSettings#getInt(String, int)
-     */
     public int getInt(final String name, final int defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : Integer.parseInt(stringValue);
     }
 
-    /**
-     * @see GameSettings#getLong(String, long)
-     */
     public long getLong(final String name, final long defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : Long.parseLong(stringValue);
     }
 
-    /**
-     * @see GameSettings#getObject(String, Object)
-     */
     public Object getObject(final String name, final Object defaultValue) {
         final String stringValue = get(name);
         return (stringValue == null) ? defaultValue : stringValue;
@@ -332,7 +300,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#getSamples()
      * @throws InternalError
      *             in all cases
      */
@@ -344,7 +311,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#getStencilBits()
      * @throws InternalError
      *             in all cases
      */
@@ -372,7 +338,6 @@ public class PropertiesGameSettings {
      * <code>isFullscreen</code> returns the fullscreen flag as read from the properties file. If the properties file
      * does not contain the fullscreen flag or was not read properly, the default value is returned.
      * 
-     * @see PreferencesGameSettings#isFullscreen()
      * @return the fullscreen flag determined by the properties file, or the default.
      */
     public boolean isFullscreen() {
@@ -387,7 +352,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#isMusic()
      * @throws InternalError
      *             in all cases
      */
@@ -396,9 +360,6 @@ public class PropertiesGameSettings {
         return (s == null) ? defaultMusic : Boolean.parseBoolean(s);
     }
 
-    /**
-     * @see GameSettings#isNew()
-     */
     public boolean isNew() {
         return isNew;
     }
@@ -406,7 +367,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#isSFX()
      * @throws InternalError
      *             in all cases
      */
@@ -418,7 +378,6 @@ public class PropertiesGameSettings {
     /**
      * If the properties file does not contain the setting or was not read properly, the default value is returned.
      * 
-     * @see GameSettings#isVerticalSync()
      * @throws InternalError
      *             in all cases
      */
@@ -523,15 +482,12 @@ public class PropertiesGameSettings {
 
     /**
      * Sets a property.
-     * 
-     * @see GameSettings#set(String, String)
      */
     public void set(final String name, final String value) {
         prop.setProperty(name, value);
     }
 
     /**
-     * @see GameSettings#setAlphaBits(int)
      * @throws InternalError
      *             in all cases
      */
@@ -541,7 +497,6 @@ public class PropertiesGameSettings {
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setBoolean(String, boolean)
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -551,7 +506,6 @@ public class PropertiesGameSettings {
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setByteArray(String, byte[])
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -559,15 +513,11 @@ public class PropertiesGameSettings {
         set(name, new String(value));
     }
 
-    /**
-     * @see GameSettings#setDepth(int)
-     */
     public void setDepth(final int depth) {
         setInt("DEPTH", depth);
     }
 
     /**
-     * @see GameSettings#setDepthBits(int)
      * @throws InternalError
      *             in all cases
      */
@@ -577,7 +527,6 @@ public class PropertiesGameSettings {
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setDouble(String, double)
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -587,7 +536,6 @@ public class PropertiesGameSettings {
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setFloat(String, float)
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -596,7 +544,6 @@ public class PropertiesGameSettings {
     }
 
     /**
-     * @see GameSettings#setFramerate(int)
      * @throws InternalError
      *             in all cases
      */
@@ -604,30 +551,20 @@ public class PropertiesGameSettings {
         setInt("FRAMERATE", framerate);
     }
 
-    /**
-     * @see GameSettings#setFrequency(int)
-     */
     public void setFrequency(final int freq) {
         setInt("FREQ", freq);
     }
 
-    /**
-     * @see GameSettings#setFullscreen(boolean)
-     */
     public void setFullscreen(final boolean fullscreen) {
         setBoolean("FULLSCREEN", fullscreen);
     }
 
-    /**
-     * @see GameSettings#setHeight(int)
-     */
     public void setHeight(final int height) {
         setInt("HEIGHT", height);
     }
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setInt(String, int)
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -635,16 +572,12 @@ public class PropertiesGameSettings {
         set(name, Integer.toString(value));
     }
 
-    /**
-     * @see GameSettings#isNew()
-     */
     public void setIsNew(final boolean isNew) {
         this.isNew = isNew;
     }
 
     /**
      * @see #set(String, String)
-     * @see PreferencesGameSettings#setLong(String, long)
      * @throws RuntimeSetting
      *             for IO failure
      */
@@ -653,7 +586,6 @@ public class PropertiesGameSettings {
     }
 
     /**
-     * @see GameSettings#setMusic(boolean)
      * @throws InternalError
      *             in all cases
      */
@@ -665,7 +597,6 @@ public class PropertiesGameSettings {
      * Not implemented. Properties can not store an arbitrary Object in human-readable format. Use set(String, String)
      * instead.
      * 
-     * @see PreferencesGameSettings#setObject(String, boolean)
      * @see #set(String, String)
      * @throws InternalError
      *             in all cases
@@ -676,15 +607,11 @@ public class PropertiesGameSettings {
                 + getClass().getName() + ".set(String, String).");
     }
 
-    /**
-     * @see GameSettings#setRenderer(String)
-     */
     public void setRenderer(final String renderer) {
         set("RENDERER", renderer);
     }
 
     /**
-     * @see GameSettings#setSamples(int)
      * @throws InternalError
      *             in all cases
      */
@@ -693,7 +620,6 @@ public class PropertiesGameSettings {
     }
 
     /**
-     * @see GameSettings#setSFX(boolean)
      * @throws InternalError
      *             in all cases
      */
@@ -702,7 +628,6 @@ public class PropertiesGameSettings {
     }
 
     /**
-     * @see GameSettings#setStencilBits(int)
      * @throws InternalError
      *             in all cases
      */
@@ -711,7 +636,6 @@ public class PropertiesGameSettings {
     }
 
     /**
-     * @see GameSettings#setVerticalSync(boolean)
      * @throws InternalError
      *             in all cases
      */
@@ -719,9 +643,6 @@ public class PropertiesGameSettings {
         setBoolean("VERTICAL_SYNC", verticalSync);
     }
 
-    /**
-     * @see GameSettings#setWidth(int)
-     */
     public void setWidth(final int width) {
         setInt("WIDTH", width);
     }
@@ -744,13 +665,17 @@ public class PropertiesGameSettings {
 
     /**
      * Sets default* static variables according to GameSettings.DEFAULT_* values and an optional .properties file. Note
-     * that we are talking about <b>defaults</b> here, not user-specific settings. <P/> This method should be called
-     * once the game name is known to the subclass. To override any default with your subclass (as opposed to by using a
-     * .properties file), just set the static variable before or after calling this method (before or after depends on
-     * the precedence you want among programmatic and declarative DEFAULT_*, default* settings). <P/> Add new setting
-     * names by making your own method which does its own thing and calls
-     * AbstractGameSettings.assignDefaults(propfilename). <P/> Property file paths are relative to CLASSPATH element
-     * roots.
+     * that we are talking about <b>defaults</b> here, not user-specific settings.
+     * <P/>
+     * This method should be called once the game name is known to the subclass. To override any default with your
+     * subclass (as opposed to by using a .properties file), just set the static variable before or after calling this
+     * method (before or after depends on the precedence you want among programmatic and declarative DEFAULT_*, default*
+     * settings).
+     * <P/>
+     * Add new setting names by making your own method which does its own thing and calls
+     * AbstractGameSettings.assignDefaults(propfilename).
+     * <P/>
+     * Property file paths are relative to CLASSPATH element roots.
      * 
      * @param propFileName
      *            Properties file read as CLASSPATH resource. If you give null, no properties file will be loaded.
