@@ -937,12 +937,6 @@ public class GLSLShaderObjectsState extends RenderState {
         if (shaderAttributes.size() > caps.getMaxGLSLVertexAttributes()) {
             logger.severe("Too many shader attributes(standard+defined): " + shaderAttributes.size() + " maximum: "
                     + caps.getMaxGLSLVertexAttributes());
-        } else if (shaderAttributes.size() + 16 > caps.getMaxGLSLVertexAttributes()) {
-            // XXX: Keep us from spamming this message in legitimate uses.
-            if (_numWarnings < MAX_NUM_WARNINGS) {
-                ++_numWarnings;
-                logger.warning("User defined attributes might overwrite default OpenGL attributes");
-            }
         }
     }
 
