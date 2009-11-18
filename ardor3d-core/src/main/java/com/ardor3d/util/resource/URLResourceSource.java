@@ -10,13 +10,11 @@
 
 package com.ardor3d.util.resource;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,15 +50,15 @@ public class URLResourceSource implements ResourceSource {
         try {
             final URL texUrl = UrlUtils.resolveRelativeURL(_url, "./" + name);
             if (texUrl != null) {
-                // check if the URL points to an existing file
-                final URI uri = texUrl.toURI();
-                final File file = new File(uri);
-                if (file.exists()) {
-                    return new URLResourceSource(texUrl);
-                }
+                // check if the URL can be opened
+                final URLConnection conn = texUrl.openConnection();
+                // just to force it to try to grab info
+                conn.getDate();
+                // Ok satisfied... return
+                return new URLResourceSource(texUrl);
             }
-        } catch (final URISyntaxException ex) {
         } catch (final MalformedURLException ex) {
+        } catch (final IOException ex) {
         }
         if (logger.isLoggable(Level.WARNING)) {
             logger.logp(Level.WARNING, getClass().getName(), "getRelativeSource(String)",
