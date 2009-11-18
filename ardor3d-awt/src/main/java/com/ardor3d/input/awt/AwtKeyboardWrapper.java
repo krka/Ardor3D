@@ -11,10 +11,14 @@
 package com.ardor3d.input.awt;
 
 import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
+import java.util.EnumSet;
 import java.util.LinkedList;
 
 import com.ardor3d.annotation.GuardedBy;
+import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyEvent;
 import com.ardor3d.input.KeyState;
 import com.ardor3d.input.KeyboardWrapper;
@@ -35,6 +39,8 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     private final Component _component;
 
+    private final EnumSet<Key> _pressedList = EnumSet.noneOf(Key.class);
+
     @Inject
     public AwtKeyboardWrapper(final Component component) {
         _component = Preconditions.checkNotNull(component, "component");
@@ -42,6 +48,13 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     public void init() {
         _component.addKeyListener(this);
+        _component.addFocusListener(new FocusListener() {
+            public void focusLost(final FocusEvent e) {}
+
+            public void focusGained(final FocusEvent e) {
+                _pressedList.clear();
+            }
+        });
     }
 
     public synchronized PeekingIterator<KeyEvent> getEvents() {
@@ -57,11 +70,17 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final java.awt.event.KeyEvent e) {
-        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.DOWN, e.getKeyChar()));
+        final Key pressed = AwtKey.findByCode(e.getKeyCode());
+        if (!_pressedList.contains(pressed)) {
+            _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN, e.getKeyChar()));
+            _pressedList.add(pressed);
+        }
     }
 
     public synchronized void keyReleased(final java.awt.event.KeyEvent e) {
-        _upcomingEvents.add(new KeyEvent(AwtKey.findByCode(e.getKeyCode()), KeyState.UP, e.getKeyChar()));
+        final Key released = AwtKey.findByCode(e.getKeyCode());
+        _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
+        _pressedList.remove(released);
     }
 
     private class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
