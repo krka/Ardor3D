@@ -20,6 +20,7 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -55,7 +56,8 @@ public class SkeletalDebugger {
             final Camera cam = Camera.getCurrentCamera();
             final int state = cam.getPlaneState();
             if (cam.contains(scene.getWorldBound()) != Camera.FrustumIntersect.Outside) {
-                SkeletalDebugger.drawSkeleton(((SkinnedMesh) scene).getCurrentPose(), renderer);
+                SkeletalDebugger.drawSkeleton(((SkinnedMesh) scene).getCurrentPose(), scene.getWorldTransform(),
+                        renderer);
             } else {
                 doChildren = false;
             }
@@ -78,18 +80,20 @@ public class SkeletalDebugger {
      * 
      * @param pose
      *            the posed skeleton to draw
+     * @param skinTransform
      * @param renderer
      *            the Renderer to draw with.
      */
-    private static void drawSkeleton(final SkeletonPose pose, final Renderer renderer) {
+    private static void drawSkeleton(final SkeletonPose pose, final ReadOnlyTransform skinTransform,
+            final Renderer renderer) {
         final Joint[] joints = pose.getSkeleton().getJoints();
         final Transform[] globals = pose.getGlobalJointTransforms();
 
         for (int i = 0, max = joints.length; i < max; i++) {
-            SkeletalDebugger.drawJoint(globals[i], renderer);
+            SkeletalDebugger.drawJoint(globals[i], skinTransform, renderer);
             final short parentIndex = joints[i].getParentIndex();
             if (parentIndex != Joint.NO_PARENT) {
-                SkeletalDebugger.drawBone(globals[parentIndex], globals[i], renderer);
+                SkeletalDebugger.drawBone(globals[parentIndex], globals[i], skinTransform, renderer);
             }
         }
     }
@@ -126,10 +130,12 @@ public class SkeletalDebugger {
      *            our parent joint transform
      * @param end
      *            our child joint transform
+     * @param skinTransform
      * @param renderer
      *            the Renderer to draw with.
      */
-    private static void drawBone(final Transform start, final Transform end, final Renderer renderer) {
+    private static void drawBone(final Transform start, final Transform end, final ReadOnlyTransform skinTransform,
+            final Renderer renderer) {
         // Determine our start and end points
         final Vector3 stPnt = Vector3.fetchTempInstance();
         final Vector3 endPnt = Vector3.fetchTempInstance();
@@ -139,6 +145,7 @@ public class SkeletalDebugger {
         // determine distance and use as a scale to elongate the bone
         // XXX: perhaps instead of 1 we should use some kind of average scale between start and end bone?
         final double scale = stPnt.distance(endPnt);
+        SkeletalDebugger.bone.setWorldTransform(Transform.IDENTITY);
         SkeletalDebugger.bone.setWorldScale(1, 1, scale);
 
         // determine center point of bone (translation).
@@ -150,6 +157,10 @@ public class SkeletalDebugger {
         final Matrix3 orient = Matrix3.fetchTempInstance();
         orient.lookAt(endPnt.subtractLocal(stPnt).normalizeLocal(), Vector3.UNIT_Y);
         SkeletalDebugger.bone.setWorldRotation(orient);
+
+        // Offset with skin transform
+        SkeletalDebugger.bone
+                .setWorldTransform(skinTransform.multiply(SkeletalDebugger.bone.getWorldTransform(), null));
 
         // Release some temp vars.
         Matrix3.releaseTempInstance(orient);
@@ -197,11 +208,13 @@ public class SkeletalDebugger {
      * 
      * @param jntTransform
      *            our joint transform
+     * @param skinTransform
      * @param renderer
      *            the Renderer to draw with.
      */
-    private static void drawJoint(final Transform jntTransform, final Renderer renderer) {
-        SkeletalDebugger.joint.setWorldTransform(jntTransform);
+    private static void drawJoint(final Transform jntTransform, final ReadOnlyTransform skinTransform,
+            final Renderer renderer) {
+        SkeletalDebugger.joint.setWorldTransform(skinTransform.multiply(jntTransform, null));
         SkeletalDebugger.joint.draw(renderer);
     }
 
