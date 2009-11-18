@@ -248,6 +248,10 @@ public abstract class JoglShaderUtil {
      *            variable to update
      */
     public static void updateShaderAttribute(final ShaderVariable shaderVariable) {
+        if (shaderVariable.variableID == -1) {
+            // attribute is not bound, or was not found in shader.
+            return;
+        }
         if (shaderVariable instanceof ShaderVariablePointerFloat) {
             updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariablePointerByte) {
