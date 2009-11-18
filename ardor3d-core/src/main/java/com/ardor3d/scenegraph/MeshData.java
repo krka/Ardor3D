@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
@@ -988,6 +989,24 @@ public class MeshData implements Cloneable, Savable {
     public void translatePoints(final Vector3 amount) {
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.addInBuffer(amount, _vertexCoords.getBuffer(), x);
+        }
+    }
+
+    public void transformVertices(final Transform transform) {
+        final Vector3 store = new Vector3();
+        for (int x = 0; x < _vertexCount; x++) {
+            BufferUtils.populateFromBuffer(store, _vertexCoords.getBuffer(), x);
+            transform.applyForward(store, store);
+            BufferUtils.setInBuffer(store, _vertexCoords.getBuffer(), x);
+        }
+    }
+
+    public void transformNormals(final Transform transform) {
+        final Vector3 store = new Vector3();
+        for (int x = 0; x < _vertexCount; x++) {
+            BufferUtils.populateFromBuffer(store, _normalCoords.getBuffer(), x);
+            transform.applyForward(store, store);
+            BufferUtils.setInBuffer(store, _normalCoords.getBuffer(), x);
         }
     }
 

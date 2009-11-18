@@ -287,6 +287,14 @@ public class ColladaAnimUtils {
             // add node to store
             skinDataStore.setSkinBaseNode(skinNode);
 
+            // Grab the bind_shape_matrix from skin
+            final Element bindShapeMatrixEL = skin.getChild("bind_shape_matrix");
+            final Transform bindShapeMatrix = new Transform();
+            if (bindShapeMatrixEL != null) {
+                final double[] array = ColladaDOMUtil.parseDoubleArray(bindShapeMatrixEL);
+                bindShapeMatrix.fromHomogeneousMatrix(new Matrix4().fromArray(array));
+            }
+
             // Visit our Node and pull out any Mesh children. Turn them into SkinnedMeshes
             for (final Spatial spat : meshNode.getChildren()) {
                 if (spat instanceof Mesh) {
@@ -297,11 +305,17 @@ public class ColladaAnimUtils {
                     // copy mesh render states across.
                     ColladaAnimUtils.copyRenderStates(sourceMesh, skMesh);
 
-                    // Use source mesh as bind pose data in the new SkinnedMesh
-                    skMesh.setBindPoseData(sourceMesh.getMeshData());
-
-                    // TODO: This is only needed for CPU skinning... consider a way of making it optional.
                     try {
+                        // Use source mesh as bind pose data in the new SkinnedMesh
+                        final MeshData bindPose = ColladaAnimUtils.copyMeshData(sourceMesh.getMeshData());
+                        skMesh.setBindPoseData(bindPose);
+
+                        // Apply our BSM
+                        if (!bindShapeMatrix.isIdentity()) {
+                            bindPose.transformVertices(bindShapeMatrix);
+                        }
+
+                        // TODO: This is only needed for CPU skinning... consider a way of making it optional.
                         // Copy bind pose to mesh data to setup for CPU skinning
                         skMesh.setMeshData(ColladaAnimUtils.copyMeshData(skMesh.getBindPoseData()));
                     } catch (final IOException e) {
