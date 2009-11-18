@@ -93,7 +93,7 @@ public abstract class JoglShaderObjectsStateUtil {
             gl.glGetObjectParameterivARB(state._fragmentShaderID, GL.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
             checkProgramError(compiled, state._fragmentShaderID);
 
-            // Attatch the program
+            // Attach the program
             gl.glAttachObjectARB(state._programID, state._fragmentShaderID);
         } else if (state._fragmentShaderID != -1) {
             removeFragShader(state);
@@ -101,8 +101,34 @@ public abstract class JoglShaderObjectsStateUtil {
         }
 
         gl.glLinkProgramARB(state._programID);
+        checkLinkError(state._programID);
         state.setNeedsRefresh(true);
         state._needSendShader = false;
+    }
+
+    private static void checkLinkError(final int programId) {
+        final GL gl = GLU.getCurrentGL();
+
+        final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+        gl.glGetProgramivARB(programId, GL.GL_LINK_STATUS, compiled);
+        if (compiled.get(0) == GL.GL_FALSE) {
+            gl.glGetProgramivARB(programId, GL.GL_INFO_LOG_LENGTH, compiled);
+            final int length = compiled.get(0);
+            String out = null;
+            if (length > 0) {
+                final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
+
+                gl.glGetProgramInfoLog(programId, infoLog.limit(), compiled, infoLog);
+
+                final byte[] infoBytes = new byte[length];
+                infoLog.get(infoBytes);
+                out = new String(infoBytes);
+            }
+
+            logger.severe(out);
+
+            throw new Ardor3dException("Error linking GLSL shader: " + out);
+        }
     }
 
     /** Removes the fragment shader */
@@ -136,16 +162,15 @@ public abstract class JoglShaderObjectsStateUtil {
     private static void checkProgramError(final IntBuffer compiled, final int id) {
         final GL gl = GLU.getCurrentGL();
 
-        if (compiled.get(0) == 0) {
+        if (compiled.get(0) == GL.GL_FALSE) {
             final IntBuffer iVal = BufferUtils.createIntBuffer(1);
             gl.glGetObjectParameterivARB(id, GL.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
-            final int length = iVal.get();
+            final int length = iVal.get(0);
             String out = null;
 
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
 
-                iVal.flip();
                 gl.glGetInfoLogARB(id, infoLog.limit(), iVal, infoLog);
 
                 final byte[] infoBytes = new byte[length];

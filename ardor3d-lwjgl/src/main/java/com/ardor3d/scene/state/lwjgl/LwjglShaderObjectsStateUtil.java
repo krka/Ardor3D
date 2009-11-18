@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexShader;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -85,7 +87,7 @@ public abstract class LwjglShaderObjectsStateUtil {
                     ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
             checkProgramError(compiled, state._fragmentShaderID);
 
-            // Attatch the program
+            // Attach the program
             ARBShaderObjects.glAttachObjectARB(state._programID, state._fragmentShaderID);
         } else if (state._fragmentShaderID != -1) {
             removeFragShader(state);
@@ -93,8 +95,32 @@ public abstract class LwjglShaderObjectsStateUtil {
         }
 
         ARBShaderObjects.glLinkProgramARB(state._programID);
+        checkLinkError(state._programID);
         state.setNeedsRefresh(true);
         state._needSendShader = false;
+    }
+
+    private static void checkLinkError(final int programId) {
+        final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+        GL20.glGetProgram(programId, GL20.GL_LINK_STATUS, compiled);
+        if (compiled.get(0) == GL11.GL_FALSE) {
+            GL20.glGetProgram(programId, GL20.GL_INFO_LOG_LENGTH, compiled);
+            final int length = compiled.get(0);
+            String out = null;
+            if (length > 0) {
+                final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
+
+                GL20.glGetProgramInfoLog(programId, compiled, infoLog);
+
+                final byte[] infoBytes = new byte[length];
+                infoLog.get(infoBytes);
+                out = new String(infoBytes);
+            }
+
+            logger.severe(out);
+
+            throw new Ardor3dException("Error linking GLSL shader: " + out);
+        }
     }
 
     /** Removes the fragment shader */
@@ -124,16 +150,15 @@ public abstract class LwjglShaderObjectsStateUtil {
      *            shader's id
      */
     private static void checkProgramError(final IntBuffer compiled, final int id) {
-        if (compiled.get(0) == 0) {
+        if (compiled.get(0) == GL11.GL_FALSE) {
             final IntBuffer iVal = BufferUtils.createIntBuffer(1);
             ARBShaderObjects.glGetObjectParameterARB(id, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB, iVal);
-            final int length = iVal.get();
+            final int length = iVal.get(0);
             String out = null;
 
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
 
-                iVal.flip();
                 ARBShaderObjects.glGetInfoLogARB(id, iVal, infoLog);
 
                 final byte[] infoBytes = new byte[length];
