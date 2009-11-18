@@ -170,6 +170,8 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
         final MouseState _savedState = _lastState;
 
         // Add our latest state info to the queue
+        // FIXME: Since this happens in the event queue, it's likely we'll get more than 1 move event added to the
+        // queue between calls to getEvents. This can cause issues.
         addNewState(e, _lastState.getButtonStates(), null);
 
         // If we have a valid move... should always be the case, but occasionally something slips through.
