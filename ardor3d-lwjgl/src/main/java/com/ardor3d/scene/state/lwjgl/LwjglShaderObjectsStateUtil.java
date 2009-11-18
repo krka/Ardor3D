@@ -102,15 +102,15 @@ public abstract class LwjglShaderObjectsStateUtil {
 
     private static void checkLinkError(final int programId) {
         final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-        GL20.glGetProgram(programId, GL20.GL_LINK_STATUS, compiled);
+        ARBShaderObjects.glGetObjectParameterARB(programId, GL20.GL_LINK_STATUS, compiled);
         if (compiled.get(0) == GL11.GL_FALSE) {
-            GL20.glGetProgram(programId, GL20.GL_INFO_LOG_LENGTH, compiled);
+            ARBShaderObjects.glGetObjectParameterARB(programId, GL20.GL_INFO_LOG_LENGTH, compiled);
             final int length = compiled.get(0);
             String out = null;
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
 
-                GL20.glGetProgramInfoLog(programId, compiled, infoLog);
+                ARBShaderObjects.glGetInfoLogARB(programId, compiled, infoLog);
 
                 final byte[] infoBytes = new byte[length];
                 infoLog.get(infoBytes);

@@ -110,15 +110,15 @@ public abstract class JoglShaderObjectsStateUtil {
         final GL gl = GLU.getCurrentGL();
 
         final IntBuffer compiled = BufferUtils.createIntBuffer(1);
-        gl.glGetProgramivARB(programId, GL.GL_LINK_STATUS, compiled);
+        gl.glGetObjectParameterivARB(programId, GL.GL_LINK_STATUS, compiled);
         if (compiled.get(0) == GL.GL_FALSE) {
-            gl.glGetProgramivARB(programId, GL.GL_INFO_LOG_LENGTH, compiled);
+            gl.glGetObjectParameterivARB(programId, GL.GL_INFO_LOG_LENGTH, compiled);
             final int length = compiled.get(0);
             String out = null;
             if (length > 0) {
                 final ByteBuffer infoLog = BufferUtils.createByteBuffer(length);
 
-                gl.glGetProgramInfoLog(programId, infoLog.limit(), compiled, infoLog);
+                gl.glGetInfoLogARB(programId, infoLog.limit(), compiled, infoLog);
 
                 final byte[] infoBytes = new byte[length];
                 infoLog.get(infoBytes);
@@ -127,7 +127,7 @@ public abstract class JoglShaderObjectsStateUtil {
 
             logger.severe(out);
 
-            throw new Ardor3dException("Error linking GLSL shader: " + out);
+            // throw new Ardor3dException("Error linking GLSL shader: " + out);
         }
     }
 
