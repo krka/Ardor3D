@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-attribute vec3 Weights;
+attribute vec4 Weights;
 attribute vec4 JointIDs;
 
 uniform mat4 JointPallete[50];
