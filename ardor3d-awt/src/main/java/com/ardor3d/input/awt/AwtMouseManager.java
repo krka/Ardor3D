@@ -118,6 +118,11 @@ public class AwtMouseManager implements MouseManager {
             throw new UnsupportedOperationException();
         }
 
+        // check if we should be here.
+        if (_grabbedState == grabbedState) {
+            return;
+        }
+
         // remember our grabbed state mode.
         _grabbedState = grabbedState;
 
