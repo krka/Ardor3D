@@ -88,7 +88,7 @@ public class SkeletalDebugger {
         for (int i = 0, max = joints.length; i < max; i++) {
             SkeletalDebugger.drawJoint(globals[i], renderer);
             final short parentIndex = joints[i].getParentIndex();
-            if (parentIndex != Short.MAX_VALUE) {
+            if (parentIndex != Joint.NO_PARENT) {
                 SkeletalDebugger.drawBone(globals[parentIndex], globals[i], renderer);
             }
         }

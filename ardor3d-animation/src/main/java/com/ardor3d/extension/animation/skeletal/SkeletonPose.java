@@ -101,24 +101,28 @@ public class SkeletonPose {
      */
     public void updateTransforms() {
         final Transform temp = Transform.fetchTempInstance();
-        // we go in array order, which ensures parent global transforms are updated before child.
-        for (int i = 0; i < _globalTransforms.length; i++) {
+        // we go in update array order, which ensures parent global transforms are updated before child.
+        final int[] orders = _skeleton.getJointOrders();
+        for (int i = 0; i < orders.length; i++) {
+            // the joint index
+            final int index = orders[i];
+
             // find our parent
-            final short parentIndex = _skeleton.getJoints()[i].getParentIndex();
-            if (parentIndex != Short.MAX_VALUE) {
+            final short parentIndex = _skeleton.getJoints()[index].getParentIndex();
+            if (parentIndex != Joint.NO_PARENT) {
                 // we have a parent, so take us from local->parent->model space by multiplying by parent's local->model
                 // space transform.
-                _globalTransforms[parentIndex].multiply(_localTransforms[i], _globalTransforms[i]);
+                _globalTransforms[parentIndex].multiply(_localTransforms[index], _globalTransforms[index]);
             } else {
                 // no parent so just set global to the local transform
-                _globalTransforms[i].set(_localTransforms[i]);
+                _globalTransforms[index].set(_localTransforms[index]);
             }
 
             // at this point we have a local->model space transform for this joint, for skinning we multiply this by the
             // joint's inverse bind pose (joint->model space, inverted). This gives us a transform that can take a
             // vertex from bind pose (model space) to current pose (model space).
-            _globalTransforms[i].multiply(_skeleton.getJoints()[i].getInverseBindPose(), temp);
-            temp.getHomogeneousMatrix(_matrixPallete[i]);
+            _globalTransforms[index].multiply(_skeleton.getJoints()[index].getInverseBindPose(), temp);
+            temp.getHomogeneousMatrix(_matrixPallete[index]);
         }
         Transform.releaseTempInstance(temp);
     }
@@ -137,7 +141,7 @@ public class SkeletonPose {
 
             // At this point we are in model space, so we need to remove our parent's transform (if we have one.)
             final short parentIndex = _skeleton.getJoints()[i].getParentIndex();
-            if (parentIndex != Short.MAX_VALUE) {
+            if (parentIndex != Joint.NO_PARENT) {
                 // We remove the parent's transform simply by multiplying by its inverse bind pose. Done! :)
                 _skeleton.getJoints()[parentIndex].getInverseBindPose().multiply(_localTransforms[i], temp);
                 _localTransforms[i].set(temp);

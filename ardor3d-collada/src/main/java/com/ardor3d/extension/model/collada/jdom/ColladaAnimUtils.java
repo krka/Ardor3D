@@ -205,7 +205,7 @@ public class ColladaAnimUtils {
                     }
                 }
                 // no parent, so it's a root bone
-                joint.setParentIndex(Short.MAX_VALUE);
+                joint.setParentIndex(Joint.NO_PARENT);
             }
 
             // Make our skeleton

@@ -68,7 +68,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         j1Transform.invert(j1Transform);
         final Joint j1 = new Joint("j1");
         j1.setInverseBindPose(j1Transform);
-        j1.setParentIndex(Short.MAX_VALUE);
+        j1.setParentIndex(Joint.NO_PARENT);
 
         final Transform j2Transform = new Transform();
         j2Transform.setTranslation(0, 0, 10);

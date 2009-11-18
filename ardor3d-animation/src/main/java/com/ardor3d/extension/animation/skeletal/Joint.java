@@ -17,6 +17,8 @@ import com.ardor3d.math.type.ReadOnlyTransform;
  * Representation of a Joint in a Skeleton. Meant to be used within a specific Skeleton object.
  */
 public class Joint {
+    /** Root node ID */
+    public static final short NO_PARENT = Short.MIN_VALUE;
 
     /** The inverse transform of this Joint in its bind position. */
     protected ReadOnlyTransform _inverseBindPose = Transform.IDENTITY;
@@ -24,7 +26,7 @@ public class Joint {
     /** A name, for display or debugging purposes. */
     private final String _name;
 
-    /** Index of our parent Joint, or Short.MAX_VALUE if we are the root. */
+    /** Index of our parent Joint, or NO_PARENT if we are the root. */
     protected short _parentIndex;
 
     /**
@@ -59,7 +61,7 @@ public class Joint {
      * Set the index of this joint's parent within the containing Skeleton's joint array.
      * 
      * @param parentIndex
-     *            the index, or Short.MAX_VALUE if this Joint is root (has no parent)
+     *            the index, or NO_PARENT if this Joint is root (has no parent)
      */
     public void setParentIndex(final short parentIndex) {
         _parentIndex = parentIndex;
