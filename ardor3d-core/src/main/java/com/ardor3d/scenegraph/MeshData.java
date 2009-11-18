@@ -1005,7 +1005,7 @@ public class MeshData implements Cloneable, Savable {
         final Vector3 store = new Vector3();
         for (int x = 0; x < _vertexCount; x++) {
             BufferUtils.populateFromBuffer(store, _normalCoords.getBuffer(), x);
-            transform.applyForward(store, store);
+            transform.applyForwardVector(store, store);
             BufferUtils.setInBuffer(store, _normalCoords.getBuffer(), x);
         }
     }
