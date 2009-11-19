@@ -254,7 +254,7 @@ public class BlendState extends RenderState {
     /** If enabled, alpha testing done. */
     private boolean testEnabled = false;
     /** Alpha test value. */
-    private TestFunction testFunction = TestFunction.Always;
+    private TestFunction testFunction = TestFunction.GreaterThan;
     /** The reference value to which incoming alpha values are compared. */
     private float reference = 0;
 
@@ -541,7 +541,7 @@ public class BlendState extends RenderState {
         capsule.write(destinationFunctionAlpha, "destinationFunctionAlpha", DestinationFunction.OneMinusSourceAlpha);
         capsule.write(blendEquationAlpha, "blendEquationAlpha", BlendEquation.Add);
         capsule.write(testEnabled, "testEnabled", false);
-        capsule.write(testFunction, "test", TestFunction.Always);
+        capsule.write(testFunction, "test", TestFunction.GreaterThan);
         capsule.write(reference, "reference", 0);
         capsule.write(constantColor, "constantColor", null);
     }
@@ -560,7 +560,7 @@ public class BlendState extends RenderState {
                 DestinationFunction.OneMinusSourceAlpha);
         blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
         testEnabled = capsule.readBoolean("testEnabled", false);
-        testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.Always);
+        testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.GreaterThan);
         reference = capsule.readFloat("reference", 0);
         constantColor = (ColorRGBA) capsule.readSavable("constantColor", null);
     }
