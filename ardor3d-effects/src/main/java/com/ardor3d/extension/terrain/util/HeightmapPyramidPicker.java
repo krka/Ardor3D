@@ -15,6 +15,7 @@ import com.ardor3d.extension.terrain.util.AbstractBresenhamTracer.Direction;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Triangle;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 
 /**
  * A picking assistant to be used with HeightmapPyramid and an AbstractBresenhamTracer.
@@ -50,8 +51,10 @@ public class HeightmapPyramidPicker {
         _maxDistance = maxDistance;
     }
 
-    public Vector3 getTerrainIntersection(final Ray3 pickRay, final Vector3 store) {
-        _workRay.set(pickRay);
+    public Vector3 getTerrainIntersection(final ReadOnlyTransform terrainWorldTransform, final Ray3 pickRay,
+            final Vector3 store) {
+        _workRay.setOrigin(terrainWorldTransform.applyInverse(pickRay.getOrigin(), null));
+        _workRay.setDirection(terrainWorldTransform.applyInverseVector(pickRay.getDirection(), null));
 
         _tracer.startWalk(_workRay);
 
@@ -69,6 +72,7 @@ public class HeightmapPyramidPicker {
             // check the triangles of main square for intersection.
             if (checkTriangles(_tracer.getGridLocation()[0], _tracer.getGridLocation()[1], intersection)) {
                 // we found an intersection, so return that!
+                terrainWorldTransform.applyForward(intersection, intersection);
                 return intersection;
             }
 
@@ -92,6 +96,7 @@ public class HeightmapPyramidPicker {
 
             if (checkTriangles(_tracer.getGridLocation()[0] + dx, _tracer.getGridLocation()[1] + dy, intersection)) {
                 // we found an intersection, so return that!
+                terrainWorldTransform.applyForward(intersection, intersection);
                 return intersection;
             }
 
