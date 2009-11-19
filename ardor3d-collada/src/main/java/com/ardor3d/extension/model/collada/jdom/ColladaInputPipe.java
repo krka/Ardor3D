@@ -155,6 +155,7 @@ public class ColladaInputPipe {
                 break;
             case TEXCOORD:
                 _buffer = BufferUtils.createFloatBuffer(size);
+                // TODO: _set is not right?
                 meshData.setTextureCoords(new FloatBufferData(_buffer, paramCount), _set);
                 break;
             case COLOR:
