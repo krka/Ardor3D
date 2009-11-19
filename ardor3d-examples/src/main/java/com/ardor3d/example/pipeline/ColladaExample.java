@@ -271,7 +271,7 @@ public class ColladaExample extends ExampleBase {
             final File file = files[i];
             if (file.isDirectory()) {
                 findFiles(file, name, fileList);
-            } else if (name.equals(file.getName().substring(file.getName().length() - 4))) {
+            } else if (name.equals(file.getName().substring(file.getName().length() - 4).toLowerCase())) {
                 System.err.println("found: " + file);
                 fileList.add(file);
             }
