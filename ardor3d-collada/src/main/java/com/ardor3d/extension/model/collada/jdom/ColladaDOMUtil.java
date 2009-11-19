@@ -154,7 +154,7 @@ public class ColladaDOMUtil {
         final int listSize = list.size();
         final float[] floatArray = new float[listSize];
         for (int i = 0; i < listSize; i++) {
-            floatArray[i] = Float.parseFloat(list.get(i));
+            floatArray[i] = Float.parseFloat(list.get(i).replace(",", "."));
         }
 
         GlobalData.getInstance().getFloatArrays().put(node, floatArray);
@@ -184,7 +184,7 @@ public class ColladaDOMUtil {
         final int listSize = list.size();
         final double[] doubleArray = new double[listSize];
         for (int i = 0; i < listSize; i++) {
-            doubleArray[i] = Double.parseDouble(list.get(i));
+            doubleArray[i] = Double.parseDouble(list.get(i).replace(",", "."));
         }
 
         GlobalData.getInstance().getDoubleArrays().put(node, doubleArray);
@@ -329,7 +329,7 @@ public class ColladaDOMUtil {
             throw new ColladaException("Null color description not allowed", colorDescription);
         }
 
-        final String[] values = GlobalData.getInstance().getPattern().split(colorDescription);
+        final String[] values = GlobalData.getInstance().getPattern().split(colorDescription.replace(",", "."));
 
         if (values.length < 3 || values.length > 4) {
             throw new ColladaException("Expected color definition of length 3 or 4 - got " + values.length

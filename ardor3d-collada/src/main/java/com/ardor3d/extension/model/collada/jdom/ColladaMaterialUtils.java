@@ -109,7 +109,7 @@ public class ColladaMaterialUtils {
                     } else if ("transparency".equals(property.getName())) {
                         final Element propertyValue = (Element) property.getChildren().get(0);
                         if ("float".equals(propertyValue.getName())) {
-                            transparency = Float.parseFloat(propertyValue.getText());
+                            transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
                             // TODO: use this
 
                             useTransparency = true;
@@ -127,7 +127,7 @@ public class ColladaMaterialUtils {
                     } else if ("shininess".equals(property.getName())) {
                         final Element propertyValue = (Element) property.getChildren().get(0);
                         if ("float".equals(propertyValue.getName())) {
-                            float shininess = Float.parseFloat(propertyValue.getText());
+                            float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
                             if (shininess >= 0.0f && shininess <= 1.0f) {
                                 final float oldShininess = shininess;
                                 shininess *= 128;

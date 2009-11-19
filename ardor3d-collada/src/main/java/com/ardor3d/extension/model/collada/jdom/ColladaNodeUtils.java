@@ -12,10 +12,8 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jdom.DataConversionException;
 import org.jdom.Element;
 
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
@@ -97,11 +95,7 @@ public class ColladaNodeUtils {
                 assetData.setTitle(child.getText());
             } else if ("unit".equals(child.getName())) {
                 assetData.setUnitName(child.getAttributeValue("name"));
-                try {
-                    assetData.setUnitMeter(child.getAttribute("meter").getFloatValue());
-                } catch (final DataConversionException e) {
-                    ColladaNodeUtils.logger.log(Level.WARNING, "Bad attribute value in unit meter", e);
-                }
+                assetData.setUnitMeter(Float.parseFloat(child.getAttribute("meter").getValue().replace(",", ".")));
             } else if ("up_axis".equals(child.getName())) {
                 final String axis = child.getText();
                 if ("X_UP".equals(axis)) {

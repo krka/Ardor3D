@@ -177,7 +177,7 @@ public class ColladaImporter {
                     final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
                     final float[] floatArray = new float[count];
                     for (int i = 0; i < count; i++) {
-                        floatArray[i] = Float.parseFloat(tokenizer.nextToken());
+                        floatArray[i] = Float.parseFloat(tokenizer.nextToken().replace(",", "."));
                     }
 
                     GlobalData.getInstance().getFloatArrays().put(currentElement, floatArray);
@@ -192,7 +192,7 @@ public class ColladaImporter {
                     final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
                     final double[] doubleArray = new double[count];
                     for (int i = 0; i < count; i++) {
-                        doubleArray[i] = Double.parseDouble(tokenizer.nextToken());
+                        doubleArray[i] = Double.parseDouble(tokenizer.nextToken().replace(",", "."));
                     }
 
                     GlobalData.getInstance().getDoubleArrays().put(currentElement, doubleArray);
