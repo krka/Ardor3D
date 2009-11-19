@@ -268,10 +268,10 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
-     * Sets the tagent buffer.
+     * Sets the tangent buffer.
      * 
      * @param tangentBuffer
-     *            the new tagent buffer
+     *            the new tangent buffer
      */
     public void setTangentBuffer(final FloatBuffer tangentBuffer) {
         if (tangentBuffer == null) {
