@@ -11,7 +11,8 @@
 package com.ardor3d.example.pipeline;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,8 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.inject.Inject;
 
 public class ColladaExample extends ExampleBase {
@@ -134,9 +137,9 @@ public class ColladaExample extends ExampleBase {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 final File file = daeFiles.get(fileIndex);
                 try {
-                    loadColladaModel(file.toURI().toURL().toString());
+                    loadColladaModel(file.toURI());
                     t1.setText("[Space - Switch model] " + file.getName());
-                } catch (final MalformedURLException e) {
+                } catch (final URISyntaxException e) {
                     e.printStackTrace();
                 }
                 fileIndex = (fileIndex + 1) % daeFiles.size();
@@ -150,6 +153,17 @@ public class ColladaExample extends ExampleBase {
         frameRateLabel.setTextColor(ColorRGBA.WHITE);
         frameRateLabel.getSceneHints().setOrthoOrder(-1);
         _root.attachChild(frameRateLabel);
+    }
+
+    private void loadColladaModel(final URI modelURI) throws URISyntaxException {
+        // add a temporary resource locator since this is potentially outside our normal model location.
+        final SimpleResourceLocator loc = new SimpleResourceLocator(modelURI.resolve("../"));
+        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+
+        loadColladaModel(modelURI.toString());
+
+        // remove locator
+        ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
     }
 
     private void loadColladaModel(final String file) {
