@@ -103,13 +103,21 @@ public class SimpleResourceLocator implements ResourceLocator {
 
     protected String trimResourceName(String resourceName) {
         // it's possible this URL has back slashes, so replace them.
-        resourceName = resourceName.replace('\\', '/');
+        resourceName = cleanup(resourceName);
         final int firstSlashIndex = resourceName.indexOf('/');
         if (firstSlashIndex >= 0 && firstSlashIndex < resourceName.length() - 1) {
             return resourceName.substring(firstSlashIndex + 1);
         } else {
             return null;
         }
+    }
+
+    private String cleanup(String name) {
+        // Replace any %2F (or %2f) with forward slashes
+        name = name.replaceAll("\\%2[F,f]", "/");
+        // replace back slashes with forward
+        name = name.replace('\\', '/');
+        return name;
     }
 
     @Override

@@ -157,7 +157,7 @@ public class ColladaExample extends ExampleBase {
 
     private void loadColladaModel(final URI modelURI) throws URISyntaxException {
         // add a temporary resource locator since this is potentially outside our normal model location.
-        final SimpleResourceLocator loc = new SimpleResourceLocator(modelURI.resolve("../"));
+        final SimpleResourceLocator loc = new SimpleResourceLocator(modelURI.resolve("./"));
         ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
 
         loadColladaModel(modelURI.toString());
