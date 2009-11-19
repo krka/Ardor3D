@@ -23,9 +23,8 @@ void main()
 	vec3 bump = normalize(texture2D(normalMap, texCoord).xyz * vec3(2.0) - vec3(1.0));
 
 	vec4 vDiffuse = diffuse * vec4(max( dot(lightDir, bump), 0.0 ));	
-	vec4 vAmb = vec4(dot(bump, vec3(0,0,1))*0.4+0.6)*ambient;
 
-	vec4 color = (vAmb + vDiffuse) * base;
+	vec4 color = (ambient + vDiffuse) * base;
 	
     float dist = length(eyeSpacePosition);
 	float fog = clamp((gl_Fog.end - dist) * gl_Fog.scale, 0.0, 1.0);	
