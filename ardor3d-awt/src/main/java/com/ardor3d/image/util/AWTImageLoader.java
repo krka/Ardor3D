@@ -19,6 +19,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -26,6 +27,7 @@ import javax.imageio.ImageIO;
 import com.ardor3d.image.Image;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.Lists;
 
 /**
  * Image loader that makes use of AWT's ImageIO to load image file data.
@@ -35,8 +37,24 @@ public class AWTImageLoader implements ImageLoader {
 
     private static boolean createOnHeap = false;
 
+    private static String[] supportedFormats;
+
+    public static String[] getSupportedFormats() {
+        return supportedFormats;
+    }
+
     public static void registerLoader() {
-        ImageLoaderUtil.registerHandler(new AWTImageLoader(), ".JPG", ".JPEG", ".GIF", ".PNG", ".BMP");
+        if (supportedFormats == null) {
+            final List<String> formats = Lists.newArrayList();
+            for (String format : ImageIO.getReaderFormatNames()) {
+                format = "." + format.toUpperCase();
+                if (!formats.contains(format)) {
+                    formats.add(format);
+                }
+            }
+            supportedFormats = formats.toArray(new String[] {});
+        }
+        ImageLoaderUtil.registerHandler(new AWTImageLoader(), supportedFormats);
     }
 
     public Image load(final InputStream is, final boolean flipImage) throws IOException {
