@@ -313,7 +313,9 @@ public class ColladaAnimUtils {
                         // Apply our BSM
                         if (!bindShapeMatrix.isIdentity()) {
                             bindPose.transformVertices(bindShapeMatrix);
-                            bindPose.transformNormals(bindShapeMatrix);
+                            if (bindPose.getNormalBuffer() != null) {
+                                bindPose.transformNormals(bindShapeMatrix, true);
+                            }
                         }
 
                         // TODO: This is only needed for CPU skinning... consider a way of making it optional.
