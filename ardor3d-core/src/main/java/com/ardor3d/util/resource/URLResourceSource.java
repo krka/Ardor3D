@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,14 +47,14 @@ public class URLResourceSource implements ResourceSource {
 
     public ResourceSource getRelativeSource(final String name) {
         try {
-            final URL texUrl = UrlUtils.resolveRelativeURL(_url, "./" + name);
-            if (texUrl != null) {
+            final URL srcURL = UrlUtils.resolveRelativeURL(_url, "./" + name);
+            if (srcURL != null) {
                 // check if the URL can be opened
-                final URLConnection conn = texUrl.openConnection();
-                // just to force it to try to grab info
-                conn.getDate();
+                // just force it to try to grab info
+                srcURL.openStream().close();
                 // Ok satisfied... return
-                return new URLResourceSource(texUrl);
+                return new URLResourceSource(srcURL);
+
             }
         } catch (final MalformedURLException ex) {
         } catch (final IOException ex) {
