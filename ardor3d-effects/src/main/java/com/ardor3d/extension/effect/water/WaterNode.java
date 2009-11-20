@@ -206,9 +206,12 @@ public class WaterNode extends Node {
         }
 
         if (isSupported()) {
-            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer(cam.getWidth() / renderScale, cam
-                    .getHeight()
-                    / renderScale, r, caps);
+            tRenderer = TextureRendererFactory.INSTANCE.createTextureRenderer( //
+                    cam.getWidth() / renderScale, // width
+                    cam.getHeight() / renderScale, // height
+                    16, // Depth bits... TODO: Make configurable?
+                    0, // Samples... TODO: Make configurable?
+                    r, caps);
 
             tRenderer.setMultipleTargets(true);
             tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
