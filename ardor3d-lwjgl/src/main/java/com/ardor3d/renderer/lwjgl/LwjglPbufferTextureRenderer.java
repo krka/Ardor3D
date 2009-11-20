@@ -171,7 +171,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
 
                 switchCameraOut();
 
-                copyToTexture(tex, 0, 0, 0, 0, _width, _height);
+                copyToTexture(tex, 0, 0, _width, _height, 0, 0);
 
                 deactivate();
             }
@@ -234,7 +234,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 switchCameraOut();
 
                 for (int i = 0; i < texs.size(); i++) {
-                    copyToTexture(texs.get(i), 0, 0, 0, 0, _width, _height);
+                    copyToTexture(texs.get(i), 0, 0, _width, _height, 0, 0);
                 }
 
                 deactivate();
