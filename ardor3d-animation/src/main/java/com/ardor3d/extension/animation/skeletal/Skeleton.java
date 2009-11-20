@@ -79,7 +79,6 @@ public class Skeleton {
         // Sort our new array by parent index.
         // Wish Java had a way to return original indices...
         Arrays.sort(sorted, new Comparator<Joint>() {
-            @Override
             public int compare(final Joint o1, final Joint o2) {
                 if (isAncestorOf(o1, o2)) {
                     return -1;
