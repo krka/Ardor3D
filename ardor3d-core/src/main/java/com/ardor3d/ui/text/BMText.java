@@ -22,6 +22,7 @@ import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -338,7 +339,7 @@ public class BMText extends Mesh {
 
         // calculate the height in world units of the screen at that depth
         final double heightAtZ;
-        if (cam.isParallelProjection()) {
+        if (cam.getProjectionMode() == ProjectionMode.Parallel) {
             heightAtZ = cam.getFrustumBottom();
         } else {
             heightAtZ = zDepth * cam.getFrustumTop() / cam.getFrustumNear();

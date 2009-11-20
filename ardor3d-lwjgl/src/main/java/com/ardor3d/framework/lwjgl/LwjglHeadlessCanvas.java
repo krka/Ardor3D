@@ -31,6 +31,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRenderer;
@@ -145,7 +146,7 @@ public class LwjglHeadlessCanvas {
         // Setup a default camera
         _camera = new Camera(width, settings.getHeight());
         _camera.setFrustumPerspective(45.0f, (float) width / (float) settings.getHeight(), 1, 1000);
-        _camera.setParallelProjection(false);
+        _camera.setProjectionMode(ProjectionMode.Perspective);
 
         // setup camera orientation and position.
         final Vector3 loc = new Vector3(0.0f, 0.0f, 0.0f);

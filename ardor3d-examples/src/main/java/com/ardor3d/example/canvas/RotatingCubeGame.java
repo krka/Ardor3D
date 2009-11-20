@@ -19,9 +19,10 @@ import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseState;
-import com.ardor3d.input.InputState;
+import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyHeldCondition;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -31,12 +32,12 @@ import com.ardor3d.input.logical.MouseButtonCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.input.logical.AnyKeyCondition;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
@@ -199,7 +200,7 @@ public class RotatingCubeGame implements Updater {
         }));
 
         logicalLayer.registerTrigger(new InputTrigger(new AnyKeyCondition(), new TriggerAction() {
-            public void perform(Canvas source, TwoInputStates inputStates, double tpf) {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 final InputState current = inputStates.getCurrent();
 
                 System.out.println("Key character pressed: " + current.getKeyboardState().getKeyEvent().getKeyChar());
@@ -292,7 +293,7 @@ public class RotatingCubeGame implements Updater {
         final Camera camera = canvas.getCanvasRenderer().getCamera();
         final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
         final Vector3 dir = Vector3.fetchTempInstance();
-        if (!camera.isParallelProjection()) {
+        if (camera.getProjectionMode() == ProjectionMode.Perspective) {
             dir.set(camera.getDirection());
         } else {
             // move up if in parallel mode
@@ -337,7 +338,7 @@ public class RotatingCubeGame implements Updater {
         final Camera camera = canvas.getCanvasRenderer().getCamera();
         final Vector3 loc = Vector3.fetchTempInstance().set(camera.getLocation());
         final Vector3 dir = Vector3.fetchTempInstance();
-        if (!camera.isParallelProjection()) {
+        if (camera.getProjectionMode() == ProjectionMode.Perspective) {
             dir.set(camera.getDirection());
         } else {
             // move up if in parallel mode

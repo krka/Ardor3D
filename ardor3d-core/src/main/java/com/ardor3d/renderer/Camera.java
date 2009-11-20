@@ -215,9 +215,16 @@ public class Camera implements Savable, Externalizable, Cloneable {
     protected Vector3 _newDirection = new Vector3();
 
     /**
-     * store the value for field parallelProjection
+     * Projection mode used by the camera.
      */
-    private boolean _parallelProjection;
+    public enum ProjectionMode {
+        Perspective, Parallel, Custom
+    }
+
+    /**
+     * Current projection mode.
+     */
+    private ProjectionMode _projectionMode = ProjectionMode.Perspective;
 
     private boolean _updateMVMatrix = true;
     private boolean _updatePMatrix = true;
@@ -350,7 +357,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
 
         _planeQuantity = 6;
 
-        _parallelProjection = source.isParallelProjection();
+        _projectionMode = source.getProjectionMode();
 
         onFrustumChange();
         onViewPortChange();
@@ -914,7 +921,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
      * Updates internal frustum coefficient values to reflect the current frustum plane values.
      */
     public void onFrustumChange() {
-        if (!isParallelProjection()) {
+        if (getProjectionMode() == ProjectionMode.Perspective) {
             final double nearSquared = _frustumNear * _frustumNear;
             final double leftSquared = _frustumLeft * _frustumLeft;
             final double rightSquared = _frustumRight * _frustumRight;
@@ -936,7 +943,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
             inverseLength = 1.0 / Math.sqrt(nearSquared + topSquared);
             _coeffTop[0] = -_frustumNear * inverseLength;
             _coeffTop[1] = _frustumTop * inverseLength;
-        } else {
+        } else if (getProjectionMode() == ProjectionMode.Parallel) {
             if (_frustumRight > _frustumLeft) {
                 _coeffLeft[0] = -1;
                 _coeffLeft[1] = 0;
@@ -1018,7 +1025,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _worldPlane[TOP_PLANE].setNormal(planeNormal);
         _worldPlane[TOP_PLANE].setConstant(_location.dot(planeNormal));
 
-        if (isParallelProjection()) {
+        if (getProjectionMode() == ProjectionMode.Parallel) {
             if (_frustumRight > _frustumLeft) {
                 _worldPlane[LEFT_PLANE].setConstant(_worldPlane[LEFT_PLANE].getConstant() + _frustumLeft);
                 _worldPlane[RIGHT_PLANE].setConstant(_worldPlane[RIGHT_PLANE].getConstant() - _frustumRight);
@@ -1055,28 +1062,10 @@ public class Camera implements Savable, Externalizable, Cloneable {
     }
 
     /**
-     * @return true if parallel projection is enabled, false if in normal perspective mode
-     * @see #setParallelProjection(boolean)
-     */
-    public boolean isParallelProjection() {
-        return _parallelProjection;
-    }
-
-    /**
-     * Enable/disable parallel projection.
-     * 
-     * @param value
-     *            true to set up this camera for parallel projection is enable, false to enter normal perspective mode
-     */
-    public void setParallelProjection(final boolean value) {
-        _parallelProjection = value;
-    }
-
-    /**
      * Updates the value of our projection matrix.
      */
     protected void updateProjectionMatrix() {
-        if (isParallelProjection()) {
+        if (getProjectionMode() == ProjectionMode.Parallel) {
             _projection.setIdentity();
             _projection.setValue(0, 0, 2.0 / (_frustumRight - _frustumLeft));
             _projection.setValue(1, 1, 2.0 / (_frustumBottom - _frustumTop));
@@ -1085,7 +1074,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
             _projection.setValue(3, 0, -(_frustumRight + _frustumLeft) / (_frustumRight - _frustumLeft));
             _projection.setValue(3, 1, -(_frustumBottom + _frustumTop) / (_frustumBottom - _frustumTop));
             _projection.setValue(3, 2, -(_frustumFar + _frustumNear) / (_frustumFar - _frustumNear));
-        } else {
+        } else if (getProjectionMode() == ProjectionMode.Perspective) {
             _projection.setIdentity();
             _projection.setValue(0, 0, (2.0 * _frustumNear) / (_frustumRight - _frustumLeft));
             _projection.setValue(1, 1, (2.0 * _frustumNear) / (_frustumTop - _frustumBottom));
@@ -1098,6 +1087,11 @@ public class Camera implements Savable, Externalizable, Cloneable {
         }
 
         _updatePMatrix = false;
+    }
+
+    public void setProjectionMatrix(final ReadOnlyMatrix4 projection) {
+        _projection.set(projection);
+        _frustumDirty = true;
     }
 
     /**
@@ -1402,6 +1396,14 @@ public class Camera implements Savable, Externalizable, Cloneable {
      */
     public int getHeight() {
         return _height;
+    }
+
+    public ProjectionMode getProjectionMode() {
+        return _projectionMode;
+    }
+
+    public void setProjectionMode(final ProjectionMode projectionMode) {
+        _projectionMode = projectionMode;
     }
 
     /**

@@ -41,6 +41,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.pass.Pass;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -327,7 +328,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
         if (_light instanceof DirectionalLight) {
-            _shadowMapRenderer.getCamera().setParallelProjection(true);
+            _shadowMapRenderer.getCamera().setProjectionMode(ProjectionMode.Parallel);
         }
     }
 

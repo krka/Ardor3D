@@ -181,7 +181,7 @@ public class PSSMCamera extends Camera {
         double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5;
         double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5;
 
-        if (isParallelProjection()) {
+        if (getProjectionMode() == ProjectionMode.Parallel) {
             fNearPlaneHeight = (_frustumTop - _frustumBottom) * 0.5;
             fNearPlaneWidth = (_frustumRight - _frustumLeft) * 0.5;
 
