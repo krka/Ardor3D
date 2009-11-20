@@ -1422,6 +1422,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         ContextManager.getCurrentContext().setCurrentCamera(this);
         if (_depthRangeDirty) {
             renderer.setDepthRange(_depthRangeNear, _depthRangeFar);
+            _depthRangeDirty = false;
         }
         if (_frustumDirty) {
             applyProjectionMatrix(renderer);
