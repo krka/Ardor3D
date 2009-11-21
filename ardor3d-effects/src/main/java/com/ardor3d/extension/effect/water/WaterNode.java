@@ -123,8 +123,9 @@ public class WaterNode extends Node {
     protected String fallbackMapTextureString = "";
 
     private GLSLShaderObjectsState blurShaderVertical = null;
-    private float blurSampleDistance = 0.02f;
+    private float blurSampleDistance = 0.002f;
     private Quad fullScreenQuad = null;
+    private boolean doBlurReflection = true;
 
     private boolean initialized;
 
@@ -222,7 +223,7 @@ public class WaterNode extends Node {
                     0, // Samples... TODO: Make configurable?
                     r, caps);
 
-            blurSampleDistance = 1f / ((float) cam.getHeight() / renderScale);
+            // blurSampleDistance = 1f / ((float) cam.getHeight() / renderScale);
 
             tRenderer.setMultipleTargets(true);
             tRenderer.setBackgroundColor(new ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f));
@@ -543,7 +544,11 @@ public class WaterNode extends Node {
         }
 
         texArray.clear();
-        texArray.add(textureReflect);
+        if (doBlurReflection) {
+            texArray.add(textureReflect);
+        } else {
+            texArray.add(textureReflectBlur);
+        }
 
         tRenderer.getCamera().setProjectionMode(ProjectionMode.Custom);
         tRenderer.getCamera().setProjectionMatrix(cam.getProjectionMatrix());
@@ -557,7 +562,9 @@ public class WaterNode extends Node {
 
         tRenderer.render(renderList, texArray, Renderer.BUFFER_NONE);
 
-        blurReflectionTexture();
+        if (doBlurReflection) {
+            blurReflectionTexture();
+        }
 
         if (skyBox != null) {
             skyBox.setTranslation(tmpLocation);
@@ -1066,5 +1073,21 @@ public class WaterNode extends Node {
      */
     public void setFallbackMapTextureString(final String fallbackMapTextureString) {
         this.fallbackMapTextureString = fallbackMapTextureString;
+    }
+
+    public boolean isDoBlurReflection() {
+        return doBlurReflection;
+    }
+
+    public void setDoBlurReflection(final boolean doBlurReflection) {
+        this.doBlurReflection = doBlurReflection;
+    }
+
+    public float getBlurSampleDistance() {
+        return blurSampleDistance;
+    }
+
+    public void setBlurSampleDistance(final float blurSampleDistance) {
+        this.blurSampleDistance = blurSampleDistance;
     }
 }
