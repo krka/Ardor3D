@@ -20,13 +20,13 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.layout.UILayoutData;
 import com.ardor3d.extension.ui.skin.SkinManager;
-import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -241,13 +241,13 @@ public abstract class UIComponent extends Node {
     /**
      * 
      * @param store
-     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     *            the object to store our results in. If null, a new Rectangle2 is created and returned.
      * @return
      */
-    public BoundingRectangle getRelativeMinComponentBounds(final BoundingRectangle store) {
-        BoundingRectangle rVal = store;
+    public Rectangle2 getRelativeMinComponentBounds(final Rectangle2 store) {
+        Rectangle2 rVal = store;
         if (rVal == null) {
-            rVal = new BoundingRectangle();
+            rVal = new Rectangle2();
         }
         final int height = getMinimumLocalComponentHeight();
         final int width = getMinimumLocalComponentWidth();
@@ -257,13 +257,13 @@ public abstract class UIComponent extends Node {
     /**
      * 
      * @param store
-     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     *            the object to store our results in. If null, a new Rectangle2 is created and returned.
      * @return
      */
-    public BoundingRectangle getRelativeMaxComponentBounds(final BoundingRectangle store) {
-        BoundingRectangle rVal = store;
+    public Rectangle2 getRelativeMaxComponentBounds(final Rectangle2 store) {
+        Rectangle2 rVal = store;
         if (rVal == null) {
-            rVal = new BoundingRectangle();
+            rVal = new Rectangle2();
         }
         final int height = getMaximumLocalComponentHeight();
         final int width = getMaximumLocalComponentWidth();
@@ -273,20 +273,20 @@ public abstract class UIComponent extends Node {
     /**
      * 
      * @param store
-     *            the object to store our results in. If null, a new BoundingRectangle is created and returned.
+     *            the object to store our results in. If null, a new Rectangle2 is created and returned.
      * @return the current bounds of this component, in the coordinate space of its parent.
      */
-    public BoundingRectangle getRelativeComponentBounds(final BoundingRectangle store) {
-        BoundingRectangle rVal = store;
+    public Rectangle2 getRelativeComponentBounds(final Rectangle2 store) {
+        Rectangle2 rVal = store;
         if (rVal == null) {
-            rVal = new BoundingRectangle();
+            rVal = new Rectangle2();
         }
         final int height = getLocalComponentHeight();
         final int width = getLocalComponentWidth();
         return getRelativeComponentBounds(rVal, width, height);
     }
 
-    private BoundingRectangle getRelativeComponentBounds(final BoundingRectangle store, final int width, final int height) {
+    private Rectangle2 getRelativeComponentBounds(final Rectangle2 store, final int width, final int height) {
         final ReadOnlyTransform local = getTransform();
         if (local.isIdentity() || local.getMatrix().isIdentity()) {
             store.set(0, 0, width, height);
@@ -519,7 +519,7 @@ public abstract class UIComponent extends Node {
         } else if (Math.abs(temp.getY()) >= 0.99999) {
             setLocalComponentSize(height, width);
         } else {
-            final BoundingRectangle rect = getRelativeMinComponentBounds(null);
+            final Rectangle2 rect = getRelativeMinComponentBounds(null);
             final float ratio = Math.min((float) width / rect.getWidth(), (float) height / rect.getHeight());
 
             setLocalComponentSize(Math.round(getMinimumLocalComponentWidth() * ratio), Math

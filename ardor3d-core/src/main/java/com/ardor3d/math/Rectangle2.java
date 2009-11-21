@@ -116,15 +116,16 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
         _height = height;
     }
 
-    public void set(final int x, final int y, final int width, final int height) {
+    public Rectangle2 set(final int x, final int y, final int width, final int height) {
         _x = x;
         _y = y;
         _width = width;
         _height = height;
+        return this;
     }
 
-    public void set(final Rectangle2 rect) {
-        set(rect._x, rect._y, rect._width, rect._height);
+    public Rectangle2 set(final Rectangle2 rect) {
+        return set(rect._x, rect._y, rect._width, rect._height);
     }
 
     public Rectangle2 intersect(final Rectangle2 other, final Rectangle2 store) {

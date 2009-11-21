@@ -17,7 +17,7 @@ import java.util.Map;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.util.Alignment;
-import com.ardor3d.extension.ui.util.BoundingRectangle;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.scenegraph.Spatial;
 import com.google.common.collect.Maps;
@@ -121,7 +121,7 @@ public class AnchorLayout extends UILayout {
         // get the anchor record (if any) for this component
         final AnchorRecord aRecord = _records.get(toVisit);
         if (aRecord != null) {
-            final BoundingRectangle rect = new BoundingRectangle();
+            final Rectangle2 rect = new Rectangle2();
             for (int x = aRecord.dependants.size(); --x >= 0;) {
                 final UIComponent dep = aRecord.dependants.get(x);
                 if (dep.getLayoutData() instanceof AnchorLayoutData) {
@@ -169,7 +169,7 @@ public class AnchorLayout extends UILayout {
             store = new Vector2();
         }
 
-        final BoundingRectangle rect = new BoundingRectangle();
+        final Rectangle2 rect = new Rectangle2();
         comp.getRelativeComponentBounds(rect);
         switch (point) {
             case TOP_LEFT:

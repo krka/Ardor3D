@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
-import com.ardor3d.extension.ui.util.BoundingRectangle;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.scenegraph.Spatial;
 import com.google.common.collect.Lists;
 
@@ -86,8 +86,8 @@ public class RowLayout extends UILayout {
     public void layoutContents(final UIContainer container) {
 
         final List<Spatial> content = container.getChildren();
-        final BoundingRectangle storeA = new BoundingRectangle();
-        final BoundingRectangle storeB = new BoundingRectangle();
+        final Rectangle2 storeA = new Rectangle2();
+        final Rectangle2 storeB = new Rectangle2();
 
         // list of components
         final List<UIComponent> comps = Lists.newArrayList();
@@ -95,8 +95,8 @@ public class RowLayout extends UILayout {
             final Spatial spat = content.get(i);
             if (spat instanceof UIComponent) {
                 final UIComponent comp = (UIComponent) spat;
-                final BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
-                final BoundingRectangle minRect = comp.getRelativeMinComponentBounds(storeB);
+                final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
+                final Rectangle2 minRect = comp.getRelativeMinComponentBounds(storeB);
                 if (_horizontal) {
                     comp.fitComponentIn(minRect.getWidth(), rect.getHeight());
                 } else {
@@ -122,8 +122,8 @@ public class RowLayout extends UILayout {
             int loops = 0;
             do {
                 final UIComponent comp = comps.remove(0);
-                BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
-                final BoundingRectangle origRect = storeB.set(rect);
+                Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
+                final Rectangle2 origRect = storeB.set(rect);
                 final int extraSize = freeSpace / (comps.size() + 1);
                 if (_horizontal) {
                     final int height = _expandsVertically ? container.getContentHeight() : rect.getHeight();
@@ -165,7 +165,7 @@ public class RowLayout extends UILayout {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) spat;
-                final BoundingRectangle rect = comp.getRelativeComponentBounds(storeA);
+                final Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
 
                 if (_horizontal) {
                     comp.setLocalXY(x - rect.getX(), Math.max(container.getContentHeight() / 2 - rect.getHeight() / 2
@@ -189,13 +189,13 @@ public class RowLayout extends UILayout {
             final List<Spatial> content = container.getChildren();
 
             // compute the min width and height of the container
-            final BoundingRectangle store = new BoundingRectangle();
+            final Rectangle2 store = new Rectangle2();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
                 }
                 final UIComponent comp = (UIComponent) s;
-                final BoundingRectangle rect = comp.getRelativeMinComponentBounds(store);
+                final Rectangle2 rect = comp.getRelativeMinComponentBounds(store);
                 if (_horizontal) {
                     minW += rect.getWidth();
                     if (minH < rect.getHeight()) {
@@ -215,10 +215,10 @@ public class RowLayout extends UILayout {
     private int getSumOfAllHeights(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
-            final BoundingRectangle store = new BoundingRectangle();
+            final Rectangle2 store = new Rectangle2();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    final BoundingRectangle rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
+                    final Rectangle2 rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
                     sum += rect.getHeight();
                 }
             }
@@ -229,10 +229,10 @@ public class RowLayout extends UILayout {
     private int getSumOfAllWidths(final List<Spatial> content) {
         int sum = 0;
         if (content != null) {
-            final BoundingRectangle store = new BoundingRectangle();
+            final Rectangle2 store = new Rectangle2();
             for (final Spatial spat : content) {
                 if (spat instanceof UIComponent) {
-                    final BoundingRectangle rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
+                    final Rectangle2 rect = ((UIComponent) spat).getRelativeMinComponentBounds(store);
                     sum += rect.getWidth();
                 }
             }

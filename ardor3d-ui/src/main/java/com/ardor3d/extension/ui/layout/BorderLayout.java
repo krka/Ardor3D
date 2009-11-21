@@ -14,7 +14,7 @@ import java.util.List;
 
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIContainer;
-import com.ardor3d.extension.ui.util.BoundingRectangle;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -38,7 +38,7 @@ public class BorderLayout extends UILayout {
         final List<Spatial> content = container.getChildren();
 
         // Go through each component in the given container and determine the width and height of our edges.
-        final BoundingRectangle store = new BoundingRectangle();
+        final Rectangle2 store = new Rectangle2();
         for (final Spatial s : content) {
             if (!(s instanceof UIComponent)) {
                 continue;
@@ -122,7 +122,7 @@ public class BorderLayout extends UILayout {
         int minH = 0;
         int maxEWCH = 0;
         if (content != null) {
-            final BoundingRectangle store = new BoundingRectangle();
+            final Rectangle2 store = new Rectangle2();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;
@@ -151,7 +151,7 @@ public class BorderLayout extends UILayout {
         int minWidth = 0;
         int maxNSWidth = 0;
         if (content != null) {
-            final BoundingRectangle store = new BoundingRectangle();
+            final Rectangle2 store = new Rectangle2();
             for (final Spatial s : content) {
                 if (!(s instanceof UIComponent)) {
                     continue;

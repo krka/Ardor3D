@@ -17,8 +17,8 @@ import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
-import com.ardor3d.extension.ui.util.BoundingRectangle;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Rectangle2;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.GameTaskQueueManager;
 
@@ -177,8 +177,8 @@ public class UIFrame extends UIContainer {
      *            the component to center on.
      */
     public void setLocationRelativeTo(final UIComponent comp) {
-        final BoundingRectangle rectA = comp.getRelativeComponentBounds(null);
-        final BoundingRectangle rectB = getRelativeComponentBounds(null);
+        final Rectangle2 rectA = comp.getRelativeComponentBounds(null);
+        final Rectangle2 rectB = getRelativeComponentBounds(null);
         int x = (rectA.getWidth() - rectB.getWidth()) / 2;
         int y = (rectA.getHeight() - rectB.getHeight()) / 2;
         x += comp.getHudX() - rectA.getX() + rectB.getX();
@@ -194,7 +194,7 @@ public class UIFrame extends UIContainer {
      *            the camera to center on.
      */
     public void setLocationRelativeTo(final Camera cam) {
-        final BoundingRectangle rectA = getRelativeComponentBounds(null);
+        final Rectangle2 rectA = getRelativeComponentBounds(null);
         int x = (cam.getWidth() - rectA.getWidth()) / 2;
         int y = (cam.getHeight() - rectA.getHeight()) / 2;
         x -= rectA.getX();
@@ -386,7 +386,7 @@ public class UIFrame extends UIContainer {
         public boolean smallerThanWindow() {
             final int dispWidth = getHud().getWidth();
             final int dispHeight = getHud().getHeight();
-            final BoundingRectangle rect = getRelativeComponentBounds(null);
+            final Rectangle2 rect = getRelativeComponentBounds(null);
             return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
         }
 
