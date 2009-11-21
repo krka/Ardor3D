@@ -124,7 +124,7 @@ public class AssetData {
     }
 
     /**
-     * @return the up axis as defined in the <asset> tag, or null if not existing.
+     * @return the up axis as defined in the &lt;asset> tag, or null if not existing.
      */
     public ReadOnlyVector3 getUpAxis() {
         return upAxis;

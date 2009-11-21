@@ -23,7 +23,7 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * The purpose of this class is to tie a <source> and <accessor> together to pull out data.
+ * The purpose of this class is to tie a <source> and accessor together to pull out data.
  */
 public class ColladaInputPipe {
     private static final Logger logger = Logger.getLogger(ColladaInputPipe.class.getName());

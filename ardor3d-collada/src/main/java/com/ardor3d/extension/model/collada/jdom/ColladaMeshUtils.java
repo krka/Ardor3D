@@ -36,7 +36,7 @@ public class ColladaMeshUtils {
      * Builds geometry from an instance_geometry element.
      * 
      * @param instance_geometry
-     * @return
+     * @return our Spatial
      */
     public static Spatial getGeometryMesh(final Element instance_geometry) {
         final Element geometry = ColladaDOMUtil.findTargetWithId(instance_geometry.getAttributeValue("url"));
