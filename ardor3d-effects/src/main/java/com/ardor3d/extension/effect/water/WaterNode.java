@@ -134,18 +134,18 @@ public class WaterNode extends Node {
      * 
      */
     public void resetParameters() {
-        waterPlane = new Plane(new Vector3(0.0f, 1.0f, 0.0f), 0.0f);
-        tangent = new Vector3(1.0f, 0.0f, 0.0f);
-        binormal = new Vector3(0.0f, 0.0f, 1.0f);
+        waterPlane = new Plane(new Vector3(0.0, 1.0, 0.0), 0.0);
+        tangent = new Vector3(1.0, 0.0, 0.0);
+        binormal = new Vector3(0.0, 0.0, 1.0);
 
-        waterMaxAmplitude = 0.0f;
-        clipBias = 1.0f;
+        waterMaxAmplitude = 0.0;
+        clipBias = 1.0;
         waterColorStart = new ColorRGBA(0.0f, 0.0f, 0.1f, 1.0f);
         waterColorEnd = new ColorRGBA(0.0f, 0.3f, 0.1f, 1.0f);
-        heightFalloffStart = 300.0f;
-        heightFalloffSpeed = 500.0f;
-        speedReflection = 0.1f;
-        speedRefraction = -0.05f;
+        heightFalloffStart = 300.0;
+        heightFalloffSpeed = 500.0;
+        speedReflection = 0.1;
+        speedRefraction = -0.05;
     }
 
     /**

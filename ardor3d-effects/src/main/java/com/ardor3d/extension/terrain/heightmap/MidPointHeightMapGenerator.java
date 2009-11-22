@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.terrain.heightmap;
 
+import java.util.Random;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.MathUtils;
@@ -35,6 +36,9 @@ public class MidPointHeightMapGenerator {
     /** The range used to normalize terrain */
     public static float NORMALIZE_RANGE = 1f;
 
+    private final Random random = new Random();
+    private boolean loaded = false;
+
     /**
      * Constructor builds a new heightmap using the midpoint displacement algorithm. Roughness determines how chaotic
      * the terrain will be. Where 1 is perfectly self-similar, > 1 early iterations have a disproportionately large
@@ -58,14 +62,34 @@ public class MidPointHeightMapGenerator {
         }
         this.roughness = roughness;
         this.size = size;
+    }
 
-        load();
+    /**
+     * Constructor builds a new heightmap using the midpoint displacement algorithm. Roughness determines how chaotic
+     * the terrain will be. Where 1 is perfectly self-similar, > 1 early iterations have a disproportionately large
+     * effect creating smooth terrain, and < 1 late iteraions have a disproportionately large effect creating chaotic
+     * terrain.
+     * 
+     * @param size
+     *            the size of the terrain, must be a power of 2.
+     * @param roughness
+     *            how chaotic to make the terrain.
+     * 
+     * @throws Ardor3dException
+     *             if size is less than or equal to zero or roughtness is less than 0.
+     */
+    public MidPointHeightMapGenerator(final int size, final float roughness, final long seed) {
+        this(size, roughness);
+        random.setSeed(seed);
     }
 
     /**
      * @return the heightData
      */
     public float[] getHeightData() {
+        if (!loaded) {
+            generateHeightData();
+        }
         return heightData;
     }
 
@@ -74,7 +98,7 @@ public class MidPointHeightMapGenerator {
      * latest attributes, so a call to <code>load</code> is recommended if attributes have changed using the set
      * methods.
      */
-    public boolean load() {
+    public boolean generateHeightData() {
         float height;
         double heightReducer;
         float[][] tempBuffer;
@@ -83,10 +107,6 @@ public class MidPointHeightMapGenerator {
         int ni, nj;
         int mi, mj;
         int pmi, pmj;
-
-        if (null != heightData) {
-            heightData = null;
-        }
 
         height = 1f;
         heightReducer = Math.pow(2, -1 * roughness);
@@ -108,8 +128,8 @@ public class MidPointHeightMapGenerator {
 
                     // displace the middle point by the average of the
                     // corners, and a random value.
-                    tempBuffer[mi][mj] = (float) ((tempBuffer[i][j] + tempBuffer[ni][j] + tempBuffer[i][nj] + tempBuffer[ni][nj]) / 4 + (Math
-                            .random()
+                    tempBuffer[mi][mj] = ((tempBuffer[i][j] + tempBuffer[ni][j] + tempBuffer[i][nj] + tempBuffer[ni][nj]) / 4 + (random
+                            .nextFloat()
                             * height - (height / 2)));
                 }
             }
@@ -131,13 +151,13 @@ public class MidPointHeightMapGenerator {
                     pmj = (j - counter / 2 + size) % size;
 
                     // Calculate the square value for the top side of the rectangle
-                    tempBuffer[mi][j] = (float) ((tempBuffer[i][j] + tempBuffer[ni][j] + tempBuffer[mi][pmj] + tempBuffer[mi][mj]) / 4 + (Math
-                            .random()
+                    tempBuffer[mi][j] = ((tempBuffer[i][j] + tempBuffer[ni][j] + tempBuffer[mi][pmj] + tempBuffer[mi][mj]) / 4 + (random
+                            .nextFloat()
                             * height - (height / 2)));
 
                     // Calculate the square value for the left side of the rectangle
-                    tempBuffer[i][mj] = (float) ((tempBuffer[i][j] + tempBuffer[i][nj] + tempBuffer[pmi][mj] + tempBuffer[mi][mj]) / 4 + (Math
-                            .random()
+                    tempBuffer[i][mj] = ((tempBuffer[i][j] + tempBuffer[i][nj] + tempBuffer[pmi][mj] + tempBuffer[mi][mj]) / 4 + (random
+                            .nextFloat()
                             * height - (height / 2)));
 
                 }
@@ -157,6 +177,9 @@ public class MidPointHeightMapGenerator {
         }
 
         logger.info("Created Heightmap using Mid Point");
+
+        loaded = true;
+
         return true;
     }
 
@@ -185,7 +208,7 @@ public class MidPointHeightMapGenerator {
      * @param z
      *            the z (north/south) coordinate.
      */
-    public void setHeightAtPoint(final float height, final int x, final int z) {
+    protected void setHeightAtPoint(final float height, final int x, final int z) {
         heightData[x + (z * size)] = height;
     }
 
@@ -196,7 +219,7 @@ public class MidPointHeightMapGenerator {
      * @param tempBuffer
      *            the terrain to normalize.
      */
-    public void normalizeTerrain(final float[][] tempBuffer) {
+    protected void normalizeTerrain(final float[][] tempBuffer) {
         float currentMin, currentMax;
         float height;
 
@@ -236,7 +259,7 @@ public class MidPointHeightMapGenerator {
      * @param tempBuffer
      *            the terrain to filter.
      */
-    public void erodeTerrain(final float[][] tempBuffer) {
+    protected void erodeTerrain(final float[][] tempBuffer) {
         // erode left to right
         float v;
 
