@@ -59,7 +59,7 @@ public class ColladaMeshUtils {
     public static Node buildMesh(final Element colladaGeometry) {
         if (colladaGeometry.getChild("mesh") != null) {
             final Element cMesh = colladaGeometry.getChild("mesh");
-            final Node meshNode = new Node(colladaGeometry.getName());
+            final Node meshNode = new Node(colladaGeometry.getAttributeValue("name", colladaGeometry.getName()));
 
             // Grab all mesh types (polygons, triangles, etc.)
             // Create each as an Ardor3D Mesh, and attach to node
@@ -150,7 +150,7 @@ public class ColladaMeshUtils {
             return null;
         }
         final Point points = new Point();
-        points.setName(mesh.getName());
+        points.setName(mesh.getAttributeValue("name", mesh.getName()));
 
         // Find POSITION vertices source
         final Element source = ColladaInputPipe.getPositionSource(mesh.getChild("vertices"));

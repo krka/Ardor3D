@@ -148,7 +148,7 @@ public class ColladaNodeUtils {
      */
     @SuppressWarnings("unchecked")
     public static Node buildNode(final Element dNode) {
-        final Node node = new Node(dNode.getName());
+        final Node node = new Node(dNode.getAttributeValue("name", dNode.getName()));
 
         final List<Element> transforms = new ArrayList<Element>();
         for (final Element child : (List<Element>) dNode.getChildren()) {
