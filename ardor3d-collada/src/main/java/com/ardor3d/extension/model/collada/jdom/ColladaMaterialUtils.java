@@ -48,7 +48,11 @@ public class ColladaMaterialUtils {
             return;
         }
 
-        final Element mat = GlobalData.getInstance().getBoundMaterial(materialName);
+        Element mat = GlobalData.getInstance().getBoundMaterial(materialName);
+        if (mat == null) {
+            ColladaMaterialUtils.logger.warning("material not bound: " + materialName + ", trying search with id.");
+            mat = ColladaDOMUtil.findTargetWithId(materialName);
+        }
         if (mat == null) {
             ColladaMaterialUtils.logger.warning("material not found: " + materialName);
             return;

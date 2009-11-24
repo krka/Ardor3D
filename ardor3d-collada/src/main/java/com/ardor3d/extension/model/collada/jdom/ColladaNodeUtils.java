@@ -12,6 +12,7 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom.Element;
@@ -23,6 +24,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.TransformException;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -247,7 +249,11 @@ public class ColladaNodeUtils {
             } else if ("scale".equals(transform.getName())) {
                 final Vector3 scale = new Vector3(array[0], array[1], array[2]);
                 scale.multiplyLocal(localTransform.getScale());
-                localTransform.setScale(scale);
+                try {
+                    localTransform.setScale(scale);
+                } catch (final TransformException e) {
+                    logger.log(Level.WARNING, "Invalid transformation", e);
+                }
             } else if ("matrix".equals(transform.getName())) {
                 // Note: This will not preserve skew.
                 final Matrix4 matrix = new Matrix4().fromArray(array);

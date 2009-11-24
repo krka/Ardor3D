@@ -159,11 +159,14 @@ public class ColladaExample extends ExampleBase {
         // add a temporary resource locator since this is potentially outside our normal model location.
         final SimpleResourceLocator loc = new SimpleResourceLocator(modelURI.resolve("./"));
         ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+        final SimpleResourceLocator loc2 = new SimpleResourceLocator(modelURI.resolve("./"));
+        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, loc2);
 
         loadColladaModel(modelURI.toString());
 
         // remove locator
         ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+        ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc2);
     }
 
     private void loadColladaModel(final String file) {

@@ -31,11 +31,11 @@ public class ColladaInputPipe {
     private final int _offset;
     private final int _set;
     private final Element _source;
-    // private final List<ParamType> fastParams = Lists.newArrayList();
     private int paramCount;
     private SourceData _sourceData = null;
     private Type _type;
     private FloatBuffer _buffer;
+    private int _texCoord = 0;
 
     enum Type {
         VERTEX, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, INV_BIND_MATRIX, UNKNOWN
@@ -81,6 +81,9 @@ public class ColladaInputPipe {
             throw new ColladaException("Input source not found: " + input.getAttributeValue("source"), input);
         }
 
+        // TODO: Need to go through the params and see if they have a name set, and skip values if not when
+        // parsing the array?
+
         _sourceData = new SourceData();
         if (_source.getChild("float_array") != null) {
             _sourceData.floatArray = ColladaDOMUtil.parseFloatArray(_source.getChild("float_array"));
@@ -109,10 +112,20 @@ public class ColladaInputPipe {
             final List<Element> params = accessor.getChildren("param");
             paramCount = params.size();
 
-            // Might need this info later
-            // for (final Element param : params) {
-            // String paramType = param.getAttributeValue("type");
-            // }
+            // Might use this info for real later, but use for testing for unsupported param skipping.
+            boolean skippedParam = false;
+            for (final Element param : params) {
+                final String paramName = param.getAttributeValue("name");
+                if (paramName == null) {
+                    skippedParam = true;
+                    break;
+                }
+                // String paramType = param.getAttributeValue("type");
+            }
+            if (paramCount > 1 && skippedParam == true) {
+                ColladaInputPipe.logger.warning("Parameter skipping not yet supported when parsing sources. "
+                        + _source.getAttributeValue("id"));
+            }
 
             _sourceData.count = ColladaDOMUtil.getAttributeIntValue(accessor, "count", 0);
             _sourceData.stride = ColladaDOMUtil.getAttributeIntValue(accessor, "stride", 1);
@@ -122,6 +135,8 @@ public class ColladaInputPipe {
         // save our offset
         _offset = ColladaDOMUtil.getAttributeIntValue(input, "offset", 0);
         _set = ColladaDOMUtil.getAttributeIntValue(input, "set", 0);
+
+        _texCoord = 0;
     }
 
     public int getOffset() {
@@ -156,7 +171,7 @@ public class ColladaInputPipe {
             case TEXCOORD:
                 _buffer = BufferUtils.createFloatBuffer(size);
                 // TODO: _set is not right?
-                meshData.setTextureCoords(new FloatBufferData(_buffer, paramCount), _set);
+                meshData.setTextureCoords(new FloatBufferData(_buffer, paramCount), _texCoord++);
                 break;
             case COLOR:
                 _buffer = BufferUtils.createFloatBuffer(size);
