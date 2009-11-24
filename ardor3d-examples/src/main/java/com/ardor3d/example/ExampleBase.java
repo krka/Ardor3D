@@ -102,7 +102,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
 
     protected WireframeState _wireframeState;
 
-    protected static volatile boolean _exit = false;
+    protected volatile boolean _exit = false;
 
     protected static boolean _stereo = false;
 
