@@ -98,6 +98,7 @@ public class MeshData implements Cloneable, Savable {
         } else {
             setVertexCoords(new FloatBufferData(vertexBuffer, 3));
         }
+        refreshInterleaved();
     }
 
     /**
@@ -109,6 +110,12 @@ public class MeshData implements Cloneable, Savable {
         return _vertexCoords;
     }
 
+    private void refreshInterleaved() {
+        if (_interleaved != null) {
+            _interleaved.setNeedsRefresh(true);
+        }
+    }
+
     /**
      * Sets the vertex coords.
      * 
@@ -118,6 +125,7 @@ public class MeshData implements Cloneable, Savable {
     public void setVertexCoords(final FloatBufferData bufferData) {
         _vertexCoords = bufferData;
         updateVertexCount();
+        refreshInterleaved();
     }
 
     /**
@@ -144,6 +152,7 @@ public class MeshData implements Cloneable, Savable {
         } else {
             _normalCoords = new FloatBufferData(normalBuffer, 3);
         }
+        refreshInterleaved();
     }
 
     /**
@@ -163,6 +172,7 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setNormalCoords(final FloatBufferData bufferData) {
         _normalCoords = bufferData;
+        refreshInterleaved();
     }
 
     /**
@@ -189,6 +199,7 @@ public class MeshData implements Cloneable, Savable {
         } else {
             _colorCoords = new FloatBufferData(colorBuffer, 4);
         }
+        refreshInterleaved();
     }
 
     /**
@@ -208,6 +219,7 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setColorCoords(final FloatBufferData bufferData) {
         _colorCoords = bufferData;
+        refreshInterleaved();
     }
 
     /**
@@ -328,6 +340,7 @@ public class MeshData implements Cloneable, Savable {
             _textureCoords.add(null);
         }
         _textureCoords.set(index, new FloatBufferData(textureBuffer, 2));
+        refreshInterleaved();
     }
 
     /**
@@ -362,6 +375,7 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setTextureCoords(final List<FloatBufferData> textureCoords) {
         _textureCoords = textureCoords;
+        refreshInterleaved();
     }
 
     /**
@@ -377,6 +391,7 @@ public class MeshData implements Cloneable, Savable {
             _textureCoords.add(null);
         }
         _textureCoords.set(index, textureCoords);
+        refreshInterleaved();
     }
 
     /**
@@ -408,6 +423,7 @@ public class MeshData implements Cloneable, Savable {
      */
     public void setInterleavedData(final FloatBufferData interleavedData) {
         _interleaved = interleavedData;
+        refreshInterleaved();
     }
 
     /**
@@ -560,6 +576,7 @@ public class MeshData implements Cloneable, Savable {
             _indexBuffer = new IntBufferData(indices);
         }
         updatePrimitiveCounts();
+        refreshInterleaved();
     }
 
     /**
@@ -580,6 +597,7 @@ public class MeshData implements Cloneable, Savable {
     public void setIndices(final IntBufferData bufferData) {
         _indexBuffer = bufferData;
         updatePrimitiveCounts();
+        refreshInterleaved();
     }
 
     /**
@@ -600,6 +618,7 @@ public class MeshData implements Cloneable, Savable {
     public void setIndexMode(final IndexMode indexMode) {
         _indexModes[0] = indexMode;
         updatePrimitiveCounts();
+        refreshInterleaved();
     }
 
     /**
@@ -620,6 +639,7 @@ public class MeshData implements Cloneable, Savable {
     public void setIndexLengths(final int[] indexLengths) {
         _indexLengths = indexLengths;
         updatePrimitiveCounts();
+        refreshInterleaved();
     }
 
     /**
@@ -655,6 +675,7 @@ public class MeshData implements Cloneable, Savable {
     public void setIndexModes(final IndexMode[] indexModes) {
         _indexModes = indexModes;
         updatePrimitiveCounts();
+        refreshInterleaved();
     }
 
     /**

@@ -1018,7 +1018,7 @@ public class JoglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
-        if (interleaved.getVBOID(context.getGlContextRep()) <= 0) {
+        if (interleaved.getVBOID(context.getGlContextRep()) <= 0 || interleaved.isNeedsRefresh()) {
             initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords);
         }
 
