@@ -85,6 +85,7 @@ public class ColladaMaterialUtils {
                 ColorRGBA transparent = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
                 float transparency = 1.0f;
                 boolean useTransparency = false;
+                String opaqueMode = "A_ONE";
 
                 for (final Element property : (List<Element>) blinnPhong.getChildren()) {
                     if ("diffuse".equals(property.getName())) {
@@ -110,6 +111,7 @@ public class ColladaMaterialUtils {
 
                             useTransparency = true;
                         }
+                        opaqueMode = property.getAttributeValue("opaque", "A_ONE");
                     } else if ("transparency".equals(property.getName())) {
                         final Element propertyValue = (Element) property.getChildren().get(0);
                         if ("float".equals(propertyValue.getName())) {
