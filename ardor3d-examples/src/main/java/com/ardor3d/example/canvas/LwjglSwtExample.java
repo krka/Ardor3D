@@ -10,7 +10,10 @@
 
 package com.ardor3d.example.canvas;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -33,16 +36,24 @@ import org.eclipse.swt.widgets.TabItem;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Exit;
 import com.ardor3d.framework.ArdorModule;
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
+import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
-import com.ardor3d.input.SwtFocusWrapper;
+import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
+import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.swt.SwtFocusWrapper;
 import com.ardor3d.input.swt.SwtKeyboardWrapper;
+import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.resource.ResourceLocatorTool;
@@ -53,6 +64,11 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 
 public class LwjglSwtExample {
+    static MouseCursor _cursor1;
+    static MouseCursor _cursor2;
+
+    static Map<Canvas, Boolean> _showCursor1 = new HashMap<Canvas, Boolean>();
+
     private static final Logger logger = Logger.getLogger(LwjglSwtExample.class.toString());
     private static int i = 0;
 
@@ -201,15 +217,64 @@ public class LwjglSwtExample {
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas1);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);
         final SwtFocusWrapper focusWrapper = new SwtFocusWrapper(canvas1);
+        final SwtMouseManager mouseManager = new SwtMouseManager(canvas1);
 
         final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
 
-        // pl.init();
-
-        // canvas.addKeyListener(keyboardWrapper);
-        // mouseWrapper.listenTo(canvas);
-
         logicalLayer.registerInput(canvas1, pl);
+
+        logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                if (source != canvas1) {
+                    return;
+                }
+
+                if (_showCursor1.get(canvas1)) {
+                    mouseManager.setCursor(_cursor1);
+                } else {
+                    mouseManager.setCursor(_cursor2);
+                }
+
+                _showCursor1.put(canvas1, !_showCursor1.get(canvas1));
+            }
+        }));
+        logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.J), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                if (source != canvas1) {
+                    return;
+                }
+
+                mouseManager.setCursor(MouseCursor.SYSTEM_DEFAULT);
+            }
+        }));
+        logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                if (source != canvas1) {
+                    return;
+                }
+
+                mouseManager.setGrabbed(mouseManager.getGrabbed() == GrabbedState.NOT_GRABBED ? GrabbedState.GRABBED
+                        : GrabbedState.NOT_GRABBED);
+            }
+        }));
+
+        final AWTImageLoader awtImageLoader = new AWTImageLoader();
+        try {
+            _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
+            _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
+        } catch (final IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        _showCursor1.put(canvas1, true);
+    }
+
+    private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
+            throws IOException {
+        final com.ardor3d.image.Image image = awtImageLoader.load(LwjglAwtExample.class
+                .getResourceAsStream(resourceName), false);
+
+        return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
 
     static ControlListener newResizeHandler(final SwtCanvas swtCanvas, final CanvasRenderer canvasRenderer) {
