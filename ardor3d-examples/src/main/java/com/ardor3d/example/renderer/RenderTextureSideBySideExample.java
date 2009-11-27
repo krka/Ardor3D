@@ -60,7 +60,9 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     @Override
     protected void quit(final Renderer r) {
         try {
-            textureRenderer.cleanup();
+            if (textureRenderer != null) {
+                textureRenderer.cleanup();
+            }
         } catch (final Exception e) {
             e.printStackTrace();
         }

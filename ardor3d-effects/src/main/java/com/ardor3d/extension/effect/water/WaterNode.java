@@ -152,7 +152,7 @@ public class WaterNode extends Node {
      * Release pbuffers in TextureRenderer's. Preferably called from user cleanup method.
      */
     public void cleanup() {
-        if (isSupported()) {
+        if (isSupported() && tRenderer != null) {
             tRenderer.cleanup();
         }
     }
