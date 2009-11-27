@@ -8,13 +8,15 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.input;
+package com.ardor3d.input.swt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Control;
+
+import com.ardor3d.input.FocusWrapper;
 
 /**
  * Focus Listener wrapper class for use with SWT.
