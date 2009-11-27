@@ -15,6 +15,7 @@ import java.util.List;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -34,6 +35,9 @@ import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
 import com.google.inject.Inject;
 
+@Purpose(htmlDescription = "Demonstrates using MathUtils.matrixLookAt.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
+maxHeapMemory = 64)
 public class MatrixLookAtExample extends ExampleBase {
 
     private Mesh targetMesh;

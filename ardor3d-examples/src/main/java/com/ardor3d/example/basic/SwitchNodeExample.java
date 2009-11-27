@@ -12,6 +12,7 @@ package com.ardor3d.example.basic;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -34,6 +35,9 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+@Purpose(htmlDescription = "A demonstration of the use of SwitchNode.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_SwitchNodeExample.jpg", //
+maxHeapMemory = 64)
 public class SwitchNodeExample extends ExampleBase {
     public static void main(final String[] args) {
         start(SwitchNodeExample.class);

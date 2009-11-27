@@ -12,6 +12,7 @@ package com.ardor3d.example.basic;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -31,6 +32,9 @@ import com.google.inject.Inject;
 /**
  * A simple example showing a textured and lit box spinning.
  */
+@Purpose(htmlDescription = "A simple example showing a textured and lit box spinning.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
+maxHeapMemory = 64)
 public class BoxExample extends ExampleBase {
 
     /** Keep a reference to the box to be able to rotate it each frame. */

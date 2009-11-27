@@ -13,6 +13,7 @@ package com.ardor3d.example.basic;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -67,6 +68,9 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+@Purpose(htmlDescription = "A showing of the Ardor3D primitives.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
+maxHeapMemory = 64)
 public class ShapesExample extends ExampleBase {
     private int wrapCount;
     private int index;

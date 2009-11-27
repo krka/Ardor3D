@@ -13,6 +13,7 @@ package com.ardor3d.example.basic;
 import java.util.ArrayList;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
@@ -27,6 +28,9 @@ import com.google.inject.Inject;
 /**
  * A simple example showing off some of the properties of the Line object and how to use antialising.
  */
+@Purpose(htmlDescription = "A simple example showing off some of the properties of the Line object and how to use antialising.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
+maxHeapMemory = 64)
 public class LineExample extends ExampleBase {
 
     public static void main(final String[] args) {
