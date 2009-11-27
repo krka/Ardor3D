@@ -12,6 +12,7 @@ package com.ardor3d.example.effect;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.SwarmInfluence;
@@ -31,6 +32,9 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+@Purpose(htmlDescription = "Example showing a particle system using the particle SwarmInfluence.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSwarmExample.jpg", //
+maxHeapMemory = 64)
 public class ParticleSwarmExample extends ExampleBase {
 
     private ParticleSystem particles;

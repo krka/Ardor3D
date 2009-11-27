@@ -11,6 +11,7 @@
 package com.ardor3d.example.benchmark.ball;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIContainer;
 import com.ardor3d.extension.ui.UIFrame;
@@ -38,6 +39,9 @@ import com.google.inject.Inject;
 /**
  * Bubblemark test - using ardor3d-ui
  */
+@Purpose(htmlDescription = "The famous BubbleMark UI test, recreated using Ardor3D UI components.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkUIExample.jpg", //
+maxHeapMemory = 64)
 public class BubbleMarkUIExample extends ExampleBase {
 
     private BallComponent[] balls;

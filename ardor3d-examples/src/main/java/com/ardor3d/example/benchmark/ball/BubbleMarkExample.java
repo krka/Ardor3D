@@ -13,6 +13,7 @@ package com.ardor3d.example.benchmark.ball;
 import java.net.URISyntaxException;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
@@ -56,6 +57,9 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </ul>
  * </p>
  */
+@Purpose(htmlDescription = "The famous BubbleMark UI test, recreated using quads.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
+maxHeapMemory = 64)
 public class BubbleMarkExample implements Scene {
 
     // Our native window, not the gl surface itself.

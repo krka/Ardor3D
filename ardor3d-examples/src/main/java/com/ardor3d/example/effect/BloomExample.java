@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
@@ -48,6 +49,9 @@ import com.google.inject.Inject;
 /**
  * Example showing bloom
  */
+@Purpose(htmlDescription = "A simple example showing bloom.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_BloomExample.jpg", //
+maxHeapMemory = 64)
 public class BloomExample extends ExampleBase {
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(BloomExample.class.getName());
