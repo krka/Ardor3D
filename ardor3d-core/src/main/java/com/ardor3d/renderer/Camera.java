@@ -252,6 +252,12 @@ public class Camera implements Savable, Externalizable, Cloneable {
     protected int _height;
 
     /**
+     * @deprecated Only for use by Savable interface.
+     */
+    @Deprecated
+    public Camera() {}
+
+    /**
      * Construct a new Camera with the given frame width and height.
      * 
      * @param width
