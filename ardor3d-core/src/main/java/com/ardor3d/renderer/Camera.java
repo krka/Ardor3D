@@ -255,7 +255,12 @@ public class Camera implements Savable, Externalizable, Cloneable {
      * @deprecated Only for use by Savable interface.
      */
     @Deprecated
-    public Camera() {}
+    public Camera() {
+        _worldPlane = new Plane[MAX_WORLD_PLANES];
+        for (int i = 0; i < MAX_WORLD_PLANES; i++) {
+            _worldPlane[i] = new Plane();
+        }
+    }
 
     /**
      * Construct a new Camera with the given frame width and height.
