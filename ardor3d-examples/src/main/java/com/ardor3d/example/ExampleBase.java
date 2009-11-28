@@ -29,6 +29,7 @@ import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
+import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
@@ -373,7 +374,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
         final NativeCanvas canvas = injector.getInstance(NativeCanvas.class);
         final Updater updater = injector.getInstance(Updater.class);
         final PhysicalLayer physicalLayer = new PhysicalLayer(injector.getInstance(KeyboardWrapper.class), injector
-                .getInstance(MouseWrapper.class), injector.getInstance(FocusWrapper.class));
+                .getInstance(MouseWrapper.class), injector.getInstance(ControllerWrapper.class), injector
+                .getInstance(FocusWrapper.class));
 
         // set the mouse manager member. It's a bit of a hack to do that this way.
         gameRunnable._mouseManager = injector.getInstance(MouseManager.class);

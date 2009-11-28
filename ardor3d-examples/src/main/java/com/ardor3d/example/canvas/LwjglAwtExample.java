@@ -32,6 +32,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.lwjgl.LwjglAwtCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.util.AWTImageLoader;
+import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.PhysicalLayer;
@@ -39,6 +40,7 @@ import com.ardor3d.input.awt.AwtFocusWrapper;
 import com.ardor3d.input.awt.AwtKeyboardWrapper;
 import com.ardor3d.input.awt.AwtMouseManager;
 import com.ardor3d.input.awt.AwtMouseWrapper;
+import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -166,8 +168,9 @@ public class LwjglAwtExample {
         final AwtFocusWrapper focusWrapper = new AwtFocusWrapper(theCanvas);
         final AwtMouseManager mouseManager = new AwtMouseManager(theCanvas);
         final AwtMouseWrapper mouseWrapper = new AwtMouseWrapper(theCanvas, mouseManager);
+        final ControllerWrapper controllerWrapper = new DummyControllerWrapper();
 
-        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, focusWrapper);
+        final PhysicalLayer pl = new PhysicalLayer(keyboardWrapper, mouseWrapper, controllerWrapper, focusWrapper);
 
         logicalLayer.registerInput(theCanvas, pl);
 

@@ -14,13 +14,15 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.input.ControllerWrapper;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.KeyboardWrapper;
-import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.MouseManager;
+import com.ardor3d.input.MouseWrapper;
+import com.ardor3d.input.lwjgl.LwjglControllerWrapper;
 import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
-import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
 import com.ardor3d.input.lwjgl.LwjglMouseManager;
+import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 
@@ -33,6 +35,7 @@ public class LwjglModule extends AbstractModule {
         bind(KeyboardWrapper.class).to(LwjglKeyboardWrapper.class).in(Scopes.SINGLETON);
         bind(MouseWrapper.class).to(LwjglMouseWrapper.class).in(Scopes.SINGLETON);
         bind(FocusWrapper.class).to(LwjglCanvas.class).in(Scopes.SINGLETON);
+        bind(ControllerWrapper.class).to(LwjglControllerWrapper.class).in(Scopes.SINGLETON);
         bind(LwjglCanvas.class).in(Scopes.SINGLETON);
         bind(NativeCanvas.class).to(LwjglCanvas.class);
         bind(CanvasRenderer.class).to(LwjglCanvasRenderer.class).in(Scopes.SINGLETON);

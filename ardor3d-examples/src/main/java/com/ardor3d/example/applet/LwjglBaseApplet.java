@@ -40,6 +40,7 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.lwjgl.LwjglControllerWrapper;
 import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
 import com.ardor3d.input.lwjgl.LwjglMouseManager;
 import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
@@ -204,7 +205,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
     protected void initInput() {
         _mouseManager = new LwjglMouseManager();
         _logicalLayer = new LogicalLayer();
-        _physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(), _glCanvas);
+        _physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
+                new LwjglControllerWrapper(), _glCanvas);
         _logicalLayer.registerInput(_glCanvas, _physicalLayer);
         _controlHandle = FirstPersonControl.setupTriggers(_logicalLayer, _worldUp, true);
 
