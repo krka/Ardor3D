@@ -35,9 +35,11 @@ public class PhysicalLayer {
     private final KeyboardWrapper _keyboardWrapper;
     private final MouseWrapper _mouseWrapper;
     private final FocusWrapper _focusWrapper;
+    private final ControllerWrapper _controllerWrapper;
 
     private KeyboardState _currentKeyboardState;
     private MouseState _currentMouseState;
+    private ControllerState _currentControllerState;
 
     private boolean _inited = false;
 
@@ -46,10 +48,11 @@ public class PhysicalLayer {
 
     @Inject
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
-            final FocusWrapper focusWrapper) {
+            final ControllerWrapper controllerWrapper, final FocusWrapper focusWrapper) {
         _keyboardWrapper = keyboardWrapper;
         _mouseWrapper = mouseWrapper;
         _focusWrapper = focusWrapper;
+        _controllerWrapper = controllerWrapper;
         _stateQueue = new LinkedBlockingQueue<InputState>();
 
         _currentKeyboardState = KeyboardState.NOTHING;
@@ -71,23 +74,28 @@ public class PhysicalLayer {
         KeyboardState oldKeyState = _currentKeyboardState;
         MouseState oldMouseState = _currentMouseState = new MouseState(_currentMouseState.getX(), _currentMouseState
                 .getY(), 0, 0, 0, _currentMouseState.getButtonStates(), _currentMouseState.getClickCounts());
+        ControllerState oldControllerState = _currentControllerState.snapshot();
 
         final long loopExitTime = System.nanoTime() + MAX_INPUT_POLL_TIME;
 
         while (true) {
             readKeyboardState();
             readMouseState();
+            readControllerState();
 
             // if there is no new input, exit the loop. Otherwise, add a new input state to the queue, and
             // see if there is even more input to read.
-            if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)) {
+            if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)
+                    && oldControllerState.equals(_currentControllerState.snapshot())) {
                 break;
             }
 
-            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState));
+            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, _currentControllerState
+                    .snapshot()));
 
             oldKeyState = _currentKeyboardState;
             oldMouseState = _currentMouseState;
+            oldControllerState = _currentControllerState;
 
             if (System.nanoTime() > loopExitTime) {
                 logger.severe("Spent too long collecting input data, this is probably an input system bug");
@@ -97,6 +105,16 @@ public class PhysicalLayer {
 
         if (_focusWrapper.getAndClearFocusLost()) {
             lostFocus();
+        }
+    }
+
+    private void readControllerState() {
+        final PeekingIterator<ControllerEvent> eventIterator = _controllerWrapper.getEvents();
+        _currentControllerState.clearEvents();
+
+        while (eventIterator.hasNext()) {
+            final ControllerEvent event = eventIterator.next();
+            _currentControllerState.addEvent(event);
         }
     }
 
@@ -160,6 +178,7 @@ public class PhysicalLayer {
         _stateQueue.add(InputState.LOST_FOCUS);
         _currentKeyboardState = KeyboardState.NOTHING;
         _currentMouseState = MouseState.NOTHING;
+        _currentControllerState = _controllerWrapper.getBlankState();
     }
 
     private void init() {
@@ -168,5 +187,8 @@ public class PhysicalLayer {
         _keyboardWrapper.init();
         _mouseWrapper.init();
         _focusWrapper.init();
+        _controllerWrapper.init();
+
+        _currentControllerState = _controllerWrapper.getBlankState();
     }
 }

@@ -17,11 +17,14 @@ import com.ardor3d.annotation.Immutable;
  */
 @Immutable
 public class InputState {
-    public static final InputState LOST_FOCUS = new InputState(KeyboardState.NOTHING, MouseState.NOTHING);
-    public static final InputState EMPTY = new InputState(KeyboardState.NOTHING, MouseState.NOTHING);
+    public static final InputState LOST_FOCUS = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
+            ControllerState.NOTHING);
+    public static final InputState EMPTY = new InputState(KeyboardState.NOTHING, MouseState.NOTHING,
+            ControllerState.NOTHING);
 
     private final KeyboardState keyboardState;
     private final MouseState mouseState;
+    private final ControllerState controllerState;
 
     /**
      * Creates a new instance.
@@ -33,7 +36,8 @@ public class InputState {
      * @throws NullPointerException
      *             if either parameter is null
      */
-    public InputState(final KeyboardState keyboardState, final MouseState mouseState) {
+    public InputState(final KeyboardState keyboardState, final MouseState mouseState,
+            final ControllerState controllerState) {
         if (keyboardState == null) {
             throw new NullPointerException("Keyboard state");
         }
@@ -42,8 +46,13 @@ public class InputState {
             throw new NullPointerException("Mouse state");
         }
 
+        if (controllerState == null) {
+            throw new NullPointerException("Controller state");
+        }
+
         this.keyboardState = keyboardState;
         this.mouseState = mouseState;
+        this.controllerState = controllerState;
     }
 
     public KeyboardState getKeyboardState() {
@@ -54,8 +63,13 @@ public class InputState {
         return mouseState;
     }
 
+    public ControllerState getControllerState() {
+        return controllerState;
+    }
+
     @Override
     public String toString() {
-        return "InputState{" + "keyboardState=" + keyboardState + ", mouseState=" + mouseState + '}';
+        return "InputState{" + "keyboardState=" + keyboardState + ", mouseState=" + mouseState + ", controllerState="
+                + controllerState + '}';
     }
 }
