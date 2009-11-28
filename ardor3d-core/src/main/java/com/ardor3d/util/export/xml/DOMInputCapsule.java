@@ -324,7 +324,10 @@ public class DOMInputCapsule implements InputCapsule {
     public double readDouble(final String name, final double defVal) throws IOException {
         double ret = defVal;
         try {
-            ret = Double.parseDouble(_currentElem.getAttribute(name));
+            final String s = _currentElem.getAttribute(name);
+            if (s.length() > 0) {
+                ret = Double.parseDouble(s);
+            }
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
