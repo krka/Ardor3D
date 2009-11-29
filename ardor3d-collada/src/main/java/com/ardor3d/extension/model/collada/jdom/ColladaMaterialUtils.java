@@ -75,13 +75,8 @@ public class ColladaMaterialUtils {
                         : technique.getChild("phong") != null ? technique.getChild("phong") : technique
                                 .getChild("lambert");
                 final MaterialState mState = new MaterialState();
-                // XXX: It seems this is generally wrong?
-                // if (blinnPhong.getAmbientColor() != null) {
-                // mState.setAmbient(blinnPhong.getAmbientColor().asColorRGBA());
-                // }
 
                 Texture diffuseTexture = null;
-
                 ColorRGBA transparent = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
                 float transparency = 1.0f;
                 boolean useTransparency = false;
@@ -93,8 +88,6 @@ public class ColladaMaterialUtils {
                         if ("color".equals(propertyValue.getName())) {
                             final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
                             mState.setDiffuse(color);
-                            // XXX: hack... see above
-                            mState.setAmbient(color);
                         } else if ("texture".equals(propertyValue.getName())) {
                             TextureState tState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
                             if (tState == null) {
@@ -102,6 +95,12 @@ public class ColladaMaterialUtils {
                                 mesh.setRenderState(tState);
                             }
                             diffuseTexture = ColladaMaterialUtils.populateTextureState(tState, propertyValue, effect);
+                        }
+                    } else if ("ambient".equals(property.getName())) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
+                            mState.setAmbient(color);
                         }
                     } else if ("transparent".equals(property.getName())) {
                         final Element propertyValue = (Element) property.getChildren().get(0);
