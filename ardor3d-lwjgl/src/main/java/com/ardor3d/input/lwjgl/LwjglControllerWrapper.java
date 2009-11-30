@@ -27,7 +27,7 @@ public class LwjglControllerWrapper implements ControllerWrapper {
 
     private static boolean inited = false;
     private final List<ControllerEvent> events = Collections.synchronizedList(new ArrayList<ControllerEvent>());
-    private LWJGLControllerEventIterator eventsIt = new LWJGLControllerEventIterator();
+    private LwjglControllerEventIterator eventsIt = new LwjglControllerEventIterator();
 
     public ControllerState getBlankState() {
         init();
@@ -46,7 +46,7 @@ public class LwjglControllerWrapper implements ControllerWrapper {
         return state;
     }
 
-    private class LWJGLControllerEventIterator extends AbstractIterator<ControllerEvent> implements
+    private class LwjglControllerEventIterator extends AbstractIterator<ControllerEvent> implements
             PeekingIterator<ControllerEvent> {
 
         @Override
@@ -63,7 +63,7 @@ public class LwjglControllerWrapper implements ControllerWrapper {
     public PeekingIterator<ControllerEvent> getEvents() {
         init();
         if (!eventsIt.hasNext()) {
-            eventsIt = new LWJGLControllerEventIterator();
+            eventsIt = new LwjglControllerEventIterator();
         }
 
         while (Controllers.next()) {

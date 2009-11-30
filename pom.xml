@@ -161,6 +161,11 @@
         <version>${lwjgl.version}</version>
       </dependency>
       <dependency>
+        <groupId>net.java.games.input</groupId>
+        <artifactId>jinput</artifactId>
+        <version>ardor3d-20090528</version>
+      </dependency>
+      <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
         <version>${jdom.version}</version>

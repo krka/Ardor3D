@@ -25,6 +25,10 @@
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl_util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.java.games.input</groupId>
+      <artifactId>jinput</artifactId>
+    </dependency>
 
     <!--
      NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
