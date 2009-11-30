@@ -49,8 +49,8 @@ public class ParticleLines extends ParticleSystem {
         _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
         _particles = new Particle[numParticles];
 
-        if (_particleGeom != null) {
-            detachChild(_particleGeom);
+        if (_particleMesh != null) {
+            detachChild(_particleMesh);
         }
         final Line line = new Line(getName() + "_lines") {
             private static final long serialVersionUID = 1L;
@@ -60,7 +60,7 @@ public class ParticleLines extends ParticleSystem {
                 ; // Do nothing.
             }
         };
-        _particleGeom = line;
+        _particleMesh = line;
         attachChild(line);
         line.getMeshData().setVertexBuffer(_geometryCoordinates);
         line.getMeshData().setColorBuffer(_appearanceColors);
@@ -81,7 +81,7 @@ public class ParticleLines extends ParticleSystem {
 
         }
         updateWorldRenderStates(true);
-        _particleGeom.setCastsShadows(false);
+        _particleMesh.setCastsShadows(false);
     }
 
     @Override
@@ -113,6 +113,6 @@ public class ParticleLines extends ParticleSystem {
 
     @Override
     public Line getParticleGeometry() {
-        return (Line) _particleGeom;
+        return (Line) _particleMesh;
     }
 }

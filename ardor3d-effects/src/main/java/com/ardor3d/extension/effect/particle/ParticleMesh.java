@@ -12,6 +12,7 @@ package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
 
+import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -55,10 +56,10 @@ public class ParticleMesh extends ParticleSystem {
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
     }
 
-    public ParticleMesh(final String name, final Mesh geom) {
+    public ParticleMesh(final String name, final Mesh sourceMesh) {
         super(name, 0, ParticleSystem.ParticleType.GeomMesh);
-        _numParticles = geom.getMeshData().getTotalPrimitiveCount();
-        _psGeom = geom;
+        _numParticles = sourceMesh.getMeshData().getTotalPrimitiveCount();
+        setParticleEmitter(new MeshEmitter(sourceMesh, false));
         getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
@@ -68,8 +69,8 @@ public class ParticleMesh extends ParticleSystem {
     @Override
     protected void initializeParticles(final int numParticles) {
 
-        if (_particleGeom != null) {
-            detachChild(_particleGeom);
+        if (_particleMesh != null) {
+            detachChild(_particleMesh);
         }
         final Mesh mesh = new Mesh(getName() + "_mesh") {
             private static final long serialVersionUID = 1L;
@@ -79,7 +80,7 @@ public class ParticleMesh extends ParticleSystem {
                 ; // Do nothing.
             }
         };
-        _particleGeom = mesh;
+        _particleMesh = mesh;
         attachChild(mesh);
         _particles = new Particle[numParticles];
         if (numParticles == 0) {
@@ -122,9 +123,12 @@ public class ParticleMesh extends ParticleSystem {
             for (int a = verts - 1; a >= 0; a--) {
                 final int ind = (k * verts) + a;
                 if (_particleType == ParticleSystem.ParticleType.GeomMesh && _useMeshTexCoords) {
-                    final int index = _psGeom.getMeshData().getIndexBuffer() != null ? _psGeom.getMeshData()
+                    final MeshEmitter source = (MeshEmitter) getParticleEmitter();
+                    final Mesh sourceMesh = source.getSource();
+                    final int index = sourceMesh.getMeshData().getIndexBuffer() != null ? sourceMesh.getMeshData()
                             .getIndexBuffer().get(ind) : ind;
-                    BufferUtils.populateFromBuffer(temp, _psGeom.getMeshData().getTextureCoords(0).getBuffer(), index);
+                    BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
+                            index);
                     BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);
                 } else {
                     BufferUtils.setInBuffer(sharedTextureData[a], meshData.getTextureCoords(0).getBuffer(), ind);
@@ -135,7 +139,7 @@ public class ParticleMesh extends ParticleSystem {
         }
         Vector2.releaseTempInstance(temp);
         updateWorldRenderStates(true);
-        _particleGeom.setCastsShadows(false);
+        _particleMesh.setCastsShadows(false);
     }
 
     @Override
@@ -205,6 +209,6 @@ public class ParticleMesh extends ParticleSystem {
 
     @Override
     public Mesh getParticleGeometry() {
-        return _particleGeom;
+        return _particleMesh;
     }
 }

@@ -48,10 +48,10 @@ public class ParticlePoints extends ParticleSystem {
         _appearanceColors = BufferUtils.createColorBuffer(numParticles * verts);
         _particles = new Particle[numParticles];
 
-        if (_particleGeom != null) {
-            detachChild(_particleGeom);
+        if (_particleMesh != null) {
+            detachChild(_particleMesh);
         }
-        _particleGeom = new Point(getName() + "_points", _geometryCoordinates, null, _appearanceColors, null) {
+        _particleMesh = new Point(getName() + "_points", _geometryCoordinates, null, _appearanceColors, null) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -59,8 +59,8 @@ public class ParticlePoints extends ParticleSystem {
                 ; // Do nothing.
             }
         };
-        _particleGeom.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
-        attachChild(_particleGeom);
+        _particleMesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(numParticles), 0);
+        attachChild(_particleMesh);
         getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
@@ -78,7 +78,7 @@ public class ParticlePoints extends ParticleSystem {
 
         }
         updateWorldRenderStates(true);
-        _particleGeom.setCastsShadows(false);
+        _particleMesh.setCastsShadows(false);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ParticlePoints extends ParticleSystem {
 
     @Override
     public Point getParticleGeometry() {
-        return (Point) _particleGeom;
+        return (Point) _particleMesh;
     }
 
 }

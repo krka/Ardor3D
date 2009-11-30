@@ -15,12 +15,11 @@ import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
+import com.ardor3d.extension.effect.particle.emitter.SavableParticleEmitter;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Rectangle3;
-import com.ardor3d.math.Ring;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Triangle;
 import com.ardor3d.math.Vector3;
@@ -49,10 +48,6 @@ public abstract class ParticleSystem extends Node {
 
     protected static final long serialVersionUID = 2L;
 
-    public enum EmitType {
-        Point, Segment, Rectangle, Ring, Geometry;
-    }
-
     public enum ParticleType {
         Quad, Triangle, Point, Line, GeomMesh;
     }
@@ -67,11 +62,7 @@ public abstract class ParticleSystem extends Node {
     protected static final ReadOnlyColorRGBA DEFAULT_END_COLOR = new ColorRGBA(1.0f, 1.0f, 0.0f, 0.0f);
 
     protected ParticleType _particleType;
-    protected EmitType _emitType = EmitType.Point;
-    protected LineSegment3 _psSegment;
-    protected Rectangle3 _psRect;
-    protected Mesh _psGeom;
-    protected Ring _psRing;
+    protected SavableParticleEmitter _particleEmitter;
     protected boolean _cameraFacing = true;
     protected boolean _velocityAligned = false;
     protected boolean _particlesInWorldCoords = true;
@@ -111,7 +102,7 @@ public abstract class ParticleSystem extends Node {
     protected final Vector3 _originOffset = new Vector3();
     protected final Vector3 _originCenter = new Vector3();
 
-    protected Mesh _particleGeom;
+    protected Mesh _particleMesh;
     protected ParticleController _controller;
 
     protected Vector3 _oldEmit = new Vector3(Float.NaN, Float.NaN, Float.NaN);
@@ -600,28 +591,6 @@ public abstract class ParticleSystem extends Node {
     }
 
     /**
-     * Get which emittype method is being used by the underlying system. One of EmitType.Point, EmitType.Line,
-     * EmitType.Rectangle, EmitType.Ring, EmitType.GeomMesh
-     * 
-     * @return An int representing the current geometry method being used.
-     */
-    public EmitType getEmitType() {
-        return _emitType;
-    }
-
-    /**
-     * Set which emittype method is being used by the underlying system. This is already done by setGeometry(Line) and
-     * setGeometry(Rectangle) You should not need to use this method unless you are switching between geometry already
-     * set by those methods.
-     * 
-     * @param type
-     *            emit type to use
-     */
-    public void setEmitType(final EmitType type) {
-        _emitType = type;
-    }
-
-    /**
      * Get which emittype method is being used by the underlying system. One of ParticleType.Quad,
      * ParticleType.Triangle, ParticleType.Point, ParticleType.Line, ParticleType.GeomMesh
      * 
@@ -643,83 +612,20 @@ public abstract class ParticleSystem extends Node {
     }
 
     /**
-     * Set a line segment to be used as the "emitter".
+     * Set our particle emitter.
      * 
-     * @param segment
-     *            New emitter line segment.
+     * @param emitter
+     *            New emitter or null for default point emitter.
      */
-    public void setGeometry(final LineSegment3 segment) {
-        _psSegment = segment;
-        _emitType = EmitType.Segment;
+    public void setParticleEmitter(final SavableParticleEmitter emitter) {
+        _particleEmitter = emitter;
     }
 
     /**
-     * Set a rectangular patch to be used as the "emitter".
-     * 
-     * @param rect
-     *            New rectangular patch.
+     * @return the set particle emitter, or null if none is set.
      */
-    public void setGeometry(final Rectangle3 rect) {
-        _psRect = rect;
-        _emitType = EmitType.Rectangle;
-    }
-
-    /**
-     * Set a ring or disk to be used as the "emitter".
-     * 
-     * @param ring
-     *            The new ring area.
-     */
-    public void setGeometry(final Ring ring) {
-        _psRing = ring;
-        _emitType = EmitType.Ring;
-    }
-
-    /**
-     * Set a Geometry's verts to be the random emission points
-     * 
-     * @param geom
-     *            The new geometry random verts.
-     */
-    public void setGeometry(final Mesh geom) {
-        _psGeom = geom;
-        _emitType = EmitType.Geometry;
-    }
-
-    /**
-     * getLine returns the currently set line segment.
-     * 
-     * @return current line segment.
-     */
-    public LineSegment3 getLineSegment() {
-        return _psSegment;
-    }
-
-    /**
-     * getRectangle returns the currently set rectangle segment.
-     * 
-     * @return current rectangle segment.
-     */
-    public Rectangle3 getRectangle() {
-        return _psRect;
-    }
-
-    /**
-     * getRing returns the currently set ring emission area.
-     * 
-     * @return current ring.
-     */
-    public Ring getRing() {
-        return _psRing;
-    }
-
-    /**
-     * getGeometry returns the currently set Mesh emitter.
-     * 
-     * @return current Mesh emitter.
-     */
-    public Mesh getGeometry() {
-        return _psGeom;
+    public SavableParticleEmitter getParticleEmitter() {
+        return _particleEmitter;
     }
 
     public void initAllParticlesLocation() {
@@ -731,10 +637,13 @@ public abstract class ParticleSystem extends Node {
 
     public void initParticleLocation(final int index) {
         final Particle p = _particles[index];
-        if (_particleType == ParticleType.GeomMesh) {
+        if (getParticleType() == ParticleType.GeomMesh && getParticleEmitter() instanceof MeshEmitter) {
+            final MeshEmitter emitter = (MeshEmitter) getParticleEmitter();
+            final Mesh mesh = emitter.getSource();
+
             // Update the triangle model on each new particle creation.
             final Vector3[] vertices = new Vector3[3];
-            final MeshData mData = _psGeom.getMeshData();
+            final MeshData mData = mesh.getMeshData();
             for (int x = 0; x < 3; x++) {
                 vertices[x] = new Vector3();
 
@@ -756,35 +665,22 @@ public abstract class ParticleSystem extends Node {
                 t.set(x, vertices[x]);
             }
             p.setTriangleModel(t);
-            _psGeom.localToWorld(t.getCenter(), p.getPosition());
+            mesh.localToWorld(t.getCenter(), p.getPosition());
             p.getPosition().multiplyLocal(getInvScale());
 
-        } else if (getEmitType() == EmitType.Geometry) {
-            if (getGeometry() != null) {
-                getGeometry().getMeshData().randomPointOnPrimitives(p.getPosition());
-                getGeometry().localToWorld(p.getPosition(), p.getPosition());
-            } else if (getGeometry() != null) {
-                getGeometry().getMeshData().randomVertex(p.getPosition());
-                getGeometry().localToWorld(p.getPosition(), p.getPosition());
-            }
+        } else if (getParticleEmitter() instanceof MeshEmitter) {
+            final MeshEmitter emitter = (MeshEmitter) getParticleEmitter();
+            final Mesh mesh = emitter.getSource();
+            mesh.getMeshData().randomPointOnPrimitives(p.getPosition());
+            mesh.localToWorld(p.getPosition(), p.getPosition());
             p.getPosition().multiplyLocal(getInvScale());
-
         } else {
-            switch (getEmitType()) {
-                case Segment:
-                    getLineSegment().random(p.getPosition());
-                    break;
-                case Rectangle:
-                    getRectangle().random(p.getPosition());
-                    break;
-                case Ring:
-                    getRing().random(p.getPosition());
-                    break;
-                case Point:
-                default:
-                    p.getPosition().set(_originOffset);
-                    break;
+            if (getParticleEmitter() != null) {
+                getParticleEmitter().randomEmissionPoint(p.getPosition());
+            } else {
+                p.getPosition().set(_originOffset);
             }
+
             _emitterTransform.applyForward(p.getPosition());
         }
     }
@@ -1008,8 +904,10 @@ public abstract class ParticleSystem extends Node {
     public void updateGeometricState(final double time, final boolean initiator) {
         super.updateGeometricState(time, initiator);
         if (isRotateWithScene()) {
-            if (_emitType == EmitType.Geometry && getGeometry() != null) {
-                getGeometry().getWorldRotation().applyPost(_emissionDirection, _worldEmit);
+            // XXX: Perhaps we can avoid this special case via an addition to the interface?
+            if (getParticleEmitter() instanceof MeshEmitter) {
+                ((MeshEmitter) getParticleEmitter()).getSource().getWorldRotation().applyPost(_emissionDirection,
+                        _worldEmit);
             } else {
                 getWorldRotation().applyPost(_emissionDirection, _worldEmit);
             }
@@ -1037,14 +935,8 @@ public abstract class ParticleSystem extends Node {
         detachAllChildren();
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(_emitType, "emitType", EmitType.Point);
         capsule.write(_particleType, "particleType", ParticleType.Quad);
-
-        capsule.write(_psSegment, "psSegment", null);
-        capsule.write(_psRect, "psRect", null);
-        capsule.write(_psRing, "psRing", null);
-        capsule.write(_psGeom, "psGeom", null);
-
+        capsule.write(_particleEmitter, "particleEmitter", null);
         capsule.write(_startSize, "startSize", DEFAULT_START_SIZE);
         capsule.write(_endSize, "endSize", DEFAULT_END_SIZE);
         capsule.write(_startColor, "startColor", new ColorRGBA(DEFAULT_START_COLOR));
@@ -1085,14 +977,8 @@ public abstract class ParticleSystem extends Node {
         detachAllChildren();
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        _emitType = capsule.readEnum("emitType", EmitType.class, EmitType.Point);
         _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
-
-        _psSegment = (LineSegment3) capsule.readSavable("psSegment", null);
-        _psRect = (Rectangle3) capsule.readSavable("psRect", null);
-        _psRing = (Ring) capsule.readSavable("psRing", null);
-        _psGeom = (Mesh) capsule.readSavable("psGeom", null);
-
+        _particleEmitter = (SavableParticleEmitter) capsule.readSavable("particleEmitter", null);
         _startSize = capsule.readDouble("startSize", DEFAULT_START_SIZE);
         _endSize = capsule.readDouble("endSize", DEFAULT_END_SIZE);
         _startColor.set((ColorRGBA) capsule.readSavable("startColor", new ColorRGBA(DEFAULT_START_COLOR)));
