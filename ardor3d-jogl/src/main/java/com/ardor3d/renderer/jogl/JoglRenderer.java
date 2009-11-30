@@ -1152,6 +1152,8 @@ public class JoglRenderer extends AbstractRenderer {
                     .getBuffer());
             offset += vertexCoords.getBufferLimit() * 4;
         }
+
+        interleaved.setNeedsRefresh(false);
     }
 
     public void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
