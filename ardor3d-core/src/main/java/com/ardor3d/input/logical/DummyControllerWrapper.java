@@ -16,32 +16,34 @@ import com.ardor3d.input.ControllerWrapper;
 import com.google.common.collect.PeekingIterator;
 
 public class DummyControllerWrapper implements ControllerWrapper {
+    public static final DummyControllerWrapper INSTANCE = new DummyControllerWrapper();
+
+    PeekingIterator<ControllerEvent> empty = new PeekingIterator<ControllerEvent>() {
+        public boolean hasNext() {
+            return false;
+        }
+
+        public void remove() {}
+
+        public ControllerEvent peek() {
+            return null;
+        }
+
+        public ControllerEvent next() {
+            return null;
+        }
+    };
 
     public ControllerState getBlankState() {
         return new ControllerState();
     }
 
     public PeekingIterator<ControllerEvent> getEvents() {
-        return new PeekingIterator<ControllerEvent>() {
-
-            public ControllerEvent next() {
-                throw new UnsupportedOperationException();
-            }
-
-            public ControllerEvent peek() {
-                throw new UnsupportedOperationException();
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-            public boolean hasNext() {
-                return false;
-            }
-        };
+        return empty;
     }
 
-    public void init() {}
+    public void init() {
+        ; // ignore, does nothing
+    }
 
 }
