@@ -27,6 +27,9 @@ public class RendererRecord extends StateRecord {
     private transient final ColorRGBA _tempColor = new ColorRGBA();
     private DrawBufferTarget _drawBufferTarget = null;
     private final Stack<Rectangle2> _clips = new Stack<Rectangle2>();
+    private int _normalMode = -1; // signifies disabled
+    private int _enabledTextures = 0;
+    private boolean _texturesValid = false;
 
     @Override
     public void invalidate() {
@@ -34,6 +37,8 @@ public class RendererRecord extends StateRecord {
         invalidateVBO();
         _drawBufferTarget = null;
         _clippingTestValid = false;
+        _texturesValid = false;
+        _normalMode = -1;
     }
 
     @Override
@@ -130,5 +135,29 @@ public class RendererRecord extends StateRecord {
 
     public void setClippingTestValid(final boolean valid) {
         _clippingTestValid = valid;
+    }
+
+    public int getEnabledTextures() {
+        return _enabledTextures;
+    }
+
+    public void setEnabledTextures(final int enabledTextures) {
+        _enabledTextures = enabledTextures;
+    }
+
+    public int getNormalMode() {
+        return _normalMode;
+    }
+
+    public void setNormalMode(final int normalMode) {
+        _normalMode = normalMode;
+    }
+
+    public boolean isTexturesValid() {
+        return _texturesValid;
+    }
+
+    public void setTexturesValid(final boolean texturesValid) {
+        _texturesValid = texturesValid;
     }
 }

@@ -121,10 +121,6 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private final FloatBuffer[] _oldTextureBuffers;
 
-    private int _prevNormMode = GL11.GL_ZERO;
-
-    private int _prevTextureNumber = 0;
-
     private final DoubleBuffer _transformBuffer = BufferUtils.createDoubleBuffer(16);
     {
         _transformBuffer.position(15);
@@ -318,65 +314,63 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     public void applyNormalsMode(final NormalsMode normalsMode, final ReadOnlyTransform worldTransform) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord rendRecord = context.getRendererRecord();
         if (normalsMode != NormalsMode.Off) {
-            final RenderContext context = ContextManager.getCurrentContext();
             final ContextCapabilities caps = context.getCapabilities();
             switch (normalsMode) {
                 case NormalizeIfScaled:
                     final ReadOnlyVector3 scale = worldTransform.getScale();
                     if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
                         if (scale.getX() == scale.getY() && scale.getY() == scale.getZ() && caps.isOpenGL1_2Supported()
-                                && _prevNormMode != GL12.GL_RESCALE_NORMAL) {
-                            if (_prevNormMode == GL11.GL_NORMALIZE) {
+                                && rendRecord.getNormalMode() != GL12.GL_RESCALE_NORMAL) {
+                            if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
                                 GL11.glDisable(GL11.GL_NORMALIZE);
                             }
                             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                            _prevNormMode = GL12.GL_RESCALE_NORMAL;
-                        } else if (_prevNormMode != GL11.GL_NORMALIZE) {
-                            if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                            rendRecord.setNormalMode(GL12.GL_RESCALE_NORMAL);
+                        } else if (rendRecord.getNormalMode() != GL11.GL_NORMALIZE) {
+                            if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                             }
                             GL11.glEnable(GL11.GL_NORMALIZE);
-                            _prevNormMode = GL11.GL_NORMALIZE;
+                            rendRecord.setNormalMode(GL11.GL_NORMALIZE);
                         }
                     } else {
-                        if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                        if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                            _prevNormMode = GL11.GL_ZERO;
-                        } else if (_prevNormMode == GL11.GL_NORMALIZE) {
+                        } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
                             GL11.glDisable(GL11.GL_NORMALIZE);
-                            _prevNormMode = GL11.GL_ZERO;
                         }
+                        rendRecord.setNormalMode(GL11.GL_ZERO);
                     }
                     break;
                 case AlwaysNormalize:
-                    if (_prevNormMode != GL11.GL_NORMALIZE) {
-                        if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                    if (rendRecord.getNormalMode() != GL11.GL_NORMALIZE) {
+                        if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
                         }
                         GL11.glEnable(GL11.GL_NORMALIZE);
-                        _prevNormMode = GL11.GL_NORMALIZE;
+                        rendRecord.setNormalMode(GL11.GL_NORMALIZE);
                     }
                     break;
                 case UseProvided:
                 default:
-                    if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+                    if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                        _prevNormMode = GL11.GL_ZERO;
-                    } else if (_prevNormMode == GL11.GL_NORMALIZE) {
+                    } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
                         GL11.glDisable(GL11.GL_NORMALIZE);
-                        _prevNormMode = GL11.GL_ZERO;
                     }
+                    rendRecord.setNormalMode(GL11.GL_ZERO);
                     break;
             }
         } else {
-            if (_prevNormMode == GL12.GL_RESCALE_NORMAL) {
+            if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                _prevNormMode = GL11.GL_ZERO;
-            } else if (_prevNormMode == GL11.GL_NORMALIZE) {
+            } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
                 GL11.glDisable(GL11.GL_NORMALIZE);
-                _prevNormMode = GL11.GL_ZERO;
             }
+            rendRecord.setNormalMode(GL11.GL_ZERO);
         }
     }
 
@@ -681,48 +675,68 @@ public class LwjglRenderer extends AbstractRenderer {
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
+        final RendererRecord rendRecord = context.getRendererRecord();
 
         final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
-        int set = 0;
+        int enabledTextures = rendRecord.getEnabledTextures();
+        final boolean valid = rendRecord.isTexturesValid();
+        boolean isOn, wasOn;
         if (ts != null) {
-            for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
-                if (caps.isMultitextureSupported()) {
-                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+            final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
+                    TextureState.MAX_TEXTURES) : 1;
+            for (int i = 0; i < max; i++) {
+                wasOn = (enabledTextures & (2 << i)) != 0;
+                isOn = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null
+                        && textureCoords.get(i).getBuffer() != null;
+
+                if (!isOn) {
+                    if (valid && !wasOn) {
+                        continue;
+                    } else {
+                        if (caps.isMultitextureSupported()) {
+                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                        }
+
+                        // disable bit in tracking int
+                        enabledTextures &= ~(2 << i);
+
+                        // disable state
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                        // discard old comparison buffer
+                        _oldTextureBuffers[i] = null;
+
+                        continue;
+                    }
+                } else {
+                    if (caps.isMultitextureSupported()) {
+                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                    }
+
+                    if (!valid || !wasOn) {
+                        // enable state
+                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                        // enable bit in tracking int
+                        enabledTextures |= (2 << i);
+                    }
+
+                    final FloatBufferData textureBufferData = textureCoords.get(i);
+                    final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
+
+                    if (_oldTextureBuffers[i] != textureBuffer) {
+                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        textureBuffer.rewind();
+                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), 0, textureBuffer);
+                    }
+
+                    _oldTextureBuffers[i] = textureBuffer;
                 }
-
-                if (textureCoords == null || i >= textureCoords.size()) {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    continue;
-                }
-
-                final FloatBufferData textureBufferData = textureCoords.get(i);
-                final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
-
-                if (textureBufferData == null) {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                } else if (_oldTextureBuffers[i] != textureBuffer) {
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    textureBuffer.rewind();
-                    GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), 0, textureBuffer);
-                } else { // TODO: needed?
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                }
-
-                _oldTextureBuffers[i] = textureBuffer;
             }
-            set = ts.getMaxTextureIndexUsed() + 1;
         }
 
-        if (set < _prevTextureNumber) {
-            for (int i = set; i < _prevTextureNumber; i++) {
-                if (caps.isMultitextureSupported()) {
-                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                }
-                GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            }
-        }
-
-        _prevTextureNumber = set < caps.getNumberOfFixedTextureUnits() ? set : caps.getNumberOfFixedTextureUnits();
+        rendRecord.setEnabledTextures(enabledTextures);
+        rendRecord.setTexturesValid(true);
     }
 
     public void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
@@ -915,42 +929,80 @@ public class LwjglRenderer extends AbstractRenderer {
         final ContextCapabilities caps = context.getCapabilities();
 
         final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+        int enabledTextures = rendRecord.getEnabledTextures();
+        final boolean valid = rendRecord.isTexturesValid();
+        boolean exists, wasOn;
         if (ts != null) {
-            for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
-                if (caps.isMultitextureSupported()) {
-                    ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                }
+            final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
+                    TextureState.MAX_TEXTURES) : 1;
+            for (int i = 0; i < max; i++) {
+                wasOn = (enabledTextures & (2 << i)) != 0;
+                exists = textureCoords != null && i < textureCoords.size();
 
-                if (textureCoords == null || i >= textureCoords.size()) {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    continue;
-                }
+                if (!exists) {
+                    if (valid && !wasOn) {
+                        continue;
+                    } else {
+                        if (caps.isMultitextureSupported()) {
+                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                        }
 
-                final FloatBufferData data = textureCoords.get(i);
-                final int vboID = setupVBO(data, context, rendRecord);
+                        // disable bit in tracking int
+                        enabledTextures &= ~(2 << i);
 
-                if (vboID > 0) {
-                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
-                    GL11.glTexCoordPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
+                        // disable state
+                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                        // discard old comparison buffer
+                        _oldTextureBuffers[i] = null;
+
+                        continue;
+                    }
                 } else {
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    LwjglRendererUtil.setBoundVBO(rendRecord, 0);
-                }
-            }
 
-            if (ts.getMaxTextureIndexUsed() + 1 < _prevTextureNumber) {
-                for (int i = ts.getMaxTextureIndexUsed() + 1; i < _prevTextureNumber; i++) {
                     if (caps.isMultitextureSupported()) {
                         ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                     }
-                    GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                    // grab a vboID and make sure it exists and is up to date.
+                    final FloatBufferData data = textureCoords.get(i);
+                    final int vboID = setupVBO(data, context, rendRecord);
+
+                    // Found good vbo
+                    if (vboID > 0) {
+                        if (!valid || !wasOn) {
+                            // enable bit in tracking int
+                            enabledTextures |= (2 << i);
+
+                            // enable state
+                            GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        }
+
+                        // set our active vbo
+                        LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
+
+                        // send data
+                        GL11.glTexCoordPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
+                    }
+                    // Not a good vbo, disable it.
+                    else {
+                        if (!valid || wasOn) {
+                            // disable bit in tracking int
+                            enabledTextures &= ~(2 << i);
+
+                            // disable state
+                            GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        }
+
+                        // set our active vbo to 0
+                        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
+                    }
                 }
             }
-
-            _prevTextureNumber = ts.getMaxTextureIndexUsed() + 1 < caps.getNumberOfFixedTextureUnits() ? ts
-                    .getMaxTextureIndexUsed() + 1 : caps.getNumberOfFixedTextureUnits();
         }
+
+        rendRecord.setEnabledTextures(enabledTextures);
+        rendRecord.setTexturesValid(true);
     }
 
     public void setupInterleavedDataVBO(final FloatBufferData interleaved, final FloatBufferData vertexCoords,
@@ -989,41 +1041,63 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
+            int enabledTextures = rendRecord.getEnabledTextures();
+            final boolean valid = rendRecord.isTexturesValid();
+            boolean exists, wasOn;
             if (ts != null) {
-                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
-                    if (caps.isMultitextureSupported()) {
-                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                    }
+                final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
+                        TextureState.MAX_TEXTURES) : 1;
+                for (int i = 0; i < max; i++) {
+                    wasOn = (enabledTextures & (2 << i)) != 0;
+                    exists = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null;
 
-                    if (textureCoords == null || i >= textureCoords.size()) {
-                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        continue;
-                    }
+                    if (!exists) {
+                        if (valid && !wasOn) {
+                            continue;
+                        } else {
+                            if (caps.isMultitextureSupported()) {
+                                ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
+                            }
 
-                    final FloatBufferData textureBufferData = textureCoords.get(i);
+                            // disable bit in tracking int
+                            enabledTextures &= ~(2 << i);
 
-                    if (textureBufferData != null) {
-                        updateVBO(textureBufferData, rendRecord, vboID, offset);
-                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
-                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        offset += textureBufferData.getBufferLimit() * 4;
+                            // disable state
+                            GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                            // discard old comparison buffer
+                            _oldTextureBuffers[i] = null;
+
+                            continue;
+                        }
+
                     } else {
-                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                    }
-                }
 
-                if (ts.getMaxTextureIndexUsed() + 1 < _prevTextureNumber) {
-                    for (int i = ts.getMaxTextureIndexUsed() + 1; i < _prevTextureNumber; i++) {
                         if (caps.isMultitextureSupported()) {
                             ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
                         }
-                        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+                        // grab a vboID and make sure it exists and is up to date.
+                        final FloatBufferData textureBufferData = textureCoords.get(i);
+                        updateVBO(textureBufferData, rendRecord, vboID, offset);
+
+                        if (!valid || !wasOn) {
+                            // enable bit in tracking int
+                            enabledTextures |= (2 << i);
+
+                            // enable state
+                            GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        }
+
+                        // send data
+                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+                        offset += textureBufferData.getBufferLimit() * 4;
                     }
                 }
-
-                _prevTextureNumber = ts.getMaxTextureIndexUsed() + 1 < caps.getNumberOfFixedTextureUnits() ? ts
-                        .getMaxTextureIndexUsed() + 1 : caps.getNumberOfFixedTextureUnits();
             }
+
+            rendRecord.setEnabledTextures(enabledTextures);
+            rendRecord.setTexturesValid(true);
         }
 
         if (vertexCoords != null) {
