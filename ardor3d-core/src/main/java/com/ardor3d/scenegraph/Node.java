@@ -264,7 +264,8 @@ public class Node extends Spatial {
     }
 
     /**
-     * <code>getChild</code> returns the first child found with exactly the given name (case sensitive.)
+     * <code>getChild</code> returns the first child found with exactly the given name (case sensitive.) If our children
+     * are Nodes, we will search their children as well.
      * 
      * @param name
      *            the name of the child to retrieve. If null, we'll return null.
