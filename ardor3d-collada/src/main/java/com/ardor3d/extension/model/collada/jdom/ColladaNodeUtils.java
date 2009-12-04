@@ -77,6 +77,7 @@ public class ColladaNodeUtils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static AssetData parseAsset(final Element asset) {
         final AssetData assetData = new AssetData();
 
@@ -113,6 +114,7 @@ public class ColladaNodeUtils {
         return assetData;
     }
 
+    @SuppressWarnings("unchecked")
     private static void parseContributor(final AssetData assetData, final Element contributor) {
         for (final Element child : (List<Element>) contributor.getChildren()) {
             if ("author".equals(child.getName())) {

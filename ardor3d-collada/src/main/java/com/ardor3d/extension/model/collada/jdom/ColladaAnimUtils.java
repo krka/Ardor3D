@@ -46,8 +46,7 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
 /**
- * TODO: document this class!
- * 
+ * Utility functions useful for parsing Collada data related to skinning and morphing.
  */
 public class ColladaAnimUtils {
     private static final Logger logger = Logger.getLogger(ColladaAnimUtils.class.getName());
