@@ -12,7 +12,6 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom.Element;
@@ -24,8 +23,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
-import com.ardor3d.math.TransformException;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
@@ -232,35 +231,30 @@ public class ColladaNodeUtils {
      * @return an Ardor3D Transform object
      */
     private static Transform getNodeTransforms(final List<Element> transforms) {
-        final Transform localTransform = new Transform();
+        final Matrix4 workingMat = Matrix4.fetchTempInstance();
+        final Matrix4 finalMat = Matrix4.fetchTempInstance();
+        finalMat.setIdentity();
         for (final Element transform : transforms) {
             final double[] array = ColladaDOMUtil.parseDoubleArray(transform);
             if ("translate".equals(transform.getName())) {
-                localTransform.translate(array[0], array[1], array[2]);
+                workingMat.setIdentity();
+                workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
+                finalMat.multiplyLocal(workingMat);
             } else if ("rotate".equals(transform.getName())) {
                 if (array[3] != 0) {
+                    workingMat.setIdentity();
                     final Matrix3 rotate = new Matrix3().fromAngleAxis(array[3] * MathUtils.DEG_TO_RAD, new Vector3(
                             array[0], array[1], array[2]));
-                    localTransform.getMatrix().multiply(rotate, rotate);
-                    if (localTransform.isRotationMatrix()) {
-                        localTransform.setRotation(rotate);
-                    } else {
-                        localTransform.setMatrix(rotate);
-                    }
+                    workingMat.set(rotate);
+                    finalMat.multiplyLocal(workingMat);
                 }
             } else if ("scale".equals(transform.getName())) {
-                final Vector3 scale = new Vector3(array[0], array[1], array[2]);
-                scale.multiplyLocal(localTransform.getScale());
-                try {
-                    localTransform.setScale(scale);
-                } catch (final TransformException e) {
-                    logger.log(Level.WARNING, "Invalid transformation", e);
-                }
+                workingMat.setIdentity();
+                workingMat.scale(new Vector4(array[0], array[1], array[2], 1), workingMat);
+                finalMat.multiplyLocal(workingMat);
             } else if ("matrix".equals(transform.getName())) {
-                // Note: This will not preserve skew.
-                final Matrix4 matrix = new Matrix4().fromArray(array);
-                final Matrix4 local = localTransform.getHomogeneousMatrix(null).multiplyLocal(matrix);
-                localTransform.fromHomogeneousMatrix(local);
+                workingMat.fromArray(array);
+                finalMat.multiplyLocal(workingMat);
             } else if ("lookat".equals(transform.getName())) {
                 // Note: This replaces any currently accumulated transforms.
                 final Vector3 pos = new Vector3(array[0], array[1], array[2]);
@@ -268,13 +262,14 @@ public class ColladaNodeUtils {
                 final Vector3 up = new Vector3(array[6], array[7], array[8]);
                 final Matrix3 rot = new Matrix3();
                 rot.lookAt(target.subtractLocal(pos), up);
-                localTransform.setRotation(rot);
-                localTransform.setTranslation(pos);
+                workingMat.set(rot);
+                workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
+                finalMat.multiplyLocal(workingMat);
             } else {
                 ColladaNodeUtils.logger.warning("transform not currently supported: "
                         + transform.getClass().getCanonicalName());
             }
         }
-        return localTransform;
+        return new Transform().fromHomogeneousMatrix(finalMat);
     }
 }
