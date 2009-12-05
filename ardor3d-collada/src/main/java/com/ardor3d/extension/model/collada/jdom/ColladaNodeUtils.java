@@ -256,7 +256,6 @@ public class ColladaNodeUtils {
                 workingMat.fromArray(array);
                 finalMat.multiplyLocal(workingMat);
             } else if ("lookat".equals(transform.getName())) {
-                // Note: This replaces any currently accumulated transforms.
                 final Vector3 pos = new Vector3(array[0], array[1], array[2]);
                 final Vector3 target = new Vector3(array[3], array[4], array[5]);
                 final Vector3 up = new Vector3(array[6], array[7], array[8]);
