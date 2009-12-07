@@ -356,9 +356,12 @@ public class ColladaAnimUtils {
                             // get first 4 weights and joints at original index and add weights up to get divisor sum
                             final int[] data = vertWeightMap[originalIndex];
                             for (int i = 0; i < data.length && j < 4; i += maxOffset + 1) {
-                                weights[j] = jointWeights.get(data[i + weightOff]);
-                                indices[j] = jointIndices.get(data[i + indOff]);
-                                sum += weights[j++];
+                                final float weight = jointWeights.get(data[i + weightOff]);
+                                if (weight != 0) {
+                                    weights[j] = jointWeights.get(data[i + weightOff]);
+                                    indices[j] = jointIndices.get(data[i + indOff]);
+                                    sum += weights[j++];
+                                }
                             }
                             // add extra padding as needed
                             while (j < 4) {
