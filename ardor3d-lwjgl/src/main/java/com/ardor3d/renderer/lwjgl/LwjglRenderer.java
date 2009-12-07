@@ -320,29 +320,51 @@ public class LwjglRenderer extends AbstractRenderer {
             final ContextCapabilities caps = context.getCapabilities();
             switch (normalsMode) {
                 case NormalizeIfScaled:
-                    final ReadOnlyVector3 scale = worldTransform.getScale();
-                    if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
-                        if (scale.getX() == scale.getY() && scale.getY() == scale.getZ() && caps.isOpenGL1_2Supported()
-                                && rendRecord.getNormalMode() != GL12.GL_RESCALE_NORMAL) {
-                            if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
-                                GL11.glDisable(GL11.GL_NORMALIZE);
+                    if (worldTransform.isRotationMatrix()) {
+                        final ReadOnlyVector3 scale = worldTransform.getScale();
+                        if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
+                            if (scale.getX() == scale.getY() && scale.getY() == scale.getZ()
+                                    && caps.isOpenGL1_2Supported()
+                                    && rendRecord.getNormalMode() != GL12.GL_RESCALE_NORMAL) {
+                                if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
+                                    GL11.glDisable(GL11.GL_NORMALIZE);
+                                }
+                                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+                                rendRecord.setNormalMode(GL12.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() != GL11.GL_NORMALIZE) {
+                                if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
+                                    GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                                }
+                                GL11.glEnable(GL11.GL_NORMALIZE);
+                                rendRecord.setNormalMode(GL11.GL_NORMALIZE);
                             }
-                            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-                            rendRecord.setNormalMode(GL12.GL_RESCALE_NORMAL);
-                        } else if (rendRecord.getNormalMode() != GL11.GL_NORMALIZE) {
+                        } else {
                             if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
                                 GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
+                                GL11.glDisable(GL11.GL_NORMALIZE);
                             }
-                            GL11.glEnable(GL11.GL_NORMALIZE);
-                            rendRecord.setNormalMode(GL11.GL_NORMALIZE);
+                            rendRecord.setNormalMode(GL11.GL_ZERO);
                         }
                     } else {
-                        if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
-                            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-                        } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
-                            GL11.glDisable(GL11.GL_NORMALIZE);
+                        if (!worldTransform.getMatrix().isIdentity()) {
+                            // *might* be scaled...
+                            if (rendRecord.getNormalMode() != GL11.GL_NORMALIZE) {
+                                if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
+                                    GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                                }
+                                GL11.glEnable(GL11.GL_NORMALIZE);
+                                rendRecord.setNormalMode(GL11.GL_NORMALIZE);
+                            }
+                        } else {
+                            // not scaled
+                            if (rendRecord.getNormalMode() == GL12.GL_RESCALE_NORMAL) {
+                                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() == GL11.GL_NORMALIZE) {
+                                GL11.glDisable(GL11.GL_NORMALIZE);
+                            }
+                            rendRecord.setNormalMode(GL11.GL_ZERO);
                         }
-                        rendRecord.setNormalMode(GL11.GL_ZERO);
                     }
                     break;
                 case AlwaysNormalize:

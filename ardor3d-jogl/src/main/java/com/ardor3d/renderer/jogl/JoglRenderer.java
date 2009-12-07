@@ -333,29 +333,51 @@ public class JoglRenderer extends AbstractRenderer {
             final ContextCapabilities caps = context.getCapabilities();
             switch (normalsMode) {
                 case NormalizeIfScaled:
-                    final ReadOnlyVector3 scale = worldTransform.getScale();
-                    if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
-                        if (scale.getX() == scale.getY() && scale.getY() == scale.getZ() && caps.isOpenGL1_2Supported()
-                                && rendRecord.getNormalMode() != GL.GL_RESCALE_NORMAL) {
-                            if (rendRecord.getNormalMode() == GL.GL_NORMALIZE) {
-                                gl.glDisable(GL.GL_NORMALIZE);
+                    if (worldTransform.isRotationMatrix()) {
+                        final ReadOnlyVector3 scale = worldTransform.getScale();
+                        if (!(scale.getX() == 1.0 && scale.getY() == 1.0 && scale.getZ() == 1.0)) {
+                            if (scale.getX() == scale.getY() && scale.getY() == scale.getZ()
+                                    && caps.isOpenGL1_2Supported()
+                                    && rendRecord.getNormalMode() != GL.GL_RESCALE_NORMAL) {
+                                if (rendRecord.getNormalMode() == GL.GL_NORMALIZE) {
+                                    gl.glDisable(GL.GL_NORMALIZE);
+                                }
+                                gl.glEnable(GL.GL_RESCALE_NORMAL);
+                                rendRecord.setNormalMode(GL.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() != GL.GL_NORMALIZE) {
+                                if (rendRecord.getNormalMode() == GL.GL_RESCALE_NORMAL) {
+                                    gl.glDisable(GL.GL_RESCALE_NORMAL);
+                                }
+                                gl.glEnable(GL.GL_NORMALIZE);
+                                rendRecord.setNormalMode(GL.GL_NORMALIZE);
                             }
-                            gl.glEnable(GL.GL_RESCALE_NORMAL);
-                            rendRecord.setNormalMode(GL.GL_RESCALE_NORMAL);
-                        } else if (rendRecord.getNormalMode() != GL.GL_NORMALIZE) {
+                        } else {
                             if (rendRecord.getNormalMode() == GL.GL_RESCALE_NORMAL) {
                                 gl.glDisable(GL.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() == GL.GL_NORMALIZE) {
+                                gl.glDisable(GL.GL_NORMALIZE);
                             }
-                            gl.glEnable(GL.GL_NORMALIZE);
-                            rendRecord.setNormalMode(GL.GL_NORMALIZE);
+                            rendRecord.setNormalMode(GL.GL_ZERO);
                         }
                     } else {
-                        if (rendRecord.getNormalMode() == GL.GL_RESCALE_NORMAL) {
-                            gl.glDisable(GL.GL_RESCALE_NORMAL);
-                        } else if (rendRecord.getNormalMode() == GL.GL_NORMALIZE) {
-                            gl.glDisable(GL.GL_NORMALIZE);
+                        if (!worldTransform.getMatrix().isIdentity()) {
+                            // *might* be scaled...
+                            if (rendRecord.getNormalMode() != GL.GL_NORMALIZE) {
+                                if (rendRecord.getNormalMode() == GL.GL_RESCALE_NORMAL) {
+                                    gl.glDisable(GL.GL_RESCALE_NORMAL);
+                                }
+                                gl.glEnable(GL.GL_NORMALIZE);
+                                rendRecord.setNormalMode(GL.GL_NORMALIZE);
+                            }
+                        } else {
+                            // not scaled
+                            if (rendRecord.getNormalMode() == GL.GL_RESCALE_NORMAL) {
+                                gl.glDisable(GL.GL_RESCALE_NORMAL);
+                            } else if (rendRecord.getNormalMode() == GL.GL_NORMALIZE) {
+                                gl.glDisable(GL.GL_NORMALIZE);
+                            }
+                            rendRecord.setNormalMode(GL.GL_ZERO);
                         }
-                        rendRecord.setNormalMode(GL.GL_ZERO);
                     }
                     break;
                 case AlwaysNormalize:

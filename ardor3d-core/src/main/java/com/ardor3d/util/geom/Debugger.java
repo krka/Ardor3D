@@ -22,7 +22,6 @@ import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
@@ -182,7 +181,7 @@ public final class Debugger {
         normalLines.generateIndices();
         normalLines.updateWorldRenderStates(false);
     }
-    private static final Vector3 _normalVect = new Vector3();
+    private static final Vector3 _normalVect = new Vector3(), _normalVect2 = new Vector3();
     public static final ColorRGBA NORMAL_COLOR_BASE = new ColorRGBA(ColorRGBA.RED);
     public static final ColorRGBA NORMAL_COLOR_TIP = new ColorRGBA(ColorRGBA.PINK);
     public static final ColorRGBA TANGENT_COLOR_BASE = new ColorRGBA(ColorRGBA.ORANGE);
@@ -231,7 +230,7 @@ public final class Debugger {
         }
         cam.setPlaneState(state);
         if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
-            final Mesh geom = (Mesh) element;
+            final Mesh mesh = (Mesh) element;
 
             double rSize = size;
             if (rSize == -1) {
@@ -249,24 +248,24 @@ public final class Debugger {
                 }
             }
 
-            final FloatBuffer norms = geom.getMeshData().getNormalBuffer();
-            final FloatBuffer verts = geom.getMeshData().getVertexBuffer();
+            final FloatBuffer norms = mesh.getMeshData().getNormalBuffer();
+            final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
             if (norms != null && verts != null && norms.limit() == verts.limit()) {
                 FloatBuffer lineVerts = normalLines.getMeshData().getVertexBuffer();
-                if (lineVerts.capacity() < (3 * (2 * geom.getMeshData().getVertexCount()))) {
+                if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
                     normalLines.getMeshData().setVertexBuffer(null);
-                    lineVerts = BufferUtils.createVector3Buffer(geom.getMeshData().getVertexCount() * 2);
+                    lineVerts = BufferUtils.createVector3Buffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setVertexBuffer(lineVerts);
                 } else {
                     lineVerts.clear();
-                    lineVerts.limit(3 * 2 * geom.getMeshData().getVertexCount());
+                    lineVerts.limit(3 * 2 * mesh.getMeshData().getVertexCount());
                     normalLines.getMeshData().setVertexBuffer(lineVerts);
                 }
 
                 FloatBuffer lineColors = normalLines.getMeshData().getColorBuffer();
-                if (lineColors.capacity() < (4 * (2 * geom.getMeshData().getVertexCount()))) {
+                if (lineColors.capacity() < (4 * (2 * mesh.getMeshData().getVertexCount()))) {
                     normalLines.getMeshData().setColorBuffer(null);
-                    lineColors = BufferUtils.createColorBuffer(geom.getMeshData().getVertexCount() * 2);
+                    lineColors = BufferUtils.createColorBuffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setColorBuffer(lineColors);
                 } else {
                     lineColors.clear();
@@ -275,7 +274,7 @@ public final class Debugger {
                 IntBuffer lineInds = normalLines.getMeshData().getIndexBuffer();
                 if (lineInds == null || lineInds.capacity() < (normalLines.getMeshData().getVertexCount())) {
                     normalLines.getMeshData().setIndexBuffer(null);
-                    lineInds = BufferUtils.createIntBuffer(geom.getMeshData().getVertexCount() * 2);
+                    lineInds = BufferUtils.createIntBuffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setIndexBuffer(lineInds);
                 } else {
                     lineInds.clear();
@@ -287,10 +286,9 @@ public final class Debugger {
                 lineVerts.rewind();
                 lineInds.rewind();
 
-                final ReadOnlyVector3 tempVec = geom.getWorldScale();
-                for (int x = 0; x < geom.getMeshData().getVertexCount(); x++) {
+                for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
                     _normalVect.set(verts.get(), verts.get(), verts.get());
-                    _normalVect.multiplyLocal(tempVec);
+                    mesh.getWorldTransform().applyForward(_normalVect);
                     lineVerts.put(_normalVect.getXf());
                     lineVerts.put(_normalVect.getYf());
                     lineVerts.put(_normalVect.getZf());
@@ -302,7 +300,9 @@ public final class Debugger {
 
                     lineInds.put(x * 2);
 
-                    _normalVect.addLocal(norms.get() * rSize, norms.get() * rSize, norms.get() * rSize);
+                    _normalVect2.set(norms.get(), norms.get(), norms.get());
+                    mesh.getWorldTransform().applyForwardVector(_normalVect2).normalizeLocal().multiplyLocal(rSize);
+                    _normalVect.addLocal(_normalVect2);
                     lineVerts.put(_normalVect.getXf());
                     lineVerts.put(_normalVect.getYf());
                     lineVerts.put(_normalVect.getZf());
@@ -315,8 +315,6 @@ public final class Debugger {
                     lineInds.put((x * 2) + 1);
                 }
 
-                normalLines.setWorldTranslation(geom.getWorldTranslation());
-                normalLines.setWorldRotation(geom.getWorldRotation());
                 normalLines.onDraw(r);
             }
 
@@ -345,7 +343,7 @@ public final class Debugger {
         }
         cam.setPlaneState(state);
         if (element instanceof Mesh && element.getSceneHints().getCullHint() != CullHint.Always) {
-            final Mesh geom = (Mesh) element;
+            final Mesh mesh = (Mesh) element;
 
             double rSize = size;
             if (rSize == -1) {
@@ -363,24 +361,24 @@ public final class Debugger {
                 }
             }
 
-            final FloatBuffer norms = geom.getMeshData().getTangentBuffer();
-            final FloatBuffer verts = geom.getMeshData().getVertexBuffer();
+            final FloatBuffer norms = mesh.getMeshData().getTangentBuffer();
+            final FloatBuffer verts = mesh.getMeshData().getVertexBuffer();
             if (norms != null && verts != null && norms.limit() == verts.limit()) {
                 FloatBuffer lineVerts = normalLines.getMeshData().getVertexBuffer();
-                if (lineVerts.capacity() < (3 * (2 * geom.getMeshData().getVertexCount()))) {
+                if (lineVerts.capacity() < (3 * (2 * mesh.getMeshData().getVertexCount()))) {
                     normalLines.getMeshData().setVertexBuffer(null);
-                    lineVerts = BufferUtils.createVector3Buffer(geom.getMeshData().getVertexCount() * 2);
+                    lineVerts = BufferUtils.createVector3Buffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setVertexBuffer(lineVerts);
                 } else {
                     lineVerts.clear();
-                    lineVerts.limit(3 * 2 * geom.getMeshData().getVertexCount());
+                    lineVerts.limit(3 * 2 * mesh.getMeshData().getVertexCount());
                     normalLines.getMeshData().setVertexBuffer(lineVerts);
                 }
 
                 FloatBuffer lineColors = normalLines.getMeshData().getColorBuffer();
-                if (lineColors.capacity() < (4 * (2 * geom.getMeshData().getVertexCount()))) {
+                if (lineColors.capacity() < (4 * (2 * mesh.getMeshData().getVertexCount()))) {
                     normalLines.getMeshData().setColorBuffer(null);
-                    lineColors = BufferUtils.createColorBuffer(geom.getMeshData().getVertexCount() * 2);
+                    lineColors = BufferUtils.createColorBuffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setColorBuffer(lineColors);
                 } else {
                     lineColors.clear();
@@ -389,7 +387,7 @@ public final class Debugger {
                 IntBuffer lineInds = normalLines.getMeshData().getIndexBuffer();
                 if (lineInds == null || lineInds.capacity() < (normalLines.getMeshData().getVertexCount())) {
                     normalLines.getMeshData().setIndexBuffer(null);
-                    lineInds = BufferUtils.createIntBuffer(geom.getMeshData().getVertexCount() * 2);
+                    lineInds = BufferUtils.createIntBuffer(mesh.getMeshData().getVertexCount() * 2);
                     normalLines.getMeshData().setIndexBuffer(lineInds);
                 } else {
                     lineInds.clear();
@@ -401,9 +399,9 @@ public final class Debugger {
                 lineVerts.rewind();
                 lineInds.rewind();
 
-                for (int x = 0; x < geom.getMeshData().getVertexCount(); x++) {
+                for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
                     _normalVect.set(verts.get(), verts.get(), verts.get());
-                    _normalVect.multiplyLocal(geom.getWorldScale());
+                    _normalVect.multiplyLocal(mesh.getWorldScale());
                     lineVerts.put(_normalVect.getXf());
                     lineVerts.put(_normalVect.getYf());
                     lineVerts.put(_normalVect.getZf());
@@ -428,9 +426,9 @@ public final class Debugger {
                     lineInds.put((x * 2) + 1);
                 }
 
-                if (geom != null) {
-                    normalLines.setWorldTranslation(geom.getWorldTranslation());
-                    normalLines.setWorldRotation(geom.getWorldRotation());
+                if (mesh != null) {
+                    normalLines.setWorldTranslation(mesh.getWorldTranslation());
+                    normalLines.setWorldRotation(mesh.getWorldRotation());
                     normalLines.onDraw(r);
                 }
             }
