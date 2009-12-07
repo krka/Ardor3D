@@ -362,7 +362,7 @@ public class ColladaAnimUtils {
                                 if (weight != 0) {
                                     if (j >= SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
                                         ColladaAnimUtils.logger.warning("Max of " + SkinnedMesh.MAX_JOINTS_PER_VERTEX
-                                                + " joints supported per vertex.  Found " + j);
+                                                + " joints supported per vertex.  Found " + (j + 1));
                                     } else {
                                         weights[j] = jointWeights.get(data[i + weightOff]);
                                         indices[j] = jointIndices.get(data[i + indOff]);
