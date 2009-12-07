@@ -512,13 +512,37 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * <code>setBorderColor</code> sets the color used when texture operations encounter the border of a texture.
+     * sets a color that is used with CombinerSource.Constant
+     * 
+     * @param red
+     * @param green
+     * @param blue
+     * @param alpha
+     */
+    public void setConstantColor(final float red, final float green, final float blue, final float alpha) {
+        _constantColor.set(red, green, blue, alpha);
+    }
+
+    /**
+     * sets the color used when texture operations encounter the border of a texture.
      * 
      * @param color
      *            the new border color (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
      */
     public void setBorderColor(final ReadOnlyColorRGBA color) {
         _borderColor.set(color);
+    }
+
+    /**
+     * sets the color used when texture operations encounter the border of a texture.
+     * 
+     * @param red
+     * @param green
+     * @param blue
+     * @param alpha
+     */
+    public void setBorderColor(final float red, final float green, final float blue, final float alpha) {
+        _borderColor.set(red, green, blue, alpha);
     }
 
     /**
@@ -645,15 +669,15 @@ public abstract class Texture implements Savable {
     }
 
     /**
-     * @return the color set to be used with CombinerSource.Constant for this texture (as applicable) If null,
-     *         BLACK_NO_ALPHA is assumed.
+     * @return the color set to be used with CombinerSource.Constant for this texture (as applicable). (the default is
+     *         {@link ColorRGBA#BLACK_NO_ALPHA})
      */
     public ReadOnlyColorRGBA getConstantColor() {
         return _constantColor;
     }
 
     /**
-     * @return the color to be used for border operations. If null, black is assumed.
+     * @return the color to be used for border operations. (the default is {@link ColorRGBA#BLACK_NO_ALPHA})
      */
     public ReadOnlyColorRGBA getBorderColor() {
         return _borderColor;
@@ -1363,9 +1387,8 @@ public abstract class Texture implements Savable {
                 MinificationFilter.NearestNeighborNoMipMaps);
         _image = (Image) capsule.readSavable("image", null);
         if (_image == null) {
-            TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
-            _key = TextureKey
-                    .getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getMinificationFilter());
+            final TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
+            _key = TextureKey.getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getMinificationFilter());
             if (_key != null && _key.getSource() != null) {
                 TextureManager.loadFromKey(_key, null, this);
             }
