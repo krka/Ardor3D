@@ -32,6 +32,8 @@ public class SimpleResourceLocator implements ResourceLocator {
      *            our base context. This is meant to be a "directory" wherein we will search for resources. Therefore,
      *            if it does not end in /, a / will be added to ensure we are talking about children of the given
      *            baseDir.
+     * @throws NullPointerException
+     *             if the given URI is null.
      * @throws URISyntaxException
      *             if the given URI does not end in / and we can not make a new URI with a trailing / from it.
      */
@@ -55,12 +57,14 @@ public class SimpleResourceLocator implements ResourceLocator {
      *            our base context. This is converted to a URI. This is meant to be a "directory" wherein we will search
      *            for resources. Therefore, if it does not end in /, a / will be added to ensure we are talking about
      *            children of the given baseDir.
+     * @throws NullPointerException
+     *             if the given URL is null.
      * @throws URISyntaxException
      *             if this URL can not be converted to a URI, or if the converted URI does not end in / and we can not
      *             make a new URI with a trailing / from it.
      */
     public SimpleResourceLocator(final URL baseDir) throws URISyntaxException {
-        this(baseDir.toURI());
+        this(baseDir != null ? baseDir.toURI() : null);
     }
 
     public URI getBaseDir() {
