@@ -343,28 +343,35 @@ public class ColladaAnimUtils {
 
                     // Use pairs map and vertWeightMap to build our weights and joint indices.
                     {
-                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.indices.length * 4);
-                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.indices.length * 4);
+                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.indices.length
+                                * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
+                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.indices.length
+                                * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
                         int j;
                         float sum = 0;
-                        final float[] weights = new float[4];
-                        final short[] indices = new short[4];
+                        final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
+                        final short[] indices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
                         for (final int originalIndex : pairsMap.indices) {
                             j = 0;
                             sum = 0;
 
                             // get first 4 weights and joints at original index and add weights up to get divisor sum
                             final int[] data = vertWeightMap[originalIndex];
-                            for (int i = 0; i < data.length && j < 4; i += maxOffset + 1) {
+                            for (int i = 0; i < data.length; i += maxOffset + 1) {
                                 final float weight = jointWeights.get(data[i + weightOff]);
                                 if (weight != 0) {
-                                    weights[j] = jointWeights.get(data[i + weightOff]);
-                                    indices[j] = jointIndices.get(data[i + indOff]);
-                                    sum += weights[j++];
+                                    if (j >= SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
+                                        ColladaAnimUtils.logger.warning("Max of " + SkinnedMesh.MAX_JOINTS_PER_VERTEX
+                                                + " joints supported per vertex.  Found " + j);
+                                    } else {
+                                        weights[j] = jointWeights.get(data[i + weightOff]);
+                                        indices[j] = jointIndices.get(data[i + indOff]);
+                                        sum += weights[j++];
+                                    }
                                 }
                             }
                             // add extra padding as needed
-                            while (j < 4) {
+                            while (j < SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
                                 weights[j] = 0;
                                 indices[j++] = 0;
                             }
