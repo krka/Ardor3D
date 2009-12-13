@@ -46,6 +46,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     protected boolean _usingDepthRB = false;
     protected final boolean _supportsDepthTexture;
     protected final boolean _supportsMultisample;
+    protected boolean _neededClip;
 
     protected final Renderer _parentRenderer;
 

@@ -532,6 +532,13 @@ public interface Renderer {
     void pushClip(int x, int y, int width, int height);
 
     /**
+     * Push a clip onto the stack indicating that future clips should not intersect with clips prior to this one.
+     * Basically this allows you to ignore prior clips for nested drawing. Make sure you pop this using
+     * {@link #popClip()}.
+     */
+    void pushEmptyClip();
+
+    /**
      * Pop the most recent rectangle from the stack and adjust the rendering area accordingly.
      */
     void popClip();
