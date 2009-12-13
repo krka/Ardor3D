@@ -194,20 +194,22 @@ public class JoglRenderer extends AbstractRenderer {
             clear |= GL.GL_ACCUM_BUFFER_BIT;
         }
 
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+
         if (strict) {
             // grab our camera to get width and height info.
             final Camera cam = Camera.getCurrentCamera();
 
             gl.glEnable(GL.GL_SCISSOR_TEST);
             gl.glScissor(0, 0, cam.getWidth(), cam.getHeight());
+            record.setClippingTestEnabled(true);
         }
 
         gl.glClear(clear);
 
         if (strict) {
             // put us back.
-            final RenderContext context = ContextManager.getCurrentContext();
-            final RendererRecord record = context.getRendererRecord();
             JoglRendererUtil.applyScissors(record);
         }
     }
@@ -1706,6 +1708,14 @@ public class JoglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord record = context.getRendererRecord();
         record.getScissorClips().push(new Rectangle2(x, y, width, height));
+
+        JoglRendererUtil.applyScissors(record);
+    }
+
+    public void pushEmptyClip() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().push(null);
 
         JoglRendererUtil.applyScissors(record);
     }

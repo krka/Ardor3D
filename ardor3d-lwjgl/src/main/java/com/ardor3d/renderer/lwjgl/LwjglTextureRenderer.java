@@ -35,6 +35,7 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.record.RendererRecord;
 import com.ardor3d.renderer.state.record.TextureRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scene.state.lwjgl.LwjglTextureStateUtil;
@@ -448,6 +449,19 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         }
 
         if (_active == 0) {
+
+            final RenderContext context = ContextManager.getCurrentContext();
+            final RendererRecord record = context.getRendererRecord();
+
+            // needed as FBOs do not share this flag it seems
+            record.setClippingTestValid(false);
+
+            // push a delimiter onto the clip stack
+            _neededClip = _parentRenderer.isClipTestEnabled();
+            if (_neededClip) {
+                _parentRenderer.pushEmptyClip();
+            }
+
             GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(),
                     _backgroundColor.getAlpha());
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboID);
@@ -466,6 +480,10 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
             ContextManager.getCurrentContext().popEnforcedStates();
+
+            if (_neededClip) {
+                _parentRenderer.popClip();
+            }
         }
         _active--;
     }

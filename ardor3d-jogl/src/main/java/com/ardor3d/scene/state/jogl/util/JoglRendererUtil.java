@@ -55,12 +55,19 @@ public abstract class JoglRendererUtil {
         final Stack<Rectangle2> clips = rendRecord.getScissorClips();
 
         if (clips.size() > 0) {
-            gl.glEnable(GL.GL_SCISSOR_TEST);
+            final Rectangle2 init = Rectangle2.fetchTempInstance();
+            init.set(-1, -1, -1, -1);
+            Rectangle2 r;
+            boolean first = true;
+            for (int i = clips.size(); --i >= 0;) {
+                r = clips.get(i);
 
-            Rectangle2 init = null;
-            for (final Rectangle2 r : clips) {
-                if (init == null) {
-                    init = new Rectangle2(r);
+                if (r == null) {
+                    break;
+                }
+                if (first) {
+                    init.set(r);
+                    first = false;
                 } else {
                     init.intersect(r, init);
                 }
@@ -70,7 +77,14 @@ public abstract class JoglRendererUtil {
                     break;
                 }
             }
-            gl.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
+
+            if (init.getWidth() == -1) {
+                setClippingEnabled(rendRecord, false);
+            } else {
+                setClippingEnabled(rendRecord, true);
+                gl.glScissor(init.getX(), init.getY(), init.getWidth(), init.getHeight());
+            }
+            Rectangle2.releaseTempInstance(init);
         } else {
             // no clips, so disable
             gl.glDisable(GL.GL_SCISSOR_TEST);

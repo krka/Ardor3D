@@ -197,20 +197,22 @@ public class LwjglRenderer extends AbstractRenderer {
             clear |= GL11.GL_ACCUM_BUFFER_BIT;
         }
 
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+
         if (strict) {
             // grab our camera to get width and height info.
             final Camera cam = Camera.getCurrentCamera();
 
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
             GL11.glScissor(0, 0, cam.getWidth(), cam.getHeight());
+            record.setClippingTestEnabled(true);
         }
 
         GL11.glClear(clear);
 
         if (strict) {
             // put us back.
-            final RenderContext context = ContextManager.getCurrentContext();
-            final RendererRecord record = context.getRendererRecord();
             LwjglRendererUtil.applyScissors(record);
         }
     }
@@ -1634,6 +1636,14 @@ public class LwjglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord record = context.getRendererRecord();
         record.getScissorClips().push(new Rectangle2(x, y, width, height));
+
+        LwjglRendererUtil.applyScissors(record);
+    }
+
+    public void pushEmptyClip() {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final RendererRecord record = context.getRendererRecord();
+        record.getScissorClips().push(null);
 
         LwjglRendererUtil.applyScissors(record);
     }
