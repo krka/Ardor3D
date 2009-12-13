@@ -214,12 +214,12 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         double x = 0;
         double y = 0;
         int width = 0;
-        final boolean hasTextObject = _text != null && _text.getText() != null;
+        final boolean hasTextObject = getText() != null;
 
         // Gather our width... check for icon and text and gap.
         if (_icon != null) {
             width = _iconDimensions.getWidth();
-            if (getText() != null && getText().length() > 0) {
+            if (hasTextObject && getText().length() > 0) {
                 width += _gap;
             }
         } else if (!hasTextObject) {

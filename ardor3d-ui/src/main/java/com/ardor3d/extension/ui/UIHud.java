@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.ui.event.DragListener;
+import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.input.ButtonState;
@@ -43,6 +44,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 /**
  * UIHud represents a "Heads Up Display" or the base of a game UI scenegraph. Various UI Input, dragging, events, etc.
@@ -80,13 +82,18 @@ public class UIHud extends Node {
      * List of potential drag listeners. When a drag operation is detected, we will offer it to each item in the list
      * until one accepts it.
      */
-    protected final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
+    private final List<WeakReference<DragListener>> _dragListeners = new ArrayList<WeakReference<DragListener>>();
 
     /** Our current drag listener. When an drag finished, this is set back to null. */
     private DragListener _dragListener = null;
 
     /** The component that currently has key focus - key events will be sent to this component. */
     private UIComponent _focusedComponent = null;
+
+    /**
+     * List of hud listeners.
+     */
+    private final List<HudListener> _hudListeners = Lists.newArrayList();
 
     /**
      * Construct a new UIHud
@@ -137,6 +144,9 @@ public class UIHud extends Node {
     public void add(final UIComponent component) {
         attachChild(component);
         component.attachedToHud();
+        for (final HudListener hl : _hudListeners) {
+            hl.componentAdded(component);
+        }
     }
 
     /**
@@ -148,6 +158,9 @@ public class UIHud extends Node {
     public void remove(final UIComponent component) {
         component.detachedFromHud();
         detachChild(component);
+        for (final HudListener hl : _hudListeners) {
+            hl.componentRemoved(component);
+        }
     }
 
     /**
@@ -192,7 +205,7 @@ public class UIHud extends Node {
         UIComponent ret = null;
         UIComponent found = null;
 
-        for (int i = 0; i < getNumberOfChildren(); i++) {
+        for (int i = getNumberOfChildren(); --i >= 0;) {
             final Spatial s = getChild(i);
             if (s instanceof UIComponent) {
                 final UIComponent comp = (UIComponent) s;
@@ -201,6 +214,7 @@ public class UIHud extends Node {
 
                 if (ret != null) {
                     found = ret;
+                    break;
                 }
             }
         }
@@ -321,6 +335,27 @@ public class UIHud extends Node {
             }
         }
         return rVal;
+    }
+
+    /**
+     * Add the given hud listener to this hud.
+     * 
+     * @param listener
+     *            the listener to add
+     */
+    public void addHudListener(final HudListener listener) {
+        _hudListeners.add(listener);
+    }
+
+    /**
+     * Remove any matching hud listener from this hud.
+     * 
+     * @param listener
+     *            the listener to remove
+     * @return true if at least one "equal" HudListener was found in the pool of listeners and removed.
+     */
+    public boolean removeHudListener(final HudListener listener) {
+        return _hudListeners.remove(listener);
     }
 
     /**
