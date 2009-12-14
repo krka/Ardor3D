@@ -93,16 +93,16 @@ public abstract class AWTImageUtil {
                     for (int x = 0; x < width; x++) {
                         for (int y = 0; y < height; y++) {
                             index = (alpha ? 4 : 3) * (y * width + x);
-                            r = (int) (((data.get(index + 0))) * tRed);
-                            g = (int) (((data.get(index + 1))) * tGreen);
-                            b = (int) (((data.get(index + 2))) * tBlue);
+                            r = (int) Math.round(((data.get(index + 0)) & 0xFF) * tRed);
+                            g = (int) Math.round(((data.get(index + 1)) & 0xFF) * tGreen);
+                            b = (int) Math.round(((data.get(index + 2)) & 0xFF) * tBlue);
 
                             // convert to integer expression
-                            argb = ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+                            argb = (r << 16) | (g << 8) | (b);
 
                             // add alpha, if applicable
                             if (alpha) {
-                                a = (int) (((data.get(index + 3))) * tAlpha);
+                                a = (int) Math.round(((data.get(index + 3)) & 0xFF) * tAlpha);
                                 argb |= (a & 0xFF) << 24;
                             }
 
