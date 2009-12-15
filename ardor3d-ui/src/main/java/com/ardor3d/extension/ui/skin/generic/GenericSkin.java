@@ -226,6 +226,7 @@ public class GenericSkin extends Skin {
     @Override
     protected void applyToButton(final UIButton component) {
 
+        component.setAlignment(Alignment.MIDDLE);
         component.setMargin(new Insets(1, 1, 1, 1));
         component.setPadding(new Insets(2, 14, 2, 14));
 
