@@ -88,7 +88,8 @@ public class ColladaMaterialUtils {
                         if ("color".equals(propertyValue.getName())) {
                             final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
                             mState.setDiffuse(color);
-                        } else if ("texture".equals(propertyValue.getName())) {
+                        } else if ("texture".equals(propertyValue.getName())
+                                && GlobalData.getInstance().getOptions().isLoadTextures()) {
                             TextureState tState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
                             if (tState == null) {
                                 tState = new TextureState();
@@ -231,7 +232,7 @@ public class ColladaMaterialUtils {
         Texture texture = null;
         if (surface == null && image != null) {
             // Only an image found (no sampler). Assume 2d texture. Load.
-            texture = ColladaMaterialUtils.loadTexture2D(image, min);
+            texture = GlobalData.getInstance().loadTexture2D(image.getChild("init_from").getText(), min);
         } else if (surface != null) {
             // We have a surface, pull images from that.
             if ("2D".equals(surface.getAttributeValue("type"))) {
@@ -254,7 +255,7 @@ public class ColladaMaterialUtils {
                 image = ColladaDOMUtil.findTargetWithId("#" + lowest.getText());
                 // image = (DaeImage) root.resolveUrl("#" + lowest.getValue());
                 if (image != null) {
-                    texture = ColladaMaterialUtils.loadTexture2D(image, min);
+                    texture = GlobalData.getInstance().loadTexture2D(image.getChild("init_from").getText(), min);
                 }
 
                 // TODO: add support for mip map levels other than 0.
@@ -278,10 +279,6 @@ public class ColladaMaterialUtils {
         }
 
         return texture;
-    }
-
-    private static Texture loadTexture2D(final Element image, final MinificationFilter minFilter) {
-        return GlobalData.getInstance().loadTexture2D(image.getChild("init_from").getText(), minFilter);
     }
 
     private static void applySampler(final Element sampler, final Texture texture) {

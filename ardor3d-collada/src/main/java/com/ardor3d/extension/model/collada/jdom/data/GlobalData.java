@@ -22,6 +22,7 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,6 +51,7 @@ public final class GlobalData {
     private final Multimap<Element, MeshVertPairs> _vertMappings;
 
     private final ColladaStorage _storage;
+    private ColladaOptions _options;
 
     private static class ThreadLocalGlobalData extends ThreadLocal<GlobalData> {
         @Override
@@ -108,7 +110,13 @@ public final class GlobalData {
             return _textures.get(path);
         }
 
-        final Texture texture = TextureManager.load(path, minFilter, Format.Guess, true);
+        final Texture texture;
+        if (!getOptions().hasTextureLocator()) {
+            texture = TextureManager.load(path, minFilter, Format.Guess, true);
+        } else {
+            final ResourceSource source = getOptions().getTextureLocator().locateResource(path);
+            texture = TextureManager.load(source, minFilter, Format.Guess, true);
+        }
         _textures.put(path, texture);
 
         return texture;
@@ -160,5 +168,13 @@ public final class GlobalData {
 
     public ColladaStorage getColladaStorage() {
         return _storage;
+    }
+
+    public void setOptions(final ColladaOptions options) {
+        _options = options;
+    }
+
+    public ColladaOptions getOptions() {
+        return _options;
     }
 }

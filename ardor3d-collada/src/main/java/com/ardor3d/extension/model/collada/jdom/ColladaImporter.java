@@ -26,6 +26,7 @@ import org.jdom.input.SAXHandler;
 import org.xml.sax.SAXException;
 
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaOptions;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.GlobalData;
 import com.ardor3d.scenegraph.Node;
@@ -36,6 +37,24 @@ import com.ardor3d.util.resource.ResourceSource;
 public class ColladaImporter {
 
     /**
+     * Constructs a new ColladaImporter using default option values.
+     */
+    public ColladaImporter() {
+        // Set our default options
+        this(new ColladaOptions());
+    }
+
+    /**
+     * Constructs a new ColladaImporter using given option values.
+     * 
+     * @param options
+     *            options to use during import
+     */
+    public ColladaImporter(final ColladaOptions options) {
+        GlobalData.getInstance().setOptions(options);
+    }
+
+    /**
      * Reads a Collada file from the given resource and returns it as a ColladaStorage object.
      * 
      * @param resource
@@ -44,7 +63,12 @@ public class ColladaImporter {
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
      */
     public ColladaStorage readColladaFile(final String resource) {
-        final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
+        final ResourceSource source;
+        if (!GlobalData.getInstance().getOptions().hasModelLocator()) {
+            source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
+        } else {
+            source = GlobalData.getInstance().getOptions().getModelLocator().locateResource(resource);
+        }
 
         if (source == null) {
             throw new Error("Unable to locate '" + resource + "'");
@@ -65,9 +89,17 @@ public class ColladaImporter {
             // Pull in the DOM tree of the Collada resource.
             final Element collada = readCollada(resource);
 
-            // add a temporary texture locator at the location of this model resource..
-            final RelativeResourceLocator loc = new RelativeResourceLocator(resource);
-            ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+            // if we don't specify a texture locator, add a temporary texture locator at the location of this model
+            // resource..
+            final boolean addLocator = !GlobalData.getInstance().getOptions().hasTextureLocator();
+
+            final RelativeResourceLocator loc;
+            if (addLocator) {
+                loc = new RelativeResourceLocator(resource);
+                ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+            } else {
+                loc = null;
+            }
 
             final AssetData assetData = ColladaNodeUtils.parseAsset(collada.getChild("asset"));
 
@@ -86,8 +118,10 @@ public class ColladaImporter {
             // Drop caches, etc. after import.
             GlobalData.disposeInstance();
 
-            // drop our added locator.
-            ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+            // drop our added locator if needed.
+            if (addLocator) {
+                ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
+            }
 
             // return storage
             return storage;
