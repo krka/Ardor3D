@@ -275,8 +275,6 @@ public class BloomRenderPass extends Pass {
             return;
         }
 
-        resetParameters();
-
         // Create texture renderers and rendertextures(alternating between two not to overwrite pbuffers)
         final DisplaySettings settings = new DisplaySettings(cam.getWidth() / renderScale, cam.getHeight()
                 / renderScale, 24, 0, 0, 8, 0, 0, false, false);
