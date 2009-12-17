@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;

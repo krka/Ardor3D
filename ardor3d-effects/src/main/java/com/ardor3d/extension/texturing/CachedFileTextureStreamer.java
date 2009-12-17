@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.extension.terrain.TexturedGeometryClipmapTerrain;
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.function.Function3D;
+import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;

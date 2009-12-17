@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 /**
  * Simple interface describing a function that receives a 3 value tuple and returns a value.

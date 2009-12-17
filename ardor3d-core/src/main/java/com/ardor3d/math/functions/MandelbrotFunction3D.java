@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 /**
  * A function that returns the famous Mandelbrot set. This is not really 3d... The z factor is ignored.

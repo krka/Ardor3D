@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 import java.util.ArrayList;
 import java.util.List;

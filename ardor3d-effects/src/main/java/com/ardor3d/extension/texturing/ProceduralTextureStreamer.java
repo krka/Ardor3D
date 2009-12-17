@@ -13,7 +13,7 @@ package com.ardor3d.extension.texturing;
 import java.nio.ByteBuffer;
 
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.function.Function3D;
+import com.ardor3d.math.functions.Function3D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class ProceduralTextureStreamer implements TextureStreamer {

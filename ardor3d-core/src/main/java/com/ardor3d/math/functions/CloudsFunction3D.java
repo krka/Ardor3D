@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 /**
  * A variation of fBm that uses absolute value to recast the extreme ends to the upper range and values near 0 to the

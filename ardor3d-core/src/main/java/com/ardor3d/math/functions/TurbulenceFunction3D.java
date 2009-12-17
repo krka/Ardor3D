@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 /**
  * Function that uses a fBm function to distort incoming coordinates on each of the 3 axis before feeding them to a

@@ -11,7 +11,7 @@
 package com.ardor3d.extension.terrain.procedural;
 
 import com.ardor3d.extension.terrain.Heightmap;
-import com.ardor3d.math.function.Function3D;
+import com.ardor3d.math.functions.Function3D;
 
 public class ProceduralHeightmap implements Heightmap {
 

@@ -8,7 +8,7 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.math.function;
+package com.ardor3d.math.functions;
 
 /**
  * An implementation of Fractional Brownian Motion (fBm), with configurable persistence and lacunarity (or tightness of
