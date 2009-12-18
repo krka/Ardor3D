@@ -48,7 +48,7 @@ public class CurveInterpolationController extends Vector3InterpolationController
     protected ReadOnlyVector3 getControlPointStart() {
         ReadOnlyVector3 control = null;
 
-        final int fromIndex = getControls().indexOf(getControlFrom());
+        final int fromIndex = getIndex();
 
         switch (getRepeatType()) {
             case CLAMP:
@@ -57,26 +57,14 @@ public class CurveInterpolationController extends Vector3InterpolationController
 
             case CYCLE:
                 if (isCycleForward()) {
-                    if (fromIndex == getMinimumIndex()) {
-                        control = getControls().get(fromIndex + 1);
-                    } else {
-                        control = getControls().get(fromIndex - 1);
-                    }
+                    control = getControls().get(fromIndex - 1);
                 } else {
-                    if (fromIndex == getMaximumIndex()) {
-                        control = getControls().get(fromIndex - 1);
-                    } else {
-                        control = getControls().get(fromIndex + 1);
-                    }
+                    control = getControls().get(fromIndex + 1);
                 }
                 break;
 
             case WRAP:
-                if (fromIndex == getMaximumIndex()) {
-                    control = getControls().get(getMaximumIndex() + 1);
-                } else {
-                    control = getControls().get(fromIndex - 1);
-                }
+                control = getControls().get(fromIndex - 1);
                 break;
         }
 
@@ -89,7 +77,7 @@ public class CurveInterpolationController extends Vector3InterpolationController
     protected ReadOnlyVector3 getCotnrolPointEnd() {
         ReadOnlyVector3 control = null;
 
-        final int toIndex = getControls().indexOf(getControlTo());
+        final int toIndex = getIndex() + 1;
 
         switch (getRepeatType()) {
             case CLAMP:
@@ -98,27 +86,14 @@ public class CurveInterpolationController extends Vector3InterpolationController
 
             case CYCLE:
                 if (isCycleForward()) {
-                    if (toIndex == getMaximumIndex()) {
-                        control = getControls().get(toIndex - 1);
-                    } else {
-                        control = getControls().get(toIndex + 1);
-                    }
-
+                    control = getControls().get(toIndex + 1);
                 } else {
-                    if (toIndex == getMinimumIndex()) {
-                        control = getControls().get(toIndex + 1);
-                    } else {
-                        control = getControls().get(toIndex - 1);
-                    }
+                    control = getControls().get(toIndex - 1);
                 }
                 break;
 
             case WRAP:
-                if (toIndex == getMinimumIndex()) {
-                    control = getControls().get(toIndex + 1);
-                } else {
-                    control = getControls().get(toIndex + 1);
-                }
+                control = getControls().get(toIndex + 1);
                 break;
         }
 

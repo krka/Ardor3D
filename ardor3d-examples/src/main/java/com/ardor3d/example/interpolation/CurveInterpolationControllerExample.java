@@ -10,13 +10,14 @@
 
 package com.ardor3d.example.interpolation;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.controller.interpolation.CurveInterpolationController;
 import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationController.UpdateField;
@@ -41,28 +42,34 @@ public class CurveInterpolationControllerExample extends InterpolationController
     @Override
     protected CurveInterpolationController createController() {
         // Create our control point vectors
-        final Vector3[] vectors = { new Vector3(15, 0, -10), //
-                new Vector3(35, -10, -20), //
+        final ReadOnlyVector3[] vectors = { new Vector3(10, 10, 10), //
+                new Vector3(0, 10, 0), //
                 new Vector3(-5, 0, -30), //
                 new Vector3(-15, 20, -40), //
                 new Vector3(0, 0, 20), //
-                new Vector3(20, 30, -80), //
-                new Vector3(15, 0, -10) };
+                new Vector3(10, 0, 0), //
+                new Vector3(10, 10, 10), // 
+                new Vector3(0, 10, 0), //
+                new Vector3(-5, 0, -30) };
 
-        final List<ReadOnlyVector3> controls = new ArrayList<ReadOnlyVector3>(vectors.length);
-        for (final Vector3 v : vectors) {
-            controls.add(v);
-        }
+        final List<ReadOnlyVector3> controls = Arrays.asList(vectors);
 
         // Create our curve from the control points and a spline
         final Curve curve = new Curve(controls, new CatmullRomSpline());
 
         // Create a line from the curve so its easy to check the box is following it
-        _root.attachChild(curve.toRenderableLine(50));
+        final Line line = curve.toRenderableLine(50);
+        line.setRandomColors();
+
+        _root.attachChild(line);
 
         // Create points from the curve so the actual control points can be easily seen
-        final Point point = curve.toRenderablePoint(true);
+        final Point point = curve.toRenderablePoint(2);
         point.setPointSize(10f);
+
+        // Create some points from our vectors
+        // final Point point = new Point("point", vectors, null, null, null);
+        // point.setPointSize(10f);
 
         _root.attachChild(point);
 
@@ -70,8 +77,8 @@ public class CurveInterpolationControllerExample extends InterpolationController
         final CurveInterpolationController controller = new CurveInterpolationController();
         controller.setCurve(curve);
         controller.setActive(true);
-        controller.setMaxTime(5);
         controller.setUpdateField(UpdateField.LOCAL_TRANSLATION);
+        controller.setSpeed(0.2);
 
         return controller;
     }

@@ -44,7 +44,6 @@ public class QuaternionInterpolationControllerExample extends
         final QuaternionInterpolationController controller = new QuaternionInterpolationController();
         controller.setControls(quats);
         controller.setActive(true);
-        controller.setMaxTime(5);
 
         return controller;
     }

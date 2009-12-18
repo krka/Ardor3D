@@ -43,7 +43,7 @@ public abstract class Vector3InterpolationController extends InterpolationContro
 
     /**
      * Interpolates between the given vectors using the
-     * {@link #interpolateVectors(ReadOnlyVector3, ReadOnlyVector3, double, ReadOnlyVector3)} to perform the actual
+     * {@link #interpolateVectors(ReadOnlyVector3, ReadOnlyVector3, double, Vector3)} to perform the actual
      * interpolation.
      */
     @Override

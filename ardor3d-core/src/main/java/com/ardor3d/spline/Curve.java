@@ -8,13 +8,8 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-/**
- * 
- */
-
 package com.ardor3d.spline;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.ardor3d.math.ColorRGBA;
@@ -56,30 +51,34 @@ public class Curve {
      * Creates a new <code>Point</code> from the control points making up this curve. It will have the name
      * <code>point</code>, no normals, colour or texture, these can be added to the returned point if needed.
      * 
-     * @param includeEndPoints
-     *            <code>true</code> to include the first and last points (which aren't actually part of the curve, they
-     *            are just used as controls to interpolate the first/last points correctly)
+     * @param steps
+     *            The number of iterations to perform between control points, the higher this number the more points
+     *            will be shown, but it will also contain more vertices, must be greater than one.
      * @return A <code>Point</code> containing all the curve points, will not be <code>null</code>.
      */
-    public Point toRenderablePoint(final boolean includeEndPoints) {
-        final Collection<ReadOnlyVector3> points = getControlPoints();
+    public Point toRenderablePoint(final int steps) {
+        return toRenderablePoint(1, getControlPointCount() - 2, steps);
+    }
 
-        final int size = includeEndPoints ? points.size() : points.size() - 2;
+    /**
+     * Creates a new <code>Point</code> from the given control point indices. It will have the name <code>point</code>,
+     * no normals, colour or texture, these can be added to the returned point if needed.
+     * 
+     * @param start
+     *            The index of the control point to start from, must be greater than or equal to one and less than
+     *            <code>end</code>.
+     * @param end
+     *            The index of the control point to end with, must be less than {@link #getControlPointCount()
+     *            controlPointCount} minus one and greater than <code>start</code>.
+     * @param steps
+     *            The number of iterations to perform between control points, the higher this number the more points
+     *            will be shown, but it will also contain more vertices, must be greater than one.
+     * @return A <code>Point</code> containing all the curve points, will not be <code>null</code>.
+     */
+    public Point toRenderablePoint(final int start, final int end, final int steps) {
+        final Vector3[] points = toVector3(start, end, steps);
 
-        Vector3[] allPoints = new Vector3[points.size()];
-        Vector3[] pointsArray;
-
-        allPoints = points.toArray(allPoints);
-
-        if (includeEndPoints) {
-            pointsArray = allPoints;
-        } else {
-            pointsArray = new Vector3[size];
-
-            System.arraycopy(allPoints, 1, pointsArray, 0, size);
-        }
-
-        return new Point("point", pointsArray, null, null, null);
+        return new Point("point", points, null, null, null);
     }
 
     /**
@@ -89,40 +88,92 @@ public class Curve {
      * @param steps
      *            The number of iterations to perform between control points, the higher this number the smoother the
      *            returned line will be, but it will also contain more vertices, must be greater than one.
-     * @throws IllegalArgumentException
-     *             If steps <= 1.
      * @return A <code>Line</code> representing this curve, will not be <code>null</code>.
      */
     public Line toRenderableLine(final int steps) {
-        if (steps <= 0) {
-            throw new IllegalArgumentException("steps must be > 1! steps=" + steps);
-        }
+        return toRenderableLine(1, getControlPointCount() - 2, steps);
+    }
 
-        final int vertices = (getControlPoints().size() * steps) - (3 * steps);
-
-        final Vector3[] vertex = new Vector3[vertices];
+    /**
+     * Creates a new <code>Line</code> from the given control point indices. It will have the name <code>curve</code>,
+     * no normals, colour or texture, these can be added to the returned line if needed.
+     * 
+     * @param start
+     *            The index of the control point to start from, must be greater than or equal to one and less than
+     *            <code>end</code>.
+     * @param end
+     *            The index of the control point to end with, must be less than {@link #getControlPointCount()
+     *            controlPointCount} minus one and greater than <code>start</code>.
+     * @param steps
+     *            The number of iterations to perform between control points, the higher this number the smoother the
+     *            returned line will be, but it will also contain more vertices, must be greater than one.
+     * @return A <code>Line</code> representing this curve, will not be <code>null</code>.
+     */
+    public Line toRenderableLine(final int start, final int end, final int steps) {
+        final Vector3[] vertex = toVector3(start, end, steps);
         final Vector3[] normal = null;
         final ColorRGBA[] color = null;
         final Vector2[] texture = null;
 
-        int index = 0;
+        final Line line = new Line("curve", vertex, normal, color, texture);
 
-        for (int i = 0; i < vertices; i++) {
-            final int is = i % steps;
+        line.getMeshData().setIndexMode(IndexMode.LineStrip);
 
-            if (0 == is && i > 0) {
-                index++;
-            }
+        return line;
+    }
 
-            final double t = is / (steps - 1.0);
+    /**
+     * Calculates the length of this curve.
+     * <p>
+     * <strong>Important note:</strong><br />
+     * To calculate the length of a curve it must be interpolated (hence the steps parameter), this method will do this
+     * EVERY time it's called (creating a lot of garbage vectors in the process). This has been done for the sake of
+     * keeping this class simple and the code as readable as possible. Therefore the length should be manually cached
+     * somewhere in your code if it is going to be used repeatedly.
+     * </p>
+     * 
+     * @param steps
+     *            The number of iterations to perform between control points, the higher this number the smoother the
+     *            returned line will be, but it will also contain more vertices, must be greater than one.
+     * @return The length of this curve.
+     * @see #getLength(int, int, int)
+     */
+    public double getLength(final int steps) {
+        return getLength(1, getControlPointCount() - 2, steps);
+    }
 
-            vertex[i] = getSpline().interpolate(getControlPoints().get(index), getControlPoints().get(index + 1),
-                    getControlPoints().get(index + 2), getControlPoints().get(index + 3), t);
+    /**
+     * Calculates the length between the given control point indices.
+     * 
+     * @param start
+     *            The index of the control point to start from, must be greater than or equal to one and less than
+     *            <code>end</code>.
+     * @param end
+     *            The index of the control point to end with, must be less than {@link #getControlPointCount()
+     *            controlPointCount} minus one and greater than <code>start</code>.
+     * @param steps
+     *            The number of iterations to perform between control points, the higher this number the smoother the
+     *            returned line will be, but it will also contain more vertices, must be greater than one.
+     * @return The length between the given control points.
+     * @see #getLength(int)
+     */
+    public double getLength(final int start, final int end, final int steps) {
+        double length = 0.0;
+
+        final Vector3[] vectors = toVector3(start, end, steps);
+
+        for (int i = 0; i < (vectors.length - 1); i++) {
+            length += vectors[i].distance(vectors[i + 1]);
         }
 
-        final Line line = new Line("curve", vertex, normal, color, texture);
-        line.getMeshData().setIndexMode(IndexMode.LineStrip);
-        return line;
+        return length;
+    }
+
+    /**
+     * @return The number of control points in this curve.
+     */
+    public int getControlPointCount() {
+        return getControlPoints().size();
     }
 
     /**
@@ -172,6 +223,54 @@ public class Curve {
      * @see #setSpline(Spline)
      */
     public Spline getSpline() {
+        assert (null != _spline) : "_spline was null, it must be set before use!";
+
         return _spline;
+    }
+
+    /**
+     * Interpolates the curve and returns an array of vectors.
+     */
+    private Vector3[] toVector3(final int start, final int end, final int steps) {
+        if (start <= 0) {
+            throw new IllegalArgumentException("start must be > 0! start=" + start);
+        }
+        if (end >= (getControlPointCount() - 1)) {
+            throw new IllegalArgumentException("end must be < " + (getControlPointCount() - 1) + "! end=" + end);
+        }
+        if (start >= end) {
+            throw new IllegalArgumentException("start must be < end! start=" + start + ", end=" + end);
+        }
+        if (steps <= 1) {
+            throw new IllegalArgumentException("steps must be >= 1! steps=" + steps);
+        }
+
+        final List<ReadOnlyVector3> controlPoints = getControlPoints();
+
+        final int count = (end - start) * steps;
+
+        final Vector3[] vectors = new Vector3[count];
+
+        int index = start;
+
+        for (int i = 0; i < count; i++) {
+            final int is = i % steps;
+
+            if (0 == is && i >= steps) {
+                index++;
+            }
+
+            final double t = is / (steps - 1.0);
+
+            final int p0 = index - 1;
+            final int p1 = index;
+            final int p2 = index + 1;
+            final int p3 = index + 2;
+
+            vectors[i] = getSpline().interpolate(controlPoints.get(p0), controlPoints.get(p1), controlPoints.get(p2),
+                    controlPoints.get(p3), t);
+        }
+
+        return vectors;
     }
 }

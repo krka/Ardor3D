@@ -60,7 +60,6 @@ public class LinearVector3InterpolationControllerExample extends
         final LinearVector3InterpolationController controller = new LinearVector3InterpolationController();
         controller.setControls(vectors);
         controller.setActive(true);
-        controller.setMaxTime(5);
         controller.setUpdateField(UpdateField.LOCAL_TRANSLATION);
 
         return controller;

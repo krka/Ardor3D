@@ -10,7 +10,7 @@
 
 package com.ardor3d.scenegraph.controller.interpolation;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ardor3d.scenegraph.Spatial;
@@ -34,6 +34,12 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
     /** Serial UID */
     private static final long serialVersionUID = 1L;
 
+    /** The minimum allowed delta */
+    private static final double DELTA_MIN = 0.0;
+
+    /** The maximum allowed delta */
+    private static final double DELTA_MAX = 1.0;
+
     /** @see #setControls(List) */
     private List<C> _controls = null;
 
@@ -41,7 +47,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
     private int _index = getMinimumIndex();
 
     /** @see #setDelta(double) */
-    private double _delta = 0.0;
+    private double _delta = DELTA_MIN;
 
     /** @see #setCycleForward(boolean) */
     private boolean _cycleForward = true;
@@ -64,9 +70,8 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
     /**
      * Interpolates on the set {@link #getControls() controls}.
      * <p>
-     * It will only update the given object if this controller is {@link #isActive() active}, its {@link #getSpeed()
-     * speed} is greater than zero, its {@link #getMaxTime() max time} is greater than zero and caller isn't
-     * <code>null</code>.
+     * It will only update the given object if this controller is {@link #isActive() active}, caller isn't
+     * <code>null</code> and it's {@link #getSpeed() speed} is greater than zero.
      * </p>
      * 
      * @param time
@@ -76,15 +81,14 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      */
     @Override
     public void update(final double time, final T caller) {
-        if (isActive() && getSpeed() > 0.0 && getMaxTime() > 0.0 && null != caller) {
+        if (isActive() && null != caller && getSpeed() > 0.0) {
 
-            /* Adjust the time based on the speed */
-            final double speedAdjustedTime = getMaxTime() / getSpeed();
+            updateDeltaAndIndex(time);
 
-            updateInternal(time, speedAdjustedTime);
-
-            assert (getDelta() >= 0.0) : "delta is less than 0.0, updateInternal() has probably been overriden incorrectly";
-            assert (getDelta() <= 1.0) : "delta is greater than 1.0, updateInternal() has probably been overriden incorrectly";
+            assert (getDelta() >= DELTA_MIN) : "delta is less than " + DELTA_MIN
+                    + ", updateDeltaAndIndex() has probably been overriden incorrectly";
+            assert (getDelta() <= DELTA_MAX) : "delta is greater than " + DELTA_MAX
+                    + ", updateDeltaAndIndex() has probably been overriden incorrectly";
 
             clampIndex();
 
@@ -135,16 +139,8 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
         if (null == controlArray) {
             throw new IllegalArgumentException("controlArray can not be null!");
         }
-        if (controlArray.length == 0) {
-            throw new IllegalArgumentException("controlArray can not be length 0!");
-        }
 
-        final List<C> controls = new ArrayList<C>(controlArray.length);
-        for (final C value : controlArray) {
-            controls.add(value);
-        }
-
-        _controls = controls;
+        setControls(Arrays.<C> asList(controlArray));
     }
 
     /**
@@ -163,17 +159,14 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      * 
      * @param time
      *            The raw time since this was last called.
-     * @param speedAdjustedTime
-     *            The time adjusted by the speed.
      */
-    protected void updateInternal(final double time, final double speedAdjustedTime) {
-        /* Calculate the distance between controls */
-        incrementDelta((1.0 / speedAdjustedTime) * time);
+    protected void updateDeltaAndIndex(final double time) {
+        incrementDelta(getSpeed() * time);
 
-        /* If > 1 then we need to start interpolating between next set of points */
-        if (getDelta() >= 1.0) {
+        /* If >= DELTA_MAX then we need to start interpolating between next set of points */
+        if (getDelta() >= DELTA_MAX) {
             /* Adjust delta for new set of points */
-            decrementDelta(1.0);
+            decrementDelta(DELTA_MAX);
 
             /* Increment/decrement current index based on whether we are cycling forward or backwards */
             if (isCycleForward()) {
@@ -199,7 +192,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
                 if (getIndex() >= getMaximumIndex()) {
                     /* Clamp these just to be on the safe side (overflow) */
                     setIndex(getMaximumIndex());
-                    setDelta(1.0);
+                    setDelta(DELTA_MAX);
                 }
                 break;
 
@@ -216,7 +209,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
                 break;
 
             case WRAP:
-                if (getIndex() > getMaximumIndex()) {
+                if (getIndex() >= getMaximumIndex()) {
                     setIndex(getMinimumIndex());
                 }
                 break;
@@ -280,11 +273,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
                 break;
 
             case WRAP:
-                if (getIndex() == getMaximumIndex()) {
-                    to = getControls().get(getMinimumIndex());
-                } else {
-                    to = getControls().get(getIndex() + 1);
-                }
+                to = getControls().get(getIndex() + 1);
                 break;
         }
 
@@ -410,7 +399,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      */
     public void reset() {
         setCycleForward(true);
-        setDelta(0.0);
+        setDelta(DELTA_MIN);
         setIndex(getMinimumIndex());
     }
 

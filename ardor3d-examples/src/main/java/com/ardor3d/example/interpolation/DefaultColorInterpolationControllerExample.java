@@ -41,7 +41,7 @@ public class DefaultColorInterpolationControllerExample extends
         final DefaultColorInterpolationController controller = new DefaultColorInterpolationController();
         controller.setControls(colors);
         controller.setActive(true);
-        controller.setMaxTime(5);
+        controller.setSpeed(0.5);
 
         return controller;
     }
