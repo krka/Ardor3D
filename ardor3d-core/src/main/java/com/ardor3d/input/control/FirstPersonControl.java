@@ -34,6 +34,8 @@ public class FirstPersonControl {
     private double _keyRotateSpeed = 2.25;
     private final Matrix3 _workerMatrix = new Matrix3();
     private final Vector3 _workerStoreA = new Vector3();
+    private InputTrigger _mouseTrigger;
+    private InputTrigger _keyTrigger;
 
     public FirstPersonControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -150,20 +152,39 @@ public class FirstPersonControl {
 
     /**
      * @param layer
+     *            the logical layer to register with
      * @param upAxis
+     *            the up axis of the camera
      * @param dragOnly
+     *            if true, mouse input will only rotate the camera if one of the mouse buttons (left, center or right)
+     *            is down.
      * @return a new FirstPersonControl object
      */
     public static FirstPersonControl setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis,
             final boolean dragOnly) {
 
         final FirstPersonControl control = new FirstPersonControl(upAxis);
-        control.setupMouseTriggers(layer, dragOnly, control.setupKeyboardTriggers(layer));
+        control.setupKeyboardTriggers(layer);
+        control.setupMouseTriggers(layer, dragOnly);
         return control;
     }
 
-    public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly,
-            final Predicate<TwoInputStates> keysHeld) {
+    /**
+     * Deregister the triggers of the given FirstPersonControl from the given LogicalLayer.
+     * 
+     * @param layer
+     * @param control
+     */
+    public static void removeTriggers(final LogicalLayer layer, final FirstPersonControl control) {
+        if (control._mouseTrigger != null) {
+            layer.deregisterTrigger(control._mouseTrigger);
+        }
+        if (control._keyTrigger != null) {
+            layer.deregisterTrigger(control._keyTrigger);
+        }
+    }
+
+    public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
         final FirstPersonControl control = this;
         // Mouse look
         final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
@@ -178,7 +199,9 @@ public class FirstPersonControl {
                 }
             }
         };
-        layer.registerTrigger(new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction));
+
+        _mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
+        layer.registerTrigger(_mouseTrigger);
     }
 
     public Predicate<TwoInputStates> setupKeyboardTriggers(final LogicalLayer layer) {
@@ -204,7 +227,16 @@ public class FirstPersonControl {
                 control.move(source.getCanvasRenderer().getCamera(), inputStates.getCurrent().getKeyboardState(), tpf);
             }
         };
-        layer.registerTrigger(new InputTrigger(keysHeld, moveAction));
+        _keyTrigger = new InputTrigger(keysHeld, moveAction);
+        layer.registerTrigger(_keyTrigger);
         return keysHeld;
+    }
+
+    public InputTrigger getKeyTrigger() {
+        return _keyTrigger;
+    }
+
+    public InputTrigger getMouseTrigger() {
+        return _mouseTrigger;
     }
 }
