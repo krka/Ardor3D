@@ -33,15 +33,18 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.resource.RelativeResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
+import com.google.inject.Inject;
 
 public class ColladaImporter {
+
+    private ColladaOptions _options;
 
     /**
      * Constructs a new ColladaImporter using default option values.
      */
     public ColladaImporter() {
         // Set our default options
-        this(new ColladaOptions());
+        setOptions(new ColladaOptions());
     }
 
     /**
@@ -50,8 +53,9 @@ public class ColladaImporter {
      * @param options
      *            options to use during import
      */
+    @Inject
     public ColladaImporter(final ColladaOptions options) {
-        GlobalData.getInstance().setOptions(options);
+        setOptions(options);
     }
 
     /**
@@ -64,10 +68,10 @@ public class ColladaImporter {
      */
     public ColladaStorage readColladaFile(final String resource) {
         final ResourceSource source;
-        if (!GlobalData.getInstance().getOptions().hasModelLocator()) {
+        if (!getOptions().hasModelLocator()) {
             source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
         } else {
-            source = GlobalData.getInstance().getOptions().getModelLocator().locateResource(resource);
+            source = getOptions().getModelLocator().locateResource(resource);
         }
 
         if (source == null) {
@@ -86,12 +90,15 @@ public class ColladaImporter {
      */
     public ColladaStorage readColladaFile(final ResourceSource resource) {
         try {
+            // Inject our options
+            GlobalData.getInstance().setOptions(getOptions());
+
             // Pull in the DOM tree of the Collada resource.
             final Element collada = readCollada(resource);
 
             // if we don't specify a texture locator, add a temporary texture locator at the location of this model
             // resource..
-            final boolean addLocator = !GlobalData.getInstance().getOptions().hasTextureLocator();
+            final boolean addLocator = !getOptions().hasTextureLocator();
 
             final RelativeResourceLocator loc;
             if (addLocator) {
@@ -331,6 +338,13 @@ public class ColladaImporter {
                 bufferType = BufferType.None;
             }
         }
+    }
 
+    public ColladaOptions getOptions() {
+        return _options;
+    }
+
+    public void setOptions(final ColladaOptions options) {
+        _options = options;
     }
 }

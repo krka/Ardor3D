@@ -67,10 +67,10 @@ public class ColladaMeshUtils {
             if (cMesh.getChild("polygons") != null) {
                 for (final Element p : (List<Element>) cMesh.getChildren("polygons")) {
                     final Mesh child = ColladaMeshUtils.buildMeshPolygons(colladaGeometry, p);
-                    if (child.getName() == null) {
-                        child.setName(meshNode.getName() + "_polygons");
-                    }
                     if (child != null) {
+                        if (child.getName() == null) {
+                            child.setName(meshNode.getName() + "_polygons");
+                        }
                         meshNode.attachChild(child);
                         hasChild = true;
                     }
@@ -79,10 +79,10 @@ public class ColladaMeshUtils {
             if (cMesh.getChild("polylist") != null) {
                 for (final Element p : (List<Element>) cMesh.getChildren("polylist")) {
                     final Mesh child = ColladaMeshUtils.buildMeshPolylist(colladaGeometry, p);
-                    if (child.getName() == null) {
-                        child.setName(meshNode.getName() + "_polylist");
-                    }
                     if (child != null) {
+                        if (child.getName() == null) {
+                            child.setName(meshNode.getName() + "_polylist");
+                        }
                         meshNode.attachChild(child);
                         hasChild = true;
                     }
@@ -91,10 +91,10 @@ public class ColladaMeshUtils {
             if (cMesh.getChild("triangles") != null) {
                 for (final Element t : (List<Element>) cMesh.getChildren("triangles")) {
                     final Mesh child = ColladaMeshUtils.buildMeshTriangles(colladaGeometry, t);
-                    if (child.getName() == null) {
-                        child.setName(meshNode.getName() + "_triangles");
-                    }
                     if (child != null) {
+                        if (child.getName() == null) {
+                            child.setName(meshNode.getName() + "_triangles");
+                        }
                         meshNode.attachChild(child);
                         hasChild = true;
                     }
@@ -103,10 +103,10 @@ public class ColladaMeshUtils {
             if (cMesh.getChild("lines") != null) {
                 for (final Element l : (List<Element>) cMesh.getChildren("lines")) {
                     final Line child = ColladaMeshUtils.buildMeshLines(colladaGeometry, l);
-                    if (child.getName() == null) {
-                        child.setName(meshNode.getName() + "_lines");
-                    }
                     if (child != null) {
+                        if (child.getName() == null) {
+                            child.setName(meshNode.getName() + "_lines");
+                        }
                         meshNode.attachChild(child);
                         hasChild = true;
                     }
