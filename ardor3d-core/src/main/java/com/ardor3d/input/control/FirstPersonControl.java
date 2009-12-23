@@ -192,10 +192,16 @@ public class FirstPersonControl {
         final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
+            private boolean firstPing = true;
+
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 final MouseState mouse = inputStates.getCurrent().getMouseState();
                 if (mouse.getDx() != 0 || mouse.getDy() != 0) {
-                    control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    if (!firstPing) {
+                        control.rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+                    } else {
+                        firstPing = false;
+                    }
                 }
             }
         };
