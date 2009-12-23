@@ -192,6 +192,7 @@ public class FirstPersonControl {
         final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), someMouseDown);
         final TriggerAction dragAction = new TriggerAction() {
 
+            // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
             private boolean firstPing = true;
 
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
