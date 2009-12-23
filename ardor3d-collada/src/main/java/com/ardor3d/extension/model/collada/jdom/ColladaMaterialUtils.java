@@ -68,104 +68,108 @@ public class ColladaMaterialUtils {
         if ("effect".equals(effectNode.getName())) {
             final Element effect = effectNode;
             // XXX: For now, just grab the common technique:
-            final Element technique = effect.getChild("profile_COMMON").getChild("technique");
-            if (technique.getChild("blinn") != null || technique.getChild("phong") != null
-                    || technique.getChild("lambert") != null) {
-                final Element blinnPhong = technique.getChild("blinn") != null ? technique.getChild("blinn")
-                        : technique.getChild("phong") != null ? technique.getChild("phong") : technique
-                                .getChild("lambert");
-                final MaterialState mState = new MaterialState();
+            if (effect.getChild("profile_COMMON") != null) {
+                final Element technique = effect.getChild("profile_COMMON").getChild("technique");
+                if (technique.getChild("blinn") != null || technique.getChild("phong") != null
+                        || technique.getChild("lambert") != null) {
+                    final Element blinnPhong = technique.getChild("blinn") != null ? technique.getChild("blinn")
+                            : technique.getChild("phong") != null ? technique.getChild("phong") : technique
+                                    .getChild("lambert");
+                    final MaterialState mState = new MaterialState();
 
-                Texture diffuseTexture = null;
-                ColorRGBA transparent = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-                float transparency = 1.0f;
-                boolean useTransparency = false;
-                String opaqueMode = "A_ONE";
+                    Texture diffuseTexture = null;
+                    ColorRGBA transparent = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
+                    float transparency = 1.0f;
+                    boolean useTransparency = false;
+                    String opaqueMode = "A_ONE";
 
-                for (final Element property : (List<Element>) blinnPhong.getChildren()) {
-                    if ("diffuse".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("color".equals(propertyValue.getName())) {
-                            final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
-                            mState.setDiffuse(color);
-                        } else if ("texture".equals(propertyValue.getName())
-                                && GlobalData.getInstance().getOptions().isLoadTextures()) {
-                            TextureState tState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
-                            if (tState == null) {
-                                tState = new TextureState();
-                                mesh.setRenderState(tState);
+                    for (final Element property : (List<Element>) blinnPhong.getChildren()) {
+                        if ("diffuse".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("color".equals(propertyValue.getName())) {
+                                final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
+                                mState.setDiffuse(color);
+                            } else if ("texture".equals(propertyValue.getName())
+                                    && GlobalData.getInstance().getOptions().isLoadTextures()) {
+                                TextureState tState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
+                                if (tState == null) {
+                                    tState = new TextureState();
+                                    mesh.setRenderState(tState);
+                                }
+                                diffuseTexture = ColladaMaterialUtils.populateTextureState(tState, propertyValue,
+                                        effect);
                             }
-                            diffuseTexture = ColladaMaterialUtils.populateTextureState(tState, propertyValue, effect);
-                        }
-                    } else if ("ambient".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("color".equals(propertyValue.getName())) {
-                            final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
-                            mState.setAmbient(color);
-                        }
-                    } else if ("transparent".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("color".equals(propertyValue.getName())) {
-                            transparent = ColladaDOMUtil.getColor(propertyValue.getText());
-                            // TODO: use this
-
-                            useTransparency = true;
-                        }
-                        opaqueMode = property.getAttributeValue("opaque", "A_ONE");
-                    } else if ("transparency".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("float".equals(propertyValue.getName())) {
-                            transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
-                            // TODO: use this
-
-                            useTransparency = true;
-                        }
-                    } else if ("emission".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("color".equals(propertyValue.getName())) {
-                            mState.setEmissive(ColladaDOMUtil.getColor(propertyValue.getText()));
-                        }
-                    } else if ("specular".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("color".equals(propertyValue.getName())) {
-                            mState.setSpecular(ColladaDOMUtil.getColor(propertyValue.getText()));
-                        }
-                    } else if ("shininess".equals(property.getName())) {
-                        final Element propertyValue = (Element) property.getChildren().get(0);
-                        if ("float".equals(propertyValue.getName())) {
-                            float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
-                            if (shininess >= 0.0f && shininess <= 1.0f) {
-                                final float oldShininess = shininess;
-                                shininess *= 128;
-                                ColladaMaterialUtils.logger.finest("Shininess - " + oldShininess
-                                        + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
-                            } else if (shininess < 0 || shininess > 128) {
-                                final float oldShininess = shininess;
-                                shininess = (float) MathUtils.clamp(shininess, 0, 128);
-                                ColladaMaterialUtils.logger.warning("Shininess must be between 0 and 128. Shininess "
-                                        + oldShininess + " was clamped to " + shininess);
+                        } else if ("ambient".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("color".equals(propertyValue.getName())) {
+                                final ColorRGBA color = ColladaDOMUtil.getColor(propertyValue.getText());
+                                mState.setAmbient(color);
                             }
-                            mState.setShininess(shininess);
+                        } else if ("transparent".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("color".equals(propertyValue.getName())) {
+                                transparent = ColladaDOMUtil.getColor(propertyValue.getText());
+                                // TODO: use this
+
+                                useTransparency = true;
+                            }
+                            opaqueMode = property.getAttributeValue("opaque", "A_ONE");
+                        } else if ("transparency".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("float".equals(propertyValue.getName())) {
+                                transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                                // TODO: use this
+
+                                useTransparency = true;
+                            }
+                        } else if ("emission".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("color".equals(propertyValue.getName())) {
+                                mState.setEmissive(ColladaDOMUtil.getColor(propertyValue.getText()));
+                            }
+                        } else if ("specular".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("color".equals(propertyValue.getName())) {
+                                mState.setSpecular(ColladaDOMUtil.getColor(propertyValue.getText()));
+                            }
+                        } else if ("shininess".equals(property.getName())) {
+                            final Element propertyValue = (Element) property.getChildren().get(0);
+                            if ("float".equals(propertyValue.getName())) {
+                                float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                                if (shininess >= 0.0f && shininess <= 1.0f) {
+                                    final float oldShininess = shininess;
+                                    shininess *= 128;
+                                    ColladaMaterialUtils.logger.finest("Shininess - " + oldShininess
+                                            + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
+                                } else if (shininess < 0 || shininess > 128) {
+                                    final float oldShininess = shininess;
+                                    shininess = (float) MathUtils.clamp(shininess, 0, 128);
+                                    ColladaMaterialUtils.logger
+                                            .warning("Shininess must be between 0 and 128. Shininess " + oldShininess
+                                                    + " was clamped to " + shininess);
+                                }
+                                mState.setShininess(shininess);
+                            }
                         }
                     }
+
+                    // XXX: There are some issues with clarity on how to use alpha blending in OpenGL FFP.
+                    // The best interpretation I have seen is that if transparent has a texture == diffuse,
+                    // Turn on alpha blending and use diffuse alpha.
+
+                    if (diffuseTexture != null && useTransparency) {
+                        final BlendState blend = new BlendState();
+                        blend.setBlendEnabled(true);
+                        blend.setTestEnabled(true);
+                        blend.setSourceFunction(SourceFunction.SourceAlpha);
+                        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
+                        mesh.setRenderState(blend);
+
+                        mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+                    }
+
+                    mesh.setRenderState(mState);
                 }
-
-                // XXX: There are some issues with clarity on how to use alpha blending in OpenGL FFP.
-                // The best interpretation I have seen is that if transparent has a texture == diffuse,
-                // Turn on alpha blending and use diffuse alpha.
-
-                if (diffuseTexture != null && useTransparency) {
-                    final BlendState blend = new BlendState();
-                    blend.setBlendEnabled(true);
-                    blend.setTestEnabled(true);
-                    blend.setSourceFunction(SourceFunction.SourceAlpha);
-                    blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
-                    mesh.setRenderState(blend);
-
-                    mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-                }
-
-                mesh.setRenderState(mState);
             }
         } else {
             ColladaMaterialUtils.logger.warning("material effect not found: "
