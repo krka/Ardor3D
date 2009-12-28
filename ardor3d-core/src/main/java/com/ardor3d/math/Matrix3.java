@@ -1115,6 +1115,15 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
+     * @return true if this Matrix is orthonormal - its rows are orthogonal, unit vectors.
+     */
+    public boolean isOrthonormal() {
+        final Matrix3 transposed = transpose(null);
+        final Matrix3 inverted = invert(null);
+        return transposed.equals(inverted);
+    }
+
+    /**
      * @return the string representation of this matrix.
      */
     @Override
@@ -1153,10 +1162,35 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     /**
      * @param o
      *            the object to compare for equality
-     * @return true if this matrix and the provided matrix have the same double values.
+     * @return true if this matrix and the provided matrix have the double values that are within the
+     *         MathUtils.ZERO_TOLERANCE.
      */
     @Override
     public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ReadOnlyMatrix3)) {
+            return false;
+        }
+        final ReadOnlyMatrix3 comp = (ReadOnlyMatrix3) o;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (Math.abs(getValue(i, j) - comp.getValue(i, j)) > MathUtils.ZERO_TOLERANCE) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param o
+     *            the object to compare for equality
+     * @return true if this matrix and the provided matrix have the exact same double values.
+     */
+    public boolean strictEquals(final Object o) {
         if (this == o) {
             return true;
         }

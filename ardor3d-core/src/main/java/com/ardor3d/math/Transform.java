@@ -811,27 +811,13 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      *             if matrix is null.
      */
     public Transform fromHomogeneousMatrix(final ReadOnlyMatrix4 matrix) {
-        return fromHomogeneousMatrix(matrix, false);
-    }
-
-    /**
-     * Reads in a 4x4 matrix as a 3x3 matrix and translation.
-     * 
-     * @param matrix
-     * @param orthonormal
-     *            true if the rotation portion of the given matrix is orthonormal
-     * @return this matrix for chaining.
-     * @throws NullPointerException
-     *             if matrix is null.
-     */
-    public Transform fromHomogeneousMatrix(final ReadOnlyMatrix4 matrix, final boolean orthonormal) {
         _matrix.set(matrix.getValue(0, 0), matrix.getValue(0, 1), matrix.getValue(0, 2), matrix.getValue(1, 0), matrix
                 .getValue(1, 1), matrix.getValue(1, 2), matrix.getValue(2, 0), matrix.getValue(2, 1), matrix.getValue(
                 2, 2));
         _translation.set(matrix.getValue(0, 3), matrix.getValue(1, 3), matrix.getValue(2, 3));
 
         _identity = false;
-        _rotationMatrix = orthonormal;
+        _rotationMatrix = _matrix.isOrthonormal();
         _uniformScale = false;
         return this;
     }
