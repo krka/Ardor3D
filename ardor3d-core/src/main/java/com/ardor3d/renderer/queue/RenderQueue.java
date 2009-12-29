@@ -29,15 +29,12 @@ public class RenderQueue {
     }
 
     private void setupDefaultBuckets() {
-        // Default these buckets to opaque queue functionality
-        final RenderBucket opaqueRenderBucket = new OpaqueRenderBucket(_renderer);
-        renderBuckets.put(RenderBucketType.PreBucket, opaqueRenderBucket);
-        renderBuckets.put(RenderBucketType.Shadow, opaqueRenderBucket);
-        renderBuckets.put(RenderBucketType.PostBucket, opaqueRenderBucket);
-
+        renderBuckets.put(RenderBucketType.PreBucket, new OpaqueRenderBucket(_renderer));
+        renderBuckets.put(RenderBucketType.Shadow, new OpaqueRenderBucket(_renderer));
         renderBuckets.put(RenderBucketType.Opaque, new OpaqueRenderBucket(_renderer));
         renderBuckets.put(RenderBucketType.Transparent, new TransparentRenderBucket(_renderer));
         renderBuckets.put(RenderBucketType.Ortho, new OrthoRenderBucket(_renderer));
+        renderBuckets.put(RenderBucketType.PostBucket, new OpaqueRenderBucket(_renderer));
     }
 
     public void setRenderBucket(final RenderBucketType type, final RenderBucket renderBucket) {
