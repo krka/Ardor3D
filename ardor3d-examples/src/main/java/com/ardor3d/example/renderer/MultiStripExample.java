@@ -40,7 +40,7 @@ public class MultiStripExample extends ExampleBase {
     protected void processPicks(final PrimitivePickResults pickResults) {
         int i = 0;
         while (pickResults.getNumber() > 0
-                && pickResults.getPickData(i).getIntersectionRecord().getNumberOfIntersection() == 0
+                && pickResults.getPickData(i).getIntersectionRecord().getNumberOfIntersections() == 0
                 && ++i < pickResults.getNumber()) {
         }
         if (pickResults.getNumber() > i) {

@@ -116,6 +116,5 @@ public class TestRay {
 
         pickRay = new Ray3(new Vector3(0, -3, 0), new Vector3(0, 1, 0));
         assertTrue(pickRay.intersects(plane, intersectionPoint));
-
     }
 }

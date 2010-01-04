@@ -46,7 +46,7 @@ public class IntersectionRecord {
      * 
      * @return the number of intersections that occurred.
      */
-    public int getNumberOfIntersection() {
+    public int getNumberOfIntersections() {
         if (_points == null) {
             return 0;
         }

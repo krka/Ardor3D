@@ -546,10 +546,10 @@ public class OrientedBoundingBox extends BoundingVolume {
         int i;
 
         // convenience variables
-        final Vector3 akA[] = new Vector3[] { box0.getXAxis(), box0.getYAxis(), box0.getZAxis() };
-        final Vector3[] akB = new Vector3[] { box1.getXAxis(), box1.getYAxis(), box1.getZAxis() };
-        final Vector3 afEA = box0._extent;
-        final Vector3 afEB = box1._extent;
+        final ReadOnlyVector3 akA[] = new ReadOnlyVector3[] { box0.getXAxis(), box0.getYAxis(), box0.getZAxis() };
+        final ReadOnlyVector3[] akB = new ReadOnlyVector3[] { box1.getXAxis(), box1.getYAxis(), box1.getZAxis() };
+        final ReadOnlyVector3 afEA = box0._extent;
+        final ReadOnlyVector3 afEB = box1._extent;
 
         // compute difference of box centers, D = C1-C0
         final Vector3 kD = box1._center.subtract(box0._center, Vector3.fetchTempInstance());
@@ -1243,9 +1243,12 @@ public class OrientedBoundingBox extends BoundingVolume {
         final ReadOnlyVector3 rayDir = ray.getDirection();
         final ReadOnlyVector3 rayOrigin = ray.getOrigin();
 
-        final Vector3 diff = rayOrigin.subtract(getCenter(), Vector3.fetchTempInstance());
         // convert ray to box coordinates
-        final ReadOnlyVector3 direction = rayDir;
+        final Vector3 diff = rayOrigin.subtract(getCenter(), Vector3.fetchTempInstance());
+        diff.set(_xAxis.dot(diff), _yAxis.dot(diff), _zAxis.dot(diff));
+        final Vector3 direction = Vector3.fetchTempInstance().set(_xAxis.dot(rayDir), _yAxis.dot(rayDir),
+                _zAxis.dot(rayDir));
+
         final double[] t = { 0, Double.POSITIVE_INFINITY };
 
         try {
@@ -1277,6 +1280,7 @@ public class OrientedBoundingBox extends BoundingVolume {
             return new IntersectionRecord();
         } finally {
             Vector3.releaseTempInstance(diff);
+            Vector3.releaseTempInstance(direction);
         }
 
     }
@@ -1317,39 +1321,39 @@ public class OrientedBoundingBox extends BoundingVolume {
         }
     }
 
-    public void setXAxis(final Vector3 axis) {
+    public void setXAxis(final ReadOnlyVector3 axis) {
         _xAxis.set(axis);
         correctCorners = false;
     }
 
-    public void setYAxis(final Vector3 axis) {
+    public void setYAxis(final ReadOnlyVector3 axis) {
         _yAxis.set(axis);
         correctCorners = false;
     }
 
-    public void setZAxis(final Vector3 axis) {
+    public void setZAxis(final ReadOnlyVector3 axis) {
         _zAxis.set(axis);
         correctCorners = false;
     }
 
-    public void setExtent(final Vector3 ext) {
+    public void setExtent(final ReadOnlyVector3 ext) {
         _extent.set(ext);
         correctCorners = false;
     }
 
-    public Vector3 getXAxis() {
+    public ReadOnlyVector3 getXAxis() {
         return _xAxis;
     }
 
-    public Vector3 getYAxis() {
+    public ReadOnlyVector3 getYAxis() {
         return _yAxis;
     }
 
-    public Vector3 getZAxis() {
+    public ReadOnlyVector3 getZAxis() {
         return _zAxis;
     }
 
-    public Vector3 getExtent() {
+    public ReadOnlyVector3 getExtent() {
         return _extent;
     }
 
