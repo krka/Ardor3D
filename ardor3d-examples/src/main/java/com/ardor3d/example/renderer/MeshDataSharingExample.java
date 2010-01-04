@@ -29,6 +29,7 @@ import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.geom.CopyLogic;
 import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
 import com.google.inject.Inject;
@@ -84,7 +85,7 @@ public class MeshDataSharingExample extends ExampleBase {
 
         _root.attachChild(n1);
 
-        final SharedCopyLogic sharedCopyLogic = new SharedCopyLogic();
+        final CopyLogic sharedCopyLogic = new SharedCopyLogic();
 
         final Random rand = new Random(1337);
         for (int i = 0; i < 500; i++) {
