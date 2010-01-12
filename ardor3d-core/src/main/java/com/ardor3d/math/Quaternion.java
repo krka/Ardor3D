@@ -1008,6 +1008,13 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
             result = new Quaternion();
         }
 
+        // check for weighting at either extreme
+        if (changeAmnt == 0.0) {
+            return result.set(startQuat);
+        } else if (changeAmnt == 1.0) {
+            return result.set(endQuat);
+        }
+
         final Quaternion q2 = Quaternion.fetchTempInstance().set(endQuat);
         // Check for equality and skip operation.
         if (startQuat.equals(q2)) {
@@ -1067,6 +1074,14 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
      */
     public Quaternion slerpLocal(final ReadOnlyQuaternion startQuat, final ReadOnlyQuaternion endQuat,
             final double changeAmnt) {
+
+        // check for weighting at either extreme
+        if (changeAmnt == 0.0) {
+            return this.set(startQuat);
+        } else if (changeAmnt == 1.0) {
+            return this.set(endQuat);
+        }
+
         // Check for equality and skip operation.
         if (startQuat.equals(endQuat)) {
             this.set(startQuat);
@@ -1090,7 +1105,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
         // warrant such calculations
         if ((1 - result) > 0.1) {// Get the angle between the 2 quaternions,
             // and then store the sin() of that angle
-            final double theta = Math.acos(result);
+            final double theta = MathUtils.acos(result);
             final double invSinTheta = 1f / MathUtils.sin(theta);
 
             // Calculate the scale for q1 and q2, according to the angle and
