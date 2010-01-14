@@ -187,7 +187,7 @@ public final class Debugger {
     public static final ColorRGBA TANGENT_COLOR_BASE = new ColorRGBA(ColorRGBA.ORANGE);
     public static final ColorRGBA TANGENT_COLOR_TIP = new ColorRGBA(ColorRGBA.YELLOW);
     protected static final BoundingBox measureBox = new BoundingBox();
-    public static final double AUTO_NORMAL_RATIO = .05;
+    public static double AUTO_NORMAL_RATIO = .05;
 
     /**
      * <code>drawNormals</code> draws lines representing normals for a given Spatial and its children.
