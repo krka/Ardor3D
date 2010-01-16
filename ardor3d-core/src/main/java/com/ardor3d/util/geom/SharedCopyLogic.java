@@ -11,6 +11,8 @@
 package com.ardor3d.util.geom;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -19,6 +21,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
 public class SharedCopyLogic implements CopyLogic {
+    private static final Logger logger = Logger.getLogger(SharedCopyLogic.class.getName());
+
     public Spatial copy(final Spatial source, final AtomicBoolean recurse) {
         recurse.set(false);
         if (source instanceof Node) {
@@ -34,7 +38,19 @@ public class SharedCopyLogic implements CopyLogic {
     }
 
     protected Mesh clone(final Mesh original) {
-        final Mesh copy = new Mesh(original.getName());
+        Mesh copy = null;
+        try {
+            copy = original.getClass().newInstance();
+        } catch (final InstantiationException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class "
+                    + original.getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        } catch (final IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class "
+                    + original.getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        }
+        copy.setName(original.getName() + "_copy");
         copy.getSceneHints().set(original.getSceneHints());
         copy.setTransform(original.getTransform());
 
@@ -48,7 +64,19 @@ public class SharedCopyLogic implements CopyLogic {
     }
 
     protected Node clone(final Node original) {
-        final Node copy = new Node(original.getName());
+        Node copy = null;
+        try {
+            copy = original.getClass().newInstance();
+        } catch (final InstantiationException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class "
+                    + original.getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        } catch (final IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class "
+                    + original.getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        }
+        copy.setName(original.getName() + "_copy");
         copy.getSceneHints().set(original.getSceneHints());
         copy.setTransform(original.getTransform());
 
