@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom.Attribute;
-import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.DataConversionException;
 import org.jdom.Element;
@@ -28,15 +27,22 @@ import org.jdom.ProcessingInstruction;
 import org.jdom.Text;
 import org.jdom.xpath.XPath;
 
-import com.ardor3d.extension.model.collada.jdom.data.GlobalData;
+import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.math.ColorRGBA;
+import com.sun.xml.internal.ws.util.xml.CDATA;
 
 /**
- * Utility class for finding specific nodes in the collada tree through id/sid or XPath expressions and for parsing
- * arrays and colors.
+ * Utility methods for parsing Collada data related to node hierarchy and arrays, using XPath or arrays extracted during
+ * sax parsing.
  */
 public class ColladaDOMUtil {
-    private static final Logger logger = Logger.getLogger(ColladaDOMUtil.class.getName());
+    private final Logger logger = Logger.getLogger(ColladaDOMUtil.class.getName());
+
+    private final DataCache _dataCache;
+
+    public ColladaDOMUtil(final DataCache dataCache) {
+        _dataCache = dataCache;
+    }
 
     /**
      * Find element with specific id
@@ -45,8 +51,8 @@ public class ColladaDOMUtil {
      *            url specifying target id
      * @return element with specific id or null if not found
      */
-    public static Element findTargetWithId(final String baseUrl) {
-        return GlobalData.getInstance().getIdCache().get(ColladaDOMUtil.parseUrl(baseUrl));
+    public Element findTargetWithId(final String baseUrl) {
+        return _dataCache.getIdCache().get(parseUrl(baseUrl));
     }
 
     /**
@@ -56,8 +62,8 @@ public class ColladaDOMUtil {
      *            url specifying target sid
      * @return element with specific id or null if not found
      */
-    public static Element findTargetWithSid(final String baseUrl) {
-        return GlobalData.getInstance().getSidCache().get(ColladaDOMUtil.parseUrl(baseUrl));
+    public Element findTargetWithSid(final String baseUrl) {
+        return _dataCache.getSidCache().get(parseUrl(baseUrl));
     }
 
     /**
@@ -70,8 +76,8 @@ public class ColladaDOMUtil {
      * @return the list of selected items, which may be of types: {@link Element}, {@link Attribute}, {@link Text},
      *         {@link CDATA}, {@link Comment}, {@link ProcessingInstruction}, Boolean, Double, or String.
      */
-    public static List<?> selectNodes(final Element element, final String query) {
-        final XPath xPathExpression = ColladaDOMUtil.getXPathExpression(query);
+    public List<?> selectNodes(final Element element, final String query) {
+        final XPath xPathExpression = getXPathExpression(query);
 
         try {
             return xPathExpression.selectNodes(element);
@@ -92,8 +98,8 @@ public class ColladaDOMUtil {
      *         {@link CDATA}, {@link Comment}, {@link ProcessingInstruction}, Boolean, Double, String, or
      *         <code>null</code> if no item was selected.
      */
-    public static Object selectSingleNode(final Element element, final String query) {
-        final XPath xPathExpression = ColladaDOMUtil.getXPathExpression(query);
+    public Object selectSingleNode(final Element element, final String query) {
+        final XPath xPathExpression = getXPathExpression(query);
 
         try {
             return xPathExpression.selectSingleNode(element);
@@ -103,7 +109,7 @@ public class ColladaDOMUtil {
         return null;
     }
 
-    private static String parseUrl(String baseUrl) {
+    private String parseUrl(String baseUrl) {
         baseUrl = baseUrl.replace("#", "");
         return baseUrl;
     }
@@ -115,9 +121,10 @@ public class ColladaDOMUtil {
      *            XPath query to compile
      * @return new XPath expression object
      */
-    private static XPath getXPathExpression(final String query) {
-        if (GlobalData.getInstance().getxPathExpressions().containsKey(query)) {
-            return GlobalData.getInstance().getxPathExpressions().get(query);
+    private XPath getXPathExpression(final String query) {
+
+        if (_dataCache.getxPathExpressions().containsKey(query)) {
+            return _dataCache.getxPathExpressions().get(query);
         }
 
         XPath xPathExpression = null;
@@ -127,7 +134,7 @@ public class ColladaDOMUtil {
             e.printStackTrace();
         }
 
-        GlobalData.getInstance().getxPathExpressions().put(query, xPathExpression);
+        _dataCache.getxPathExpressions().put(query, xPathExpression);
 
         return xPathExpression;
     }
@@ -139,9 +146,9 @@ public class ColladaDOMUtil {
      *            node to parse content from
      * @return parsed float array
      */
-    public static float[] parseFloatArray(final Element node) {
-        if (GlobalData.getInstance().getFloatArrays().containsKey(node)) {
-            return GlobalData.getInstance().getFloatArrays().get(node);
+    public float[] parseFloatArray(final Element node) {
+        if (_dataCache.getFloatArrays().containsKey(node)) {
+            return _dataCache.getFloatArrays().get(node);
         }
 
         final String content = node.getText();
@@ -157,7 +164,7 @@ public class ColladaDOMUtil {
             floatArray[i] = Float.parseFloat(list.get(i).replace(",", "."));
         }
 
-        GlobalData.getInstance().getFloatArrays().put(node, floatArray);
+        _dataCache.getFloatArrays().put(node, floatArray);
 
         return floatArray;
     }
@@ -169,9 +176,9 @@ public class ColladaDOMUtil {
      *            node to parse content from
      * @return parsed double array
      */
-    public static double[] parseDoubleArray(final Element node) {
-        if (GlobalData.getInstance().getDoubleArrays().containsKey(node)) {
-            return GlobalData.getInstance().getDoubleArrays().get(node);
+    public double[] parseDoubleArray(final Element node) {
+        if (_dataCache.getDoubleArrays().containsKey(node)) {
+            return _dataCache.getDoubleArrays().get(node);
         }
 
         final String content = node.getText();
@@ -187,7 +194,7 @@ public class ColladaDOMUtil {
             doubleArray[i] = Double.parseDouble(list.get(i).replace(",", "."));
         }
 
-        GlobalData.getInstance().getDoubleArrays().put(node, doubleArray);
+        _dataCache.getDoubleArrays().put(node, doubleArray);
 
         return doubleArray;
     }
@@ -199,9 +206,9 @@ public class ColladaDOMUtil {
      *            node to parse content from
      * @return parsed int array
      */
-    public static int[] parseIntArray(final Element node) {
-        if (GlobalData.getInstance().getIntArrays().containsKey(node)) {
-            return GlobalData.getInstance().getIntArrays().get(node);
+    public int[] parseIntArray(final Element node) {
+        if (_dataCache.getIntArrays().containsKey(node)) {
+            return _dataCache.getIntArrays().get(node);
         }
 
         final String content = node.getText();
@@ -217,7 +224,7 @@ public class ColladaDOMUtil {
             intArray[i] = Integer.parseInt(list.get(i));
         }
 
-        GlobalData.getInstance().getIntArrays().put(node, intArray);
+        _dataCache.getIntArrays().put(node, intArray);
 
         return intArray;
     }
@@ -229,9 +236,9 @@ public class ColladaDOMUtil {
      *            node to parse content from
      * @return parsed boolean array
      */
-    public static boolean[] parseBooleanArray(final Element node) {
-        if (GlobalData.getInstance().getDoubleArrays().containsKey(node)) {
-            return GlobalData.getInstance().getBooleanArrays().get(node);
+    public boolean[] parseBooleanArray(final Element node) {
+        if (_dataCache.getDoubleArrays().containsKey(node)) {
+            return _dataCache.getBooleanArrays().get(node);
         }
 
         final String content = node.getText();
@@ -247,7 +254,7 @@ public class ColladaDOMUtil {
             booleanArray[i] = Boolean.parseBoolean(list.get(i));
         }
 
-        GlobalData.getInstance().getBooleanArrays().put(node, booleanArray);
+        _dataCache.getBooleanArrays().put(node, booleanArray);
 
         return booleanArray;
     }
@@ -259,9 +266,9 @@ public class ColladaDOMUtil {
      *            node to parse content from
      * @return parsed string array
      */
-    public static String[] parseStringArray(final Element node) {
-        if (GlobalData.getInstance().getStringArrays().containsKey(node)) {
-            return GlobalData.getInstance().getStringArrays().get(node);
+    public String[] parseStringArray(final Element node) {
+        if (_dataCache.getStringArrays().containsKey(node)) {
+            return _dataCache.getStringArrays().get(node);
         }
 
         final String content = node.getText();
@@ -273,7 +280,7 @@ public class ColladaDOMUtil {
         }
         final String[] stringArray = list.toArray(new String[list.size()]);
 
-        GlobalData.getInstance().getStringArrays().put(node, stringArray);
+        _dataCache.getStringArrays().put(node, stringArray);
 
         return stringArray;
     }
@@ -285,14 +292,14 @@ public class ColladaDOMUtil {
      *            Root of strip operation
      */
     @SuppressWarnings("unchecked")
-    public static void stripNamespace(final Element rootElement) {
+    public void stripNamespace(final Element rootElement) {
         rootElement.setNamespace(null);
 
         final List children = rootElement.getChildren();
         final Iterator i = children.iterator();
         while (i.hasNext()) {
             final Element child = (Element) i.next();
-            ColladaDOMUtil.stripNamespace(child);
+            stripNamespace(child);
         }
     }
 
@@ -305,13 +312,13 @@ public class ColladaDOMUtil {
      *            Attribute name to parse a value for
      * @return parsed integer
      */
-    public static int getAttributeIntValue(final Element input, final String attributeName, final int defaultVal) {
+    public int getAttributeIntValue(final Element input, final String attributeName, final int defaultVal) {
         final Attribute attribute = input.getAttribute(attributeName);
         if (attribute != null) {
             try {
                 return attribute.getIntValue();
             } catch (final DataConversionException e) {
-                ColladaDOMUtil.logger.log(Level.WARNING, "Could not parse int value", e);
+                logger.log(Level.WARNING, "Could not parse int value", e);
             }
         }
         return defaultVal;
@@ -324,12 +331,12 @@ public class ColladaDOMUtil {
      *            Collada color description
      * @return Ardor3d ColorRGBA
      */
-    public static ColorRGBA getColor(final String colorDescription) {
+    public ColorRGBA getColor(final String colorDescription) {
         if (colorDescription == null) {
             throw new ColladaException("Null color description not allowed", colorDescription);
         }
 
-        final String[] values = GlobalData.getInstance().getPattern().split(colorDescription.replace(",", "."));
+        final String[] values = _dataCache.getPattern().split(colorDescription.replace(",", "."));
 
         if (values.length < 3 || values.length > 4) {
             throw new ColladaException("Expected color definition of length 3 or 4 - got " + values.length
@@ -342,5 +349,28 @@ public class ColladaDOMUtil {
         } catch (final NumberFormatException e) {
             throw new ColladaException("Unable to parse float number", colorDescription, e);
         }
+    }
+
+    /**
+     * Find Element with semantic POSITION under an element with inputs
+     * 
+     * @param v
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Element getPositionSource(final Element v) {
+        for (final Element input : (List<Element>) v.getChildren("input")) {
+            if ("POSITION".equals(input.getAttributeValue("semantic"))) {
+                final Element n = findTargetWithId(input.getAttributeValue("source"));
+                if (n != null && "source".equals(n.getName())) {
+                    return n;
+                }
+            }
+        }
+
+        // changed this to throw an exception instead - otherwise, there will just be a nullpointer exception
+        // outside. This provides much more information about what went wrong / Petter
+        // return null;
+        throw new ColladaException("Unable to find POSITION semantic for inputs under DaeVertices", v);
     }
 }

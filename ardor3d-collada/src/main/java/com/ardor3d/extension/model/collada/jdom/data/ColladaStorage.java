@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,6 +12,7 @@ package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.util.List;
 
+import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.scenegraph.Node;
 import com.google.common.collect.Lists;
 
@@ -23,6 +24,9 @@ public class ColladaStorage {
     private Node _scene;
     private final List<SkinData> _skins = Lists.newArrayList();
     private AssetData assetData;
+
+    private final List<JointChannel> _jointChannels = Lists.newArrayList();
+    private AnimationItem animationItemRoot;
 
     public void setScene(final Node scene) {
         _scene = scene;
@@ -48,5 +52,17 @@ public class ColladaStorage {
 
     public void setAssetData(final AssetData assetData) {
         this.assetData = assetData;
+    }
+
+    public List<JointChannel> getJointChannels() {
+        return _jointChannels;
+    }
+
+    public AnimationItem getAnimationItemRoot() {
+        return animationItemRoot;
+    }
+
+    public void setAnimationItemRoot(final AnimationItem animationItemRoot) {
+        this.animationItemRoot = animationItemRoot;
     }
 }

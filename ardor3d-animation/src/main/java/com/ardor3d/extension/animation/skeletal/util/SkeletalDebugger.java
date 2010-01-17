@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -10,7 +10,13 @@
 
 package com.ardor3d.extension.animation.skeletal.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.extension.animation.skeletal.Joint;
+import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.math.ColorRGBA;
@@ -20,7 +26,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -32,11 +37,31 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Pyramid;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.ui.text.BMText.Align;
 
 /**
  * Utility useful for drawing Skeletons found in a scene.
  */
 public class SkeletalDebugger {
+    public static double BONE_RATIO = .05;
+    public static double JOINT_RATIO = .075;
+    public static double LABEL_RATIO = .5;
+
+    protected static final BoundingSphere measureSphere = new BoundingSphere();
+    protected static final BasicText jointText = BasicText.createDefaultTextLabel("", "");
+    static {
+        // No lighting, replace texturing
+        SkeletalDebugger.jointText.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+        SkeletalDebugger.jointText.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
+        // Do not queue... draw right away.
+        SkeletalDebugger.jointText.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+
+        SkeletalDebugger.jointText.setDefaultColor(ColorRGBA.YELLOW);
+        SkeletalDebugger.jointText.setAlign(Align.Center);
+
+        SkeletalDebugger.jointText.updateGeometricState(0);
+    }
 
     /**
      * Traverse the given scene and draw the currently posed Skeleton of any SkinnedMesh we encounter.
@@ -47,21 +72,48 @@ public class SkeletalDebugger {
      *            the Renderer to draw with.
      */
     public static void drawSkeletons(final Spatial scene, final Renderer renderer) {
+        SkeletalDebugger.drawSkeletons(scene, renderer, false, false);
+    }
+
+    /**
+     * Traverse the given scene and draw the currently posed Skeleton of any SkinnedMesh we encounter. If showLabels is
+     * true, joint names will be drawn over the joints.
+     * 
+     * @param scene
+     *            the scene
+     * @param renderer
+     *            the Renderer to draw with.
+     * @param allowSkeletonRedraw
+     *            if true, we will draw the skeleton for every skinnedmesh we encounter, even if two skinnedmeshes are
+     *            on the same skeleton.
+     * @param showLabels
+     *            show the names of the joints over them.
+     */
+    public static void drawSkeletons(final Spatial scene, final Renderer renderer, final boolean allowSkeletonRedraw,
+            final boolean showLabels) {
+        SkeletalDebugger.drawSkeletons(scene, renderer, allowSkeletonRedraw, showLabels, new HashSet<Skeleton>());
+    }
+
+    private static void drawSkeletons(final Spatial scene, final Renderer renderer, final boolean allowSkeletonRedraw,
+            final boolean showLabels, final Set<Skeleton> alreadyDrawn) {
         assert scene != null : "scene must not be null.";
 
         // Check if we are a skinned mesh
         boolean doChildren = true;
         if (scene instanceof SkinnedMesh) {
-            // If we're in view, go ahead and draw our associated skeleton pose
-            final Camera cam = Camera.getCurrentCamera();
-            final int state = cam.getPlaneState();
-            if (cam.contains(scene.getWorldBound()) != Camera.FrustumIntersect.Outside) {
-                SkeletalDebugger.drawSkeleton(((SkinnedMesh) scene).getCurrentPose(), scene.getWorldTransform(),
-                        renderer);
-            } else {
-                doChildren = false;
+            final SkeletonPose pose = ((SkinnedMesh) scene).getCurrentPose();
+            if (allowSkeletonRedraw || !alreadyDrawn.contains(pose.getSkeleton())) {
+                // If we're in view, go ahead and draw our associated skeleton pose
+                final Camera cam = Camera.getCurrentCamera();
+                final int state = cam.getPlaneState();
+                if (cam.contains(scene.getWorldBound()) != Camera.FrustumIntersect.Outside) {
+                    SkeletalDebugger.drawSkeleton(pose, scene, renderer, showLabels);
+                    alreadyDrawn.add(pose.getSkeleton());
+                } else {
+                    doChildren = false;
+                }
+                cam.setPlaneState(state);
             }
-            cam.setPlaneState(state);
         }
 
         // Recurse down the scene if we're a Node and we were not flagged to ignore children.
@@ -69,7 +121,8 @@ public class SkeletalDebugger {
             final Node n = (Node) scene;
             if (n.getNumberOfChildren() != 0) {
                 for (int i = n.getNumberOfChildren(); --i >= 0;) {
-                    SkeletalDebugger.drawSkeletons(n.getChild(i), renderer);
+                    SkeletalDebugger.drawSkeletons(n.getChild(i), renderer, allowSkeletonRedraw, showLabels,
+                            alreadyDrawn);
                 }
             }
         }
@@ -80,20 +133,43 @@ public class SkeletalDebugger {
      * 
      * @param pose
      *            the posed skeleton to draw
-     * @param skinTransform
+     * @param scene
      * @param renderer
      *            the Renderer to draw with.
+     * @param showLabels
+     *            show the names of the joints over them.
      */
-    private static void drawSkeleton(final SkeletonPose pose, final ReadOnlyTransform skinTransform,
-            final Renderer renderer) {
+    private static void drawSkeleton(final SkeletonPose pose, final Spatial scene, final Renderer renderer,
+            final boolean showLabels) {
         final Joint[] joints = pose.getSkeleton().getJoints();
         final Transform[] globals = pose.getGlobalJointTransforms();
 
         for (int i = 0, max = joints.length; i < max; i++) {
-            SkeletalDebugger.drawJoint(globals[i], skinTransform, renderer);
+            SkeletalDebugger.drawJoint(globals[i], scene, renderer);
             final short parentIndex = joints[i].getParentIndex();
+
             if (parentIndex != Joint.NO_PARENT) {
-                SkeletalDebugger.drawBone(globals[parentIndex], globals[i], skinTransform, renderer);
+                SkeletalDebugger.drawBone(globals[parentIndex], globals[i], scene, renderer);
+            }
+        }
+
+        if (showLabels) {
+            final boolean inOrtho = renderer.isInOrthoMode();
+            if (!inOrtho) {
+                renderer.setOrtho();
+            }
+            for (int i = 0, max = joints.length; i < max; i++) {
+                SkeletalDebugger.jointText.setText(i + ". " + joints[i].getName());
+                SkeletalDebugger.jointText.setTranslation(Camera.getCurrentCamera().getScreenCoordinates(
+                        globals[i].getTranslation()));
+
+                final double size = SkeletalDebugger.LABEL_RATIO;
+                SkeletalDebugger.jointText.setScale(size, size, -size);
+
+                SkeletalDebugger.jointText.draw(renderer);
+            }
+            if (!inOrtho) {
+                renderer.unsetOrtho();
             }
         }
     }
@@ -130,11 +206,11 @@ public class SkeletalDebugger {
      *            our parent joint transform
      * @param end
      *            our child joint transform
-     * @param skinTransform
+     * @param scene
      * @param renderer
      *            the Renderer to draw with.
      */
-    private static void drawBone(final Transform start, final Transform end, final ReadOnlyTransform skinTransform,
+    private static void drawBone(final Transform start, final Transform end, final Spatial scene,
             final Renderer renderer) {
         // Determine our start and end points
         final Vector3 stPnt = Vector3.fetchTempInstance();
@@ -143,10 +219,20 @@ public class SkeletalDebugger {
         end.applyForward(Vector3.ZERO, endPnt);
 
         // determine distance and use as a scale to elongate the bone
-        // XXX: perhaps instead of 1 we should use some kind of average scale between start and end bone?
-        final double scale = stPnt.distance(endPnt);
+        double scale = stPnt.distance(endPnt);
+        if (scale == 0) {
+            scale = MathUtils.ZERO_TOLERANCE;
+        }
+        final BoundingVolume vol = scene.getWorldBound();
+        double size = 1.0;
+        if (vol != null) {
+            SkeletalDebugger.measureSphere.setCenter(vol.getCenter());
+            SkeletalDebugger.measureSphere.setRadius(0);
+            SkeletalDebugger.measureSphere.mergeLocal(vol);
+            size = SkeletalDebugger.BONE_RATIO * SkeletalDebugger.measureSphere.getRadius();
+        }
         SkeletalDebugger.bone.setWorldTransform(Transform.IDENTITY);
-        SkeletalDebugger.bone.setWorldScale(1, 1, scale);
+        SkeletalDebugger.bone.setWorldScale(size, size, scale);
 
         // determine center point of bone (translation).
         final Vector3 store = Vector3.fetchTempInstance();
@@ -156,11 +242,13 @@ public class SkeletalDebugger {
         // Orient bone to point along axis formed by start and end points.
         final Matrix3 orient = Matrix3.fetchTempInstance();
         orient.lookAt(endPnt.subtractLocal(stPnt).normalizeLocal(), Vector3.UNIT_Y);
-        SkeletalDebugger.bone.setWorldRotation(orient);
+        final Quaternion q = new Quaternion().fromRotationMatrix(orient);
+        q.normalizeLocal();
+        SkeletalDebugger.bone.setWorldRotation(q);
 
         // Offset with skin transform
-        SkeletalDebugger.bone
-                .setWorldTransform(skinTransform.multiply(SkeletalDebugger.bone.getWorldTransform(), null));
+        SkeletalDebugger.bone.setWorldTransform(scene.getWorldTransform().multiply(
+                SkeletalDebugger.bone.getWorldTransform(), null));
 
         // Release some temp vars.
         Matrix3.releaseTempInstance(orient);
@@ -169,6 +257,16 @@ public class SkeletalDebugger {
 
         // Draw our bone!
         SkeletalDebugger.bone.draw(renderer);
+    }
+
+    /**
+     * Set the color of the joint label object used in showing joint names.
+     * 
+     * @param color
+     *            the new color to use for joint labels.
+     */
+    public static void setJointLabelColor(final ReadOnlyColorRGBA color) {
+        SkeletalDebugger.jointText.setDefaultColor(color);
     }
 
     /**
@@ -208,13 +306,22 @@ public class SkeletalDebugger {
      * 
      * @param jntTransform
      *            our joint transform
-     * @param skinTransform
+     * @param scene
      * @param renderer
      *            the Renderer to draw with.
      */
-    private static void drawJoint(final Transform jntTransform, final ReadOnlyTransform skinTransform,
-            final Renderer renderer) {
-        SkeletalDebugger.joint.setWorldTransform(skinTransform.multiply(jntTransform, null));
+    private static void drawJoint(final Transform jntTransform, final Spatial scene, final Renderer renderer) {
+        final BoundingVolume vol = scene.getWorldBound();
+        double size = 1.0;
+        if (vol != null) {
+            SkeletalDebugger.measureSphere.setCenter(vol.getCenter());
+            SkeletalDebugger.measureSphere.setRadius(0);
+            SkeletalDebugger.measureSphere.mergeLocal(vol);
+            size = SkeletalDebugger.BONE_RATIO * SkeletalDebugger.measureSphere.getRadius();
+        }
+        SkeletalDebugger.joint.setWorldTransform(scene.getWorldTransform().multiply(jntTransform, null));
+        SkeletalDebugger.joint.setWorldRotation(SkeletalDebugger.joint.getWorldRotation());
+        SkeletalDebugger.joint.setWorldScale(size);
         SkeletalDebugger.joint.draw(renderer);
     }
 

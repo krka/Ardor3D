@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -26,36 +26,46 @@ import org.jdom.input.SAXHandler;
 import org.xml.sax.SAXException;
 
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
-import com.ardor3d.extension.model.collada.jdom.data.ColladaOptions;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.extension.model.collada.jdom.data.GlobalData;
+import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.resource.RelativeResourceLocator;
+import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.google.inject.Inject;
 
+/**
+ * Main class for importing Collada files.
+ * <p>
+ * Example usages:
+ * <li>new ColladaImporter().load(resource);</li>
+ * <li>new ColladaImporter().loadTextures(false).modelLocator(locator).load(resource);</li>
+ * </p>
+ */
 public class ColladaImporter {
+    private boolean _loadTextures = true;
+    private boolean _loadAnimations = true;
+    private ResourceLocator _textureLocator;
+    private ResourceLocator _modelLocator;
 
-    private ColladaOptions _options;
-
-    /**
-     * Constructs a new ColladaImporter using default option values.
-     */
-    public ColladaImporter() {
-        // Set our default options
-        setOptions(new ColladaOptions());
+    public ColladaImporter loadTextures(final boolean loadTextures) {
+        _loadTextures = loadTextures;
+        return this;
     }
 
-    /**
-     * Constructs a new ColladaImporter using given option values.
-     * 
-     * @param options
-     *            options to use during import
-     */
-    @Inject
-    public ColladaImporter(final ColladaOptions options) {
-        setOptions(options);
+    public ColladaImporter loadAnimations(final boolean loadAnimations) {
+        _loadAnimations = loadAnimations;
+        return this;
+    }
+
+    public ColladaImporter textureLocator(final ResourceLocator textureLocator) {
+        _textureLocator = textureLocator;
+        return this;
+    }
+
+    public ColladaImporter modelLocator(final ResourceLocator modelLocator) {
+        _modelLocator = modelLocator;
+        return this;
     }
 
     /**
@@ -66,19 +76,20 @@ public class ColladaImporter {
      *            resource.
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
      */
-    public ColladaStorage readColladaFile(final String resource) {
+    public ColladaStorage load(final String resource) {
         final ResourceSource source;
-        if (!getOptions().hasModelLocator()) {
+        if (_modelLocator == null) {
             source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
         } else {
-            source = getOptions().getModelLocator().locateResource(resource);
+            source = _modelLocator.locateResource(resource);
         }
 
         if (source == null) {
             throw new Error("Unable to locate '" + resource + "'");
         }
 
-        return readColladaFile(source);
+        return load(source);
+
     }
 
     /**
@@ -88,17 +99,26 @@ public class ColladaImporter {
      *            the name of the resource to find.
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
      */
-    public ColladaStorage readColladaFile(final ResourceSource resource) {
+    private ColladaStorage load(final ResourceSource resource) {
+        final ColladaStorage colladaStorage = new ColladaStorage();
+        final DataCache dataCache = new DataCache();
+        final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
+        final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(_loadTextures, dataCache,
+                colladaDOMUtil, _textureLocator);
+        final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils);
+        final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
+                colladaMeshUtils);
+        final ColladaNodeUtils colladaNodeUtils = new ColladaNodeUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,
+                colladaMeshUtils, colladaAnimUtils);
+
         try {
-            // Inject our options
-            GlobalData.getInstance().setOptions(getOptions());
 
             // Pull in the DOM tree of the Collada resource.
-            final Element collada = readCollada(resource);
+            final Element collada = readCollada(resource, dataCache);
 
             // if we don't specify a texture locator, add a temporary texture locator at the location of this model
             // resource..
-            final boolean addLocator = !getOptions().hasTextureLocator();
+            final boolean addLocator = _textureLocator == null;
 
             final RelativeResourceLocator loc;
             if (addLocator) {
@@ -108,22 +128,20 @@ public class ColladaImporter {
                 loc = null;
             }
 
-            final AssetData assetData = ColladaNodeUtils.parseAsset(collada.getChild("asset"));
+            final AssetData assetData = colladaNodeUtils.parseAsset(collada.getChild("asset"));
 
             // Collada may or may not have a scene, so this can return null.
-            final Node scene = ColladaNodeUtils.getVisualScene(collada);
+            final Node scene = colladaNodeUtils.getVisualScene(collada);
 
-            // Pull out our storage
-            final ColladaStorage storage = GlobalData.getInstance().getColladaStorage();
+            if (_loadAnimations) {
+                colladaAnimUtils.parseLibraryAnimations(collada);
+            }
 
             // set our scene into storage
-            storage.setScene(scene);
+            colladaStorage.setScene(scene);
 
             // set our asset data into storage
-            storage.setAssetData(assetData);
-
-            // Drop caches, etc. after import.
-            GlobalData.disposeInstance();
+            colladaStorage.setAssetData(assetData);
 
             // drop our added locator if needed.
             if (addLocator) {
@@ -131,11 +149,10 @@ public class ColladaImporter {
             }
 
             // return storage
-            return storage;
+            return colladaStorage;
         } catch (final Exception e) {
             throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
         }
-
     }
 
     /**
@@ -146,22 +163,21 @@ public class ColladaImporter {
      *            the ResourceSource to read the resource from
      * @return the Collada root element
      */
-    private Element readCollada(final ResourceSource resource) {
+    private Element readCollada(final ResourceSource resource, final DataCache dataCache) {
         try {
             final SAXBuilder builder = new SAXBuilder() {
                 @Override
                 protected SAXHandler createContentHandler() {
-                    final SAXHandler contentHandler = new SAXHandler(new ArdorFactory()) {
+                    return new SAXHandler(new ArdorFactory(dataCache)) {
                         @Override
                         public void startPrefixMapping(final String prefix, final String uri) throws SAXException {
                         // Just kill what's usually done here...
                         }
 
                     };
-                    return contentHandler;
                 }
             };
-            //            
+            //
             // final SAXBuilder builder = new SAXBuilder();
             // builder.setFactory(new ArdorSimpleFactory());
 
@@ -177,6 +193,12 @@ public class ColladaImporter {
     }
 
     final class ArdorSimpleFactory extends DefaultJDOMFactory {
+        private final DataCache dataCache;
+
+        ArdorSimpleFactory(final DataCache dataCache) {
+            this.dataCache = dataCache;
+        }
+
         @Override
         public Text text(final String text) {
             return new Text(Text.normalizeString(text));
@@ -185,9 +207,9 @@ public class ColladaImporter {
         @Override
         public void setAttribute(final Element parent, final Attribute a) {
             if ("id".equals(a.getName())) {
-                GlobalData.getInstance().getIdCache().put(a.getValue(), parent);
+                dataCache.getIdCache().put(a.getValue(), parent);
             } else if ("sid".equals(a.getName())) {
-                GlobalData.getInstance().getSidCache().put(a.getValue(), parent);
+                dataCache.getSidCache().put(a.getValue(), parent);
             }
 
             super.setAttribute(parent, a);
@@ -196,16 +218,22 @@ public class ColladaImporter {
 
     private enum BufferType {
         None, Float, Double, Int, String, P
-    };
+    }
 
     /**
-     * A JDOMFactory that normalizes all text (strips extra whitespace etc)
+     * A JDOMFactory that normalizes all text (strips extra whitespace etc), preparses all arrays and hashes all
+     * elements based on their id/sid.
      */
     final class ArdorFactory extends DefaultJDOMFactory {
+        private final DataCache dataCache;
         private Element currentElement;
         private BufferType bufferType = BufferType.None;
         private int count = 0;
         private final List<String> list = new ArrayList<String>();
+
+        ArdorFactory(final DataCache dataCache) {
+            this.dataCache = dataCache;
+        }
 
         @Override
         public Text text(final String text) {
@@ -221,7 +249,7 @@ public class ColladaImporter {
                         floatArray[i] = Float.parseFloat(tokenizer.nextToken().replace(",", "."));
                     }
 
-                    GlobalData.getInstance().getFloatArrays().put(currentElement, floatArray);
+                    dataCache.getFloatArrays().put(currentElement, floatArray);
 
                     return new Text("");
                 }
@@ -236,7 +264,7 @@ public class ColladaImporter {
                         doubleArray[i] = Double.parseDouble(tokenizer.nextToken().replace(",", "."));
                     }
 
-                    GlobalData.getInstance().getDoubleArrays().put(currentElement, doubleArray);
+                    dataCache.getDoubleArrays().put(currentElement, doubleArray);
 
                     return new Text("");
                 }
@@ -252,7 +280,7 @@ public class ColladaImporter {
                         intArray[i++] = Integer.parseInt(tokenizer.nextToken());
                     }
 
-                    GlobalData.getInstance().getIntArrays().put(currentElement, intArray);
+                    dataCache.getIntArrays().put(currentElement, intArray);
 
                     return new Text("");
                 }
@@ -272,7 +300,7 @@ public class ColladaImporter {
                         intArray[i] = Integer.parseInt(list.get(i));
                     }
 
-                    GlobalData.getInstance().getIntArrays().put(currentElement, intArray);
+                    dataCache.getIntArrays().put(currentElement, intArray);
 
                     return new Text("");
                 }
@@ -283,9 +311,9 @@ public class ColladaImporter {
         @Override
         public void setAttribute(final Element parent, final Attribute a) {
             if ("id".equals(a.getName())) {
-                GlobalData.getInstance().getIdCache().put(a.getValue(), parent);
+                dataCache.getIdCache().put(a.getValue(), parent);
             } else if ("sid".equals(a.getName())) {
-                GlobalData.getInstance().getSidCache().put(a.getValue(), parent);
+                dataCache.getSidCache().put(a.getValue(), parent);
             } else if ("count".equals(a.getName())) {
                 try {
                     count = a.getIntValue();
@@ -338,13 +366,5 @@ public class ColladaImporter {
                 bufferType = BufferType.None;
             }
         }
-    }
-
-    public ColladaOptions getOptions() {
-        return _options;
-    }
-
-    public void setOptions(final ColladaOptions options) {
-        _options = options;
     }
 }

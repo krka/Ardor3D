@@ -14,23 +14,40 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.animation.skeletal.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.AnimationManager;
+import com.ardor3d.extension.animation.skeletal.JointChannel;
+import com.ardor3d.extension.animation.skeletal.SkeletonPose;
+import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
+import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
+import com.ardor3d.extension.animation.skeletal.blendtree.TransformApplier;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.framework.Canvas;
+import com.ardor3d.extension.model.collada.jdom.data.SkinData;
+import com.ardor3d.extension.ui.UIButton;
+import com.ardor3d.extension.ui.UICheckBox;
+import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIHud;
+import com.ardor3d.extension.ui.UILabel;
+import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
+import com.ardor3d.extension.ui.event.ActionEvent;
+import com.ardor3d.extension.ui.event.ActionListener;
+import com.ardor3d.extension.ui.layout.AnchorLayout;
+import com.ardor3d.extension.ui.layout.AnchorLayoutData;
+import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.Key;
-import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
-import com.ardor3d.input.logical.TriggerAction;
-import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -43,16 +60,26 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
+ */
+@Purpose(htmlDescription = "Illustrates loading a model from Collada.  If the model also contains an animation, the animation is played as well.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
+maxHeapMemory = 128)
 public class ColladaExample extends ExampleBase {
+    private static final double UPDATE_RATE = 1.0 / 60.0;
+    private double time = 0.0;
 
     private Node colladaNode;
-    private boolean showSkeleton = false, showMesh = true;
+    private boolean showSkeleton = false, showJointLabels = false;
 
-    private BasicText frameRateLabel;
+    private UILabel frameRateLabel;
+    private UIHud hud;
 
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
@@ -60,18 +87,23 @@ public class ColladaExample extends ExampleBase {
     private List<File> daeFiles;
     private int fileIndex = 0;
 
+    private final Timer _timer;
+    private AnimationManager manager;
+    private List<SkinData> skinDatas;
+
     public static void main(final String[] args) {
         ExampleBase.start(ColladaExample.class);
     }
 
     @Inject
-    public ColladaExample(final LogicalLayer layer, final FrameHandler frameWork) {
+    public ColladaExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
+        _timer = timer;
     }
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Ardor3D - Collada Import");
+        _canvas.setTitle("Ardor3D - Collada Example");
 
         _lightState.detachAll();
         final DirectionalLight light = new DirectionalLight();
@@ -89,70 +121,96 @@ public class ColladaExample extends ExampleBase {
 
         _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
 
-        final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "[Space - Switch model]");
+        // Create our options frame and fps label
+        createHUD();
+    }
+
+    private void createHUD() {
+        final BasicText t1 = BasicText.createDefaultTextLabel("Text1", "Seymour.dae");
         t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         t1.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t1.setTranslation(new Vector3(5, 0 * (t1.getHeight() + 5) + 10, 0));
         _root.attachChild(t1);
         _root.getSceneHints().setCullHint(CullHint.Never);
 
-        final BasicText t2 = BasicText.createDefaultTextLabel("Text2", "[M] Hide Mesh.");
-        t2.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-        t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        t2.setTranslation(new Vector3(5, 1 * (t2.getHeight() + 5) + 10, 0));
-        _root.attachChild(t2);
-        _root.getSceneHints().setCullHint(CullHint.Never);
+        hud = new UIHud();
+        hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
 
-        final BasicText t3 = BasicText.createDefaultTextLabel("Text3", "[K] Show Skeleton.");
-        t3.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
-        t3.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        t3.setTranslation(new Vector3(5, 2 * (t3.getHeight() + 5) + 10, 0));
-        _root.attachChild(t3);
-        _root.getSceneHints().setCullHint(CullHint.Never);
+        // Add fps display
+        frameRateLabel = new UILabel("X");
+        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
+                - frameRateLabel.getContentHeight());
+        frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
+        hud.add(frameRateLabel);
 
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.K), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                showSkeleton = !showSkeleton;
-                if (showSkeleton) {
-                    t3.setText("[K] Hide Skeleton.");
-                } else {
-                    t3.setText("[K] Show Skeleon.");
-                }
-            }
-        }));
+        final UIFrame optionsFrame = new UIFrame("Controls", EnumSet.noneOf(FrameButtons.class));
 
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.M), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-                showMesh = !showMesh;
-                colladaNode.getSceneHints().setCullHint(showMesh ? CullHint.Dynamic : CullHint.Always);
-                if (showMesh) {
-                    t2.setText("[M] Hide Mesh.");
-                } else {
-                    t2.setText("[M] Show Mesh.");
-                }
-            }
-        }));
+        final UIPanel basePanel = optionsFrame.getContentPanel();
+        basePanel.setLayout(new AnchorLayout());
 
-        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+        final UIButton loadSceneButton = new UIButton("Load next scene");
+        loadSceneButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, basePanel, Alignment.TOP_LEFT, 5, -5));
+        loadSceneButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
                 final File file = daeFiles.get(fileIndex);
                 try {
                     loadColladaModel(file.toURI());
-                    t1.setText("[Space - Switch model] " + file.getName());
+                    t1.setText(file.getName());
                 } catch (final URISyntaxException e) {
                     e.printStackTrace();
                 }
                 fileIndex = (fileIndex + 1) % daeFiles.size();
             }
-        }));
+        });
+        basePanel.add(loadSceneButton);
 
-        // Add fps display
-        frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
-        frameRateLabel.setTranslation(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getHeight(), 0);
-        frameRateLabel.setTextColor(ColorRGBA.WHITE);
-        frameRateLabel.getSceneHints().setOrthoOrder(-1);
-        _root.attachChild(frameRateLabel);
+        final UICheckBox skinCheck = new UICheckBox("Show skin mesh");
+        skinCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, loadSceneButton, Alignment.BOTTOM_LEFT, 0, -5));
+        skinCheck.setSelected(true);
+        skinCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                colladaNode.getSceneHints().setCullHint(skinCheck.isSelected() ? CullHint.Dynamic : CullHint.Always);
+            }
+        });
+        basePanel.add(skinCheck);
+
+        final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
+        final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        skeletonCheck.setSelected(showSkeleton);
+        skeletonCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                showSkeleton = skeletonCheck.isSelected();
+                boneLabelCheck.setEnabled(showSkeleton);
+            }
+        });
+        basePanel.add(skeletonCheck);
+
+        boneLabelCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skeletonCheck, Alignment.BOTTOM_LEFT, 0,
+                -5));
+        boneLabelCheck.setSelected(false);
+        boneLabelCheck.setEnabled(showSkeleton);
+        boneLabelCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                showJointLabels = boneLabelCheck.isSelected();
+            }
+        });
+        basePanel.add(boneLabelCheck);
+
+        optionsFrame.updateMinimumSizeFromContents();
+        optionsFrame.layout();
+        optionsFrame.pack();
+
+        optionsFrame.setUseStandin(true);
+        optionsFrame.setOpacity(0.8f);
+
+        final Camera cam = _canvas.getCanvasRenderer().getCamera();
+        optionsFrame.setLocalXY(cam.getWidth() - optionsFrame.getLocalComponentWidth() - 10, cam.getHeight()
+                - optionsFrame.getLocalComponentHeight() - 10);
+        hud.add(optionsFrame);
+
+        UIComponent.setUseTransparency(true);
     }
 
     private void loadColladaModel(final URI modelURI) throws URISyntaxException {
@@ -178,15 +236,11 @@ public class ColladaExample extends ExampleBase {
             final ColladaImporter colladaImporter = new ColladaImporter();
 
             // Load the collada scene
-            final ColladaStorage storage = colladaImporter.readColladaFile(file);
+            final ColladaStorage storage = colladaImporter.load(file);
             colladaNode = storage.getScene();
 
-            // Set dynamic node culling
-            colladaNode.getSceneHints().setCullHint(showMesh ? CullHint.Dynamic : CullHint.Always);
-
-            // Uncomment for debugging the scenegraph
-            // final ScenegraphTree tree = new ScenegraphTree();
-            // tree.show(colladaNode);
+            setupSkins(storage);
+            setupAnimations(storage);
 
             System.out.println("Importing: " + file);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
@@ -194,7 +248,7 @@ public class ColladaExample extends ExampleBase {
             // Add colladaNode to root
             _root.attachChild(colladaNode);
 
-            // TODO temp camera positioning until reading camera instances...
+            // Setup camera
             ReadOnlyVector3 upAxis = Vector3.UNIT_Y;
             if (storage.getAssetData().getUpAxis() != null) {
                 upAxis = storage.getAssetData().getUpAxis();
@@ -204,6 +258,39 @@ public class ColladaExample extends ExampleBase {
         } catch (final Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void setupSkins(final ColladaStorage storage) {
+        skinDatas = storage.getSkins();
+    }
+
+    private void setupAnimations(final ColladaStorage storage) {
+        // Check if there is any animationdata in the file
+        if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
+            return;
+        }
+
+        // Make our manager
+        manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
+
+        final AnimationClip clipA = new AnimationClip();
+        for (final JointChannel channel : storage.getJointChannels()) {
+            // add it to a clip
+            clipA.addChannel(channel);
+        }
+
+        // add the clip
+        manager.addClip(clipA);
+
+        // Set some clip instance specific data - repeat, time scaling
+        manager.getClipState(clipA).setLoopCount(Integer.MAX_VALUE);
+        manager.getClipState(clipA).setTimeScale(1.0);
+
+        // Add our "applier logic".
+        manager.setApplier(new TransformApplier());
+
+        // Add our "blend tree"
+        manager.setBlendRoot(new ClipSource(clipA, manager));
     }
 
     private void positionCamera(final ReadOnlyVector3 upAxis) {
@@ -243,7 +330,14 @@ public class ColladaExample extends ExampleBase {
     }
 
     @Override
+    protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+        hud.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
+    }
+
+    @Override
     protected void updateExample(final ReadOnlyTimer timer) {
+        hud.updateGeometricState(timer.getTimePerFrame());
+
         final long now = System.currentTimeMillis();
         final long dt = now - startTime;
         if (dt > 200) {
@@ -254,6 +348,32 @@ public class ColladaExample extends ExampleBase {
             frames = 0;
         }
         frames++;
+
+        if (manager != null) {
+            manager.update();
+        }
+
+        time += timer.getTimePerFrame();
+        if (time > ColladaExample.UPDATE_RATE) {
+            time -= ColladaExample.UPDATE_RATE;
+            for (final SkinData skinData : skinDatas) {
+                final SkeletonPose pose = skinData.getPose();
+                pose.updateTransforms();
+
+                final List<SkinnedMesh> skins = skinData.getSkins();
+                for (final SkinnedMesh skin : skins) {
+                    skin.applyPose();
+                    // skin.updateModelBound();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void renderExample(final Renderer renderer) {
+        super.renderExample(renderer);
+        renderer.renderBuckets();
+        renderer.draw(hud);
     }
 
     @Override
@@ -261,7 +381,7 @@ public class ColladaExample extends ExampleBase {
         super.renderDebug(renderer);
 
         if (showSkeleton) {
-            SkeletalDebugger.drawSkeletons(_root, renderer);
+            SkeletalDebugger.drawSkeletons(_root, renderer, false, showJointLabels);
         }
     }
 
@@ -275,7 +395,6 @@ public class ColladaExample extends ExampleBase {
             if (file.isDirectory()) {
                 findFiles(file, name, fileList);
             } else if (name.equals(file.getName().substring(file.getName().length() - 4).toLowerCase())) {
-                System.err.println("found: " + file);
                 fileList.add(file);
             }
         }

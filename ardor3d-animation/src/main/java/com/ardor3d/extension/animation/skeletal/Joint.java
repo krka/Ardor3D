@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -25,6 +25,8 @@ public class Joint {
 
     /** A name, for display or debugging purposes. */
     private final String _name;
+
+    protected short _index;
 
     /** Index of our parent Joint, or NO_PARENT if we are the root. */
     protected short _parentIndex;
@@ -69,5 +71,18 @@ public class Joint {
 
     public short getParentIndex() {
         return _parentIndex;
+    }
+
+    public void setIndex(final short index) {
+        _index = index;
+    }
+
+    public short getIndex() {
+        return _index;
+    }
+
+    @Override
+    public String toString() {
+        return "Joint: '" + getName() + "'";
     }
 }

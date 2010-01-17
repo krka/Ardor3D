@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,6 +11,7 @@
 package com.ardor3d.extension.model.collada.jdom;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,14 +32,15 @@ public class ColladaInputPipe {
     private final int _offset;
     private final int _set;
     private final Element _source;
-    private int paramCount;
+    private int _paramCount;
     private SourceData _sourceData = null;
     private Type _type;
     private FloatBuffer _buffer;
     private int _texCoord = 0;
 
-    enum Type {
-        VERTEX, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, INV_BIND_MATRIX, UNKNOWN
+    public enum Type {
+        VERTEX, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, //
+        INV_BIND_MATRIX, INPUT, IN_TANGENT, OUT_TANGENT, OUTPUT, INTERPOLATION, UNKNOWN
     }
 
     class SourceData {
@@ -51,6 +53,24 @@ public class ColladaInputPipe {
         boolean[] boolArray;
         int[] intArray;
         String[] stringArray;
+
+        @Override
+        public String toString() {
+            switch (paramType) {
+                case bool_param:
+                    return "SourceData [boolArray=" + Arrays.toString(boolArray) + "]";
+                case float_param:
+                    return "SourceData [floatArray=" + Arrays.toString(floatArray) + "]";
+                case idref_param:
+                    return "SourceData [idrefArray=" + Arrays.toString(stringArray) + "]";
+                case int_param:
+                    return "SourceData [intArray=" + Arrays.toString(intArray) + "]";
+                case name_param:
+                    return "SourceData [nameArray=" + Arrays.toString(stringArray) + "]";
+                default:
+                    return "Unknown paramType";
+            }
+        }
     }
 
     public enum ParamType {
@@ -58,7 +78,7 @@ public class ColladaInputPipe {
     }
 
     @SuppressWarnings("unchecked")
-    public ColladaInputPipe(final Element input) {
+    public ColladaInputPipe(final ColladaDOMUtil colladaDOMUtil, final Element input) {
         // Setup our type
         try {
             _type = Type.valueOf(input.getAttributeValue("semantic"));
@@ -68,7 +88,7 @@ public class ColladaInputPipe {
         }
 
         // Locate our source
-        final Element n = ColladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
+        final Element n = colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
         if (n == null) {
             throw new ColladaException("Input source not found: " + input.getAttributeValue("source"), input);
         }
@@ -76,7 +96,7 @@ public class ColladaInputPipe {
         if ("source".equals(n.getName())) {
             _source = n;
         } else if ("vertices".equals(n.getName())) {
-            _source = ColladaInputPipe.getPositionSource(n);
+            _source = colladaDOMUtil.getPositionSource(n);
         } else {
             throw new ColladaException("Input source not found: " + input.getAttributeValue("source"), input);
         }
@@ -86,19 +106,19 @@ public class ColladaInputPipe {
 
         _sourceData = new SourceData();
         if (_source.getChild("float_array") != null) {
-            _sourceData.floatArray = ColladaDOMUtil.parseFloatArray(_source.getChild("float_array"));
+            _sourceData.floatArray = colladaDOMUtil.parseFloatArray(_source.getChild("float_array"));
             _sourceData.paramType = ParamType.float_param;
         } else if (_source.getChild("bool_array") != null) {
-            _sourceData.boolArray = ColladaDOMUtil.parseBooleanArray(_source.getChild("bool_array"));
+            _sourceData.boolArray = colladaDOMUtil.parseBooleanArray(_source.getChild("bool_array"));
             _sourceData.paramType = ParamType.bool_param;
         } else if (_source.getChild("int_array") != null) {
-            _sourceData.intArray = ColladaDOMUtil.parseIntArray(_source.getChild("int_array"));
+            _sourceData.intArray = colladaDOMUtil.parseIntArray(_source.getChild("int_array"));
             _sourceData.paramType = ParamType.int_param;
         } else if (_source.getChild("Name_array") != null) {
-            _sourceData.stringArray = ColladaDOMUtil.parseStringArray(_source.getChild("Name_array"));
+            _sourceData.stringArray = colladaDOMUtil.parseStringArray(_source.getChild("Name_array"));
             _sourceData.paramType = ParamType.name_param;
         } else if (_source.getChild("IDREF_array") != null) {
-            _sourceData.stringArray = ColladaDOMUtil.parseStringArray(_source.getChild("IDREF_array"));
+            _sourceData.stringArray = colladaDOMUtil.parseStringArray(_source.getChild("IDREF_array"));
             _sourceData.paramType = ParamType.idref_param;
         }
 
@@ -110,7 +130,7 @@ public class ColladaInputPipe {
             }
 
             final List<Element> params = accessor.getChildren("param");
-            paramCount = params.size();
+            _paramCount = params.size();
 
             // Might use this info for real later, but use for testing for unsupported param skipping.
             boolean skippedParam = false;
@@ -122,19 +142,19 @@ public class ColladaInputPipe {
                 }
                 // String paramType = param.getAttributeValue("type");
             }
-            if (paramCount > 1 && skippedParam == true) {
+            if (_paramCount > 1 && skippedParam == true) {
                 ColladaInputPipe.logger.warning("Parameter skipping not yet supported when parsing sources. "
                         + _source.getAttributeValue("id"));
             }
 
-            _sourceData.count = ColladaDOMUtil.getAttributeIntValue(accessor, "count", 0);
-            _sourceData.stride = ColladaDOMUtil.getAttributeIntValue(accessor, "stride", 1);
-            _sourceData.offset = ColladaDOMUtil.getAttributeIntValue(accessor, "offset", 0);
+            _sourceData.count = colladaDOMUtil.getAttributeIntValue(accessor, "count", 0);
+            _sourceData.stride = colladaDOMUtil.getAttributeIntValue(accessor, "stride", 1);
+            _sourceData.offset = colladaDOMUtil.getAttributeIntValue(accessor, "offset", 0);
         }
 
         // save our offset
-        _offset = ColladaDOMUtil.getAttributeIntValue(input, "offset", 0);
-        _set = ColladaDOMUtil.getAttributeIntValue(input, "set", 0);
+        _offset = colladaDOMUtil.getAttributeIntValue(input, "offset", 0);
+        _set = colladaDOMUtil.getAttributeIntValue(input, "set", 0);
 
         _texCoord = 0;
     }
@@ -158,7 +178,7 @@ public class ColladaInputPipe {
     public void setupBuffer(final int numEntries, final MeshData meshData) {
         // use our source and the number of params to determine our buffer length
         // we'll use the params from the common technique accessor:
-        final int size = paramCount * numEntries;
+        final int size = _paramCount * numEntries;
         switch (_type) {
             case VERTEX:
                 _buffer = BufferUtils.createFloatBuffer(size);
@@ -170,8 +190,8 @@ public class ColladaInputPipe {
                 break;
             case TEXCOORD:
                 _buffer = BufferUtils.createFloatBuffer(size);
-                // TODO: _set is not right?
-                meshData.setTextureCoords(new FloatBufferData(_buffer, paramCount), _texCoord++);
+                // TODO: Is doing texCoord++ the best we can do?
+                meshData.setTextureCoords(new FloatBufferData(_buffer, _paramCount), _texCoord++);
                 break;
             case COLOR:
                 _buffer = BufferUtils.createFloatBuffer(size);
@@ -181,7 +201,7 @@ public class ColladaInputPipe {
         }
     }
 
-    private void pushValues(final int memberIndex) {
+    void pushValues(final int memberIndex) {
         if (_buffer == null) {
             return;
         }
@@ -197,7 +217,7 @@ public class ColladaInputPipe {
 
         int index = memberIndex * _sourceData.stride + _sourceData.offset;
         final ParamType paramType = _sourceData.paramType;
-        for (int i = 0; i < paramCount; i++) {
+        for (int i = 0; i < _paramCount; i++) {
             if (ParamType.float_param == paramType) {
                 _buffer.put(_sourceData.floatArray[index]);
             } else if (ParamType.int_param == paramType) {
@@ -205,23 +225,6 @@ public class ColladaInputPipe {
             }
             index++;
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Element getPositionSource(final Element v) {
-        for (final Element input : (List<Element>) v.getChildren("input")) {
-            if ("POSITION".equals(input.getAttributeValue("semantic"))) {
-                final Element n = ColladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                if (n != null && "source".equals(n.getName())) {
-                    return n;
-                }
-            }
-        }
-
-        // changed this to throw an exception instead - otherwise, there will just be a nullpointer exception
-        // outside. This provides much more information about what went wrong / Petter
-        // return null;
-        throw new ColladaException("Unable to find POSITION semantic for inputs under DaeVertices", v);
     }
 
     /**

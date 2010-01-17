@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -29,10 +29,10 @@ public class SkeletonPose {
     private final Transform[] _globalTransforms;
 
     /**
-     * A pallete of matrices used in skin deformation - basically the global transform X the inverse bind pose
+     * A palette of matrices used in skin deformation - basically the global transform X the inverse bind pose
      * transform.
      */
-    private final Matrix4[] _matrixPallete;
+    private final Matrix4[] _matrixPalette;
 
     /**
      * Construct a new SkeletonPose using the given Skeleton.
@@ -58,10 +58,10 @@ public class SkeletonPose {
             _globalTransforms[i] = new Transform();
         }
 
-        // init pallete
-        _matrixPallete = new Matrix4[jointCount];
+        // init palette
+        _matrixPalette = new Matrix4[jointCount];
         for (int i = 0; i < jointCount; i++) {
-            _matrixPallete[i] = new Matrix4();
+            _matrixPalette[i] = new Matrix4();
         }
 
         // start off in bind pose.
@@ -92,20 +92,22 @@ public class SkeletonPose {
     /**
      * @return an array of global space transforms for each of the skeleton's joints.
      */
-    public Matrix4[] getMatrixPallete() {
-        return _matrixPallete;
+    public Matrix4[] getMatrixPalette() {
+        return _matrixPalette;
     }
 
     /**
-     * Update the global and pallete transforms of our posed joints based on the current local joint transforms.
+     * Update the global and palette transforms of our posed joints based on the current local joint transforms.
      */
     public void updateTransforms() {
         final Transform temp = Transform.fetchTempInstance();
         // we go in update array order, which ensures parent global transforms are updated before child.
-        final int[] orders = _skeleton.getJointOrders();
-        for (int i = 0; i < orders.length; i++) {
+        // final int[] orders = _skeleton.getJointOrders();
+        final int nrJoints = _skeleton.getJoints().length;
+        // for (int i = 0; i < orders.length; i++) {
+        for (int i = 0; i < nrJoints; i++) {
             // the joint index
-            final int index = orders[i];
+            final int index = i;
 
             // find our parent
             final short parentIndex = _skeleton.getJoints()[index].getParentIndex();
@@ -122,7 +124,7 @@ public class SkeletonPose {
             // joint's inverse bind pose (joint->model space, inverted). This gives us a transform that can take a
             // vertex from bind pose (model space) to current pose (model space).
             _globalTransforms[index].multiply(_skeleton.getJoints()[index].getInverseBindPose(), temp);
-            temp.getHomogeneousMatrix(_matrixPallete[index]);
+            temp.getHomogeneousMatrix(_matrixPalette[index]);
         }
         Transform.releaseTempInstance(temp);
     }

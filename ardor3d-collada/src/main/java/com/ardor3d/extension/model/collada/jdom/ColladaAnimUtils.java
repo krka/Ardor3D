@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,24 +15,41 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Element;
 
+import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.Joint;
+import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.ParamType;
-import com.ardor3d.extension.model.collada.jdom.data.GlobalData;
+import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.Type;
+import com.ardor3d.extension.model.collada.jdom.data.AnimationItem;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
+import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.MeshVertPairs;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
+import com.ardor3d.extension.model.collada.jdom.data.TransformElement;
+import com.ardor3d.extension.model.collada.jdom.data.TransformElement.TransformElementType;
+import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.Vector3;
+import com.ardor3d.math.Vector4;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
@@ -44,12 +61,107 @@ import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
- * Utility functions useful for parsing Collada data related to skinning and morphing.
+ * Methods for parsing Collada data related to animation, skinning and morphing.
  */
 public class ColladaAnimUtils {
     private static final Logger logger = Logger.getLogger(ColladaAnimUtils.class.getName());
+
+    private final ColladaStorage _colladaStorage;
+    private final DataCache _dataCache;
+    private final ColladaDOMUtil _colladaDOMUtil;
+    private final ColladaMeshUtils _colladaMeshUtils;
+
+    public ColladaAnimUtils(final ColladaStorage colladaStorage, final DataCache dataCache,
+            final ColladaDOMUtil colladaDOMUtil, final ColladaMeshUtils colladaMeshUtils) {
+        _colladaStorage = colladaStorage;
+        _dataCache = dataCache;
+        _colladaDOMUtil = colladaDOMUtil;
+        _colladaMeshUtils = colladaMeshUtils;
+    }
+
+    /**
+     * Retrieve a name to use for the skin node based on the element names.
+     * 
+     * @param ic
+     *            instance_controller element.
+     * @param controller
+     *            controller element
+     * @return name.
+     * @see SkinData#SkinData(String)
+     */
+    private String getSkinStoreName(final Element ic, final Element controller) {
+        final String controllerName = controller.getAttributeValue("name", (String) null) != null ? controller
+                .getAttributeValue("name", (String) null) : controller.getAttributeValue("id", (String) null);
+        final String instanceControllerName = ic.getAttributeValue("name", (String) null) != null ? ic
+                .getAttributeValue("name", (String) null) : ic.getAttributeValue("sid", (String) null);
+        final String storeName = (controllerName != null ? controllerName : "")
+                + (controllerName != null && instanceControllerName != null ? " : " : "")
+                + (instanceControllerName != null ? instanceControllerName : "");
+        return storeName;
+    }
+
+    /**
+     * Copy the render states from our source Spatial to the destination Spatial. Does not recurse.
+     * 
+     * @param source
+     * @param target
+     */
+    private void copyRenderStates(final Spatial source, final Spatial target) {
+        final EnumMap<StateType, RenderState> states = source.getLocalRenderStates();
+        for (final RenderState state : states.values()) {
+            target.setRenderState(state);
+        }
+    }
+
+    /**
+     * Clone the given MeshData object via deep copy using the Ardor3D BinaryExporter and BinaryImporter.
+     * 
+     * @param meshData
+     *            the source to clone.
+     * @return the clone.
+     * @throws IOException
+     *             if we have troubles during the clone.
+     */
+    private MeshData copyMeshData(final MeshData meshData) throws IOException {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final BinaryExporter exporter = new BinaryExporter();
+        exporter.save(meshData, bos);
+        bos.flush();
+        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        final BinaryImporter importer = new BinaryImporter();
+        final Savable sav = importer.load(bis);
+        return (MeshData) sav;
+    }
+
+    /**
+     * Builds data based on an instance controller element.
+     * 
+     * @param node
+     *            Ardor3D parent Node
+     * @param instanceController
+     */
+    void buildController(final Node node, final Element instanceController) {
+        final Element controller = _colladaDOMUtil.findTargetWithId(instanceController.getAttributeValue("url"));
+
+        if (controller == null) {
+            throw new ColladaException("Unable to find controller with id: "
+                    + instanceController.getAttributeValue("url"), instanceController);
+        }
+
+        final Element skin = controller.getChild("skin");
+        if (skin != null) {
+            buildSkinMeshes(node, instanceController, controller, skin);
+        } else {
+            // look for morph... can only be one or the other according to Collada
+            final Element morph = controller.getChild("morph");
+            if (morph != null) {
+                buildMorphMeshes(node, controller, morph);
+            }
+        }
+    }
 
     /**
      * Construct skin mesh(es) from the skin element and attach them (under a single new Node) to the given parent Node.
@@ -57,18 +169,18 @@ public class ColladaAnimUtils {
      * @param ardorParentNode
      *            Ardor3D Node to attach our skin node to.
      * @param instanceController
-     *            the <instance_controller> element. We'll parse the skeleon reference from here.
+     *            the <instance_controller> element. We'll parse the skeleton reference from here.
      * @param controller
      *            the referenced <controller> element. Used for naming purposes.
      * @param skin
      *            our <skin> element.
      */
     @SuppressWarnings("unchecked")
-    public static void buildSkinMeshes(final Node ardorParentNode, final Element instanceController,
+    private void buildSkinMeshes(final Node ardorParentNode, final Element instanceController,
             final Element controller, final Element skin) {
         final String skinSource = skin.getAttributeValue("source");
 
-        final Element skinNodeEL = ColladaDOMUtil.findTargetWithId(skinSource);
+        final Element skinNodeEL = _colladaDOMUtil.findTargetWithId(skinSource);
         if (skinNodeEL == null || !"geometry".equals(skinNodeEL.getName())) {
             throw new ColladaException("Expected a mesh for skin source with url: " + skinSource
                     + " (line number is referring skin)", controller.getChild("skin"));
@@ -76,12 +188,12 @@ public class ColladaAnimUtils {
 
         final Element geometry = skinNodeEL;
 
-        final Node meshNode = ColladaMeshUtils.buildMesh(geometry);
+        final Node meshNode = _colladaMeshUtils.buildMesh(geometry);
         if (meshNode != null) {
             // Look for skeleton entries in the original <instance_controller> element
             final List<Element> skeletonRoots = Lists.newArrayList();
             for (final Element sk : (List<Element>) instanceController.getChildren("skeleton")) {
-                final Element skroot = ColladaDOMUtil.findTargetWithId(sk.getText());
+                final Element skroot = _colladaDOMUtil.findTargetWithId(sk.getText());
                 if (skroot != null) {
                     // add as a possible root for when we need to locate a joint by name later.
                     skeletonRoots.add(skroot);
@@ -103,7 +215,7 @@ public class ColladaAnimUtils {
             final List<ColladaInputPipe.ParamType> paramTypes = Lists.newArrayList();
 
             for (final Element inputEL : (List<Element>) jointsEL.getChildren("input")) {
-                final ColladaInputPipe pipe = new ColladaInputPipe(inputEL);
+                final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, inputEL);
                 final ColladaInputPipe.SourceData sd = pipe.getSourceData();
                 if (pipe.getType() == ColladaInputPipe.Type.JOINT) {
                     final String[] namesData = sd.stringArray;
@@ -124,38 +236,30 @@ public class ColladaAnimUtils {
                 }
             }
 
-            // Make a joint array with name and inverse bind matrix
-            final Joint[] joints = new Joint[jointNames.size()];
-            for (int i = 0; i < joints.length; i++) {
-                joints[i] = new Joint(jointNames.get(i));
-                if (bindMatrices.size() > i) {
-                    joints[i].setInverseBindPose(bindMatrices.get(i));
-                }
-            }
-
             // Use the skeleton information from the instance_controller to set the parent array locations on the
             // joints.
-            for (int i = 0; i < joints.length; i++) {
-                final Joint joint = joints[i];
+            Skeleton ourSkeleton = null; // TODO: maybe not the best way. iterate
+            final int[] order = new int[jointNames.size()];
+            for (int i = 0; i < jointNames.size(); i++) {
+                final String name = jointNames.get(i);
                 final ParamType paramType = paramTypes.get(i);
                 final String searcher = paramType == ParamType.idref_param ? "id" : "sid";
-                final String name = joint.getName();
                 Element found = null;
                 for (final Element root : skeletonRoots) {
                     if (name.equals(root.getAttributeValue(searcher))) {
                         found = root;
                     } else if (paramType == ParamType.idref_param) {
-                        found = ColladaDOMUtil.findTargetWithId(name);
+                        found = _colladaDOMUtil.findTargetWithId(name);
                     } else {
-                        found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@sid='" + name + "']");
+                        found = (Element) _colladaDOMUtil.selectSingleNode(root, ".//*[@sid='" + name + "']");
                     }
 
                     // Last resorts (bad exporters)
                     if (found == null) {
-                        found = ColladaDOMUtil.findTargetWithId(name);
+                        found = _colladaDOMUtil.findTargetWithId(name);
                     }
                     if (found == null) {
-                        found = (Element) ColladaDOMUtil.selectSingleNode(root, ".//*[@name='" + name + "']");
+                        found = (Element) _colladaDOMUtil.selectSingleNode(root, ".//*[@name='" + name + "']");
                     }
 
                     if (found != null) {
@@ -164,18 +268,18 @@ public class ColladaAnimUtils {
                 }
                 if (found == null) {
                     if (paramType == ParamType.idref_param) {
-                        found = ColladaDOMUtil.findTargetWithId(name);
+                        found = _colladaDOMUtil.findTargetWithId(name);
                     } else {
-                        found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@sid='" + name
-                                + "']");
+                        found = (Element) _colladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@sid='"
+                                + name + "']");
                     }
 
                     // Last resorts (bad exporters)
                     if (found == null) {
-                        found = ColladaDOMUtil.findTargetWithId(name);
+                        found = _colladaDOMUtil.findTargetWithId(name);
                     }
                     if (found == null) {
-                        found = (Element) ColladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@name='"
+                        found = (Element) _colladaDOMUtil.selectSingleNode(geometry, "/*//visual_scene//*[@name='"
                                 + name + "']");
                     }
 
@@ -183,32 +287,15 @@ public class ColladaAnimUtils {
                         throw new ColladaException("Unable to find joint with " + searcher + ": " + name, skin);
                     }
                 }
-                if (found.getParentElement() != null) {
-                    String parName = found.getParentElement().getAttributeValue(searcher);
 
-                    // Last resort (bad exporters)
-                    if (parName == null) {
-                        parName = found.getParentElement().getAttributeValue("id");
-                    }
-                    if (parName == null) {
-                        parName = found.getParentElement().getAttributeValue("name");
-                    }
+                final Joint joint = _dataCache.getElementJointMapping().get(found);
+                joint.setInverseBindPose(bindMatrices.get(i));
 
-                    if (parName != null) {
-                        final int index = jointNames.indexOf(parName);
-                        if (index >= 0) {
-                            // found a valid index, so set on joint.
-                            joint.setParentIndex((short) index);
-                            continue;
-                        }
-                    }
-                }
-                // no parent, so it's a root bone
-                joint.setParentIndex(Joint.NO_PARENT);
+                ourSkeleton = _dataCache.getJointSkeletonMapping().get(joint);
+                order[i] = joint.getIndex();
             }
 
             // Make our skeleton
-            final Skeleton ourSkeleton = new Skeleton("skeleton", joints);
             final SkeletonPose skPose = new SkeletonPose(ourSkeleton);
             // Skeleton's default to bind position, so update the global transforms.
             skPose.updateTransforms();
@@ -226,7 +313,7 @@ public class ColladaAnimUtils {
 
             int maxOffset = 0;
             for (final Element inputEL : (List<Element>) weightsEL.getChildren("input")) {
-                final ColladaInputPipe pipe = new ColladaInputPipe(inputEL);
+                final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, inputEL);
                 final ColladaInputPipe.SourceData sd = pipe.getSourceData();
                 if (pipe.getOffset() > maxOffset) {
                     maxOffset = pipe.getOffset();
@@ -255,7 +342,7 @@ public class ColladaAnimUtils {
 
             // Pull our values array
             int firstIndex = 0, count = 0;
-            final int[] vals = ColladaDOMUtil.parseIntArray(weightsEL.getChild("v"));
+            final int[] vals = _colladaDOMUtil.parseIntArray(weightsEL.getChild("v"));
             try {
                 count = weightsEL.getAttribute("count").getIntValue();
             } catch (final DataConversionException e) {
@@ -264,7 +351,7 @@ public class ColladaAnimUtils {
             // use the vals to fill our vert weight map
             final int[][] vertWeightMap = new int[count][];
             int index = 0;
-            for (final int length : ColladaDOMUtil.parseIntArray(weightsEL.getChild("vcount"))) {
+            for (final int length : _colladaDOMUtil.parseIntArray(weightsEL.getChild("vcount"))) {
                 final int[] entry = new int[(maxOffset + 1) * length];
                 vertWeightMap[index++] = entry;
 
@@ -274,7 +361,7 @@ public class ColladaAnimUtils {
             }
 
             // Create a record for the global ColladaStorage.
-            final String storeName = ColladaAnimUtils.getSkinStoreName(instanceController, controller);
+            final String storeName = getSkinStoreName(instanceController, controller);
             final SkinData skinDataStore = new SkinData(storeName);
             // add pose to store
             skinDataStore.setPose(skPose);
@@ -282,7 +369,7 @@ public class ColladaAnimUtils {
             // Create a base Node for our skin meshes
             final Node skinNode = new Node(meshNode.getName());
             // copy Node render states across.
-            ColladaAnimUtils.copyRenderStates(meshNode, skinNode);
+            copyRenderStates(meshNode, skinNode);
             // add node to store
             skinDataStore.setSkinBaseNode(skinNode);
 
@@ -290,7 +377,7 @@ public class ColladaAnimUtils {
             final Element bindShapeMatrixEL = skin.getChild("bind_shape_matrix");
             final Transform bindShapeMatrix = new Transform();
             if (bindShapeMatrixEL != null) {
-                final double[] array = ColladaDOMUtil.parseDoubleArray(bindShapeMatrixEL);
+                final double[] array = _colladaDOMUtil.parseDoubleArray(bindShapeMatrixEL);
                 bindShapeMatrix.fromHomogeneousMatrix(new Matrix4().fromArray(array));
             }
 
@@ -302,11 +389,11 @@ public class ColladaAnimUtils {
                     skMesh.setCurrentPose(skPose);
 
                     // copy mesh render states across.
-                    ColladaAnimUtils.copyRenderStates(sourceMesh, skMesh);
+                    copyRenderStates(sourceMesh, skMesh);
 
                     try {
                         // Use source mesh as bind pose data in the new SkinnedMesh
-                        final MeshData bindPose = ColladaAnimUtils.copyMeshData(sourceMesh.getMeshData());
+                        final MeshData bindPose = copyMeshData(sourceMesh.getMeshData());
                         skMesh.setBindPoseData(bindPose);
 
                         // Apply our BSM
@@ -319,19 +406,18 @@ public class ColladaAnimUtils {
 
                         // TODO: This is only needed for CPU skinning... consider a way of making it optional.
                         // Copy bind pose to mesh data to setup for CPU skinning
-                        skMesh.setMeshData(ColladaAnimUtils.copyMeshData(skMesh.getBindPoseData()));
+                        skMesh.setMeshData(copyMeshData(skMesh.getBindPoseData()));
                     } catch (final IOException e) {
                         e.printStackTrace();
                         throw new ColladaException("Unable to copy skeleton bind pose data.", geometry);
                     }
 
                     // Grab the MeshVertPairs from Global for this mesh.
-                    final Collection<MeshVertPairs> vertPairsList = GlobalData.getInstance().getVertMappings().get(
-                            geometry);
+                    final Collection<MeshVertPairs> vertPairsList = _dataCache.getVertMappings().get(geometry);
                     MeshVertPairs pairsMap = null;
                     if (vertPairsList != null) {
                         for (final MeshVertPairs pairs : vertPairsList) {
-                            if (pairs.mesh == sourceMesh) {
+                            if (pairs.getMesh() == sourceMesh) {
                                 pairsMap = pairs;
                             }
                         }
@@ -343,15 +429,15 @@ public class ColladaAnimUtils {
 
                     // Use pairs map and vertWeightMap to build our weights and joint indices.
                     {
-                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.indices.length
+                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.getIndices().length
                                 * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
-                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.indices.length
+                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.getIndices().length
                                 * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
                         int j;
                         float sum = 0;
                         final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
                         final short[] indices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
-                        for (final int originalIndex : pairsMap.indices) {
+                        for (final int originalIndex : pairsMap.getIndices()) {
                             j = 0;
                             sum = 0;
 
@@ -361,11 +447,11 @@ public class ColladaAnimUtils {
                                 final float weight = jointWeights.get(data[i + weightOff]);
                                 if (weight != 0) {
                                     if (j >= SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
-                                        ColladaAnimUtils.logger.warning("Max of " + SkinnedMesh.MAX_JOINTS_PER_VERTEX
+                                        logger.warning("Max of " + SkinnedMesh.MAX_JOINTS_PER_VERTEX
                                                 + " joints supported per vertex.  Found " + (j + 1));
                                     } else {
                                         weights[j] = jointWeights.get(data[i + weightOff]);
-                                        indices[j] = jointIndices.get(data[i + indOff]);
+                                        indices[j] = (short) order[jointIndices.get(data[i + indOff])];
                                         sum += weights[j++];
                                     }
                                 }
@@ -405,62 +491,8 @@ public class ColladaAnimUtils {
             ardorParentNode.attachChild(skinNode);
 
             // Add skin record to storage.
-            GlobalData.getInstance().getColladaStorage().getSkins().add(skinDataStore);
+            _colladaStorage.getSkins().add(skinDataStore);
         }
-    }
-
-    /**
-     * Retrieve a name to use for the skin node based on the element names.
-     * 
-     * @param ic
-     *            instance_controller element.
-     * @param controller
-     *            controller element
-     * @return name.
-     * @see SkinData#SkinData(String)
-     */
-    private static String getSkinStoreName(final Element ic, final Element controller) {
-        final String controllerName = controller.getAttributeValue("name", (String) null) != null ? controller
-                .getAttributeValue("name", (String) null) : controller.getAttributeValue("id", (String) null);
-        final String instanceControllerName = ic.getAttributeValue("name", (String) null) != null ? ic
-                .getAttributeValue("name", (String) null) : ic.getAttributeValue("sid", (String) null);
-        final String storeName = (controllerName != null ? controllerName : "")
-                + (controllerName != null && instanceControllerName != null ? " : " : "")
-                + (instanceControllerName != null ? instanceControllerName : "");
-        return storeName;
-    }
-
-    /**
-     * Copy the render states from our source Spatial to the destination Spatial. Does not recurse.
-     * 
-     * @param source
-     * @param target
-     */
-    private static void copyRenderStates(final Spatial source, final Spatial target) {
-        final EnumMap<StateType, RenderState> states = source.getLocalRenderStates();
-        for (final RenderState state : states.values()) {
-            target.setRenderState(state);
-        }
-    }
-
-    /**
-     * Clone the given MeshData object via deep copy using the Ardor3D BinaryExporter and BinaryImporter.
-     * 
-     * @param meshData
-     *            the source to clone.
-     * @return the clone.
-     * @throws IOException
-     *             if we have troubles during the clone.
-     */
-    private static MeshData copyMeshData(final MeshData meshData) throws IOException {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final BinaryExporter exporter = new BinaryExporter();
-        exporter.save(meshData, bos);
-        bos.flush();
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        final BinaryImporter importer = new BinaryImporter();
-        final Savable sav = importer.load(bis);
-        return (MeshData) sav;
     }
 
     /**
@@ -477,10 +509,10 @@ public class ColladaAnimUtils {
      * @param morph
      *            our <morph> element
      */
-    public static void buildMorphMeshes(final Node ardorParentNode, final Element controller, final Element morph) {
+    private void buildMorphMeshes(final Node ardorParentNode, final Element controller, final Element morph) {
         final String skinSource = morph.getAttributeValue("source");
 
-        final Element skinNode = ColladaDOMUtil.findTargetWithId(skinSource);
+        final Element skinNode = _colladaDOMUtil.findTargetWithId(skinSource);
         if (skinNode == null || !"geometry".equals(skinNode.getName())) {
             throw new ColladaException("Expected a mesh for morph source with url: " + skinSource
                     + " (line number is referring morph)", controller.getChild("morph"));
@@ -488,14 +520,547 @@ public class ColladaAnimUtils {
 
         final Element geometry = skinNode;
 
-        final Spatial baseMesh = ColladaMeshUtils.buildMesh(geometry);
+        final Spatial baseMesh = _colladaMeshUtils.buildMesh(geometry);
 
         // TODO: support morph animations someday.
-        ColladaAnimUtils.logger.warning("Morph target animation not yet supported.");
+        logger.warning("Morph target animation not yet supported.");
 
         // Just add mesh.
         if (baseMesh != null) {
             ardorParentNode.attachChild(baseMesh);
+        }
+    }
+
+    /**
+     * Parse all animations in library_animations
+     * 
+     * @param colladaRoot
+     */
+    public void parseLibraryAnimations(final Element colladaRoot) {
+        if (colladaRoot.getChild("library_animations") == null) {
+            logger.warning("No animations found in collada file!");
+            return;
+        }
+
+        final Element libraryAnimations = colladaRoot.getChild("library_animations");
+
+        final AnimationItem animationItemRoot = new AnimationItem("Animation Root");
+        _colladaStorage.setAnimationItemRoot(animationItemRoot);
+
+        final Map<Element, List<TargetChannel>> channelMap = Maps.newHashMap();
+
+        parseAnimations(channelMap, libraryAnimations, animationItemRoot);
+
+        for (final Entry<Element, List<TargetChannel>> entry : channelMap.entrySet()) {
+            buildAnimations(entry);
+        }
+    }
+
+    /**
+     * Merge all animation channels into Ardor jointchannels
+     * 
+     * @param entry
+     */
+    private void buildAnimations(final Entry<Element, List<TargetChannel>> entry) {
+        final Element parentElement = entry.getKey();
+        final List<TargetChannel> targetList = entry.getValue();
+
+        final List<Element> elementTransforms = new ArrayList<Element>();
+        for (final Element child : (List<Element>) parentElement.getChildren()) {
+            if (_dataCache.getTransformTypes().contains(child.getName())) {
+                elementTransforms.add(child);
+            }
+        }
+        final List<TransformElement> transformList = getNodeTransformList(elementTransforms);
+
+        for (final TargetChannel targetChannel : targetList) {
+            final String source = targetChannel.source;
+            final Target target = targetChannel.target;
+            final Element targetNode = targetChannel.targetNode;
+
+            final int targetIndex = elementTransforms.indexOf(targetNode);
+            logger.fine(parentElement.getName() + "(" + parentElement.getAttributeValue("name") + ") -> "
+                    + targetNode.getName() + "(" + targetIndex + ")");
+
+            final EnumMap<Type, ColladaInputPipe> pipes = Maps.newEnumMap(Type.class);
+
+            final Element samplerElement = _colladaDOMUtil.findTargetWithId(source);
+            for (final Element inputElement : (List<Element>) samplerElement.getChildren("input")) {
+                final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, inputElement);
+                pipes.put(pipe.getType(), pipe);
+            }
+
+            // get input (which is TIME for now)
+            final ColladaInputPipe inputPipe = pipes.get(Type.INPUT);
+            final ColladaInputPipe.SourceData sdIn = inputPipe.getSourceData();
+            final float[] time = sdIn.floatArray;
+            targetChannel.time = time;
+            logger.fine("inputPipe: " + Arrays.toString(time));
+
+            // get output data
+            final ColladaInputPipe outputPipe = pipes.get(Type.OUTPUT);
+            final ColladaInputPipe.SourceData sdOut = outputPipe.getSourceData();
+            final float[] animationData = sdOut.floatArray;
+            targetChannel.animationData = animationData;
+            logger.fine("outputPipe: " + Arrays.toString(animationData));
+
+            // get target array from transform list
+            final TransformElement transformElement = transformList.get(targetIndex);
+            final double[] array = transformElement.getArray();
+            targetChannel.array = array;
+
+            final int stride = sdOut.stride;
+            targetChannel.stride = stride;
+
+            targetChannel.currentPos = 0;
+        }
+
+        final List<Float> finalTimeList = Lists.newArrayList();
+        final List<Transform> finalTransformList = Lists.newArrayList();
+        final List<TargetChannel> workingChannels = Lists.newArrayList();
+        for (;;) {
+            float lowestTime = Float.MAX_VALUE;
+            boolean found = false;
+            for (final TargetChannel targetChannel : targetList) {
+                if (targetChannel.currentPos < targetChannel.time.length) {
+                    final float time = targetChannel.time[targetChannel.currentPos];
+                    if (time < lowestTime) {
+                        lowestTime = time;
+                    }
+                    found = true;
+                }
+            }
+            if (!found) {
+                break;
+            }
+
+            workingChannels.clear();
+            for (final TargetChannel targetChannel : targetList) {
+                if (targetChannel.currentPos < targetChannel.time.length) {
+                    final float time = targetChannel.time[targetChannel.currentPos];
+                    if (time == lowestTime) {
+                        workingChannels.add(targetChannel);
+                    }
+                }
+            }
+
+            for (final TargetChannel targetChannel : workingChannels) {
+                final Target target = targetChannel.target;
+                final float[] animationData = targetChannel.animationData;
+                final double[] array = targetChannel.array;
+
+                // set the correct values depending on accessor
+                final int position = targetChannel.currentPos * targetChannel.stride;
+                if (target.accessorType == AccessorType.None) {
+                    for (int j = 0; j < array.length; j++) {
+                        array[j] = animationData[position + j];
+                    }
+                } else {
+                    if (target.accessorType == AccessorType.Vector) {
+                        array[target.accessorIndexX] = animationData[position];
+                    } else if (target.accessorType == AccessorType.Matrix) {
+                        array[target.accessorIndexY * 4 + target.accessorIndexX] = animationData[position];
+                    }
+                }
+                targetChannel.currentPos++;
+            }
+
+            // bake the transform
+            final Transform transform = bakeTransforms(transformList);
+            finalTimeList.add(lowestTime);
+            finalTransformList.add(transform);
+        }
+
+        final float[] time = new float[finalTimeList.size()];
+        for (int i = 0; i < finalTimeList.size(); i++) {
+            time[i] = finalTimeList.get(i);
+        }
+        final Transform[] transforms = finalTransformList.toArray(new Transform[finalTransformList.size()]);
+
+        // create channel (TODO: create a channel to handle other interpolations)
+        final Joint joint = _dataCache.getElementJointMapping().get(parentElement);
+        if (joint == null) {
+            final String str = getElementString(parentElement, 0, false);
+            logger.warning("No element-joint mapping found for element: " + str);
+            return;
+        }
+        final int jointIndex = joint.getIndex();
+        final JointChannel jointChannel = new JointChannel(jointIndex, time, transforms);
+
+        final AnimationItem animationItemRoot = targetList.get(0).animationItemRoot;
+        AnimationClip animationClip = animationItemRoot.getAnimationClip();
+        if (animationClip == null) {
+            animationClip = new AnimationClip();
+            animationItemRoot.setAnimationClip(animationClip);
+        }
+        animationClip.addChannel(jointChannel);
+
+        _colladaStorage.getJointChannels().add(jointChannel);
+    }
+
+    /**
+     * Storing animation data to use for merging into jointchannels
+     */
+    class TargetChannel {
+        Target target;
+        Element targetNode;
+        String source;
+        AnimationItem animationItemRoot;
+
+        float[] time;
+        float[] animationData;
+        double[] array;
+        int stride;
+        int currentPos;
+
+        public TargetChannel(final Target target, final Element targetNode, final String source,
+                final AnimationItem animationItemRoot) {
+            this.target = target;
+            this.targetNode = targetNode;
+            this.source = source;
+            this.animationItemRoot = animationItemRoot;
+        }
+    }
+
+    /**
+     * Gather up all animation channels based on what nodes they affect.
+     * 
+     * @param channelMap
+     * @param animationRoot
+     * @param animationItemRoot
+     */
+    private void parseAnimations(final Map<Element, List<TargetChannel>> channelMap, final Element animationRoot,
+            final AnimationItem animationItemRoot) {
+        if (animationRoot.getChild("animation") != null) {
+            Attribute nameAttribute = animationRoot.getAttribute("name");
+            if (nameAttribute == null) {
+                nameAttribute = animationRoot.getAttribute("id");
+            }
+            final String name = nameAttribute != null ? nameAttribute.getValue() : "Default";
+
+            final AnimationItem animationItem = new AnimationItem(name);
+            animationItemRoot.getChildren().add(animationItem);
+
+            for (final Element animationElement : (List<Element>) animationRoot.getChildren("animation")) {
+                parseAnimations(channelMap, animationElement, animationItem);
+            }
+        } else {
+            logger.fine("\n-- Parsing animation --");
+            final Element channel = animationRoot.getChild("channel");
+            final String source = channel.getAttributeValue("source");
+
+            final String targetString = channel.getAttributeValue("target");
+            final Target target = processTargetString(targetString);
+            logger.fine(target.toString());
+            final Element targetNode = findTargetNode(target);
+            if (targetNode == null || !_dataCache.getTransformTypes().contains(targetNode.getName())) {
+                // TODO: pass with warning or exception or nothing?
+                // throw new ColladaException("No target transform node found for target: " + target, target);
+                return;
+            }
+            final Element parentElement = targetNode.getParentElement();
+
+            List<TargetChannel> targetList = channelMap.get(parentElement);
+            if (targetList == null) {
+                targetList = Lists.newArrayList();
+                channelMap.put(parentElement, targetList);
+            }
+            targetList.add(new TargetChannel(target, targetNode, source, animationItemRoot));
+        }
+    }
+
+    /**
+     * Find a target node based on collada target format.
+     * 
+     * @param target
+     * @return
+     */
+    private Element findTargetNode(final Target target) {
+        Element currentElement = _colladaDOMUtil.findTargetWithId(target.id);
+        if (currentElement == null) {
+            throw new ColladaException("No target found with id: " + target.id, target);
+        }
+
+        for (final String sid : target.sids) {
+            final String query = ".//*[@sid='" + sid + "']";
+            final Element sidElement = (Element) _colladaDOMUtil.selectSingleNode(currentElement, query);
+            if (sidElement == null) {
+                // throw new ColladaException("No element found with sid: " + sid, target);
+
+                // TODO: this is a hack to support older 3ds max exports. will be removed and instead use
+                // the above exception
+                // logger.warning("No element found with sid: " + sid + ", trying with first child.");
+                // final List<Element> children = currentElement.getChildren();
+                // if (!children.isEmpty()) {
+                // currentElement = children.get(0);
+                // }
+                // break;
+
+                logger.warning("No element found with sid: " + sid + ", skipping channel.");
+                return null;
+            } else {
+                currentElement = sidElement;
+            }
+        }
+
+        return currentElement;
+    }
+
+    private static final Map<String, Integer> symbolMap = Maps.newHashMap();
+    static {
+        symbolMap.put("ANGLE", 3);
+        symbolMap.put("TIME", 0);
+
+        symbolMap.put("X", 0);
+        symbolMap.put("Y", 1);
+        symbolMap.put("Z", 2);
+        symbolMap.put("W", 3);
+
+        symbolMap.put("R", 0);
+        symbolMap.put("G", 1);
+        symbolMap.put("B", 2);
+        symbolMap.put("A", 3);
+
+        symbolMap.put("S", 0);
+        symbolMap.put("T", 1);
+        symbolMap.put("P", 2);
+        symbolMap.put("Q", 3);
+
+        symbolMap.put("U", 0);
+        symbolMap.put("V", 1);
+        symbolMap.put("P", 2);
+        symbolMap.put("Q", 3);
+    }
+
+    /**
+     * Break up a target uri string into id, sids and accessors
+     * 
+     * @param targetString
+     * @return
+     */
+    private Target processTargetString(final String targetString) {
+        final Target target = new Target();
+
+        int accessorIndex = targetString.indexOf(".");
+        if (accessorIndex == -1) {
+            accessorIndex = targetString.indexOf("(");
+        }
+        final boolean hasAccessor = accessorIndex != -1;
+        if (accessorIndex == -1) {
+            accessorIndex = targetString.length();
+        }
+
+        final String baseString = targetString.substring(0, accessorIndex);
+
+        int sidIndex = baseString.indexOf("/");
+        final boolean hasSid = sidIndex != -1;
+        if (!hasSid) {
+            sidIndex = baseString.length();
+        }
+
+        final String id = baseString.substring(0, sidIndex);
+        target.id = id;
+
+        if (hasSid) {
+            final String sidGroup = baseString.substring(sidIndex + 1, baseString.length());
+
+            final StringTokenizer tokenizer = new StringTokenizer(sidGroup, "/");
+            while (tokenizer.hasMoreTokens()) {
+                final String sid = tokenizer.nextToken();
+                target.sids.add(sid);
+            }
+        }
+
+        if (hasAccessor) {
+            String accessorString = targetString.substring(accessorIndex, targetString.length());
+            accessorString = accessorString.replace(".", "");
+
+            if (accessorString.startsWith("(")) {
+                int endPara = accessorString.indexOf(")");
+                final String indexXString = accessorString.substring(1, endPara);
+                target.accessorIndexX = Integer.parseInt(indexXString);
+                if (endPara < accessorString.length() - 1) {
+                    final String lastAccessorString = accessorString.substring(endPara + 1, accessorString.length());
+                    endPara = lastAccessorString.indexOf(")");
+                    final String indexYString = lastAccessorString.substring(1, endPara);
+                    target.accessorIndexY = Integer.parseInt(indexYString);
+                    target.accessorType = AccessorType.Matrix;
+                } else {
+                    target.accessorType = AccessorType.Vector;
+                }
+            } else {
+                target.accessorIndexX = symbolMap.get(accessorString);
+                target.accessorType = AccessorType.Vector;
+            }
+        }
+
+        return target;
+    }
+
+    /**
+     * Convert a list of collada elements into a list of TransformElements
+     * 
+     * @param transforms
+     * @return
+     */
+    private List<TransformElement> getNodeTransformList(final List<Element> transforms) {
+        final List<TransformElement> transformList = Lists.newArrayList();
+
+        for (final Element transform : transforms) {
+            final double[] array = _colladaDOMUtil.parseDoubleArray(transform);
+
+            if ("translate".equals(transform.getName())) {
+                transformList.add(new TransformElement(array, TransformElementType.Translation));
+            } else if ("rotate".equals(transform.getName())) {
+                transformList.add(new TransformElement(array, TransformElementType.Rotation));
+            } else if ("scale".equals(transform.getName())) {
+                transformList.add(new TransformElement(array, TransformElementType.Scale));
+            } else if ("matrix".equals(transform.getName())) {
+                transformList.add(new TransformElement(array, TransformElementType.Matrix));
+            } else if ("lookat".equals(transform.getName())) {
+                transformList.add(new TransformElement(array, TransformElementType.Lookat));
+            } else {
+                logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
+            }
+        }
+
+        return transformList;
+    }
+
+    /**
+     * Bake a list of TransformElements into an Ardor3D Transform object.
+     * 
+     * @param transforms
+     * @return
+     */
+    private Transform bakeTransforms(final List<TransformElement> transforms) {
+        final Matrix4 workingMat = Matrix4.fetchTempInstance();
+        final Matrix4 finalMat = Matrix4.fetchTempInstance();
+        finalMat.setIdentity();
+        for (final TransformElement transform : transforms) {
+            final double[] array = transform.getArray();
+            final TransformElementType type = transform.getType();
+            if (type == TransformElementType.Translation) {
+                workingMat.setIdentity();
+                workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
+                finalMat.multiplyLocal(workingMat);
+            } else if (type == TransformElementType.Rotation) {
+                if (array[3] != 0) {
+                    workingMat.setIdentity();
+                    final Matrix3 rotate = new Matrix3().fromAngleAxis(array[3] * MathUtils.DEG_TO_RAD, new Vector3(
+                            array[0], array[1], array[2]));
+                    workingMat.set(rotate);
+                    finalMat.multiplyLocal(workingMat);
+                }
+            } else if (type == TransformElementType.Scale) {
+                workingMat.setIdentity();
+                workingMat.scale(new Vector4(array[0], array[1], array[2], 1), workingMat);
+                finalMat.multiplyLocal(workingMat);
+            } else if (type == TransformElementType.Matrix) {
+                workingMat.fromArray(array);
+                finalMat.multiplyLocal(workingMat);
+            } else if (type == TransformElementType.Lookat) {
+                final Vector3 pos = new Vector3(array[0], array[1], array[2]);
+                final Vector3 target = new Vector3(array[3], array[4], array[5]);
+                final Vector3 up = new Vector3(array[6], array[7], array[8]);
+                final Matrix3 rot = new Matrix3();
+                rot.lookAt(target.subtractLocal(pos), up);
+                workingMat.set(rot);
+                workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
+                finalMat.multiplyLocal(workingMat);
+            } else {
+                logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
+            }
+        }
+        return new Transform().fromHomogeneousMatrix(finalMat);
+    }
+
+    /**
+     * Util for making a readable string out of a xml element hierarchy
+     * 
+     * @param e
+     * @param maxDepth
+     * @return
+     */
+    public static String getElementString(final Element e, final int maxDepth) {
+        return getElementString(e, maxDepth, true);
+    }
+
+    public static String getElementString(final Element e, final int maxDepth, final boolean showDots) {
+        final StringBuilder str = new StringBuilder();
+        getElementString(e, str, 0, maxDepth, showDots);
+        return str.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void getElementString(final Element e, final StringBuilder str, final int depth, final int maxDepth,
+            final boolean showDots) {
+        addSpacing(str, depth);
+        str.append("<");
+        str.append(e.getName());
+        str.append(" ");
+        final List<Attribute> attrs = e.getAttributes();
+        for (int i = 0; i < attrs.size(); i++) {
+            final Attribute attr = attrs.get(i);
+            str.append(attr.getName());
+            str.append("=\"");
+            str.append(attr.getValue());
+            str.append("\"");
+            if (i < attrs.size() - 1) {
+                str.append(" ");
+            }
+        }
+        if (!e.getChildren().isEmpty() || !e.getText().isEmpty()) {
+            str.append(">");
+            if (depth < maxDepth) {
+                str.append("\n");
+                for (final Element child : (List<Element>) e.getChildren()) {
+                    getElementString(child, str, depth + 1, maxDepth, showDots);
+                }
+                if (!e.getText().isEmpty()) {
+                    addSpacing(str, depth + 1);
+                    str.append(e.getText());
+                    str.append("\n");
+                }
+            } else if (showDots) {
+                str.append("\n");
+                addSpacing(str, depth + 1);
+                str.append("...");
+                str.append("\n");
+            }
+            addSpacing(str, depth);
+            str.append("</");
+            str.append(e.getName());
+            str.append(">");
+        } else {
+            str.append("/>");
+        }
+        str.append("\n");
+    }
+
+    private static void addSpacing(final StringBuilder str, final int depth) {
+        for (int i = 0; i < depth; i++) {
+            str.append("  ");
+        }
+    }
+
+    private enum AccessorType {
+        None, Vector, Matrix
+    }
+
+    private class Target {
+        public String id;
+        public List<String> sids = Lists.newArrayList();
+        public AccessorType accessorType = AccessorType.None;
+        public int accessorIndexX = -1, accessorIndexY = -1;
+
+        @Override
+        public String toString() {
+            if (accessorType == AccessorType.None) {
+                return "Target [accessorType=" + accessorType + ", id=" + id + ", sids=" + sids + "]";
+            }
+            return "Target [accessorType=" + accessorType + ", accessorIndexX=" + accessorIndexX + ", accessorIndexY="
+                    + accessorIndexY + ", id=" + id + ", sids=" + sids + "]";
         }
     }
 }

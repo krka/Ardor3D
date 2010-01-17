@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -18,22 +18,18 @@ import java.util.regex.Pattern;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
 
+import com.ardor3d.extension.animation.skeletal.Joint;
+import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
-import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
- * A thread local singleton containing caches for various items such as XPath patterns, data read from a Collada file,
- * vertex mappings and so forth. In general this is to decrease parsing time.
+ * Performance cache and temp storage during parsing.
  */
-public final class GlobalData {
-
+public class DataCache {
     private final Map<String, Element> _boundMaterials;
     private final Map<String, Texture> _textures;
     private final Map<String, Element> _idCache;
@@ -50,27 +46,13 @@ public final class GlobalData {
 
     private final Multimap<Element, MeshVertPairs> _vertMappings;
 
-    private final ColladaStorage _storage;
-    private ColladaOptions _options;
+    private final Map<Element, Joint> _elementJointMapping;
+    private JointNode _rootJointNode;
+    private final Map<Joint, Skeleton> _jointSkeletonMapping;
+    private final List<Skeleton> _skeletons;
+    private final List<ControllerStore> _controllers;
 
-    private static class ThreadLocalGlobalData extends ThreadLocal<GlobalData> {
-        @Override
-        protected GlobalData initialValue() {
-            return new GlobalData();
-        }
-    }
-
-    private static ThreadLocalGlobalData threadLocalGlobalData = new ThreadLocalGlobalData();
-
-    public static GlobalData getInstance() {
-        return GlobalData.threadLocalGlobalData.get();
-    }
-
-    public static void disposeInstance() {
-        GlobalData.threadLocalGlobalData.remove();
-    }
-
-    private GlobalData() {
+    public DataCache() {
         _boundMaterials = Maps.newHashMap();
         _textures = Maps.newHashMap();
         _idCache = Maps.newHashMap();
@@ -88,7 +70,10 @@ public final class GlobalData {
         _stringArrays = Maps.newHashMap();
         _vertMappings = ArrayListMultimap.create();
 
-        _storage = new ColladaStorage();
+        _elementJointMapping = Maps.newHashMap();
+        _skeletons = Lists.newArrayList();
+        _jointSkeletonMapping = Maps.newHashMap();
+        _controllers = Lists.newArrayList();
     }
 
     public void bindMaterial(final String ref, final Element material) {
@@ -105,21 +90,16 @@ public final class GlobalData {
         return _boundMaterials.get(ref);
     }
 
-    public Texture loadTexture2D(final String path, final MinificationFilter minFilter) {
-        if (_textures.containsKey(path)) {
-            return _textures.get(path);
-        }
+    public boolean containsTexture(final String path) {
+        return _textures.containsKey(path);
+    }
 
-        final Texture texture;
-        if (!getOptions().hasTextureLocator()) {
-            texture = TextureManager.load(path, minFilter, Format.Guess, true);
-        } else {
-            final ResourceSource source = getOptions().getTextureLocator().locateResource(path);
-            texture = TextureManager.load(source, minFilter, Format.Guess, true);
-        }
+    public void addTexture(final String path, final Texture texture) {
         _textures.put(path, texture);
+    }
 
-        return texture;
+    public Texture getTexture(final String path) {
+        return _textures.get(path);
     }
 
     public Map<String, Element> getIdCache() {
@@ -166,15 +146,31 @@ public final class GlobalData {
         return _vertMappings;
     }
 
-    public ColladaStorage getColladaStorage() {
-        return _storage;
+    public Map<Element, Joint> getElementJointMapping() {
+        return _elementJointMapping;
     }
 
-    public void setOptions(final ColladaOptions options) {
-        _options = options;
+    public JointNode getRootJointNode() {
+        return _rootJointNode;
     }
 
-    public ColladaOptions getOptions() {
-        return _options;
+    public void setRootJointNode(final JointNode rootJointNode) {
+        _rootJointNode = rootJointNode;
+    }
+
+    public Map<Joint, Skeleton> getJointSkeletonMapping() {
+        return _jointSkeletonMapping;
+    }
+
+    public List<ControllerStore> getControllers() {
+        return _controllers;
+    }
+
+    public List<Skeleton> getSkeletons() {
+        return _skeletons;
+    }
+
+    public void addSkeleton(final Skeleton skeleton) {
+        _skeletons.add(skeleton);
     }
 }

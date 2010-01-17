@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -13,7 +13,7 @@ package com.ardor3d.extension.animation.skeletal;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import com.ardor3d.math.Vector4;
+import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.scenegraph.Mesh;
@@ -167,7 +167,7 @@ public class SkinnedMesh extends Mesh {
     /**
      * @param shaderState
      *            the shader to use for GPU skinning. Should be set up to accept vec4 attributes "Weights" and
-     *            "JointIDs" and a mat4[] uniform called "JointPallete". Applies the renderstate to this mesh as well.
+     *            "JointIDs" and a mat4[] uniform called "JointPalette". Applies the renderstate to this mesh as well.
      */
     public void setGPUShader(final GLSLShaderObjectsState shaderState) {
         _gpuShader = shaderState;
@@ -182,20 +182,17 @@ public class SkinnedMesh extends Mesh {
             if (_gpuShader != null) {
                 _gpuShader.setAttributePointer("Weights", 4, false, 0, _weights);
                 _gpuShader.setAttributePointer("JointIDs", 4, false, false, 0, _jointIndices);
-                _gpuShader.setUniform("JointPallete", _currentPose.getMatrixPallete(), true);
+                _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
             }
         } else {
-            // Set up some data holding variables.
-            final Vector4 bindVertex = Vector4.fetchTempInstance();
-            final Vector4 bindNormal = Vector4.fetchTempInstance();
-            final Vector4 vertexSum = Vector4.fetchTempInstance();
-            final Vector4 normalSum = Vector4.fetchTempInstance();
-            final Vector4 temp = Vector4.fetchTempInstance();
-            final float[] data = new float[3];
-            final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
+            final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX * _bindPoseData.getVertexCount()];
+            final short[] jointIndices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX * _bindPoseData.getVertexCount()];
+
+            // pull in joint data
             _weights.rewind();
-            final short[] jointIndices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
+            _weights.get(weights);
             _jointIndices.rewind();
+            _jointIndices.get(jointIndices);
 
             // Get a handle to the source and dest vertices buffers
             final FloatBuffer bindVerts = _bindPoseData.getVertexBuffer();
@@ -222,68 +219,87 @@ public class SkinnedMesh extends Mesh {
                 }
             }
 
+            Matrix4 jntMat;
+            double bindVX, bindVY, bindVZ;
+            double bindNX = 0, bindNY = 0, bindNZ = 0;
+            double vSumX, vSumY, vSumZ;
+            double nSumX = 0, nSumY = 0, nSumZ = 0;
+            double tempX, tempY, tempZ;
+            float weight;
+            int jointIndex;
+
             // Cycle through each vertex
             for (int i = 0; i < _bindPoseData.getVertexCount(); i++) {
                 // zero out our sum var
-                vertexSum.zero();
+                vSumX = 0;
+                vSumY = 0;
+                vSumZ = 0;
 
                 // Grab the bind pose vertex Vbp from _bindPoseData
-                bindVerts.get(data);
-                bindVertex.set(data[0], data[1], data[2], 1); // 1 for point
+                bindVX = bindVerts.get();
+                bindVY = bindVerts.get();
+                bindVZ = bindVerts.get();
 
                 // See if we should do the corresponding normal as well
                 if (bindNorms != null) {
                     // zero out our sum var
-                    normalSum.zero();
+                    nSumX = 0;
+                    nSumY = 0;
+                    nSumZ = 0;
 
                     // Grab the bind pose norm Nbp from _bindPoseData
-                    bindNorms.get(data);
-                    bindNormal.set(data[0], data[1], data[2], 0); // 0 for vector
+                    bindNX = bindNorms.get();
+                    bindNY = bindNorms.get();
+                    bindNZ = bindNorms.get();
                 }
-
-                // pull in joint data
-                _weights.get(weights);
-                _jointIndices.get(jointIndices);
 
                 // for each joint where the weight != 0
                 for (int j = 0; j < SkinnedMesh.MAX_JOINTS_PER_VERTEX; j++) {
-                    if (weights[j] == 0) {
+                    final int index = i * SkinnedMesh.MAX_JOINTS_PER_VERTEX + j;
+                    if (weights[index] == 0) {
                         continue;
                     }
 
-                    final int jointIndex = jointIndices[j];
-                    temp.set(bindVertex);
+                    jointIndex = jointIndices[index];
+                    jntMat = _currentPose.getMatrixPalette()[jointIndex];
+                    weight = weights[index];
 
-                    // Multiply our vertex by the matrix pallete entry
-                    _currentPose.getMatrixPallete()[jointIndex].applyPost(temp, temp);
+                    // Multiply our vertex by the matrix palette entry
+                    tempX = jntMat.getValue(0, 0) * bindVX + jntMat.getValue(0, 1) * bindVY + jntMat.getValue(0, 2)
+                            * bindVZ + jntMat.getValue(0, 3);
+                    tempY = jntMat.getValue(1, 0) * bindVX + jntMat.getValue(1, 1) * bindVY + jntMat.getValue(1, 2)
+                            * bindVZ + jntMat.getValue(1, 3);
+                    tempZ = jntMat.getValue(2, 0) * bindVX + jntMat.getValue(2, 1) * bindVY + jntMat.getValue(2, 2)
+                            * bindVZ + jntMat.getValue(2, 3);
+
                     // Sum, weighted.
-                    temp.multiplyLocal(weights[j]);
-                    vertexSum.addLocal(temp);
+                    vSumX += tempX * weight;
+                    vSumY += tempY * weight;
+                    vSumZ += tempZ * weight;
 
                     if (bindNorms != null) {
-                        temp.set(bindNormal);
+                        // Multiply our normal by the matrix palette entry
+                        tempX = jntMat.getValue(0, 0) * bindNX + jntMat.getValue(0, 1) * bindNY + jntMat.getValue(0, 2)
+                                * bindNZ;
+                        tempY = jntMat.getValue(1, 0) * bindNX + jntMat.getValue(1, 1) * bindNY + jntMat.getValue(1, 2)
+                                * bindNZ;
+                        tempZ = jntMat.getValue(2, 0) * bindNX + jntMat.getValue(2, 1) * bindNY + jntMat.getValue(2, 2)
+                                * bindNZ;
 
-                        // Multiply our normal by the matrix pallete entry
-                        _currentPose.getMatrixPallete()[jointIndex].applyPost(temp, temp);
                         // Sum, weighted.
-                        temp.multiplyLocal(weights[j]);
-                        normalSum.addLocal(temp);
+                        nSumX += tempX * weight;
+                        nSumY += tempY * weight;
+                        nSumZ += tempZ * weight;
                     }
                 }
 
                 // Store sum into _meshData
-                storeVerts.put(vertexSum.getXf()).put(vertexSum.getYf()).put(vertexSum.getZf());
+                storeVerts.put((float) vSumX).put((float) vSumY).put((float) vSumZ);
 
                 if (bindNorms != null) {
-                    storeNorms.put(normalSum.getXf()).put(normalSum.getYf()).put(normalSum.getZf());
+                    storeNorms.put((float) nSumX).put((float) nSumY).put((float) nSumZ);
                 }
             }
-
-            Vector4.releaseTempInstance(bindVertex);
-            Vector4.releaseTempInstance(vertexSum);
-            Vector4.releaseTempInstance(bindNormal);
-            Vector4.releaseTempInstance(normalSum);
-            Vector4.releaseTempInstance(temp);
         }
     }
 

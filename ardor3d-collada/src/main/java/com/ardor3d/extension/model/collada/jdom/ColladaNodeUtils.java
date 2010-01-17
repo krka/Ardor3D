@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -16,8 +16,12 @@ import java.util.logging.Logger;
 
 import org.jdom.Element;
 
+import com.ardor3d.extension.animation.skeletal.Joint;
+import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.model.collada.jdom.data.AssetData;
-import com.ardor3d.extension.model.collada.jdom.data.GlobalData;
+import com.ardor3d.extension.model.collada.jdom.data.ControllerStore;
+import com.ardor3d.extension.model.collada.jdom.data.DataCache;
+import com.ardor3d.extension.model.collada.jdom.data.JointNode;
 import com.ardor3d.extension.model.collada.jdom.data.NodeType;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -27,9 +31,29 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.google.common.collect.Lists;
 
+/**
+ * Methods for parsing Collada data related to scenes and node hierarchy.
+ */
 public class ColladaNodeUtils {
     private static final Logger logger = Logger.getLogger(ColladaNodeUtils.class.getName());
+
+    private final DataCache _dataCache;
+    private final ColladaDOMUtil _colladaDOMUtil;
+    private final ColladaMaterialUtils _colladaMaterialUtils;
+    private final ColladaMeshUtils _colladaMeshUtils;
+    private final ColladaAnimUtils _colladaAnimUtils;
+
+    public ColladaNodeUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
+            final ColladaMaterialUtils colladaMaterialUtils, final ColladaMeshUtils colladaMeshUtils,
+            final ColladaAnimUtils colladaAnimUtils) {
+        _dataCache = dataCache;
+        _colladaDOMUtil = colladaDOMUtil;
+        _colladaMaterialUtils = colladaMaterialUtils;
+        _colladaMeshUtils = colladaMeshUtils;
+        _colladaAnimUtils = colladaAnimUtils;
+    }
 
     /**
      * Retrieves the scene and returns it as an Ardor3D Node.
@@ -39,36 +63,57 @@ public class ColladaNodeUtils {
      * @return Scene as an Node or null if not found
      */
     @SuppressWarnings("unchecked")
-    public static Node getVisualScene(final Element colladaRoot) {
+    public Node getVisualScene(final Element colladaRoot) {
         if (colladaRoot.getChild("scene") == null) {
-            ColladaNodeUtils.logger.warning("No scene found in collada file!");
+            logger.warning("No scene found in collada file!");
             return null;
         }
 
         final Element instance_visual_scene = colladaRoot.getChild("scene").getChild("instance_visual_scene");
         if (instance_visual_scene == null) {
-            ColladaNodeUtils.logger.warning("No instance_visual_scene found in collada file!");
+            logger.warning("No instance_visual_scene found in collada file!");
             return null;
         }
 
-        final Element visualScene = ColladaDOMUtil.findTargetWithId(instance_visual_scene.getAttributeValue("url"));
+        final Element visualScene = _colladaDOMUtil.findTargetWithId(instance_visual_scene.getAttributeValue("url"));
 
         if (visualScene != null) {
             final Node sceneRoot = new Node(visualScene.getAttributeValue("name") != null ? visualScene
                     .getAttributeValue("name") : "Collada Root");
 
             // Load each sub node and attach
+            final JointNode jointNode = new JointNode(null);
+            _dataCache.setRootJointNode(jointNode);
             for (final Element n : (List<Element>) visualScene.getChildren("node")) {
-                NodeType nodeType = NodeType.NODE;
-                if (n.getAttribute("type") != null) {
-                    nodeType = Enum.valueOf(NodeType.class, n.getAttributeValue("type"));
+                final Node subNode = buildNode(n, jointNode);
+                if (subNode != null) {
+                    sceneRoot.attachChild(subNode);
                 }
-                if (nodeType == NodeType.NODE) {
-                    final Node subNode = ColladaNodeUtils.buildNode(n);
-                    if (subNode != null) {
-                        sceneRoot.attachChild(subNode);
-                    }
+            }
+
+            final List<List<Joint>> jointCollection = Lists.newArrayList();
+            for (final JointNode jointChildNode : _dataCache.getRootJointNode().getChildren()) {
+                final List<Joint> jointList = Lists.newArrayList();
+                buildJointLists(jointChildNode, jointList);
+                jointCollection.add(jointList);
+            }
+
+            for (final List<Joint> jointList : jointCollection) {
+                final Joint[] joints = jointList.toArray(new Joint[jointList.size()]);
+                final Skeleton skeleton = new Skeleton(joints[0].getName() + "_skeleton", joints);
+                logger.fine(skeleton.getName());
+                for (final Joint joint : jointList) {
+                    _dataCache.getJointSkeletonMapping().put(joint, skeleton);
+                    logger.fine("- Joint " + joint.getName() + " - index: " + joint.getIndex() + " parent index: "
+                            + joint.getParentIndex());
                 }
+                _dataCache.addSkeleton(skeleton);
+            }
+
+            for (final ControllerStore controllerStore : _dataCache.getControllers()) {
+                _colladaMaterialUtils.bindMaterials(controllerStore.instanceController.getChild("bind_material"));
+                _colladaAnimUtils.buildController(controllerStore.ardorParentNode, controllerStore.instanceController);
+                _colladaMaterialUtils.unbindMaterials(controllerStore.instanceController.getChild("bind_material"));
             }
 
             return sceneRoot;
@@ -76,13 +121,33 @@ public class ColladaNodeUtils {
         return null;
     }
 
+    private void buildJointLists(final JointNode jointNode, final List<Joint> jointList) {
+        final Joint joint = jointNode.getJoint();
+        joint.setIndex((short) jointList.size());
+        if (jointNode.getParent().getJoint() != null) {
+            joint.setParentIndex(jointNode.getParent().getJoint().getIndex());
+        } else {
+            joint.setParentIndex(Joint.NO_PARENT);
+        }
+        jointList.add(joint);
+        for (final JointNode jointChildNode : jointNode.getChildren()) {
+            buildJointLists(jointChildNode, jointList);
+        }
+    }
+
+    /**
+     * Parse an asset element into an AssetData object.
+     * 
+     * @param asset
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    public static AssetData parseAsset(final Element asset) {
+    public AssetData parseAsset(final Element asset) {
         final AssetData assetData = new AssetData();
 
         for (final Element child : (List<Element>) asset.getChildren()) {
             if ("contributor".equals(child.getName())) {
-                ColladaNodeUtils.parseContributor(assetData, child);
+                parseContributor(assetData, child);
             } else if ("created".equals(child.getName())) {
                 assetData.setCreated(child.getText());
             } else if ("kewords".equals(child.getName())) {
@@ -114,7 +179,7 @@ public class ColladaNodeUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static void parseContributor(final AssetData assetData, final Element contributor) {
+    private void parseContributor(final AssetData assetData, final Element contributor) {
         for (final Element child : (List<Element>) contributor.getChildren()) {
             if ("author".equals(child.getName())) {
                 assetData.setAuthor(child.getText());
@@ -134,79 +199,82 @@ public class ColladaNodeUtils {
      * @param instanceNode
      * @return a new Ardor3D node, created from the <node> pointed to by the given <instance_node> element
      */
-    public static Node getNode(final Element instanceNode) {
-        final Element node = ColladaDOMUtil.findTargetWithId(instanceNode.getAttributeValue("url"));
+    public Node getNode(final Element instanceNode, final JointNode jointNode) {
+        final Element node = _colladaDOMUtil.findTargetWithId(instanceNode.getAttributeValue("url"));
 
         if (node == null) {
             throw new ColladaException("No node with id: " + instanceNode.getAttributeValue("url") + " found",
                     instanceNode);
         }
 
-        return ColladaNodeUtils.buildNode(node);
+        return buildNode(node, jointNode);
     }
 
     /**
+     * Recursively parse the node hierarcy.
+     * 
      * @param dNode
      * @return a new Ardor3D node, created from the given <node> element
      */
     @SuppressWarnings("unchecked")
-    public static Node buildNode(final Element dNode) {
+    private Node buildNode(final Element dNode, JointNode jointNode) {
+        NodeType nodeType = NodeType.NODE;
+        if (dNode.getAttribute("type") != null) {
+            nodeType = Enum.valueOf(NodeType.class, dNode.getAttributeValue("type"));
+        }
+        if (nodeType == NodeType.JOINT) {
+            String name = dNode.getAttributeValue("name");
+            if (name == null) {
+                name = dNode.getAttributeValue("id");
+            }
+            if (name == null) {
+                name = dNode.getAttributeValue("sid");
+            }
+            final Joint joint = new Joint(name);
+            final JointNode jointChildNode = new JointNode(joint);
+            jointChildNode.setParent(jointNode);
+            jointNode.getChildren().add(jointChildNode);
+            jointNode = jointChildNode;
+
+            _dataCache.getElementJointMapping().put(dNode, joint);
+        }
+
         final Node node = new Node(dNode.getAttributeValue("name", dNode.getName()));
 
         final List<Element> transforms = new ArrayList<Element>();
         for (final Element child : (List<Element>) dNode.getChildren()) {
-            if (GlobalData.getInstance().getTransformTypes().contains(child.getName())) {
+            if (_dataCache.getTransformTypes().contains(child.getName())) {
                 transforms.add(child);
             }
         }
 
         // process any transform information.
         if (!transforms.isEmpty()) {
-            final Transform localTransform = ColladaNodeUtils.getNodeTransforms(transforms);
+            final Transform localTransform = getNodeTransforms(transforms);
 
             node.setTransform(localTransform);
         }
 
         // process any instance geometries
         for (final Element instance_geometry : (List<Element>) dNode.getChildren("instance_geometry")) {
-            ColladaMaterialUtils.bindMaterials(instance_geometry.getChild("bind_material"));
+            _colladaMaterialUtils.bindMaterials(instance_geometry.getChild("bind_material"));
 
-            final Spatial mesh = ColladaMeshUtils.getGeometryMesh(instance_geometry);
+            final Spatial mesh = _colladaMeshUtils.getGeometryMesh(instance_geometry);
             if (mesh != null) {
                 node.attachChild(mesh);
             }
 
-            ColladaMaterialUtils.unbindMaterials(instance_geometry.getChild("bind_material"));
+            _colladaMaterialUtils.unbindMaterials(instance_geometry.getChild("bind_material"));
         }
 
         // process any instance controllers
-        for (final Element ic : (List<Element>) dNode.getChildren("instance_controller")) {
-            ColladaMaterialUtils.bindMaterials(ic.getChild("bind_material"));
-
-            final Element controller = ColladaDOMUtil.findTargetWithId(ic.getAttributeValue("url"));
-
-            if (controller == null) {
-                throw new ColladaException("Unable to find controller with id: " + ic.getAttributeValue("url")
-                        + ", referenced from node " + dNode, dNode);
-            }
-
-            final Element skin = controller.getChild("skin");
-            if (skin != null) {
-                ColladaAnimUtils.buildSkinMeshes(node, ic, controller, skin);
-            } else {
-                // look for morph... can only be one or the other according to Collada
-                final Element morph = controller.getChild("morph");
-                if (morph != null) {
-                    ColladaAnimUtils.buildMorphMeshes(node, controller, morph);
-                }
-            }
-
-            ColladaMaterialUtils.unbindMaterials(ic.getChild("bind_material"));
+        for (final Element instanceController : (List<Element>) dNode.getChildren("instance_controller")) {
+            _dataCache.getControllers().add(new ControllerStore(node, instanceController));
         }
 
         // process any instance nodes
         for (final Element in : (List<Element>) dNode.getChildren("instance_node")) {
-            final Node subNode = ColladaNodeUtils.getNode(in);
+            final Node subNode = getNode(in, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);
             }
@@ -214,7 +282,7 @@ public class ColladaNodeUtils {
 
         // process any concrete child nodes.
         for (final Element n : (List<Element>) dNode.getChildren("node")) {
-            final Node subNode = ColladaNodeUtils.buildNode(n);
+            final Node subNode = buildNode(n, jointNode);
             if (subNode != null) {
                 node.attachChild(subNode);
             }
@@ -230,12 +298,12 @@ public class ColladaNodeUtils {
      *            List of transform elements
      * @return an Ardor3D Transform object
      */
-    private static Transform getNodeTransforms(final List<Element> transforms) {
+    public Transform getNodeTransforms(final List<Element> transforms) {
         final Matrix4 workingMat = Matrix4.fetchTempInstance();
         final Matrix4 finalMat = Matrix4.fetchTempInstance();
         finalMat.setIdentity();
         for (final Element transform : transforms) {
-            final double[] array = ColladaDOMUtil.parseDoubleArray(transform);
+            final double[] array = _colladaDOMUtil.parseDoubleArray(transform);
             if ("translate".equals(transform.getName())) {
                 workingMat.setIdentity();
                 workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
@@ -265,8 +333,7 @@ public class ColladaNodeUtils {
                 workingMat.setColumn(3, new double[] { array[0], array[1], array[2], 1 });
                 finalMat.multiplyLocal(workingMat);
             } else {
-                ColladaNodeUtils.logger.warning("transform not currently supported: "
-                        + transform.getClass().getCanonicalName());
+                logger.warning("transform not currently supported: " + transform.getClass().getCanonicalName());
             }
         }
         return new Transform().fromHomogeneousMatrix(finalMat);

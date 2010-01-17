@@ -16,6 +16,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
@@ -48,7 +49,13 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
-public class ColladaAnimationExample extends ExampleBase {
+/**
+ * Illustrates loading a model from Collada and procedurally animating its joints.
+ */
+@Purpose(htmlDescription = "Illustrates loading a model from Collada and procedurally animating its joints.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
+maxHeapMemory = 64)
+public class ColladaManualAnimationExample extends ExampleBase {
 
     private static final boolean UPDATE_BOUNDS = false;
     private static final double UPDATE_RATE = 1.0 / 30.0;
@@ -69,11 +76,11 @@ public class ColladaAnimationExample extends ExampleBase {
     private long startTime = System.currentTimeMillis();
 
     public static void main(final String[] args) {
-        ExampleBase.start(ColladaAnimationExample.class);
+        ExampleBase.start(ColladaManualAnimationExample.class);
     }
 
     @Inject
-    public ColladaAnimationExample(final LogicalLayer layer, final FrameHandler frameWork) {
+    public ColladaManualAnimationExample(final LogicalLayer layer, final FrameHandler frameWork) {
         super(layer, frameWork);
     }
 
@@ -82,8 +89,8 @@ public class ColladaAnimationExample extends ExampleBase {
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         time += timer.getTimePerFrame();
-        if (time > ColladaAnimationExample.UPDATE_RATE) {
-            time -= ColladaAnimationExample.UPDATE_RATE;
+        if (time > ColladaManualAnimationExample.UPDATE_RATE) {
+            time -= ColladaManualAnimationExample.UPDATE_RATE;
             final List<SkinData> skinDataList = colladaStorage.getSkins();
             final SkinData skinData = skinDataList.get(0);
             final SkeletonPose pose = skinData.getPose();
@@ -112,7 +119,7 @@ public class ColladaAnimationExample extends ExampleBase {
             final List<SkinnedMesh> skins = skinData.getSkins();
             for (final SkinnedMesh skinnedMesh : skins) {
                 skinnedMesh.applyPose();
-                if (ColladaAnimationExample.UPDATE_BOUNDS) {
+                if (ColladaManualAnimationExample.UPDATE_BOUNDS) {
                     skinnedMesh.updateModelBound();
                 }
             }
@@ -187,7 +194,7 @@ public class ColladaAnimationExample extends ExampleBase {
             final long time = System.currentTimeMillis();
             final ColladaImporter colladaImporter = new ColladaImporter();
 
-            colladaStorage = colladaImporter.readColladaFile("collada/sony/Seymour.dae");
+            colladaStorage = colladaImporter.load("collada/sony/Seymour.dae");
             colladaNode = colladaStorage.getScene();
 
             System.err.println("took " + (System.currentTimeMillis() - time) + " ms");

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2009 Ardor Labs, Inc.
+ * Copyright (c) 2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -21,15 +21,23 @@ public class MeshVertPairs {
     /**
      * The referenced Ardor3D Mesh.
      */
-    public final Mesh mesh;
+    private final Mesh _mesh;
 
     /**
      * The Collada indices. This array should be as big as the vertex count of the Mesh.
      */
-    public final int[] indices;
+    private final int[] _indices;
 
     public MeshVertPairs(final Mesh mesh, final int[] indices) {
-        this.mesh = mesh;
-        this.indices = indices;
+        this._mesh = mesh;
+        this._indices = indices;
+    }
+
+    public Mesh getMesh() {
+        return _mesh;
+    }
+
+    public int[] getIndices() {
+        return _indices;
     }
 }
