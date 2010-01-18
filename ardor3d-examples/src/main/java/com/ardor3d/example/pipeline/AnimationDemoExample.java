@@ -73,7 +73,7 @@ import com.google.inject.Inject;
 @Purpose(htmlDescription = "Illustrates loading several animations from Collada and arranging them in a controllable blend tree.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemo.jpg", //
 maxHeapMemory = 64)
-public class AnimationDemo extends ExampleBase {
+public class AnimationDemoExample extends ExampleBase {
 
     private Node colladaNode;
     private boolean showSkeleton = false, showJointLabels = false;
@@ -101,11 +101,11 @@ public class AnimationDemo extends ExampleBase {
     private UIButton runWalkButton, punchButton;
 
     public static void main(final String[] args) {
-        ExampleBase.start(AnimationDemo.class);
+        ExampleBase.start(AnimationDemoExample.class);
     }
 
     @Inject
-    public AnimationDemo(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
+    public AnimationDemoExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
         super(layer, frameWork);
         _timer = timer;
     }
