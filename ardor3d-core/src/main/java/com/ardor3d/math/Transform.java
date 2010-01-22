@@ -956,9 +956,9 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
      * @throws IOException
      */
     public void writeExternal(final ObjectOutput out) throws IOException {
-        out.writeObject(_translation);
         out.writeObject(_matrix);
         out.writeObject(_scale);
+        out.writeObject(_translation);
         out.writeBoolean(_identity);
         out.writeBoolean(_rotationMatrix);
         out.writeBoolean(_uniformScale);
