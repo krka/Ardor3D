@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jdom.Attribute;
+import org.jdom.CDATA;
 import org.jdom.Comment;
 import org.jdom.DataConversionException;
 import org.jdom.Element;
@@ -29,7 +30,6 @@ import org.jdom.xpath.XPath;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.math.ColorRGBA;
-import com.sun.xml.internal.ws.util.xml.CDATA;
 
 /**
  * Utility methods for parsing Collada data related to node hierarchy and arrays, using XPath or arrays extracted during

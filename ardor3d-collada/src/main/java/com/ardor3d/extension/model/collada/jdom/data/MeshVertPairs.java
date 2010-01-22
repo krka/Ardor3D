@@ -29,8 +29,8 @@ public class MeshVertPairs {
     private final int[] _indices;
 
     public MeshVertPairs(final Mesh mesh, final int[] indices) {
-        this._mesh = mesh;
-        this._indices = indices;
+        _mesh = mesh;
+        _indices = indices;
     }
 
     public Mesh getMesh() {
