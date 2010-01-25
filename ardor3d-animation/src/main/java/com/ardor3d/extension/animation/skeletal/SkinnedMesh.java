@@ -300,6 +300,11 @@ public class SkinnedMesh extends Mesh {
                     storeNorms.put((float) nSumX).put((float) nSumY).put((float) nSumZ);
                 }
             }
+
+            _meshData.getVertexCoords().setNeedsRefresh(true);
+            if (bindNorms != null) {
+                _meshData.getNormalCoords().setNeedsRefresh(true);
+            }
         }
     }
 

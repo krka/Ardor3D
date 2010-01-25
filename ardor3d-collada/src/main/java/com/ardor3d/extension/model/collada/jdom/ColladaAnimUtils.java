@@ -56,6 +56,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
@@ -406,7 +407,12 @@ public class ColladaAnimUtils {
 
                         // TODO: This is only needed for CPU skinning... consider a way of making it optional.
                         // Copy bind pose to mesh data to setup for CPU skinning
-                        skMesh.setMeshData(copyMeshData(skMesh.getBindPoseData()));
+                        final MeshData meshData = copyMeshData(skMesh.getBindPoseData());
+                        meshData.getVertexCoords().setVboAccessMode(VBOAccessMode.StreamDraw);
+                        if (meshData.getNormalCoords() != null) {
+                            meshData.getNormalCoords().setVboAccessMode(VBOAccessMode.StreamDraw);
+                        }
+                        skMesh.setMeshData(meshData);
                     } catch (final IOException e) {
                         e.printStackTrace();
                         throw new ColladaException("Unable to copy skeleton bind pose data.", geometry);
