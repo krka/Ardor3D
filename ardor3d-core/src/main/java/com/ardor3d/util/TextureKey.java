@@ -207,15 +207,21 @@ final public class TextureKey implements Savable {
             return false;
         }
 
-        if (_flipped != that._flipped) {
-            return false;
-        }
-        if (_format != that._format) {
-            return false;
-        }
         if (_id == null && that._id != null) {
             return false;
         } else if (_id != null && !_id.equals(that._id)) {
+            return false;
+        }
+
+        if (_minFilter != that._minFilter) {
+            return false;
+        }
+
+        if (_format != that._format) {
+            return false;
+        }
+
+        if (_flipped != that._flipped) {
             return false;
         }
 
