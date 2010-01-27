@@ -27,7 +27,7 @@ public class ContextGarbageCollector {
      *            general this is best used in single context applications, and null is a perfectly acceptable value.
      */
     public static void doRuntimeCleanup(final Renderer immediateDelete) {
-        TextureManager.cleanExpiredTextures(immediateDelete);
+        TextureManager.cleanExpiredTextures(immediateDelete, null);
         AbstractBufferData.cleanExpiredVBOs(immediateDelete);
         DisplayListDelegate.cleanExpiredDisplayLists(immediateDelete);
     }
@@ -42,7 +42,7 @@ public class ContextGarbageCollector {
      *            process at least one more (empty) frame to allow for the final gl calls to be processed.
      */
     public static void doFinalCleanup(final Renderer immediateDelete) {
-        TextureManager.cleanAllTextures(immediateDelete);
+        TextureManager.cleanAllTextures(immediateDelete, null);
         AbstractBufferData.cleanAllVBOs(immediateDelete);
         DisplayListDelegate.cleanAllDisplayLists(immediateDelete);
     }

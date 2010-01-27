@@ -14,6 +14,7 @@ import java.lang.ref.ReferenceQueue;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
@@ -228,17 +229,47 @@ final public class TextureManager {
     }
 
     /**
+     * Delete all textures from card. This will gather all texture ids believed to be on the card and try to delete
+     * them. If a deleter is passed in, textures that are part of the currently active context (if one is active) will
+     * be deleted immediately. If a deleter is not passed in, we do not have an active context, or we encounter textures
+     * that are not part of the current context, then we will queue those textures to be deleted later using the
+     * GameTaskQueueManager.
      * 
      * @param deleter
+     *            if not null, this renderer will be used to immediately delete any textures in the currently active
+     *            context. All other textures will be queued to delete in their own contexts.
      */
     public static void cleanAllTextures(final Renderer deleter) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+        cleanAllTextures(deleter, null);
+    }
 
+    /**
+     * Delete all textures from card. This will gather all texture ids believed to be on the card and try to delete
+     * them. If a deleter is passed in, textures that are part of the currently active context (if one is active) will
+     * be deleted immediately. If a deleter is not passed in, we do not have an active context, or we encounter textures
+     * that are not part of the current context, then we will queue those textures to be deleted later using the
+     * GameTaskQueueManager.
+     * 
+     * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
+     * These objects may be used to discover when the deletion tasks have all completed.
+     * 
+     * @param deleter
+     *            if not null, this renderer will be used to immediately delete any textures in the currently active
+     *            context. All other textures will be queued to delete in their own contexts.
+     * @param futureStore
+     *            if not null, this map will be populated with any Future task handles created during cleanup.
+     */
+    public static void cleanAllTextures(final Renderer deleter, final Map<Object, Future<Void>> futureStore) {
         // gather up expired textures... these don't exist in our cache
-        gatherGCdIds(idMap);
+        Multimap<Object, Integer> idMap = gatherGCdIds();
 
-        // Walk through the cached items and delete those too.
+        // Walk through the cached items and gather those too.
         for (final TextureKey key : _tCache.keySet()) {
+            // possibly lazy init
+            if (idMap == null) {
+                idMap = ArrayListMultimap.create();
+            }
+
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = key.getContextObjects();
                 for (final Object o : contextObjects) {
@@ -250,27 +281,61 @@ final public class TextureManager {
             }
         }
 
-        handleTextureDelete(deleter, idMap);
+        // delete the ids
+        if (!idMap.isEmpty()) {
+            handleTextureDelete(deleter, idMap, futureStore);
+        }
     }
 
     /**
+     * Delete any textures from the card that have been recently garbage collected in Java. If a deleter is passed in,
+     * gc'd textures that are part of the currently active context (if one is active) will be deleted immediately. If a
+     * deleter is not passed in, we do not have an active context, or we encounter gc'd textures that are not part of
+     * the current context, then we will queue those textures to be deleted later using the GameTaskQueueManager.
      * 
+     * @param deleter
+     *            if not null, this renderer will be used to immediately delete any gc'd textures in the currently
+     *            active context. All other gc'd textures will be queued to delete in their own contexts.
      */
     public static void cleanExpiredTextures(final Renderer deleter) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+        cleanExpiredTextures(deleter, null);
+    }
 
+    /**
+     * Delete any textures from the card that have been recently garbage collected in Java. If a deleter is passed in,
+     * gc'd textures that are part of the currently active context (if one is active) will be deleted immediately. If a
+     * deleter is not passed in, we do not have an active context, or we encounter gc'd textures that are not part of
+     * the current context, then we will queue those textures to be deleted later using the GameTaskQueueManager.
+     * 
+     * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
+     * These objects may be used to discover when the deletion tasks have all completed.
+     * 
+     * @param deleter
+     *            if not null, this renderer will be used to immediately delete any gc'd textures in the currently
+     *            active context. All other gc'd textures will be queued to delete in their own contexts.
+     * @param futureStore
+     *            if not null, this map will be populated with any Future task handles created during cleanup.
+     */
+    public static void cleanExpiredTextures(final Renderer deleter, final Map<Object, Future<Void>> futureStore) {
         // gather up expired textures...
-        gatherGCdIds(idMap);
+        final Multimap<Object, Integer> idMap = gatherGCdIds();
 
         // send to be deleted on next render.
-        handleTextureDelete(deleter, idMap);
+        if (idMap != null) {
+            handleTextureDelete(deleter, idMap, futureStore);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private static void gatherGCdIds(final Multimap<Object, Integer> idMap) {
+    private static Multimap<Object, Integer> gatherGCdIds() {
+        Multimap<Object, Integer> idMap = null;
         // Pull all expired textures from ref queue and add to an id multimap.
         ContextIdReference<TextureKey> ref;
         while ((ref = (ContextIdReference<TextureKey>) _textureRefQueue.poll()) != null) {
+            // lazy init
+            if (idMap == null) {
+                idMap = ArrayListMultimap.create();
+            }
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = ref.getContextObjects();
                 for (final Object o : contextObjects) {
@@ -282,9 +347,11 @@ final public class TextureManager {
             }
             ref.clear();
         }
+        return idMap;
     }
 
-    private static void handleTextureDelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
+    private static void handleTextureDelete(final Renderer deleter, final Multimap<Object, Integer> idMap,
+            final Map<Object, Future<Void>> futureStore) {
         Object currentGLRef = null;
         // Grab the current context, if any.
         if (deleter != null && ContextManager.getCurrentContext() != null) {
@@ -298,13 +365,16 @@ final public class TextureManager {
             }
             // Otherwise, add a delete request to that context's render task queue.
             else {
-                GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref)).render(
-                        new RendererCallable<Void>() {
+                final Future<Void> future = GameTaskQueueManager.getManager(ContextManager.getContextForRef(glref))
+                        .render(new RendererCallable<Void>() {
                             public Void call() throws Exception {
                                 getRenderer().deleteTextureIds(idMap.get(glref));
                                 return null;
                             }
                         });
+                if (futureStore != null) {
+                    futureStore.put(glref, future);
+                }
             }
         }
     }
