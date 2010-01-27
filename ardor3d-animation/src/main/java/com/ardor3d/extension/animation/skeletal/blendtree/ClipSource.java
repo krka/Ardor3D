@@ -44,7 +44,6 @@ public class ClipSource implements BlendTreeSource {
         _manager = manager;
     }
 
-    @Override
     public Map<String, Object> getSourceData() {
         return ImmutableMap.copyOf(getManager().getClipState(getClip()).getChannelData());
     }

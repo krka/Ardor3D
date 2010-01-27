@@ -10,8 +10,6 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
-import java.util.Arrays;
-
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
@@ -40,9 +38,22 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
         }
 
         // Construct our data
-        _rotations = Arrays.copyOf(rotations, rotations.length);
-        _translations = Arrays.copyOf(translations, translations.length);
-        _scales = Arrays.copyOf(scales, scales.length);
+        _rotations = TransformChannel.copyOf(rotations, new ReadOnlyQuaternion[rotations.length]);
+        _translations = TransformChannel.copyOf(translations, new ReadOnlyVector3[translations.length]);
+        _scales = TransformChannel.copyOf(scales, new ReadOnlyVector3[scales.length]);
+    }
+
+    /**
+     * REPLACE THIS ONCE WE SWITCH TO JAVA 6.0 (with Arrays.copyOf)
+     * 
+     * @param <T>
+     * @param srcArray
+     * @param dstArray
+     * @return
+     */
+    private static <T> T[] copyOf(final T[] srcArray, final T[] dstArray) {
+        System.arraycopy(srcArray, 0, dstArray, 0, Math.min(srcArray.length, dstArray.length));
+        return dstArray;
     }
 
     public TransformChannel(final String channelName, final float[] times, final ReadOnlyTransform[] transforms) {

@@ -69,7 +69,6 @@ public class ManagedTransformSource implements BlendTreeSource {
         tData.setRotation(rotation);
     }
 
-    @Override
     public Map<String, TransformData> getSourceData() {
         return ImmutableMap.copyOf(data);
     }

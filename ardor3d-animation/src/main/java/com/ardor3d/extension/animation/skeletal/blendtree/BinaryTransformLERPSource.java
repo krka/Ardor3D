@@ -56,7 +56,6 @@ public class BinaryTransformLERPSource implements BlendTreeSource {
         _blendWeight = blendWeight;
     }
 
-    @Override
     public Map<String, Object> getSourceData() {
 
         // XXX: Could we reuse one hashmap here? Or better to always make a new instance.

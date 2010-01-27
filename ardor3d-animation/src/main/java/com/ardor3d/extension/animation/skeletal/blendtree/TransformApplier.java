@@ -20,7 +20,6 @@ import com.ardor3d.extension.animation.skeletal.TransformData;
  * Very simple applier. Just applies joint transform data.
  */
 public class TransformApplier implements BlendTreeApplier {
-    @Override
     public void applyTo(final SkeletonPose applyToPose, final BlendTreeSource blendTreeRoot) {
         final Map<String, ? extends Object> data = blendTreeRoot.getSourceData();
 

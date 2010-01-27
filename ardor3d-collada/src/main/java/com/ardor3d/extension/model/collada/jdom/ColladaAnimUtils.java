@@ -567,6 +567,7 @@ public class ColladaAnimUtils {
      * 
      * @param entry
      */
+    @SuppressWarnings("unchecked")
     private void buildAnimations(final Entry<Element, List<TargetChannel>> entry) {
         final Element parentElement = entry.getKey();
         final List<TargetChannel> targetList = entry.getValue();
@@ -735,6 +736,7 @@ public class ColladaAnimUtils {
      * @param animationRoot
      * @param animationItemRoot
      */
+    @SuppressWarnings("unchecked")
     private void parseAnimations(final Map<Element, List<TargetChannel>> channelMap, final Element animationRoot,
             final AnimationItem animationItemRoot) {
         if (animationRoot.getChild("animation") != null) {
@@ -1016,14 +1018,14 @@ public class ColladaAnimUtils {
                 str.append(" ");
             }
         }
-        if (!e.getChildren().isEmpty() || !e.getText().isEmpty()) {
+        if (!e.getChildren().isEmpty() || !"".equals(e.getText())) {
             str.append(">");
             if (depth < maxDepth) {
                 str.append("\n");
                 for (final Element child : (List<Element>) e.getChildren()) {
                     getElementString(child, str, depth + 1, maxDepth, showDots);
                 }
-                if (!e.getText().isEmpty()) {
+                if (!"".equals(e.getText())) {
                     addSpacing(str, depth + 1);
                     str.append(e.getText());
                     str.append("\n");
