@@ -27,7 +27,7 @@ public class ContextGarbageCollector {
      *            general this is best used in single context applications, and null is a perfectly acceptable value.
      */
     public static void doRuntimeCleanup(final Renderer immediateDelete) {
-        TextureManager.cleanExpiredTextures(null);
+        TextureManager.cleanExpiredTextures(immediateDelete);
         AbstractBufferData.cleanExpiredVBOs(immediateDelete);
         DisplayListDelegate.cleanExpiredDisplayLists(immediateDelete);
     }
