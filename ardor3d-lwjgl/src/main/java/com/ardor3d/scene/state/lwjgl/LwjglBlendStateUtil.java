@@ -18,7 +18,7 @@ import org.lwjgl.opengl.EXTBlendMinmax;
 import org.lwjgl.opengl.EXTBlendSubtract;
 import org.lwjgl.opengl.GL11;
 
-import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -115,13 +115,12 @@ public abstract class LwjglBlendStateUtil {
                     || (caps.isConstantBlendColorSupported() && (state.getDestinationFunctionAlpha()
                             .usesConstantColor() || state.getSourceFunctionAlpha().usesConstantColor()));
             if (applyConstant && caps.isConstantBlendColorSupported()) {
-                final ColorRGBA constant = state.getConstantColor(ColorRGBA.fetchTempInstance());
+                final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
                     ARBImaging.glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant
                             .getAlpha());
                     record.blendColor.set(constant);
                 }
-                ColorRGBA.releaseTempInstance(constant);
             }
         }
     }

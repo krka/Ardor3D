@@ -176,13 +176,20 @@ public abstract class AbstractBufferData<T extends Buffer> {
         handleVBODelete(deleter, idMap);
     }
 
+    /**
+     * Clean any VBO ids from the hardware, using the given Renderer object to do the work immediately, if given. If
+     * not, we will delete in the next execution of the appropriate context's game task render queue.
+     * 
+     * @param deleter
+     *            the Renderer to use. If null, execution will not occur immediately.
+     */
     public static void cleanExpiredVBOs(final Renderer deleter) {
         final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
 
         // gather up expired vbos...
         gatherGCdIds(idMap);
 
-        // send to be deleted on next render.
+        // send to be deleted (perhaps on next render.)
         handleVBODelete(deleter, idMap);
     }
 

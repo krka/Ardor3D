@@ -13,6 +13,7 @@ package com.ardor3d.renderer.state;
 import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.record.BlendStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.util.export.Ardor3DExporter;
@@ -232,31 +233,31 @@ public class BlendState extends RenderState {
 
     // attributes
     /** The current value of if blend is enabled. */
-    private boolean blendEnabled = false;
+    private boolean _blendEnabled = false;
 
     /** The blend color used in constant blend operations. */
-    private ColorRGBA constantColor = new ColorRGBA(0, 0, 0, 0);
+    private ColorRGBA _constantColor = new ColorRGBA(0, 0, 0, 0);
 
     /** The current source blend function. */
-    private SourceFunction sourceFunctionRGB = SourceFunction.SourceAlpha;
+    private SourceFunction _sourceFunctionRGB = SourceFunction.SourceAlpha;
     /** The current destination blend function. */
-    private DestinationFunction destinationFunctionRGB = DestinationFunction.OneMinusSourceAlpha;
+    private DestinationFunction _destinationFunctionRGB = DestinationFunction.OneMinusSourceAlpha;
     /** The current blend equation. */
-    private BlendEquation blendEquationRGB = BlendEquation.Add;
+    private BlendEquation _blendEquationRGB = BlendEquation.Add;
 
     /** The current source blend function. */
-    private SourceFunction sourceFunctionAlpha = SourceFunction.SourceAlpha;
+    private SourceFunction _sourceFunctionAlpha = SourceFunction.SourceAlpha;
     /** The current destination blend function. */
-    private DestinationFunction destinationFunctionAlpha = DestinationFunction.OneMinusSourceAlpha;
+    private DestinationFunction _destinationFunctionAlpha = DestinationFunction.OneMinusSourceAlpha;
     /** The current blend equation. */
-    private BlendEquation blendEquationAlpha = BlendEquation.Add;
+    private BlendEquation _blendEquationAlpha = BlendEquation.Add;
 
     /** If enabled, alpha testing done. */
-    private boolean testEnabled = false;
+    private boolean _testEnabled = false;
     /** Alpha test value. */
-    private TestFunction testFunction = TestFunction.GreaterThan;
+    private TestFunction _testFunction = TestFunction.GreaterThan;
     /** The reference value to which incoming alpha values are compared. */
-    private float reference = 0;
+    private float _reference = 0;
 
     /**
      * Constructor instantiates a new <code>BlendState</code> object with default values.
@@ -274,7 +275,7 @@ public class BlendState extends RenderState {
      * @return true if blending is enabled, false otherwise.
      */
     public boolean isBlendEnabled() {
-        return blendEnabled;
+        return _blendEnabled;
     }
 
     /**
@@ -284,7 +285,7 @@ public class BlendState extends RenderState {
      *            true to enable the blending, false to disable it.
      */
     public void setBlendEnabled(final boolean value) {
-        blendEnabled = value;
+        _blendEnabled = value;
         setNeedsRefresh(true);
     }
 
@@ -314,7 +315,7 @@ public class BlendState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        sourceFunctionRGB = function;
+        _sourceFunctionRGB = function;
         setNeedsRefresh(true);
     }
 
@@ -330,7 +331,7 @@ public class BlendState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        sourceFunctionAlpha = function;
+        _sourceFunctionAlpha = function;
         setNeedsRefresh(true);
     }
 
@@ -340,7 +341,7 @@ public class BlendState extends RenderState {
      * @return the source function for the blending function.
      */
     public SourceFunction getSourceFunctionRGB() {
-        return sourceFunctionRGB;
+        return _sourceFunctionRGB;
     }
 
     /**
@@ -349,7 +350,7 @@ public class BlendState extends RenderState {
      * @return the source function for the blending function.
      */
     public SourceFunction getSourceFunctionAlpha() {
-        return sourceFunctionAlpha;
+        return _sourceFunctionAlpha;
     }
 
     /**
@@ -379,7 +380,7 @@ public class BlendState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        destinationFunctionRGB = function;
+        _destinationFunctionRGB = function;
         setNeedsRefresh(true);
     }
 
@@ -395,7 +396,7 @@ public class BlendState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        destinationFunctionAlpha = function;
+        _destinationFunctionAlpha = function;
         setNeedsRefresh(true);
     }
 
@@ -405,7 +406,7 @@ public class BlendState extends RenderState {
      * @return the destination function for the blending function.
      */
     public DestinationFunction getDestinationFunctionRGB() {
-        return destinationFunctionRGB;
+        return _destinationFunctionRGB;
     }
 
     /**
@@ -414,7 +415,7 @@ public class BlendState extends RenderState {
      * @return the destination function for the blending function.
      */
     public DestinationFunction getDestinationFunctionAlpha() {
-        return destinationFunctionAlpha;
+        return _destinationFunctionAlpha;
     }
 
     public void setBlendEquation(final BlendEquation blendEquation) {
@@ -426,22 +427,22 @@ public class BlendState extends RenderState {
         if (blendEquation == null) {
             throw new IllegalArgumentException("blendEquation can not be null.");
         }
-        blendEquationRGB = blendEquation;
+        _blendEquationRGB = blendEquation;
     }
 
     public void setBlendEquationAlpha(final BlendEquation blendEquation) {
         if (blendEquation == null) {
             throw new IllegalArgumentException("blendEquation can not be null.");
         }
-        blendEquationAlpha = blendEquation;
+        _blendEquationAlpha = blendEquation;
     }
 
     public BlendEquation getBlendEquationRGB() {
-        return blendEquationRGB;
+        return _blendEquationRGB;
     }
 
     public BlendEquation getBlendEquationAlpha() {
-        return blendEquationAlpha;
+        return _blendEquationAlpha;
     }
 
     /**
@@ -450,7 +451,7 @@ public class BlendState extends RenderState {
      * @return true if alpha testing is enabled, false otherwise.
      */
     public boolean isTestEnabled() {
-        return testEnabled;
+        return _testEnabled;
     }
 
     /**
@@ -460,7 +461,7 @@ public class BlendState extends RenderState {
      *            true to enabled alpha testing, false to disable it.
      */
     public void setTestEnabled(final boolean value) {
-        testEnabled = value;
+        _testEnabled = value;
         setNeedsRefresh(true);
     }
 
@@ -477,7 +478,7 @@ public class BlendState extends RenderState {
         if (function == null) {
             throw new IllegalArgumentException("function can not be null.");
         }
-        testFunction = function;
+        _testFunction = function;
         setNeedsRefresh(true);
     }
 
@@ -487,7 +488,7 @@ public class BlendState extends RenderState {
      * @return the testing function used for the alpha testing.
      */
     public TestFunction getTestFunction() {
-        return testFunction;
+        return _testFunction;
     }
 
     /**
@@ -505,7 +506,7 @@ public class BlendState extends RenderState {
         if (reference > 1) {
             reference = 1;
         }
-        this.reference = reference;
+        _reference = reference;
         setNeedsRefresh(true);
     }
 
@@ -515,54 +516,55 @@ public class BlendState extends RenderState {
      * @return the reference value that alpha values are compared to.
      */
     public float getReference() {
-        return reference;
+        return _reference;
     }
 
     /**
      * @return the color used in constant blending functions. (0,0,0,0) is the default.
      */
-    public ColorRGBA getConstantColor(final ColorRGBA store) {
-        return constantColor;
+    public ReadOnlyColorRGBA getConstantColor() {
+        return _constantColor;
     }
 
-    public void setConstantColor(final ColorRGBA constantColor) {
-        this.constantColor.set(constantColor);
+    public void setConstantColor(final ReadOnlyColorRGBA constantColor) {
+        _constantColor.set(constantColor);
     }
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
         super.write(e);
         final OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(blendEnabled, "blendEnabled", false);
-        capsule.write(sourceFunctionRGB, "sourceFunctionRGB", SourceFunction.SourceAlpha);
-        capsule.write(destinationFunctionRGB, "destinationFunctionRGB", DestinationFunction.OneMinusSourceAlpha);
-        capsule.write(blendEquationRGB, "blendEquationRGB", BlendEquation.Add);
-        capsule.write(sourceFunctionAlpha, "sourceFunctionAlpha", SourceFunction.SourceAlpha);
-        capsule.write(destinationFunctionAlpha, "destinationFunctionAlpha", DestinationFunction.OneMinusSourceAlpha);
-        capsule.write(blendEquationAlpha, "blendEquationAlpha", BlendEquation.Add);
-        capsule.write(testEnabled, "testEnabled", false);
-        capsule.write(testFunction, "test", TestFunction.GreaterThan);
-        capsule.write(reference, "reference", 0);
-        capsule.write(constantColor, "constantColor", null);
+        capsule.write(_blendEnabled, "blendEnabled", false);
+        capsule.write(_sourceFunctionRGB, "sourceFunctionRGB", SourceFunction.SourceAlpha);
+        capsule.write(_destinationFunctionRGB, "destinationFunctionRGB", DestinationFunction.OneMinusSourceAlpha);
+        capsule.write(_blendEquationRGB, "blendEquationRGB", BlendEquation.Add);
+        capsule.write(_sourceFunctionAlpha, "sourceFunctionAlpha", SourceFunction.SourceAlpha);
+        capsule.write(_destinationFunctionAlpha, "destinationFunctionAlpha", DestinationFunction.OneMinusSourceAlpha);
+        capsule.write(_blendEquationAlpha, "blendEquationAlpha", BlendEquation.Add);
+        capsule.write(_testEnabled, "testEnabled", false);
+        capsule.write(_testFunction, "test", TestFunction.GreaterThan);
+        capsule.write(_reference, "reference", 0);
+        capsule.write(_constantColor, "constantColor", null);
     }
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
-        blendEnabled = capsule.readBoolean("blendEnabled", false);
-        sourceFunctionRGB = capsule.readEnum("sourceFunctionRGB", SourceFunction.class, SourceFunction.SourceAlpha);
-        destinationFunctionRGB = capsule.readEnum("destinationFunctionRGB", DestinationFunction.class,
+        _blendEnabled = capsule.readBoolean("blendEnabled", false);
+        _sourceFunctionRGB = capsule.readEnum("sourceFunctionRGB", SourceFunction.class, SourceFunction.SourceAlpha);
+        _destinationFunctionRGB = capsule.readEnum("destinationFunctionRGB", DestinationFunction.class,
                 DestinationFunction.OneMinusSourceAlpha);
-        blendEquationRGB = capsule.readEnum("blendEquationRGB", BlendEquation.class, BlendEquation.Add);
-        sourceFunctionAlpha = capsule.readEnum("sourceFunctionAlpha", SourceFunction.class, SourceFunction.SourceAlpha);
-        destinationFunctionAlpha = capsule.readEnum("destinationFunctionAlpha", DestinationFunction.class,
+        _blendEquationRGB = capsule.readEnum("blendEquationRGB", BlendEquation.class, BlendEquation.Add);
+        _sourceFunctionAlpha = capsule
+                .readEnum("sourceFunctionAlpha", SourceFunction.class, SourceFunction.SourceAlpha);
+        _destinationFunctionAlpha = capsule.readEnum("destinationFunctionAlpha", DestinationFunction.class,
                 DestinationFunction.OneMinusSourceAlpha);
-        blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
-        testEnabled = capsule.readBoolean("testEnabled", false);
-        testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.GreaterThan);
-        reference = capsule.readFloat("reference", 0);
-        constantColor = (ColorRGBA) capsule.readSavable("constantColor", null);
+        _blendEquationAlpha = capsule.readEnum("blendEquationAlpha", BlendEquation.class, BlendEquation.Add);
+        _testEnabled = capsule.readBoolean("testEnabled", false);
+        _testFunction = capsule.readEnum("test", TestFunction.class, TestFunction.GreaterThan);
+        _reference = capsule.readFloat("reference", 0);
+        _constantColor = (ColorRGBA) capsule.readSavable("constantColor", null);
     }
 
     @Override

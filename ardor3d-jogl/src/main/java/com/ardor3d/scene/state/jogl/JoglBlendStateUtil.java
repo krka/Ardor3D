@@ -13,7 +13,7 @@ package com.ardor3d.scene.state.jogl;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 
-import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
@@ -113,12 +113,11 @@ public abstract class JoglBlendStateUtil {
                     || (caps.isConstantBlendColorSupported() && (state.getDestinationFunctionAlpha()
                             .usesConstantColor() || state.getSourceFunctionAlpha().usesConstantColor()));
             if (applyConstant && caps.isConstantBlendColorSupported()) {
-                final ColorRGBA constant = state.getConstantColor(ColorRGBA.fetchTempInstance());
+                final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
                     gl.glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant.getAlpha());
                     record.blendColor.set(constant);
                 }
-                ColorRGBA.releaseTempInstance(constant);
             }
         }
     }
