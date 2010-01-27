@@ -10,8 +10,6 @@
 
 package com.ardor3d.example.renderer;
 
-import java.util.logging.Logger;
-
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.texturing.ProceduralTextureStreamer;
 import com.ardor3d.extension.texturing.TextureClipmap;
@@ -44,8 +42,6 @@ import com.google.inject.Inject;
  * Very simple example showing use of a Texture3D texture.
  */
 public class TextureClipmapExample extends ExampleBase {
-    /** The Constant logger. */
-    private static final Logger logger = Logger.getLogger(TextureClipmapExample.class.getName());
 
     /** Text fields used to present info about the example. */
     private final BasicText _exampleInfo[] = new BasicText[9];
