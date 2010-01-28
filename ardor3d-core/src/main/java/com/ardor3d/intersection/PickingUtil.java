@@ -85,7 +85,7 @@ public abstract class PickingUtil {
         }
     }
 
-    public static void findTrianglePick(final Mesh mesh, final Ray3 toTest, final List<PrimitiveKey> results) {
+    public static void findPrimitivePick(final Mesh mesh, final Ray3 toTest, final List<PrimitiveKey> results) {
         if (mesh.getWorldBound() == null || !mesh.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
             return;
         }
@@ -107,7 +107,7 @@ public abstract class PickingUtil {
      *            The intersection testing mesh.
      * @return True if they intersect.
      */
-    public static boolean hasTriangleCollision(final Mesh testMesh, final Mesh toCheck) {
+    public static boolean hasPrimitiveCollision(final Mesh testMesh, final Mesh toCheck) {
         if (!testMesh.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)
                 || !toCheck.getSceneHints().isPickingHintEnabled(PickingHint.Collidable)) {
             return false;
@@ -127,14 +127,14 @@ public abstract class PickingUtil {
 
     /**
      * This function finds all intersections between this mesh and the checking one. The intersections are stored as
-     * Integer objects of Triangle indexes in each of the parameters.
+     * PrimitiveKeys.
      * 
      * @param toCheck
      *            The Mesh to check.
      * @param testIndex
-     *            The array of triangle indexes intersecting in this mesh.
+     *            The array of PrimitiveKeys intersecting in this mesh.
      * @param otherIndex
-     *            The array of triangle indexes intersecting in the given mesh.
+     *            The array of PrimitiveKeys intersecting in the given mesh.
      */
     public static void findPrimitiveCollision(final Mesh testMesh, final Mesh toCheck,
             final List<PrimitiveKey> testIndex, final List<PrimitiveKey> otherIndex) {
@@ -195,7 +195,7 @@ public abstract class PickingUtil {
                     return true;
                 }
 
-                return PickingUtil.hasTriangleCollision(mesh, (Mesh) scene);
+                return PickingUtil.hasPrimitiveCollision(mesh, (Mesh) scene);
             }
 
             return false;

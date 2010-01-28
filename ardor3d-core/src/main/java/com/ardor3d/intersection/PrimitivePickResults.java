@@ -38,7 +38,7 @@ public class PrimitivePickResults extends PickResults {
     public void addPick(final Ray3 ray, final Mesh mesh) {
         // find the primitive that is being hit. Add this node and the primitive to the CollisionResults list.
         final List<PrimitiveKey> resultTriangles = new ArrayList<PrimitiveKey>();
-        PickingUtil.findTrianglePick(mesh, ray, resultTriangles);
+        PickingUtil.findPrimitivePick(mesh, ray, resultTriangles);
         final PickData data = new PrimitivePickData(ray, mesh, resultTriangles, willCheckDistance());
         addPickData(data);
     }
