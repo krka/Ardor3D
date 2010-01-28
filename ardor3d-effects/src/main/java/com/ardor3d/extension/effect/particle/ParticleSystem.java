@@ -30,6 +30,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.event.DirtyType;
@@ -932,8 +933,13 @@ public abstract class ParticleSystem extends Node {
 
     @Override
     public void write(final Ardor3DExporter e) throws IOException {
-        detachAllChildren();
+        // Do not save the "generated" particle geometry.
+        final Spatial geom = getParticleGeometry();
+        detachChild(geom);
         super.write(e);
+        // Reattach
+        attachChild(geom);
+
         final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_particleType, "particleType", ParticleType.Quad);
         capsule.write(_particleEmitter, "particleEmitter", null);
@@ -974,7 +980,6 @@ public abstract class ParticleSystem extends Node {
 
     @Override
     public void read(final Ardor3DImporter e) throws IOException {
-        detachAllChildren();
         super.read(e);
         final InputCapsule capsule = e.getCapsule(this);
         _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
