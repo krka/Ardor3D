@@ -482,7 +482,7 @@ public class ColladaAnimUtils {
                     // add to the skinNode.
                     skinNode.attachChild(skMesh);
 
-                    // Apply our bind pose to the skin mesh.
+                    // Manually apply our bind pose to the skin mesh.
                     skMesh.applyPose();
 
                     // Update the model bounding.
