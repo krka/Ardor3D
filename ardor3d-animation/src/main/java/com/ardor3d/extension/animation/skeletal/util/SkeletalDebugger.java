@@ -158,16 +158,23 @@ public class SkeletalDebugger {
             if (!inOrtho) {
                 renderer.setOrtho();
             }
+            final Transform store = Transform.fetchTempInstance();
+            final Vector3 point = Vector3.fetchTempInstance();
             for (int i = 0, max = joints.length; i < max; i++) {
                 SkeletalDebugger.jointText.setText(i + ". " + joints[i].getName());
+
+                final Transform t = scene.getWorldTransform().multiply(globals[i], store);
+                point.zero();
                 SkeletalDebugger.jointText.setTranslation(Camera.getCurrentCamera().getScreenCoordinates(
-                        globals[i].getTranslation()));
+                        t.applyForward(point)));
 
                 final double size = SkeletalDebugger.LABEL_RATIO;
                 SkeletalDebugger.jointText.setScale(size, size, -size);
 
                 SkeletalDebugger.jointText.draw(renderer);
             }
+            Transform.releaseTempInstance(store);
+            Vector3.releaseTempInstance(point);
             if (!inOrtho) {
                 renderer.unsetOrtho();
             }
