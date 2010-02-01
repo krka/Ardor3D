@@ -71,7 +71,7 @@ import com.google.inject.Inject;
  * Illustrates loading several animations from Collada and arranging them in a controllable blend tree.
  */
 @Purpose(htmlDescription = "Illustrates loading several animations from Collada and arranging them in a controllable blend tree.", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemo.jpg", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationDemoExample extends ExampleBase {
 
