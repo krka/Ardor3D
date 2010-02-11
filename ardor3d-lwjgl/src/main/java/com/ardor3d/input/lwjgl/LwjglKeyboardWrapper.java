@@ -27,10 +27,12 @@ public class LwjglKeyboardWrapper implements KeyboardWrapper {
     private LwjglKeyEventIterator _currentIterator = null;
 
     public void init() {
-        try {
-            Keyboard.create();
-        } catch (final LWJGLException e) {
-            throw new RuntimeException(e);
+        if (!Keyboard.isCreated()) {
+            try {
+                Keyboard.create();
+            } catch (final LWJGLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
