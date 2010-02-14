@@ -10,9 +10,7 @@
 
 package com.ardor3d.renderer.lwjgl;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -121,10 +119,10 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private final FloatBuffer[] _oldTextureBuffers;
 
-    private final DoubleBuffer _transformBuffer = BufferUtils.createDoubleBuffer(16);
+    private final FloatBuffer _transformBuffer = BufferUtils.createFloatBuffer(16);
     {
         _transformBuffer.position(15);
-        _transformBuffer.put(1.0);
+        _transformBuffer.put(1.0f);
     }
 
     private final Matrix4 _transformMatrix = new Matrix4();
@@ -1344,53 +1342,28 @@ public class LwjglRenderer extends AbstractRenderer {
         return glMode;
     }
 
-    public void setModelViewMatrix(final Buffer matrix) {
+    public void setModelViewMatrix(final FloatBuffer matrix) {
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         LwjglRendererUtil.switchMode(matRecord, GL11.GL_MODELVIEW);
         loadMatrix(matrix);
     }
 
-    public void setProjectionMatrix(final Buffer matrix) {
+    public void setProjectionMatrix(final FloatBuffer matrix) {
         final RendererRecord matRecord = ContextManager.getCurrentContext().getRendererRecord();
         LwjglRendererUtil.switchMode(matRecord, GL11.GL_PROJECTION);
         loadMatrix(matrix);
     }
 
-    private void loadMatrix(final Buffer matrix) {
-        if (matrix instanceof DoubleBuffer) {
-            GL11.glLoadMatrix((DoubleBuffer) matrix);
-        } else if (matrix instanceof FloatBuffer) {
-            GL11.glLoadMatrix((FloatBuffer) matrix);
-        }
+    private void loadMatrix(final FloatBuffer matrix) {
+        GL11.glLoadMatrix(matrix);
     }
 
-    public Buffer getModelViewMatrix(final Buffer store) {
-        if (store == null || store instanceof DoubleBuffer) {
-            return getMatrix(GL11.GL_MODELVIEW_MATRIX, (DoubleBuffer) store);
-        } else if (store instanceof FloatBuffer) {
-            return getMatrix(GL11.GL_MODELVIEW_MATRIX, (FloatBuffer) store);
-        } else {
-            return null;
-        }
+    public FloatBuffer getModelViewMatrix(final FloatBuffer store) {
+        return getMatrix(GL11.GL_MODELVIEW_MATRIX, store);
     }
 
-    public Buffer getProjectionMatrix(final Buffer store) {
-        if (store == null || store instanceof DoubleBuffer) {
-            return getMatrix(GL11.GL_PROJECTION_MATRIX, (DoubleBuffer) store);
-        } else if (store instanceof FloatBuffer) {
-            return getMatrix(GL11.GL_PROJECTION_MATRIX, (FloatBuffer) store);
-        } else {
-            return null;
-        }
-    }
-
-    private DoubleBuffer getMatrix(final int matrixType, final DoubleBuffer store) {
-        DoubleBuffer result = store;
-        if (result == null || result.remaining() < 16) {
-            result = BufferUtils.createDoubleBuffer(16);
-        }
-        GL11.glGetDouble(matrixType, store);
-        return result;
+    public FloatBuffer getProjectionMatrix(final FloatBuffer store) {
+        return getMatrix(GL11.GL_PROJECTION_MATRIX, store);
     }
 
     private FloatBuffer getMatrix(final int matrixType, final FloatBuffer store) {

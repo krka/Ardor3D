@@ -10,8 +10,8 @@
 
 package com.ardor3d.renderer;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.List;
 
@@ -406,29 +406,27 @@ public interface Renderer {
     // TODO: Display List
     void renderDisplayList(int displayListID);
 
-    void setProjectionMatrix(Buffer matrix);
+    void setProjectionMatrix(FloatBuffer matrix);
 
     /**
      * Gets the current projection matrix in row major order
      * 
      * @param store
-     *            The buffer to store in. Must be a FloatBuffer or DoubleBuffer or null. If null or remaining is < 16, a
-     *            new Buffer (DoubleBuffer for null) will be created and returned.
+     *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
      * @return
      */
-    Buffer getProjectionMatrix(Buffer store);
+    FloatBuffer getProjectionMatrix(FloatBuffer store);
 
-    void setModelViewMatrix(Buffer matrix);
+    void setModelViewMatrix(FloatBuffer matrix);
 
     /**
      * Gets the current modelview matrix in row major order
      * 
      * @param store
-     *            The buffer to store in. Must be a FloatBuffer or DoubleBuffer or null. If null or remaining is < 16, a
-     *            new Buffer (DoubleBuffer for null) will be created and returned.
+     *            The buffer to store in. If null or remaining is < 16, a new FloatBuffer will be created and returned.
      * @return
      */
-    Buffer getModelViewMatrix(Buffer store);
+    FloatBuffer getModelViewMatrix(FloatBuffer store);
 
     void setViewport(int x, int y, int width, int height);
 

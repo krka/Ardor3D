@@ -14,7 +14,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -207,7 +207,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
      */
     protected Plane[] _worldPlane;
 
-    protected final DoubleBuffer _matrixBuffer = BufferUtils.createDoubleBuffer(16);
+    protected final FloatBuffer _matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     /**
      * Computation vector used in lookAt operations.
@@ -1466,7 +1466,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
      */
     protected void applyProjectionMatrix(final Renderer renderer) {
         _matrixBuffer.rewind();
-        getProjectionMatrix().toDoubleBuffer(_matrixBuffer);
+        getProjectionMatrix().toFloatBuffer(_matrixBuffer);
         _matrixBuffer.rewind();
         renderer.setProjectionMatrix(_matrixBuffer);
     }
@@ -1493,7 +1493,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
      */
     protected void applyModelViewMatrix(final Renderer renderer) {
         _matrixBuffer.rewind();
-        getModelViewMatrix().toDoubleBuffer(_matrixBuffer);
+        getModelViewMatrix().toFloatBuffer(_matrixBuffer);
         _matrixBuffer.rewind();
         renderer.setModelViewMatrix(_matrixBuffer);
     }
