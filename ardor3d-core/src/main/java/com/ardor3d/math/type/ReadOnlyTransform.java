@@ -11,6 +11,7 @@
 package com.ardor3d.math.type;
 
 import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
@@ -60,5 +61,15 @@ public interface ReadOnlyTransform {
      *            and 15 is already 1.0.
      */
     public void getGLApplyMatrix(DoubleBuffer store);
+
+    /**
+     * Populates an nio float buffer with data from this transform to use as a model view matrix in OpenGL. This is done
+     * as efficiently as possible, not touching positions 3, 7, 11 and 15.
+     * 
+     * @param store
+     *            float buffer to store in. Assumes a size of 16 and that position 3, 7 and 11 are already set as 0.0f
+     *            and 15 is already 1.0f.
+     */
+    public void getGLApplyMatrix(FloatBuffer store);
 
 }
