@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
@@ -798,7 +799,44 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
         store.put(_translation.getX());
         store.put(_translation.getY());
         store.put(_translation.getZ());
-        store.put(1);
+        store.put(1.0);
+        store.rewind();
+    }
+
+    public void getGLApplyMatrix(final FloatBuffer store) {
+        store.position(0);
+        if (_rotationMatrix) {
+            store.put((float) (_scale.getX() * _matrix._data[0][0]));
+            store.put((float) (_scale.getX() * _matrix._data[1][0]));
+            store.put((float) (_scale.getX() * _matrix._data[2][0]));
+            store.position(4);
+            store.put((float) (_scale.getY() * _matrix._data[0][1]));
+            store.put((float) (_scale.getY() * _matrix._data[1][1]));
+            store.put((float) (_scale.getY() * _matrix._data[2][1]));
+            store.position(8);
+            store.put((float) (_scale.getZ() * _matrix._data[0][2]));
+            store.put((float) (_scale.getZ() * _matrix._data[1][2]));
+            store.put((float) (_scale.getZ() * _matrix._data[2][2]));
+            store.position(12);
+        } else {
+            store.put((float) _matrix._data[0][0]);
+            store.put((float) _matrix._data[1][0]);
+            store.put((float) _matrix._data[2][0]);
+            store.position(4);
+            store.put((float) _matrix._data[0][1]);
+            store.put((float) _matrix._data[1][1]);
+            store.put((float) _matrix._data[2][1]);
+            store.position(8);
+            store.put((float) _matrix._data[0][2]);
+            store.put((float) _matrix._data[1][2]);
+            store.put((float) _matrix._data[2][2]);
+            store.position(12);
+        }
+
+        store.put(_translation.getXf());
+        store.put(_translation.getYf());
+        store.put(_translation.getZf());
+        store.put(1.0f);
         store.rewind();
     }
 
