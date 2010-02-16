@@ -78,7 +78,7 @@ public class MaterialState extends RenderState {
     public static final ColorMaterial DEFAULT_COLOR_MATERIAL = ColorMaterial.None;
 
     /** Default material face for all material states. */
-    public static final MaterialFace DEFAULT_MATERIAL_FACE = MaterialFace.Front;
+    public static final MaterialFace DEFAULT_MATERIAL_FACE = MaterialFace.FrontAndBack;
 
     // attributes of the material
     protected final ColorRGBA _ambient = new ColorRGBA(DEFAULT_AMBIENT);
