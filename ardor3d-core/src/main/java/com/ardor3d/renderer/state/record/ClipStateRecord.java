@@ -18,8 +18,8 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class ClipStateRecord extends StateRecord {
 
-    public boolean[] planeEnabled = new boolean[ClipState.MAX_CLIP_PLANES];
-    public DoubleBuffer buf = BufferUtils.createDoubleBuffer(4);
+    public final boolean[] planeEnabled = new boolean[ClipState.MAX_CLIP_PLANES];
+    public final DoubleBuffer buf = BufferUtils.createDoubleBuffer(4);
 
     @Override
     public void invalidate() {
