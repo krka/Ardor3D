@@ -1208,10 +1208,15 @@ public final class BufferUtils {
     // // -- GENERAL INDEXBUFFERDATA ROUTINES -- ////
 
     /**
-     * Create a new IndexBufferData of the specified size.
+     * Create a new IndexBufferData of the specified size. The specific implementation will be chosen based on the max
+     * value you need to store in your buffer. If that value is less than 2^8, a ByteBufferData is used. If it is less
+     * than 2^16, a ShortBufferData is used. Otherwise an IntBufferData is used.
      * 
      * @param size
      *            required number of values to store.
+     * @param maxValue
+     *            the largest value you will need to store in your buffer. Often this is equal to
+     *            ("size of vertex buffer" - 1).
      * @return the new IndexBufferData
      */
     public static IndexBufferData<?> createIndexBufferData(final int size, final int maxValue) {
@@ -1225,10 +1230,12 @@ public final class BufferUtils {
     }
 
     /**
-     * Create a new IndexBufferData of the specified size.
+     * Create a new IndexBufferData of the specified size and class.
      * 
      * @param size
      *            required number of values to store.
+     * @param clazz
+     *            The class type to instantiate.
      * @return the new IndexBufferData
      */
     public static IndexBufferData<?> createIndexBufferData(final int size,
