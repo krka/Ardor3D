@@ -87,7 +87,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.setBindPoseData(cy.getMeshData());
         arm.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(cy.getMeshData().getVertexBuffer().capacity()));
         arm.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(cy.getMeshData().getNormalBuffer().capacity()));
-        arm.getMeshData().setIndexBuffer(BufferUtils.clone(cy.getMeshData().getIndexBuffer()));
+        arm.getMeshData().setIndices(BufferUtils.clone(cy.getMeshData().getIndices()));
         arm.getMeshData().setTextureBuffer(BufferUtils.clone(cy.getMeshData().getTextureBuffer(0)), 0);
         arm.setCurrentPose(pose);
         arm.setTranslation(0, 0, 5);
