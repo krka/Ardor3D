@@ -109,23 +109,7 @@ public class Line extends Mesh {
         _meshData.setNormalBuffer(normals);
         _meshData.setColorBuffer(colors);
         _meshData.setTextureCoords(coords, 0);
-
-        generateIndices();
-    }
-
-    /**
-     * Generate indices for the line
-     */
-    public void generateIndices() {
-        if (_meshData.getIndexBuffer() == null || _meshData.getIndexBuffer().limit() != _meshData.getVertexCount()) {
-            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getVertexCount()));
-        } else {
-            _meshData.getIndexBuffer().rewind();
-        }
-
-        for (int x = 0; x < _meshData.getVertexCount(); x++) {
-            _meshData.getIndexBuffer().put(x);
-        }
+        _meshData.setIndices(null);
     }
 
     /**
@@ -165,7 +149,6 @@ public class Line extends Mesh {
         }
         verts.put((float) (radius + x)).put((float) y).put(0);
         normals.put((float) radius).put(0).put(0);
-        generateIndices();
     }
 
     /**

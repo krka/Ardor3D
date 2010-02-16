@@ -60,7 +60,7 @@ public abstract class GeometryTool {
                 }
             }
 
-            final int[] inds = BufferUtils.getIntArray(mesh.getMeshData().getIndexBuffer());
+            final int[] inds = BufferUtils.getIntArray(mesh.getMeshData().getIndices());
 
             final HashMap<VertKey, Integer> store = new HashMap<VertKey, Integer>();
             int good = 0;
@@ -138,7 +138,9 @@ public abstract class GeometryTool {
             }
 
             mesh.getMeshData().getIndexBuffer().clear();
-            mesh.getMeshData().getIndexBuffer().put(inds);
+            for (final int i : inds) {
+                mesh.getMeshData().getIndices().put(i);
+            }
             newCount = mesh.getMeshData().getVertexCount();
         }
         logger.info("mesh: " + mesh + " old: " + oldCount + " new: " + newCount);

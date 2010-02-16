@@ -29,6 +29,11 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyVector4;
+import com.ardor3d.scenegraph.ByteBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
+import com.ardor3d.scenegraph.IntBufferData;
+import com.ardor3d.scenegraph.ShortBufferData;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
 import com.google.common.collect.MapMaker;
 
@@ -786,8 +791,27 @@ public final class BufferUtils {
         if (buff == null) {
             return null;
         }
-        buff.clear();
+        buff.rewind();
         final int[] inds = new int[buff.limit()];
+        for (int x = 0; x < inds.length; x++) {
+            inds[x] = buff.get();
+        }
+        return inds;
+    }
+
+    /**
+     * Create a new int[] array and populate it with the given IndexBufferData's contents.
+     * 
+     * @param buff
+     *            the IndexBufferData to read from
+     * @return a new int array populated from the IndexBufferData
+     */
+    public static int[] getIntArray(final IndexBufferData<?> buff) {
+        if (buff == null || buff.getBuffer() == null) {
+            return null;
+        }
+        buff.getBuffer().rewind();
+        final int[] inds = new int[buff.getBufferLimit()];
         for (int x = 0; x < inds.length; x++) {
             inds[x] = buff.get();
         }
@@ -1179,6 +1203,67 @@ public final class BufferUtils {
             buffer = newVerts;
         }
         return buffer;
+    }
+
+    // // -- GENERAL INDEXBUFFERDATA ROUTINES -- ////
+
+    /**
+     * Create a new IndexBufferData of the specified size.
+     * 
+     * @param size
+     *            required number of values to store.
+     * @return the new IndexBufferData
+     */
+    public static IndexBufferData<?> createIndexBufferData(final int size, final int maxValue) {
+        if (maxValue < 256) { // 2^8
+            return createIndexBufferData(size, ByteBufferData.class);
+        } else if (maxValue < 65536) { // 2^16
+            return createIndexBufferData(size, ShortBufferData.class);
+        } else {
+            return createIndexBufferData(size, IntBufferData.class);
+        }
+    }
+
+    /**
+     * Create a new IndexBufferData of the specified size.
+     * 
+     * @param size
+     *            required number of values to store.
+     * @return the new IndexBufferData
+     */
+    public static IndexBufferData<?> createIndexBufferData(final int size,
+            final Class<? extends IndexBufferData<?>> clazz) {
+        try {
+            return clazz.getConstructor(int.class).newInstance(size);
+        } catch (final Exception ex) {
+            throw new Ardor3dException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Creates a new IndexBufferData with the same contents as the given IndexBufferData. The new IndexBufferData is
+     * separate from the old one and changes are not reflected across.
+     * 
+     * @param buf
+     *            the IndexBufferData to copy
+     * @return the copy
+     */
+    @SuppressWarnings("unchecked")
+    public static IndexBufferData<?> clone(final IndexBufferData<?> buf) {
+        if (buf == null) {
+            return null;
+        }
+
+        final IndexBufferData<?> copy = createIndexBufferData(buf.getBufferLimit(),
+                (Class<? extends IndexBufferData<?>>) buf.getClass());
+        if (buf.getBuffer() == null) {
+            copy.setBuffer(null);
+        } else {
+            buf.getBuffer().rewind();
+            copy.put(buf);
+        }
+
+        return copy;
     }
 
     // // -- GENERAL HEAP BYTE ROUTINES -- ////

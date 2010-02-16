@@ -276,7 +276,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
             area.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(maxSamples * 2));
             area.getMeshData().setIndexBuffer(BufferUtils.createIntBuffer(maxSamples * 2));
             for (int i = 0; i < maxSamples * 2; i++) {
-                area.getMeshData().getIndexBuffer().put(i);
+                area.getMeshData().getIndices().put(i);
             }
             area.getMeshData().getIndexBuffer().rewind();
             area.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);

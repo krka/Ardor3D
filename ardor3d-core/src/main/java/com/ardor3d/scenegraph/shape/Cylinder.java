@@ -224,7 +224,10 @@ public class Cylinder extends Mesh {
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         final int count = ((_closed ? 2 : 0) + 2 * (_axisSamples - 1)) * _radialSamples;
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * count));
+
+        if (_meshData.getIndices() == null || _meshData.getIndices().getBufferLimit() != 3 * count) {
+            _meshData.setIndices(BufferUtils.createIndexBufferData(3 * count, verts - 1));
+        }
 
         setGeometryData();
         setIndexData();
@@ -298,7 +301,8 @@ public class Cylinder extends Mesh {
                 tempNormal.multiplyLocal((_radius - _radius2) * axisFraction + _radius2).addLocal(sliceCenter);
                 _meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 
-                _meshData.getTextureCoords(0).getBuffer().put((float) (_inverted ? 1 - radialFraction : radialFraction))
+                _meshData.getTextureCoords(0).getBuffer()
+                        .put((float) (_inverted ? 1 - radialFraction : radialFraction))
                         .put((float) axisFractionTexture);
                 i++;
             }
@@ -322,6 +326,8 @@ public class Cylinder extends Mesh {
     }
 
     private void setIndexData() {
+        _meshData.getIndexBuffer().rewind();
+
         // generate connectivity
         for (int axisCount = 0, axisStart = 0; axisCount < _axisSamples - 1; axisCount++) {
             int i0 = axisStart;
@@ -332,39 +338,39 @@ public class Cylinder extends Mesh {
             for (int i = 0; i < _radialSamples; i++) {
                 if (_closed && axisCount == 0) {
                     if (!_inverted) {
-                        _meshData.getIndexBuffer().put(i0++);
-                        _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 2);
-                        _meshData.getIndexBuffer().put(i1++);
+                        _meshData.getIndices().put(i0++);
+                        _meshData.getIndices().put(_meshData.getVertexCount() - 2);
+                        _meshData.getIndices().put(i1++);
                     } else {
-                        _meshData.getIndexBuffer().put(i0++);
-                        _meshData.getIndexBuffer().put(i1++);
-                        _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 2);
+                        _meshData.getIndices().put(i0++);
+                        _meshData.getIndices().put(i1++);
+                        _meshData.getIndices().put(_meshData.getVertexCount() - 2);
                     }
                 } else if (_closed && axisCount == _axisSamples - 2) {
                     if (!_inverted) {
-                        _meshData.getIndexBuffer().put(i2++);
-                        _meshData.getIndexBuffer().put(i3++);
-                        _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 1);
+                        _meshData.getIndices().put(i2++);
+                        _meshData.getIndices().put(i3++);
+                        _meshData.getIndices().put(_meshData.getVertexCount() - 1);
                     } else {
-                        _meshData.getIndexBuffer().put(i2++);
-                        _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 1);
-                        _meshData.getIndexBuffer().put(i3++);
+                        _meshData.getIndices().put(i2++);
+                        _meshData.getIndices().put(_meshData.getVertexCount() - 1);
+                        _meshData.getIndices().put(i3++);
                     }
                 } else {
                     if (!_inverted) {
-                        _meshData.getIndexBuffer().put(i0++);
-                        _meshData.getIndexBuffer().put(i1);
-                        _meshData.getIndexBuffer().put(i2);
-                        _meshData.getIndexBuffer().put(i1++);
-                        _meshData.getIndexBuffer().put(i3++);
-                        _meshData.getIndexBuffer().put(i2++);
+                        _meshData.getIndices().put(i0++);
+                        _meshData.getIndices().put(i1);
+                        _meshData.getIndices().put(i2);
+                        _meshData.getIndices().put(i1++);
+                        _meshData.getIndices().put(i3++);
+                        _meshData.getIndices().put(i2++);
                     } else {
-                        _meshData.getIndexBuffer().put(i0++);
-                        _meshData.getIndexBuffer().put(i2);
-                        _meshData.getIndexBuffer().put(i1);
-                        _meshData.getIndexBuffer().put(i1++);
-                        _meshData.getIndexBuffer().put(i2++);
-                        _meshData.getIndexBuffer().put(i3++);
+                        _meshData.getIndices().put(i0++);
+                        _meshData.getIndices().put(i2);
+                        _meshData.getIndices().put(i1);
+                        _meshData.getIndices().put(i1++);
+                        _meshData.getIndices().put(i2++);
+                        _meshData.getIndices().put(i3++);
                     }
                 }
             }

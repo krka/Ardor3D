@@ -118,7 +118,9 @@ public class Capsule extends Mesh {
         // determine tri quantity
         final int tris = 2 * radialSamples * sampleLines;
 
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * tris));
+        if (_meshData.getIndices() == null || _meshData.getIndices().getBufferLimit() != 3 * tris) {
+            _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
+        }
 
         setGeometryData();
         setIndexData();
@@ -223,23 +225,25 @@ public class Capsule extends Mesh {
     }
 
     private void setIndexData() {
+        _meshData.getIndexBuffer().rewind();
+
         // start with top of top dome.
         for (int samples = 1; samples <= radialSamples; samples++) {
-            _meshData.getIndexBuffer().put(samples + 1);
-            _meshData.getIndexBuffer().put(samples);
-            _meshData.getIndexBuffer().put(0);
+            _meshData.getIndices().put(samples + 1);
+            _meshData.getIndices().put(samples);
+            _meshData.getIndices().put(0);
         }
 
         for (int plane = 1; plane < (sphereSamples); plane++) {
             final int topPlaneStart = plane * (radialSamples + 1);
             final int bottomPlaneStart = (plane - 1) * (radialSamples + 1);
             for (int sample = 1; sample <= radialSamples; sample++) {
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
             }
         }
 
@@ -250,12 +254,12 @@ public class Capsule extends Mesh {
             final int topPlaneStart = start + plane * (radialSamples + 1);
             final int bottomPlaneStart = start + (plane - 1) * (radialSamples + 1);
             for (int sample = 1; sample <= radialSamples; sample++) {
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
             }
         }
 
@@ -266,21 +270,21 @@ public class Capsule extends Mesh {
             final int topPlaneStart = start + plane * (radialSamples + 1);
             final int bottomPlaneStart = start + (plane - 1) * (radialSamples + 1);
             for (int sample = 1; sample <= radialSamples; sample++) {
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
             }
         }
 
         start += ((sphereSamples - 1) * (radialSamples + 1));
         // Finally the bottom of bottom dome.
         for (int samples = 1; samples <= radialSamples; samples++) {
-            _meshData.getIndexBuffer().put(start + samples);
-            _meshData.getIndexBuffer().put(start + samples + 1);
-            _meshData.getIndexBuffer().put(start + radialSamples + 2);
+            _meshData.getIndices().put(start + samples);
+            _meshData.getIndices().put(start + samples + 1);
+            _meshData.getIndices().put(start + radialSamples + 2);
         }
     }
 

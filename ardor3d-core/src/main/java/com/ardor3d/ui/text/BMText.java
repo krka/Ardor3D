@@ -641,7 +641,7 @@ public class BMText extends Mesh {
         }
         _meshData.setVertexBuffer(vertices);
         _meshData.setTextureBuffer(texCrds, 0);
-        _meshData.setIndexBuffer(null);
+        _meshData.setIndices(null);
     }
 
     // this is inefficient yet incredibly convenient

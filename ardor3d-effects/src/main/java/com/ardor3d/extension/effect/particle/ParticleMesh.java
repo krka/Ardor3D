@@ -126,7 +126,7 @@ public class ParticleMesh extends ParticleSystem {
                     final MeshEmitter source = (MeshEmitter) getParticleEmitter();
                     final Mesh sourceMesh = source.getSource();
                     final int index = sourceMesh.getMeshData().getIndexBuffer() != null ? sourceMesh.getMeshData()
-                            .getIndexBuffer().get(ind) : ind;
+                            .getIndices().get(ind) : ind;
                     BufferUtils.populateFromBuffer(temp, sourceMesh.getMeshData().getTextureCoords(0).getBuffer(),
                             index);
                     BufferUtils.setInBuffer(temp, meshData.getTextureCoords(0).getBuffer(), ind);

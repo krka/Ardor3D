@@ -11,7 +11,6 @@
 package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -24,6 +23,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.scenegraph.IndexBufferData;
+import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
 
 /**
@@ -108,7 +109,7 @@ public class NormalGenerator {
         }
 
         // Get the data of the mesh as arrays
-        _sourceInds = BufferUtils.getIntArray(mesh.getMeshData().getIndexBuffer());
+        _sourceInds = BufferUtils.getIntArray(mesh.getMeshData().getIndices());
         _sourceVerts = BufferUtils.getVector3Array(mesh.getMeshData().getVertexBuffer());
         if (mesh.getMeshData().getColorBuffer() != null) {
             _sourceColors = BufferUtils.getColorArray(mesh.getMeshData().getColorBuffer());
@@ -222,13 +223,15 @@ public class NormalGenerator {
         }
 
         // Index buffer:
-        IntBuffer indices = mesh.getMeshData().getIndexBuffer();
-        if (indices.capacity() < _splitIndices.length) {
-            indices = BufferUtils.createIntBuffer(_splitIndices);
+        IndexBufferData<?> indices = mesh.getMeshData().getIndices();
+        if (indices.getBuffer().capacity() < _splitIndices.length) {
+            indices = new IntBufferData(BufferUtils.createIntBuffer(_splitIndices));
         } else {
-            indices.clear();
-            indices.put(_splitIndices);
-            indices.flip();
+            indices.getBuffer().clear();
+            for (final int i : _splitIndices) {
+                indices.put(i);
+            }
+            indices.getBuffer().flip();
         }
 
         // Apply the buffers to the mesh
@@ -237,7 +240,7 @@ public class NormalGenerator {
         mesh.getMeshData().setColorBuffer(colors);
         mesh.getMeshData().getTextureCoords().clear();
         mesh.getMeshData().setTextureBuffer(texCoords, 0);
-        mesh.getMeshData().setIndexBuffer(indices);
+        mesh.getMeshData().setIndices(indices);
     }
 
     /**

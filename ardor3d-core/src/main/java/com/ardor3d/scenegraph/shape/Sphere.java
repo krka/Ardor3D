@@ -301,8 +301,9 @@ public class Sphere extends Mesh {
      */
     private void setIndexData() {
         // allocate connectivity
+        final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
         final int tris = 2 * (_zSamples - 2) * _radialSamples;
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
 
         // generate connectivity
         int index = 0;
@@ -314,20 +315,20 @@ public class Sphere extends Mesh {
             int i3 = i2 + 1;
             for (int i = 0; i < _radialSamples; i++, index += 6) {
                 if (!_viewInside) {
-                    _meshData.getIndexBuffer().put(i0++);
-                    _meshData.getIndexBuffer().put(i1);
-                    _meshData.getIndexBuffer().put(i2);
-                    _meshData.getIndexBuffer().put(i1++);
-                    _meshData.getIndexBuffer().put(i3++);
-                    _meshData.getIndexBuffer().put(i2++);
+                    _meshData.getIndices().put(i0++);
+                    _meshData.getIndices().put(i1);
+                    _meshData.getIndices().put(i2);
+                    _meshData.getIndices().put(i1++);
+                    _meshData.getIndices().put(i3++);
+                    _meshData.getIndices().put(i2++);
                 } else // inside view
                 {
-                    _meshData.getIndexBuffer().put(i0++);
-                    _meshData.getIndexBuffer().put(i2);
-                    _meshData.getIndexBuffer().put(i1);
-                    _meshData.getIndexBuffer().put(i1++);
-                    _meshData.getIndexBuffer().put(i2++);
-                    _meshData.getIndexBuffer().put(i3++);
+                    _meshData.getIndices().put(i0++);
+                    _meshData.getIndices().put(i2);
+                    _meshData.getIndices().put(i1);
+                    _meshData.getIndices().put(i1++);
+                    _meshData.getIndices().put(i2++);
+                    _meshData.getIndices().put(i3++);
                 }
             }
         }
@@ -335,14 +336,14 @@ public class Sphere extends Mesh {
         // south pole triangles
         for (int i = 0; i < _radialSamples; i++, index += 3) {
             if (!_viewInside) {
-                _meshData.getIndexBuffer().put(i);
-                _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 2);
-                _meshData.getIndexBuffer().put(i + 1);
+                _meshData.getIndices().put(i);
+                _meshData.getIndices().put(_meshData.getVertexCount() - 2);
+                _meshData.getIndices().put(i + 1);
             } else // inside view
             {
-                _meshData.getIndexBuffer().put(i);
-                _meshData.getIndexBuffer().put(i + 1);
-                _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 2);
+                _meshData.getIndices().put(i);
+                _meshData.getIndices().put(i + 1);
+                _meshData.getIndices().put(_meshData.getVertexCount() - 2);
             }
         }
 
@@ -350,14 +351,14 @@ public class Sphere extends Mesh {
         final int iOffset = (_zSamples - 3) * (_radialSamples + 1);
         for (int i = 0; i < _radialSamples; i++, index += 3) {
             if (!_viewInside) {
-                _meshData.getIndexBuffer().put(i + iOffset);
-                _meshData.getIndexBuffer().put(i + 1 + iOffset);
-                _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 1);
+                _meshData.getIndices().put(i + iOffset);
+                _meshData.getIndices().put(i + 1 + iOffset);
+                _meshData.getIndices().put(_meshData.getVertexCount() - 1);
             } else // inside view
             {
-                _meshData.getIndexBuffer().put(i + iOffset);
-                _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 1);
-                _meshData.getIndexBuffer().put(i + 1 + iOffset);
+                _meshData.getIndices().put(i + iOffset);
+                _meshData.getIndices().put(_meshData.getVertexCount() - 1);
+                _meshData.getIndices().put(i + 1 + iOffset);
             }
         }
     }

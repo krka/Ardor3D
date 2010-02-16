@@ -11,11 +11,11 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -264,8 +264,8 @@ public class GeoSphere extends Mesh {
             old = next;
         }
 
-        final IntBuffer indexBuffer = BufferUtils.createIntBuffer(tris * 3);
-        _meshData.setIndexBuffer(indexBuffer);
+        final IndexBufferData<?> indexBuffer = BufferUtils.createIndexBufferData(tris * 3, verts - 1);
+        _meshData.setIndices(indexBuffer);
 
         int carryIntIndex = _meshData.getVertexBuffer().position() / 3;
         int extra = 0;

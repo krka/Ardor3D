@@ -242,8 +242,9 @@ public class Dome extends Mesh {
      */
     private void setIndexData() {
         // allocate connectivity
+        final int verts = ((_planes - 1) * (_radialSamples + 1)) + 1;
         final int tris = (_planes - 2) * _radialSamples * 2 + _radialSamples;
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
 
         // generate connectivity
         int index = 0;
@@ -252,21 +253,21 @@ public class Dome extends Mesh {
             final int bottomPlaneStart = (plane - 1) * (_radialSamples + 1);
             final int topPlaneStart = plane * (_radialSamples + 1);
             for (int sample = 0; sample < _radialSamples; sample++, index += 6) {
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(bottomPlaneStart + sample + 1);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample);
-                _meshData.getIndexBuffer().put(topPlaneStart + sample + 1);
+                _meshData.getIndices().put(bottomPlaneStart + sample);
+                _meshData.getIndices().put(topPlaneStart + sample);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(bottomPlaneStart + sample + 1);
+                _meshData.getIndices().put(topPlaneStart + sample);
+                _meshData.getIndices().put(topPlaneStart + sample + 1);
             }
         }
 
         // pole triangles
         final int bottomPlaneStart = (_planes - 2) * (_radialSamples + 1);
         for (int samples = 0; samples < _radialSamples; samples++, index += 3) {
-            _meshData.getIndexBuffer().put(bottomPlaneStart + samples);
-            _meshData.getIndexBuffer().put(_meshData.getVertexCount() - 1);
-            _meshData.getIndexBuffer().put(bottomPlaneStart + samples + 1);
+            _meshData.getIndices().put(bottomPlaneStart + samples);
+            _meshData.getIndices().put(_meshData.getVertexCount() - 1);
+            _meshData.getIndices().put(bottomPlaneStart + samples + 1);
         }
     }
 

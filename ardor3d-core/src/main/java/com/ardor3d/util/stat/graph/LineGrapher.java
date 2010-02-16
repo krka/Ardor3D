@@ -176,7 +176,6 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             entry.point.setScale(new Vector3(scaleWidth, scaleHeight, 1));
             entry.line.getMeshData().setVertexBuffer(fb);
             entry.line.setScale(new Vector3(scaleWidth, scaleHeight, 1));
-            entry.line.generateIndices();
             fb.rewind();
 
             // - attach point/line to root as needed

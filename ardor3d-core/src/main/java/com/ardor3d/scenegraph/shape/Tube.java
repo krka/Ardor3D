@@ -65,7 +65,9 @@ public class Tube extends Mesh implements Savable {
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(_meshData.getTextureBuffer(0), verts), 0);
 
         final int tris = (4 * _radialSamples * (1 + _axisSamples));
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(_meshData.getIndexBuffer(), 3 * tris));
+        if (_meshData.getIndices() == null || _meshData.getIndices().getBufferLimit() != 3 * tris) {
+            _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
+        }
 
         setGeometryData();
         setIndexData();
@@ -184,8 +186,8 @@ public class Tube extends Mesh implements Savable {
             }
             _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
-                    (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount]))
+                    .put((float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
         // top edge
         for (int radialCount = 0; radialCount < _radialSamples; radialCount++) {
@@ -202,8 +204,8 @@ public class Tube extends Mesh implements Savable {
             }
             _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + 0.5 * cos[radialCount])).put(
                     (float) (0.5 + 0.5 * sin[radialCount]));
-            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount])).put(
-                    (float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
+            _meshData.getTextureCoords(0).getBuffer().put((float) (0.5 + innerOuterRatio * 0.5 * cos[radialCount]))
+                    .put((float) (0.5 + innerOuterRatio * 0.5 * sin[radialCount]));
         }
 
     }
@@ -222,11 +224,11 @@ public class Tube extends Mesh implements Savable {
                 final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
                 if (_viewInside) {
-                    _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-                    _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                    _meshData.getIndices().put(index0).put(index1).put(index2);
+                    _meshData.getIndices().put(index1).put(index3).put(index2);
                 } else {
-                    _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-                    _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                    _meshData.getIndices().put(index0).put(index2).put(index1);
+                    _meshData.getIndices().put(index1).put(index2).put(index3);
                 }
             }
         }
@@ -239,11 +241,11 @@ public class Tube extends Mesh implements Savable {
                 final int index2 = index0 + (_axisSamples + 1);
                 final int index3 = index2 + 1;
                 if (_viewInside) {
-                    _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-                    _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                    _meshData.getIndices().put(index0).put(index2).put(index1);
+                    _meshData.getIndices().put(index1).put(index2).put(index3);
                 } else {
-                    _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-                    _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                    _meshData.getIndices().put(index0).put(index1).put(index2);
+                    _meshData.getIndices().put(index1).put(index3).put(index2);
                 }
             }
         }
@@ -255,11 +257,11 @@ public class Tube extends Mesh implements Savable {
             final int index2 = bottomEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
             if (_viewInside) {
-                _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-                _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                _meshData.getIndices().put(index0).put(index2).put(index1);
+                _meshData.getIndices().put(index1).put(index2).put(index3);
             } else {
-                _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-                _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                _meshData.getIndices().put(index0).put(index1).put(index2);
+                _meshData.getIndices().put(index1).put(index3).put(index2);
             }
         }
 
@@ -270,11 +272,11 @@ public class Tube extends Mesh implements Savable {
             final int index2 = topEdge + 2 * ((radialCount + 1) % _radialSamples);
             final int index3 = index2 + 1;
             if (_viewInside) {
-                _meshData.getIndexBuffer().put(index0).put(index1).put(index2);
-                _meshData.getIndexBuffer().put(index1).put(index3).put(index2);
+                _meshData.getIndices().put(index0).put(index1).put(index2);
+                _meshData.getIndices().put(index1).put(index3).put(index2);
             } else {
-                _meshData.getIndexBuffer().put(index0).put(index2).put(index1);
-                _meshData.getIndexBuffer().put(index1).put(index2).put(index3);
+                _meshData.getIndices().put(index0).put(index2).put(index1);
+                _meshData.getIndices().put(index1).put(index2).put(index3);
             }
         }
     }

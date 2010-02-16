@@ -11,11 +11,11 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -54,7 +54,7 @@ public class Octahedron extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * NUM_TRIS, NUM_POINTS - 1));
 
         setVertexData();
         setNormalData();
@@ -64,8 +64,8 @@ public class Octahedron extends Mesh {
     }
 
     private void setIndexData() {
-        final IntBuffer indices = _meshData.getIndexBuffer();
-        indices.rewind();
+        final IndexBufferData<?> indices = _meshData.getIndices();
+        indices.getBuffer().rewind();
         indices.put(4).put(0).put(2);
         indices.put(4).put(2).put(1);
         indices.put(4).put(1).put(3);
@@ -74,14 +74,6 @@ public class Octahedron extends Mesh {
         indices.put(5).put(1).put(2);
         indices.put(5).put(3).put(1);
         indices.put(5).put(0).put(3);
-
-        if (!true) {
-            for (int i = 0; i < NUM_TRIS; i++) {
-                final int iSave = _meshData.getIndexBuffer().get(3 * i + 1);
-                _meshData.getIndexBuffer().put(3 * i + 1, _meshData.getIndexBuffer().get(3 * i + 2));
-                _meshData.getIndexBuffer().put(3 * i + 2, iSave);
-            }
-        }
     }
 
     private void setTextureData() {

@@ -11,6 +11,7 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Vector3;
@@ -205,8 +206,11 @@ public class StripBox extends Mesh implements Savable {
     private void setIndexData() {
         _meshData.setIndexMode(IndexMode.TriangleStrip);
         if (_meshData.getIndexBuffer() == null) {
-            final int[] indices = { 2, 3, 6, 7, 5, 3, 0, 2, 1, 6, 4, 5, 1, 0 };
-            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(indices));
+            final byte[] indices = new byte[] { 2, 3, 6, 7, 5, 3, 0, 2, 1, 6, 4, 5, 1, 0 };
+            final ByteBuffer buf = BufferUtils.createByteBuffer(indices.length);
+            buf.put(indices);
+            buf.rewind();
+            _meshData.setIndexBuffer(buf);
         }
     }
 

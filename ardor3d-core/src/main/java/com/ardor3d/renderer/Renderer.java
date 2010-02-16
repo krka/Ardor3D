@@ -28,7 +28,7 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.NormalsMode;
@@ -379,7 +379,7 @@ public interface Renderer {
 
     void setupTextureData(List<FloatBufferData> textureCoords);
 
-    void drawElements(IntBufferData indices, int[] indexLengths, IndexMode[] indexModes);
+    void drawElements(IndexBufferData<?> indices, int[] indexLengths, IndexMode[] indexModes);
 
     void drawArrays(FloatBufferData vertexBuffer, int[] indexLengths, IndexMode[] indexModes);
 
@@ -401,7 +401,7 @@ public interface Renderer {
     void setupInterleavedDataVBO(FloatBufferData interleaved, FloatBufferData vertexCoords,
             FloatBufferData normalCoords, FloatBufferData colorCoords, List<FloatBufferData> textureCoords);
 
-    void drawElementsVBO(IntBufferData indices, int[] indexLengths, IndexMode[] indexModes);
+    void drawElementsVBO(IndexBufferData<?> indices, int[] indexLengths, IndexMode[] indexModes);
 
     // TODO: Display List
     void renderDisplayList(int displayListID);

@@ -11,10 +11,10 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -150,7 +150,8 @@ public class PQTorus extends Mesh {
     }
 
     private void setIndexData() {
-        final IntBuffer indices = BufferUtils.createIntBuffer(6 * _meshData.getVertexCount());
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(6 * _meshData.getVertexCount(), _meshData
+                .getVertexCount() - 1);
 
         for (int i = 0; i < _meshData.getVertexCount(); i++) {
             indices.put(i);
@@ -162,7 +163,7 @@ public class PQTorus extends Mesh {
             indices.put(i - _radialSamples + 1);
         }
 
-        for (int i = 0, len = indices.capacity(); i < len; i++) {
+        for (int i = 0, len = indices.getBufferCapacity(); i < len; i++) {
             int ind = indices.get(i);
             if (ind < 0) {
                 ind += _meshData.getVertexCount();
@@ -173,9 +174,9 @@ public class PQTorus extends Mesh {
                 indices.put(i, ind);
             }
         }
-        indices.rewind();
+        indices.getBuffer().rewind();
 
-        _meshData.setIndexBuffer(indices);
+        _meshData.setIndices(indices);
     }
 
     @Override

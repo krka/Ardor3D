@@ -10,9 +10,11 @@
 
 package com.ardor3d.renderer.lwjgl;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -88,7 +90,7 @@ import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
@@ -761,7 +763,7 @@ public class LwjglRenderer extends AbstractRenderer {
         rendRecord.setTexturesValid(true);
     }
 
-    public void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+    public void drawElements(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes) {
         if (indices == null || indices.getBuffer() == null) {
             logger.severe("Missing indices for drawElements call without VBO");
             return;
@@ -771,7 +773,13 @@ public class LwjglRenderer extends AbstractRenderer {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
             indices.getBuffer().rewind();
-            GL11.glDrawElements(glIndexMode, indices.getBuffer());
+            if (indices.getBuffer() instanceof IntBuffer) {
+                GL11.glDrawElements(glIndexMode, (IntBuffer) indices.getBuffer());
+            } else if (indices.getBuffer() instanceof ShortBuffer) {
+                GL11.glDrawElements(glIndexMode, (ShortBuffer) indices.getBuffer());
+            } else if (indices.getBuffer() instanceof ByteBuffer) {
+                GL11.glDrawElements(glIndexMode, (ByteBuffer) indices.getBuffer());
+            }
 
             if (Constants.stats) {
                 addStats(indexModes[0], indices.getBufferLimit());
@@ -786,7 +794,13 @@ public class LwjglRenderer extends AbstractRenderer {
 
                 indices.getBuffer().position(offset);
                 indices.getBuffer().limit(offset + count);
-                GL11.glDrawElements(glIndexMode, indices.getBuffer());
+                if (indices.getBuffer() instanceof IntBuffer) {
+                    GL11.glDrawElements(glIndexMode, (IntBuffer) indices.getBuffer());
+                } else if (indices.getBuffer() instanceof ShortBuffer) {
+                    GL11.glDrawElements(glIndexMode, (ShortBuffer) indices.getBuffer());
+                } else if (indices.getBuffer() instanceof ByteBuffer) {
+                    GL11.glDrawElements(glIndexMode, (ByteBuffer) indices.getBuffer());
+                }
 
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
@@ -841,7 +855,8 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    private int setupVBO(final IntBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+    private int setupIndicesVBO(final IndexBufferData<?> data, final RenderContext context,
+            final RendererRecord rendRecord) {
         if (data == null) {
             return -1;
         }
@@ -849,17 +864,26 @@ public class LwjglRenderer extends AbstractRenderer {
         int vboID = data.getVBOID(context.getGlContextRep());
         if (vboID > 0) {
             if (data.isNeedsRefresh()) {
-                final IntBuffer dataBuffer = data.getBuffer();
+                final Buffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
                 LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer);
+                if (dataBuffer instanceof IntBuffer) {
+                    ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0,
+                            (IntBuffer) dataBuffer);
+                } else if (dataBuffer instanceof ShortBuffer) {
+                    ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0,
+                            (ShortBuffer) dataBuffer);
+                } else if (dataBuffer instanceof ByteBuffer) {
+                    ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, 0,
+                            (ByteBuffer) dataBuffer);
+                }
                 data.setNeedsRefresh(false);
             }
 
             return vboID;
         }
 
-        final IntBuffer dataBuffer = data.getBuffer();
+        final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
@@ -868,8 +892,16 @@ public class LwjglRenderer extends AbstractRenderer {
 
             rendRecord.invalidateVBO();
             LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-            ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB, dataBuffer,
-                    getGLVBOAccessMode(data.getVboAccessMode()));
+            if (dataBuffer instanceof IntBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB,
+                        (IntBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ShortBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB,
+                        (ShortBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ByteBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ELEMENT_ARRAY_BUFFER_ARB,
+                        (ByteBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
+            }
         } else {
             throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
         }
@@ -1191,11 +1223,11 @@ public class LwjglRenderer extends AbstractRenderer {
         interleaved.setNeedsRefresh(false);
     }
 
-    public void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+    public void drawElementsVBO(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes) {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(indices, context, rendRecord);
+        final int vboID = setupIndicesVBO(indices, context, rendRecord);
 
         LwjglRendererUtil.setBoundElementVBO(rendRecord, vboID);
 

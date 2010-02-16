@@ -499,7 +499,7 @@ public class ClipmapLevel extends Mesh {
                     clipRegion.getTop() + frameDistance + clipSideSize / 2, clipRegion.getBottom() - frameDistance);
         }
 
-        final IntBuffer indices = getMeshData().getIndexBuffer();
+        final IntBuffer indices = (IntBuffer) getMeshData().getIndexBuffer();
         indices.clear();
         indices.put(tmpIndices, 0, getStripIndex());
         indices.flip();

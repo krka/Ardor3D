@@ -10,6 +10,7 @@
 
 package com.ardor3d.scenegraph.shape;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.scenegraph.Mesh;
@@ -88,9 +89,6 @@ public class Quad extends Mesh {
         final FloatBuffer tbuf = BufferUtils.createVector2Buffer(verts);
         _meshData.setTextureBuffer(tbuf, 0);
 
-        final int tris = 2;
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(tris * 3));
-
         _meshData.getNormalBuffer().put(0).put(0).put(1);
         _meshData.getNormalBuffer().put(0).put(0).put(1);
         _meshData.getNormalBuffer().put(0).put(0).put(1);
@@ -101,12 +99,11 @@ public class Quad extends Mesh {
         tbuf.put(1).put(0);
         tbuf.put(1).put(1);
 
-        _meshData.getIndexBuffer().put(0);
-        _meshData.getIndexBuffer().put(1);
-        _meshData.getIndexBuffer().put(2);
-        _meshData.getIndexBuffer().put(0);
-        _meshData.getIndexBuffer().put(2);
-        _meshData.getIndexBuffer().put(3);
+        final byte[] indices = { 0, 1, 2, 0, 2, 3 };
+        final ByteBuffer buf = BufferUtils.createByteBuffer(indices.length);
+        buf.put(indices);
+        buf.rewind();
+        _meshData.setIndexBuffer(buf);
 
         resize(width, height);
     }

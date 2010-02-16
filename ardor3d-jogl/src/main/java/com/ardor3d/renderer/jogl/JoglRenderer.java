@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.jogl;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -84,7 +85,7 @@ import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
 import com.ardor3d.scenegraph.FloatBufferData;
-import com.ardor3d.scenegraph.IntBufferData;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
@@ -799,7 +800,7 @@ public class JoglRenderer extends AbstractRenderer {
         rendRecord.setTexturesValid(true);
     }
 
-    public void drawElements(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+    public void drawElements(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes) {
         if (indices == null || indices.getBuffer() == null) {
             logger.severe("Missing indices for drawElements call without VBO");
             return;
@@ -884,7 +885,8 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    private int setupVBO(final IntBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+    private int setupIndicesVBO(final IndexBufferData<?> data, final RenderContext context,
+            final RendererRecord rendRecord) {
         if (data == null) {
             return -1;
         }
@@ -894,7 +896,7 @@ public class JoglRenderer extends AbstractRenderer {
         int vboID = data.getVBOID(context.getGlContextRep());
         if (vboID > 0) {
             if (data.isNeedsRefresh()) {
-                final IntBuffer dataBuffer = data.getBuffer();
+                final Buffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
                 JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
                 gl.glBufferSubDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer.limit() * 4, dataBuffer);
@@ -904,7 +906,7 @@ public class JoglRenderer extends AbstractRenderer {
             return vboID;
         }
 
-        final IntBuffer dataBuffer = data.getBuffer();
+        final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
@@ -1251,13 +1253,13 @@ public class JoglRenderer extends AbstractRenderer {
         interleaved.setNeedsRefresh(false);
     }
 
-    public void drawElementsVBO(final IntBufferData indices, final int[] indexLengths, final IndexMode[] indexModes) {
+    public void drawElementsVBO(final IndexBufferData<?> indices, final int[] indexLengths, final IndexMode[] indexModes) {
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(indices, context, rendRecord);
+        final int vboID = setupIndicesVBO(indices, context, rendRecord);
 
         JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
 

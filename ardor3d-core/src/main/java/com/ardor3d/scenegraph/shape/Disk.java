@@ -67,7 +67,7 @@ public class Disk extends Mesh {
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(verts), 0);
 
         final int tris = radialSamples * (2 * shellLess - 1);
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
 
         setGeometryData(shellLess);
         setIndexData(radialless, shellLess);
@@ -113,21 +113,21 @@ public class Disk extends Mesh {
         // generate connectivity
         int index = 0;
         for (int radialCount0 = radialless, radialCount1 = 0; radialCount1 < _radialSamples; radialCount0 = radialCount1++) {
-            _meshData.getIndexBuffer().put(0);
-            _meshData.getIndexBuffer().put(1 + shellLess * radialCount0);
-            _meshData.getIndexBuffer().put(1 + shellLess * radialCount1);
+            _meshData.getIndices().put(0);
+            _meshData.getIndices().put(1 + shellLess * radialCount0);
+            _meshData.getIndices().put(1 + shellLess * radialCount1);
             index += 3;
             for (int iS = 1; iS < shellLess; iS++, index += 6) {
                 final int i00 = iS + shellLess * radialCount0;
                 final int i01 = iS + shellLess * radialCount1;
                 final int i10 = i00 + 1;
                 final int i11 = i01 + 1;
-                _meshData.getIndexBuffer().put(i00);
-                _meshData.getIndexBuffer().put(i10);
-                _meshData.getIndexBuffer().put(i11);
-                _meshData.getIndexBuffer().put(i00);
-                _meshData.getIndexBuffer().put(i11);
-                _meshData.getIndexBuffer().put(i01);
+                _meshData.getIndices().put(i00);
+                _meshData.getIndices().put(i10);
+                _meshData.getIndices().put(i11);
+                _meshData.getIndices().put(i00);
+                _meshData.getIndices().put(i11);
+                _meshData.getIndices().put(i01);
             }
         }
     }

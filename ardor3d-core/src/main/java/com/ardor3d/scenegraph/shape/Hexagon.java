@@ -51,7 +51,7 @@ public class Hexagon extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * NUM_TRIS, NUM_POINTS - 1));
 
         setVertexData();
         setIndexData();
@@ -83,29 +83,29 @@ public class Hexagon extends Mesh {
     private void setIndexData() {
         _meshData.getIndexBuffer().rewind();
         // tri 1
-        _meshData.getIndexBuffer().put(0);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(1);
+        _meshData.getIndices().put(0);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(1);
         // tri 2
-        _meshData.getIndexBuffer().put(1);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(2);
+        _meshData.getIndices().put(1);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(2);
         // tri 3
-        _meshData.getIndexBuffer().put(2);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(3);
+        _meshData.getIndices().put(2);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(3);
         // tri 4
-        _meshData.getIndexBuffer().put(3);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(4);
+        _meshData.getIndices().put(3);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(4);
         // tri 5
-        _meshData.getIndexBuffer().put(4);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(5);
+        _meshData.getIndices().put(4);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(5);
         // tri 6
-        _meshData.getIndexBuffer().put(5);
-        _meshData.getIndexBuffer().put(6);
-        _meshData.getIndexBuffer().put(0);
+        _meshData.getIndices().put(5);
+        _meshData.getIndices().put(6);
+        _meshData.getIndices().put(0);
     }
 
     private void setTextureData() {

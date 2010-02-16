@@ -67,6 +67,19 @@ public abstract class AbstractBufferData<T extends Buffer> {
     }
 
     /**
+     * Gets the count.
+     * 
+     * @return the count
+     */
+    public int getBufferCapacity() {
+        if (_buffer != null) {
+            return _buffer.capacity();
+        }
+
+        return 0;
+    }
+
+    /**
      * Get the buffer holding the data.
      * 
      * @return the buffer
@@ -235,5 +248,4 @@ public abstract class AbstractBufferData<T extends Buffer> {
             }
         }
     }
-
 }

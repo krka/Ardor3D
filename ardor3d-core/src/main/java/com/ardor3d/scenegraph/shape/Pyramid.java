@@ -12,9 +12,9 @@ package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -173,7 +173,7 @@ public class Pyramid extends Mesh {
      * pyramid.
      */
     private void setIndexData() {
-        final IntBuffer indices = BufferUtils.createIntBuffer(18);
+        final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(18, 16 - 1);
         indices.put(3).put(2).put(1);
         indices.put(3).put(1).put(0);
         indices.put(6).put(5).put(4);
@@ -181,8 +181,8 @@ public class Pyramid extends Mesh {
         indices.put(12).put(11).put(10);
         indices.put(15).put(14).put(13);
 
-        indices.rewind();
-        _meshData.setIndexBuffer(indices);
+        indices.getBuffer().rewind();
+        _meshData.setIndices(indices);
     }
 
     @Override

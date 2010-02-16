@@ -11,7 +11,7 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -21,29 +21,29 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * Simple data class storing a buffer of ints
+ * Simple data class storing a buffer of bytes
  */
-public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable {
+public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savable {
 
     /**
-     * Instantiates a new IntBufferData.
+     * Instantiates a new ByteBufferData.
      */
-    public IntBufferData() {}
+    public ByteBufferData() {}
 
     /**
-     * Instantiates a new IntBufferData with a buffer of the given size.
+     * Instantiates a new ByteBufferData with a buffer of the given size.
      */
-    public IntBufferData(final int size) {
-        this(BufferUtils.createIntBuffer(size));
+    public ByteBufferData(final int size) {
+        this(BufferUtils.createByteBuffer(size));
     }
 
     /**
-     * Creates a new IntBufferData.
+     * Creates a new ByteBufferData.
      * 
      * @param buffer
      *            Buffer holding the data. Must not be null.
      */
-    public IntBufferData(final IntBuffer buffer) {
+    public ByteBufferData(final ByteBuffer buffer) {
         if (buffer == null) {
             throw new IllegalArgumentException("Buffer can not be null!");
         }
@@ -51,13 +51,13 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
         _buffer = buffer;
     }
 
-    public Class<? extends IntBufferData> getClassTag() {
+    public Class<? extends ByteBufferData> getClassTag() {
         return getClass();
     }
 
     public void read(final Ardor3DImporter im) throws IOException {
         final InputCapsule cap = im.getCapsule(this);
-        _buffer = cap.readIntBuffer("buffer", null);
+        _buffer = cap.readByteBuffer("buffer", null);
     }
 
     public void write(final Ardor3DExporter ex) throws IOException {
@@ -72,25 +72,25 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
 
     @Override
     public int get(final int index) {
-        return _buffer.get(index);
+        return _buffer.get(index) & 0xFF;
     }
 
     @Override
-    public IntBufferData put(final int value) {
-        _buffer.put(value);
+    public ByteBufferData put(final int value) {
+        _buffer.put((byte) value);
         return this;
     }
 
     @Override
-    public IntBufferData put(final int index, final int value) {
-        _buffer.put(index, value);
+    public ByteBufferData put(final int index, final int value) {
+        _buffer.put(index, (byte) value);
         return this;
     }
 
     @Override
     public void put(final IndexBufferData<?> buf) {
-        if (buf instanceof IntBufferData) {
-            _buffer.put((IntBuffer) buf.getBuffer());
+        if (buf instanceof ByteBufferData) {
+            _buffer.put((ByteBuffer) buf.getBuffer());
         } else {
             while (buf.getBuffer().hasRemaining()) {
                 put(buf.get());

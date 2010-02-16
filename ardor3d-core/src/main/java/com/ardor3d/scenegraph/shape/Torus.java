@@ -141,8 +141,9 @@ public class Torus extends Mesh {
 
     private void setIndexData() {
         // allocate connectivity
+        final int verts = ((_circleSamples + 1) * (_radialSamples + 1));
         final int tris = (2 * _circleSamples * _radialSamples);
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * tris));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
         int i;
         // generate connectivity
         int connectionStart = 0;
@@ -155,19 +156,19 @@ public class Torus extends Mesh {
             int i3 = i2 + 1;
             for (i = 0; i < _radialSamples; i++, index += 6) {
                 if (!_viewInside) {
-                    _meshData.getIndexBuffer().put(i0++);
-                    _meshData.getIndexBuffer().put(i2);
-                    _meshData.getIndexBuffer().put(i1);
-                    _meshData.getIndexBuffer().put(i1++);
-                    _meshData.getIndexBuffer().put(i2++);
-                    _meshData.getIndexBuffer().put(i3++);
+                    _meshData.getIndices().put(i0++);
+                    _meshData.getIndices().put(i2);
+                    _meshData.getIndices().put(i1);
+                    _meshData.getIndices().put(i1++);
+                    _meshData.getIndices().put(i2++);
+                    _meshData.getIndices().put(i3++);
                 } else {
-                    _meshData.getIndexBuffer().put(i0++);
-                    _meshData.getIndexBuffer().put(i1);
-                    _meshData.getIndexBuffer().put(i2);
-                    _meshData.getIndexBuffer().put(i1++);
-                    _meshData.getIndexBuffer().put(i3++);
-                    _meshData.getIndexBuffer().put(i2++);
+                    _meshData.getIndices().put(i0++);
+                    _meshData.getIndices().put(i1);
+                    _meshData.getIndices().put(i2);
+                    _meshData.getIndices().put(i1++);
+                    _meshData.getIndices().put(i3++);
+                    _meshData.getIndices().put(i2++);
                 }
             }
         }

@@ -94,15 +94,15 @@ public class OrientedBox extends Mesh {
      */
     private void setIndexData() {
         if (_meshData.getIndexBuffer() == null) {
-            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(36));
+            _meshData.setIndexBuffer(BufferUtils.createByteBuffer(36));
 
             for (int i = 0; i < 6; i++) {
-                _meshData.getIndexBuffer().put(i * 4 + 0);
-                _meshData.getIndexBuffer().put(i * 4 + 1);
-                _meshData.getIndexBuffer().put(i * 4 + 3);
-                _meshData.getIndexBuffer().put(i * 4 + 1);
-                _meshData.getIndexBuffer().put(i * 4 + 2);
-                _meshData.getIndexBuffer().put(i * 4 + 3);
+                _meshData.getIndices().put(i * 4 + 0);
+                _meshData.getIndices().put(i * 4 + 1);
+                _meshData.getIndices().put(i * 4 + 3);
+                _meshData.getIndices().put(i * 4 + 1);
+                _meshData.getIndices().put(i * 4 + 2);
+                _meshData.getIndices().put(i * 4 + 3);
             }
         }
     }

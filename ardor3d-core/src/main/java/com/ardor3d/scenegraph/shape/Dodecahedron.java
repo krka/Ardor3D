@@ -11,8 +11,8 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
@@ -51,7 +51,7 @@ public class Dodecahedron extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
+        _meshData.setIndices(BufferUtils.createIndexBufferData(3 * NUM_TRIS, NUM_POINTS - 1));
 
         setVertexData();
         setNormalData();
@@ -61,53 +61,44 @@ public class Dodecahedron extends Mesh {
     }
 
     private void setIndexData() {
-        final IntBuffer indices = _meshData.getIndexBuffer();
+        final ByteBuffer indices = (ByteBuffer) _meshData.getIndexBuffer();
         indices.rewind();
-        indices.put(0).put(8).put(9);
-        indices.put(0).put(9).put(4);
-        indices.put(0).put(4).put(16);
-        indices.put(0).put(12).put(13);
-        indices.put(0).put(13).put(1);
-        indices.put(0).put(1).put(8);
-        indices.put(0).put(16).put(17);
-        indices.put(0).put(17).put(2);
-        indices.put(0).put(2).put(12);
-        indices.put(8).put(1).put(18);
-        indices.put(8).put(18).put(5);
-        indices.put(8).put(5).put(9);
-        indices.put(12).put(2).put(10);
-        indices.put(12).put(10).put(3);
-        indices.put(12).put(3).put(13);
-        indices.put(16).put(4).put(14);
-        indices.put(16).put(14).put(6);
-        indices.put(16).put(6).put(17);
-        indices.put(9).put(5).put(15);
-        indices.put(9).put(15).put(14);
-        indices.put(9).put(14).put(4);
-        indices.put(6).put(11).put(10);
-        indices.put(6).put(10).put(2);
-        indices.put(6).put(2).put(17);
-        indices.put(3).put(19).put(18);
-        indices.put(3).put(18).put(1);
-        indices.put(3).put(1).put(13);
-        indices.put(7).put(15).put(5);
-        indices.put(7).put(5).put(18);
-        indices.put(7).put(18).put(19);
-        indices.put(7).put(11).put(6);
-        indices.put(7).put(6).put(14);
-        indices.put(7).put(14).put(15);
-        indices.put(7).put(19).put(3);
-        indices.put(7).put(3).put(10);
-        indices.put(7).put(10).put(11);
-
-        if (!true) { // outside view
-            for (int i = 0; i < NUM_TRIS; i++) {
-                final int iSave = _meshData.getIndexBuffer().get(3 * i + 1);
-                _meshData.getIndexBuffer().put(3 * i + 1, _meshData.getIndexBuffer().get(3 * i + 2));
-                _meshData.getIndexBuffer().put(3 * i + 2, iSave);
-            }
-        }
-
+        indices.put((byte) 0).put((byte) 8).put((byte) 9);
+        indices.put((byte) 0).put((byte) 9).put((byte) 4);
+        indices.put((byte) 0).put((byte) 4).put((byte) 16);
+        indices.put((byte) 0).put((byte) 12).put((byte) 13);
+        indices.put((byte) 0).put((byte) 13).put((byte) 1);
+        indices.put((byte) 0).put((byte) 1).put((byte) 8);
+        indices.put((byte) 0).put((byte) 16).put((byte) 17);
+        indices.put((byte) 0).put((byte) 17).put((byte) 2);
+        indices.put((byte) 0).put((byte) 2).put((byte) 12);
+        indices.put((byte) 8).put((byte) 1).put((byte) 18);
+        indices.put((byte) 8).put((byte) 18).put((byte) 5);
+        indices.put((byte) 8).put((byte) 5).put((byte) 9);
+        indices.put((byte) 12).put((byte) 2).put((byte) 10);
+        indices.put((byte) 12).put((byte) 10).put((byte) 3);
+        indices.put((byte) 12).put((byte) 3).put((byte) 13);
+        indices.put((byte) 16).put((byte) 4).put((byte) 14);
+        indices.put((byte) 16).put((byte) 14).put((byte) 6);
+        indices.put((byte) 16).put((byte) 6).put((byte) 17);
+        indices.put((byte) 9).put((byte) 5).put((byte) 15);
+        indices.put((byte) 9).put((byte) 15).put((byte) 14);
+        indices.put((byte) 9).put((byte) 14).put((byte) 4);
+        indices.put((byte) 6).put((byte) 11).put((byte) 10);
+        indices.put((byte) 6).put((byte) 10).put((byte) 2);
+        indices.put((byte) 6).put((byte) 2).put((byte) 17);
+        indices.put((byte) 3).put((byte) 19).put((byte) 18);
+        indices.put((byte) 3).put((byte) 18).put((byte) 1);
+        indices.put((byte) 3).put((byte) 1).put((byte) 13);
+        indices.put((byte) 7).put((byte) 15).put((byte) 5);
+        indices.put((byte) 7).put((byte) 5).put((byte) 18);
+        indices.put((byte) 7).put((byte) 18).put((byte) 19);
+        indices.put((byte) 7).put((byte) 11).put((byte) 6);
+        indices.put((byte) 7).put((byte) 6).put((byte) 14);
+        indices.put((byte) 7).put((byte) 14).put((byte) 15);
+        indices.put((byte) 7).put((byte) 19).put((byte) 3);
+        indices.put((byte) 7).put((byte) 3).put((byte) 10);
+        indices.put((byte) 7).put((byte) 10).put((byte) 11);
     }
 
     private void setTextureData() {

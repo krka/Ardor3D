@@ -11,12 +11,12 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
@@ -130,12 +130,12 @@ public class Extrusion extends Mesh {
             normals = BufferUtils.createFloatBuffer(numVertices);
         }
         final int numIndices = (path.size() - 1) * 2 * shapeBuffer.limit();
-        IntBuffer indices;
+        IndexBufferData<?> indices;
         if (_meshData.getIndexBuffer() != null && _meshData.getIndexBuffer().limit() == numIndices) {
-            indices = _meshData.getIndexBuffer();
-            indices.rewind();
+            indices = _meshData.getIndices();
+            indices.getBuffer().rewind();
         } else {
-            indices = BufferUtils.createIntBuffer(numIndices);
+            indices = BufferUtils.createIndexBufferData(numIndices, numVertices - 1);
         }
 
         final int shapeVertices = shapeBuffer.limit() / 3;
@@ -196,7 +196,7 @@ public class Extrusion extends Mesh {
 
         _meshData.setVertexBuffer(vertices);
         _meshData.setNormalBuffer(normals);
-        _meshData.setIndexBuffer(indices);
+        _meshData.setIndices(indices);
     }
 
     /**

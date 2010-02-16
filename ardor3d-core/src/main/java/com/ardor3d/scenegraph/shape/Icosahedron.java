@@ -11,8 +11,8 @@
 package com.ardor3d.scenegraph.shape;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector2;
@@ -28,7 +28,6 @@ public class Icosahedron extends Mesh {
     private static final long serialVersionUID = 1L;
 
     private static final int NUM_POINTS = 12;
-    private static final int NUM_TRIS = 20;
 
     private double _sideLength;
 
@@ -52,8 +51,6 @@ public class Icosahedron extends Mesh {
         _meshData.setNormalBuffer(BufferUtils.createVector3Buffer(NUM_POINTS));
         _meshData.setTextureBuffer(BufferUtils.createVector2Buffer(NUM_POINTS), 0);
 
-        _meshData.setIndexBuffer(BufferUtils.createIntBuffer(3 * NUM_TRIS));
-
         setVertexData();
         setNormalData();
         setTextureData();
@@ -62,37 +59,12 @@ public class Icosahedron extends Mesh {
     }
 
     private void setIndexData() {
-        final IntBuffer indices = _meshData.getIndexBuffer();
-        indices.rewind();
-        indices.put(0).put(8).put(4);
-        indices.put(0).put(5).put(10);
-        indices.put(2).put(4).put(9);
-        indices.put(2).put(11).put(5);
-        indices.put(1).put(6).put(8);
-        indices.put(1).put(10).put(7);
-        indices.put(3).put(9).put(6);
-        indices.put(3).put(7).put(11);
-        indices.put(0).put(10).put(8);
-        indices.put(1).put(8).put(10);
-        indices.put(2).put(9).put(11);
-        indices.put(3).put(11).put(9);
-        indices.put(4).put(2).put(0);
-        indices.put(5).put(0).put(2);
-        indices.put(6).put(1).put(3);
-        indices.put(7).put(3).put(1);
-        indices.put(8).put(6).put(4);
-        indices.put(9).put(4).put(6);
-        indices.put(10).put(5).put(7);
-        indices.put(11).put(7).put(5);
-
-        if (!true) { // outside view
-            for (int i = 0; i < NUM_TRIS; i++) {
-                final int iSave = _meshData.getIndexBuffer().get(3 * i + 1);
-                _meshData.getIndexBuffer().put(3 * i + 1, _meshData.getIndexBuffer().get(3 * i + 2));
-                _meshData.getIndexBuffer().put(3 * i + 2, iSave);
-            }
-        }
-
+        final byte[] indices = { 0, 8, 4, 0, 5, 10, 2, 4, 9, 2, 11, 5, 1, 6, 8, 1, 10, 7, 3, 9, 6, 3, 7, 11, 0, 10, 8,
+                1, 8, 10, 2, 9, 11, 3, 11, 9, 4, 2, 0, 5, 0, 2, 6, 1, 3, 7, 3, 1, 8, 6, 4, 9, 4, 6, 10, 5, 7, 11, 7, 5 };
+        final ByteBuffer buf = BufferUtils.createByteBuffer(indices.length);
+        buf.put(indices);
+        buf.rewind();
+        _meshData.setIndexBuffer(buf);
     }
 
     private void setTextureData() {

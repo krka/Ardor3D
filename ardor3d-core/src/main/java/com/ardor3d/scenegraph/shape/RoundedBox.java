@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.math.Vector3;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.Ardor3DImporter;
@@ -164,15 +165,15 @@ public class RoundedBox extends Mesh implements Savable {
 
     private void setIndexData() {
         if (_meshData.getIndexBuffer() == null) {
-            final int[] indices = new int[180];
+            final IndexBufferData<?> buff = BufferUtils.createIndexBufferData(180, 48 - 1);
             final int[] data = new int[] { 0, 4, 1, 1, 4, 5, 1, 5, 3, 3, 5, 7, 3, 7, 2, 2, 7, 6, 2, 6, 0, 0, 6, 4, 4,
                     6, 5, 5, 6, 7 };
             for (int i = 0; i < 6; i++) {
                 for (int n = 0; n < 30; n++) {
-                    indices[30 * i + n] = 8 * i + data[n];
+                    buff.put(30 * i + n, 8 * i + data[n]);
                 }
             }
-            _meshData.setIndexBuffer(BufferUtils.createIntBuffer(indices));
+            _meshData.setIndices(buff);
         }
     }
 

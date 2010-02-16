@@ -18,6 +18,7 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Simple data class storing a buffer of floats and a number that indicates how many floats to group together to make up
@@ -32,6 +33,13 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
      * Instantiates a new FloatBufferData.
      */
     public FloatBufferData() {}
+
+    /**
+     * Instantiates a new FloatBufferData with a buffer of the given size.
+     */
+    public FloatBufferData(final int size, final int valuesPerTuple) {
+        this(BufferUtils.createFloatBuffer(size), valuesPerTuple);
+    }
 
     /**
      * Creates a new FloatBufferData.

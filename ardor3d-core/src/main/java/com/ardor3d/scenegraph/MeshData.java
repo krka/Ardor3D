@@ -11,8 +11,11 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +64,7 @@ public class MeshData implements Cloneable, Savable {
     protected FloatBufferData _interleaved;
 
     /** Index data. */
-    protected IntBufferData _indexBuffer;
+    protected IndexBufferData<?> _indexBuffer;
     protected int[] _indexLengths;
     protected IndexMode[] _indexModes = new IndexMode[] { IndexMode.Triangles };
 
@@ -556,7 +559,7 @@ public class MeshData implements Cloneable, Savable {
      * 
      * @return the index buffer
      */
-    public IntBuffer getIndexBuffer() {
+    public Buffer getIndexBuffer() {
         if (_indexBuffer == null) {
             return null;
         }
@@ -580,11 +583,43 @@ public class MeshData implements Cloneable, Savable {
     }
 
     /**
+     * Sets the index buffer.
+     * 
+     * @param indices
+     *            the new index buffer
+     */
+    public void setIndexBuffer(final ShortBuffer indices) {
+        if (indices == null) {
+            _indexBuffer = null;
+        } else {
+            _indexBuffer = new ShortBufferData(indices);
+        }
+        updatePrimitiveCounts();
+        refreshInterleaved();
+    }
+
+    /**
+     * Sets the index buffer.
+     * 
+     * @param indices
+     *            the new index buffer
+     */
+    public void setIndexBuffer(final ByteBuffer indices) {
+        if (indices == null) {
+            _indexBuffer = null;
+        } else {
+            _indexBuffer = new ByteBufferData(indices);
+        }
+        updatePrimitiveCounts();
+        refreshInterleaved();
+    }
+
+    /**
      * Gets the indices.
      * 
      * @return the indices
      */
-    public IntBufferData getIndices() {
+    public IndexBufferData<?> getIndices() {
         return _indexBuffer;
     }
 
@@ -594,7 +629,7 @@ public class MeshData implements Cloneable, Savable {
      * @param bufferData
      *            the new indices
      */
-    public void setIndices(final IntBufferData bufferData) {
+    public void setIndices(final IndexBufferData<?> bufferData) {
         _indexBuffer = bufferData;
         updatePrimitiveCounts();
         refreshInterleaved();
@@ -747,7 +782,7 @@ public class MeshData implements Cloneable, Savable {
 
         for (int i = 0; i < rSize; i++) {
             if (getIndexBuffer() != null) {
-                result[i] = getIndexBuffer().get(getVertexIndex(primitiveIndex, i, section));
+                result[i] = getIndices().get(getVertexIndex(primitiveIndex, i, section));
             } else {
                 result[i] = getVertexIndex(primitiveIndex, i, section);
             }
@@ -787,7 +822,7 @@ public class MeshData implements Cloneable, Savable {
             }
             if (getIndexBuffer() != null) {
                 // indexed geometry
-                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndexBuffer().get(
+                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndices().get(
                         getVertexIndex(primitiveIndex, i, section)));
             } else {
                 // non-indexed geometry
@@ -924,9 +959,9 @@ public class MeshData implements Cloneable, Savable {
                 int pntC = getVertexIndex(primitiveIndex, 2, section);
 
                 if (hasIndices) {
-                    pntA = getIndexBuffer().get(pntA);
-                    pntB = getIndexBuffer().get(pntB);
-                    pntC = getIndexBuffer().get(pntC);
+                    pntA = getIndices().get(pntA);
+                    pntB = getIndices().get(pntB);
+                    pntC = getIndices().get(pntC);
                 }
 
                 double b = MathUtils.nextRandomDouble();
@@ -960,7 +995,7 @@ public class MeshData implements Cloneable, Savable {
             case Points: {
                 int pnt = getVertexIndex(primitiveIndex, 0, section);
                 if (hasIndices) {
-                    pnt = getIndexBuffer().get(pnt);
+                    pnt = getIndices().get(pnt);
                 }
                 BufferUtils.populateFromBuffer(result, getVertexBuffer(), pnt);
                 break;
@@ -971,8 +1006,8 @@ public class MeshData implements Cloneable, Savable {
                 int pntA = getVertexIndex(primitiveIndex, 0, section);
                 int pntB = getVertexIndex(primitiveIndex, 1, section);
                 if (hasIndices) {
-                    pntA = getIndexBuffer().get(pntA);
-                    pntB = getIndexBuffer().get(pntB);
+                    pntA = getIndices().get(pntA);
+                    pntB = getIndices().get(pntB);
                 }
 
                 final Vector3 work = Vector3.fetchTempInstance();
@@ -1147,7 +1182,7 @@ public class MeshData implements Cloneable, Savable {
         capsule.write(_fogCoords, "fogBuffer", null);
         capsule.write(_tangentCoords, "tangentBuffer", null);
         capsule.writeSavableList(_textureCoords, "textureCoords", new ArrayList<FloatBufferData>(1));
-        capsule.write(_indexBuffer, "indexBuffer", null);
+        capsule.write((Savable) _indexBuffer, "indexBuffer", null);
         capsule.write(_interleaved, "interleaved", null);
         capsule.write(_indexLengths, "indexLengths", null);
         capsule.write(_indexModes, "indexModes");
@@ -1163,7 +1198,7 @@ public class MeshData implements Cloneable, Savable {
         _fogCoords = (FloatBufferData) capsule.readSavable("fogBuffer", null);
         _tangentCoords = (FloatBufferData) capsule.readSavable("tangentBuffer", null);
         _textureCoords = capsule.readSavableList("textureCoords", new ArrayList<FloatBufferData>(1));
-        _indexBuffer = (IntBufferData) capsule.readSavable("indexBuffer", null);
+        _indexBuffer = (IndexBufferData<?>) capsule.readSavable("indexBuffer", null);
         _interleaved = (FloatBufferData) capsule.readSavable("interleaved", null);
         _indexLengths = capsule.readIntArray("indexLengths", null);
         _indexModes = capsule.readEnumArray("indexModes", IndexMode.class, new IndexMode[] { IndexMode.Triangles });

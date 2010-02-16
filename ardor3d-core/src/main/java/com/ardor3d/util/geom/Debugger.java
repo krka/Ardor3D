@@ -11,7 +11,6 @@
 package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -34,6 +33,7 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -178,7 +178,6 @@ public final class Debugger {
         normalLines.getMeshData().setIndexMode(IndexMode.Lines);
         normalLines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
         normalLines.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(500));
-        normalLines.generateIndices();
         normalLines.updateWorldRenderStates(false);
     }
     private static final Vector3 _normalVect = new Vector3(), _normalVect2 = new Vector3();
@@ -271,20 +270,21 @@ public final class Debugger {
                     lineColors.clear();
                 }
 
-                IntBuffer lineInds = normalLines.getMeshData().getIndexBuffer();
-                if (lineInds == null || lineInds.capacity() < (normalLines.getMeshData().getVertexCount())) {
-                    normalLines.getMeshData().setIndexBuffer(null);
-                    lineInds = BufferUtils.createIntBuffer(mesh.getMeshData().getVertexCount() * 2);
-                    normalLines.getMeshData().setIndexBuffer(lineInds);
+                IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
+                if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
+                    normalLines.getMeshData().setIndices(null);
+                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2, normalLines
+                            .getMeshData().getVertexCount() - 1);
+                    normalLines.getMeshData().setIndices(lineInds);
                 } else {
-                    lineInds.clear();
-                    lineInds.limit(normalLines.getMeshData().getVertexCount());
+                    lineInds.getBuffer().clear();
+                    lineInds.getBuffer().limit(normalLines.getMeshData().getVertexCount());
                 }
 
                 verts.rewind();
                 norms.rewind();
                 lineVerts.rewind();
-                lineInds.rewind();
+                lineInds.getBuffer().rewind();
 
                 for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
                     _normalVect.set(verts.get(), verts.get(), verts.get());
@@ -384,20 +384,21 @@ public final class Debugger {
                     lineColors.clear();
                 }
 
-                IntBuffer lineInds = normalLines.getMeshData().getIndexBuffer();
-                if (lineInds == null || lineInds.capacity() < (normalLines.getMeshData().getVertexCount())) {
-                    normalLines.getMeshData().setIndexBuffer(null);
-                    lineInds = BufferUtils.createIntBuffer(mesh.getMeshData().getVertexCount() * 2);
-                    normalLines.getMeshData().setIndexBuffer(lineInds);
+                IndexBufferData<?> lineInds = normalLines.getMeshData().getIndices();
+                if (lineInds == null || lineInds.getBufferCapacity() < (normalLines.getMeshData().getVertexCount())) {
+                    normalLines.getMeshData().setIndices(null);
+                    lineInds = BufferUtils.createIndexBufferData(mesh.getMeshData().getVertexCount() * 2, normalLines
+                            .getMeshData().getVertexCount() - 1);
+                    normalLines.getMeshData().setIndices(lineInds);
                 } else {
-                    lineInds.clear();
-                    lineInds.limit(normalLines.getMeshData().getVertexCount());
+                    lineInds.getBuffer().clear();
+                    lineInds.getBuffer().limit(normalLines.getMeshData().getVertexCount());
                 }
 
                 verts.rewind();
                 norms.rewind();
                 lineVerts.rewind();
-                lineInds.rewind();
+                lineInds.getBuffer().rewind();
 
                 for (int x = 0; x < mesh.getMeshData().getVertexCount(); x++) {
                     _normalVect.set(verts.get(), verts.get(), verts.get());
