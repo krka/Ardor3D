@@ -12,6 +12,7 @@ package com.ardor3d.example.effect;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -41,6 +42,12 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of the QuadImposterNode class; which sets the texture level of detail for a Node.
+ */
+@Purpose(htmlDescription = "A demonstration of the QuadImposterNode class; which sets the texture level of detail for a Node.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
+maxHeapMemory = 64)
 public class QuadImposterExample extends ExampleBase {
     private final Timer _timer;
     private boolean showImposter = true;

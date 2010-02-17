@@ -12,6 +12,7 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -36,8 +37,11 @@ import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
 /**
- * Similar to the BoxExample, but in stereo
+ * Illustrates the StereoCamera class, which allows for your stereo viewing pleasures.
  */
+@Purpose(htmlDescription = "Illustrates the StereoCamera class, which allows for your stereo viewing pleasures.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_StereoExample.jpg", //
+maxHeapMemory = 64)
 public class StereoExample extends ExampleBase {
 
     private StereoCamera _camera;

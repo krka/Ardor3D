@@ -13,6 +13,7 @@ package com.ardor3d.example.renderer;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
@@ -21,6 +22,12 @@ import com.ardor3d.scenegraph.Point;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of displaying numerous Point in three-dimensions.
+ */
+@Purpose(htmlDescription = "A demonstration of displaying numerous Point in three-dimensions.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_PointsExample.jpg", //
+maxHeapMemory = 64)
 public class PointsExample extends ExampleBase {
 
     static final int POINTS = 25;

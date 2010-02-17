@@ -26,9 +26,9 @@ import com.ardor3d.scenegraph.Line;
 import com.google.inject.Inject;
 
 /**
- * A simple example showing off some of the properties of the Line object and how to use antialising.
+ * A demonstration of antialising on a Line object.
  */
-@Purpose(htmlDescription = "A simple example showing off some of the properties of the Line object and how to use antialising.", //
+@Purpose(htmlDescription = "A demonstration of antialising on a Line object.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
 maxHeapMemory = 64)
 public class LineExample extends ExampleBase {

@@ -11,6 +11,7 @@
 package com.ardor3d.example.ui;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
@@ -32,6 +33,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates how to display and move GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
+ */
+@Purpose(htmlDescription = "Illustrates how to display and move GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_RotatingUIExample.jpg", //
+maxHeapMemory = 64)
 public class RotatingUIExample extends ExampleBase {
     UIHud hud;
     Timer timer;

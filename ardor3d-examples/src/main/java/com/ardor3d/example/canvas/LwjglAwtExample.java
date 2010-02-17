@@ -25,6 +25,7 @@ import javax.swing.SwingConstants;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Exit;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
@@ -53,6 +54,12 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
+/**
+ * This examples demonstrates how to render OpenGL (via LWJGL) on a AWT canvas.
+ */
+@Purpose(htmlDescription = "This examples demonstrates how to render OpenGL (via LWJGL) on a AWT canvas.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_LwjglAwtExample.jpg", //
+maxHeapMemory = 64)
 public class LwjglAwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;

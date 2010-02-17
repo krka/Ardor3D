@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.texturing.ProceduralTextureStreamer;
 import com.ardor3d.extension.texturing.TextureClipmap;
 import com.ardor3d.framework.Canvas;
@@ -39,8 +40,11 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
 /**
- * Very simple example showing use of a Texture3D texture.
+ * Illustrates the TextureClipmap class, which prohibits the display of textures outside a defined region.
  */
+@Purpose(htmlDescription = "Illustrates the TextureClipmap class, which prohibits the display of textures outside a defined region.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_TextureClipmapExample.jpg", //
+maxHeapMemory = 64)
 public class TextureClipmapExample extends ExampleBase {
 
     /** Text fields used to present info about the example. */

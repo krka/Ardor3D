@@ -11,6 +11,7 @@
 package com.ardor3d.example.effect;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.water.ProjectedGrid;
 import com.ardor3d.extension.effect.water.WaterHeightGenerator;
 import com.ardor3d.framework.Canvas;
@@ -38,8 +39,11 @@ import com.ardor3d.util.Timer;
 import com.google.inject.Inject;
 
 /**
- * Example showing the Projected Grid mesh.
+ * A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.
  */
+@Purpose(htmlDescription = "A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ProjectedGridExample.jpg", //
+maxHeapMemory = 64)
 public class ProjectedGridExample extends ExampleBase {
     private final Timer _timer;
 

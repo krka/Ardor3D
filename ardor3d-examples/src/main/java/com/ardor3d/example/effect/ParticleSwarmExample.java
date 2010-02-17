@@ -32,6 +32,9 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * Example showing a particle system using the particle SwarmInfluence.
+ */
 @Purpose(htmlDescription = "Example showing a particle system using the particle SwarmInfluence.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSwarmExample.jpg", //
 maxHeapMemory = 64)

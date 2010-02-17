@@ -14,6 +14,7 @@ import java.util.Random;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -34,6 +35,12 @@ import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.
+ */
+@Purpose(htmlDescription = "Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
+maxHeapMemory = 64)
 public class MeshDataSharingExample extends ExampleBase {
 
     public static void main(final String[] args) {

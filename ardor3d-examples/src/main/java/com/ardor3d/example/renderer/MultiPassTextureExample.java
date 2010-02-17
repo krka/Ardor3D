@@ -12,6 +12,7 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -32,6 +33,9 @@ import com.google.inject.Inject;
 /**
  * Borrows from the BoxExample to illustrate using PassNode to do simple multi-texturing.
  */
+@Purpose(htmlDescription = "Borrows from the BoxExample to illustrate using PassNode to do simple multi-texturing.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MultiPassTextureExample.jpg", //
+maxHeapMemory = 64)
 public class MultiPassTextureExample extends ExampleBase {
 
     /** Keep a reference to the box to be able to rotate it each frame. */

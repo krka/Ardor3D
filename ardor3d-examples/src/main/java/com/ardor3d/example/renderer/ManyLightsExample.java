@@ -14,6 +14,7 @@ import java.util.Random;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.light.PointLight;
@@ -28,6 +29,12 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of randomly placed spheres being illuminated by numerious PointLight sources.
+ */
+@Purpose(htmlDescription = "A demonstration of randomly placed spheres being illuminated by numerious PointLight sources.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ManyLightsExample.jpg", //
+maxHeapMemory = 64)
 public class ManyLightsExample extends ExampleBase {
     private final Random rand = new Random();
     private Node colornode;

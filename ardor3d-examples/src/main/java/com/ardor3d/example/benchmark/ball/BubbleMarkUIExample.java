@@ -37,7 +37,7 @@ import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
 /**
- * Bubblemark test - using ardor3d-ui
+ * The famous BubbleMark UI test, recreated using Ardor3D UI components.
  */
 @Purpose(htmlDescription = "The famous BubbleMark UI test, recreated using Ardor3D UI components.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkUIExample.jpg", //

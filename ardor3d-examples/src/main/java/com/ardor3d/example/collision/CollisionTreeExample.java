@@ -16,6 +16,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.CollisionData;
@@ -37,6 +38,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of finding and retrieving collisions between two nodes.
+ */
+@Purpose(htmlDescription = "A demonstration of finding and retrieving collisions between two nodes", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/collision_CollisionTreeExample.jpg", //
+maxHeapMemory = 64)
 public class CollisionTreeExample extends ExampleBase {
     private final ReadOnlyColorRGBA[] colorSpread = { ColorRGBA.WHITE, ColorRGBA.GREEN, ColorRGBA.GRAY };
 

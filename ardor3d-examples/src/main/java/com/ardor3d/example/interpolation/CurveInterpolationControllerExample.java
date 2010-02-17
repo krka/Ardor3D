@@ -13,6 +13,7 @@ package com.ardor3d.example.interpolation;
 import java.util.Arrays;
 import java.util.List;
 
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
@@ -26,8 +27,11 @@ import com.ardor3d.spline.Curve;
 import com.google.inject.Inject;
 
 /**
- * A simple example showing the CurveInterpolationController in action.
+ * A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set of 3D coordinates (via spline).
  */
+@Purpose(htmlDescription = "A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set of 3D coordinates (via spline).", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_CurveInterpolationControllerExample.jpg", //
+maxHeapMemory = 64)
 public class CurveInterpolationControllerExample extends InterpolationControllerBase<CurveInterpolationController> {
 
     public static void main(final String[] args) {

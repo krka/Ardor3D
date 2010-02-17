@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -42,6 +43,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates the DataMode class, which describe how we prefer data to be sent to the card.
+ */
+@Purpose(htmlDescription = "Illustrates the DataMode class, which describe how we prefer data to be sent to the card.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_VBOSpeedExample.jpg", //
+maxHeapMemory = 64)
 public class VBOSpeedExample extends ExampleBase {
 
     private BasicText frameRateLabel;

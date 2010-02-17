@@ -20,6 +20,7 @@ import javax.imageio.ImageIO;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
@@ -52,6 +53,12 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of procedurally updating a texture.
+ */
+@Purpose(htmlDescription = "A demonstration of procedurally updating a texture.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_UpdateTextureExample.jpg", //
+maxHeapMemory = 64)
 public class UpdateTextureExample extends ExampleBase {
     private Mesh t;
     private final Matrix3 rotate = new Matrix3();

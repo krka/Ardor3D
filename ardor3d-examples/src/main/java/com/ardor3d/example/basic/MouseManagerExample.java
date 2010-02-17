@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
@@ -43,6 +44,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of the MouseManager class, which is used to control properties (e.g. cursor, location) of the native mouse.
+ */
+@Purpose(htmlDescription = "A demonstration of the MouseManager class, which is used to control properties (e.g. curser, location) of the native mouse.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
+maxHeapMemory = 64)
 public class MouseManagerExample extends ExampleBase {
 
     private Mesh t;

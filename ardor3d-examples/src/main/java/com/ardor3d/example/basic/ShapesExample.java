@@ -68,7 +68,10 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
-@Purpose(htmlDescription = "A showing of the Ardor3D primitives.", //
+/**
+ * A display of intrinsic shapes (e.g. Box, Cone, Torus).
+ */
+@Purpose(htmlDescription = "A display of intrinsic shapes (e.g. Box, Cone, Torus).", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_ShapesExample.jpg", //
 maxHeapMemory = 64)
 public class ShapesExample extends ExampleBase {

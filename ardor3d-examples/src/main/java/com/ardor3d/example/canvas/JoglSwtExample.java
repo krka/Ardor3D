@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.TabItem;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Exit;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
@@ -65,6 +66,12 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 
+/**
+ * This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.
+ */
+@Purpose(htmlDescription = "This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
+maxHeapMemory = 64)
 public class JoglSwtExample {
     static MouseCursor _cursor1;
     static MouseCursor _cursor2;

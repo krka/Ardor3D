@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -32,6 +33,12 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates the BillboardNode class; which defines a node that always orients towards the camera.
+ */
+@Purpose(htmlDescription = "Illustrates the BillboardNode class; which defines a node that always orients towards the camera.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_BillboardNodeExample.jpg", //
+maxHeapMemory = 64)
 public class BillboardNodeExample extends ExampleBase {
     private BasicText t;
 

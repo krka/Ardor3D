@@ -12,6 +12,7 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
@@ -35,6 +36,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.
+ */
+@Purpose(htmlDescription = "Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_RenderTextureSideBySideExample.jpg", //
+maxHeapMemory = 64)
 public class RenderTextureSideBySideExample extends ExampleBase {
     private final Quaternion rotQuat = new Quaternion();
     private double angle = 0;

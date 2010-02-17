@@ -13,6 +13,7 @@ package com.ardor3d.example.renderer;
 import java.util.Random;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
@@ -43,6 +44,12 @@ import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.scenegraph.SceneCompiler;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates creating a display list from two sets (i.e. original set and copied set) of Nodes.
+ */
+@Purpose(htmlDescription = "Illustrates creating a display list from two sets (i.e. original set and copied set) of Nodes.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DisplayListDelegateExample.jpg", //
+maxHeapMemory = 64)
 public class DisplayListDelegateExample extends ExampleBase {
 
     /** Text fields used to present info about the example. */
@@ -107,7 +114,7 @@ public class DisplayListDelegateExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Geometry Clipmap Terrain - Example");
+        _canvas.setTitle("DisplayListDelegate - Example");
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 100, 0));
         _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
 

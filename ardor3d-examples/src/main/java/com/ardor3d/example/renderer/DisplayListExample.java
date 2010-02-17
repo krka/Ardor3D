@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -64,6 +65,12 @@ import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.scenegraph.SceneCompiler;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates creating a display list of intrinsic shapes (e.g. Box, Cone, Torus).
+ */
+@Purpose(htmlDescription = "Illustrates creating a display list of intrinsic shapes (e.g. Box, Cone, Torus).", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DisplayListExample.jpg", //
+maxHeapMemory = 64)
 public class DisplayListExample extends ExampleBase {
     private int wrapCount;
     private int index;

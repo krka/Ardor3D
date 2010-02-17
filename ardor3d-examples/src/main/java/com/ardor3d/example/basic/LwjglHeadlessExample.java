@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglHeadlessCanvas;
@@ -50,7 +51,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
- * This lwjgl-based example is meant to show how to use Ardor3D's LwjglHeadlessCanvas.
+ * A demonstration of the LwjglHeadlessCanvas class, which is canvas used to draw Scene data to an offscreen target.
  * </p>
  * 
  * <p>
@@ -58,6 +59,9 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
+@Purpose(htmlDescription = "A demonstration of the LwjglHeadlessCanvas class, which is canvas used to draw Scene data to an offscreen target.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglHeadlessExample.jpg", //
+maxHeapMemory = 64)
 public class LwjglHeadlessExample implements Scene {
 
     // Our headless canvas

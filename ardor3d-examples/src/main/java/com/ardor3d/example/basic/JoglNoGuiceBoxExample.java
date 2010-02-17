@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.jogl.JoglCanvas;
@@ -49,6 +50,9 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
+@Purpose(htmlDescription = "This jogl-based example is meant to show how to use Ardor3D at the most primitive level.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_JoglNoGuiceBoxExample.jpg", //
+maxHeapMemory = 64)
 public class JoglNoGuiceBoxExample implements Scene {
 
     // Our native window, not the gl surface itself.

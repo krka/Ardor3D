@@ -12,6 +12,7 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -32,6 +33,9 @@ import com.google.inject.Inject;
 /**
  * Simple example showing differences between GeoSphere and Sphere and their various texture mappings.
  */
+@Purpose(htmlDescription = "Simple example showing differences between GeoSphere and Sphere and their various texture mappings.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_SphereComparisonsExample.jpg", //
+maxHeapMemory = 64)
 public class SphereComparisonsExample extends ExampleBase {
 
     public static void main(final String[] args) {

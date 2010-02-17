@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
@@ -35,6 +36,12 @@ import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates the Camera class, which represents a view into a 3d scene and how that view should map to a 2D rendering surface.
+ */
+@Purpose(htmlDescription = "Illustrates the Camera class, which represents a view into a 3d scene and how that view should map to a 2D rendering surface.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
+maxHeapMemory = 64)
 public class ViewportExample extends ExampleBase {
 
     private Box box2;

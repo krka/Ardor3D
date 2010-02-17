@@ -15,6 +15,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
@@ -42,6 +43,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
+ */
+@Purpose(htmlDescription = "A demonstration of combining the skeletal animation classes with OpenGL Shading Language.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_PrimitiveSkeletonExample.jpg", //
+maxHeapMemory = 64)
 public class PrimitiveSkeletonExample extends ExampleBase {
 
     private boolean runAnimation = true;

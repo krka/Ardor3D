@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
@@ -42,7 +43,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 /**
  * <p>
  * This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of Guice
- * and most of our framework classes and interfaces.
+ * and most of Ardor3D's framework classes and interfaces.
  * </p>
  * 
  * <p>
@@ -50,6 +51,10 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
+
+@Purpose(htmlDescription = "This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglNoGuiceBoxExample.jpg", //
+maxHeapMemory = 64)
 public class LwjglNoGuiceBoxExample implements Scene {
 
     // Our native window, not the gl surface itself.

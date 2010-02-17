@@ -40,7 +40,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
- * This example recreates the classic UI benchmark "BubbleMark".
+ * The famous BubbleMark UI test, recreated using quads.
  * </p>
  * <p>
  * There are several system params you can use to modify the test:

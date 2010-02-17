@@ -12,6 +12,7 @@ package com.ardor3d.example.effect;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.framework.FrameHandler;
@@ -29,6 +30,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size, color) change over time.
+ */
+@Purpose(htmlDescription = "A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size, color) change over time.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
+maxHeapMemory = 64)
 public class ParticleSystemExample extends ExampleBase {
 
     private ParticleSystem particles;

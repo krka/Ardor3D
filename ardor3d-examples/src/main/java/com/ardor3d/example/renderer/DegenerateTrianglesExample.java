@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
@@ -39,6 +40,12 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).
+ */
+@Purpose(htmlDescription = "Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DegenerateTrianglesExample.jpg", //
+maxHeapMemory = 64)
 public class DegenerateTrianglesExample extends ExampleBase {
 
     private BasicText t;

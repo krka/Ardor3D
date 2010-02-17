@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
@@ -32,6 +33,12 @@ import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.
+ */
+@Purpose(htmlDescription = "Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_BMTextExample.jpg", //
+maxHeapMemory = 64)
 public class BMTextExample extends ExampleBase {
 
     private final Matrix3 rotate = new Matrix3();

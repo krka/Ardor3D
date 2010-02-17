@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
@@ -51,8 +52,11 @@ import com.ardor3d.util.TextureKey;
 import com.google.inject.Inject;
 
 /**
- * Example showing use of the GeneratedImageFactory and Functions.
+ * Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of textures.
  */
+@Purpose(htmlDescription = "Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of textures.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
+maxHeapMemory = 64)
 public class GeneratedTexturesExample extends ExampleBase {
     private final static int COUNT = 10;
     private final static int SPAN = 3;

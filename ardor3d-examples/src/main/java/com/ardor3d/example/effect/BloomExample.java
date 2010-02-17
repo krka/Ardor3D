@@ -47,7 +47,7 @@ import com.ardor3d.util.TextureManager;
 import com.google.inject.Inject;
 
 /**
- * Example showing bloom
+ * A simple example showing bloom.
  */
 @Purpose(htmlDescription = "A simple example showing bloom.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_BloomExample.jpg", //

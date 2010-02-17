@@ -12,6 +12,7 @@ package com.ardor3d.example.basic;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
@@ -23,6 +24,12 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of an affine transform (e.g. translation, rotation, and scale) on a three-dimensional cube.
+ */
+@Purpose(htmlDescription = "A demonstration of an affine transform (e.g. translation, rotation, and scale) on a three-dimensional cube.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_TransformRotationExample.jpg", //
+maxHeapMemory = 64)
 public class TransformRotationExample extends ExampleBase {
 
     public static void main(final String[] args) {

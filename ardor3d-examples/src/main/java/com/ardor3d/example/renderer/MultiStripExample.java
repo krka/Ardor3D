@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.PickData;
@@ -25,6 +26,12 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * Illustrates mesh with several primitives (i.e. strip, quad, triangle).
+ */
+@Purpose(htmlDescription = "Illustrates mesh with several primitives (i.e. strip, quad, triangle).", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MultiStripExample.jpg", //
+maxHeapMemory = 64)
 public class MultiStripExample extends ExampleBase {
 
     public static void main(final String[] args) {

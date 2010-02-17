@@ -35,7 +35,10 @@ import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
 import com.google.inject.Inject;
 
-@Purpose(htmlDescription = "Demonstrates using MathUtils.matrixLookAt.", //
+/**
+ * A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source position to a given target position.
+ */
+@Purpose(htmlDescription = "A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source position to a given target position.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
 maxHeapMemory = 64)
 public class MatrixLookAtExample extends ExampleBase {

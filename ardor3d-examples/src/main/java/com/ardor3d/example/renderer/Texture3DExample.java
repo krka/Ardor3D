@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
@@ -33,6 +34,9 @@ import com.google.inject.Inject;
 /**
  * Very simple example showing use of a Texture3D texture.
  */
+@Purpose(htmlDescription = "Very simple example showing use of a Texture3D texture.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_Texture3DExample.jpg", //
+maxHeapMemory = 64)
 public class Texture3DExample extends ExampleBase {
 
     public static void main(final String[] args) {

@@ -11,6 +11,7 @@
 package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
@@ -43,8 +44,11 @@ import com.ardor3d.util.TextureKey;
 import com.google.inject.Inject;
 
 /**
- * A simple Mandelbrot set explorer.
+ * Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.
  */
+@Purpose(htmlDescription = "Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MandelbrotExplorerExample.jpg", //
+maxHeapMemory = 64)
 public class MandelbrotExplorerExample extends ExampleBase {
 
     private final Quad display = new Quad("display");

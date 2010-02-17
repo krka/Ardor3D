@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -40,6 +41,12 @@ import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.inject.Inject;
 
+/**
+ * A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data stream.
+ */
+@Purpose(htmlDescription = "A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data stream.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
+maxHeapMemory = 64)
 public class ExportImportExample extends ExampleBase {
     private static final Logger logger = Logger.getLogger(ExportImportExample.class.getName());
 
