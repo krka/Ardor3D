@@ -14,6 +14,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -1266,7 +1267,8 @@ public class JoglRenderer extends AbstractRenderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            gl.glDrawElements(glIndexMode, indices.getBufferLimit(), GL.GL_UNSIGNED_INT, 0);
+            final int type = getGLDataType(indices);
+            gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, 0);
             if (Constants.stats) {
                 addStats(indexModes[0], indices.getBufferLimit());
             }
@@ -1278,8 +1280,11 @@ public class JoglRenderer extends AbstractRenderer {
 
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
+                final int type = getGLDataType(indices);
+                final int byteSize = getByteSize(type);
                 // offset in this call is done in bytes.
-                gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, offset * 4);
+                gl.glDrawElements(glIndexMode, count, type, offset * byteSize);
+
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
@@ -1408,6 +1413,30 @@ public class JoglRenderer extends AbstractRenderer {
                 break;
         }
         return glMode;
+    }
+
+    private int getGLDataType(final IndexBufferData<?> indices) {
+        if (indices.getBuffer() instanceof ByteBuffer) {
+            return GL.GL_UNSIGNED_BYTE;
+        } else if (indices.getBuffer() instanceof ShortBuffer) {
+            return GL.GL_UNSIGNED_SHORT;
+        } else if (indices.getBuffer() instanceof IntBuffer) {
+            return GL.GL_UNSIGNED_INT;
+        }
+
+        throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
+    }
+
+    private int getByteSize(final int glValue) {
+        switch (glValue) {
+            case GL.GL_UNSIGNED_BYTE:
+                return 1;
+            case GL.GL_UNSIGNED_SHORT:
+                return 2;
+            case GL.GL_UNSIGNED_INT:
+                return 4;
+        }
+        throw new IllegalArgumentException("Unsupported value: " + glValue);
     }
 
     public void setModelViewMatrix(final FloatBuffer matrix) {

@@ -1234,7 +1234,8 @@ public class LwjglRenderer extends AbstractRenderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            GL11.glDrawElements(glIndexMode, indices.getBufferLimit(), GL11.GL_UNSIGNED_INT, 0);
+            final int type = getGLDataType(indices);
+            GL11.glDrawElements(glIndexMode, indices.getBufferLimit(), type, 0);
             if (Constants.stats) {
                 addStats(indexModes[0], indices.getBufferLimit());
             }
@@ -1246,8 +1247,10 @@ public class LwjglRenderer extends AbstractRenderer {
 
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
+                final int type = getGLDataType(indices);
+                final int byteSize = getByteSize(type);
                 // offset in this call is done in bytes.
-                GL11.glDrawElements(glIndexMode, count, GL11.GL_UNSIGNED_INT, offset * 4);
+                GL11.glDrawElements(glIndexMode, count, type, offset * byteSize);
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
                 }
@@ -1372,6 +1375,30 @@ public class LwjglRenderer extends AbstractRenderer {
                 break;
         }
         return glMode;
+    }
+
+    private int getGLDataType(final IndexBufferData<?> indices) {
+        if (indices.getBuffer() instanceof ByteBuffer) {
+            return GL11.GL_UNSIGNED_BYTE;
+        } else if (indices.getBuffer() instanceof ShortBuffer) {
+            return GL11.GL_UNSIGNED_SHORT;
+        } else if (indices.getBuffer() instanceof IntBuffer) {
+            return GL11.GL_UNSIGNED_INT;
+        }
+
+        throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
+    }
+
+    private int getByteSize(final int glValue) {
+        switch (glValue) {
+            case GL11.GL_UNSIGNED_BYTE:
+                return 1;
+            case GL11.GL_UNSIGNED_SHORT:
+                return 2;
+            case GL11.GL_UNSIGNED_INT:
+                return 4;
+        }
+        throw new IllegalArgumentException("Unsupported value: " + glValue);
     }
 
     public void setModelViewMatrix(final FloatBuffer matrix) {
