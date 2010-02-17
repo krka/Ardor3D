@@ -168,7 +168,7 @@ public class RunExamples extends JFrame {
                     // Look for the example's thumbnail.
                     final URL imageURL = RunExamples.class.getResource(purpose.thumbnailPath());
                     if (imageURL != null) {
-                        imgURL = "<br><img src=\"" + imageURL + "\"/>";
+                        imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
                 } catch (final Exception ex) {
                 }
