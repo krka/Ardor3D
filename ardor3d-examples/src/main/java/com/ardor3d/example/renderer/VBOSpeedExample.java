@@ -25,6 +25,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
@@ -43,6 +44,10 @@ import com.google.inject.Inject;
 
 public class VBOSpeedExample extends ExampleBase {
 
+    private BasicText frameRateLabel;
+    private int frames = 0;
+    private long startTime = System.currentTimeMillis();
+
     private int vboMode = 0;
 
     public static void main(final String[] args) {
@@ -54,19 +59,20 @@ public class VBOSpeedExample extends ExampleBase {
         super(layer, frameWork);
     }
 
-    double counter = 0;
-    int frames = 0;
-
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
-        counter += timer.getTimePerFrame();
-        frames++;
-        if (counter > 1) {
-            final double fps = (frames / counter);
-            counter = 0;
+
+        final long now = System.currentTimeMillis();
+        final long dt = now - startTime;
+        if (dt > 1000) {
+            final long fps = Math.round(1e3 * frames / dt);
+            frameRateLabel.setText(fps + " fps");
+
+            startTime = now;
             frames = 0;
-            System.out.printf("%7.1f FPS\n", fps);
         }
+
+        frames++;
     }
 
     @Override
@@ -131,5 +137,12 @@ public class VBOSpeedExample extends ExampleBase {
             }
         }));
 
+        // Add fps display
+        frameRateLabel = BasicText.createDefaultTextLabel("fpsLabel", "");
+        frameRateLabel.setTranslation(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
+                - frameRateLabel.getHeight(), 0);
+        frameRateLabel.setTextColor(ColorRGBA.WHITE);
+        frameRateLabel.getSceneHints().setOrthoOrder(-1);
+        _root.attachChild(frameRateLabel);
     }
 }
