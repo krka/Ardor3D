@@ -447,11 +447,11 @@ public class MathUtils {
     }
 
     public static int floor(final float val) {
-        return Math.round(val);
+        return (int) Math.floor(val);
     }
 
     public static long floor(final double val) {
-        return Math.round(val);
+        return (long) Math.floor(val);
     }
 
     public static double clamp(final double val, final double min, final double max) {
