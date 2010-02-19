@@ -22,11 +22,9 @@ import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
@@ -41,7 +39,6 @@ import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
@@ -61,11 +58,6 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
     public static void main(final String[] args) {
         ExampleBase.start(PrimitiveSkeletonExample.class);
-    }
-
-    @Inject
-    public PrimitiveSkeletonExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

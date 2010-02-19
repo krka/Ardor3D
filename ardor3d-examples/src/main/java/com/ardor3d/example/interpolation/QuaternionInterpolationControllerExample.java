@@ -11,14 +11,12 @@
 package com.ardor3d.example.interpolation;
 
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.scenegraph.controller.interpolation.QuaternionInterpolationController;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the QuaternionInterpolationController class; which will rotate a Node each epoch by interpolating between the given quaternions.
+ * A demonstration of the QuaternionInterpolationController class; which will rotate a Node each epoch by interpolating
+ * between the given quaternions.
  */
 @Purpose(htmlDescription = "A demonstration of the QuaternionInterpolationController class; which will rotate a Node each epoch by interpolating between the given quaternions.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_QuaternionInterpolationControllerExample.jpg", //
@@ -28,11 +26,6 @@ public class QuaternionInterpolationControllerExample extends
 
     public static void main(final String[] args) {
         start(QuaternionInterpolationControllerExample.class);
-    }
-
-    @Inject
-    public QuaternionInterpolationControllerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

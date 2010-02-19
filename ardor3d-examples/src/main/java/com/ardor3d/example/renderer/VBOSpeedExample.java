@@ -17,13 +17,11 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -41,7 +39,6 @@ import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Illustrates the DataMode class, which describe how we prefer data to be sent to the card.
@@ -59,11 +56,6 @@ public class VBOSpeedExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(VBOSpeedExample.class);
-    }
-
-    @Inject
-    public VBOSpeedExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

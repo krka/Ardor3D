@@ -16,10 +16,8 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.RampEntry;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -27,10 +25,10 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the ParticleSystem and RampEntry classes; which controls how an emitter's properties (e.g. size, color) change over time.
+ * A demonstration of the ParticleSystem and RampEntry classes; which controls how an emitter's properties (e.g. size,
+ * color) change over time.
  */
 @Purpose(htmlDescription = "A demonstration of the ParticleSystem and RampEntry classes; which controls how an emitter's properties (e.g. size, color) change over time.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
@@ -39,11 +37,6 @@ public class ParticleRampExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ParticleRampExample.class);
-    }
-
-    @Inject
-    public ParticleRampExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

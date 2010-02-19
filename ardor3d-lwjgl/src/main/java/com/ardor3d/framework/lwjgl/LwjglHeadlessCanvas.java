@@ -36,7 +36,6 @@ import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRenderer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * <p>
@@ -68,7 +67,6 @@ public class LwjglHeadlessCanvas {
      * @param scene
      *            the scene we will render.
      */
-    @Inject
     public LwjglHeadlessCanvas(final DisplaySettings settings, final Scene scene) {
         _scene = scene;
         _settings = settings;

@@ -48,8 +48,6 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -63,9 +61,7 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.Timer;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 
 /**
  * Illustrates loading several animations from Collada and arranging them in a controllable blend tree.
@@ -84,7 +80,6 @@ public class AnimationDemoExample extends ExampleBase {
     private int frames = 0;
     private long startTime = System.currentTimeMillis();
 
-    private final Timer _timer;
     private AnimationManager manager;
     private SkeletonPose pose;
     private List<SkinnedMesh> skins;
@@ -102,12 +97,6 @@ public class AnimationDemoExample extends ExampleBase {
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
-    }
-
-    @Inject
-    public AnimationDemoExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
-        super(layer, frameWork);
-        _timer = timer;
     }
 
     @Override

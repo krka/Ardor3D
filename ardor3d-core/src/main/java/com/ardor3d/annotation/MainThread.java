@@ -16,8 +16,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.google.inject.BindingAnnotation;
-
 /**
  * Methods flagged with this annotation should only be run in the main thread, that is, the thread that handles the
  * OpenGL calls. It is possible, and good during development but possibly not during production, to use a method
@@ -31,7 +29,6 @@ import com.google.inject.BindingAnnotation;
  * only for clarity purposes rather than as a way of getting method interception to work. It should always be added to
  * any class directly implementing an interface method that uses it.
  */
-@BindingAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.PARAMETER })
 @Inherited

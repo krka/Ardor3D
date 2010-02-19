@@ -25,11 +25,9 @@ import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.light.DirectionalLight;
@@ -47,7 +45,6 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.inject.Inject;
 
 /**
  * Illustrates loading a model from Collada and procedurally animating its joints.
@@ -77,11 +74,6 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
     public static void main(final String[] args) {
         ExampleBase.start(ColladaManualAnimationExample.class);
-    }
-
-    @Inject
-    public ColladaManualAnimationExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     double time = 0.0;

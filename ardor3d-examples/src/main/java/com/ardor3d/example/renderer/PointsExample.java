@@ -14,13 +14,10 @@ import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of displaying numerous Point in three-dimensions.
@@ -34,11 +31,6 @@ public class PointsExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(PointsExample.class);
-    }
-
-    @Inject
-    public PointsExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     /**

@@ -24,9 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.example.Exit;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
@@ -47,12 +45,9 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Stage;
 
 /**
  * This examples demonstrates how to render OpenGL (via JOGL) on a AWT canvas.
@@ -69,15 +64,11 @@ public class JoglAwtExample {
     public static void main(final String[] args) throws Exception {
         System.setProperty("ardor3d.useMultipleContexts", "true");
 
-        final Module ardorModule = new ArdorModule();
-        // final Module systemModule = new LwjglAwtModule();
-
-        final Injector injector = Guice.createInjector(Stage.PRODUCTION, ardorModule);
-
-        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
+        final Timer timer = new Timer();
+        final FrameHandler frameWork = new FrameHandler(timer);
 
         final MyExit exit = new MyExit();
-        final LogicalLayer logicalLayer = injector.getInstance(LogicalLayer.class);
+        final LogicalLayer logicalLayer = new LogicalLayer();
 
         final ExampleScene scene1 = new ExampleScene();
         final RotatingCubeGame game1 = new RotatingCubeGame(scene1, exit, logicalLayer, Key.T);

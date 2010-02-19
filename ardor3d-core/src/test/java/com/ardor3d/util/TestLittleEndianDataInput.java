@@ -12,11 +12,12 @@ package com.ardor3d.util;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.EOFException;
 import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * These tests are fairly brittle, since they rely on the implementation of BufferedInputStream.

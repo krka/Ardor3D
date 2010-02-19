@@ -16,7 +16,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
@@ -27,7 +26,6 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
@@ -42,10 +40,10 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the MouseManager class, which is used to control properties (e.g. cursor, location) of the native mouse.
+ * A demonstration of the MouseManager class, which is used to control properties (e.g. cursor, location) of the native
+ * mouse.
  */
 @Purpose(htmlDescription = "A demonstration of the MouseManager class, which is used to control properties (e.g. curser, location) of the native mouse.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
@@ -65,11 +63,6 @@ public class MouseManagerExample extends ExampleBase {
         start(MouseManagerExample.class);
     }
 
-    @Inject
-    public MouseManagerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
-    }
-
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
         if (timer.getTimePerFrame() < 1) {
@@ -85,7 +78,7 @@ public class MouseManagerExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Vertex Colors");
+        _canvas.setTitle("Mouse Manager Example");
 
         final Vector3 max = new Vector3(5, 5, 5);
         final Vector3 min = new Vector3(-5, -5, -5);

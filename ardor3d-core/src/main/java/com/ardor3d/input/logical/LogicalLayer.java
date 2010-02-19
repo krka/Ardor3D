@@ -20,7 +20,6 @@ import com.ardor3d.annotation.ThreadSafe;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.PhysicalLayer;
-import com.google.inject.Inject;
 
 /**
  * Implementation of a logical layer on top of the physical one, to be able to more easily trigger certain commands for
@@ -32,7 +31,7 @@ public final class LogicalLayer {
     private final Set<InputTrigger> _triggers = new CopyOnWriteArraySet<InputTrigger>();
     private LogicalTriggersApplier _applier = new BasicTriggersApplier();
 
-    @Inject
+    
     public LogicalLayer() {}
 
     public void registerInput(final Canvas source, final PhysicalLayer physicalLayer) {

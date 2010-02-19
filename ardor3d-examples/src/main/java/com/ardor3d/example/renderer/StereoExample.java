@@ -13,10 +13,8 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.ContextManager;
@@ -34,7 +32,6 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Illustrates the StereoCamera class, which allows for your stereo viewing pleasures.
@@ -60,11 +57,6 @@ public class StereoExample extends ExampleBase {
     public static void main(final String[] args) {
         _stereo = !_sideBySide && !_useAnaglyph;
         start(StereoExample.class);
-    }
-
-    @Inject
-    public StereoExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

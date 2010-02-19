@@ -34,9 +34,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import com.ardor3d.example.ExampleBase;
-import com.ardor3d.example.Exit;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
@@ -59,12 +57,9 @@ import com.ardor3d.input.swt.SwtKeyboardWrapper;
 import com.ardor3d.input.swt.SwtMouseManager;
 import com.ardor3d.input.swt.SwtMouseWrapper;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Stage;
 
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
@@ -84,15 +79,13 @@ public class LwjglSwtExample {
     public static void main(final String[] args) {
         System.setProperty("ardor3d.useMultipleContexts", "true");
 
-        final Module ardorModule = new ArdorModule();
-
-        final Injector injector = Guice.createInjector(Stage.PRODUCTION, ardorModule);
-
-        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
+        final Timer timer = new Timer();
+        final FrameHandler frameWork = new FrameHandler(timer);
+        final LogicalLayer logicalLayer = new LogicalLayer();
 
         final MyExit exit = new MyExit();
         final ExampleScene scene = new ExampleScene();
-        final RotatingCubeGame game = new RotatingCubeGame(scene, exit, injector.getInstance(LogicalLayer.class), Key.T);
+        final RotatingCubeGame game = new RotatingCubeGame(scene, exit, logicalLayer, Key.T);
 
         frameWork.addUpdater(game);
 
@@ -118,7 +111,7 @@ public class LwjglSwtExample {
             public void handleEvent(final Event e) {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
-                        addNewCanvas(tabFolder, scene, injector);
+                        addNewCanvas(tabFolder, scene, frameWork, logicalLayer);
                     }
                 });
             }
@@ -136,7 +129,7 @@ public class LwjglSwtExample {
             ex.printStackTrace();
         }
 
-        addNewCanvas(tabFolder, scene, injector);
+        addNewCanvas(tabFolder, scene, frameWork, logicalLayer);
 
         shell.open();
 
@@ -162,11 +155,10 @@ public class LwjglSwtExample {
         System.exit(0);
     }
 
-    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final Injector injector) {
+    private static void addNewCanvas(final TabFolder tabFolder, final ExampleScene scene, final FrameHandler frameWork,
+            final LogicalLayer logicalLayer) {
         i++;
         logger.info("Adding canvas");
-
-        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
 
         // Add a new tab to hold our canvas
         final TabItem item = new TabItem(tabFolder, SWT.NONE);
@@ -220,8 +212,6 @@ public class LwjglSwtExample {
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
         frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, lwjglCanvasRenderer4));
-
-        final LogicalLayer logicalLayer = injector.getInstance(LogicalLayer.class);
 
         final SwtKeyboardWrapper keyboardWrapper = new SwtKeyboardWrapper(canvas1);
         final SwtMouseWrapper mouseWrapper = new SwtMouseWrapper(canvas1);

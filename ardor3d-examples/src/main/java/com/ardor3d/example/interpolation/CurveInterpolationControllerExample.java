@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
@@ -24,10 +22,10 @@ import com.ardor3d.scenegraph.controller.interpolation.CurveInterpolationControl
 import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationController.UpdateField;
 import com.ardor3d.spline.CatmullRomSpline;
 import com.ardor3d.spline.Curve;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set of 3D coordinates (via spline).
+ * A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set
+ * of 3D coordinates (via spline).
  */
 @Purpose(htmlDescription = "A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set of 3D coordinates (via spline).", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_CurveInterpolationControllerExample.jpg", //
@@ -36,11 +34,6 @@ public class CurveInterpolationControllerExample extends InterpolationController
 
     public static void main(final String[] args) {
         start(CurveInterpolationControllerExample.class);
-    }
-
-    @Inject
-    public CurveInterpolationControllerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

@@ -13,13 +13,11 @@ package com.ardor3d.example.interpolation;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
@@ -32,17 +30,11 @@ import com.ardor3d.scenegraph.controller.interpolation.InterpolationController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 public abstract class InterpolationControllerBase<C extends InterpolationController<?, ?>> extends ExampleBase {
 
     /** Keep a reference to the box to be able to rotate it each frame. */
     private Mesh box;
-
-    @Inject
-    public InterpolationControllerBase(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
-    }
 
     @Override
     protected void initExample() {

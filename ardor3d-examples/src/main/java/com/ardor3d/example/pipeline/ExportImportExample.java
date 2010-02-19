@@ -20,10 +20,8 @@ import java.util.logging.Logger;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
@@ -39,10 +37,10 @@ import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data stream.
+ * A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data
+ * stream.
  */
 @Purpose(htmlDescription = "A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data stream.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
@@ -57,11 +55,6 @@ public class ExportImportExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ExportImportExample.class);
-    }
-
-    @Inject
-    public ExportImportExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

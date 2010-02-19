@@ -15,7 +15,6 @@ import java.util.List;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
@@ -23,13 +22,11 @@ import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.util.GeneratedImageFactory;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.TextureKey;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 
 /**
  * Very simple example showing use of a Texture3D texture.
@@ -41,11 +38,6 @@ public class Texture3DExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(Texture3DExample.class);
-    }
-
-    @Inject
-    public Texture3DExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

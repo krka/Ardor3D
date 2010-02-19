@@ -15,10 +15,8 @@ import java.util.Random;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -36,7 +34,6 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
-import com.google.inject.Inject;
 
 /**
  * A demonstration on how to determine if collisions exist between two nodes.
@@ -55,11 +52,6 @@ public class ManyCollisionsExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ManyCollisionsExample.class);
-    }
-
-    @Inject
-    public ManyCollisionsExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

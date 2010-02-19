@@ -15,11 +15,9 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.WrapMode;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -28,10 +26,10 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size, color) change over time.
+ * A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size,
+ * color) change over time.
  */
 @Purpose(htmlDescription = "A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size, color) change over time.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
@@ -43,11 +41,6 @@ public class ParticleSystemExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ParticleSystemExample.class);
-    }
-
-    @Inject
-    public ParticleSystemExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     int ignore = 10;

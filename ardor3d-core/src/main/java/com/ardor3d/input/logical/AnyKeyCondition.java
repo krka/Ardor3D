@@ -10,8 +10,8 @@
 
 package com.ardor3d.input.logical;
 
-import com.google.common.base.Predicate;
 import com.ardor3d.input.InputState;
+import com.google.common.base.Predicate;
 
 /**
  * Applicable whenever 'any' key has been pressed.

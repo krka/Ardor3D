@@ -21,8 +21,6 @@ import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -30,8 +28,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.Timer;
-import com.google.inject.Inject;
 
 /**
  * Illustrates how to display and move GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
@@ -41,16 +37,9 @@ thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_RotatingUIExample.jpg"
 maxHeapMemory = 64)
 public class RotatingUIExample extends ExampleBase {
     UIHud hud;
-    Timer timer;
 
     public static void main(final String[] args) {
         start(RotatingUIExample.class);
-    }
-
-    @Inject
-    public RotatingUIExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
-        super(layer, frameWork);
-        this.timer = timer;
     }
 
     @Override

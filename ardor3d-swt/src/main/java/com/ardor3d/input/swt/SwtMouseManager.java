@@ -23,7 +23,6 @@ import com.ardor3d.image.util.SWTImageUtil;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;
-import com.google.inject.Inject;
 
 /**
  * Implementation of the {@link com.ardor3d.input.MouseManager} interface for use with SWT. This implementation supports
@@ -44,7 +43,6 @@ public class SwtMouseManager implements MouseManager {
     /** Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed" */
     private Cursor _pregrabCursor;
 
-    @Inject
     public SwtMouseManager(final Control control) {
         _control = control;
     }

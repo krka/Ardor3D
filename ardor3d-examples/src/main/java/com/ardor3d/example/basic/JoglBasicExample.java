@@ -17,8 +17,8 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
-import com.ardor3d.framework.lwjgl.LwjglCanvas;
-import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
+import com.ardor3d.framework.jogl.JoglCanvas;
+import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -31,7 +31,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ContextGarbageCollector;
@@ -42,8 +41,8 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
  * <p>
- * This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of Guice
- * and most of Ardor3D's framework classes and interfaces.
+ * This jogl-based example is meant to show how to use Ardor3D at the most primitive level, forsaking the use of
+ * ExampleBase and much of our framework classes and interfaces.
  * </p>
  * 
  * <p>
@@ -51,14 +50,13 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
-
-@Purpose(htmlDescription = "This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level.", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglNoGuiceBoxExample.jpg", //
+@Purpose(htmlDescription = "This jogl-based example is meant to show how to use Ardor3D at the most primitive level.", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_JoglBasicExample.jpg", //
 maxHeapMemory = 64)
-public class LwjglNoGuiceBoxExample implements Scene {
+public class JoglBasicExample implements Scene {
 
     // Our native window, not the gl surface itself.
-    private final LwjglCanvas _canvas;
+    private final JoglCanvas _canvas;
 
     // Our timer.
     private final Timer _timer = new Timer();
@@ -70,15 +68,15 @@ public class LwjglNoGuiceBoxExample implements Scene {
     private final Node _root = new Node();
 
     public static void main(final String[] args) {
-        final LwjglNoGuiceBoxExample example = new LwjglNoGuiceBoxExample();
+        final JoglBasicExample example = new JoglBasicExample();
         example.start();
     }
 
     /**
      * Constructs the example class, also creating the native window and GL surface.
      */
-    public LwjglNoGuiceBoxExample() {
-        _canvas = initLwjgl();
+    public JoglBasicExample() {
+        _canvas = initJogl();
         _canvas.init();
     }
 
@@ -95,6 +93,7 @@ public class LwjglNoGuiceBoxExample implements Scene {
             _canvas.draw(null);
             Thread.yield();
         }
+        _canvas.getCanvasRenderer().setCurrentContext();
 
         // Done, do cleanup
         ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
@@ -102,21 +101,21 @@ public class LwjglNoGuiceBoxExample implements Scene {
     }
 
     /**
-     * Setup an lwjgl canvas and canvas renderer.
+     * Setup a jogl canvas and canvas renderer.
      * 
      * @return the canvas.
      */
-    private LwjglCanvas initLwjgl() {
-        final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(this);
+    private JoglCanvas initJogl() {
+        final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(this);
         final DisplaySettings settings = new DisplaySettings(800, 600, 24, 0, 0, 8, 0, 0, false, false);
-        return new LwjglCanvas(canvasRenderer, settings);
+        return new JoglCanvas(canvasRenderer, settings);
     }
 
     /**
      * Initialize our scene.
      */
     private void initExample() {
-        _canvas.setTitle("LwjglNoGuiceBoxExample - close window to exit");
+        _canvas.setTitle("JoglNoGuiceBoxExample - close window to exit");
 
         // Make a box...
         final Box _box = new Box("Box", Vector3.ZERO, 5, 5, 5);
@@ -134,13 +133,13 @@ public class LwjglNoGuiceBoxExample implements Scene {
         _root.attachChild(_box);
 
         // set it to rotate:
-        _box.addController(new SpatialController<Spatial>() {
+        _box.addController(new SpatialController<Box>() {
             private static final long serialVersionUID = 1L;
             private final Vector3 _axis = new Vector3(1, 1, 0.5f).normalizeLocal();
             private final Matrix3 _rotate = new Matrix3();
             private double _angle = 0;
 
-            public void update(final double time, final Spatial caller) {
+            public void update(final double time, final Box caller) {
                 // update our rotation
                 _angle = _angle + (_timer.getTimePerFrame() * 25);
                 if (_angle > 180) {

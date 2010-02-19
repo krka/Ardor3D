@@ -15,11 +15,9 @@ import java.nio.FloatBuffer;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -66,7 +64,6 @@ import com.ardor3d.scenegraph.shape.GeoSphere.TextureMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * A display of intrinsic shapes (e.g. Box, Cone, Torus).
@@ -82,11 +79,6 @@ public class ShapesExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ShapesExample.class);
-    }
-
-    @Inject
-    public ShapesExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

@@ -11,13 +11,11 @@
 package com.ardor3d.example;
 
 import com.ardor3d.framework.FrameHandler;
-import com.google.inject.Inject;
 
-public class GameThread extends Thread implements Exit {
+public class GameThread extends Thread {
     private final FrameHandler frameWork;
     private volatile boolean exit = false;
 
-    @Inject
     public GameThread(final FrameHandler frameWork) {
         this.frameWork = frameWork;
     }

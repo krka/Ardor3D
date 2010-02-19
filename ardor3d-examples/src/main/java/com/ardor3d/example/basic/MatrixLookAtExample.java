@@ -16,10 +16,8 @@ import java.util.List;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -33,10 +31,10 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.SceneCopier;
 import com.ardor3d.util.geom.SharedCopyLogic;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source position to a given target position.
+ * A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source
+ * position to a given target position.
  */
 @Purpose(htmlDescription = "A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source position to a given target position.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
@@ -55,11 +53,6 @@ public class MatrixLookAtExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(MatrixLookAtExample.class);
-    }
-
-    @Inject
-    public MatrixLookAtExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

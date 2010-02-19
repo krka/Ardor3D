@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.util.Timer;
-import com.google.inject.Inject;
 
 /**
  * Does the work needed in a given frame.
@@ -42,7 +41,7 @@ public final class FrameHandler {
     private final CopyOnWriteArrayList<Canvas> _canvases;
     private final Timer _timer;
 
-    @Inject
+    
     public FrameHandler(final Timer timer) {
         _timer = timer;
         _updaters = new CopyOnWriteArrayList<Updater>();

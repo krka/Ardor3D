@@ -14,10 +14,7 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
-import com.google.inject.Inject;
 
 /**
  * Simplest example of loading a collada model.
@@ -28,11 +25,6 @@ maxHeapMemory = 64)
 public class SimpleColladaExample extends ExampleBase {
     public static void main(final String[] args) {
         ExampleBase.start(SimpleColladaExample.class);
-    }
-
-    @Inject
-    public SimpleColladaExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

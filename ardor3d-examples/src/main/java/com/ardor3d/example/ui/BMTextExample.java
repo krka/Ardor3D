@@ -15,8 +15,6 @@ import java.util.Random;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -31,7 +29,6 @@ import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
-import com.google.inject.Inject;
 
 /**
  * Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.
@@ -45,11 +42,6 @@ public class BMTextExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(BMTextExample.class);
-    }
-
-    @Inject
-    public BMTextExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

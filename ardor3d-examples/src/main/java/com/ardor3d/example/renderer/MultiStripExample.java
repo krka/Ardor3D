@@ -15,8 +15,6 @@ import java.nio.IntBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Vector3;
@@ -24,7 +22,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * Illustrates mesh with several primitives (i.e. strip, quad, triangle).
@@ -36,11 +33,6 @@ public class MultiStripExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(MultiStripExample.class);
-    }
-
-    @Inject
-    public MultiStripExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

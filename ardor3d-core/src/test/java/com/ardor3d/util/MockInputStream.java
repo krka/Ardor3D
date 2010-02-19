@@ -10,8 +10,8 @@
 
 package com.ardor3d.util;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MockInputStream extends InputStream  {
     private int bytesAvailable = 0;

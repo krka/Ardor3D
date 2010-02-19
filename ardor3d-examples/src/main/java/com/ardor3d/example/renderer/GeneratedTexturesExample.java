@@ -17,7 +17,6 @@ import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.backdrop.ImageBackdrop;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -25,7 +24,6 @@ import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -49,10 +47,10 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureKey;
-import com.google.inject.Inject;
 
 /**
- * Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of textures.
+ * Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of
+ * textures.
  */
 @Purpose(htmlDescription = "Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of textures.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
@@ -77,11 +75,6 @@ public class GeneratedTexturesExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(GeneratedTexturesExample.class);
-    }
-
-    @Inject
-    public GeneratedTexturesExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

@@ -15,11 +15,9 @@ import java.util.Random;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
@@ -42,7 +40,6 @@ import com.ardor3d.util.geom.SharedCopyLogic;
 import com.ardor3d.util.scenegraph.CompileOptions;
 import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.scenegraph.SceneCompiler;
-import com.google.inject.Inject;
 
 /**
  * Illustrates creating a display list from two sets (i.e. original set and copied set) of Nodes.
@@ -69,11 +66,6 @@ public class DisplayListDelegateExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(DisplayListDelegateExample.class);
-    }
-
-    @Inject
-    public DisplayListDelegateExample(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
-        super(logicalLayer, frameHandler);
     }
 
     @Override

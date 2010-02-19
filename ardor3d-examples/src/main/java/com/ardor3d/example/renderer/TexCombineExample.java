@@ -13,20 +13,17 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionRGB;
 import com.ardor3d.image.Texture.CombinerOperandRGB;
 import com.ardor3d.image.Texture.CombinerSource;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Shows interpolated textures using texture combine.
@@ -43,11 +40,6 @@ public class TexCombineExample extends ExampleBase {
     private final TextureState ts = new TextureState();
     float blend = 0;
     int direction = 1;
-
-    @Inject
-    public TexCombineExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
-    }
 
     @Override
     protected void initExample() {

@@ -37,10 +37,8 @@ import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.TransformedSubTex;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -54,8 +52,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
-import com.google.inject.Inject;
 
 /**
  * Illustrates how to display GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
@@ -67,16 +63,9 @@ public class SimpleUIExample extends ExampleBase {
     UIHud hud;
     UILabel fpslabel;
     UIProgressBar bar;
-    Timer timer;
 
     public static void main(final String[] args) {
         start(SimpleUIExample.class);
-    }
-
-    @Inject
-    public SimpleUIExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
-        super(layer, frameWork);
-        this.timer = timer;
     }
 
     @Override
@@ -263,8 +252,8 @@ public class SimpleUIExample extends ExampleBase {
 
         clockPanel.addController(new SpatialController<Spatial>() {
             public void update(final double time, final Spatial caller) {
-                final double angle1 = timer.getTimeInSeconds() % MathUtils.TWO_PI;
-                final double angle2 = (timer.getTimeInSeconds() / 12.) % MathUtils.TWO_PI;
+                final double angle1 = _timer.getTimeInSeconds() % MathUtils.TWO_PI;
+                final double angle2 = (_timer.getTimeInSeconds() / 12.) % MathUtils.TWO_PI;
 
                 minute.getTransform().setRotation(new Quaternion().fromAngleAxis(angle1, Vector3.NEG_UNIT_Z));
                 hour.getTransform().setRotation(new Quaternion().fromAngleAxis(angle2, Vector3.NEG_UNIT_Z));

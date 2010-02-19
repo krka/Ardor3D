@@ -46,8 +46,6 @@ import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -60,10 +58,8 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.google.inject.Inject;
 
 /**
  * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
@@ -87,18 +83,11 @@ public class ColladaExample extends ExampleBase {
     private List<File> daeFiles;
     private int fileIndex = 0;
 
-    private final Timer _timer;
     private AnimationManager manager;
     private List<SkinData> skinDatas;
 
     public static void main(final String[] args) {
         ExampleBase.start(ColladaExample.class);
-    }
-
-    @Inject
-    public ColladaExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
-        super(layer, frameWork);
-        _timer = timer;
     }
 
     @Override

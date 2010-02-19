@@ -19,27 +19,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.framework.ArdorModule;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
+import com.ardor3d.framework.jogl.JoglCanvas;
+import com.ardor3d.framework.jogl.JoglCanvasRenderer;
+import com.ardor3d.framework.lwjgl.LwjglCanvas;
+import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
-import com.ardor3d.input.ControllerWrapper;
-import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.Key;
-import com.ardor3d.input.KeyboardWrapper;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseManager;
-import com.ardor3d.input.MouseWrapper;
 import com.ardor3d.input.PhysicalLayer;
+import com.ardor3d.input.awt.AwtFocusWrapper;
+import com.ardor3d.input.awt.AwtKeyboardWrapper;
+import com.ardor3d.input.awt.AwtMouseManager;
+import com.ardor3d.input.awt.AwtMouseWrapper;
 import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.AnyKeyCondition;
+import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
@@ -48,6 +52,10 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.input.lwjgl.LwjglControllerWrapper;
+import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
+import com.ardor3d.input.lwjgl.LwjglMouseManager;
+import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -72,6 +80,7 @@ import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
+import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
@@ -79,25 +88,20 @@ import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Provider;
-import com.google.inject.Scopes;
-import com.google.inject.Stage;
 
-public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
+public abstract class ExampleBase implements Runnable, Updater, Scene {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
-    protected final LogicalLayer _logicalLayer;
+    protected final LogicalLayer _logicalLayer = new LogicalLayer();
 
     protected PhysicalLayer _physicalLayer;
 
-    protected final Node _root = new Node();
+    protected final Timer _timer = new Timer();
+    protected final FrameHandler _frameHandler = new FrameHandler(_timer);
 
-    protected final FrameHandler _frameHandler;
+    protected DisplaySettings _settings;
+
+    protected final Node _root = new Node();
 
     protected LightState _lightState;
 
@@ -126,12 +130,6 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
     protected static int _minDepthBits = -1;
     protected static int _minAlphaBits = -1;
     protected static int _minStencilBits = -1;
-
-    @Inject
-    public ExampleBase(final LogicalLayer logicalLayer, final FrameHandler frameHandler) {
-        _logicalLayer = logicalLayer;
-        _frameHandler = frameHandler;
-    }
 
     public void run() {
         try {
@@ -333,65 +331,42 @@ public abstract class ExampleBase implements Runnable, Updater, Scene, Exit {
                 // other
                 prefs.isFullscreen(), _stereo);
 
-        // get our framework
-        final ArdorModule ardorModule = new ArdorModule();
-        Module systemModule = null;
+        ExampleBase example;
+        try {
+            example = exampleClazz.newInstance();
+            example._settings = settings;
+        } catch (final Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
 
+        // get our framework
         if ("LWJGL".equalsIgnoreCase(prefs.getRenderer())) {
-            systemModule = new LwjglModule();
+            final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(example);
+            example._canvas = new LwjglCanvas(canvasRenderer, settings);
+            example._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
+                    new LwjglControllerWrapper(), (LwjglCanvas) example._canvas);
+            example._mouseManager = new LwjglMouseManager();
             TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
         } else if ("JOGL".equalsIgnoreCase(prefs.getRenderer())) {
-            systemModule = new JoglModule();
+            final JoglCanvasRenderer canvasRenderer = new JoglCanvasRenderer(example);
+            example._canvas = new JoglCanvas(canvasRenderer, settings);
+            final JoglCanvas canvas = (JoglCanvas) example._canvas;
+            example._mouseManager = new AwtMouseManager(canvas);
+            example._physicalLayer = new PhysicalLayer(new AwtKeyboardWrapper(canvas), new AwtMouseWrapper(canvas,
+                    example._mouseManager), DummyControllerWrapper.INSTANCE, new AwtFocusWrapper(canvas));
             TextureRendererFactory.INSTANCE.setProvider(new JoglTextureRendererProvider());
         }
-        final Module exampleModule = new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(ExampleBase.class).to(exampleClazz).in(Scopes.SINGLETON);
-                bind(Scene.class).to(ExampleBase.class);
-                bind(Updater.class).to(ExampleBase.class);
-                bind(Exit.class).to(ExampleBase.class);
-            }
-        };
-        final Provider<DisplaySettings> settingsProvider = new Provider<DisplaySettings>() {
-            public DisplaySettings get() {
-                return settings;
-            }
-        };
 
-        // Setup our injector.
-        final Injector injector = Guice.createInjector(Stage.PRODUCTION, ardorModule, systemModule, exampleModule,
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(DisplaySettings.class).toProvider(settingsProvider);
-                    }
-                });
-
-        final LogicalLayer ll = injector.getInstance(LogicalLayer.class);
-        final FrameHandler frameWork = injector.getInstance(FrameHandler.class);
-        final ExampleBase gameRunnable = injector.getInstance(ExampleBase.class);
-        final NativeCanvas canvas = injector.getInstance(NativeCanvas.class);
-        final Updater updater = injector.getInstance(Updater.class);
-        final PhysicalLayer physicalLayer = new PhysicalLayer(injector.getInstance(KeyboardWrapper.class), injector
-                .getInstance(MouseWrapper.class), injector.getInstance(ControllerWrapper.class), injector
-                .getInstance(FocusWrapper.class));
-
-        // set the mouse manager member. It's a bit of a hack to do that this way.
-        gameRunnable._mouseManager = injector.getInstance(MouseManager.class);
-
-        ll.registerInput(canvas, physicalLayer);
+        example._logicalLayer.registerInput(example._canvas, example._physicalLayer);
 
         // Register our example as an updater.
-        frameWork.addUpdater(updater);
+        example._frameHandler.addUpdater(example);
 
-        // Make a native canvas and register it.
-        frameWork.addCanvas(canvas);
+        // register our native canvas
+        example._frameHandler.addCanvas(example._canvas);
 
-        gameRunnable._canvas = canvas;
-        gameRunnable._physicalLayer = physicalLayer;
-
-        new Thread(gameRunnable).start();
+        new Thread(example).start();
     }
 
     protected static PropertiesGameSettings getAttributes(final PropertiesGameSettings settings) {

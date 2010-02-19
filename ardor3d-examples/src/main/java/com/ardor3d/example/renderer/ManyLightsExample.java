@@ -15,8 +15,6 @@ import java.util.Random;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.light.PointLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -27,7 +25,6 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of randomly placed spheres being illuminated by numerious PointLight sources.
@@ -42,11 +39,6 @@ public class ManyLightsExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ManyLightsExample.class);
-    }
-
-    @Inject
-    public ManyLightsExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

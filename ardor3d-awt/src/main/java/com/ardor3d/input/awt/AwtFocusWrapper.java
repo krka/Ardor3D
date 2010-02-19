@@ -15,7 +15,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import com.ardor3d.input.FocusWrapper;
-import com.google.inject.Inject;
 
 /**
  * Focus listener class for use with AWT.
@@ -25,7 +24,7 @@ public class AwtFocusWrapper implements FocusWrapper, FocusListener {
 
     private final Component _component;
 
-    @Inject
+    
     public AwtFocusWrapper(final Component component) {
         _component = component;
     }

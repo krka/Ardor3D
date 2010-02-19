@@ -11,15 +11,13 @@
 package com.ardor3d.example.interpolation;
 
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolationController;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the DefaultColorInterpolationController class; which updates the default color each epoch by interpolating between the given colors.
+ * A demonstration of the DefaultColorInterpolationController class; which updates the default color each epoch by
+ * interpolating between the given colors.
  */
 @Purpose(htmlDescription = "A demonstration of the DefaultColorInterpolationController class; which updates the default color each epoch by interpolating between the given colors.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_DefaultColorInterpolationControllerExample.jpg", //
@@ -29,11 +27,6 @@ public class DefaultColorInterpolationControllerExample extends
 
     public static void main(final String[] args) {
         start(DefaultColorInterpolationControllerExample.class);
-    }
-
-    @Inject
-    public DefaultColorInterpolationControllerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

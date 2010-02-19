@@ -13,10 +13,8 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -28,7 +26,6 @@ import com.ardor3d.scenegraph.shape.GeoSphere;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.shape.Sphere.TextureMode;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Simple example showing differences between GeoSphere and Sphere and their various texture mappings.
@@ -40,11 +37,6 @@ public class SphereComparisonsExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(SphereComparisonsExample.class);
-    }
-
-    @Inject
-    public SphereComparisonsExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

@@ -15,13 +15,11 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.water.ProjectedGrid;
 import com.ardor3d.extension.effect.water.WaterHeightGenerator;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
@@ -35,8 +33,6 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.Timer;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.
@@ -45,8 +41,6 @@ import com.google.inject.Inject;
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ProjectedGridExample.jpg", //
 maxHeapMemory = 64)
 public class ProjectedGridExample extends ExampleBase {
-    private final Timer _timer;
-
     /** The Projected Grid mesh */
     private ProjectedGrid projectedGrid;
 
@@ -55,12 +49,6 @@ public class ProjectedGridExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ProjectedGridExample.class);
-    }
-
-    @Inject
-    public ProjectedGridExample(final LogicalLayer layer, final FrameHandler frameWork, final Timer timer) {
-        super(layer, frameWork);
-        _timer = timer;
     }
 
     double counter = 0;

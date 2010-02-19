@@ -14,13 +14,11 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
@@ -29,11 +27,11 @@ import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.extension.SwitchNode;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of the SwitchNode class; used to control which Node to actively display from a set of Nodes.
@@ -44,11 +42,6 @@ maxHeapMemory = 64)
 public class SwitchNodeExample extends ExampleBase {
     public static void main(final String[] args) {
         start(SwitchNodeExample.class);
-    }
-
-    @Inject
-    public SwitchNodeExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override
@@ -79,8 +72,10 @@ public class SwitchNodeExample extends ExampleBase {
         box.setTranslation(new Vector3(0, 0, 0));
         box.setRandomColors();
         switchNode.attachChild(box);
+        switchNode.getSceneHints().setCullHint(CullHint.Dynamic);
 
         _root.attachChild(switchNode);
+        _root.getSceneHints().setCullHint(CullHint.Never);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {

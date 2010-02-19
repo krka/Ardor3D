@@ -11,18 +11,16 @@
 package com.ardor3d.example.interpolation;
 
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.controller.interpolation.LinearVector3InterpolationController;
 import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationController.UpdateField;
-import com.google.inject.Inject;
 
 /**
- * A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D coordinates (via linear interpolation).
+ * A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D
+ * coordinates (via linear interpolation).
  */
 @Purpose(htmlDescription = "A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D coordinates (via linear interpolation).", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_LinearVector3InterpolationControllerExample.jpg", //
@@ -32,11 +30,6 @@ public class LinearVector3InterpolationControllerExample extends
 
     public static void main(final String[] args) {
         start(LinearVector3InterpolationControllerExample.class);
-    }
-
-    @Inject
-    public LinearVector3InterpolationControllerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

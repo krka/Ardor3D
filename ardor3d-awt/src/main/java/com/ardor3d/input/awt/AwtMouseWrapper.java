@@ -35,7 +35,6 @@ import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
-import com.google.inject.Inject;
 
 /**
  * Mouse wrapper class for use with AWT.
@@ -61,7 +60,7 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     private int _ignoreX = Integer.MAX_VALUE;
     private int _ignoreY = Integer.MAX_VALUE;
 
-    @Inject
+    
     public AwtMouseWrapper(final Component component, final MouseManager manager) {
         _manager = manager;
         if (component instanceof Frame) {

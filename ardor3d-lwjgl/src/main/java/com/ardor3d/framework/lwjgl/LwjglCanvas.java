@@ -28,7 +28,6 @@ import com.ardor3d.image.Image;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * A canvas implementation for use with native LWJGL windows.
@@ -43,7 +42,6 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
 
     private volatile boolean _focusLost = false;
 
-    @Inject
     public LwjglCanvas(final LwjglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
         _canvasRenderer = canvasRenderer;
         _settings = settings;

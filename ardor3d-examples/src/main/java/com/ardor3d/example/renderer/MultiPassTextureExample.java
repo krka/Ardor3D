@@ -13,10 +13,8 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -28,7 +26,6 @@ import com.ardor3d.scenegraph.extension.PassNodeState;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Borrows from the BoxExample to illustrate using PassNode to do simple multi-texturing.
@@ -52,11 +49,6 @@ public class MultiPassTextureExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(MultiPassTextureExample.class);
-    }
-
-    @Inject
-    public MultiPassTextureExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

@@ -29,10 +29,10 @@ import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.MouseWrapper;
 import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.EnumMultiset;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
-import com.google.common.collect.EnumMultiset;
 
 /**
  * A mouse wrapper for use with SWT.

@@ -16,10 +16,8 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.SwarmInfluence;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -30,7 +28,6 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Example showing a particle system using the particle SwarmInfluence.
@@ -47,11 +44,6 @@ public class ParticleSwarmExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(ParticleSwarmExample.class);
-    }
-
-    @Inject
-    public ParticleSwarmExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

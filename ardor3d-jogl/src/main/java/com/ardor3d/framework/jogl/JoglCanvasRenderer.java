@@ -28,7 +28,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
-import com.google.inject.Inject;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
 
@@ -61,7 +60,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     private RenderContext _currentContext;
 
-    @Inject
     public JoglCanvasRenderer(final Scene scene) {
         _scene = scene;
     }

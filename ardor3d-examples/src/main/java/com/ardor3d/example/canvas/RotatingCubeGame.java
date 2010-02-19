@@ -13,7 +13,6 @@ package com.ardor3d.example.canvas;
 import java.util.Random;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.example.Exit;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
@@ -47,7 +46,6 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.inject.Inject;
 
 public class RotatingCubeGame implements Updater {
     // private final Canvas view;
@@ -68,7 +66,6 @@ public class RotatingCubeGame implements Updater {
     private static final double MOUSE_TURN_SPEED = 1;
     private int rotationSign = 1;
 
-    @Inject
     public RotatingCubeGame(final ExampleScene scene, final Exit exit, final LogicalLayer logicalLayer,
             final Key toggleRotationKey) {
         this.scene = scene;
@@ -83,7 +80,6 @@ public class RotatingCubeGame implements Updater {
         // add a rotating controller to the cube
         // add a light
         box = new Box("The cube", new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
-        // box = SimpleShapeFactory.createQuad("the 'box'", 1, 1);
 
         final ZBufferState buf = new ZBufferState();
         buf.setEnabled(true);

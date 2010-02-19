@@ -12,12 +12,10 @@ package com.ardor3d.example.renderer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.util.TextureProjector;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -28,7 +26,6 @@ import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Illustrates the TextureProjector class, which projects a two-dimensional texture onto a three-dimensional surface.
@@ -45,11 +42,6 @@ public class TextureProjectionExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(TextureProjectionExample.class);
-    }
-
-    @Inject
-    public TextureProjectionExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

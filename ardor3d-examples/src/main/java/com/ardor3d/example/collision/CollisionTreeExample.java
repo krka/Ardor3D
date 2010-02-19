@@ -17,8 +17,6 @@ import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.intersection.CollisionData;
 import com.ardor3d.intersection.CollisionResults;
 import com.ardor3d.intersection.PickingUtil;
@@ -36,7 +34,6 @@ import com.ardor3d.scenegraph.shape.PQTorus;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of finding and retrieving collisions between two nodes.
@@ -57,11 +54,6 @@ public class CollisionTreeExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(CollisionTreeExample.class);
-    }
-
-    @Inject
-    public CollisionTreeExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     @Override

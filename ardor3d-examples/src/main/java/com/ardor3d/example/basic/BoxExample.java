@@ -13,10 +13,8 @@ package com.ardor3d.example.basic;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -27,7 +25,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * A simple example showing a textured and lit box spinning.
@@ -51,11 +48,6 @@ public class BoxExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(BoxExample.class);
-    }
-
-    @Inject
-    public BoxExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -31,7 +30,6 @@ import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.MathUtils;
@@ -51,7 +49,6 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of procedurally updating a texture.
@@ -72,11 +69,6 @@ public class UpdateTextureExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(UpdateTextureExample.class);
-    }
-
-    @Inject
-    public UpdateTextureExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

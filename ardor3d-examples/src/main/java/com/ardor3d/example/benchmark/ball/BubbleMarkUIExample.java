@@ -26,15 +26,12 @@ import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * The famous BubbleMark UI test, recreated using Ardor3D UI components.
@@ -61,11 +58,6 @@ public class BubbleMarkUIExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(BubbleMarkUIExample.class);
-    }
-
-    @Inject
-    public BubbleMarkUIExample(final LogicalLayer layer, final FrameHandler frameWork) {
-        super(layer, frameWork);
     }
 
     /**

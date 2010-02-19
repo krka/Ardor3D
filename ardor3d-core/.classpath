@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="lib/google/aopalliance-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/google/guice-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/unittests/cglib-nodep-2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/unittests/easymock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/unittests/easymockclassextension.jar"/>

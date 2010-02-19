@@ -72,10 +72,10 @@ import com.google.common.collect.Lists;
 /**
  * starter for Ardor3D examples
  */
-public class RunExamples extends JFrame {
+public class ExampleRunner extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private final Logger logger = Logger.getLogger(RunExamples.class.getCanonicalName());
+    private final Logger logger = Logger.getLogger(ExampleRunner.class.getCanonicalName());
     private final JTree tree;
     private final ClassTreeModel model;
     private final JSplitPane splitPane;
@@ -84,10 +84,10 @@ public class RunExamples extends JFrame {
     private final Action runSelectedAction;
     private final JCheckBox consoleBox;
     private final static String HEADER = "<html><body><h2 align=\"center\">Ardor3d Examples</h2><p align=\"center\"><img src=\""
-            + RunExamples.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
+            + ExampleRunner.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
             + "\"></p></body></html>";
 
-    public RunExamples() {
+    public ExampleRunner() {
         setTitle("Ardor3D SDK Examples");
         setLayout(new BorderLayout());
         model = new ClassTreeModel();
@@ -166,7 +166,7 @@ public class RunExamples extends JFrame {
             if (purpose != null) {
                 try {
                     // Look for the example's thumbnail.
-                    final URL imageURL = RunExamples.class.getResource(purpose.thumbnailPath());
+                    final URL imageURL = ExampleRunner.class.getResource(purpose.thumbnailPath());
                     if (imageURL != null) {
                         imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
@@ -180,7 +180,7 @@ public class RunExamples extends JFrame {
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
                 imgURL = "<img src=\""
-                        + RunExamples.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
+                        + ExampleRunner.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
                         + "\"/>";
             }
 
@@ -225,7 +225,7 @@ public class RunExamples extends JFrame {
                     final DisplayConsole console = showConsole ? new DisplayConsole(clazz.getCanonicalName(), p) : null;
                     new ConsoleStreamer(in, console).start();
                 } catch (final Exception ex) {
-                    JOptionPane.showMessageDialog(RunExamples.this, ex.toString());
+                    JOptionPane.showMessageDialog(ExampleRunner.this, ex.toString());
                 }
             }
         }.start();
@@ -272,7 +272,7 @@ public class RunExamples extends JFrame {
 
         public void addClassForPackage(final String packageName, final Class<?> clazz) {
             logger.fine("found " + clazz + " in " + packageName);
-            if (clazz.equals(RunExamples.class)) {
+            if (clazz.equals(ExampleRunner.class)) {
                 return;
             }
             Vector<Class<?>> cl = classes.get(packageName);
@@ -565,7 +565,7 @@ public class RunExamples extends JFrame {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (final Exception e) {
         }
-        final RunExamples app = new RunExamples();
+        final ExampleRunner app = new ExampleRunner();
         app.setSize(700, 400);
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setLocationRelativeTo(null);

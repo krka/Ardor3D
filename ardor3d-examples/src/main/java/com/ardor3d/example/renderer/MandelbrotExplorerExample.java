@@ -13,7 +13,6 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
@@ -23,7 +22,6 @@ import com.ardor3d.image.util.GeneratedImageFactory;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.logical.InputTrigger;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
@@ -41,7 +39,6 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.TextureKey;
-import com.google.inject.Inject;
 
 /**
  * Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.
@@ -60,11 +57,6 @@ public class MandelbrotExplorerExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(MandelbrotExplorerExample.class);
-    }
-
-    @Inject
-    public MandelbrotExplorerExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override

@@ -25,7 +25,6 @@ import com.ardor3d.input.KeyboardWrapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.PeekingIterator;
-import com.google.inject.Inject;
 
 /**
  * Keyboard wrapper class for use with AWT.
@@ -41,7 +40,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     private final EnumSet<Key> _pressedList = EnumSet.noneOf(Key.class);
 
-    @Inject
+    
     public AwtKeyboardWrapper(final Component component) {
         _component = Preconditions.checkNotNull(component, "component");
     }

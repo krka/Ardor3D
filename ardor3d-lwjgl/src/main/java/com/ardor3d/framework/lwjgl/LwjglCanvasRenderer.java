@@ -28,7 +28,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.google.inject.Inject;
 
 public class LwjglCanvasRenderer implements CanvasRenderer {
     protected Scene _scene;
@@ -54,7 +53,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     // }
     // }
 
-    @Inject
     public LwjglCanvasRenderer(final Scene scene) {
         _scene = scene;
     }

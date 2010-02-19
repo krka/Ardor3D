@@ -28,7 +28,6 @@ import com.ardor3d.image.util.AWTImageUtil;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;
-import com.google.inject.Inject;
 
 /**
  * Implementation of the {@link com.ardor3d.input.MouseManager} interface for use with AWT windows. This implementation
@@ -51,7 +50,7 @@ public class AwtMouseManager implements MouseManager {
     /** Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed" */
     private Cursor _pregrabCursor;
 
-    @Inject
+    
     public AwtMouseManager(final Component component) {
         _component = component;
 

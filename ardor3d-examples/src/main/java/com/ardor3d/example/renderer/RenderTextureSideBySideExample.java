@@ -13,12 +13,9 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -34,7 +31,6 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.google.inject.Inject;
 
 /**
  * Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.
@@ -50,18 +46,10 @@ public class RenderTextureSideBySideExample extends ExampleBase {
     private Quad quad;
     private TextureRenderer textureRenderer;
     private Texture2D fakeTex;
-    private final DisplaySettings _settings;
     private boolean inited = false;
 
     public static void main(final String[] args) {
         start(RenderTextureSideBySideExample.class);
-    }
-
-    @Inject
-    public RenderTextureSideBySideExample(final LogicalLayer layer, final FrameHandler frameWork,
-            final DisplaySettings settings) {
-        super(layer, frameWork);
-        _settings = settings;
     }
 
     @Override

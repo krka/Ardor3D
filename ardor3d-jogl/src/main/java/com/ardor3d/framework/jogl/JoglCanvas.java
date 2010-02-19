@@ -36,7 +36,6 @@ import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.renderer.jogl.JoglPbufferTextureRenderer;
-import com.google.inject.Inject;
 
 /**
  * A canvas implementation for use with native JOGL windows.
@@ -53,7 +52,6 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
     private JoglAwtCanvas _glCanvas;
 
-    @Inject
     public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
         _settings = settings;
 

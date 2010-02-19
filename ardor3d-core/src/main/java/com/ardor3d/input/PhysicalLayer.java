@@ -22,7 +22,6 @@ import com.ardor3d.input.logical.DummyControllerWrapper;
 import com.ardor3d.input.logical.DummyFocusWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.PeekingIterator;
-import com.google.inject.Inject;
 
 /**
  * Provides access to the physical layer of the input system. This is done via one method that polls the input system,
@@ -48,24 +47,24 @@ public class PhysicalLayer {
     private static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
     private static final List<InputState> EMPTY_LIST = ImmutableList.of();
 
-    @Inject
+    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper) {
         this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, DummyFocusWrapper.INSTANCE);
     }
 
-    @Inject
+    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final FocusWrapper focusWrapper) {
         this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, focusWrapper);
     }
 
-    @Inject
+    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final ControllerWrapper controllerWrapper) {
         this(keyboardWrapper, mouseWrapper, controllerWrapper, DummyFocusWrapper.INSTANCE);
     }
 
-    @Inject
+    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final ControllerWrapper controllerWrapper, final FocusWrapper focusWrapper) {
         _keyboardWrapper = keyboardWrapper;

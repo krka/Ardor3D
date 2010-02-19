@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.framework.FrameHandler;
-import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
@@ -23,7 +21,6 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.scenegraph.Line;
-import com.google.inject.Inject;
 
 /**
  * A demonstration of antialising on a Line object.
@@ -35,11 +32,6 @@ public class LineExample extends ExampleBase {
 
     public static void main(final String[] args) {
         start(LineExample.class);
-    }
-
-    @Inject
-    public LineExample(final LogicalLayer logicalLayer, final FrameHandler frameWork) {
-        super(logicalLayer, frameWork);
     }
 
     @Override
