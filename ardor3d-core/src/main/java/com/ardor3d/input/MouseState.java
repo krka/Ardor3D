@@ -98,13 +98,42 @@ public class MouseState {
     }
 
     /**
+     * 
+     * @param state
+     *            the button to look for
+     * @return true if the given mouse button is currently mapped to a state.
+     */
+    public boolean hasButtonState(final MouseButton button) {
+        return _buttonStates.containsKey(button);
+    }
+
+    /**
      * Returns all the buttons' states. It could be easier for most classes to use the
      * {@link #getButtonState(MouseButton)} methods, and that also results in less object creation.
      * 
      * @return a defensive copy of the states of all the buttons at this point in time.
      */
     public EnumMap<MouseButton, ButtonState> getButtonStates() {
-        return _buttonStates.clone();
+        return getButtonStates(null);
+    }
+
+    /**
+     * Returns all the buttons' states. It could be easier for most classes to use the
+     * {@link #getButtonState(MouseButton)} methods, and that also results in less object creation.
+     * 
+     * @param store
+     *            a map to store the states in... any values in store are cleared first. If store is null, a new map is
+     *            created.
+     * @return a defensive copy of the states of all the buttons at this point in time.
+     */
+    public EnumMap<MouseButton, ButtonState> getButtonStates(final EnumMap<MouseButton, ButtonState> store) {
+        EnumMap<MouseButton, ButtonState> rVal = store;
+        if (store == null) {
+            rVal = Maps.newEnumMap(MouseButton.class);
+        }
+        rVal.clear();
+        rVal.putAll(_buttonStates);
+        return rVal;
     }
 
     /**

@@ -60,7 +60,6 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
     private int _ignoreX = Integer.MAX_VALUE;
     private int _ignoreY = Integer.MAX_VALUE;
 
-    
     public AwtMouseWrapper(final Component component, final MouseManager manager) {
         _manager = manager;
         if (component instanceof Frame) {
@@ -205,19 +204,15 @@ public class AwtMouseWrapper implements MouseWrapper, MouseListener, MouseWheelL
 
     private void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
-            final int height = (_frame != null && _frame.getComponentCount() > 0) ? _frame.getComponent(0).getHeight()
-                    : _component.getHeight();
-            _lastState = new MouseState(mouseEvent.getX(), height - mouseEvent.getY(), 0, 0, 0, null, null);
+            _lastState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), 0, 0, 0, null, null);
         }
     }
 
     private void addNewState(final MouseEvent mouseEvent, final EnumMap<MouseButton, ButtonState> enumMap,
             final Multiset<MouseButton> clicks) {
-        final int fixedY = getArdor3DY(mouseEvent);
-
-        final MouseState newState = new MouseState(mouseEvent.getX(), fixedY, getDX(mouseEvent), getDY(mouseEvent),
-                (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent).getWheelRotation() : 0),
-                enumMap, clicks);
+        final MouseState newState = new MouseState(mouseEvent.getX(), getArdor3DY(mouseEvent), getDX(mouseEvent),
+                getDY(mouseEvent), (mouseEvent instanceof MouseWheelEvent ? ((MouseWheelEvent) mouseEvent)
+                        .getWheelRotation() : 0), enumMap, clicks);
 
         _upcomingEvents.add(newState);
         _lastState = newState;
