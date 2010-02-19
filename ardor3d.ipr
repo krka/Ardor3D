@@ -390,28 +390,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: aopalliance:aopalliance:1.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: com.google.code.guice:guice:1.0">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/guice/guice/1.0/guice-1.0.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/guice/guice/1.0/guice-1.0-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/code/guice/guice/1.0/guice-1.0-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.eclipse.swt.carbon:macosx:ardor3d-3448">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/swt/carbon/macosx/ardor3d-3448/macosx-ardor3d-3448.jar!/" />
@@ -445,28 +423,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/net/java/dev/jogl/jogl/ardor3d-1.1.2-pre-20080523/jogl-ardor3d-1.1.2-pre-20080523-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: org.jibx:jibx-extras:1.1.6a">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-extras/1.1.6a/jibx-extras-1.1.6a.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-extras/1.1.6a/jibx-extras-1.1.6a-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-extras/1.1.6a/jibx-extras-1.1.6a-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="Maven: org.jibx:jibx-run:1.1.6a">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-run/1.1.6a/jibx-run-1.1.6a.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-run/1.1.6a/jibx-run-1.1.6a-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/org/jibx/jibx-run/1.1.6a/jibx-run-1.1.6a-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: org.codehaus.woodstox:wstx-asl:3.2.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/woodstox/wstx-asl/3.2.1/wstx-asl-3.2.1.jar!/" />
@@ -489,15 +445,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/stax/stax-api/1.0.1/stax-api-1.0.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.google.collections:google-collections:1.0-rc1">
+    <library name="Maven: com.google.collections:google-collections:1.0">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0-rc1/google-collections-1.0-rc1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0-/google-collections-1.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0-rc1/google-collections-1.0-rc1-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0/google-collections-1.0-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0-rc1/google-collections-1.0-rc1-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/collections/google-collections/1.0/google-collections-1.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.lwjgl:lwjgl:ardor3d-2.1.0">

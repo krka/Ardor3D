@@ -8,6 +8,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/unittests/easymock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/unittests/easymockclassextension.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/unittests/junit-4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-1.0-rc1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/google/google-collect-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
