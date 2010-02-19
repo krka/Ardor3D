@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright  2008-2010 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -11,520 +11,751 @@
 package com.ardor3d.input;
 
 /**
- * All the keys that the keyboard input system can handle. Currently, the 'code' field refers to LWJGL codes only.
- * Adding support for JOGL may mean that some changes are going to be required.
+ * Keys supported by Ardor3D platforms. Note that all keys are not likely supported by any one platform.
  */
 public enum Key {
     /**
-     * LWJGL special key 'none', which is returned when an unrecognized key is pressed.
+     * Returned when a key character is not supported.
      */
-    NONE(0x00),
+    UNKNOWN,
+
     /**
      * escape key.
      */
-    ESCAPE(0x01),
+    ESCAPE,
+
     /**
      * 1 key.
      */
-    ONE(0x02),
+    ONE,
+
     /**
      * 2 key.
      */
-    TWO(0x03),
+    TWO,
+
     /**
      * 3 key.
      */
-    THREE(0x04),
+    THREE,
+
     /**
      * 4 key.
      */
-    FOUR(0x05),
+    FOUR,
+
     /**
      * 5 key.
      */
-    FIVE(0x06),
+    FIVE,
+
     /**
      * 6 key.
      */
-    SIX(0x07),
+    SIX,
+
     /**
      * 7 key.
      */
-    SEVEN(0x08),
+    SEVEN,
+
     /**
      * 8 key.
      */
-    EIGHT(0x09),
+    EIGHT,
+
     /**
      * 9 key.
      */
-    NINE(0x0A),
+    NINE,
+
     /**
      * 0 key.
      */
-    ZERO(0x0B),
+    ZERO,
+
     /**
      * - key.
      */
-    MINUS(0x0C),
+    MINUS,
+
     /**
      * = key.
      */
-    EQUALS(0x0D),
+    EQUALS,
+
     /**
      * back key.
      */
-    BACK(0x0E),
+    BACK,
+
     /**
      * tab key.
      */
-    TAB(0x0F),
+    TAB,
+
     /**
      * q key.
      */
-    Q(0x10),
+    Q,
+
     /**
      * w key.
      */
-    W(0x11),
+    W,
+
     /**
      * e key.
      */
-    E(0x12),
+    E,
+
     /**
      * r key.
      */
-    R(0x13),
+    R,
+
     /**
      * t key.
      */
-    T(0x14),
+    T,
+
     /**
      * y key.
      */
-    Y(0x15),
+    Y,
+
     /**
      * u key.
      */
-    U(0x16),
+    U,
+
     /**
      * i key.
      */
-    I(0x17),
+    I,
+
     /**
      * o key.
      */
-    O(0x18),
+    O,
+
     /**
      * p key.
      */
-    P(0x19),
+    P,
+
     /**
      * [ key.
      */
-    LBRACKET(0x1A),
+    LBRACKET,
+
     /**
      * ] key.
      */
-    RBRACKET(0x1B),
+    RBRACKET,
+
     /**
-     * enter (main keyboard) key.
+     * enter key.
      */
-    RETURN(0x1C),
+    RETURN,
+
     /**
      * left control key.
      */
-    LCONTROL(0x1D),
+    LCONTROL,
+
     /**
      * a key.
      */
-    A(0x1E),
+    A,
+
     /**
      * s key.
      */
-    S(0x1F),
+    S,
+
     /**
      * d key.
      */
-    D(0x20),
+    D,
+
     /**
      * f key.
      */
-    F(0x21),
+    F,
+
     /**
      * g key.
      */
-    G(0x22),
+    G,
+
     /**
      * h key.
      */
-    H(0x23),
+    H,
+
     /**
      * j key.
      */
-    J(0x24),
+    J,
+
     /**
      * k key.
      */
-    K(0x25),
+    K,
+
     /**
      * l key.
      */
-    L(0x26),
+    L,
+
     /**
      * ; key.
      */
-    SEMICOLON(0x27),
+    SEMICOLON,
+
     /**
      * ' key.
      */
-    APOSTROPHE(0x28),
+    APOSTROPHE,
+
+    /**
+     * Applications key.
+     */
+    APPS,
+
     /**
      * ` key.
      */
-    GRAVE(0x29),
+    GRAVE,
+
     /**
      * left shift key.
      */
-    LSHIFT(0x2A),
+    LSHIFT,
+
     /**
      * \ key.
      */
-    BACKSLASH(0x2B),
+    BACKSLASH,
+
     /**
      * z key.
      */
-    Z(0x2C),
+    Z,
+
     /**
      * x key.
      */
-    X(0x2D),
+    X,
+
     /**
      * c key.
      */
-    C(0x2E),
+    C,
+
     /**
      * v key.
      */
-    V(0x2F),
+    V,
+
     /**
      * b key.
      */
-    B(0x30),
+    B,
+
     /**
      * n key.
      */
-    N(0x31),
+    N,
+
     /**
      * m key.
      */
-    M(0x32),
+    M,
+
     /**
      * , key.
      */
-    COMMA(0x33),
+    COMMA,
+
     /**
-     * . key (main keyboard).
+     * . key .
      */
-    PERIOD(0x34),
+    PERIOD,
+
     /**
-     * / key (main keyboard).
+     * / key .
      */
-    SLASH(0x35),
+    SLASH,
+
     /**
      * right shift key.
      */
-    RSHIFT(0x36),
+    RSHIFT,
+
     /**
-     * * key (on keypad).
+     * * key .
      */
-    MULTIPLY(0x37),
+    MULTIPLY,
+
     /**
      * left alt key.
      */
-    LMENU(0x38),
+    LMENU,
+
     /**
      * space key.
      */
-    SPACE(0x39),
+    SPACE,
+
     /**
      * caps lock key.
      */
-    CAPITAL(0x3A),
+    CAPITAL,
+
     /**
      * F1 key.
      */
-    F1(0x3B),
+    F1,
+
     /**
      * F2 key.
      */
-    F2(0x3C),
+    F2,
+
     /**
      * F3 key.
      */
-    F3(0x3D),
+    F3,
+
     /**
      * F4 key.
      */
-    F4(0x3E),
+    F4,
+
     /**
      * F5 key.
      */
-    F5(0x3F),
+    F5,
+
     /**
      * F6 key.
      */
-    F6(0x40),
+    F6,
+
     /**
      * F7 key.
      */
-    F7(0x41),
+    F7,
+
     /**
      * F8 key.
      */
-    F8(0x42),
+    F8,
+
     /**
      * F9 key.
      */
-    F9(0x43),
+    F9,
+
     /**
      * F10 key.
      */
-    F10(0x44),
+    F10,
+
     /**
      * NumLK key.
      */
-    NUMLOCK(0x45),
+    NUMLOCK,
+
     /**
      * Scroll lock key.
      */
-    SCROLL(0x46),
+    SCROLL,
+
     /**
-     * 7 key (num pad).
+     * 7 key .
      */
-    NUMPAD7(0x47),
+    NUMPAD7,
+
     /**
-     * 8 key (num pad).
+     * 8 key .
      */
-    NUMPAD8(0x48),
+    NUMPAD8,
+
     /**
-     * 9 key (num pad).
+     * 9 key .
      */
-    NUMPAD9(0x49),
+    NUMPAD9,
+
     /**
-     * - key (num pad).
+     * - key .
      */
-    NUMPADSUBTRACT(0x4A),
+    NUMPADSUBTRACT,
+
     /**
-     * 4 key (num pad).
+     * 4 key .
      */
-    NUMPAD4(0x4B),
+    NUMPAD4,
+
     /**
-     * 5 key (num pad).
+     * 5 key .
      */
-    NUMPAD5(0x4C),
+    NUMPAD5,
+
     /**
-     * 6 key (num pad).
+     * 6 key .
      */
-    NUMPAD6(0x4D),
+    NUMPAD6,
+
     /**
-     * + key (num pad).
+     * + key .
      */
-    NUMPADADD(0x4E),
+    NUMPADADD,
+
     /**
-     * 1 key (num pad).
+     * 1 key .
      */
-    NUMPAD1(0x4F),
+    NUMPAD1,
+
     /**
-     * 2 key (num pad).
+     * 2 key .
      */
-    NUMPAD2(0x50),
+    NUMPAD2,
+
     /**
-     * 3 key (num pad).
+     * 3 key .
      */
-    NUMPAD3(0x51),
+    NUMPAD3,
+
     /**
-     * 0 key (num pad).
+     * 0 key .
      */
-    NUMPAD0(0x52),
+    NUMPAD0,
+
     /**
-     * . key (num pad).
+     * . key .
      */
-    DECIMAL(0x53),
+    DECIMAL,
+
     /**
      * F11 key.
      */
-    F11(0x57),
+    F11,
+
     /**
      * F12 key.
      */
-    F12(0x58),
+    F12,
+
     /**
      * F13 key.
      */
-    F13(0x64),
+    F13,
+
     /**
      * F14 key.
      */
-    F14(0x65),
+    F14,
+
     /**
      * F15 key.
      */
-    F15(0x66),
+    F15,
+
     /**
-     * kana key (Japanese).
+     * kana key .
      */
-    KANA(0x70),
+    KANA,
+
     /**
-     * convert key (Japanese).
+     * convert key .
      */
-    CONVERT(0x79),
+    CONVERT,
+
     /**
-     * noconvert key (Japanese).
+     * noconvert key .
      */
-    NOCONVERT(0x7B),
+    NOCONVERT,
+
     /**
-     * yen key (Japanese).
+     * yen key .
      */
-    YEN(0x7D),
+    YEN,
+
     /**
-     * = on num pad (NEC PC98).
+     * = on num pad .
      */
-    NUMPADEQUALS(0x8D),
+    NUMPADEQUALS,
+
     /**
-     * circum flex key (Japanese).
+     * circum flex key .
      */
-    CIRCUMFLEX(0x90),
+    CIRCUMFLEX,
+
     /**
-     * &#064; key (NEC PC98).
+     * &#064; key .
      */
-    AT(0x91),
+    AT,
+
     /**
-     * : key (NEC PC98)
+     * : key
      */
-    COLON(0x92),
+    COLON,
+
     /**
-     * _ key (NEC PC98).
+     * _ key .
      */
-    UNDERLINE(0x93),
+    UNDERLINE,
+
     /**
-     * kanji key (Japanese).
+     * kanji key .
      */
-    KANJI(0x94),
+    KANJI,
+
     /**
-     * stop key (NEC PC98).
+     * stop key .
      */
-    STOP(0x95),
+    STOP,
+
     /**
-     * ax key (Japanese).
+     * ax key .
      */
-    AX(0x96),
+    AX,
+
     /**
-     * (J3100).
+     * .
      */
-    UNLABELED(0x97),
+    UNLABELED,
+
     /**
-     * Enter key (num pad).
+     * Enter key .
      */
-    NUMPADENTER(0x9C),
+    NUMPADENTER,
+
     /**
      * right control key.
      */
-    RCONTROL(0x9D),
+    RCONTROL,
+
     /**
-     * , key on num pad (NEC PC98).
+     * , key on num pad .
      */
-    NUMPADCOMMA(0xB3),
+    NUMPADCOMMA,
+
     /**
-     * / key (num pad).
+     * / key .
      */
-    DIVIDE(0xB5),
+    DIVIDE,
+
     /**
      * SysRq key.
      */
-    SYSRQ(0xB7),
+    SYSRQ,
+
     /**
      * right alt key.
      */
-    RMENU(0xB8),
+    RMENU,
+
     /**
      * pause key.
      */
-    PAUSE(0xC5),
+    PAUSE,
+
     /**
      * home key.
      */
-    HOME(0xC7),
+    HOME,
+
     /**
      * up arrow key.
      */
-    UP(0xC8),
+    UP,
+
     /**
      * PageUp/Prior key.
      */
-    PAGEUP_PRIOR(0xC9),
+    PAGEUP_PRIOR,
+
     /**
      * left arrow key.
      */
-    LEFT(0xCB),
+    LEFT,
+
     /**
      * right arrow key.
      */
-    RIGHT(0xCD),
+    RIGHT,
+
     /**
      * end key.
      */
-    END(0xCF),
+    END,
+
     /**
      * down arrow key.
      */
-    DOWN(0xD0),
+    DOWN,
+
     /**
      * PageDown/Next key.
      */
-    PAGEDOWN_NEXT(0xD1),
+    PAGEDOWN_NEXT,
+
     /**
      * insert key.
      */
-    INSERT(0xD2),
+    INSERT,
+
     /**
      * delete key.
      */
-    DELETE(0xD3),
+    DELETE,
+
     /**
      * Left Windows/Option key
      */
-    LMETA(0xDB),
+    LMETA,
+
     /**
      * Right Windows/Option key
      */
-    RMETA(0xDC), APPS(0xDD),
+    RMETA,
+
     /**
      * power key.
      */
-    POWER(0xDE),
+    POWER,
+
     /**
      * sleep key.
      */
-    SLEEP(0xDF);
+    SLEEP,
 
-    private final int code;
+    /**
+     * mobile call button
+     */
+    CALL,
 
-    private Key(final int code) {
-        this.code = code;
-    }
+    /**
+     * mobile camera button
+     */
+    CAMERA,
 
-    public static Key findByCode(final int keyCode) {
-        for (final Key k : values()) {
-            if (k.code == keyCode) {
-                return k;
-            }
-        }
+    /**
+     * mobile clear button
+     */
+    CLEAR,
 
-        throw new KeyNotFoundException(keyCode);
-    }
+    /**
+     * dpad center button
+     */
+    CENTER,
 
-    public int getCode() {
-        return code;
-    }
+    /**
+     * mobile end call button
+     */
+    ENDCALL,
+
+    /**
+     * mobile envelope button
+     */
+    ENVELOPE,
+
+    /**
+     * mobile explorer button
+     */
+    EXPLORER,
+
+    /**
+     * mobile focus button
+     */
+    FOCUS,
+
+    /**
+     * mobile headsethook button
+     */
+    HEADSETHOOK,
+
+    /**
+     * mobile fast fwd button
+     */
+    MEDIA_FAST_FORWARD,
+
+    /**
+     * mobile next button
+     */
+    MEDIA_NEXT,
+
+    /**
+     * mobile play/pause button
+     */
+    PLAY_PAUSE,
+
+    /**
+     * mobile previous button
+     */
+    MEDIA_PREVIOUS,
+
+    /**
+     * mobile rewind button
+     */
+    MEDIA_REWIND,
+
+    /**
+     * mobile stop button
+     */
+    MEDIA_STOP,
+
+    /**
+     * mobile menu button
+     */
+    MENU,
+
+    /**
+     * mobile mute button
+     */
+    MUTE,
+
+    /**
+     * mobile notification button
+     */
+    NOTIFICATION,
+
+    /**
+     * plus key
+     */
+    PLUS,
+
+    /**
+     * pound key
+     */
+    POUND,
+
+    /**
+     * mobile call button
+     */
+    SEARCH,
+
+    /**
+     * mobile star button
+     */
+    STAR,
+
+    /**
+     * mobile # button
+     */
+    SYM,
+
+    /**
+     * volume down button
+     */
+    VOLUME_DOWN,
+
+    /**
+     * volume up button
+     */
+    VOLUME_UP;
 }

@@ -41,7 +41,7 @@ public class TestAwtKeyboardWrapper {
     @Test
     public void testKeys1() throws Exception {
 
-        e1 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.AWT_KEY_A.getAwtCode(), 'a');
+        e1 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.A.getAwtCode(), 'a');
 
         kw.keyPressed(e1);
         kw.keyReleased(e1);
@@ -63,8 +63,8 @@ public class TestAwtKeyboardWrapper {
 
     @Test
     public void testKeys2() throws Exception {
-        e1 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.AWT_KEY_A.getAwtCode(), 'a');
-        e2 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.AWT_KEY_B.getAwtCode(), 'b');
+        e1 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.A.getAwtCode(), 'a');
+        e2 = new java.awt.event.KeyEvent(control, 0, 0, 0, AwtKey.B.getAwtCode(), 'b');
 
         kw.keyPressed(e1);
         kw.keyPressed(e2);
