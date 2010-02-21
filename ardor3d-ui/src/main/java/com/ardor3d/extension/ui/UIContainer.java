@@ -83,12 +83,12 @@ public abstract class UIContainer extends UIComponent {
     /**
      * Checks to see if a given UIComponent is in this container.
      * 
-     * @param comp
+     * @param component
      *            the component to look for
      * @return true if the given component is in this container.
      */
-    public boolean contains(final UIComponent comp) {
-        return contains(comp, false);
+    public boolean contains(final UIComponent component) {
+        return contains(component, false);
     }
 
     /**
@@ -122,16 +122,23 @@ public abstract class UIContainer extends UIComponent {
      */
     public void add(final UIComponent component) {
         attachChild(component);
+        // send relation event if we already have a hud
+        if (getHud() != null) {
+            component.attachedToHud();
+        }
     }
 
     /**
      * Remove a component from this container.
      * 
-     * @param comp
+     * @param component
      *            the component to remove
      */
-    public void remove(final UIComponent comp) {
-        detachChild(comp);
+    public void remove(final UIComponent component) {
+        detachChild(component);
+        if (getHud() != null) {
+            component.detachedFromHud();
+        }
     }
 
     /**
