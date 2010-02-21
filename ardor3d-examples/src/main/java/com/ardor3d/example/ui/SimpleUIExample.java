@@ -22,6 +22,7 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIScrollPanel;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
@@ -54,7 +55,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * Illustrates how to display GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
+ * Illustrates how to display GUI primitives (e.g. RadioButton, Label, TabbedPane) on a canvas.
  */
 @Purpose(htmlDescription = "Illustrates how to display GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_SimpleUIExample.jpg", //
@@ -105,10 +106,13 @@ public class SimpleUIExample extends ExampleBase {
 
         final UIPanel panel3 = makeClockPanel();
 
+        final UIPanel panel4 = makeScrollPanel();
+
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
         pane.add(panel, "widgets");
         pane.add(panel2, "grid");
         pane.add(panel3, "clock");
+        pane.add(panel4, "picture");
 
         final UIFrame frame = new UIFrame("Sample");
         frame.setContentPanel(pane);
@@ -262,6 +266,16 @@ public class SimpleUIExample extends ExampleBase {
         });
 
         return clockPanel;
+    }
+
+    private UIPanel makeScrollPanel() {
+        final Texture tex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear,
+                Format.GuessNoCompression, false);
+        final UILabel comp = new UILabel("");
+        comp.setIcon(new SubTex(tex));
+        comp.updateIconDimensionsFromIcon();
+        final UIScrollPanel panel = new UIScrollPanel(comp);
+        return panel;
     }
 
     @Override
