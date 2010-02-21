@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.ui;
 
-import com.ardor3d.extension.ui.UIScrollBar.Orientation;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;

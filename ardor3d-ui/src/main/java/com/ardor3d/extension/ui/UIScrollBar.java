@@ -25,10 +25,6 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
  */
 public class UIScrollBar extends UIPanel {
 
-    public static enum Orientation {
-        Horizontal, Vertical
-    };
-
     private final Orientation orientation;
     private final UIPanel barBackground;
     private final UIPanel barForeground;

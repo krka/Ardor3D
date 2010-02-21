@@ -13,6 +13,7 @@ package com.ardor3d.example.ui;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
@@ -23,6 +24,7 @@ import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UIScrollPanel;
+import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UITabbedPane;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
@@ -150,7 +152,7 @@ public class SimpleUIExample extends ExampleBase {
 
     private UIPanel makeLoginPanel() {
         final UIPanel pLogin = new UIPanel(new GridLayout());
-        final UILabel lHeader = new UILabel("Log in to server xyz");
+        final UILabel lHeader = new UILabel("Welcome! Log in to server xyz");
         lHeader.setLayoutData(new GridLayoutData(2, true, true));
         final UILabel lName = new UILabel("Name");
         // will be replaced by a text field
@@ -160,10 +162,19 @@ public class SimpleUIExample extends ExampleBase {
         // will be replaced by a password field
         final UILabel tfPassword = new UILabel("*********");
         tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
+        final UISlider slider = new UISlider(Orientation.Horizontal, 12);
+        slider.setLayoutData(new GridLayoutData(2, true, true));
+        final UILabel lSliderValue = new UILabel("0");
+        lSliderValue.setLayoutData(GridLayoutData.SpanAndWrap(2));
         final UIButton btLogin = new UIButton("login");
         btLogin.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 System.out.println("login pressed!");
+            }
+        });
+        slider.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                lSliderValue.setText(String.valueOf(slider.getOffset()));
             }
         });
         pLogin.add(lHeader);
@@ -171,6 +182,8 @@ public class SimpleUIExample extends ExampleBase {
         pLogin.add(tfName);
         pLogin.add(lPassword);
         pLogin.add(tfPassword);
+        pLogin.add(slider);
+        pLogin.add(lSliderValue);
         pLogin.add(btLogin);
         return pLogin;
     }
@@ -301,7 +314,6 @@ public class SimpleUIExample extends ExampleBase {
             final double fps = (frames / counter);
             counter = 0;
             frames = 0;
-            System.out.printf("%7.1f FPS\n", fps);
             fpslabel.setText(fps + " FPS");
             bar.setPercentFilled(timer.getTimeInSeconds() / 15);
             bar.updateMinimumSizeFromContents();
