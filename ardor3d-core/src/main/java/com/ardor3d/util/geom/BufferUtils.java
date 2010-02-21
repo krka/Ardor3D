@@ -846,6 +846,19 @@ public final class BufferUtils {
      *            required number of double to store.
      * @return the new DoubleBuffer
      */
+    public static DoubleBuffer createDoubleBufferOnHeap(final int size) {
+        final DoubleBuffer buf = ByteBuffer.allocate(8 * size).order(ByteOrder.nativeOrder()).asDoubleBuffer();
+        buf.clear();
+        return buf;
+    }
+
+    /**
+     * Create a new DoubleBuffer of the specified size.
+     * 
+     * @param size
+     *            required number of double to store.
+     * @return the new DoubleBuffer
+     */
     public static DoubleBuffer createDoubleBuffer(final int size) {
         final DoubleBuffer buf = ByteBuffer.allocateDirect(8 * size).order(ByteOrder.nativeOrder()).asDoubleBuffer();
         buf.clear();
@@ -890,7 +903,12 @@ public final class BufferUtils {
         }
         buf.rewind();
 
-        final DoubleBuffer copy = createDoubleBuffer(buf.limit());
+        final DoubleBuffer copy;
+        if (buf.isDirect()) {
+            copy = createDoubleBuffer(buf.limit());
+        } else {
+            copy = createDoubleBufferOnHeap(buf.limit());
+        }
         copy.put(buf);
 
         return copy;
@@ -924,9 +942,6 @@ public final class BufferUtils {
     public static FloatBuffer createFloatBufferOnHeap(final int size) {
         final FloatBuffer buf = ByteBuffer.allocate(4 * size).order(ByteOrder.nativeOrder()).asFloatBuffer();
         buf.clear();
-        if (Constants.trackDirectMemory) {
-            trackingHash.put(buf, ref);
-        }
         return buf;
     }
 
@@ -982,13 +997,31 @@ public final class BufferUtils {
         }
         buf.rewind();
 
-        final FloatBuffer copy = createFloatBuffer(buf.limit());
+        final FloatBuffer copy;
+        if (buf.isDirect()) {
+            copy = createFloatBuffer(buf.limit());
+        } else {
+            copy = createFloatBufferOnHeap(buf.limit());
+        }
         copy.put(buf);
 
         return copy;
     }
 
     // // -- GENERAL INT ROUTINES -- ////
+
+    /**
+     * Create a new IntBuffer of the specified size.
+     * 
+     * @param size
+     *            required number of ints to store.
+     * @return the new IntBuffer
+     */
+    public static IntBuffer createIntBufferOnHeap(final int size) {
+        final IntBuffer buf = ByteBuffer.allocate(4 * size).order(ByteOrder.nativeOrder()).asIntBuffer();
+        buf.clear();
+        return buf;
+    }
 
     /**
      * Create a new IntBuffer of the specified size.
@@ -1040,7 +1073,12 @@ public final class BufferUtils {
         }
         buf.rewind();
 
-        final IntBuffer copy = createIntBuffer(buf.limit());
+        final IntBuffer copy;
+        if (buf.isDirect()) {
+            copy = createIntBuffer(buf.limit());
+        } else {
+            copy = createIntBufferOnHeap(buf.limit());
+        }
         copy.put(buf);
 
         return copy;
@@ -1098,13 +1136,31 @@ public final class BufferUtils {
         }
         buf.rewind();
 
-        final ByteBuffer copy = createByteBuffer(buf.limit());
+        final ByteBuffer copy;
+        if (buf.isDirect()) {
+            copy = createByteBuffer(buf.limit());
+        } else {
+            copy = createByteBufferOnHeap(buf.limit());
+        }
         copy.put(buf);
 
         return copy;
     }
 
     // // -- GENERAL SHORT ROUTINES -- ////
+
+    /**
+     * Create a new ShortBuffer of the specified size.
+     * 
+     * @param size
+     *            required number of shorts to store.
+     * @return the new ShortBuffer
+     */
+    public static ShortBuffer createShortBufferOnHeap(final int size) {
+        final ShortBuffer buf = ByteBuffer.allocate(2 * size).order(ByteOrder.nativeOrder()).asShortBuffer();
+        buf.clear();
+        return buf;
+    }
 
     /**
      * Create a new ShortBuffer of the specified size.
@@ -1174,7 +1230,12 @@ public final class BufferUtils {
         }
         buf.rewind();
 
-        final ShortBuffer copy = createShortBuffer(buf.limit());
+        final ShortBuffer copy;
+        if (buf.isDirect()) {
+            copy = createShortBuffer(buf.limit());
+        } else {
+            copy = createShortBufferOnHeap(buf.limit());
+        }
         copy.put(buf);
 
         return copy;

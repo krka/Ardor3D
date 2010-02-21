@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -27,6 +27,8 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.Savable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Exports to the ardor3d Binary Format. Format descriptor: (each numbered item denotes a series of bytes that follows
@@ -111,145 +113,175 @@ import com.ardor3d.util.export.Savable;
 public class BinaryExporter implements Ardor3DExporter {
     private static final Logger logger = Logger.getLogger(BinaryExporter.class.getName());
 
-    // TODO: Provide better cleanup and reuse of this class.
+    /**
+     * The default compression level to use during output. Defaults to Deflater.BEST_COMPRESSION.
+     */
+    public static int DEFAULT_COMPRESSION = Deflater.BEST_COMPRESSION;
 
-    public static int COMPRESSION = Deflater.BEST_COMPRESSION;
+    protected final int _compression;
 
     protected int _aliasCount = 1;
     protected int _idCount = 1;
 
-    protected IdentityHashMap<Savable, BinaryIdContentPair> _contentTable;
+    protected final Map<Savable, BinaryIdContentPair> _contentTable = Maps.newIdentityHashMap();
 
-    protected HashMap<Integer, Integer> _locationTable;
+    protected final Map<Integer, Integer> _locationTable = Maps.newHashMap();
 
     // key - class name, value = bco
-    private HashMap<String, BinaryClassObject> _classes;
+    protected final Map<String, BinaryClassObject> _classes = Maps.newHashMap();
 
-    private final List<Savable> _contentKeys = new ArrayList<Savable>();
+    protected final List<Savable> _contentKeys = Lists.newArrayList();
 
-    public static boolean _debug = false;
+    protected final boolean _debug;
 
-    public BinaryExporter() {}
+    public BinaryExporter() {
+        this(false, DEFAULT_COMPRESSION);
+    }
+
+    /**
+     * Construct a new exporter, specifying some options.
+     * 
+     * @param debug
+     *            if true, information about the out will be logged.
+     * @param compression
+     *            the compression type to use. One of the constants from {@link java.util.zip.Deflater}
+     */
+    public BinaryExporter(final boolean debug, final int compression) {
+        _debug = debug;
+        _compression = compression;
+    }
 
     public static BinaryExporter getInstance() {
         return new BinaryExporter();
     }
 
+    public static BinaryExporter getInstance(final boolean debug, final int compression) {
+        return new BinaryExporter(debug, compression);
+    }
+
     public boolean save(final Savable object, final OutputStream os) throws IOException {
-        _classes = new HashMap<String, BinaryClassObject>();
-        _contentTable = new IdentityHashMap<Savable, BinaryIdContentPair>();
-        _locationTable = new HashMap<Integer, Integer>();
-        GZIPOutputStream zos = new GZIPOutputStream(os) {
-            {
-                def.setLevel(COMPRESSION);
-            }
-        };
-        final int id = processBinarySavable(object);
+        try {
+            GZIPOutputStream zos = new GZIPOutputStream(os) {
+                {
+                    def.setLevel(_compression);
+                }
+            };
+            final int id = processBinarySavable(object);
 
-        // write out tag table
-        int ttbytes = 0;
-        final int classNum = _classes.keySet().size();
-        final int aliasWidth = ((int) MathUtils.log(classNum, 256) + 1); // make all
-        // aliases a
-        // fixed width
-        zos.write(ByteUtils.convertToBytes(classNum));
-        for (final String key : _classes.keySet()) {
-            final BinaryClassObject bco = _classes.get(key);
+            // write out tag table
+            int ttbytes = 0;
+            final int classNum = _classes.keySet().size();
+            final int aliasWidth = ((int) MathUtils.log(classNum, 256) + 1); // make all
+            // aliases a
+            // fixed width
+            zos.write(ByteUtils.convertToBytes(classNum));
+            for (final String key : _classes.keySet()) {
+                final BinaryClassObject bco = _classes.get(key);
 
-            // write alias
-            final byte[] aliasBytes = fixClassAlias(bco._alias, aliasWidth);
-            zos.write(aliasBytes);
-            ttbytes += aliasWidth;
-
-            // write classname size & classname
-            final byte[] classBytes = key.getBytes();
-            zos.write(ByteUtils.convertToBytes(classBytes.length));
-            zos.write(classBytes);
-            ttbytes += 4 + classBytes.length;
-
-            zos.write(ByteUtils.convertToBytes(bco._nameFields.size()));
-
-            for (final String fieldName : bco._nameFields.keySet()) {
-                final BinaryClassField bcf = bco._nameFields.get(fieldName);
-                zos.write(bcf._alias);
-                zos.write(bcf._type);
+                // write alias
+                final byte[] aliasBytes = fixClassAlias(bco._alias, aliasWidth);
+                zos.write(aliasBytes);
+                ttbytes += aliasWidth;
 
                 // write classname size & classname
-                final byte[] fNameBytes = fieldName.getBytes();
-                zos.write(ByteUtils.convertToBytes(fNameBytes.length));
-                zos.write(fNameBytes);
-                ttbytes += 2 + 4 + fNameBytes.length;
-            }
-        }
+                final byte[] classBytes = key.getBytes();
+                zos.write(ByteUtils.convertToBytes(classBytes.length));
+                zos.write(classBytes);
+                ttbytes += 4 + classBytes.length;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        // write out data to a seperate stream
-        int location = 0;
-        // keep track of location for each piece
-        final HashMap<String, List<BinaryIdContentPair>> alreadySaved = new HashMap<String, List<BinaryIdContentPair>>(
-                _contentTable.size());
-        for (final Savable savable : _contentKeys) {
-            // look back at previous written data for matches
-            final String savableName = savable.getClassTag().getName();
-            final BinaryIdContentPair pair = _contentTable.get(savable);
-            List<BinaryIdContentPair> bucket = alreadySaved.get(savableName + getChunk(pair));
-            final int prevLoc = findPrevMatch(pair, bucket);
-            if (prevLoc != -1) {
-                _locationTable.put(pair.getId(), prevLoc);
-                continue;
+                zos.write(ByteUtils.convertToBytes(bco._nameFields.size()));
+
+                for (final String fieldName : bco._nameFields.keySet()) {
+                    final BinaryClassField bcf = bco._nameFields.get(fieldName);
+                    zos.write(bcf._alias);
+                    zos.write(bcf._type);
+
+                    // write classname size & classname
+                    final byte[] fNameBytes = fieldName.getBytes();
+                    zos.write(ByteUtils.convertToBytes(fNameBytes.length));
+                    zos.write(fNameBytes);
+                    ttbytes += 2 + 4 + fNameBytes.length;
+                }
             }
 
-            _locationTable.put(pair.getId(), location);
-            if (bucket == null) {
-                bucket = new ArrayList<BinaryIdContentPair>();
-                alreadySaved.put(savableName + getChunk(pair), bucket);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            // write out data to a seperate stream
+            int location = 0;
+            // keep track of location for each piece
+            final HashMap<String, List<BinaryIdContentPair>> alreadySaved = new HashMap<String, List<BinaryIdContentPair>>(
+                    _contentTable.size());
+            for (final Savable savable : _contentKeys) {
+                // look back at previous written data for matches
+                final String savableName = savable.getClassTag().getName();
+                final BinaryIdContentPair pair = _contentTable.get(savable);
+                List<BinaryIdContentPair> bucket = alreadySaved.get(savableName + getChunk(pair));
+                final int prevLoc = findPrevMatch(pair, bucket);
+                if (prevLoc != -1) {
+                    _locationTable.put(pair.getId(), prevLoc);
+                    continue;
+                }
+
+                _locationTable.put(pair.getId(), location);
+                if (bucket == null) {
+                    bucket = new ArrayList<BinaryIdContentPair>();
+                    alreadySaved.put(savableName + getChunk(pair), bucket);
+                }
+                bucket.add(pair);
+                final byte[] aliasBytes = fixClassAlias(_classes.get(savableName)._alias, aliasWidth);
+                out.write(aliasBytes);
+                location += aliasWidth;
+                final BinaryOutputCapsule cap = _contentTable.get(savable).getContent();
+                out.write(ByteUtils.convertToBytes(cap._bytes.length));
+                location += 4; // length of bytes
+                out.write(cap._bytes);
+                location += cap._bytes.length;
             }
-            bucket.add(pair);
-            final byte[] aliasBytes = fixClassAlias(_classes.get(savableName)._alias, aliasWidth);
-            out.write(aliasBytes);
-            location += aliasWidth;
-            final BinaryOutputCapsule cap = _contentTable.get(savable).getContent();
-            out.write(ByteUtils.convertToBytes(cap._bytes.length));
-            location += 4; // length of bytes
-            out.write(cap._bytes);
-            location += cap._bytes.length;
+
+            // write out location table
+            // tag/location
+            final int locNum = _locationTable.keySet().size();
+            zos.write(ByteUtils.convertToBytes(locNum));
+            int locbytes = 0;
+            for (final Integer key : _locationTable.keySet()) {
+                zos.write(ByteUtils.convertToBytes(key));
+                zos.write(ByteUtils.convertToBytes(_locationTable.get(key)));
+                locbytes += 8;
+            }
+
+            // write out number of root ids - hardcoded 1 for now
+            zos.write(ByteUtils.convertToBytes(1));
+
+            // write out root id
+            zos.write(ByteUtils.convertToBytes(id));
+
+            // append stream to the output stream
+            out.writeTo(zos);
+
+            zos.finish();
+
+            out = null;
+            zos = null;
+
+            if (_debug) {
+                logger.info("Stats:");
+                logger.info("classes: " + classNum);
+                logger.info("class table: " + ttbytes + " bytes");
+                logger.info("objects: " + locNum);
+                logger.info("location table: " + locbytes + " bytes");
+                logger.info("data: " + location + " bytes");
+            }
+
+            return true;
+
+        } finally {
+            _aliasCount = 1;
+            _idCount = 1;
+
+            _contentTable.clear();
+            _locationTable.clear();
+            _classes.clear();
+            _contentKeys.clear();
         }
-
-        // write out location table
-        // tag/location
-        final int locNum = _locationTable.keySet().size();
-        zos.write(ByteUtils.convertToBytes(locNum));
-        int locbytes = 0;
-        for (final Integer key : _locationTable.keySet()) {
-            zos.write(ByteUtils.convertToBytes(key));
-            zos.write(ByteUtils.convertToBytes(_locationTable.get(key)));
-            locbytes += 8;
-        }
-
-        // write out number of root ids - hardcoded 1 for now
-        zos.write(ByteUtils.convertToBytes(1));
-
-        // write out root id
-        zos.write(ByteUtils.convertToBytes(id));
-
-        // append stream to the output stream
-        out.writeTo(zos);
-
-        zos.finish();
-
-        out = null;
-        zos = null;
-
-        if (_debug) {
-            logger.info("Stats:");
-            logger.info("classes: " + classNum);
-            logger.info("class table: " + ttbytes + " bytes");
-            logger.info("objects: " + locNum);
-            logger.info("location table: " + locbytes + " bytes");
-            logger.info("data: " + location + " bytes");
-        }
-
-        return true;
     }
 
     protected String getChunk(final BinaryIdContentPair pair) {

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -29,30 +29,39 @@ import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.ReadListener;
 import com.ardor3d.util.export.Savable;
+import com.google.common.collect.Maps;
 
 public class BinaryImporter implements Ardor3DImporter {
     private static final Logger logger = Logger.getLogger(BinaryImporter.class.getName());
 
-    // TODO: Provide better cleanup and reuse of this class -- Good for now.
-
     // Key - alias, object - bco
-    protected HashMap<String, BinaryClassObject> _classes;
+    protected final Map<String, BinaryClassObject> _classes = Maps.newHashMap();
     // Key - id, object - the savable
-    protected HashMap<Integer, Savable> _contentTable;
+    protected final Map<Integer, Savable> _contentTable = Maps.newHashMap();
     // Key - savable, object - capsule
-    protected IdentityHashMap<Savable, BinaryInputCapsule> _capsuleTable;
+    protected final Map<Savable, BinaryInputCapsule> _capsuleTable = Maps.newIdentityHashMap();
     // Key - id, opject - location in the file
-    protected HashMap<Integer, Integer> _locationTable;
+    protected final Map<Integer, Integer> _locationTable = Maps.newHashMap();
 
-    public static boolean _debug = false;
+    protected final boolean _debug;
 
-    protected byte[] _dataArray;
-    protected int _aliasWidth;
+    protected byte[] _dataArray = null;
+    protected int _aliasWidth = 0;
 
-    public BinaryImporter() {}
+    public BinaryImporter() {
+        this(false);
+    }
+
+    public BinaryImporter(final boolean debug) {
+        _debug = debug;
+    }
 
     public static BinaryImporter getInstance() {
         return new BinaryImporter();
+    }
+
+    public static BinaryImporter getInstance(final boolean debug) {
+        return new BinaryImporter(debug);
     }
 
     public Savable load(final InputStream is) throws IOException {
@@ -65,92 +74,98 @@ public class BinaryImporter implements Ardor3DImporter {
 
     public Savable load(final InputStream is, final ReadListener listener, final ByteArrayOutputStream reuseableStream)
             throws IOException {
-        _contentTable = new HashMap<Integer, Savable>();
-        final GZIPInputStream zis = new GZIPInputStream(is);
-        BufferedInputStream bis = new BufferedInputStream(zis);
-        final int numClasses = ByteUtils.readInt(bis);
-        int bytes = 4;
-        _aliasWidth = ((int) MathUtils.log(numClasses, 256) + 1);
-        _classes = new HashMap<String, BinaryClassObject>(numClasses);
-        for (int i = 0; i < numClasses; i++) {
-            final String alias = readString(bis, _aliasWidth);
+        try {
+            final GZIPInputStream zis = new GZIPInputStream(is);
+            BufferedInputStream bis = new BufferedInputStream(zis);
+            final int numClasses = ByteUtils.readInt(bis);
+            int bytes = 4;
+            _aliasWidth = ((int) MathUtils.log(numClasses, 256) + 1);
+            for (int i = 0; i < numClasses; i++) {
+                final String alias = readString(bis, _aliasWidth);
 
-            final int classLength = ByteUtils.readInt(bis);
-            final String className = readString(bis, classLength);
-            final BinaryClassObject bco = new BinaryClassObject();
-            bco._alias = alias.getBytes();
-            bco._className = className;
+                final int classLength = ByteUtils.readInt(bis);
+                final String className = readString(bis, classLength);
+                final BinaryClassObject bco = new BinaryClassObject();
+                bco._alias = alias.getBytes();
+                bco._className = className;
 
-            final int fields = ByteUtils.readInt(bis);
-            bytes += (8 + _aliasWidth + classLength);
+                final int fields = ByteUtils.readInt(bis);
+                bytes += (8 + _aliasWidth + classLength);
 
-            bco._nameFields = new HashMap<String, BinaryClassField>(fields);
-            bco._aliasFields = new HashMap<Byte, BinaryClassField>(fields);
-            for (int x = 0; x < fields; x++) {
-                final byte fieldAlias = (byte) bis.read();
-                final byte fieldType = (byte) bis.read();
+                bco._nameFields = new HashMap<String, BinaryClassField>(fields);
+                bco._aliasFields = new HashMap<Byte, BinaryClassField>(fields);
+                for (int x = 0; x < fields; x++) {
+                    final byte fieldAlias = (byte) bis.read();
+                    final byte fieldType = (byte) bis.read();
 
-                final int fieldNameLength = ByteUtils.readInt(bis);
-                final String fieldName = readString(bis, fieldNameLength);
-                final BinaryClassField bcf = new BinaryClassField(fieldName, fieldAlias, fieldType);
-                bco._nameFields.put(fieldName, bcf);
-                bco._aliasFields.put(fieldAlias, bcf);
-                bytes += (6 + fieldNameLength);
+                    final int fieldNameLength = ByteUtils.readInt(bis);
+                    final String fieldName = readString(bis, fieldNameLength);
+                    final BinaryClassField bcf = new BinaryClassField(fieldName, fieldAlias, fieldType);
+                    bco._nameFields.put(fieldName, bcf);
+                    bco._aliasFields.put(fieldAlias, bcf);
+                    bytes += (6 + fieldNameLength);
+                }
+                _classes.put(alias, bco);
             }
-            _classes.put(alias, bco);
-        }
-        if (listener != null) {
-            listener.readBytes(bytes);
-        }
-
-        final int numLocs = ByteUtils.readInt(bis);
-        bytes = 4;
-
-        _capsuleTable = new IdentityHashMap<Savable, BinaryInputCapsule>(numLocs);
-        _locationTable = new HashMap<Integer, Integer>(numLocs);
-        for (int i = 0; i < numLocs; i++) {
-            final int id = ByteUtils.readInt(bis);
-            final int loc = ByteUtils.readInt(bis);
-            _locationTable.put(id, loc);
-            bytes += 8;
-        }
-
-        @SuppressWarnings("unused")
-        final int numbIDs = ByteUtils.readInt(bis); // XXX: NOT CURRENTLY USED
-        final int id = ByteUtils.readInt(bis);
-        bytes += 8;
-        if (listener != null) {
-            listener.readBytes(bytes);
-        }
-
-        ByteArrayOutputStream baos = reuseableStream;
-        if (baos == null) {
-            baos = new ByteArrayOutputStream(bytes);
-        } else {
-            baos.reset();
-        }
-        int size = -1;
-        final byte[] cache = new byte[4096];
-        while ((size = bis.read(cache)) != -1) {
-            baos.write(cache, 0, size);
             if (listener != null) {
-                listener.readBytes(size);
+                listener.readBytes(bytes);
             }
-        }
-        bis = null;
 
-        _dataArray = baos.toByteArray();
-        baos = null;
+            final int numLocs = ByteUtils.readInt(bis);
+            bytes = 4;
 
-        final Savable rVal = readObject(id);
-        if (_debug) {
-            logger.info("Importer Stats: ");
-            logger.info("Tags: " + numClasses);
-            logger.info("Objects: " + numLocs);
-            logger.info("Data Size: " + _dataArray.length);
+            for (int i = 0; i < numLocs; i++) {
+                final int id = ByteUtils.readInt(bis);
+                final int loc = ByteUtils.readInt(bis);
+                _locationTable.put(id, loc);
+                bytes += 8;
+            }
+
+            @SuppressWarnings("unused")
+            final int numbIDs = ByteUtils.readInt(bis); // XXX: NOT CURRENTLY USED
+            final int id = ByteUtils.readInt(bis);
+            bytes += 8;
+            if (listener != null) {
+                listener.readBytes(bytes);
+            }
+
+            ByteArrayOutputStream baos = reuseableStream;
+            if (baos == null) {
+                baos = new ByteArrayOutputStream(bytes);
+            } else {
+                baos.reset();
+            }
+            int size = -1;
+            final byte[] cache = new byte[4096];
+            while ((size = bis.read(cache)) != -1) {
+                baos.write(cache, 0, size);
+                if (listener != null) {
+                    listener.readBytes(size);
+                }
+            }
+            bis = null;
+
+            _dataArray = baos.toByteArray();
+            baos = null;
+
+            final Savable rVal = readObject(id);
+            if (_debug) {
+                logger.info("Importer Stats: ");
+                logger.info("Tags: " + numClasses);
+                logger.info("Objects: " + numLocs);
+                logger.info("Data Size: " + _dataArray.length);
+            }
+            return rVal;
+
+        } finally {
+            // Let go of / reset contents.
+            _aliasWidth = 0;
+            _contentTable.clear();
+            _classes.clear();
+            _capsuleTable.clear();
+            _locationTable.clear();
+            _dataArray = null;
         }
-        _dataArray = null;
-        return rVal;
     }
 
     public Savable load(final URL f) throws IOException {
