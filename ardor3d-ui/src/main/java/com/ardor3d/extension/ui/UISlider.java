@@ -111,6 +111,14 @@ public class UISlider extends UIPanel implements DragListener {
         }
     }
 
+    public void setSliderLength(final int len) {
+        if (orientation == Orientation.Horizontal) {
+            btSlider.setLocalComponentWidth(len);
+        } else {
+            btSlider.setLocalComponentHeight(len);
+        }
+    }
+
     /**
      * get the current offset from the beginning of the range or in other words the value of the slider
      * 
@@ -190,5 +198,9 @@ public class UISlider extends UIPanel implements DragListener {
             getHud().removeDragListener(this);
         }
         super.detachedFromHud();
+    }
+
+    public int getMaxOffset() {
+        return maxOffset;
     }
 }

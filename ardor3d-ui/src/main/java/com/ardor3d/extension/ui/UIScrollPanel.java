@@ -89,14 +89,12 @@ public class UIScrollPanel extends UIPanel {
         if (view != null) {
             float rel = (float) getContentHeight() / view.getLocalComponentHeight();
             verticalScrollBar.setRelativeSliderLength(rel);
-            rel = (float) offsetY / view.getLocalComponentHeight();
-            verticalScrollBar.setRelativeOffset(rel);
+            verticalScrollBar.setOffset(offsetY);
             verticalScrollBar.setMaxOffset(view.getLocalComponentHeight() - getContentHeight()
                     + horizontalScrollBar.getLocalComponentHeight());
             rel = (float) getContentWidth() / view.getLocalComponentWidth();
             horizontalScrollBar.setRelativeSliderLength(rel);
-            rel = (float) offsetX / view.getLocalComponentWidth();
-            horizontalScrollBar.setRelativeOffset(rel);
+            horizontalScrollBar.setOffset(offsetX);
             horizontalScrollBar.setMaxOffset(view.getLocalComponentWidth() - getContentWidth()
                     + verticalScrollBar.getLocalComponentWidth());
             verticalScrollBar.fireComponentDirty();

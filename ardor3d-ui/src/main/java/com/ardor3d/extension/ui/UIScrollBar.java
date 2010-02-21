@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
-import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
@@ -26,13 +25,9 @@ import com.ardor3d.extension.ui.layout.BorderLayoutData;
 public class UIScrollBar extends UIPanel {
 
     private final Orientation orientation;
-    private final UIPanel barBackground;
-    private final UIPanel barForeground;
+    private final UISlider slider;
     private final UIButton btTopLeft;
     private final UIButton btBottomRight;
-    private float relativeOffset = 0f;
-    private int offset = 0;
-    private int maxOffset = 0;
     private int sliderLength;
     private float relativeSliderLength = 0.5f;
     /** List of action listeners notified when this scrollbar is changed. */
@@ -40,11 +35,9 @@ public class UIScrollBar extends UIPanel {
 
     public UIScrollBar(final Orientation orientation) {
         this.orientation = orientation;
-        barBackground = new UIPanel();
-        barBackground.setBorder(new SolidBorder(1, 1, 1, 1));
-        barForeground = new UIPanel();
-        barForeground.setBorder(new SolidBorder(1, 1, 1, 1));
-        barForeground.setBackdrop(new SolidBackdrop(getForegroundColor()));
+        slider = new UISlider(orientation);
+        slider.setLayoutData(BorderLayoutData.CENTER);
+        slider.setBackdrop(new SolidBackdrop(getForegroundColor()));
         btTopLeft = new UIButton(orientation == Orientation.Vertical ? "^" : "<");
         btTopLeft.setPadding(null);
         btBottomRight = new UIButton(orientation == Orientation.Vertical ? "v" : ">");
@@ -52,9 +45,7 @@ public class UIScrollBar extends UIPanel {
         setLayout(new BorderLayout());
         add(btTopLeft);
         add(btBottomRight);
-        add(barBackground);
-        add(barForeground);
-        barBackground.setLayoutData(BorderLayoutData.CENTER);
+        add(slider);
         if (orientation == Orientation.Vertical) {
             btTopLeft.setLayoutData(BorderLayoutData.NORTH);
             btBottomRight.setLayoutData(BorderLayoutData.SOUTH);
@@ -76,6 +67,7 @@ public class UIScrollBar extends UIPanel {
                 } else {
                     direction = UIScrollBar.this.orientation == Orientation.Horizontal ? 1 : -1;
                 }
+                int offset = slider.getOffset();
                 if (direction < 0) {
                     offset -= 10;
                     if (offset < 0) {
@@ -83,15 +75,21 @@ public class UIScrollBar extends UIPanel {
                     }
                 } else {
                     offset += 10;
-                    if (offset > maxOffset) {
-                        offset = maxOffset;
+                    if (offset > slider.getMaxOffset()) {
+                        offset = slider.getMaxOffset();
                     }
                 }
+                slider.setOffset(offset);
                 fireChangeEvent();
             }
         };
         btTopLeft.addActionListener(al);
         btBottomRight.addActionListener(al);
+        slider.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                fireChangeEvent();
+            }
+        });
     }
 
     private void fireChangeEvent() {
@@ -125,19 +123,11 @@ public class UIScrollBar extends UIPanel {
             relativeSliderLength = 1f;
         }
         if (orientation == Orientation.Horizontal) {
-            final int len = Math.max(20, Math.round(relativeSliderLength * barBackground.getContentWidth()));
-            barForeground.setLocalComponentHeight(barBackground.getLocalComponentHeight());
-            barForeground.setLocalComponentWidth(len);
-            barForeground.setLocalX(Math.round((barBackground.getContentWidth() - len) * relativeOffset
-                    + barBackground.getLocalX()));
-            barForeground.setLocalY(barBackground.getLocalY());
+            final int len = Math.max(20, Math.round(relativeSliderLength * slider.getContentWidth()));
+            slider.setSliderLength(len);
         } else {
-            final int len = Math.max(20, Math.round(relativeSliderLength * barBackground.getContentHeight()));
-            barForeground.setLocalComponentHeight(len);
-            barForeground.setLocalComponentWidth(barBackground.getLocalComponentWidth());
-            barForeground.setLocalX(barBackground.getLocalX());
-            barForeground.setLocalY(barBackground.getLocalY()
-                    + Math.round((barBackground.getContentHeight() - len) * relativeOffset));
+            final int len = Math.max(20, Math.round(relativeSliderLength * slider.getContentHeight()));
+            slider.setSliderLength(len);
         }
     }
 
@@ -146,20 +136,16 @@ public class UIScrollBar extends UIPanel {
     }
 
     public int getOffset() {
-        return offset;
+        return slider.getOffset();
     }
 
     public void setOffset(final int offset) {
-        this.offset = offset;
-    }
-
-    public void setRelativeOffset(final float relativeOffset) {
-        this.relativeOffset = relativeOffset;
+        slider.setOffset(offset);
         layout();
         fireComponentDirty();
     }
 
     public void setMaxOffset(final int maxOffset) {
-        this.maxOffset = maxOffset;
+        slider.setMaxOffset(maxOffset);
     }
 }
