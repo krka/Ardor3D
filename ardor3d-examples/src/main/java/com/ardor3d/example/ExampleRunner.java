@@ -12,7 +12,9 @@ package com.ardor3d.example;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -28,9 +30,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -39,6 +43,8 @@ import java.util.zip.ZipEntry;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -50,6 +56,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
@@ -57,11 +64,14 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.Document;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -90,9 +100,34 @@ public class ExampleRunner extends JFrame {
     public ExampleRunner() {
         setTitle("Ardor3D SDK Examples");
         setLayout(new BorderLayout());
+
         model = new ClassTreeModel();
         tree = new JTree(model);
-        tree.setCellRenderer(new ClassNameCellRenderer());
+        tree.setCellRenderer(new ClassNameCellRenderer(model));
+        final ErasableTextField tfPattern = new ErasableTextField(10);
+        tfPattern.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void removeUpdate(final DocumentEvent e) {
+                model.updateMatches(tfPattern.getText());
+                tree.repaint();
+            }
+
+            public void insertUpdate(final DocumentEvent e) {
+                model.updateMatches(tfPattern.getText());
+                tree.repaint();
+            }
+
+            public void changedUpdate(final DocumentEvent e) {
+                model.updateMatches(tfPattern.getText());
+                tree.repaint();
+            }
+        });
+        final JPanel pTree = new JPanel(new BorderLayout());
+        final JScrollPane scrTree = new JScrollPane(tree);
+        scrTree.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        pTree.add(scrTree);
+        pTree.add(tfPattern, BorderLayout.NORTH);
+
         runSelectedAction = new AbstractAction() {
             private static final long serialVersionUID = 1L;
             {
@@ -111,6 +146,7 @@ public class ExampleRunner extends JFrame {
         consoleBox = new JCheckBox("Show console: ");
         consoleBox.setHorizontalTextPosition(SwingConstants.LEFT);
         final JPanel pExample = new JPanel(new BorderLayout());
+        pExample.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
         pExample.add(lDescription);
         final JPanel pSettings = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         pSettings.add(consoleBox);
@@ -121,7 +157,7 @@ public class ExampleRunner extends JFrame {
 
         splitPane = new JSplitPane();
         splitPane.setDividerLocation(300);
-        splitPane.setLeftComponent(new JScrollPane(tree));
+        splitPane.setLeftComponent(pTree);
         splitPane.setRightComponent(pExample);
         add(splitPane);
 
@@ -231,11 +267,21 @@ public class ExampleRunner extends JFrame {
         }.start();
     }
 
-    class ClassTreeModel implements TreeModel {
+    interface SearchFilter {
+        public boolean matches(final Object value);
+
+        public void updateMatches(final String p);
+    }
+
+    class ClassTreeModel implements TreeModel, SearchFilter {
 
         private final EventListenerList listeners = new EventListenerList();
         private final LinkedHashMap<String, Vector<Class<?>>> classes = new LinkedHashMap<String, Vector<Class<?>>>();
+        // the next two maps are for caching the status for the search filter
+        private final HashMap<String, Boolean> classMatches = new HashMap<String, Boolean>();
+        private final HashMap<String, Boolean> packageMatches = new HashMap<String, Boolean>();
         private final String root = "all examples";
+        private FileFilter classFileFilter;
 
         public void addTreeModelListener(final TreeModelListener l) {
             listeners.add(TreeModelListener.class, l);
@@ -275,12 +321,39 @@ public class ExampleRunner extends JFrame {
             if (clazz.equals(ExampleRunner.class)) {
                 return;
             }
+            packageMatches.put(packageName, false);
+            classMatches.put(clazz.getCanonicalName(), false);
             Vector<Class<?>> cl = classes.get(packageName);
             if (cl == null) {
                 cl = new Vector<Class<?>>();
                 classes.put(packageName, cl);
             }
             cl.add(clazz);
+        }
+
+        public void updateMatches(final String pattern) {
+            final String lcPattern = pattern.toLowerCase();
+            packageMatches.clear();
+            for (final Entry<String, Boolean> entry : classMatches.entrySet()) {
+                final String className = entry.getKey().substring(entry.getKey().lastIndexOf('.') + 1);
+                final boolean bool = !pattern.equals("") && className.toLowerCase().contains(lcPattern);
+                entry.setValue(bool);
+                logger.fine(pattern + ": " + entry.getKey() + " set to " + bool);
+                if (bool) {
+                    final String packageName = entry.getKey().substring(0, entry.getKey().lastIndexOf('.'));
+                    packageMatches.put(packageName, true);
+                    logger.fine("add package name to matches: " + packageName);
+                }
+            }
+        }
+
+        public boolean matches(final Object value) {
+            if (value instanceof Class<?>) {
+                return classMatches.get(((Class<?>) value).getCanonicalName());
+            }
+            final Boolean res = packageMatches.get(value);
+            logger.fine("check " + value + " results in: " + res);
+            return res == null ? false : res;
         }
 
         public boolean isLeaf(final Object node) {
@@ -296,19 +369,22 @@ public class ExampleRunner extends JFrame {
         }
 
         /**
-         * @return FileFilter for searching class files (no inner classes, only those with "Test" in the name)
+         * @return FileFilter for searching class files (no inner classes)
          */
         private FileFilter getFileFilter() {
-            return new FileFilter() {
-                /**
-                 * @see FileFilter
-                 */
-                public boolean accept(final File pathname) {
-                    return (pathname.isDirectory() && !pathname.getName().startsWith("."))
-                            || (pathname.getName().endsWith(".class") && pathname.getName().indexOf('$') < 0);
-                }
+            if (classFileFilter == null) {
+                classFileFilter = new FileFilter() {
+                    /**
+                     * @see FileFilter
+                     */
+                    public boolean accept(final File pathname) {
+                        return (pathname.isDirectory() && !pathname.getName().startsWith("."))
+                                || (pathname.getName().endsWith(".class") && pathname.getName().indexOf('$') < 0);
+                    }
 
-            };
+                };
+            }
+            return classFileFilter;
         }
 
         /**
@@ -361,16 +437,17 @@ public class ExampleRunner extends JFrame {
          */
         private void addAllFilesInDirectory(final File directory, final String packageName, final boolean recursive) {
             // Get the list of the files contained in the package
+            logger.fine(directory + " -> " + packageName);
             final File[] files = directory.listFiles(getFileFilter());
             if (files != null) {
                 for (int i = 0; i < files.length; i++) {
                     // we are only interested in .class files
                     if (files[i].isDirectory()) {
                         if (recursive) {
-                            addAllFilesInDirectory(files[i], packageName + files[i].getName() + ".", true);
+                            addAllFilesInDirectory(files[i], packageName + "." + files[i].getName(), true);
                         }
                     } else {
-                        final Class<?> result = load(packageName + files[i].getName());
+                        final Class<?> result = load(packageName + "." + files[i].getName());
                         if (result != null) {
                             addClassForPackage(packageName, result);
                         }
@@ -390,7 +467,7 @@ public class ExampleRunner extends JFrame {
             fireTreeChanged();
         }
 
-        protected void find(String pckgname, final boolean recursive) {
+        protected void find(final String pckgname, final boolean recursive) {
             URL url;
 
             // Translate the package name into an absolute path
@@ -404,7 +481,7 @@ public class ExampleRunner extends JFrame {
             // URL url = UPBClassLoader.get().getResource(name);
             url = this.getClass().getResource(name);
             // URL url = ClassLoader.getSystemClassLoader().getResource(name);
-            pckgname = pckgname + ".";
+            // pckgname = pckgname + ".";
 
             File directory;
             try {
@@ -453,28 +530,32 @@ public class ExampleRunner extends JFrame {
         {
             classNameLabel.setOpaque(true);
         }
+        Font defaultFont = classNameLabel.getFont();
+        Font matchFont = defaultFont.deriveFont(Font.BOLD);
+        SearchFilter searchFilter;
+
+        public ClassNameCellRenderer(final SearchFilter searchFilter) {
+            this.searchFilter = searchFilter;
+        }
 
         public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected,
                 final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-            Component returnValue = null;
             if ((value != null) && (value instanceof Class<?>)) {
                 final Class<?> clazz = (Class<?>) value;
                 classNameLabel.setText(clazz.getSimpleName());
-                if (selected) {
-                    classNameLabel.setBackground(defaultRenderer.getBackgroundSelectionColor());
-                    classNameLabel.setForeground(defaultRenderer.getTextSelectionColor());
-                } else {
-                    classNameLabel.setBackground(defaultRenderer.getBackgroundNonSelectionColor());
-                    classNameLabel.setForeground(defaultRenderer.getTextNonSelectionColor());
-                }
-                classNameLabel.setEnabled(tree.isEnabled());
-                returnValue = classNameLabel;
+            } else {
+                classNameLabel.setText(value.toString());
             }
-            if (returnValue == null) {
-                returnValue = defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row,
-                        hasFocus);
+            classNameLabel.setFont(searchFilter.matches(value) ? matchFont : defaultFont);
+            if (selected) {
+                classNameLabel.setBackground(defaultRenderer.getBackgroundSelectionColor());
+                classNameLabel.setForeground(defaultRenderer.getTextSelectionColor());
+            } else {
+                classNameLabel.setBackground(defaultRenderer.getBackgroundNonSelectionColor());
+                classNameLabel.setForeground(defaultRenderer.getTextNonSelectionColor());
             }
-            return returnValue;
+            classNameLabel.setEnabled(tree.isEnabled());
+            return classNameLabel;
         }
     }
 
@@ -557,6 +638,43 @@ public class ExampleRunner extends JFrame {
         }
     }
 
+    class ErasableTextField extends JPanel {
+
+        private static final long serialVersionUID = 1L;
+        private final JTextField textField;
+        private final JButton btClear;
+
+        public ErasableTextField(final int len) {
+            super(new BorderLayout());
+            textField = new JTextField(len);
+            btClear = new JButton(new AbstractAction() {
+                private static final long serialVersionUID = 1L;
+
+                {
+                    putValue(Action.SHORT_DESCRIPTION, "clear entry");
+                    putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
+                            .getResource("/com/ardor3d/example/media/images/edit-clear-locationbar-rtl.png")));
+                }
+
+                public void actionPerformed(final ActionEvent e) {
+                    textField.setText("");
+                }
+            });
+            btClear.setPreferredSize(new Dimension(20, 20));
+            btClear.setFocusable(false);
+            add(textField);
+            add(btClear, BorderLayout.EAST);
+        }
+
+        public Document getDocument() {
+            return textField.getDocument();
+        }
+
+        public String getText() {
+            return textField.getText();
+        }
+    }
+
     /**
      * @param args
      */
@@ -566,7 +684,7 @@ public class ExampleRunner extends JFrame {
         } catch (final Exception e) {
         }
         final ExampleRunner app = new ExampleRunner();
-        app.setSize(700, 400);
+        app.setSize(800, 400);
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setLocationRelativeTo(null);
         app.setVisible(true);
