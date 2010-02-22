@@ -135,10 +135,11 @@ public abstract class UIContainer extends UIComponent {
      *            the component to remove
      */
     public void remove(final UIComponent component) {
-        detachChild(component);
         if (getHud() != null) {
             component.detachedFromHud();
         }
+
+        detachChild(component);
     }
 
     /**

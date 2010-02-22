@@ -728,14 +728,14 @@ public abstract class UIComponent extends Node {
      * @return current screen x coordinate of this component's origin (usually its lower left corner.)
      */
     public int getHudX() {
-        return (int) Math.round(getWorldTranslation().getX());
+        return Math.round(getWorldTranslation().getXf());
     }
 
     /**
      * @return current screen y coordinate of this component's origin (usually its lower left corner.)
      */
     public int getHudY() {
-        return (int) Math.round(getWorldTranslation().getY());
+        return Math.round(getWorldTranslation().getYf());
     }
 
     /**

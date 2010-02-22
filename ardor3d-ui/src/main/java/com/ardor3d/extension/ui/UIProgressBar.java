@@ -14,7 +14,6 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.util.Insets;
-import com.ardor3d.scenegraph.hint.PickingHint;
 
 /**
  * This component shows progress as "percent complete" via a proportionally sized bar and an optional text label.
@@ -81,15 +80,6 @@ public class UIProgressBar extends UIPanel {
         compact();
 
         layout();
-    }
-
-    @Override
-    public UIComponent getUIComponent(final int hudX, final int hudY) {
-        if (!getSceneHints().isPickingHintEnabled(PickingHint.Pickable) || !insideMargin(hudX, hudY)) {
-            return null;
-        }
-
-        return this;
     }
 
     @Override
