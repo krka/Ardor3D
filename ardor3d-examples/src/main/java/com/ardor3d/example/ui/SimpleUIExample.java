@@ -317,7 +317,7 @@ public class SimpleUIExample extends ExampleBase {
             final double fps = (frames / counter);
             counter = 0;
             frames = 0;
-            fpslabel.setText(fps + " FPS");
+            fpslabel.setText(Math.round(fps) + " FPS");
             bar.setPercentFilled(timer.getTimeInSeconds() / 15);
             bar.updateMinimumSizeFromContents();
         }
