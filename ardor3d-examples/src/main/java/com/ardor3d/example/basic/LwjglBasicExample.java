@@ -116,7 +116,7 @@ public class LwjglBasicExample implements Scene {
      * Initialize our scene.
      */
     private void initExample() {
-        _canvas.setTitle("LwjglNoGuiceBoxExample - close window to exit");
+        _canvas.setTitle("LwjglBasicExample - close window to exit");
 
         // Make a box...
         final Box _box = new Box("Box", Vector3.ZERO, 5, 5, 5);

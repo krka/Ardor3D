@@ -115,7 +115,7 @@ public class JoglBasicExample implements Scene {
      * Initialize our scene.
      */
     private void initExample() {
-        _canvas.setTitle("JoglNoGuiceBoxExample - close window to exit");
+        _canvas.setTitle("JoglBasicExample - close window to exit");
 
         // Make a box...
         final Box _box = new Box("Box", Vector3.ZERO, 5, 5, 5);
