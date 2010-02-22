@@ -71,6 +71,9 @@ public class UISlider extends UIContainer {
         // Set our orientation
         _orientation = orientation;
 
+        // Add our back panel
+        attachChild(_backPanel);
+
         // Create a default data model
         _model = new DefaultSliderModel(minValue, maxValue);
 
@@ -80,9 +83,6 @@ public class UISlider extends UIContainer {
 
         // Set our initial value
         setValue(initialValue);
-
-        // Add our back panel
-        attachChild(_backPanel);
 
         // Apply our skin.
         applySkin();
@@ -113,18 +113,17 @@ public class UISlider extends UIContainer {
     public void layout() {
         // Keep the knob sized to our content area. This lets the knob control its handle placement.
         _knob.setLocalComponentSize(getContentWidth(), getContentHeight());
-        _knob.layout();
 
         // Update the knob's relative position, based on the slider's range and value.
         updateKnob();
 
         // Set the backing panel's position and size based on orientation. We'll center it on the perpendicular axis.
         if (getOrientation() == Orientation.Horizontal) {
-            _backPanel.setLocalComponentSize(getContentWidth(), _backPanel.getMinimumLocalComponentWidth());
-            _backPanel.setLocalXY(0, (getContentHeight() - _backPanel.getMinimumLocalComponentHeight()) / 2);
+            _backPanel.setLocalComponentSize(getContentWidth(), _knob.getMinimumLocalComponentHeight());
+            _backPanel.setLocalXY(0, (getContentHeight() - _backPanel.getLocalComponentHeight()) / 2);
         } else {
-            _backPanel.setLocalComponentSize(_backPanel.getMinimumLocalComponentWidth(), getContentHeight());
-            _backPanel.setLocalXY((getContentWidth() - _backPanel.getMinimumLocalComponentHeight()) / 2, 0);
+            _backPanel.setLocalComponentSize(_knob.getMinimumLocalComponentWidth(), getContentHeight());
+            _backPanel.setLocalXY((getContentWidth() - _backPanel.getLocalComponentWidth()) / 2, 0);
         }
 
         // lay out the back panel's contents, if any.
@@ -143,21 +142,7 @@ public class UISlider extends UIContainer {
 
     @Override
     public void updateMinimumSizeFromContents() {
-        // No layout, so handle this directly.
-        // update and compact knob
-        _knob.updateMinimumSizeFromContents();
-        _knob.compact();
-        // update and compact backPanel
-        _backPanel.updateMinimumSizeFromContents();
-        _backPanel.compact();
-        // Set our minimum size based on the sizes of our knob and backPanel.
-        if (getOrientation() == Orientation.Horizontal) {
-            setMinimumContentSize(_knob.getLocalComponentWidth(), Math.max(_backPanel.getLocalComponentHeight(), _knob
-                    .getLocalComponentHeight()));
-        } else {
-            setMinimumContentSize(Math.max(_backPanel.getLocalComponentWidth(), _knob.getLocalComponentWidth()), _knob
-                    .getLocalComponentHeight());
-        }
+        super.updateMinimumSizeFromContents();
 
         // Our size may have have changed, so force an update of the knob's position.
         updateKnob();

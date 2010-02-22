@@ -22,8 +22,6 @@ public class UISliderKnob extends UIContainer {
 
     private static final long serialVersionUID = 1L;
 
-    public static int MIN_SIZE = 25;
-
     /** The current relative position of the knob handle, as a percent. */
     protected float _position = 0;
 
@@ -49,7 +47,7 @@ public class UISliderKnob extends UIContainer {
         _parentSlider = slider;
 
         // create and attach our knob handle
-        _knobLabel = new UILabel("V");
+        _knobLabel = new UILabel("");
         _knobLabel.getSceneHints().setAllPickingHints(true);
         attachChild(_knobLabel);
     }
@@ -82,30 +80,14 @@ public class UISliderKnob extends UIContainer {
         // Set our handles relative location using the position, our size and the size of the handle
         if (_parentSlider.getOrientation() == Orientation.Horizontal) {
             _knobLabel.setLocalX((int) ((getContentWidth() - _knobLabel.getLocalComponentWidth()) * _position));
+            _knobLabel.setLocalY((getContentHeight() - _knobLabel.getLocalComponentHeight()) / 2);
         } else {
+            _knobLabel.setLocalX((getContentWidth() - _knobLabel.getLocalComponentWidth()) / 2);
             _knobLabel.setLocalY((int) ((getContentHeight() - _knobLabel.getLocalComponentHeight()) * _position));
         }
 
         // let the ui system know we've changed something.
         fireComponentDirty();
-    }
-
-    @Override
-    public void updateMinimumSizeFromContents() {
-        super.updateMinimumSizeFromContents();
-
-        // update our knob.
-        _knobLabel.updateMinimumSizeFromContents();
-        _knobLabel.compact();
-
-        // set our min size based on our knob's size and our orientation
-        if (_parentSlider.getOrientation() == Orientation.Horizontal) {
-            setMinimumContentSize(UISliderKnob.MIN_SIZE, Math.max(_knobLabel.getLocalComponentHeight(),
-                    UISliderKnob.MIN_SIZE));
-        } else {
-            setMinimumContentSize(Math.max(_knobLabel.getLocalComponentWidth(), UISliderKnob.MIN_SIZE),
-                    UISliderKnob.MIN_SIZE);
-        }
     }
 
     @Override

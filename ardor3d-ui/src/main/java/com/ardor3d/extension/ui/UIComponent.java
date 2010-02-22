@@ -26,6 +26,7 @@ import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
@@ -385,7 +386,7 @@ public abstract class UIComponent extends Node {
      *            the new height
      */
     public void setContentHeight(final int height) {
-        _contentsSize.setHeight(Math.max(Math.min(height, _maximumContentsSize.getHeight()), _minimumContentsSize
+        _contentsSize.setHeight(MathUtils.clamp(height, _minimumContentsSize.getHeight(), _maximumContentsSize
                 .getHeight()));
     }
 
@@ -397,8 +398,8 @@ public abstract class UIComponent extends Node {
      *            the new width
      */
     public void setContentWidth(final int width) {
-        _contentsSize.setWidth(Math.max(Math.min(width, _maximumContentsSize.getWidth()), _minimumContentsSize
-                .getWidth()));
+        _contentsSize
+                .setWidth(MathUtils.clamp(width, _minimumContentsSize.getWidth(), _maximumContentsSize.getWidth()));
     }
 
     /**
@@ -443,6 +444,7 @@ public abstract class UIComponent extends Node {
      */
     public void setMaximumContentSize(final int width, final int height) {
         _maximumContentsSize.set(width, height);
+        validateContentSize();
     }
 
     /**
@@ -461,6 +463,7 @@ public abstract class UIComponent extends Node {
      */
     public void setMaximumContentHeight(final int height) {
         _maximumContentsSize.setHeight(height);
+        validateContentSize();
     }
 
     /**
@@ -471,6 +474,7 @@ public abstract class UIComponent extends Node {
      */
     public void setMinimumContentSize(final int width, final int height) {
         _minimumContentsSize.set(width, height);
+        validateContentSize();
     }
 
     /**
@@ -480,6 +484,7 @@ public abstract class UIComponent extends Node {
      */
     public void setMinimumContentWidth(final int width) {
         _minimumContentsSize.setWidth(width);
+        validateContentSize();
     }
 
     /**
@@ -489,6 +494,18 @@ public abstract class UIComponent extends Node {
      */
     public void setMinimumContentHeight(final int height) {
         _minimumContentsSize.setHeight(height);
+        validateContentSize();
+    }
+
+    /**
+     * Ensures content size is between min and max.
+     */
+    protected void validateContentSize() {
+        final int width = MathUtils.clamp(_contentsSize.getWidth(), _minimumContentsSize.getWidth(),
+                _maximumContentsSize.getWidth());
+        final int height = MathUtils.clamp(_contentsSize.getHeight(), _minimumContentsSize.getHeight(),
+                _maximumContentsSize.getHeight());
+        _contentsSize.set(width, height);
     }
 
     /**

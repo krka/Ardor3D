@@ -12,6 +12,7 @@ package com.ardor3d.extension.ui.skin.generic;
 
 import java.net.URL;
 
+import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIFrame;
@@ -546,7 +547,7 @@ public class GenericSkin extends Skin {
                         state.setForegroundColor(ColorRGBA.GRAY);
                     }
                     resize.refreshState();
-                    resize.compact();
+                    resize.updateMinimumSizeFromContents();
                     resize.setMinimumContentSize(resize.getContentWidth(), resize.getContentHeight());
                     resize.setMaximumContentSize(resize.getContentWidth(), resize.getContentHeight());
                 }
@@ -631,15 +632,59 @@ public class GenericSkin extends Skin {
     protected void applyToSlider(final UISlider component) {
         final UISliderKnob knob = component.getKnob();
         knob.setBackdrop(null);
-        knob.setMargin(new Insets(0, 0, 0, 0));
         knob.setPadding(new Insets(0, 0, 0, 0));
 
-        // temp border
-        // TODO: Add icon
-        knob.getKnobLabel().setBorder(new SolidBorder(1, 1, 1, 1));
+        if (component.getOrientation() == Orientation.Horizontal) {
+            knob.getKnobLabel().setIcon(new SubTex(_sharedTex, 42, 80, 16, 14));
+            knob.setMargin(new Insets(0, 1, 0, 1));
+        } else {
+            knob.getKnobLabel().setIcon(new SubTex(_sharedTex, 69, 72, 14, 16));
+            knob.setMargin(new Insets(1, 0, 1, 0));
+        }
 
-        // temp border
-        // TODO: Add some border / bkdrop to slider
-        component.setBorder(new SolidBorder(1, 1, 1, 1));
+        final UIPanel back = component.getBackPanel();
+        if (component.getOrientation() == Orientation.Horizontal) {
+            final UIBorder border = new ImageBorder(
+            // left
+                    new SubTex(_sharedTex, 7, 85, 4, 7),
+                    // right
+                    new SubTex(_sharedTex, 33, 85, 4, 7),
+                    // top
+                    new SubTex(_sharedTex, 11, 79, 22, 6),
+                    // bottom
+                    new SubTex(_sharedTex, 11, 92, 22, 4),
+                    // top left
+                    new SubTex(_sharedTex, 7, 79, 4, 6),
+                    // top right
+                    new SubTex(_sharedTex, 33, 79, 4, 6),
+                    // bottom left
+                    new SubTex(_sharedTex, 7, 92, 4, 4),
+                    // bottom right
+                    new SubTex(_sharedTex, 33, 92, 4, 4));
+            back.setBorder(border);
+            back.setMinimumContentSize(1, 7);
+        } else {
+            final UIBorder border = new ImageBorder(
+            // left
+                    new SubTex(_sharedTex, 67, 97, 5, 19),
+                    // right
+                    new SubTex(_sharedTex, 80, 97, 5, 19),
+                    // top
+                    new SubTex(_sharedTex, 72, 91, 8, 6),
+                    // bottom
+                    new SubTex(_sharedTex, 72, 117, 8, 4),
+                    // top left
+                    new SubTex(_sharedTex, 67, 91, 5, 6),
+                    // top right
+                    new SubTex(_sharedTex, 80, 91, 5, 6),
+                    // bottom left
+                    new SubTex(_sharedTex, 67, 117, 5, 4),
+                    // bottom right
+                    new SubTex(_sharedTex, 80, 117, 5, 4));
+            back.setBorder(border);
+            back.setMinimumContentSize(8, 1);
+        }
+        back.setLayout(null);
+        back.setBackdrop(new SolidBackdrop(ColorRGBA.WHITE));
     }
 }

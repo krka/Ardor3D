@@ -162,20 +162,10 @@ public class SimpleUIExample extends ExampleBase {
         // will be replaced by a password field
         final UILabel tfPassword = new UILabel("*********");
         tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
-        final UISlider slider = new UISlider(Orientation.Horizontal, 0, 12, 0);
-        slider.setLayoutData(new GridLayoutData(2, true, true));
-        slider.setSnapToValues(true);
-        final UILabel lSliderValue = new UILabel("0");
-        lSliderValue.setLayoutData(GridLayoutData.SpanAndWrap(2));
         final UIButton btLogin = new UIButton("login");
         btLogin.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 System.out.println("login pressed!");
-            }
-        });
-        slider.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                lSliderValue.setText(String.valueOf(slider.getValue()));
             }
         });
         pLogin.add(lHeader);
@@ -183,8 +173,6 @@ public class SimpleUIExample extends ExampleBase {
         pLogin.add(tfName);
         pLogin.add(lPassword);
         pLogin.add(tfPassword);
-        pLogin.add(slider);
-        pLogin.add(lSliderValue);
         pLogin.add(btLogin);
         return pLogin;
     }
@@ -224,6 +212,20 @@ public class SimpleUIExample extends ExampleBase {
         final UIRadioButton radio2 = new UIRadioButton("option B");
         radio2.setGroup(group);
         centerPanel.add(radio2);
+
+        final UISlider slider = new UISlider(Orientation.Horizontal, 0, 12, 0);
+        slider.setSnapToValues(true);
+        slider.setMinimumContentWidth(100);
+
+        final UILabel lSliderValue = new UILabel("0");
+        lSliderValue.setLayoutData(GridLayoutData.SpanAndWrap(2));
+        slider.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                lSliderValue.setText(String.valueOf(slider.getValue()));
+            }
+        });
+        centerPanel.add(slider);
+        centerPanel.add(lSliderValue);
 
         bar = new UIProgressBar("Loading: ", true);
         bar.setPercentFilled(0);
