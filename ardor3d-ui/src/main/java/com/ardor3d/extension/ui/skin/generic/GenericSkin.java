@@ -419,10 +419,6 @@ public class GenericSkin extends Skin {
                     final UIButton closeButton = titleBar.getCloseButton();
                     if (closeButton != null) {
                         closeButton.setButtonText("");
-                        closeButton
-                                .setMinimumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
-                        closeButton
-                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                         closeButton.setButtonIcon(new SubTex(_sharedTex, 94, 76, 16, 16));
                         closeButton.getPressedState().setIcon(new SubTex(_sharedTex, 94, 94, 16, 16));
                         for (final UIState state : closeButton.getStates()) {
@@ -432,6 +428,10 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         closeButton.refreshState();
+                        closeButton.updateMinimumSizeFromContents();
+                        closeButton.compact();
+                        closeButton
+                                .setMaximumContentSize(closeButton.getContentWidth(), closeButton.getContentHeight());
                     }
                 }
 
@@ -440,10 +440,6 @@ public class GenericSkin extends Skin {
                     final UIButton minimizeButton = titleBar.getMinimizeButton();
                     if (minimizeButton != null) {
                         minimizeButton.setButtonText("");
-                        minimizeButton.setMinimumContentSize(minimizeButton.getContentWidth(), minimizeButton
-                                .getContentHeight());
-                        minimizeButton.setMaximumContentSize(minimizeButton.getContentWidth(), minimizeButton
-                                .getContentHeight());
                         minimizeButton.setButtonIcon(new SubTex(_sharedTex, 113, 76, 16, 16));
                         minimizeButton.getPressedState().setIcon(new SubTex(_sharedTex, 113, 94, 16, 16));
                         for (final UIState state : minimizeButton.getStates()) {
@@ -453,6 +449,10 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         minimizeButton.refreshState();
+                        minimizeButton.updateMinimumSizeFromContents();
+                        minimizeButton.compact();
+                        minimizeButton.setMaximumContentSize(minimizeButton.getContentWidth(), minimizeButton
+                                .getContentHeight());
                     }
                 }
 
@@ -461,10 +461,6 @@ public class GenericSkin extends Skin {
                     final UIButton expandButton = titleBar.getExpandButton();
                     if (expandButton != null) {
                         expandButton.setButtonText("");
-                        expandButton.setMinimumContentSize(expandButton.getContentWidth(), expandButton
-                                .getContentHeight());
-                        expandButton.setMaximumContentSize(expandButton.getContentWidth(), expandButton
-                                .getContentHeight());
                         expandButton.setButtonIcon(new SubTex(_sharedTex, 132, 76, 16, 16));
                         expandButton.getPressedState().setIcon(new SubTex(_sharedTex, 132, 94, 16, 16));
                         for (final UIState state : expandButton.getStates()) {
@@ -474,6 +470,10 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         expandButton.refreshState();
+                        expandButton.updateMinimumSizeFromContents();
+                        expandButton.compact();
+                        expandButton.setMaximumContentSize(expandButton.getContentWidth(), expandButton
+                                .getContentHeight());
                     }
                 }
 
@@ -482,8 +482,6 @@ public class GenericSkin extends Skin {
                     final UIButton helpButton = titleBar.getHelpButton();
                     if (helpButton != null) {
                         helpButton.setButtonText("");
-                        helpButton.setMinimumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
-                        helpButton.setMaximumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
                         helpButton.setButtonIcon(new SubTex(_sharedTex, 151, 76, 16, 16));
                         helpButton.getPressedState().setIcon(new SubTex(_sharedTex, 151, 94, 16, 16));
                         for (final UIState state : helpButton.getStates()) {
@@ -493,6 +491,9 @@ public class GenericSkin extends Skin {
                             state.setMargin(new Insets(1, 1, 1, 1));
                         }
                         helpButton.refreshState();
+                        helpButton.updateMinimumSizeFromContents();
+                        helpButton.compact();
+                        helpButton.setMaximumContentSize(helpButton.getContentWidth(), helpButton.getContentHeight());
                     }
                 }
             }

@@ -175,10 +175,10 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
      */
     public void setIcon(final SubTex icon) {
         _icon = icon;
-        updateMinimumSizeFromContents();
         if (icon != null && _iconDimensions.getHeight() == 0 && _iconDimensions.getWidth() == 0) {
             updateIconDimensionsFromIcon();
         }
+        updateMinimumSizeFromContents();
     }
 
     /**
