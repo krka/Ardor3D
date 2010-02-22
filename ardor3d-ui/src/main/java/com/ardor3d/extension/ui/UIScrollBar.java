@@ -29,7 +29,6 @@ public class UIScrollBar extends UIPanel {
     private final UIButton btTopLeft;
     private final UIButton btBottomRight;
     private int sliderLength;
-    private float relativeSliderLength = 0.5f;
     /** List of action listeners notified when this scrollbar is changed. */
     private final List<ActionListener> _listeners = new ArrayList<ActionListener>();
 
@@ -67,7 +66,7 @@ public class UIScrollBar extends UIPanel {
                 } else {
                     direction = UIScrollBar.this.orientation == Orientation.Horizontal ? 1 : -1;
                 }
-                int offset = slider.getOffset();
+                int offset = slider.getValue();
                 if (direction < 0) {
                     offset -= 10;
                     if (offset < 0) {
@@ -75,11 +74,11 @@ public class UIScrollBar extends UIPanel {
                     }
                 } else {
                     offset += 10;
-                    if (offset > slider.getMaxOffset()) {
-                        offset = slider.getMaxOffset();
+                    if (offset > slider.getModel().getMaxValue()) {
+                        offset = slider.getModel().getMaxValue();
                     }
                 }
-                slider.setOffset(offset);
+                slider.setValue(offset);
                 fireChangeEvent();
             }
         };
@@ -116,36 +115,17 @@ public class UIScrollBar extends UIPanel {
         return sliderLength;
     }
 
-    @Override
-    public void layout() {
-        super.layout();
-        if (relativeSliderLength >= 1f) {
-            relativeSliderLength = 1f;
-        }
-        if (orientation == Orientation.Horizontal) {
-            final int len = Math.max(20, Math.round(relativeSliderLength * slider.getContentWidth()));
-            slider.setSliderLength(len);
-        } else {
-            final int len = Math.max(20, Math.round(relativeSliderLength * slider.getContentHeight()));
-            slider.setSliderLength(len);
-        }
+    public int getValue() {
+        return slider.getValue();
     }
 
-    public void setRelativeSliderLength(final float relativeSliderLength) {
-        this.relativeSliderLength = relativeSliderLength;
-    }
-
-    public int getOffset() {
-        return slider.getOffset();
-    }
-
-    public void setOffset(final int offset) {
-        slider.setOffset(offset);
+    public void setValue(final int offset) {
+        slider.setValue(offset);
         layout();
         fireComponentDirty();
     }
 
-    public void setMaxOffset(final int maxOffset) {
-        slider.setMaxOffset(maxOffset);
+    public void setMaxValue(final int maxOffset) {
+        slider.getModel().setMaxValue(maxOffset);
     }
 }

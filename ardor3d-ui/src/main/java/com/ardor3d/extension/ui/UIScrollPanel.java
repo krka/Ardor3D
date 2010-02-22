@@ -47,14 +47,14 @@ public class UIScrollPanel extends UIPanel {
         setDoClip(true);
         horizontalScrollBar.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                offsetX = horizontalScrollBar.getOffset();
+                offsetX = horizontalScrollBar.getValue();
                 fireComponentDirty();
                 updateScrollBarSliders();
             }
         });
         verticalScrollBar.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                offsetY = verticalScrollBar.getOffset();
+                offsetY = verticalScrollBar.getValue();
                 fireComponentDirty();
                 updateScrollBarSliders();
             }
@@ -87,15 +87,11 @@ public class UIScrollPanel extends UIPanel {
 
     private void updateScrollBarSliders() {
         if (view != null) {
-            float rel = (float) getContentHeight() / view.getLocalComponentHeight();
-            verticalScrollBar.setRelativeSliderLength(rel);
-            verticalScrollBar.setOffset(offsetY);
-            verticalScrollBar.setMaxOffset(view.getLocalComponentHeight() - getContentHeight()
+            verticalScrollBar.setValue(offsetY);
+            verticalScrollBar.setMaxValue(view.getLocalComponentHeight() - getContentHeight()
                     + horizontalScrollBar.getLocalComponentHeight());
-            rel = (float) getContentWidth() / view.getLocalComponentWidth();
-            horizontalScrollBar.setRelativeSliderLength(rel);
-            horizontalScrollBar.setOffset(offsetX);
-            horizontalScrollBar.setMaxOffset(view.getLocalComponentWidth() - getContentWidth()
+            horizontalScrollBar.setValue(offsetX);
+            horizontalScrollBar.setMaxValue(view.getLocalComponentWidth() - getContentWidth()
                     + verticalScrollBar.getLocalComponentWidth());
             verticalScrollBar.fireComponentDirty();
             horizontalScrollBar.fireComponentDirty();

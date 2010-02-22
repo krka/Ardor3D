@@ -162,8 +162,9 @@ public class SimpleUIExample extends ExampleBase {
         // will be replaced by a password field
         final UILabel tfPassword = new UILabel("*********");
         tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
-        final UISlider slider = new UISlider(Orientation.Horizontal, 12);
+        final UISlider slider = new UISlider(Orientation.Horizontal, 0, 12, 0);
         slider.setLayoutData(new GridLayoutData(2, true, true));
+        slider.setSnapToValues(true);
         final UILabel lSliderValue = new UILabel("0");
         lSliderValue.setLayoutData(GridLayoutData.SpanAndWrap(2));
         final UIButton btLogin = new UIButton("login");
@@ -174,7 +175,7 @@ public class SimpleUIExample extends ExampleBase {
         });
         slider.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                lSliderValue.setText(String.valueOf(slider.getOffset()));
+                lSliderValue.setText(String.valueOf(slider.getValue()));
             }
         });
         pLogin.add(lHeader);

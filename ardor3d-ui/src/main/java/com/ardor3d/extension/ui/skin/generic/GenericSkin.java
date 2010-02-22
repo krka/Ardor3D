@@ -21,6 +21,8 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UISlider;
+import com.ardor3d.extension.ui.UISliderKnob;
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITooltip;
@@ -623,5 +625,21 @@ public class GenericSkin extends Skin {
         component.setBorder(new SolidBorder(1, 1, 1, 1));
         component.setForegroundColor(ColorRGBA.BLACK);
         component.setOpacity(1.0f);
+    }
+
+    @Override
+    protected void applyToSlider(final UISlider component) {
+        final UISliderKnob knob = component.getKnob();
+        knob.setBackdrop(null);
+        knob.setMargin(new Insets(0, 0, 0, 0));
+        knob.setPadding(new Insets(0, 0, 0, 0));
+
+        // temp border
+        // TODO: Add icon
+        knob.getKnobLabel().setBorder(new SolidBorder(1, 1, 1, 1));
+
+        // temp border
+        // TODO: Add some border / bkdrop to slider
+        component.setBorder(new SolidBorder(1, 1, 1, 1));
     }
 }

@@ -10,70 +10,92 @@
 
 package com.ardor3d.extension.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
-import com.ardor3d.extension.ui.event.DragListener;
-import com.ardor3d.extension.ui.layout.BorderLayout;
-import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.extension.ui.model.DefaultSliderModel;
+import com.ardor3d.extension.ui.model.SliderModel;
+import com.google.common.collect.Lists;
 
 /**
- * Still experimental.
+ * A widget allowing display and control of a choice from a range of values.
  */
-public class UISlider extends UIPanel implements DragListener {
+public class UISlider extends UIContainer {
 
-    private final Orientation orientation;
+    /** Our data model */
+    private SliderModel _model;
 
-    private final UIPanel barBackground;
-    private final UIButton btSlider;
-    private int offset = 0;
-    private int maxOffset;
+    /** The panel or decoration in the back of the slider. */
+    private final UIPanel _backPanel = new UIPanel();
+
+    /** The knob used to display and control the value of this slider. */
+    private final UISliderKnob _knob;
+
     /** List of action listeners notified when this slider is changed. */
-    private final List<ActionListener> _listeners = new ArrayList<ActionListener>();
-    private int startDragX;
-    private int startDragY;
+    private final List<ActionListener> _listeners = Lists.newArrayList();
+
+    /** The orientation of this slider knob. */
+    private final Orientation _orientation;
+
+    /** Do we snap to the integer values? */
+    private boolean _snapToValues = true;
 
     /**
-     * create a slider widget with a default range of 0..100
+     * create a slider widget with a default range of [0,100]. Initial value is 50.
      * 
      * @param orientation
      *            the orientation of the slider (Orientation.Horizontal or Orientation.Vertical)
      */
     public UISlider(final Orientation orientation) {
-        this(orientation, 100);
+        this(orientation, 0, 100, 50);
     }
 
     /**
-     * create a slider widget with a default range of 0..maxOffset
+     * create a slider widget with a default range of [minValue,maxOffset] and the given initialValue.
      * 
      * @param orientation
      *            the orientation of the slider (Orientation.Horizontal or Orientation.Vertical)
-     * @param maxOffset
-     *            the maximum value the slider can take (inclusive); the minimum value is 0
+     * @param minValue
+     *            the minimum value the slider can take (inclusive).
+     * @param maxValue
+     *            the maximum value the slider can take (inclusive). Must be greater than or equal to minValue.
+     * @param initialValue
+     *            the starting value of the slider. Must be between min and max values.
      */
-    public UISlider(final Orientation orientation, final int maxOffset) {
-        this.orientation = orientation;
-        this.maxOffset = maxOffset;
-        barBackground = new UIPanel();
-        barBackground.setBorder(new SolidBorder(1, 1, 1, 1));
-        btSlider = new UIButton("");
-        setLayout(new BorderLayout());
-        add(barBackground);
-        add(btSlider);
+    public UISlider(final Orientation orientation, final int minValue, final int maxValue, final int initialValue) {
+        assert orientation != null : "orientation must not be null.";
+        assert minValue <= maxValue : "minValue must be less than maxValue.";
+        assert minValue <= initialValue && initialValue <= maxValue : "initialValue must be between minValue and maxValue.";
 
-        barBackground.setLayoutData(BorderLayoutData.CENTER);
+        // Set our orientation
+        _orientation = orientation;
+
+        // Create a default data model
+        _model = new DefaultSliderModel(minValue, maxValue);
+
+        // set up our knob and attach it.
+        _knob = new UISliderKnob(this);
+        attachChild(_knob);
+
+        // Set our initial value
+        setValue(initialValue);
+
+        // Add our back panel
+        attachChild(_backPanel);
+
+        // Apply our skin.
         applySkin();
-
-        updateMinimumSizeFromContents();
-        compact();
-
-        layout();
     }
 
-    private void fireChangeEvent() {
+    /**
+     * Notifies any listeners that this slider has updated its value.
+     */
+    public void fireChangeEvent() {
+        if (!isEnabled()) {
+            return;
+        }
+
         final ActionEvent event = new ActionEvent(this);
         for (final ActionListener l : _listeners) {
             l.actionPerformed(event);
@@ -81,126 +103,172 @@ public class UISlider extends UIPanel implements DragListener {
     }
 
     /**
-     * Add the specified listener to this scrollbar's list of listeners notified when it's changed. Get the current
-     * value using the getOffset() function when you receive a change event.
+     * @return our orientation.
+     */
+    public Orientation getOrientation() {
+        return _orientation;
+    }
+
+    @Override
+    public void layout() {
+        // Keep the knob sized to our content area. This lets the knob control its handle placement.
+        _knob.setLocalComponentSize(getContentWidth(), getContentHeight());
+        _knob.layout();
+
+        // Update the knob's relative position, based on the slider's range and value.
+        updateKnob();
+
+        // Set the backing panel's position and size based on orientation. We'll center it on the perpendicular axis.
+        if (getOrientation() == Orientation.Horizontal) {
+            _backPanel.setLocalComponentSize(getContentWidth(), _backPanel.getMinimumLocalComponentWidth());
+            _backPanel.setLocalXY(0, (getContentHeight() - _backPanel.getMinimumLocalComponentHeight()) / 2);
+        } else {
+            _backPanel.setLocalComponentSize(_backPanel.getMinimumLocalComponentWidth(), getContentHeight());
+            _backPanel.setLocalXY((getContentWidth() - _backPanel.getMinimumLocalComponentHeight()) / 2, 0);
+        }
+
+        // lay out the back panel's contents, if any.
+        _backPanel.layout();
+    }
+
+    @Override
+    public UIComponent getUIComponent(final int x, final int y) {
+        // prevent picking when disabled.
+        if (!isEnabled()) {
+            return null;
+        }
+
+        return super.getUIComponent(x, y);
+    }
+
+    @Override
+    public void updateMinimumSizeFromContents() {
+        // No layout, so handle this directly.
+        // update and compact knob
+        _knob.updateMinimumSizeFromContents();
+        _knob.compact();
+        // update and compact backPanel
+        _backPanel.updateMinimumSizeFromContents();
+        _backPanel.compact();
+        // Set our minimum size based on the sizes of our knob and backPanel.
+        if (getOrientation() == Orientation.Horizontal) {
+            setMinimumContentSize(_knob.getLocalComponentWidth(), Math.max(_backPanel.getLocalComponentHeight(), _knob
+                    .getLocalComponentHeight()));
+        } else {
+            setMinimumContentSize(Math.max(_backPanel.getLocalComponentWidth(), _knob.getLocalComponentWidth()), _knob
+                    .getLocalComponentHeight());
+        }
+
+        // Our size may have have changed, so force an update of the knob's position.
+        updateKnob();
+    }
+
+    /**
+     * Set the value on this slider
+     * 
+     * @param value
+     *            the new value. Must be between min and max values.
+     */
+    public void setValue(final int value) {
+        assert _model.getMinValue() <= value && value <= _model.getMaxValue() : "value must be between the model's minValue and maxValue.";
+        _model.setCurrentValue(value, this);
+        updateKnob();
+    }
+
+    /**
+     * Update our knob's position.
+     */
+    private void updateKnob() {
+        _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
+    }
+
+    /**
+     * @return the current data model's current value.
+     */
+    public int getValue() {
+        return _model.getCurrentValue();
+    }
+
+    /**
+     * @return the data model for the slider.
+     */
+    public SliderModel getModel() {
+        return _model;
+    }
+
+    /**
+     * @param model
+     *            the new data model for this slider. Must not be null.
+     */
+    public void setModel(final DefaultSliderModel model) {
+        assert model != null : "model can not be null.";
+        _model = model;
+        updateKnob();
+    }
+
+    /**
+     * Add the specified listener to this slider's list of listeners notified when it has changed.
      * 
      * @param listener
+     *            the listener to add
      */
     public void addActionListener(final ActionListener listener) {
         _listeners.add(listener);
     }
 
-    public Orientation getOrientation() {
-        return orientation;
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        int freeSpace;
-        if (orientation == Orientation.Horizontal) {
-            freeSpace = barBackground.getContentWidth() - btSlider.getLocalComponentWidth();
-            final int loc = Math.round((float) offset / maxOffset * freeSpace);
-            btSlider.setLocalComponentHeight(barBackground.getContentHeight());
-            btSlider.setLocalXY(loc, barBackground.getLocalY());
-        } else {
-            freeSpace = barBackground.getContentHeight() - btSlider.getLocalComponentHeight();
-            final int loc = Math.round((float) offset / maxOffset * freeSpace);
-            btSlider.setLocalComponentWidth(barBackground.getContentWidth());
-            btSlider.setLocalXY(barBackground.getLocalX(), loc);
-        }
-    }
-
-    public void setSliderLength(final int len) {
-        if (orientation == Orientation.Horizontal) {
-            btSlider.setLocalComponentWidth(len);
-        } else {
-            btSlider.setLocalComponentHeight(len);
-        }
+    /**
+     * Remove a listener from this slider's list of listeners.
+     * 
+     * @param listener
+     *            the listener to remove
+     * @return true if the listener was removed.
+     */
+    public boolean removeActionListener(final ActionListener listener) {
+        return _listeners.remove(listener);
     }
 
     /**
-     * get the current offset from the beginning of the range or in other words the value of the slider
-     * 
-     * @return the value as 0 <= offset <= maxOffset
+     * Called by the knob when our knob is released. Snaps to the nearest value.
      */
-    public int getOffset() {
-        return offset;
+    void knobReleased() {
+        if (_snapToValues) {
+            setValue(Math.round(_knob.getPosition() * (_model.getMaxValue() - _model.getMinValue())));
+        }
+    }
+
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        _knob.setEnabled(enabled);
+        _backPanel.setEnabled(false);
     }
 
     /**
-     * set the value of the slider
-     * 
-     * @param offset
+     * @return the knob associated with this slider.
      */
-    public void setOffset(final int offset) {
-        this.offset = offset;
+    public UISliderKnob getKnob() {
+        return _knob;
     }
 
     /**
-     * set the maximum value of the slider
-     * 
-     * @param maxOffset
+     * @return the back panel associated with this slider.
      */
-    public void setMaxOffset(final int maxOffset) {
-        this.maxOffset = maxOffset;
+    public UIPanel getBackPanel() {
+        return _backPanel;
     }
 
-    @Override
-    public void updateMinimumSizeFromContents() {
-        setMinimumContentSize(btSlider.getLocalComponentWidth(), btSlider.getLocalComponentHeight());
+    /**
+     * @param snap
+     *            true if we snap the slider to the integer representations on mouse release.
+     */
+    public void setSnapToValues(final boolean snap) {
+        _snapToValues = snap;
     }
 
-    public void drag(final int mouseX, final int mouseY) {
-        if (orientation == Orientation.Horizontal) {
-            final int freeSpace = barBackground.getContentWidth() - btSlider.getLocalComponentWidth();
-            offset = Math.round((mouseX - startDragX) / (float) freeSpace * maxOffset);
-            if (offset < 0) {
-                offset = 0;
-            }
-            if (offset > maxOffset) {
-                offset = maxOffset;
-            }
-        } else {
-            final int freeSpace = barBackground.getContentHeight() - btSlider.getLocalComponentHeight();
-            offset = Math.round((mouseY - startDragY) / (float) freeSpace * maxOffset);
-            if (offset < 0) {
-                offset = 0;
-            }
-            if (offset > maxOffset) {
-                offset = maxOffset;
-            }
-        }
-        fireChangeEvent();
-        layout();
-    }
-
-    public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
-
-    public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
-        return component == btSlider;
-    }
-
-    public void startDrag(final int mouseX, final int mouseY) {
-        startDragX = mouseX;
-        startDragY = mouseY;
-    }
-
-    @Override
-    public void attachedToHud() {
-        super.attachedToHud();
-        getHud().addDragListener(this);
-    }
-
-    @Override
-    public void detachedFromHud() {
-        if (getHud() != null) {
-            getHud().removeDragListener(this);
-        }
-        super.detachedFromHud();
-    }
-
-    public int getMaxOffset() {
-        return maxOffset;
+    /**
+     * @return true if we snap the slider to the integer representations on mouse release.
+     */
+    public boolean isSnapToValues() {
+        return _snapToValues;
     }
 }

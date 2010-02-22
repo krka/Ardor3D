@@ -18,6 +18,7 @@ import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITooltip;
 
@@ -55,6 +56,11 @@ public abstract class Skin {
         } else if (component instanceof UIFrame) {
             applyToFrame((UIFrame) component);
         }
+
+        // 5. SLIDER
+        else if (component instanceof UISlider) {
+            applyToSlider((UISlider) component);
+        }
     }
 
     protected abstract void applyToTab(UITab component);
@@ -74,4 +80,6 @@ public abstract class Skin {
     protected abstract void applyToFrame(UIFrame component);
 
     protected abstract void applyToProgressBar(UIProgressBar component);
+
+    protected abstract void applyToSlider(UISlider component);
 }
