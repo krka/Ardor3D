@@ -17,8 +17,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -30,7 +28,6 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -54,22 +51,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
@@ -96,15 +87,15 @@ public class ExampleRunner extends JFrame {
     private final ClassTreeModel model;
     private final JSplitPane splitPane;
     private final JLabel lDescription;
-    private final JSlider sliderMemory;
     private final Action runSelectedAction;
+    private final Action browseSelectedAction;
     private final ErasableTextField tfPattern;
     private final JTabbedPane tabbedPane;
     private final DisplayConsole console;
-    private final int[] memorySettings = { 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144,
-            8192 };
-
-    private final static String HEADER = "<html><body><h2 align=\"center\">Ardor3d Examples</h2><p align=\"center\"><img src=\""
+    private int maxHeapMemory = 64;
+    private final static String HEADER = "<html><body><h2 align=\"center\">Ardor3d Examples</h2>"
+            + "<p>Choose an example in the tree and select Run. Movement keys are: W, A, S, and D. Control view with left/right buttons.</p>"
+            + "<p align=\"center\"><img src=\""
             + ExampleRunner.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
             + "\"></p></body></html>";
     private static Comparator<Class<?>> classComparator = new Comparator<Class<?>>() {
@@ -136,10 +127,10 @@ public class ExampleRunner extends JFrame {
                 search();
             }
         });
-        final JToolBar toolbar = new JToolBar();
         final AbstractAction expandAction = new AbstractAction() {
 
             private static final long serialVersionUID = 1L;
+
             {
                 putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
                         .getResource("/com/ardor3d/example/media/icons/view-list-tree.png")));
@@ -158,15 +149,21 @@ public class ExampleRunner extends JFrame {
                 }
             }
         };
+        final JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         final JToggleButton btExpand = new JToggleButton(expandAction);
+        btExpand.setBorderPainted(false);
+        btExpand.setBorder(null);
+
         final JPanel pTree = new JPanel(new BorderLayout());
         final JScrollPane scrTree = new JScrollPane(tree);
-        scrTree.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        scrTree.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3)); // border layout aligns with toolbarPanel
         pTree.add(scrTree);
-        pTree.add(toolbar, BorderLayout.NORTH);
+        pTree.add(toolbarPanel, BorderLayout.NORTH);
 
         runSelectedAction = new AbstractAction() {
+
             private static final long serialVersionUID = 1L;
+
             {
                 putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
                         .getResource("/com/ardor3d/example/media/icons/media-playback-start.png")));
@@ -180,32 +177,36 @@ public class ExampleRunner extends JFrame {
         };
         final JButton runButton = new JButton(runSelectedAction);
         runButton.setBorder(null);
-        toolbar.add(btExpand);
-        toolbar.add(runButton);
-        toolbar.add(tfPattern);
+
+        browseSelectedAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
+
+            {
+                putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
+                        .getResource("/com/ardor3d/example/media/icons/world.png")));
+                putValue(Action.SHORT_DESCRIPTION, "View the source code. (Requires active Internet connection.)");
+            }
+
+            public void actionPerformed(final ActionEvent e) {
+                browseSelected();
+            }
+        };
+        final JButton browseButton = new JButton(browseSelectedAction);
+        browseButton.setBorder(null);
+
+        toolbarPanel.add(btExpand);
+        toolbarPanel.add(tfPattern);
+        toolbarPanel.add(runButton);
+        toolbarPanel.add(browseButton);
 
         lDescription = new JLabel();
         lDescription.setVerticalTextPosition(SwingConstants.TOP);
         lDescription.setVerticalAlignment(SwingConstants.TOP);
         lDescription.setHorizontalAlignment(SwingConstants.CENTER);
-        sliderMemory = new JSlider(0, memorySettings.length - 1, 0);
-        sliderMemory.setToolTipText("Set the maximum heap memory for this demo.");
         final JPanel pExample = new JPanel(new BorderLayout());
         pExample.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
         pExample.add(lDescription);
-        final JPanel pSettings = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        pSettings.add(new JLabel("Memory: "));
-        final JLabel lMemory = new JLabel("64M");
-        sliderMemory.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(final ChangeEvent e) {
-                lMemory.setText(memorySettings[sliderMemory.getValue()] + "M");
-            }
-        });
-        pSettings.add(lMemory);
-        pSettings.add(sliderMemory);
-        pSettings.add(new JButton(runSelectedAction));
-        pExample.add(pSettings, BorderLayout.SOUTH);
         console = new DisplayConsole();
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabPlacement(SwingConstants.BOTTOM);
@@ -221,23 +222,14 @@ public class ExampleRunner extends JFrame {
         add(splitPane);
 
         model.reload("com.ardor3d.example");
+        btExpand.doClick();
 
-        final JPopupMenu ctxMenu = new JPopupMenu();
-        ctxMenu.add(runSelectedAction);
-        tree.setComponentPopupMenu(ctxMenu);
         tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+
             public void valueChanged(final TreeSelectionEvent e) {
                 updateDescription();
                 updateActionStatus();
-            }
-        });
-
-        tree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() > 1) {
-                    runSelected();
-                }
+                tabbedPane.setSelectedIndex(0);
             }
         });
 
@@ -256,6 +248,7 @@ public class ExampleRunner extends JFrame {
         final TreePath tp = tree.getSelectionPath();
         final boolean canRun = tp != null && tp.getLastPathComponent() instanceof Class<?>;
         runSelectedAction.setEnabled(canRun);
+        browseSelectedAction.setEnabled(canRun);
     }
 
     private void updateDescription() {
@@ -273,6 +266,7 @@ public class ExampleRunner extends JFrame {
         } else {
             final Purpose purpose = selectedClass.getAnnotation(Purpose.class);
             String imgURL = "";
+            String htmlDescription = "";
             if (purpose != null) {
                 try {
                     // Look for the example's thumbnail.
@@ -280,18 +274,11 @@ public class ExampleRunner extends JFrame {
                     if (imageURL != null) {
                         imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
+                    htmlDescription = purpose.htmlDescription();
                 } catch (final Exception ex) {
                 }
-
-                // Set our requested max heap.
-                // spMemory.setValue(purpose.maxHeapMemory());
-                int memIndex = Arrays.binarySearch(memorySettings, purpose.maxHeapMemory());
-                if (memIndex < 0) {
-                    memIndex = -memIndex;
-                }
-                sliderMemory.setValue(memIndex);
+                maxHeapMemory = purpose.maxHeapMemory();
             }
-
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
                 imgURL = "<img src=\""
@@ -300,10 +287,8 @@ public class ExampleRunner extends JFrame {
             }
 
             // Set the description HTML
-            lDescription.setText("<html><body><h2 align=\"center\">" + selectedClass.getSimpleName() + "</h2>"
-                    + (purpose == null ? "" : "<p>" + purpose.htmlDescription() + "</p>") + "<p align=\"center\">"
-                    + imgURL + "</p></body></html>");
-
+            lDescription.setText("<html><body><h2 align=\"center\">" + selectedClass.getSimpleName() + "</h2>" + "<p>"
+                    + htmlDescription + "</p>" + "<p align=\"center\">" + imgURL + "</p></body></html>");
         }
     }
 
@@ -318,6 +303,7 @@ public class ExampleRunner extends JFrame {
             return;
         }
         new Thread() {
+
             @Override
             public void run() {
                 try {
@@ -326,7 +312,7 @@ public class ExampleRunner extends JFrame {
                     final boolean isWindows = System.getProperty("os.name").contains("Windows");
                     final List<String> args = Lists.newArrayList();
                     args.add(isWindows ? "javaw" : "java");
-                    args.add("-Xmx" + memorySettings[sliderMemory.getValue()] + "M");
+                    args.add("-Xmx" + maxHeapMemory + "M");
                     args.add("-cp");
                     args.add(System.getProperty("java.class.path"));
                     args.add("-Djava.library.path=" + System.getProperty("java.library.path"));
@@ -345,7 +331,32 @@ public class ExampleRunner extends JFrame {
         }.start();
     }
 
+    private void browseSelected() {
+        // just take the first selected node
+        final TreePath tp = tree.getSelectionPath();
+        if (tp == null) {
+            return;
+        }
+        final Object selected = tp.getLastPathComponent();
+        if (!(selected instanceof Class<?>)) {
+            return;
+        }
+
+        String className = ((Class<?>) selected).getCanonicalName();
+        className = className.replace('.', '/');
+        final String urlString = "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/"
+                + className + ".java";
+        // try {
+        // java.awt.Desktop.getDesktop().browse(new URI(urlString));
+        // } catch (final Exception ex) {
+        // ex.printStackTrace();
+        // JOptionPane.showMessageDialog(ExampleRunner.this, "Unable to open URL: " + urlString + "\n"
+        // + ex.getMessage());
+        // }
+    }
+
     interface SearchFilter {
+
         public boolean matches(final Object value);
 
         public int updateMatches(final String p);
@@ -459,6 +470,7 @@ public class ExampleRunner extends JFrame {
         private FileFilter getFileFilter() {
             if (classFileFilter == null) {
                 classFileFilter = new FileFilter() {
+
                     /**
                      * @see FileFilter
                      */
@@ -466,7 +478,6 @@ public class ExampleRunner extends JFrame {
                         return (pathname.isDirectory() && !pathname.getName().startsWith("."))
                                 || (pathname.getName().endsWith(".class") && pathname.getName().indexOf('$') < 0);
                     }
-
                 };
             }
             return classFileFilter;
@@ -525,14 +536,14 @@ public class ExampleRunner extends JFrame {
             logger.fine(directory + " -> " + packageName);
             final File[] files = directory.listFiles(getFileFilter());
             if (files != null) {
-                for (int i = 0; i < files.length; i++) {
+                for (final File file : files) {
                     // we are only interested in .class files
-                    if (files[i].isDirectory()) {
+                    if (file.isDirectory()) {
                         if (recursive) {
-                            addAllFilesInDirectory(files[i], packageName + "." + files[i].getName(), true);
+                            addAllFilesInDirectory(file, packageName + "." + file.getName(), true);
                         }
                     } else {
-                        final Class<?> result = load(packageName + "." + files[i].getName());
+                        final Class<?> result = load(packageName + "." + file.getName());
                         if (result != null) {
                             addClassForPackage(result);
                         }
@@ -607,12 +618,13 @@ public class ExampleRunner extends JFrame {
                 }
             }
         }
-
     }
 
     class ClassNameCellRenderer implements TreeCellRenderer {
+
         DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
         JLabel classNameLabel = new JLabel(" ");
+
         {
             classNameLabel.setOpaque(true);
         }
@@ -652,6 +664,7 @@ public class ExampleRunner extends JFrame {
     }
 
     class ConsoleStreamer extends Thread {
+
         InputStream is;
         DisplayConsole console;
 
@@ -678,8 +691,8 @@ public class ExampleRunner extends JFrame {
     }
 
     class DisplayConsole extends JPanel {
-        private static final long serialVersionUID = 1L;
 
+        private static final long serialVersionUID = 1L;
         final int MAX_CHARACTERS = 50000;
         private final JTextArea textArea;
         private final JScrollPane scrollPane;
@@ -696,26 +709,18 @@ public class ExampleRunner extends JFrame {
 
             setLayout(new BorderLayout());
             add(scrollPane, BorderLayout.CENTER);
-
-            // setSize(500, 300);
-            // setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            // setLocationByPlatform(true);
-            // setVisible(true);
-
-            // Close when process ends.
         }
 
         public void started(final String className, final Process process) {
             textArea.setText(className + ": started...");
             new Thread() {
+
                 @Override
                 public void run() {
                     try {
                         process.waitFor();
                     } catch (final InterruptedException ex) {
                     }
-                    // setVisible(false);
-                    // dispose();
                 }
             }.start();
         }
@@ -726,11 +731,7 @@ public class ExampleRunner extends JFrame {
                 content = content.substring(content.length() - MAX_CHARACTERS);
             }
             textArea.setText(content);
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    textArea.setCaretPosition(textArea.getText().length());
-                }
-            });
+            textArea.setCaretPosition(textArea.getText().length());
         }
     }
 
@@ -744,8 +745,10 @@ public class ExampleRunner extends JFrame {
         public ErasableTextField(final int len) {
             super(new BorderLayout());
             textField = new JTextField(len);
+            textField.setToolTipText("Type text here to find matching examples.");
             defaultTextBackground = textField.getBackground();
             btClear = new JButton(new AbstractAction() {
+
                 private static final long serialVersionUID = 1L;
 
                 {
