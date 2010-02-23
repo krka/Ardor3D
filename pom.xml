@@ -93,7 +93,7 @@
 
   <!-- these properties help simplify specifying some commonly occurring variables -->
   <properties>
-    <lwjgl.version>ardor3d-2.1.0</lwjgl.version>
+    <lwjgl.version>ardor3d-2.3.0</lwjgl.version>
     <jdom.version>ardor3d-1.1.1</jdom.version>
     <swt.version>ardor3d-3448</swt.version>
   </properties>
