@@ -153,7 +153,7 @@ public class PQTorus extends Mesh {
         final IndexBufferData<?> indices = BufferUtils.createIndexBufferData(6 * _meshData.getVertexCount(), _meshData
                 .getVertexCount() - 1);
 
-        for (int i = 0; i < _meshData.getVertexCount(); i++) {
+        for (int i = _radialSamples; i < _meshData.getVertexCount() + (_radialSamples); i++) {
             indices.put(i);
             indices.put(i - _radialSamples);
             indices.put(i + 1);
