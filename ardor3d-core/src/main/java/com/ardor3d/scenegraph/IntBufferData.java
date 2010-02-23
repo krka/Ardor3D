@@ -77,12 +77,18 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
 
     @Override
     public IntBufferData put(final int value) {
+        if (value < 0) {
+            throw new IllegalArgumentException("Invalid value passed to int buffer: " + value);
+        }
         _buffer.put(value);
         return this;
     }
 
     @Override
     public IntBufferData put(final int index, final int value) {
+        if (value < 0) {
+            throw new IllegalArgumentException("Invalid value passed to int buffer: " + value);
+        }
         _buffer.put(index, value);
         return this;
     }

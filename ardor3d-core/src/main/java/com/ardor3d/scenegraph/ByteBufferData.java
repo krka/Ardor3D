@@ -67,7 +67,7 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
 
     @Override
     public int get() {
-        return _buffer.get();
+        return _buffer.get() & 0xFF;
     }
 
     @Override
@@ -77,12 +77,18 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
 
     @Override
     public ByteBufferData put(final int value) {
+        if (value < 0 || value >= 256) {
+            throw new IllegalArgumentException("Invalid value passed to byte buffer: " + value);
+        }
         _buffer.put((byte) value);
         return this;
     }
 
     @Override
     public ByteBufferData put(final int index, final int value) {
+        if (value < 0 || value >= 256) {
+            throw new IllegalArgumentException("Invalid value passed to byte buffer: " + value);
+        }
         _buffer.put(index, (byte) value);
         return this;
     }

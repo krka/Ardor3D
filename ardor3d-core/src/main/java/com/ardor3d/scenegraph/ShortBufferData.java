@@ -67,23 +67,29 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
 
     @Override
     public int get() {
-        return _buffer.get();
+        return _buffer.get() & 0xFFFF;
     }
 
     @Override
     public int get(final int index) {
-        return _buffer.get(index);
+        return _buffer.get(index) & 0xFFFF;
     }
 
     @Override
     public ShortBufferData put(final int value) {
-        _buffer.put((short) (value & 0xFFFF));
+        if (value < 0 || value >= 65536) {
+            throw new IllegalArgumentException("Invalid value passed to short buffer: " + value);
+        }
+        _buffer.put((short) value);
         return this;
     }
 
     @Override
     public ShortBufferData put(final int index, final int value) {
-        _buffer.put(index, (short) (value & 0xFFFF));
+        if (value < 0 || value >= 65536) {
+            throw new IllegalArgumentException("Invalid value passed to short buffer: " + value);
+        }
+        _buffer.put(index, (short) value);
         return this;
     }
 
