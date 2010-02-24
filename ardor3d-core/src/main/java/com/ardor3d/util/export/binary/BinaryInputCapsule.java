@@ -1246,6 +1246,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final FloatBuffer value = direct ? BufferUtils.createFloatBuffer(length) : BufferUtils
                 .createFloatBufferOnHeap(length);
         value.put(buf.asFloatBuffer());
+        value.rewind();
         return value;
     }
 
@@ -1269,6 +1270,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final IntBuffer value = direct ? BufferUtils.createIntBuffer(length) : BufferUtils
                 .createIntBufferOnHeap(length);
         value.put(buf.asIntBuffer());
+        value.rewind();
         return value;
     }
 
@@ -1292,6 +1294,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final ShortBuffer value = direct ? BufferUtils.createShortBuffer(length) : BufferUtils
                 .createShortBufferOnHeap(length);
         value.put(buf.asShortBuffer());
+        value.rewind();
         return value;
     }
 
@@ -1315,7 +1318,8 @@ public class BinaryInputCapsule implements InputCapsule {
         final ByteBuffer value = direct ? BufferUtils.createByteBuffer(length) : BufferUtils
                 .createByteBufferOnHeap(length);
         value.put(buf);
-        return buf;
+        value.rewind();
+        return value;
     }
 
     static private class ID {
