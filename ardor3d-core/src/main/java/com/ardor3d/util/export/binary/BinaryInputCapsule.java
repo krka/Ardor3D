@@ -1236,7 +1236,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final boolean direct = readBoolean(content);
 
         // Pull data in as a little endian byte buffer.
-        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        final ByteBuffer buf = ByteBuffer.allocateDirect(length * 4).order(ByteOrder.LITTLE_ENDIAN);
         buf.put(content, _index, length * 4).rewind();
 
         // increment index
@@ -1260,7 +1260,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final boolean direct = readBoolean(content);
 
         // Pull data in as a little endian byte buffer.
-        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        final ByteBuffer buf = ByteBuffer.allocateDirect(length * 4).order(ByteOrder.LITTLE_ENDIAN);
         buf.put(content, _index, length * 4).rewind();
 
         // increment index
@@ -1284,7 +1284,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final boolean direct = readBoolean(content);
 
         // Pull data in as a little endian byte buffer.
-        final ByteBuffer buf = ByteBuffer.allocate(length * 2).order(ByteOrder.LITTLE_ENDIAN);
+        final ByteBuffer buf = ByteBuffer.allocateDirect(length * 2).order(ByteOrder.LITTLE_ENDIAN);
         buf.put(content, _index, length * 2).rewind();
 
         // increment index
@@ -1308,7 +1308,7 @@ public class BinaryInputCapsule implements InputCapsule {
         final boolean direct = readBoolean(content);
 
         // Pull data in as a little endian byte buffer.
-        final ByteBuffer buf = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
+        final ByteBuffer buf = ByteBuffer.allocateDirect(length).order(ByteOrder.LITTLE_ENDIAN);
         buf.put(content, _index, length).rewind();
 
         // increment index
