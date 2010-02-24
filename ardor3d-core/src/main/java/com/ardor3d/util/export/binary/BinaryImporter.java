@@ -203,10 +203,7 @@ public class BinaryImporter implements Ardor3DImporter {
 
     protected String readString(final InputStream f, final int length) throws IOException {
         final byte[] data = new byte[length];
-        for (int j = 0; j < length; j++) {
-            data[j] = (byte) f.read();
-        }
-
+        f.read(data, 0, length);
         return new String(data);
     }
 

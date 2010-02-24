@@ -404,28 +404,6 @@ public abstract class ByteUtils {
         return byteArray[offset] != 0;
     }
 
-    /**
-     * Properly reads in data from the given stream until the specified number of bytes have been read.
-     * 
-     * @param store
-     *            the byte array to store in. Should have a length > bytes
-     * @param bytes
-     *            the number of bytes to read.
-     * @param is
-     *            the stream to read from
-     * @return the store array for chaining purposes
-     * @throws IOException
-     *             if an error occurs while reading from the stream
-     * @throws ArrayIndexOutOfBoundsException
-     *             if bytes greater than the length of the store.
-     */
-    public static byte[] readData(final byte[] store, final int bytes, final InputStream is) throws IOException {
-        for (int i = 0; i < bytes; i++) {
-            store[i] = (byte) is.read();
-        }
-        return store;
-    }
-
     public static byte[] rightAlignBytes(final byte[] bytes, final int width) {
         if (bytes.length != width) {
             final byte[] rVal = new byte[width];

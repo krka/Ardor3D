@@ -13,6 +13,7 @@ package com.ardor3d.util.export.binary;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -802,68 +803,120 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
 
     // NIO BUFFERS
-    // float buffer
 
+    // float buffer
     protected void write(final FloatBuffer value) throws IOException {
         if (value == null) {
             write(NULL_OBJECT);
             return;
         }
-        value.rewind();
+
+        // write length
         final int length = value.limit();
         write(length);
-        for (int x = 0; x < length; x++) {
-            write(value.get());
-        }
+
+        // write boolean for directness
+        write(value.isDirect());
+
+        // create little endian store
+        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+
+        // place buffer into store. Rewind buffers
         value.rewind();
+        buf.asFloatBuffer().put(value);
+        buf.rewind();
+        value.rewind();
+
+        // Pull out store as array
+        final byte[] array = new byte[buf.capacity()];
+        buf.get(array);
+
+        // write to stream
+        _baos.write(array);
     }
 
     // int buffer
-
     protected void write(final IntBuffer value) throws IOException {
         if (value == null) {
             write(NULL_OBJECT);
             return;
         }
-        value.rewind();
+
+        // write length
         final int length = value.limit();
         write(length);
-        for (int x = 0; x < length; x++) {
-            write(value.get());
-        }
-        value.rewind();
-    }
 
-    // byte buffer
+        // write boolean for directness
+        write(value.isDirect());
 
-    protected void write(final ByteBuffer value) throws IOException {
-        if (value == null) {
-            write(NULL_OBJECT);
-            return;
-        }
+        // create little endian store
+        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+
+        // place buffer into store. Rewind buffers
         value.rewind();
-        final int length = value.limit();
-        write(length);
-        for (int x = 0; x < length; x++) {
-            write(value.get());
-        }
+        buf.asIntBuffer().put(value);
+        buf.rewind();
         value.rewind();
+
+        // Pull out store as array
+        final byte[] array = new byte[buf.capacity()];
+        buf.get(array);
+
+        // write to stream
+        _baos.write(array);
     }
 
     // short buffer
-
     protected void write(final ShortBuffer value) throws IOException {
         if (value == null) {
             write(NULL_OBJECT);
             return;
         }
-        value.rewind();
+
+        // write length
         final int length = value.limit();
         write(length);
-        for (int x = 0; x < length; x++) {
-            write(value.get());
-        }
+
+        // write boolean for directness
+        write(value.isDirect());
+
+        // create little endian store
+        final ByteBuffer buf = ByteBuffer.allocate(length * 2).order(ByteOrder.LITTLE_ENDIAN);
+
+        // place buffer into store. Rewind buffers
         value.rewind();
+        buf.asShortBuffer().put(value);
+        buf.rewind();
+        value.rewind();
+
+        // Pull out store as array
+        final byte[] array = new byte[buf.capacity()];
+        buf.get(array);
+
+        // write to stream
+        _baos.write(array);
+    }
+
+    // byte buffer
+    protected void write(final ByteBuffer value) throws IOException {
+        if (value == null) {
+            write(NULL_OBJECT);
+            return;
+        }
+
+        // write length
+        final int length = value.limit();
+        write(length);
+
+        // write boolean for directness
+        write(value.isDirect());
+
+        // Pull out value as array
+        final byte[] array = new byte[length];
+        value.get(array);
+
+        // write to stream
+        _baos.write(array);
     }
 
     public void write(final Enum<?> value, final String name, final Enum<?> defVal) throws IOException {

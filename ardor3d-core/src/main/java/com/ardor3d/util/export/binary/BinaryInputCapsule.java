@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
@@ -1224,64 +1225,97 @@ public class BinaryInputCapsule implements InputCapsule {
     }
 
     // NIO BUFFERS
-    // float buffer
 
+    // float buffer
     protected FloatBuffer readFloatBuffer(final byte[] content) throws IOException {
         final int length = readInt(content);
         if (length == BinaryOutputCapsule.NULL_OBJECT) {
             return null;
         }
-        final FloatBuffer value = BufferUtils.createFloatBuffer(length);
-        for (int x = 0; x < length; x++) {
-            value.put(readFloat(content));
-        }
-        value.rewind();
+
+        final boolean direct = readBoolean(content);
+
+        // Pull data in as a little endian byte buffer.
+        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        buf.put(content, _index, length * 4).rewind();
+
+        // increment index
+        _index += length * 4;
+
+        // Convert to float buffer.
+        final FloatBuffer value = direct ? BufferUtils.createFloatBuffer(length) : BufferUtils
+                .createFloatBufferOnHeap(length);
+        value.put(buf.asFloatBuffer());
         return value;
     }
 
     // int buffer
-
     protected IntBuffer readIntBuffer(final byte[] content) throws IOException {
         final int length = readInt(content);
         if (length == BinaryOutputCapsule.NULL_OBJECT) {
             return null;
         }
-        final IntBuffer value = BufferUtils.createIntBuffer(length);
-        for (int x = 0; x < length; x++) {
-            value.put(readInt(content));
-        }
-        value.rewind();
-        return value;
-    }
 
-    // byte buffer
+        final boolean direct = readBoolean(content);
 
-    protected ByteBuffer readByteBuffer(final byte[] content) throws IOException {
-        final int length = readInt(content);
-        if (length == BinaryOutputCapsule.NULL_OBJECT) {
-            return null;
-        }
-        final ByteBuffer value = BufferUtils.createByteBuffer(length);
-        for (int x = 0; x < length; x++) {
-            value.put(readByte(content));
-        }
-        value.rewind();
+        // Pull data in as a little endian byte buffer.
+        final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        buf.put(content, _index, length * 4).rewind();
+
+        // increment index
+        _index += length * 4;
+
+        // Convert to int buffer.
+        final IntBuffer value = direct ? BufferUtils.createIntBuffer(length) : BufferUtils
+                .createIntBufferOnHeap(length);
+        value.put(buf.asIntBuffer());
         return value;
     }
 
     // short buffer
-
     protected ShortBuffer readShortBuffer(final byte[] content) throws IOException {
         final int length = readInt(content);
         if (length == BinaryOutputCapsule.NULL_OBJECT) {
             return null;
         }
-        final ShortBuffer value = BufferUtils.createShortBuffer(length);
-        for (int x = 0; x < length; x++) {
-            value.put(readShort(content));
-        }
-        value.rewind();
+
+        final boolean direct = readBoolean(content);
+
+        // Pull data in as a little endian byte buffer.
+        final ByteBuffer buf = ByteBuffer.allocate(length * 2).order(ByteOrder.LITTLE_ENDIAN);
+        buf.put(content, _index, length * 2).rewind();
+
+        // increment index
+        _index += length * 2;
+
+        // Convert to short buffer.
+        final ShortBuffer value = direct ? BufferUtils.createShortBuffer(length) : BufferUtils
+                .createShortBufferOnHeap(length);
+        value.put(buf.asShortBuffer());
         return value;
+    }
+
+    // byte buffer
+    protected ByteBuffer readByteBuffer(final byte[] content) throws IOException {
+        final int length = readInt(content);
+        if (length == BinaryOutputCapsule.NULL_OBJECT) {
+            return null;
+        }
+
+        final boolean direct = readBoolean(content);
+
+        // Pull data in as a little endian byte buffer.
+        final ByteBuffer buf = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
+        buf.put(content, _index, length).rewind();
+
+        // increment index
+        _index += length;
+
+        // Convert to platform endian buffer.
+        final ByteBuffer value = direct ? BufferUtils.createByteBuffer(length) : BufferUtils
+                .createByteBufferOnHeap(length);
+        value.put(buf);
+        return buf;
     }
 
     static private class ID {
@@ -1307,6 +1341,7 @@ public class BinaryInputCapsule implements InputCapsule {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T[] readEnumArray(final String name, final Class<T> enumType, final T[] defVal)
             throws IOException {
         final String[] eVals = readStringArray(name, null);
