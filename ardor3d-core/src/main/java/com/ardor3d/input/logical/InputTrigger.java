@@ -19,12 +19,37 @@ import com.google.common.base.Predicate;
  */
 @Immutable
 public final class InputTrigger {
-    private final Predicate<TwoInputStates> condition;
-    private final TriggerAction action;
+    private final Predicate<TwoInputStates> _condition;
+    private final TriggerAction _action;
+    private String _id;
 
+    /**
+     * Construct a new InputTrigger with the given condition and action.
+     * 
+     * @param condition
+     *            the predicate to test for this trigger
+     * @param action
+     *            the action to take if the predicate returns true.
+     */
     public InputTrigger(final Predicate<TwoInputStates> condition, final TriggerAction action) {
-        this.condition = condition;
-        this.action = action;
+        _condition = condition;
+        _action = action;
+    }
+
+    /**
+     * Construct a new InputTrigger with the given condition and action.
+     * 
+     * @param condition
+     *            the predicate to test for this trigger
+     * @param action
+     *            the action to take if the predicate returns true.
+     * @param id
+     *            an id, useful for identifying this trigger for deregistration, etc.
+     */
+    public InputTrigger(final Predicate<TwoInputStates> condition, final TriggerAction action, final String id) {
+        _condition = condition;
+        _action = action;
+        _id = id;
     }
 
     /**
@@ -38,8 +63,23 @@ public final class InputTrigger {
      *            the time per frame in seconds
      */
     void performIfValid(final Canvas source, final TwoInputStates states, final double tpf) {
-        if (condition.apply(states)) {
-            action.perform(source, states, tpf);
+        if (_condition.apply(states)) {
+            _action.perform(source, states, tpf);
         }
+    }
+
+    /**
+     * @param id
+     *            the id to set. This id can be used to uniquely identify a trigger.
+     */
+    public void setId(final String id) {
+        _id = id;
+    }
+
+    /**
+     * @return the id set, or null if none was set.
+     */
+    public String getId() {
+        return _id;
     }
 }
