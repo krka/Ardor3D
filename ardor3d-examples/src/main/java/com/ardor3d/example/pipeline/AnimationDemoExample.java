@@ -101,7 +101,7 @@ public class AnimationDemoExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Ardor3D - Collada Import");
+        _canvas.setTitle("Ardor3D - Animation Demo Example");
         _canvas.getCanvasRenderer().getRenderer().setBackgroundColor(ColorRGBA.GRAY);
 
         _lightState.detachAll();
@@ -238,10 +238,6 @@ public class AnimationDemoExample extends ExampleBase {
 
             createAnimation(colladaImporter);
 
-            // Uncomment for debugging the scenegraph
-            // final ScenegraphTree tree = new ScenegraphTree();
-            // tree.show(colladaNode);
-
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
@@ -357,7 +353,6 @@ public class AnimationDemoExample extends ExampleBase {
             }
 
             final Vector3 vec = new Vector3(center);
-            // XXX: a bit of a hack
             if (upAxis.equals(Vector3.UNIT_Z)) {
                 vec.addLocal(0.0, -radius * 2, 0.0);
             } else {
