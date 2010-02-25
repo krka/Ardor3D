@@ -913,6 +913,7 @@ public class BinaryOutputCapsule implements OutputCapsule {
 
         // Pull out value as array
         final byte[] array = new byte[length];
+        value.rewind();
         value.get(array);
 
         // write to stream
