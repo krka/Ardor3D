@@ -10,7 +10,6 @@
 
 package com.ardor3d.example.pipeline;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -31,11 +30,14 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.scenegraph.shape.Teapot;
 import com.ardor3d.scenegraph.shape.Torus;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
+import com.ardor3d.util.export.xml.XMLExporter;
+import com.ardor3d.util.export.xml.XMLImporter;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -51,7 +53,8 @@ public class ExportImportExample extends ExampleBase {
     private final Matrix3 rotation = new Matrix3();
 
     private Node originalNode;
-    private Node importedNode;
+    private Node binaryImportedNode;
+    private Node xmlImportedNode;
 
     public static void main(final String[] args) {
         start(ExportImportExample.class);
@@ -62,7 +65,10 @@ public class ExportImportExample extends ExampleBase {
         final double time = timer.getTimeInSeconds() * 0.5;
 
         originalNode.setRotation(rotation.fromAngles(time, time, time));
-        importedNode.setRotation(rotation.fromAngles(time, time, time));
+        if (binaryImportedNode != null)
+            binaryImportedNode.setRotation(rotation);
+        if (xmlImportedNode != null)
+        xmlImportedNode.setRotation(rotation);
     }
 
     @Override
@@ -94,6 +100,11 @@ public class ExportImportExample extends ExampleBase {
         quad.updateModelBound();
         quad.setRenderState(bgts);
 
+        final Teapot teapot = new Teapot();
+        teapot.setScale(20);
+        teapot.updateModelBound();
+        teapot.setRandomColors();
+
         final Mesh multiStrip = createMultiStrip();
         multiStrip.updateModelBound();
         multiStrip.setTranslation(0, 0, -30);
@@ -102,6 +113,7 @@ public class ExportImportExample extends ExampleBase {
         originalNode.attachChild(torus);
         originalNode.attachChild(quad);
         originalNode.attachChild(multiStrip);
+        originalNode.attachChild(teapot);
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -110,16 +122,30 @@ public class ExportImportExample extends ExampleBase {
             logger.log(Level.SEVERE, "BinaryExporter failed to save file", e);
         }
 
-        originalNode.setTranslation(new Vector3(-80, 0, -300));
+        originalNode.setTranslation(new Vector3(-80, 0, -400));
         _root.attachChild(originalNode);
 
-        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         try {
-            importedNode = (Node) BinaryImporter.getInstance().load(bis);
-            importedNode.setTranslation(new Vector3(80, 0, -300));
-            _root.attachChild(importedNode);
+            binaryImportedNode = (Node) BinaryImporter.getInstance().load(bos.toByteArray());
+            binaryImportedNode.setTranslation(new Vector3(80, 80, -400));
+            _root.attachChild(binaryImportedNode);
         } catch (final IOException e) {
             logger.log(Level.SEVERE, "BinaryImporter failed to load file", e);
+        }
+
+        bos.reset();
+        try {
+            XMLExporter.getInstance().save(originalNode, bos);
+        } catch (final IOException e) {
+            logger.log(Level.SEVERE, "XMLExporter failed to save file", e);
+        }
+
+        try {
+            xmlImportedNode = (Node) XMLImporter.getInstance().load(bos.toByteArray());
+            xmlImportedNode.setTranslation(new Vector3(80, -80, -400));
+            _root.attachChild(xmlImportedNode);
+        } catch (final IOException e) {
+            logger.log(Level.SEVERE, "XMLImporter failed to load file", e);
         }
     }
 
