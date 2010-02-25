@@ -19,8 +19,6 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -475,9 +473,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_releaseVariance, "releaseVariance", 0);
         capsule.write(_precision, "precision", 0);
         capsule.write(_controlFlow, "controlFlow", false);
@@ -487,9 +484,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _releaseVariance = capsule.readDouble("releaseVariance", 0);
         _precision = capsule.readDouble("precision", 0);
         _controlFlow = capsule.readBoolean("controlFlow", false);

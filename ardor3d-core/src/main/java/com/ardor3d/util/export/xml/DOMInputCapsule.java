@@ -29,9 +29,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
@@ -45,13 +47,11 @@ public class DOMInputCapsule implements InputCapsule {
 
     private final Document _doc;
     private Element _currentElem;
-    private final XMLImporter _importer;
     private boolean _isAtRoot = true;
     private final Map<String, Savable> _referencedSavables = new HashMap<String, Savable>();
 
-    public DOMInputCapsule(final Document doc, final XMLImporter importer) {
+    public DOMInputCapsule(final Document doc) {
         _doc = doc;
-        _importer = importer;
         _currentElem = doc.getDocumentElement();
     }
 
@@ -653,7 +653,7 @@ public class DOMInputCapsule implements InputCapsule {
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final String[] tmp = new String[size];
-            final NodeList nodes = _currentElem.getChildNodes();
+            final NodeList nodes = tmpEl.getChildNodes();
             int strIndex = 0;
             for (int i = 0; i < nodes.getLength(); i++) {
                 final Node n = nodes.item(i);
@@ -671,7 +671,7 @@ public class DOMInputCapsule implements InputCapsule {
             ex.initCause(e);
             throw ex;
         }
-        _currentElem = (Element) _currentElem.getParentNode();
+        // _currentElem = (Element) _currentElem.getParentNode();
         return ret;
     }
 
@@ -782,13 +782,48 @@ public class DOMInputCapsule implements InputCapsule {
             } else if (_currentElem.hasAttribute("class")) {
                 className = _currentElem.getAttribute("class");
             }
-            tmp = (Savable) Thread.currentThread().getContextClassLoader().loadClass(className).newInstance();
+
+            try {
+                @SuppressWarnings("unchecked")
+                final Class<? extends Savable> clazz = (Class<? extends Savable>) Class.forName(className);
+                final SavableFactory ann = clazz.getAnnotation(SavableFactory.class);
+                if (ann == null) {
+                    tmp = clazz.newInstance();
+                } else {
+                    tmp = (Savable) clazz.getMethod(ann.factoryMethod(), InputCapsule.class).invoke(null,
+                            (Object[]) null);
+                }
+            } catch (final InstantiationException e) {
+                Logger.getLogger(getClass().getName()).logp(
+                        Level.SEVERE,
+                        this.getClass().toString(),
+                        "readSavableFromCurrentElem(Savable)",
+                        "Could not access constructor of class '" + className + "'! \n"
+                                + "Some types may require the annotation SavableFactory.  Please double check.");
+                throw new Ardor3dException(e);
+            } catch (final NoSuchMethodException e) {
+                Logger
+                        .getLogger(getClass().getName())
+                        .logp(
+                                Level.SEVERE,
+                                this.getClass().toString(),
+                                "readSavableFromCurrentElem(Savable)",
+                                e.getMessage()
+                                        + " \n"
+                                        + "Method specified in annotation does not appear to exist or has an invalid method signature.");
+                throw new Ardor3dException(e);
+            } catch (final Exception e) {
+                Logger.getLogger(getClass().getName()).logp(Level.SEVERE, this.getClass().toString(),
+                        "readSavableFromCurrentElem(Savable)", "Exception", e);
+                return null;
+            }
+
             final String refID = _currentElem.getAttribute("reference_ID");
             if (refID.length() > 0) {
                 _referencedSavables.put(refID, tmp);
             }
             if (tmp != null) {
-                tmp.read(_importer);
+                tmp.read(this);
                 ret = tmp;
             }
         }
@@ -1098,11 +1133,13 @@ public class DOMInputCapsule implements InputCapsule {
             }
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final FloatBuffer tmp = BufferUtils.createFloatBuffer(size);
-            final String[] strings = tmpEl.getAttribute("data").split("\\s+");
-            for (final String s : strings) {
-                tmp.put(Float.parseFloat(s));
+            if (size > 0) {
+                final String[] strings = tmpEl.getAttribute("data").split("\\s+");
+                for (final String s : strings) {
+                    tmp.put(Float.parseFloat(s));
+                }
+                tmp.flip();
             }
-            tmp.flip();
             ret = tmp;
         } catch (final Exception e) {
             final IOException ex = new IOException();
@@ -1122,11 +1159,13 @@ public class DOMInputCapsule implements InputCapsule {
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final IntBuffer tmp = BufferUtils.createIntBuffer(size);
-            final String[] strings = tmpEl.getAttribute("data").split("\\s+");
-            for (final String s : strings) {
-                tmp.put(Integer.parseInt(s));
+            if (size > 0) {
+                final String[] strings = tmpEl.getAttribute("data").split("\\s+");
+                for (final String s : strings) {
+                    tmp.put(Integer.parseInt(s));
+                }
+                tmp.flip();
             }
-            tmp.flip();
             ret = tmp;
         } catch (final Exception e) {
             final IOException ex = new IOException();
@@ -1146,11 +1185,13 @@ public class DOMInputCapsule implements InputCapsule {
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final ByteBuffer tmp = BufferUtils.createByteBuffer(size);
-            final String[] strings = tmpEl.getAttribute("data").split("\\s+");
-            for (final String s : strings) {
-                tmp.put(Byte.valueOf(s));
+            if (size > 0) {
+                final String[] strings = tmpEl.getAttribute("data").split("\\s+");
+                for (final String s : strings) {
+                    tmp.put(Byte.valueOf(s));
+                }
+                tmp.flip();
             }
-            tmp.flip();
             ret = tmp;
         } catch (final Exception e) {
             final IOException ex = new IOException();
@@ -1170,11 +1211,13 @@ public class DOMInputCapsule implements InputCapsule {
 
             final int size = Integer.parseInt(tmpEl.getAttribute("size"));
             final ShortBuffer tmp = BufferUtils.createShortBuffer(size);
-            final String[] strings = tmpEl.getAttribute("data").split("\\s+");
-            for (final String s : strings) {
-                tmp.put(Short.valueOf(s));
+            if (size > 0) {
+                final String[] strings = tmpEl.getAttribute("data").split("\\s+");
+                for (final String s : strings) {
+                    tmp.put(Short.valueOf(s));
+                }
+                tmp.flip();
             }
-            tmp.flip();
             ret = tmp;
         } catch (final Exception e) {
             final IOException ex = new IOException();

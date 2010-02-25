@@ -16,8 +16,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -157,9 +155,9 @@ public class SwarmInfluence extends ParticleInfluence {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule cap = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        final OutputCapsule cap = capsule;
         cap.write(_swarmRangeSQ, "swarmRangeSQ", DEFAULT_SWARM_RANGE_SQ);
         cap.write(_deviance, "deviance", DEFAULT_DEVIANCE);
         cap.write(_turnSpeed, "turnSpeed", DEFAULT_TURN_SPEED);
@@ -169,9 +167,9 @@ public class SwarmInfluence extends ParticleInfluence {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule cap = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        final InputCapsule cap = capsule;
         _swarmRangeSQ = cap.readDouble("swarmRangeSQ", DEFAULT_SWARM_RANGE_SQ);
         _deviance = cap.readDouble("deviance", DEFAULT_DEVIANCE);
         _turnSpeed = cap.readDouble("turnSpeed", DEFAULT_TURN_SPEED);

@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 
 import com.ardor3d.renderer.state.record.FragmentProgramStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -211,18 +209,16 @@ public class FragmentProgramState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(usingParameters, "usingParameters", false);
         capsule.write(parameters, "parameters", new float[24][]);
         capsule.write(program, "program", null);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         usingParameters = capsule.readBoolean("usingParameters", false);
         parameters = capsule.readFloatArray2D("parameters", new float[24][]);
         program = capsule.readByteBuffer("program", null);

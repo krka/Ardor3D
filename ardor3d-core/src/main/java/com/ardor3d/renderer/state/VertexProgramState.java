@@ -20,8 +20,6 @@ import java.util.logging.Logger;
 
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.VertexProgramStateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -225,18 +223,16 @@ public class VertexProgramState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_usingParameters, "usingParameters", false);
         capsule.write(_parameters, "parameters", new float[96][]);
         capsule.write(_program, "program", null);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _usingParameters = capsule.readBoolean("usingParameters", false);
         _parameters = capsule.readFloatArray2D("parameters", new float[96][]);
         _program = capsule.readByteBuffer("program", null);

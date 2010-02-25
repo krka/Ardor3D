@@ -36,8 +36,6 @@ import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -465,9 +463,8 @@ public class Mesh extends Spatial implements Renderable {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_meshData, "meshData", null);
         capsule.write(_castsShadows, "castsShadows", true);
         capsule.write(_modelBound, "modelBound", null);
@@ -475,9 +472,8 @@ public class Mesh extends Spatial implements Renderable {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _meshData = (MeshData) capsule.readSavable("meshData", null);
         _castsShadows = capsule.readBoolean("castsShadows", true);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);

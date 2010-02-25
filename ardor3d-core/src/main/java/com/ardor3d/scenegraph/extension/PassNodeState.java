@@ -17,8 +17,6 @@ import java.util.EnumMap;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -104,14 +102,14 @@ public class PassNodeState implements Savable, Serializable {
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule oc = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        final OutputCapsule oc = capsule;
         oc.write(_enabled, "enabled", true);
         oc.write(_passStates.values().toArray(new RenderState[0]), "passStates", null);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule ic = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        final InputCapsule ic = capsule;
         _enabled = ic.readBoolean("enabled", true);
         final Savable[] temp = ic.readSavableArray("passStates", null);
         _passStates.clear();

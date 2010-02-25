@@ -14,8 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -117,18 +115,16 @@ public class WireframeState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_face, "face", Face.FrontAndBack);
         capsule.write(_lineWidth, "lineWidth", 1);
         capsule.write(_antialiased, "antialiased", false);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _face = capsule.readEnum("face", Face.class, Face.FrontAndBack);
         _lineWidth = capsule.readFloat("lineWidth", 1);
         _antialiased = capsule.readBoolean("antialiased", false);

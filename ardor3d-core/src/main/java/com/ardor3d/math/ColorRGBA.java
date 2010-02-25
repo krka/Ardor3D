@@ -17,8 +17,6 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -864,16 +862,14 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(getRed(), "r", 1);
         capsule.write(getGreen(), "g", 1);
         capsule.write(getBlue(), "b", 1);
         capsule.write(getAlpha(), "a", 1);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         setRed(capsule.readFloat("r", 1));
         setGreen(capsule.readFloat("g", 1));
         setBlue(capsule.readFloat("b", 1));

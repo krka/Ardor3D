@@ -24,9 +24,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.ByteUtils;
+import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.ReadListener;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Maps;
@@ -168,23 +171,23 @@ public class BinaryImporter implements Ardor3DImporter {
         }
     }
 
-    public Savable load(final URL f) throws IOException {
-        return load(f, null);
+    public Savable load(final URL url) throws IOException {
+        return load(url, null);
     }
 
-    public Savable load(final URL f, final ReadListener listener) throws IOException {
-        final InputStream is = f.openStream();
+    public Savable load(final URL url, final ReadListener listener) throws IOException {
+        final InputStream is = url.openStream();
         final Savable rVal = load(is, listener);
         is.close();
         return rVal;
     }
 
-    public Savable load(final File f) throws IOException {
-        return load(f, null);
+    public Savable load(final File file) throws IOException {
+        return load(file, null);
     }
 
-    public Savable load(final File f, final ReadListener listener) throws IOException {
-        final FileInputStream fis = new FileInputStream(f);
+    public Savable load(final File file, final ReadListener listener) throws IOException {
+        final FileInputStream fis = new FileInputStream(file);
         final Savable rVal = load(fis, listener);
         fis.close();
         return rVal;
@@ -197,13 +200,9 @@ public class BinaryImporter implements Ardor3DImporter {
         return rVal;
     }
 
-    public BinaryInputCapsule getCapsule(final Savable id) {
-        return _capsuleTable.get(id);
-    }
-
-    protected String readString(final InputStream f, final int length) throws IOException {
+    protected String readString(final InputStream is, final int length) throws IOException {
         final byte[] data = new byte[length];
-        f.read(data, 0, length);
+        is.read(data, 0, length);
         return new String(data);
     }
 
@@ -242,28 +241,47 @@ public class BinaryImporter implements Ardor3DImporter {
             final BinaryInputCapsule cap = new BinaryInputCapsule(this, bco);
             cap.setContent(_dataArray, loc, loc + dataLength);
 
-            final Savable out = BinaryClassLoader.fromName(bco._className, cap);
+            final Savable out;
+
+            try {
+                @SuppressWarnings("unchecked")
+                final Class<? extends Savable> clazz = (Class<? extends Savable>) Class.forName(bco._className);
+                final SavableFactory ann = clazz.getAnnotation(SavableFactory.class);
+                if (ann == null) {
+                    out = clazz.newInstance();
+                } else {
+                    out = (Savable) clazz.getMethod(ann.factoryMethod(), InputCapsule.class).invoke(null,
+                            (Object[]) null);
+                }
+            } catch (final InstantiationException e) {
+                logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int)",
+                        "Could not access constructor of class '" + bco._className + "'! \n"
+                                + "Some types may require the annotation SavableFactory.  Please double check.", e);
+                throw new Ardor3dException(e);
+            } catch (final NoSuchMethodException e) {
+                logger
+                        .logp(
+                                Level.SEVERE,
+                                this.getClass().toString(),
+                                "readObject(int)",
+                                e.getMessage()
+                                        + " \n"
+                                        + "Method specified in annotation does not appear to exist or has an invalid method signature.",
+                                e);
+                throw new Ardor3dException(e);
+            }
 
             _capsuleTable.put(out, cap);
             _contentTable.put(id, out);
 
-            out.read(this);
+            out.read(_capsuleTable.get(out));
 
             _capsuleTable.remove(out);
 
             return out;
 
-        } catch (final IOException e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "Exception", e);
-            return null;
-        } catch (final ClassNotFoundException e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "Exception", e);
-            return null;
-        } catch (final InstantiationException e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "Exception", e);
-            return null;
-        } catch (final IllegalAccessException e) {
-            logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int id)", "Exception", e);
+        } catch (final Exception e) {
+            logger.logp(Level.SEVERE, this.getClass().toString(), "readObject(int)", "Exception", e);
             return null;
         }
     }

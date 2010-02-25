@@ -12,8 +12,6 @@ package com.ardor3d.image;
 
 import java.io.IOException;
 
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -108,16 +106,14 @@ public class Texture1D extends Texture {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_wrapS, "wrapS", WrapMode.EdgeClamp);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _wrapS = capsule.readEnum("wrapS", WrapMode.class, WrapMode.EdgeClamp);
     }
 }

@@ -16,8 +16,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.record.BlendStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -531,9 +529,8 @@ public class BlendState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_blendEnabled, "blendEnabled", false);
         capsule.write(_sourceFunctionRGB, "sourceFunctionRGB", SourceFunction.SourceAlpha);
         capsule.write(_destinationFunctionRGB, "destinationFunctionRGB", DestinationFunction.OneMinusSourceAlpha);
@@ -548,9 +545,8 @@ public class BlendState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _blendEnabled = capsule.readBoolean("blendEnabled", false);
         _sourceFunctionRGB = capsule.readEnum("sourceFunctionRGB", SourceFunction.class, SourceFunction.SourceAlpha);
         _destinationFunctionRGB = capsule.readEnum("destinationFunctionRGB", DestinationFunction.class,

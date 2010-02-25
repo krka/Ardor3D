@@ -16,8 +16,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.record.FogStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -196,9 +194,8 @@ public class FogState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(start, "start", 0);
         capsule.write(end, "end", 0);
         capsule.write(density, "density", 0);
@@ -209,9 +206,8 @@ public class FogState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         start = capsule.readFloat("start", 0);
         end = capsule.readFloat("end", 0);
         density = capsule.readFloat("density", 0);

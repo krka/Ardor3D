@@ -15,8 +15,6 @@ import java.io.IOException;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -374,10 +372,8 @@ public class OrientedBox extends Mesh {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_center, "center", new Vector3(Vector3.ZERO));
         capsule.write(_xAxis, "_xAxis", new Vector3(Vector3.UNIT_X));
         capsule.write(_yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
@@ -392,10 +388,8 @@ public class OrientedBox extends Mesh {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
-
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _center = (Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO));
         _xAxis = (Vector3) capsule.readSavable("_xAxis", new Vector3(Vector3.UNIT_X));
         _yAxis = (Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y));

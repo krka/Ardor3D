@@ -16,8 +16,6 @@ import java.nio.FloatBuffer;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -292,18 +290,16 @@ public class RoundedBox extends Mesh implements Savable {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_extent, "extent", new Vector3(Vector3.ZERO));
         capsule.write(_border, "border", new Vector3(Vector3.ZERO));
         capsule.write(_slope, "slope", new Vector3(Vector3.ZERO));
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _extent.set((Vector3) capsule.readSavable("extent", new Vector3(Vector3.ZERO)));
         _border.set((Vector3) capsule.readSavable("border", new Vector3(Vector3.ZERO)));
         _slope.set((Vector3) capsule.readSavable("slope", new Vector3(Vector3.ZERO)));

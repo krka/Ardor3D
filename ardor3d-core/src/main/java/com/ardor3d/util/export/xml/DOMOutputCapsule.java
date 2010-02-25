@@ -26,7 +26,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.ardor3d.util.export.Ardor3DExporter;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
@@ -38,12 +37,10 @@ public class DOMOutputCapsule implements OutputCapsule {
     private static final String _dataAttributeName = "data";
     private final Document _doc;
     private Element _currentElement;
-    private final Ardor3DExporter _exporter;
     private final Map<Savable, Element> _writtenSavables = new IdentityHashMap<Savable, Element>();
 
-    public DOMOutputCapsule(final Document doc, final Ardor3DExporter exporter) {
+    public DOMOutputCapsule(final Document doc) {
         _doc = doc;
-        _exporter = exporter;
         _currentElement = null;
     }
 
@@ -482,7 +479,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         } else {
             el = appendElement(name);
             _writtenSavables.put(object, el);
-            object.write(_exporter);
+            object.write(this);
         }
         if (className != null) {
             el.setAttribute("class", className);
@@ -638,7 +635,7 @@ public class DOMOutputCapsule implements OutputCapsule {
         final Iterator<? extends Savable> keyIterator = map.keySet().iterator();
         while (keyIterator.hasNext()) {
             final Savable key = keyIterator.next();
-            final Element mapEntry = appendElement(XMLExporter.ELEMENT_MAPENTRY);
+            appendElement(XMLExporter.ELEMENT_MAPENTRY);
             write(key, XMLExporter.ELEMENT_KEY, null);
             final Savable value = map.get(key);
             write(value, XMLExporter.ELEMENT_VALUE, null);

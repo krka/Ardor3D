@@ -10,6 +10,7 @@
 
 package com.ardor3d.util.export.xml;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,7 +23,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import com.ardor3d.util.export.Ardor3DImporter;
-import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.Savable;
 
 /**
@@ -30,13 +30,12 @@ import com.ardor3d.util.export.Savable;
  */
 public class XMLImporter implements Ardor3DImporter {
 
-    private DOMInputCapsule _domIn;
-
     public XMLImporter() {}
 
-    public Savable load(final InputStream f) throws IOException {
+    public Savable load(final InputStream is) throws IOException {
         try {
-            _domIn = new DOMInputCapsule(DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(f), this);
+            final DOMInputCapsule _domIn = new DOMInputCapsule(DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder().parse(is));
             return _domIn.readSavable(null, null);
         } catch (final SAXException e) {
             final IOException ex = new IOException();
@@ -49,16 +48,16 @@ public class XMLImporter implements Ardor3DImporter {
         }
     }
 
-    public Savable load(final URL f) throws IOException {
-        return load(f.openStream());
+    public Savable load(final URL url) throws IOException {
+        return load(url.openStream());
     }
 
     public Savable load(final File f) throws IOException {
         return load(new FileInputStream(f));
     }
 
-    public InputCapsule getCapsule(final Savable id) {
-        return _domIn;
+    public Savable load(final byte[] data) throws IOException {
+        return load(new ByteArrayInputStream(data));
     }
 
     public static XMLImporter getInstance() {

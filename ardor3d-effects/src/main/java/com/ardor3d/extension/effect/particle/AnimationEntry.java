@@ -12,8 +12,6 @@ package com.ardor3d.extension.effect.particle;
 
 import java.io.IOException;
 
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -57,15 +55,13 @@ public class AnimationEntry implements Savable {
         return getClass();
     }
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule capsule = im.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _offset = capsule.readDouble("offsetMS", 0.05);
         _rate = capsule.readDouble("rate", 0.2);
         _frames = capsule.readIntArray("frames", null);
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule capsule = ex.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_offset, "offsetMS", 0.05);
         capsule.write(_rate, "rate", 0.2);
         capsule.write(_frames, "frames", null);

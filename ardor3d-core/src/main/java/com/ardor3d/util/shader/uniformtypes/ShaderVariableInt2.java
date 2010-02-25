@@ -12,8 +12,6 @@ package com.ardor3d.util.shader.uniformtypes;
 
 import java.io.IOException;
 
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.shader.ShaderVariable;
@@ -24,19 +22,15 @@ public class ShaderVariableInt2 extends ShaderVariable {
     public int value2;
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
-
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(value1, "value1", 0);
         capsule.write(value2, "value2", 0);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
-
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         value1 = capsule.readInt("value1", 0);
         value2 = capsule.readInt("value2", 0);
     }

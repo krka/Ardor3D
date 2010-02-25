@@ -15,8 +15,6 @@ import java.util.EnumSet;
 
 import com.ardor3d.renderer.state.record.OffsetStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -116,9 +114,8 @@ public class OffsetState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_factor, "factor", 0);
         capsule.write(_units, "units", 0);
         capsule.write(_enabledOffsets.contains(OffsetType.Fill), "typeFill", false);
@@ -127,9 +124,8 @@ public class OffsetState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _factor = capsule.readFloat("factor", 0);
         _units = capsule.readFloat("units", 0);
         _enabledOffsets.clear();

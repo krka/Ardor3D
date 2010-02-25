@@ -14,8 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -57,13 +55,11 @@ public class LineSegmentEmitter extends SavableParticleEmitter {
     // Methods for Savable
     // /////////////////
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule capsule = im.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _source = (LineSegment3) capsule.readSavable("source", null);
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule capsule = ex.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_source, "source", null);
     }
 }

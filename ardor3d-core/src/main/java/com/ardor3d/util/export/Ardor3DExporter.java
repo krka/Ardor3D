@@ -16,9 +16,21 @@ import java.io.OutputStream;
 
 public interface Ardor3DExporter {
 
-    public boolean save(Savable object, OutputStream f) throws IOException;
+    /**
+     * Save a Savable object to the given stream.
+     * 
+     * @param savable
+     * @param os
+     * @throws IOException
+     */
+    void save(Savable savable, OutputStream os) throws IOException;
 
-    public boolean save(Savable object, File f) throws IOException;
-
-    public OutputCapsule getCapsule(Savable object);
+    /**
+     * Save a Savable object to the given file.
+     * 
+     * @param savable
+     * @param file
+     * @throws IOException
+     */
+    void save(Savable savable, File file) throws IOException;
 }

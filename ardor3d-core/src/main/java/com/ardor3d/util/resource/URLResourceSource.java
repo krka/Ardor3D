@@ -19,8 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.util.UrlUtils;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -125,8 +123,7 @@ public class URLResourceSource implements ResourceSource {
         return URLResourceSource.class;
     }
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule capsule = im.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         final String protocol = capsule.readString("protocol", null);
         final String host = capsule.readString("host", null);
         final String file = capsule.readString("file", null);
@@ -148,8 +145,7 @@ public class URLResourceSource implements ResourceSource {
         _type = capsule.readString("type", null);
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule capsule = ex.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_url.getProtocol(), "protocol", null);
         capsule.write(_url.getHost(), "host", null);
         capsule.write(_url.getFile(), "file", null);

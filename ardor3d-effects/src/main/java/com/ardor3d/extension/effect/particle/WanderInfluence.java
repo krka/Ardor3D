@@ -15,8 +15,6 @@ import java.util.ArrayList;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -90,18 +88,18 @@ public class WanderInfluence extends ParticleInfluence {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule cap = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        final OutputCapsule cap = capsule;
         cap.write(_wanderRadius, "wanderRadius", DEFAULT_RADIUS);
         cap.write(_wanderDistance, "wanderDistance", DEFAULT_DISTANCE);
         cap.write(_wanderJitter, "wanderJitter", DEFAULT_JITTER);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule cap = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        final InputCapsule cap = capsule;
         _wanderRadius = cap.readDouble("wanderRadius", DEFAULT_RADIUS);
         _wanderDistance = cap.readDouble("wanderDistance", DEFAULT_DISTANCE);
         _wanderJitter = cap.readDouble("wanderJitter", DEFAULT_JITTER);

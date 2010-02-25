@@ -13,9 +13,9 @@ package com.ardor3d.util.export;
 import java.io.IOException;
 
 public interface Savable {
-    void write(Ardor3DExporter ex) throws IOException;
+    void write(OutputCapsule capsule) throws IOException;
 
-    void read(Ardor3DImporter im) throws IOException;
+    void read(InputCapsule capsule) throws IOException;
 
     Class<?> getClassTag();
 }

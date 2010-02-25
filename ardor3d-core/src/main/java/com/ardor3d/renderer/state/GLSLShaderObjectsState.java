@@ -36,8 +36,6 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -941,9 +939,8 @@ public class GLSLShaderObjectsState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.writeSavableList(shaderUniforms, "shaderUniforms", new ArrayList<ShaderVariable>());
         capsule.writeSavableList(shaderAttributes, "shaderAttributes", new ArrayList<ShaderVariable>());
         capsule.write(vertShader, "vertShader", null);
@@ -951,9 +948,8 @@ public class GLSLShaderObjectsState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         shaderUniforms = capsule.readSavableList("shaderUniforms", new ArrayList<ShaderVariable>());
         shaderAttributes = capsule.readSavableList("shaderAttributes", new ArrayList<ShaderVariable>());
         vertShader = capsule.readByteBuffer("vertShader", null);

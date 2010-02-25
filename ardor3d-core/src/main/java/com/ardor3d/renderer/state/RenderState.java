@@ -16,8 +16,6 @@ import java.util.Stack;
 
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -138,13 +136,11 @@ public abstract class RenderState implements Savable {
         return stack.peek();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_enabled, "enabled", true);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _enabled = capsule.readBoolean("enabled", true);
     }
 

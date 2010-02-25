@@ -18,8 +18,6 @@ import java.io.ObjectOutput;
 import com.ardor3d.math.type.ReadOnlyRing;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -275,16 +273,14 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_center, "center", new Vector3(Vector3.ZERO));
         capsule.write(_up, "up", new Vector3(Vector3.UNIT_Z));
         capsule.write(_innerRadius, "innerRadius", 0.0);
         capsule.write(_outerRadius, "outerRadius", 1.0);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
         _up.set((Vector3) capsule.readSavable("up", new Vector3(Vector3.UNIT_Z)));
         _innerRadius = capsule.readDouble("innerRadius", 0.0);

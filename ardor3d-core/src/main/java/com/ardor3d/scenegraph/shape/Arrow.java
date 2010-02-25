@@ -17,8 +17,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -63,17 +61,15 @@ public class Arrow extends Node {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_length, "length", 1);
         capsule.write(_width, "width", .25);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _length = capsule.readDouble("length", 1);
         _width = capsule.readDouble("width", .25);
 

@@ -17,8 +17,6 @@ import java.io.ObjectOutput;
 import com.ardor3d.math.type.ReadOnlyLineSegment3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -232,16 +230,14 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
     // /////////////////
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_extent, "extent", 0.0);
     }
 
     @Override
-    public void read(final Ardor3DImporter i) throws IOException {
-        super.read(i);
-        final InputCapsule capsule = i.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _extent = capsule.readDouble("extent", 0.0);
     }
 

@@ -21,8 +21,6 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -262,9 +260,8 @@ public class BillboardNode extends Node {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_orient, "orient", new Matrix3());
         capsule.write(_look, "look", new Vector3(Vector3.ZERO));
         capsule.write(_left, "left", new Vector3(Vector3.ZERO));
@@ -272,9 +269,8 @@ public class BillboardNode extends Node {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _orient.set((Matrix3) capsule.readSavable("orient", new Matrix3(Matrix3.IDENTITY)));
         _look.set((Vector3) capsule.readSavable("look", new Vector3(Vector3.ZERO)));
         _left.set((Vector3) capsule.readSavable("left", new Vector3(Vector3.ZERO)));

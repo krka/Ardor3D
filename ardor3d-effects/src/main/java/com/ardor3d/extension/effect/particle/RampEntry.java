@@ -14,8 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -119,8 +117,7 @@ public class RampEntry implements Savable {
         return getClass();
     }
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule capsule = im.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _offset = capsule.readDouble("offsetMS", DEFAULT_OFFSET);
         _size = capsule.readDouble("size", DEFAULT_SIZE);
         _spin = capsule.readDouble("spin", DEFAULT_SPIN);
@@ -128,8 +125,7 @@ public class RampEntry implements Savable {
         _color = (ColorRGBA) capsule.readSavable("color", DEFAULT_COLOR);
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule capsule = ex.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_offset, "offsetMS", DEFAULT_OFFSET);
         capsule.write(_size, "size", DEFAULT_SIZE);
         capsule.write(_spin, "spin", DEFAULT_SPIN);

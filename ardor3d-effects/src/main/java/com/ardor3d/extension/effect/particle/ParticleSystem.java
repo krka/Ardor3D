@@ -34,8 +34,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.event.DirtyType;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -932,15 +930,14 @@ public abstract class ParticleSystem extends Node {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
+    public void write(final OutputCapsule capsule) throws IOException {
         // Do not save the "generated" particle geometry.
         final Spatial geom = getParticleGeometry();
         detachChild(geom);
-        super.write(e);
+        super.write(capsule);
         // Reattach
         attachChild(geom);
 
-        final OutputCapsule capsule = e.getCapsule(this);
         capsule.write(_particleType, "particleType", ParticleType.Quad);
         capsule.write(_particleEmitter, "particleEmitter", null);
         capsule.write(_startSize, "startSize", DEFAULT_START_SIZE);
@@ -979,9 +976,8 @@ public abstract class ParticleSystem extends Node {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _particleType = capsule.readEnum("particleType", ParticleType.class, ParticleType.Quad);
         _particleEmitter = (SavableParticleEmitter) capsule.readSavable("particleEmitter", null);
         _startSize = capsule.readDouble("startSize", DEFAULT_START_SIZE);

@@ -27,8 +27,6 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -1172,9 +1170,7 @@ public class MeshData implements Cloneable, Savable {
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
-
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_vertexCount, "vertexCount", 0);
         capsule.write(_vertexCoords, "vertexBuffer", null);
         capsule.write(_normalCoords, "normalBuffer", null);
@@ -1188,9 +1184,7 @@ public class MeshData implements Cloneable, Savable {
         capsule.write(_indexModes, "indexModes");
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
-
+    public void read(final InputCapsule capsule) throws IOException {
         _vertexCount = capsule.readInt("vertexCount", 0);
         _vertexCoords = (FloatBufferData) capsule.readSavable("vertexBuffer", null);
         _normalCoords = (FloatBufferData) capsule.readSavable("normalBuffer", null);

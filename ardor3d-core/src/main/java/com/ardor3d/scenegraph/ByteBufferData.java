@@ -13,8 +13,6 @@ package com.ardor3d.scenegraph;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -55,14 +53,12 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
         return getClass();
     }
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule cap = im.getCapsule(this);
-        _buffer = cap.readByteBuffer("buffer", null);
+    public void read(final InputCapsule capsule) throws IOException {
+        _buffer = capsule.readByteBuffer("buffer", null);
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule cap = ex.getCapsule(this);
-        cap.write(_buffer, "buffer", null);
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_buffer, "buffer", null);
     }
 
     @Override

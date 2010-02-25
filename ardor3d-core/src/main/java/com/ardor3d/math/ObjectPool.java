@@ -53,7 +53,7 @@ public abstract class ObjectPool<T extends Poolable> {
         }
     }
 
-    protected void reset(final T object) {}
+    private void reset(final T object) {}
 
     public static <T extends Poolable> ObjectPool<T> create(final Class<T> clazz, final int maxSize) {
         return new ObjectPool<T>(maxSize) {

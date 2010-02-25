@@ -14,8 +14,6 @@ import java.io.IOException;
 
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.StencilStateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -533,9 +531,8 @@ public class StencilState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_useTwoSided, "useTwoSided", false);
         capsule.write(_stencilFunctionFront, "stencilFuncFront", StencilFunction.Always);
         capsule.write(_stencilReferenceFront, "stencilRefFront", 0);
@@ -555,9 +552,8 @@ public class StencilState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _useTwoSided = capsule.readBoolean("useTwoSided", false);
         _stencilFunctionFront = capsule.readEnum("stencilFuncFront", StencilFunction.class, StencilFunction.Always);
         _stencilReferenceFront = capsule.readInt("stencilRefFront", 0);

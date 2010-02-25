@@ -35,8 +35,6 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -373,9 +371,8 @@ public class QuadImposterNode extends Node {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_texture, "texture", null);
         capsule.write(_targetScene, "targetScene", null);
         capsule.write(_imposterQuad, "standIn", new Quad("ImposterQuad"));
@@ -385,9 +382,8 @@ public class QuadImposterNode extends Node {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _texture = (Texture2D) capsule.readSavable("texture", null);
         _targetScene = (Node) capsule.readSavable("targetScene", null);
         _imposterQuad = (Quad) capsule.readSavable("standIn", new Quad("ImposterQuad"));

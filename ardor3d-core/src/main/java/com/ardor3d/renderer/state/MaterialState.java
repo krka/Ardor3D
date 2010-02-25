@@ -16,8 +16,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.record.MaterialStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -232,9 +230,8 @@ public class MaterialState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
         capsule.write(_diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
         capsule.write(_specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
@@ -245,9 +242,8 @@ public class MaterialState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
         _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
         _specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));

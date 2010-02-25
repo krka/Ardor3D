@@ -25,8 +25,8 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -699,20 +699,20 @@ public class BoundingSphere extends BoundingVolume {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         try {
-            e.getCapsule(this).write(getRadius(), "radius", 0);
+            capsule.write(getRadius(), "radius", 0);
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "write(Ardor3DExporter)", "Exception", ex);
         }
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         try {
-            setRadius(e.getCapsule(this).readDouble("radius", 0));
+            setRadius(capsule.readDouble("radius", 0));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "read(Ardor3DImporter)", "Exception", ex);
         }

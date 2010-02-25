@@ -159,7 +159,7 @@ public class BinaryExporter implements Ardor3DExporter {
         return new BinaryExporter(debug, compression);
     }
 
-    public boolean save(final Savable object, final OutputStream os) throws IOException {
+    public void save(final Savable object, final OutputStream os) throws IOException {
         try {
             GZIPOutputStream zos = new GZIPOutputStream(os) {
                 {
@@ -270,9 +270,6 @@ public class BinaryExporter implements Ardor3DExporter {
                 logger.info("location table: " + locbytes + " bytes");
                 logger.info("data: " + location + " bytes");
             }
-
-            return true;
-
         } finally {
             _aliasCount = 1;
             _idCount = 1;
@@ -312,20 +309,15 @@ public class BinaryExporter implements Ardor3DExporter {
         return bytes;
     }
 
-    public boolean save(final Savable object, final File f) throws IOException {
-        final File parentDirectory = f.getParentFile();
+    public void save(final Savable object, final File file) throws IOException {
+        final File parentDirectory = file.getParentFile();
         if (parentDirectory != null && !parentDirectory.exists()) {
             parentDirectory.mkdirs();
         }
 
-        final FileOutputStream fos = new FileOutputStream(f);
-        final boolean rVal = save(object, fos);
+        final FileOutputStream fos = new FileOutputStream(file);
+        save(object, fos);
         fos.close();
-        return rVal;
-    }
-
-    public BinaryOutputCapsule getCapsule(final Savable object) {
-        return _contentTable.get(object).getContent();
     }
 
     public int processBinarySavable(final Savable object) throws IOException {
@@ -350,7 +342,7 @@ public class BinaryExporter implements Ardor3DExporter {
         if (old == null) {
             _contentKeys.add(object);
         }
-        object.write(this);
+        object.write(_contentTable.get(object).getContent());
         newPair.getContent().finish();
         return newPair.getId();
 

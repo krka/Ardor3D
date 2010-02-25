@@ -15,8 +15,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -178,8 +176,7 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
 
     public abstract void update(double time, T caller);
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_repeatType, "repeatType", RepeatType.CLAMP);
         capsule.write(_minTime, "minTime", 0);
         capsule.write(_maxTime, "maxTime", 0);
@@ -187,8 +184,7 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
         capsule.write(_active, "active", true);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _repeatType = capsule.readEnum("repeatType", RepeatType.class, RepeatType.CLAMP);
         _minTime = capsule.readDouble("minTime", 0);
         _maxTime = capsule.readDouble("maxTime", 0);

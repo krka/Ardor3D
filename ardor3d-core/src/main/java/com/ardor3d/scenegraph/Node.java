@@ -25,8 +25,8 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.visitor.Visitor;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.scenegraph.RenderDelegate;
 
 /**
@@ -464,15 +464,15 @@ public class Node extends Spatial {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        e.getCapsule(this).writeSavableList(new ArrayList<Spatial>(_children), "children", null);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        capsule.writeSavableList(new ArrayList<Spatial>(_children), "children", null);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final List<Spatial> cList = e.getCapsule(this).readSavableList("children", null);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        final List<Spatial> cList = capsule.readSavableList("children", null);
         _children.clear();
         if (cList != null) {
             _children.addAll(cList);

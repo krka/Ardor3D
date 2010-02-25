@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.util.EnumSet;
 
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -432,8 +430,7 @@ public class SceneHints implements Savable {
         return this.getClass();
     }
 
-    public void read(final Ardor3DImporter im) throws IOException {
-        final InputCapsule capsule = im.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _orthoOrder = capsule.readInt("orthoOrder", 0);
         _cullHint = capsule.readEnum("cullMode", CullHint.class, CullHint.Inherit);
         _renderBucketType = capsule.readEnum("renderBucketType", RenderBucketType.class, RenderBucketType.Inherit);
@@ -457,8 +454,7 @@ public class SceneHints implements Savable {
         }
     }
 
-    public void write(final Ardor3DExporter ex) throws IOException {
-        final OutputCapsule capsule = ex.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_orthoOrder, "orthoOrder", 0);
         capsule.write(_cullHint, "cullMode", CullHint.Inherit);
         capsule.write(_renderBucketType, "renderBucketType", RenderBucketType.Inherit);

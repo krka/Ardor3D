@@ -22,8 +22,6 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -283,8 +281,7 @@ final public class TextureKey implements Savable {
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_source, "source", null);
         capsule.write(_flipped, "flipped", false);
         capsule.write(_format, "format", Image.Format.Guess);
@@ -292,8 +289,7 @@ final public class TextureKey implements Savable {
         capsule.write(_id, "id", null);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _source = (ResourceSource) capsule.readSavable("source", null);
         _flipped = capsule.readBoolean("flipped", false);
         _format = capsule.readEnum("format", Image.Format.class, Image.Format.Guess);

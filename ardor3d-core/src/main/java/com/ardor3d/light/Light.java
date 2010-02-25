@@ -15,8 +15,6 @@ import java.io.Serializable;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -311,8 +309,7 @@ public abstract class Light implements Serializable, Savable {
         specular.set(light.specular);
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
         capsule.write(diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
         capsule.write(specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
@@ -326,8 +323,7 @@ public abstract class Light implements Serializable, Savable {
         capsule.write(_shadowCaster, "shadowCaster", false);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
         diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
         specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));

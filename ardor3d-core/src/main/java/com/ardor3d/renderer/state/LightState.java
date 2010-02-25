@@ -23,8 +23,6 @@ import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -287,9 +285,8 @@ public class LightState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.writeSavableList(lightList, "lightList", new ArrayList<Light>());
         capsule.write(lightMask, "lightMask", 0);
         capsule.write(backLightMask, "backLightMask", 0);
@@ -300,9 +297,8 @@ public class LightState extends RenderState {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         lightList = capsule.readSavableList("lightList", new ArrayList<Light>());
         lightMask = capsule.readInt("lightMask", 0);
         backLightMask = capsule.readInt("backLightMask", 0);

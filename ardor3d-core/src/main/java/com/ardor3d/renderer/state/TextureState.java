@@ -26,8 +26,6 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -265,18 +263,16 @@ public class TextureState extends RenderState {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.writeSavableList(_texture, "texture", new ArrayList<Texture>(1));
         capsule.write(_correctionType, "correctionType", CorrectionType.Perspective);
 
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _texture = capsule.readSavableList("texture", new ArrayList<Texture>(1));
         _correctionType = capsule.readEnum("correctionType", CorrectionType.class, CorrectionType.Perspective);
     }

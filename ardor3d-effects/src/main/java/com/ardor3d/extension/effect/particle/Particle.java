@@ -21,8 +21,6 @@ import com.ardor3d.math.Triangle;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -457,8 +455,7 @@ public class Particle implements Savable {
     // Savable interface methods
     // /////
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(startIndex, "startIndex", 0);
         capsule.write(_position, "position", new Vector3(Vector3.ZERO));
         capsule.write(status, "status", Status.Available);
@@ -469,8 +466,7 @@ public class Particle implements Savable {
         capsule.write(type, "type", ParticleSystem.ParticleType.Quad);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         startIndex = capsule.readInt("startIndex", 0);
         _position.set((Vector3) capsule.readSavable("position", new Vector3(Vector3.ZERO)));
         status = capsule.readEnum("status", Status.class, Status.Available);

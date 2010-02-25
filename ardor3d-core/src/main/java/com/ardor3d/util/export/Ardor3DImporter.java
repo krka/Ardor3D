@@ -17,11 +17,39 @@ import java.net.URL;
 
 public interface Ardor3DImporter {
 
-    public Savable load(InputStream f) throws IOException;
+    /**
+     * Load a Savable object from the given stream.
+     * 
+     * @param is
+     * @return the savable object.
+     * @throws IOException
+     */
+    Savable load(InputStream is) throws IOException;
 
-    public Savable load(URL f) throws IOException;
+    /**
+     * Load a Savable object from the given URL.
+     * 
+     * @param url
+     * @return the savable object.
+     * @throws IOException
+     */
+    Savable load(URL url) throws IOException;
 
-    public Savable load(File f) throws IOException;
+    /**
+     * Load a Savable object from the given file.
+     * 
+     * @param file
+     * @return the savable object.
+     * @throws IOException
+     */
+    Savable load(File file) throws IOException;
 
-    public InputCapsule getCapsule(Savable id);
+    /**
+     * Load a Savable object from the given byte array, starting at the first index.
+     * 
+     * @param data
+     * @return the savable object.
+     * @throws IOException
+     */
+    Savable load(byte[] data) throws IOException;
 }

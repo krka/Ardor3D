@@ -24,8 +24,6 @@ import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -1338,9 +1336,7 @@ public abstract class Texture implements Savable {
         }
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         if (_storeImage) {
             capsule.write(_image, "image", null);
         }
@@ -1381,8 +1377,7 @@ public abstract class Texture implements Savable {
         }
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
                 MinificationFilter.NearestNeighborNoMipMaps);
         _image = (Image) capsule.readSavable("image", null);

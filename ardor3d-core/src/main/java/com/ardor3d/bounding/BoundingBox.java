@@ -24,8 +24,6 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -873,18 +871,16 @@ public class BoundingBox extends BoundingVolume {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(getXExtent(), "xExtent", 0);
         capsule.write(getYExtent(), "yExtent", 0);
         capsule.write(getZExtent(), "zExtent", 0);
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         setXExtent(capsule.readDouble("xExtent", 0));
         setYExtent(capsule.readDouble("yExtent", 0));
         setZExtent(capsule.readDouble("zExtent", 0));

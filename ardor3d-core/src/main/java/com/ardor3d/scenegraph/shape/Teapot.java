@@ -23,9 +23,12 @@ public class Teapot extends Mesh {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Instantiates a new Teapot object. All information must be applies later. For internal usage only
+     * Instantiates a new Teapot object.
      */
-    public Teapot() {}
+    public Teapot() {
+        super("teapot");
+        resetData();
+    }
 
     /**
      * Constructor instantiates a new Teapot object.

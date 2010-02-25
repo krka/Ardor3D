@@ -18,8 +18,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -260,9 +258,8 @@ public class StripBox extends Mesh implements Savable {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_xExtent, "xExtent", 0);
         capsule.write(_yExtent, "yExtent", 0);
         capsule.write(_zExtent, "zExtent", 0);
@@ -271,9 +268,8 @@ public class StripBox extends Mesh implements Savable {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _xExtent = capsule.readDouble("xExtent", 0);
         _yExtent = capsule.readDouble("yExtent", 0);
         _zExtent = capsule.readDouble("zExtent", 0);

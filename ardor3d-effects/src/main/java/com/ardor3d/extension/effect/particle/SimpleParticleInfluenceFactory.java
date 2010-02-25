@@ -18,8 +18,6 @@ import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyLine3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
@@ -88,9 +86,8 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void write(final Ardor3DExporter e) throws IOException {
-            super.write(e);
-            final OutputCapsule capsule = e.getCapsule(this);
+        public void write(final OutputCapsule capsule) throws IOException {
+            super.write(capsule);
             capsule.write(_strength, "strength", 1f);
             capsule.write(_windDirection, "windDirection", new Vector3(Vector3.UNIT_X));
             capsule.write(_random, "random", false);
@@ -98,9 +95,8 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void read(final Ardor3DImporter e) throws IOException {
-            super.read(e);
-            final InputCapsule capsule = e.getCapsule(this);
+        public void read(final InputCapsule capsule) throws IOException {
+            super.read(capsule);
             _strength = capsule.readDouble("strength", 1.0);
             _windDirection.set((Vector3) capsule.readSavable("windDirection", new Vector3(Vector3.UNIT_X)));
             _random = capsule.readBoolean("random", false);
@@ -155,17 +151,15 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void write(final Ardor3DExporter e) throws IOException {
-            super.write(e);
-            final OutputCapsule capsule = e.getCapsule(this);
+        public void write(final OutputCapsule capsule) throws IOException {
+            super.write(capsule);
             capsule.write(gravity, "gravity", new Vector3(Vector3.ZERO));
             capsule.write(rotateWithScene, "rotateWithScene", true);
         }
 
         @Override
-        public void read(final Ardor3DImporter e) throws IOException {
-            super.read(e);
-            final InputCapsule capsule = e.getCapsule(this);
+        public void read(final InputCapsule capsule) throws IOException {
+            super.read(capsule);
             gravity.set((Vector3) capsule.readSavable("gravity", new Vector3(Vector3.ZERO)));
             rotateWithScene = capsule.readBoolean("rotateWithScene", true);
         }
@@ -202,16 +196,14 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void write(final Ardor3DExporter e) throws IOException {
-            super.write(e);
-            final OutputCapsule capsule = e.getCapsule(this);
+        public void write(final OutputCapsule capsule) throws IOException {
+            super.write(capsule);
             capsule.write(dragCoefficient, "dragCoefficient", 1.0);
         }
 
         @Override
-        public void read(final Ardor3DImporter e) throws IOException {
-            super.read(e);
-            final InputCapsule capsule = e.getCapsule(this);
+        public void read(final InputCapsule capsule) throws IOException {
+            super.read(capsule);
             dragCoefficient = capsule.readDouble("dragCoefficient", 1.0);
         }
 
@@ -358,9 +350,8 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void write(final Ardor3DExporter e) throws IOException {
-            super.write(e);
-            final OutputCapsule capsule = e.getCapsule(this);
+        public void write(final OutputCapsule capsule) throws IOException {
+            super.write(capsule);
             capsule.write(_type, "type", VT_CYLINDER);
             capsule.write(_strength, "strength", 1.0);
             capsule.write(_divergence, "divergence", 0.0);
@@ -372,9 +363,8 @@ public final class SimpleParticleInfluenceFactory {
         }
 
         @Override
-        public void read(final Ardor3DImporter e) throws IOException {
-            super.read(e);
-            final InputCapsule capsule = e.getCapsule(this);
+        public void read(final InputCapsule capsule) throws IOException {
+            super.read(capsule);
             _type = capsule.readInt("type", VT_CYLINDER);
             _strength = capsule.readDouble("strength", 1.0);
             _divergence = capsule.readDouble("divergence", 0.0);

@@ -17,8 +17,6 @@ import java.io.ObjectOutput;
 
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -868,14 +866,12 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
         return this.getClass();
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(getX(), "x", 0);
         capsule.write(getY(), "y", 0);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         setX(capsule.readDouble("x", 0));
         setY(capsule.readDouble("y", 0));
     }

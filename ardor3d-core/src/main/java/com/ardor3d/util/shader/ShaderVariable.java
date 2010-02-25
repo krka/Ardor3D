@@ -12,8 +12,6 @@ package com.ardor3d.util.shader;
 
 import java.io.IOException;
 
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -42,16 +40,12 @@ public class ShaderVariable implements Savable {
         return false;
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
-
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(name, "name", "");
         capsule.write(variableID, "variableID", -1);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
-
+    public void read(final InputCapsule capsule) throws IOException {
         name = capsule.readString("name", "");
         variableID = capsule.readInt("variableID", -1);
     }

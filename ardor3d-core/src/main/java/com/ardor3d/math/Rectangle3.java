@@ -18,8 +18,6 @@ import java.io.ObjectOutput;
 import com.ardor3d.math.type.ReadOnlyRectangle3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -207,15 +205,13 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     // Methods for Savable
     // /////////////////
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_a, "a", new Vector3(Vector3.ZERO));
         capsule.write(_b, "b", new Vector3(Vector3.ZERO));
         capsule.write(_c, "c", new Vector3(Vector3.ZERO));
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _a.set((Vector3) capsule.readSavable("a", new Vector3(Vector3.ZERO)));
         _b.set((Vector3) capsule.readSavable("b", new Vector3(Vector3.ZERO)));
         _c.set((Vector3) capsule.readSavable("c", new Vector3(Vector3.ZERO)));

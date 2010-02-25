@@ -13,8 +13,8 @@ package com.ardor3d.extension.effect.particle.emitter;
 import java.io.IOException;
 
 import com.ardor3d.math.Vector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
 
 public class PointEmitter extends SavableParticleEmitter {
 
@@ -34,7 +34,7 @@ public class PointEmitter extends SavableParticleEmitter {
     // Methods for Savable
     // /////////////////
 
-    public void read(final Ardor3DImporter im) throws IOException {}
+    public void read(final InputCapsule capsule) throws IOException {}
 
-    public void write(final Ardor3DExporter ex) throws IOException {}
+    public void write(final OutputCapsule capsule) throws IOException {}
 }

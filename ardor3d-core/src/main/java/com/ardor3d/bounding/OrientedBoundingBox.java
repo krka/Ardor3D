@@ -24,8 +24,6 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.math.type.ReadOnlyPlane.Side;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
@@ -1425,9 +1423,8 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     @Override
-    public void write(final Ardor3DExporter e) throws IOException {
-        super.write(e);
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_xAxis, "_xAxis", new Vector3(Vector3.UNIT_X));
         capsule.write(_yAxis, "yAxis", new Vector3(Vector3.UNIT_Y));
         capsule.write(_zAxis, "zAxis", new Vector3(Vector3.UNIT_Z));
@@ -1435,9 +1432,8 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     @Override
-    public void read(final Ardor3DImporter e) throws IOException {
-        super.read(e);
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _xAxis.set((Vector3) capsule.readSavable("xAxis", new Vector3(Vector3.UNIT_X)));
         _yAxis.set((Vector3) capsule.readSavable("yAxis", new Vector3(Vector3.UNIT_Y)));
         _zAxis.set((Vector3) capsule.readSavable("zAxis", new Vector3(Vector3.UNIT_Z)));

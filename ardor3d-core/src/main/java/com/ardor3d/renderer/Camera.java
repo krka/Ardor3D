@@ -29,8 +29,6 @@ import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyMatrix4;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.util.export.Ardor3DExporter;
-import com.ardor3d.util.export.Ardor3DImporter;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -252,14 +250,10 @@ public class Camera implements Savable, Externalizable, Cloneable {
     protected int _height;
 
     /**
-     * @deprecated Only for use by Savable interface.
+     * Construct a new Camera with a width and height of 100.
      */
-    @Deprecated
     public Camera() {
-        _worldPlane = new Plane[MAX_WORLD_PLANES];
-        for (int i = 0; i < MAX_WORLD_PLANES; i++) {
-            _worldPlane[i] = new Plane();
-        }
+        this(100, 100);
     }
 
     /**
@@ -1498,8 +1492,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         renderer.setModelViewMatrix(_matrixBuffer);
     }
 
-    public void write(final Ardor3DExporter e) throws IOException {
-        final OutputCapsule capsule = e.getCapsule(this);
+    public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_location, "location", new Vector3(Vector3.ZERO));
         capsule.write(_left, "left", new Vector3(Vector3.UNIT_X));
         capsule.write(_up, "up", new Vector3(Vector3.UNIT_Y));
@@ -1525,8 +1518,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
         capsule.write(_depthRangeFar, "depthRangeFar", 1.0);
     }
 
-    public void read(final Ardor3DImporter e) throws IOException {
-        final InputCapsule capsule = e.getCapsule(this);
+    public void read(final InputCapsule capsule) throws IOException {
         _location.set((Vector3) capsule.readSavable("location", new Vector3(Vector3.ZERO)));
         _left.set((Vector3) capsule.readSavable("left", new Vector3(Vector3.UNIT_X)));
         _up.set((Vector3) capsule.readSavable("up", new Vector3(Vector3.UNIT_Y)));
