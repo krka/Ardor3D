@@ -29,7 +29,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.Ardor3dImporter;
 import com.ardor3d.util.export.ByteUtils;
-import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.ReadListener;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Maps;
@@ -250,7 +249,7 @@ public class BinaryImporter implements Ardor3dImporter {
                 if (ann == null) {
                     out = clazz.newInstance();
                 } else {
-                    out = (Savable) clazz.getMethod(ann.factoryMethod(), InputCapsule.class).invoke(null,
+                    out = (Savable) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null,
                             (Object[]) null);
                 }
             } catch (final InstantiationException e) {
