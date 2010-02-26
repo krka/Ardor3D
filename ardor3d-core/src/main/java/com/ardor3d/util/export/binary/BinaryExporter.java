@@ -24,7 +24,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.util.export.Ardor3DExporter;
+import com.ardor3d.util.export.Ardor3dExporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Lists;
@@ -110,7 +110,7 @@ import com.google.common.collect.Maps;
  * </p>
  */
 
-public class BinaryExporter implements Ardor3DExporter {
+public class BinaryExporter implements Ardor3dExporter {
     private static final Logger logger = Logger.getLogger(BinaryExporter.class.getName());
 
     /**

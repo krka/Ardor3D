@@ -22,13 +22,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.Ardor3dImporter;
 import com.ardor3d.util.export.Savable;
 
 /**
  * Part of the ardor3d XML IO system
  */
-public class XMLImporter implements Ardor3DImporter {
+public class XMLImporter implements Ardor3dImporter {
 
     public XMLImporter() {}
 

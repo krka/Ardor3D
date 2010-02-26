@@ -27,14 +27,14 @@ import java.util.zip.GZIPInputStream;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.util.Ardor3dException;
-import com.ardor3d.util.export.Ardor3DImporter;
+import com.ardor3d.util.export.Ardor3dImporter;
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.ReadListener;
 import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Maps;
 
-public class BinaryImporter implements Ardor3DImporter {
+public class BinaryImporter implements Ardor3dImporter {
     private static final Logger logger = Logger.getLogger(BinaryImporter.class.getName());
 
     // Key - alias, object - bco

@@ -17,13 +17,13 @@ import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import com.ardor3d.util.export.Ardor3DExporter;
+import com.ardor3d.util.export.Ardor3dExporter;
 import com.ardor3d.util.export.Savable;
 
 /**
  * Part of the ardor3d XML IO system
  */
-public class XMLExporter implements Ardor3DExporter {
+public class XMLExporter implements Ardor3dExporter {
     public static final String ELEMENT_MAPENTRY = "MapEntry";
     public static final String ELEMENT_KEY = "Key";
     public static final String ELEMENT_VALUE = "Value";

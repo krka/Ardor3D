@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public interface Ardor3DExporter {
+public interface Ardor3dExporter {
 
     /**
      * Save a Savable object to the given stream.

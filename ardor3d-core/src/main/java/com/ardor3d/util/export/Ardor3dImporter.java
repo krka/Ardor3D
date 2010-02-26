@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public interface Ardor3DImporter {
+public interface Ardor3dImporter {
 
     /**
      * Load a Savable object from the given stream.
