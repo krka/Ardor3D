@@ -38,6 +38,7 @@ import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
@@ -73,7 +74,10 @@ public class GLSLShaderObjectsState extends RenderState {
 
     // XXX: The below fields are public for brevity mostly as a way to remember that this class needs revisiting.
 
-    /** Optional logic for setting shadervariables based on the current geom */
+    /**
+     * Optional logic for setting shadervariables based on the current geom. Note: If this object does not implement
+     * Savable, it will be ignored during write.
+     */
     public GLSLShaderDataLogic _shaderDataLogic;
 
     /** The Mesh this shader currently operates on during rendering */
@@ -945,6 +949,10 @@ public class GLSLShaderObjectsState extends RenderState {
         capsule.writeSavableList(shaderAttributes, "shaderAttributes", new ArrayList<ShaderVariable>());
         capsule.write(vertShader, "vertShader", null);
         capsule.write(fragShader, "fragShader", null);
+
+        if (_shaderDataLogic instanceof Savable) {
+            capsule.write((Savable) _shaderDataLogic, "shaderDataLogic", null);
+        }
     }
 
     @Override
@@ -954,6 +962,17 @@ public class GLSLShaderObjectsState extends RenderState {
         shaderAttributes = capsule.readSavableList("shaderAttributes", new ArrayList<ShaderVariable>());
         vertShader = capsule.readByteBuffer("vertShader", null);
         fragShader = capsule.readByteBuffer("fragShader", null);
+
+        final Savable shaderDataLogic = capsule.readSavable("shaderDataLogic", null);
+        // only override set _shaderDataLogic if we have something in the capsule.
+        if (shaderDataLogic != null) {
+            if (shaderDataLogic instanceof GLSLShaderDataLogic) {
+                _shaderDataLogic = (GLSLShaderDataLogic) shaderDataLogic;
+            } else {
+                logger.warning("Deserialized shaderDataLogic is not of type GLSLShaderDataLogic. "
+                        + shaderDataLogic.getClass().getName());
+            }
+        }
     }
 
     @Override
