@@ -790,7 +790,7 @@ public class DOMInputCapsule implements InputCapsule {
                 if (ann == null) {
                     tmp = clazz.newInstance();
                 } else {
-                    tmp = (Savable) clazz.getMethod(ann.factoryMethod(), InputCapsule.class).invoke(null,
+                    tmp = (Savable) clazz.getMethod(ann.factoryMethod(), (Class<?>[]) null).invoke(null,
                             (Object[]) null);
                 }
             } catch (final InstantiationException e) {
