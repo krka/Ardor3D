@@ -133,7 +133,7 @@ public abstract class JoglLightStateUtil {
                 final DirectionalLight dirLight = (DirectionalLight) light;
 
                 final ReadOnlyVector3 direction = dirLight.getDirection();
-                setPosition(index, record, direction.getXf(), direction.getYf(), direction.getZf(), 0, lr);
+                setPosition(index, record, -direction.getXf(), -direction.getYf(), -direction.getZf(), 0, lr);
                 break;
             }
             case Point:

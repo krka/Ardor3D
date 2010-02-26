@@ -466,7 +466,7 @@ public class ParallelSplitShadowMapPass extends Pass {
             final DirectionalLight dl = (DirectionalLight) _light;
 
             tmpVec.set(dl.getDirection());
-            // tmpVec.negateLocal();
+            tmpVec.negateLocal();
             tmpVec.multiplyLocal(distance);
             tmpVec.addLocal(center);
             shadowCam.setLocation(tmpVec);

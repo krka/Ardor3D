@@ -18,7 +18,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 
 /**
- * <code>DirectionalLight</code> defines a light that is assumed to be infintely far away (something similar to the
+ * <code>DirectionalLight</code> defines a light that is assumed to be infinitely far away (something similar to the
  * sun). This means the direction of the light rays are all parallel. The direction field of this class identifies the
  * direction in which the light is traveling, which is opposite how jME works.
  */
