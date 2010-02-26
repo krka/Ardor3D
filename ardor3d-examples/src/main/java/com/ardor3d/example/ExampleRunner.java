@@ -14,7 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -57,6 +56,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
@@ -149,7 +149,8 @@ public class ExampleRunner extends JFrame {
                 }
             }
         };
-        final JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        final JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(false);
         final JToggleButton btExpand = new JToggleButton(expandAction);
         btExpand.setBorderPainted(false);
         btExpand.setBorder(null);
@@ -158,7 +159,7 @@ public class ExampleRunner extends JFrame {
         final JScrollPane scrTree = new JScrollPane(tree);
         scrTree.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3)); // border layout aligns with toolbarPanel
         pTree.add(scrTree);
-        pTree.add(toolbarPanel, BorderLayout.NORTH);
+        pTree.add(toolbar, BorderLayout.NORTH);
 
         runSelectedAction = new AbstractAction() {
 
@@ -195,10 +196,10 @@ public class ExampleRunner extends JFrame {
         final JButton browseButton = new JButton(browseSelectedAction);
         browseButton.setBorder(null);
 
-        toolbarPanel.add(btExpand);
-        toolbarPanel.add(tfPattern);
-        toolbarPanel.add(runButton);
-        toolbarPanel.add(browseButton);
+        toolbar.add(btExpand);
+        toolbar.add(tfPattern);
+        toolbar.add(runButton);
+        toolbar.add(browseButton);
 
         lDescription = new JLabel();
         lDescription.setVerticalTextPosition(SwingConstants.TOP);
