@@ -23,7 +23,6 @@ import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
-import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.TransformChannel;
 import com.ardor3d.extension.animation.skeletal.TransformData;
 import com.ardor3d.extension.animation.skeletal.blendtree.BinaryTransformLERPSource;
@@ -82,7 +81,6 @@ public class AnimationDemoExample extends ExampleBase {
 
     private AnimationManager manager;
     private SkeletonPose pose;
-    private List<SkinnedMesh> skins;
 
     private BinaryTransformLERPSource moveBlend, punchBlend, headBlend;
     private int headJoint;
@@ -108,7 +106,7 @@ public class AnimationDemoExample extends ExampleBase {
         final DirectionalLight light = new DirectionalLight();
         light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
         light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
-        light.setDirection(new Vector3(1, 1, 1).normalizeLocal());
+        light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
         light.setEnabled(true);
         _lightState.attach(light);
 
@@ -234,7 +232,6 @@ public class AnimationDemoExample extends ExampleBase {
             colladaNode = storage.getScene();
             final List<SkinData> skinDatas = storage.getSkins();
             pose = skinDatas.get(0).getPose();
-            skins = skinDatas.get(0).getSkins();
 
             createAnimation(colladaImporter);
 
