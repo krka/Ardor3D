@@ -59,7 +59,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
-@Purpose(htmlDescription = "A demonstration of the LwjglHeadlessCanvas class, which is canvas used to draw Scene data to an offscreen target.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LwjglHeadlessExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglHeadlessExample.jpg", //
 maxHeapMemory = 64)
 public class LwjglHeadlessExample implements Scene {

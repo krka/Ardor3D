@@ -49,7 +49,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 /**
  * Illustrates loading a model from Collada and procedurally animating its joints.
  */
-@Purpose(htmlDescription = "Illustrates loading a model from Collada and procedurally animating its joints.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaManualAnimationExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
 maxHeapMemory = 64)
 public class ColladaManualAnimationExample extends ExampleBase {
@@ -108,10 +108,9 @@ public class ColladaManualAnimationExample extends ExampleBase {
 
             pose.updateTransforms();
 
-            final List<SkinnedMesh> skins = skinData.getSkins();
-            for (final SkinnedMesh skinnedMesh : skins) {
-                skinnedMesh.applyPose();
-                if (ColladaManualAnimationExample.UPDATE_BOUNDS) {
+            if (ColladaManualAnimationExample.UPDATE_BOUNDS) {
+                final List<SkinnedMesh> skins = skinData.getSkins();
+                for (final SkinnedMesh skinnedMesh : skins) {
                     skinnedMesh.updateModelBound();
                 }
             }

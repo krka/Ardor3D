@@ -37,7 +37,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * Illustrates the Camera class, which represents a view into a 3d scene and how that view should map to a 2D rendering
  * surface.
  */
-@Purpose(htmlDescription = "Illustrates the Camera class, which represents a view into a 3d scene and how that view should map to a 2D rendering surface.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.ViewportExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
 maxHeapMemory = 64)
 public class ViewportExample extends ExampleBase {

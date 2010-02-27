@@ -31,7 +31,7 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size,
  * color) change over time.
  */
-@Purpose(htmlDescription = "A demonstration of the ParticleSystem and TextureState classes; which controls an emitter's properties (e.g. size, color) change over time.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleSystemExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
 maxHeapMemory = 64)
 public class ParticleSystemExample extends ExampleBase {

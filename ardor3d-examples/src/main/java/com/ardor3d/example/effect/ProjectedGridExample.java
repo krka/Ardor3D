@@ -37,7 +37,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.
  */
-@Purpose(htmlDescription = "A demonstration of the ProjectedGrid class; used to efficiently determine which vertices's in a terrain to draw.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ProjectedGridExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ProjectedGridExample.jpg", //
 maxHeapMemory = 64)
 public class ProjectedGridExample extends ExampleBase {

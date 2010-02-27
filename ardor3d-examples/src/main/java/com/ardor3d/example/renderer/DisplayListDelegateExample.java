@@ -44,7 +44,7 @@ import com.ardor3d.util.scenegraph.SceneCompiler;
 /**
  * Illustrates creating a display list from two sets (i.e. original set and copied set) of Nodes.
  */
-@Purpose(htmlDescription = "Illustrates creating a display list from two sets (i.e. original set and copied set) of Nodes.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.DisplayListDelegateExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DisplayListDelegateExample.jpg", //
 maxHeapMemory = 64)
 public class DisplayListDelegateExample extends ExampleBase {

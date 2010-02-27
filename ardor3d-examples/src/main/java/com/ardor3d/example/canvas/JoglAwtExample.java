@@ -52,7 +52,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 /**
  * This examples demonstrates how to render OpenGL (via JOGL) on a AWT canvas.
  */
-@Purpose(htmlDescription = "This examples demonstrates how to render OpenGL (via JOGL) on a AWT canvas.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglAwtExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
 maxHeapMemory = 64)
 public class JoglAwtExample {

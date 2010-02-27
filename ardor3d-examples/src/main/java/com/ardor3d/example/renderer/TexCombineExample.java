@@ -28,7 +28,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Shows interpolated textures using texture combine.
  */
-@Purpose(htmlDescription = "Shows interpolated textures using texture combine.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.TexCombineExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_TexCombineExample.jpg", //
 maxHeapMemory = 64)
 public class TexCombineExample extends ExampleBase {

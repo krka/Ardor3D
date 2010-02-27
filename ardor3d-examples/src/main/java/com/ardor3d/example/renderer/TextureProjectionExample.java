@@ -30,7 +30,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Illustrates the TextureProjector class, which projects a two-dimensional texture onto a three-dimensional surface.
  */
-@Purpose(htmlDescription = "Illustrates the TextureProjector class, which projects a two-dimensional texture onto a three-dimensional surface.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.TextureProjectionExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_TextureProjectionExample.jpg", //
 maxHeapMemory = 64)
 public class TextureProjectionExample extends ExampleBase {

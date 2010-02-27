@@ -26,7 +26,6 @@ import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
-import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.TransformApplier;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
@@ -64,7 +63,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 /**
  * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
  */
-@Purpose(htmlDescription = "Illustrates loading a model from Collada.  If the model also contains an animation, the animation is played as well.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
 maxHeapMemory = 128)
 public class ColladaExample extends ExampleBase {
@@ -348,12 +347,6 @@ public class ColladaExample extends ExampleBase {
             for (final SkinData skinData : skinDatas) {
                 final SkeletonPose pose = skinData.getPose();
                 pose.updateTransforms();
-
-                final List<SkinnedMesh> skins = skinData.getSkins();
-                for (final SkinnedMesh skin : skins) {
-                    skin.applyPose();
-                    // skin.updateModelBound();
-                }
             }
         }
     }

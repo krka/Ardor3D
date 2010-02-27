@@ -64,7 +64,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 /**
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
  */
-@Purpose(htmlDescription = "This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglSwtExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
 maxHeapMemory = 64)
 public class LwjglSwtExample {

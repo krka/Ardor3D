@@ -18,7 +18,7 @@ import com.ardor3d.scenegraph.controller.interpolation.QuaternionInterpolationCo
  * A demonstration of the QuaternionInterpolationController class; which will rotate a Node each epoch by interpolating
  * between the given quaternions.
  */
-@Purpose(htmlDescription = "A demonstration of the QuaternionInterpolationController class; which will rotate a Node each epoch by interpolating between the given quaternions.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.QuaternionInterpolationControllerExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_QuaternionInterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class QuaternionInterpolationControllerExample extends

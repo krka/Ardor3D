@@ -66,7 +66,7 @@ import com.google.common.collect.Lists;
 /**
  * Illustrates loading several animations from Collada and arranging them in a controllable blend tree.
  */
-@Purpose(htmlDescription = "Illustrates loading several animations from Collada and arranging them in a controllable blend tree.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationDemoExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationDemoExample extends ExampleBase {
@@ -409,11 +409,6 @@ public class AnimationDemoExample extends ExampleBase {
 
         manager.update();
         pose.updateTransforms();
-
-        for (final SkinnedMesh skin : skins) {
-            skin.applyPose();
-            // skin.updateModelBound();
-        }
     }
 
     @Override

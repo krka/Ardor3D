@@ -39,7 +39,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 /**
  * Illustrates the TextureClipmap class, which prohibits the display of textures outside a defined region.
  */
-@Purpose(htmlDescription = "Illustrates the TextureClipmap class, which prohibits the display of textures outside a defined region.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.TextureClipmapExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_TextureClipmapExample.jpg", //
 maxHeapMemory = 64)
 public class TextureClipmapExample extends ExampleBase {

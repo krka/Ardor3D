@@ -50,7 +50,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * special debugging. This is to simplify the example to the basic essentials.
  * </p>
  */
-@Purpose(htmlDescription = "This jogl-based example is meant to show how to use Ardor3D at the most primitive level.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.JoglBasicExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_JoglBasicExample.jpg", //
 maxHeapMemory = 64)
 public class JoglBasicExample implements Scene {

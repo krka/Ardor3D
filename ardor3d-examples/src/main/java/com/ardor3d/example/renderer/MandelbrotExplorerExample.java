@@ -43,7 +43,7 @@ import com.ardor3d.util.TextureKey;
 /**
  * Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.
  */
-@Purpose(htmlDescription = "Illustrates the MandelbrotFunction3D class, which allow for procedural creation of the famous Mandelbrot set.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MandelbrotExplorerExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MandelbrotExplorerExample.jpg", //
 maxHeapMemory = 64)
 public class MandelbrotExplorerExample extends ExampleBase {

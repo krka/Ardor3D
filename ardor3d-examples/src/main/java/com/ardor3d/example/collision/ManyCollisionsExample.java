@@ -38,7 +38,7 @@ import com.ardor3d.util.geom.SharedCopyLogic;
 /**
  * A demonstration on how to determine if collisions exist between two nodes.
  */
-@Purpose(htmlDescription = "A demonstration on how to determine if collisions exist between two nodes.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.collision.ManyCollisionsExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/collision_ManyCollisionsExample.jpg", //
 maxHeapMemory = 64)
 public class ManyCollisionsExample extends ExampleBase {

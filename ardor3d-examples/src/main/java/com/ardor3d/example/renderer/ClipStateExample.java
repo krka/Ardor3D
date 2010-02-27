@@ -23,7 +23,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 /**
  * Illustrates the ClipState class; which specifies a plane to test for clipping of a Node.
  */
-@Purpose(htmlDescription = "Illustrates the ClipState class; which specifies a plane to test for clipping of a Node.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.ClipStateExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ClipStateExample.jpg", //
 maxHeapMemory = 64)
 public class ClipStateExample extends ExampleBase {

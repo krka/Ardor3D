@@ -30,7 +30,7 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the ParticleSystem and RampEntry classes; which controls how an emitter's properties (e.g. size,
  * color) change over time.
  */
-@Purpose(htmlDescription = "A demonstration of the ParticleSystem and RampEntry classes; which controls how an emitter's properties (e.g. size, color) change over time.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleRampExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
 maxHeapMemory = 64)
 public class ParticleRampExample extends ExampleBase {

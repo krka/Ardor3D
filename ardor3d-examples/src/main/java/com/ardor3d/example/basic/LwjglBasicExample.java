@@ -52,7 +52,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 
-@Purpose(htmlDescription = "This lwjgl-based example is meant to show how to use Ardor3D at the most primitive level.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LwjglBasicExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglBasicExample.jpg", //
 maxHeapMemory = 64)
 public class LwjglBasicExample implements Scene {

@@ -36,7 +36,7 @@ import com.ardor3d.util.geom.SharedCopyLogic;
  * A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source
  * position to a given target position.
  */
-@Purpose(htmlDescription = "A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source position to a given target position.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.MatrixLookAtExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
 maxHeapMemory = 64)
 public class MatrixLookAtExample extends ExampleBase {

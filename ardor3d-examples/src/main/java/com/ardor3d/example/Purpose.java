@@ -24,17 +24,25 @@ import java.lang.annotation.Target;
 public @interface Purpose {
 
     /**
-     * @return a free form description of the example, it may contain HTML tags
+     * @return The base filename of the localisation properties file to read {@link #htmlDescriptionKey() html
+     *         descriptions} from.
      */
-    String htmlDescription();
+    String localisationBaseFile() default "com/ardor3d/example/i18n/example_descriptions";
+
+    /**
+     * @return The key of the description to load from the {@link #localisationBaseFile() localisation properties file}.
+     */
+    String htmlDescriptionKey() default "com.ardor3d.example.NotSet";
 
     /**
      * @return the resource path to a screenshot thumbnail, e.g. /com/ardor3d/example/thumbnails/boxexample.png
      */
-    String thumbnailPath();
+    String thumbnailPath() default "/com/ardor3d/example/media/images/ardor3d_white_256.jpg";
 
     /**
+     * Default value is 64.
+     * 
      * @return the value to use for max heap (in MB).
      */
-    int maxHeapMemory();
+    int maxHeapMemory() default 64;
 }

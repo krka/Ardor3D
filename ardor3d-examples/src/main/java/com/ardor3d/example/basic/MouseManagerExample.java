@@ -45,7 +45,7 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the MouseManager class, which is used to control properties (e.g. cursor, location) of the native
  * mouse.
  */
-@Purpose(htmlDescription = "A demonstration of the MouseManager class, which is used to control properties (e.g. curser, location) of the native mouse.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.MouseManagerExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
 maxHeapMemory = 64)
 public class MouseManagerExample extends ExampleBase {

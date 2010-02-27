@@ -52,7 +52,7 @@ import com.ardor3d.util.TextureKey;
  * Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of
  * textures.
  */
-@Purpose(htmlDescription = "Illustrates the GeneratedImageFactory class and math.functions package, which allow for procedural creation of textures.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.GeneratedTexturesExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
 maxHeapMemory = 64)
 public class GeneratedTexturesExample extends ExampleBase {

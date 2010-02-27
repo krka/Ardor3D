@@ -64,7 +64,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 /**
  * This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.
  */
-@Purpose(htmlDescription = "This examples demonstrates how to render OpenGL (via JOGL) in a SWT canvas.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglSwtExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_JoglSwtExample.jpg", //
 maxHeapMemory = 64)
 public class JoglSwtExample {

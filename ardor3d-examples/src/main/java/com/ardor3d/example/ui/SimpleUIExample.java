@@ -59,7 +59,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Illustrates how to display GUI primitives (e.g. RadioButton, Label, TabbedPane) on a canvas.
  */
-@Purpose(htmlDescription = "Illustrates how to display GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.SimpleUIExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_SimpleUIExample.jpg", //
 maxHeapMemory = 64)
 public class SimpleUIExample extends ExampleBase {

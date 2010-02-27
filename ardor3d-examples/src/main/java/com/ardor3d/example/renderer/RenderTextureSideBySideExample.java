@@ -35,7 +35,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.
  */
-@Purpose(htmlDescription = "Illustrates the TextureRenderer class; which renders a scene to a buffer and copying it to a texture.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.RenderTextureSideBySideExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_RenderTextureSideBySideExample.jpg", //
 maxHeapMemory = 64)
 public class RenderTextureSideBySideExample extends ExampleBase {

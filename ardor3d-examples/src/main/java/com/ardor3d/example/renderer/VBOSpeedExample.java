@@ -43,7 +43,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Illustrates the DataMode class, which describe how we prefer data to be sent to the card.
  */
-@Purpose(htmlDescription = "Illustrates the DataMode class, which describe how we prefer data to be sent to the card.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.VBOSpeedExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_VBOSpeedExample.jpg", //
 maxHeapMemory = 64)
 public class VBOSpeedExample extends ExampleBase {

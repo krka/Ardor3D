@@ -19,7 +19,7 @@ import com.ardor3d.math.Vector3;
 /**
  * Simplest example of loading a collada model.
  */
-@Purpose(htmlDescription = "Simplest example of loading a collada model.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleColladaExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_SimpleColladaExample.jpg", //
 maxHeapMemory = 64)
 public class SimpleColladaExample extends ExampleBase {

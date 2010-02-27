@@ -43,7 +43,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
  */
-@Purpose(htmlDescription = "A demonstration of combining the skeletal animation classes with OpenGL Shading Language.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.PrimitiveSkeletonExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_PrimitiveSkeletonExample.jpg", //
 maxHeapMemory = 64)
 public class PrimitiveSkeletonExample extends ExampleBase {
@@ -91,6 +91,8 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.setCurrentPose(pose);
         arm.setTranslation(0, 0, 5);
         arm.getSceneHints().setCullHint(CullHint.Dynamic);
+
+        arm.setWeightsPerVert(4);
 
         final FloatBuffer weights = BufferUtils.createFloatBuffer( //
                 1, 0, 0, 0, //
@@ -236,7 +238,6 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
             pose.updateTransforms();
 
-            arm.applyPose();
             if (!useGPU) {
                 // no point to updating the model bound in gpu mode
                 arm.updateModelBound();

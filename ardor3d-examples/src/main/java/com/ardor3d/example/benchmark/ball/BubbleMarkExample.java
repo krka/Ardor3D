@@ -57,7 +57,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </ul>
  * </p>
  */
-@Purpose(htmlDescription = "The famous BubbleMark UI test, recreated using quads.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
 maxHeapMemory = 64)
 public class BubbleMarkExample implements Scene {

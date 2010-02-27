@@ -40,7 +40,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).
  */
-@Purpose(htmlDescription = "Illustrates two techniques for creating a triangle strip (i.e. series of connected triangles).", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.DegenerateTrianglesExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DegenerateTrianglesExample.jpg", //
 maxHeapMemory = 64)
 public class DegenerateTrianglesExample extends ExampleBase {

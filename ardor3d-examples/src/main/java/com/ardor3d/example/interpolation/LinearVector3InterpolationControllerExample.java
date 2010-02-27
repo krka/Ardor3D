@@ -22,7 +22,7 @@ import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationContr
  * A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D
  * coordinates (via linear interpolation).
  */
-@Purpose(htmlDescription = "A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D coordinates (via linear interpolation).", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.LinearVector3InterpolationControllerExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_LinearVector3InterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class LinearVector3InterpolationControllerExample extends

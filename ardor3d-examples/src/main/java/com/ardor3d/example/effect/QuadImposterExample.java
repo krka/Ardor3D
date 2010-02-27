@@ -40,7 +40,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * A demonstration of the QuadImposterNode class; which sets the texture level of detail for a Node.
  */
-@Purpose(htmlDescription = "A demonstration of the QuadImposterNode class; which sets the texture level of detail for a Node.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.QuadImposterExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_QuadImposterExample.jpg", //
 maxHeapMemory = 64)
 public class QuadImposterExample extends ExampleBase {

@@ -38,7 +38,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * A demonstration of finding and retrieving collisions between two nodes.
  */
-@Purpose(htmlDescription = "A demonstration of finding and retrieving collisions between two nodes", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.collision.CollisionTreeExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/collision_CollisionTreeExample.jpg", //
 maxHeapMemory = 64)
 public class CollisionTreeExample extends ExampleBase {

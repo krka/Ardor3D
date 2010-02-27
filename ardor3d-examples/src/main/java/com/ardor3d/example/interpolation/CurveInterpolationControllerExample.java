@@ -27,7 +27,7 @@ import com.ardor3d.spline.Curve;
  * A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set
  * of 3D coordinates (via spline).
  */
-@Purpose(htmlDescription = "A demonstration of the CurveInterpolationController class; which will move/translate a Node each epoch through a set of 3D coordinates (via spline).", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.CurveInterpolationControllerExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_CurveInterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class CurveInterpolationControllerExample extends InterpolationControllerBase<CurveInterpolationController> {

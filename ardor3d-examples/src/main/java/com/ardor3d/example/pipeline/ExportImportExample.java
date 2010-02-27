@@ -44,7 +44,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data
  * stream.
  */
-@Purpose(htmlDescription = "A demonstration of the BinaryImporter and BinaryExporter classes; which can export/import a Node to/from a data stream.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ExportImportExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
 maxHeapMemory = 64)
 public class ExportImportExample extends ExampleBase {
@@ -65,10 +65,12 @@ public class ExportImportExample extends ExampleBase {
         final double time = timer.getTimeInSeconds() * 0.5;
 
         originalNode.setRotation(rotation.fromAngles(time, time, time));
-        if (binaryImportedNode != null)
+        if (binaryImportedNode != null) {
             binaryImportedNode.setRotation(rotation);
-        if (xmlImportedNode != null)
-        xmlImportedNode.setRotation(rotation);
+        }
+        if (xmlImportedNode != null) {
+            xmlImportedNode.setRotation(rotation);
+        }
     }
 
     @Override

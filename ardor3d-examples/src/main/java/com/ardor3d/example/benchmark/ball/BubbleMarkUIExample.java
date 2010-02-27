@@ -36,7 +36,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * The famous BubbleMark UI test, recreated using Ardor3D UI components.
  */
-@Purpose(htmlDescription = "The famous BubbleMark UI test, recreated using Ardor3D UI components.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkUIExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkUIExample.jpg", //
 maxHeapMemory = 64)
 public class BubbleMarkUIExample extends ExampleBase {

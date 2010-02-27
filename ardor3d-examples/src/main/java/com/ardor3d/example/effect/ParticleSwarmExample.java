@@ -32,7 +32,7 @@ import com.ardor3d.util.TextureManager;
 /**
  * Example showing a particle system using the particle SwarmInfluence.
  */
-@Purpose(htmlDescription = "Example showing a particle system using the particle SwarmInfluence.", //
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleSwarmExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSwarmExample.jpg", //
 maxHeapMemory = 64)
 public class ParticleSwarmExample extends ExampleBase {

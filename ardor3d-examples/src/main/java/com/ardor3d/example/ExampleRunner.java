@@ -33,6 +33,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
@@ -275,10 +278,20 @@ public class ExampleRunner extends JFrame {
                     if (imageURL != null) {
                         imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
-                    htmlDescription = purpose.htmlDescription();
                 } catch (final Exception ex) {
                 }
+
                 maxHeapMemory = purpose.maxHeapMemory();
+
+                try {
+                    final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale
+                            .getDefault(), getClass().getClassLoader());
+
+                    htmlDescription = bundle.getString(purpose.htmlDescriptionKey());
+
+                } catch (final MissingResourceException e) {
+                    e.printStackTrace();
+                }
             }
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
