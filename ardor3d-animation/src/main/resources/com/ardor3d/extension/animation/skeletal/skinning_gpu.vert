@@ -11,7 +11,7 @@
 attribute vec4 Weights;
 attribute vec4 JointIDs;
 
-uniform mat4 JointPallete[50];
+uniform mat4 JointPalette[50];
 
 varying vec3 N;
 
@@ -19,7 +19,7 @@ void main(void) {
     mat4 mat = mat4(0.0);
     
     for ( int i = 0; i < 4; i++) {
-        mat += JointPallete[int(JointIDs[i])] * Weights[i];
+        mat += JointPalette[int(JointIDs[i])] * Weights[i];
     }
     
     gl_Position = gl_ModelViewProjectionMatrix * (mat * gl_Vertex);

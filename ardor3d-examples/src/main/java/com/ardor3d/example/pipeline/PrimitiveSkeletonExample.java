@@ -63,14 +63,14 @@ public class PrimitiveSkeletonExample extends ExampleBase {
     @Override
     protected void initExample() {
         final Transform j1Transform = new Transform();
-        j1Transform.setTranslation(0, 0, 0);
+        j1Transform.setTranslation(0, 0, -5);
         j1Transform.invert(j1Transform);
         final Joint j1 = new Joint("j1");
         j1.setInverseBindPose(j1Transform);
         j1.setParentIndex(Joint.NO_PARENT);
 
         final Transform j2Transform = new Transform();
-        j2Transform.setTranslation(0, 0, 10);
+        j2Transform.setTranslation(0, 0, 5);
         j2Transform.invert(j2Transform);
         final Joint j2 = new Joint("j2");
         j2.setInverseBindPose(j2Transform);
@@ -89,7 +89,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.getMeshData().setIndices(BufferUtils.clone(cy.getMeshData().getIndices()));
         arm.getMeshData().setTextureBuffer(BufferUtils.clone(cy.getMeshData().getTextureBuffer(0)), 0);
         arm.setCurrentPose(pose);
-        arm.setTranslation(0, 0, 5);
+        arm.setTranslation(0, 0, -10);
         arm.getSceneHints().setCullHint(CullHint.Dynamic);
 
         arm.setWeightsPerVert(4);
