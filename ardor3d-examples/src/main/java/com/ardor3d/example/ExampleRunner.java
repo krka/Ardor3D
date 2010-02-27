@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -90,6 +91,7 @@ public class ExampleRunner extends JFrame {
     private final ClassTreeModel model;
     private final JSplitPane splitPane;
     private final JLabel lDescription;
+    private final JLabel lStatus;
     private final Action runSelectedAction;
     private final Action browseSelectedAction;
     private final ErasableTextField tfPattern;
@@ -158,11 +160,16 @@ public class ExampleRunner extends JFrame {
         btExpand.setBorderPainted(false);
         btExpand.setBorder(null);
 
+        lStatus = new JLabel(" ");
         final JPanel pTree = new JPanel(new BorderLayout());
         final JScrollPane scrTree = new JScrollPane(tree);
         scrTree.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3)); // border layout aligns with toolbarPanel
+        final JPanel pStatus = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        pStatus.setBorder(BorderFactory.createEtchedBorder());
+        pStatus.add(lStatus);
         pTree.add(scrTree);
         pTree.add(toolbar, BorderLayout.NORTH);
+        pTree.add(pStatus, BorderLayout.SOUTH);
 
         runSelectedAction = new AbstractAction() {
 
@@ -227,6 +234,7 @@ public class ExampleRunner extends JFrame {
 
         model.reload("com.ardor3d.example");
         btExpand.doClick();
+        lStatus.setText("Examples: " + model.getSize());
 
         tree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
 
@@ -246,6 +254,7 @@ public class ExampleRunner extends JFrame {
         final int matches = model.updateMatches(pattern);
         tfPattern.setWarning(pattern.length() > 0 && matches == 0);
         tree.repaint();
+        lStatus.setText("Examples: " + model.getSize() + (matches > 0 ? (" | matched: " + matches) : ""));
     }
 
     private void updateActionStatus() {
@@ -283,15 +292,7 @@ public class ExampleRunner extends JFrame {
 
                 maxHeapMemory = purpose.maxHeapMemory();
 
-                try {
-                    final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale
-                            .getDefault(), getClass().getClassLoader());
-
-                    htmlDescription = bundle.getString(purpose.htmlDescriptionKey());
-
-                } catch (final MissingResourceException e) {
-                    e.printStackTrace();
-                }
+                htmlDescription = getHtmlDescription(purpose);
             }
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
@@ -304,6 +305,24 @@ public class ExampleRunner extends JFrame {
             lDescription.setText("<html><body><h2 align=\"center\">" + selectedClass.getSimpleName() + "</h2>" + "<p>"
                     + htmlDescription + "</p>" + "<p align=\"center\">" + imgURL + "</p></body></html>");
         }
+    }
+
+    private String getHtmlDescription(final Class<?> clazz) {
+        final Purpose purpose = clazz.getAnnotation(Purpose.class);
+        return getHtmlDescription(purpose);
+    }
+
+    private String getHtmlDescription(final Purpose purpose) {
+        try {
+            final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale.getDefault(),
+                    getClass().getClassLoader());
+
+            return bundle.getString(purpose.htmlDescriptionKey());
+
+        } catch (final MissingResourceException e) {
+            logger.log(Level.WARNING, "no resource for " + purpose.localisationBaseFile(), e);
+        }
+        return "";
     }
 
     private void runSelected() {
@@ -346,28 +365,19 @@ public class ExampleRunner extends JFrame {
     }
 
     private void browseSelected() {
-        // just take the first selected node
-        final TreePath tp = tree.getSelectionPath();
-        if (tp == null) {
-            return;
-        }
-        final Object selected = tp.getLastPathComponent();
-        if (!(selected instanceof Class<?>)) {
-            return;
-        }
+    // just take the first selected node
 
-        String className = ((Class<?>) selected).getCanonicalName();
-        className = className.replace('.', '/');
-        final String urlString = "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/"
-                + className + ".java";
-        // try {
-        // java.awt.Desktop.getDesktop().browse(new URI(urlString));
-        // } catch (final Exception ex) {
-        // ex.printStackTrace();
-        // JOptionPane.showMessageDialog(ExampleRunner.this, "Unable to open URL: " + urlString + "\n"
-        // + ex.getMessage());
-        // }
-    }
+    // Java 6
+    /*
+     * final TreePath tp = tree.getSelectionPath(); if (tp == null) { return; } final Object selected =
+     * tp.getLastPathComponent(); if (!(selected instanceof Class<?>)) { return; }
+     * 
+     * String className = ((Class<?>) selected).getCanonicalName(); className = className.replace('.', '/'); final
+     * String urlString = "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/" +
+     * className + ".java"; try { java.awt.Desktop.getDesktop().browse(new URI(urlString)); } catch (final Exception ex)
+     * { ex.printStackTrace(); JOptionPane.showMessageDialog(ExampleRunner.this, "Unable to open URL: " + urlString +
+     * "\n" + ex.getMessage()); }
+     */}
 
     interface SearchFilter {
 
@@ -381,10 +391,11 @@ public class ExampleRunner extends JFrame {
         private final EventListenerList listeners = new EventListenerList();
         private final LinkedHashMap<Package, Vector<Class<?>>> classes = new LinkedHashMap<Package, Vector<Class<?>>>();
         // the next two maps are for caching the status for the search filter
-        private final HashMap<String, Boolean> classMatches = new HashMap<String, Boolean>();
+        private final HashMap<Class<?>, Boolean> classMatches = new HashMap<Class<?>, Boolean>();
         private final HashMap<Package, Boolean> packageMatches = new HashMap<Package, Boolean>();
         private String root = "all examples";
         private FileFilter classFileFilter;
+        private int size;
 
         public void addTreeModelListener(final TreeModelListener l) {
             listeners.add(TreeModelListener.class, l);
@@ -409,7 +420,8 @@ public class ExampleRunner extends JFrame {
 
         public int getIndexOfChild(final Object parent, final Object child) {
             if (parent == root) {
-                return ((List<Vector<Class<?>>>) classes.values()).indexOf(child);
+                final Vector<Package> vec = new Vector<Package>(classes.keySet());
+                return vec.indexOf(child);
             }
             final Vector<Class<?>> cl = classes.get(parent);
             return cl == null ? 0 : cl.indexOf(child);
@@ -425,12 +437,13 @@ public class ExampleRunner extends JFrame {
                 return;
             }
             packageMatches.put(clazz.getPackage(), false);
-            classMatches.put(clazz.getCanonicalName(), false);
+            classMatches.put(clazz, false);
             Vector<Class<?>> cl = classes.get(clazz.getPackage());
             if (cl == null) {
                 cl = new Vector<Class<?>>();
                 classes.put(clazz.getPackage(), cl);
             }
+            size++;
             cl.add(clazz);
             Collections.sort(cl, classComparator);
         }
@@ -439,18 +452,31 @@ public class ExampleRunner extends JFrame {
             int numberMatches = 0;
             final String lcPattern = pattern.toLowerCase();
             packageMatches.clear();
-            for (final Entry<String, Boolean> entry : classMatches.entrySet()) {
-                final String className = entry.getKey().substring(entry.getKey().lastIndexOf('.') + 1);
-                final boolean bool = !pattern.equals("") && className.toLowerCase().contains(lcPattern);
-                entry.setValue(bool);
-                logger.fine(pattern + ": " + entry.getKey() + " set to " + bool);
-                if (bool) {
+            for (final Entry<Class<?>, Boolean> entry : classMatches.entrySet()) {
+                final String className = entry.getKey().getSimpleName();
+                boolean matches = false;
+                boolean needsUpdate = false;
+                if ("".equals(pattern)) {
+                    matches = false;
+                } else {
+                    matches = !pattern.equals("") && className.toLowerCase().contains(lcPattern);
+                    if (!matches) {
+                        final String htmlDescription = getHtmlDescription(entry.getKey());
+                        matches = htmlDescription.toLowerCase().contains(lcPattern);
+                    }
+                }
+                if (entry.getValue() != matches) {
+                    needsUpdate = true;
+                }
+                entry.setValue(matches);
+                logger.fine(pattern + ": " + entry.getKey() + " set to " + matches);
+                if (matches) {
                     numberMatches++;
-                    Package pkg;
-                    try {
-                        pkg = Class.forName(entry.getKey()).getPackage();
-                        packageMatches.put(pkg, true);
-                    } catch (final ClassNotFoundException ex) {
+                    final Package pkg = entry.getKey().getPackage();
+                    packageMatches.put(pkg, true);
+                    if (needsUpdate) {
+                        fireTreeNodeChanged(pkg);
+                        fireTreeNodeChanged(entry.getKey());
                     }
                 }
             }
@@ -459,7 +485,7 @@ public class ExampleRunner extends JFrame {
 
         public boolean matches(final Object value) {
             if (value instanceof Class<?>) {
-                return classMatches.get(((Class<?>) value).getCanonicalName());
+                return classMatches.get(value);
             }
             final Boolean res = packageMatches.get(value);
             logger.fine("check " + value + " results in: " + res);
@@ -475,7 +501,7 @@ public class ExampleRunner extends JFrame {
         }
 
         public void valueForPathChanged(final TreePath path, final Object newValue) {
-            ; // ignored
+            fireTreeNodeChanged(path);
         }
 
         /**
@@ -572,10 +598,43 @@ public class ExampleRunner extends JFrame {
             }
         }
 
+        protected void fireTreeNodeChanged(final TreePath tp) {
+            final Object obj = tp.getLastPathComponent();
+            final TreePath parentPath = tp.getParentPath();
+            final Object parentObj = parentPath.getLastPathComponent();
+            final TreeModelEvent ev = new TreeModelEvent(this, parentPath,
+                    new int[] { getIndexOfChild(parentObj, obj) }, new Object[] { obj });
+            for (final TreeModelListener l : listeners.getListeners(TreeModelListener.class)) {
+                l.treeNodesChanged(ev);
+            }
+        }
+
+        protected void fireTreeNodeChanged(final Package pkg) {
+            final TreeModelEvent ev = new TreeModelEvent(this, new Object[] { root }, new int[] { getIndexOfChild(root,
+                    pkg) }, new Object[] { pkg });
+            for (final TreeModelListener l : listeners.getListeners(TreeModelListener.class)) {
+                l.treeNodesChanged(ev);
+            }
+        }
+
+        protected void fireTreeNodeChanged(final Class<?> clazz) {
+            final Package pkg = clazz.getPackage();
+            final TreeModelEvent ev = new TreeModelEvent(this, new Object[] { root, pkg }, new int[] { getIndexOfChild(
+                    pkg, clazz) }, new Object[] { clazz });
+            for (final TreeModelListener l : listeners.getListeners(TreeModelListener.class)) {
+                l.treeNodesChanged(ev);
+            }
+        }
+
         public void reload(final String pckgname) {
             root = pckgname;
+            size = 0;
             find(pckgname, true);
             fireTreeChanged();
+        }
+
+        public int getSize() {
+            return size;
         }
 
         protected void find(final String pckgname, final boolean recursive) {
