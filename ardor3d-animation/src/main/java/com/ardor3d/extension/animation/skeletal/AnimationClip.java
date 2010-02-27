@@ -10,14 +10,18 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
 import java.util.List;
 
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Lists;
 
-public class AnimationClip {
+public class AnimationClip implements Savable {
 
     private final List<AbstractAnimationChannel<?>> _channels;
-    private double _maxTime = 0;
+    private transient double _maxTime = 0;
 
     public AnimationClip() {
         _channels = Lists.newArrayList();
@@ -74,5 +78,26 @@ public class AnimationClip {
     @Override
     public String toString() {
         return "AnimationClip [channel count=" + _channels.size() + ", max time=" + _maxTime + "]";
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends AnimationClip> getClassTag() {
+        return this.getClass();
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.writeSavableList(_channels, "channels", null);
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        _channels.clear();
+        final List<Savable> channels = capsule.readSavableList("channels", null);
+        for (final Savable channel : channels) {
+            _channels.add((AbstractAnimationChannel<?>) channel);
+        }
+        updateMaxTimeIndex();
     }
 }

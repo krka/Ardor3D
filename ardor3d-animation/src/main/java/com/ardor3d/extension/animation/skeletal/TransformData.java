@@ -10,13 +10,18 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
+
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
-public class TransformData {
+public class TransformData implements Savable {
     private final Quaternion _rotation = new Quaternion(Quaternion.IDENTITY);
     private final Vector3 _scale = new Vector3(Vector3.ONE);
     private final Vector3 _translation = new Vector3(Vector3.ZERO);
@@ -74,5 +79,25 @@ public class TransformData {
         transform.setRotation(getRotation());
         transform.setScale(getScale());
         transform.setTranslation(getTranslation());
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends TransformData> getClassTag() {
+        return this.getClass();
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_rotation, "rotation", new Quaternion(Quaternion.IDENTITY));
+        capsule.write(_scale, "scale", new Vector3(Vector3.ONE));
+        capsule.write(_translation, "translation", new Vector3(Vector3.ZERO));
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        setRotation((Quaternion) capsule.readSavable("rotation", new Quaternion(Quaternion.IDENTITY)));
+        setScale((Vector3) capsule.readSavable("scale", new Vector3(Vector3.ONE)));
+        setTranslation((Vector3) capsule.readSavable("rotation", new Vector3(Vector3.ZERO)));
     }
 }

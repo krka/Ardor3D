@@ -102,7 +102,7 @@ public class SkeletalDebugger {
         boolean doChildren = true;
         if (scene instanceof SkinnedMesh) {
             final SkeletonPose pose = ((SkinnedMesh) scene).getCurrentPose();
-            if (allowSkeletonRedraw || !alreadyDrawn.contains(pose.getSkeleton())) {
+            if (pose != null && (allowSkeletonRedraw || !alreadyDrawn.contains(pose.getSkeleton()))) {
                 // If we're in view, go ahead and draw our associated skeleton pose
                 final Camera cam = Camera.getCurrentCamera();
                 final int state = cam.getPlaneState();

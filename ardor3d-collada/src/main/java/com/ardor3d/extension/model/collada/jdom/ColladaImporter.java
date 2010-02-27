@@ -12,7 +12,9 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import org.jdom.Attribute;
 import org.jdom.DataConversionException;
@@ -43,6 +45,8 @@ import com.ardor3d.util.resource.ResourceSource;
  * </p>
  */
 public class ColladaImporter {
+    private static final Logger logger = Logger.getLogger(ColladaImporter.class.getName());
+
     private boolean _loadTextures = true;
     private boolean _loadAnimations = true;
     private ResourceLocator _textureLocator;
@@ -224,7 +228,7 @@ public class ColladaImporter {
      * A JDOMFactory that normalizes all text (strips extra whitespace etc), preparses all arrays and hashes all
      * elements based on their id/sid.
      */
-    final class ArdorFactory extends DefaultJDOMFactory {
+    private static final class ArdorFactory extends DefaultJDOMFactory {
         private final DataCache dataCache;
         private Element currentElement;
         private BufferType bufferType = BufferType.None;
@@ -237,73 +241,78 @@ public class ColladaImporter {
 
         @Override
         public Text text(final String text) {
-            switch (bufferType) {
-                case Float: {
-                    final String normalizedText = Text.normalizeString(text);
-                    if (normalizedText.length() == 0) {
+            try {
+                switch (bufferType) {
+                    case Float: {
+                        final String normalizedText = Text.normalizeString(text);
+                        if (normalizedText.length() == 0) {
+                            return new Text("");
+                        }
+                        final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
+                        final float[] floatArray = new float[count];
+                        for (int i = 0; i < count; i++) {
+                            floatArray[i] = Float.parseFloat(tokenizer.nextToken().replace(",", "."));
+                        }
+
+                        dataCache.getFloatArrays().put(currentElement, floatArray);
+
                         return new Text("");
                     }
-                    final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
-                    final float[] floatArray = new float[count];
-                    for (int i = 0; i < count; i++) {
-                        floatArray[i] = Float.parseFloat(tokenizer.nextToken().replace(",", "."));
-                    }
+                    case Double: {
+                        final String normalizedText = Text.normalizeString(text);
+                        if (normalizedText.length() == 0) {
+                            return new Text("");
+                        }
+                        final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
+                        final double[] doubleArray = new double[count];
+                        for (int i = 0; i < count; i++) {
+                            doubleArray[i] = Double.parseDouble(tokenizer.nextToken().replace(",", "."));
+                        }
 
-                    dataCache.getFloatArrays().put(currentElement, floatArray);
+                        dataCache.getDoubleArrays().put(currentElement, doubleArray);
 
-                    return new Text("");
-                }
-                case Double: {
-                    final String normalizedText = Text.normalizeString(text);
-                    if (normalizedText.length() == 0) {
                         return new Text("");
                     }
-                    final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
-                    final double[] doubleArray = new double[count];
-                    for (int i = 0; i < count; i++) {
-                        doubleArray[i] = Double.parseDouble(tokenizer.nextToken().replace(",", "."));
-                    }
+                    case Int: {
+                        final String normalizedText = Text.normalizeString(text);
+                        if (normalizedText.length() == 0) {
+                            return new Text("");
+                        }
+                        final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
+                        final int[] intArray = new int[count];
+                        int i = 0;
+                        while (tokenizer.hasMoreTokens()) {
+                            intArray[i++] = Integer.parseInt(tokenizer.nextToken());
+                        }
 
-                    dataCache.getDoubleArrays().put(currentElement, doubleArray);
+                        dataCache.getIntArrays().put(currentElement, intArray);
 
-                    return new Text("");
-                }
-                case Int: {
-                    final String normalizedText = Text.normalizeString(text);
-                    if (normalizedText.length() == 0) {
                         return new Text("");
                     }
-                    final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
-                    final int[] intArray = new int[count];
-                    int i = 0;
-                    while (tokenizer.hasMoreTokens()) {
-                        intArray[i++] = Integer.parseInt(tokenizer.nextToken());
-                    }
+                    case P: {
+                        list.clear();
+                        final String normalizedText = Text.normalizeString(text);
+                        if (normalizedText.length() == 0) {
+                            return new Text("");
+                        }
+                        final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
+                        while (tokenizer.hasMoreTokens()) {
+                            list.add(tokenizer.nextToken());
+                        }
+                        final int listSize = list.size();
+                        final int[] intArray = new int[listSize];
+                        for (int i = 0; i < listSize; i++) {
+                            intArray[i] = Integer.parseInt(list.get(i));
+                        }
 
-                    dataCache.getIntArrays().put(currentElement, intArray);
+                        dataCache.getIntArrays().put(currentElement, intArray);
 
-                    return new Text("");
-                }
-                case P: {
-                    list.clear();
-                    final String normalizedText = Text.normalizeString(text);
-                    if (normalizedText.length() == 0) {
                         return new Text("");
                     }
-                    final StringTokenizer tokenizer = new StringTokenizer(normalizedText, " ");
-                    while (tokenizer.hasMoreTokens()) {
-                        list.add(tokenizer.nextToken());
-                    }
-                    final int listSize = list.size();
-                    final int[] intArray = new int[listSize];
-                    for (int i = 0; i < listSize; i++) {
-                        intArray[i] = Integer.parseInt(list.get(i));
-                    }
-
-                    dataCache.getIntArrays().put(currentElement, intArray);
-
-                    return new Text("");
                 }
+            } catch (final NoSuchElementException e) {
+                throw new ColladaException("Number of values in collada array does not match its count attribute: "
+                        + count, e);
             }
             return new Text(Text.normalizeString(text));
         }

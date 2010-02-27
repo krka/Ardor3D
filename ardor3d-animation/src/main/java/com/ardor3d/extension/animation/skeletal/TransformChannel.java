@@ -10,24 +10,33 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
 /**
  * NOTE: Could optimize memory by reusing math objects that are the same from one index to the next. Could optimize
  * execution time by then checking object equality and skipping (s)lerps.
  */
+@SavableFactory(factoryMethod = "initSavable")
 public class TransformChannel extends AbstractAnimationChannel<TransformData> {
 
     private final ReadOnlyQuaternion[] _rotations;
     private final ReadOnlyVector3[] _translations;
     private final ReadOnlyVector3[] _scales;
-    private final Quaternion _workR = new Quaternion();
-    private final Vector3 _workT = new Vector3();
-    private final Vector3 _workS = new Vector3();
+
+    private transient final Quaternion _workR = new Quaternion();
+    private transient final Vector3 _workT = new Vector3();
+    private transient final Vector3 _workS = new Vector3();
 
     public TransformChannel(final String channelName, final float[] times, final ReadOnlyQuaternion[] rotations,
             final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
@@ -44,7 +53,7 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
     }
 
     /**
-     * REPLACE THIS ONCE WE SWITCH TO JAVA 6.0 (with Arrays.copyOf)
+     * XXX: REPLACE THIS ONCE WE SWITCH TO JAVA 6.0 (with Arrays.copyOf)
      * 
      * @param <T>
      * @param srcArray
@@ -75,7 +84,6 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
         }
     }
 
-    @Override
     public void setCurrentSample(final int sampleIndex, final TransformData applyTo) {
         applyTo.setRotation(_rotations[sampleIndex]);
         applyTo.setTranslation(_translations[sampleIndex]);
@@ -118,5 +126,55 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
     @Override
     public TransformData createStateDataObject() {
         return new TransformData();
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends TransformChannel> getClassTag() {
+        return this.getClass();
+    }
+
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        capsule.write((Savable[]) _rotations, "rotations", null);
+        capsule.write((Savable[]) _scales, "scales", null);
+        capsule.write((Savable[]) _translations, "translations", null);
+    }
+
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        final ReadOnlyQuaternion[] rotations = (ReadOnlyQuaternion[]) capsule.readSavableArray("rotations", null);
+        final ReadOnlyVector3[] scales = (ReadOnlyVector3[]) capsule.readSavableArray("scales", null);
+        final ReadOnlyVector3[] translations = (ReadOnlyVector3[]) capsule.readSavableArray("translations", null);
+        try {
+            final Field field1 = this.getClass().getDeclaredField("_rotations");
+            field1.setAccessible(true);
+            field1.set(this, rotations);
+
+            final Field field2 = this.getClass().getDeclaredField("_scales");
+            field2.setAccessible(true);
+            field2.set(this, scales);
+
+            final Field field3 = this.getClass().getDeclaredField("_translations");
+            field3.setAccessible(true);
+            field3.set(this, translations);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static TransformChannel initSavable() {
+        return new TransformChannel();
+    }
+
+    protected TransformChannel() {
+        super(null, null);
+        _rotations = null;
+        _translations = null;
+        _scales = null;
     }
 }

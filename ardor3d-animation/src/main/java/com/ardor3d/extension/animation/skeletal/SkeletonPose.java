@@ -10,14 +10,24 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
+import com.google.common.collect.Lists;
 
 /**
  * Joins a Skeleton with an array of joint poses. This allows the skeleton to exist and be reused between multiple
  * instances of poses.
  */
-public class SkeletonPose {
+@SavableFactory(factoryMethod = "initSavable")
+public class SkeletonPose implements Savable {
 
     /** The skeleton being "posed". */
     private final Skeleton _skeleton;
@@ -25,14 +35,19 @@ public class SkeletonPose {
     /** Local transforms for the joints of the associated skeleton. */
     private final Transform[] _localTransforms;
 
-    /** Global transforms for the joints of the associated skeleton. */
-    private final Transform[] _globalTransforms;
+    /** Global transforms for the joints of the associated skeleton. Not saved to savable. */
+    private transient final Transform[] _globalTransforms;
 
     /**
      * A palette of matrices used in skin deformation - basically the global transform X the inverse bind pose
-     * transform.
+     * transform. Not saved to savable.
      */
-    private final Matrix4[] _matrixPalette;
+    private transient final Matrix4[] _matrixPalette;
+
+    /**
+     * The list of elements interested in notification when this SkeletonPose updates. Not saved to savable.
+     */
+    private transient final List<PoseListener> _poseListeners = Lists.newArrayListWithCapacity(1);
 
     /**
      * Construct a new SkeletonPose using the given Skeleton.
@@ -97,6 +112,33 @@ public class SkeletonPose {
     }
 
     /**
+     * Register a PoseListener on this SkeletonPose.
+     * 
+     * @param listener
+     *            the PoseListener
+     */
+    public void addPoseListener(final PoseListener listener) {
+        _poseListeners.add(listener);
+    }
+
+    /**
+     * Remove a PoseListener from this SkeletonPose.
+     * 
+     * @param listener
+     *            the PoseListener
+     */
+    public void removePoseListener(final PoseListener listener) {
+        _poseListeners.remove(listener);
+    }
+
+    /**
+     * Clear all PoseListeners registered on this SkeletonPose.
+     */
+    public void clearListeners() {
+        _poseListeners.clear();
+    }
+
+    /**
      * Update the global and palette transforms of our posed joints based on the current local joint transforms.
      */
     public void updateTransforms() {
@@ -127,6 +169,7 @@ public class SkeletonPose {
             temp.getHomogeneousMatrix(_matrixPalette[index]);
         }
         Transform.releaseTempInstance(temp);
+        firePoseUpdated();
     }
 
     /**
@@ -150,5 +193,86 @@ public class SkeletonPose {
             }
         }
         Transform.releaseTempInstance(temp);
+        firePoseUpdated();
+    }
+
+    /**
+     * Notify any registered PoseListeners that this pose has been "updated".
+     */
+    public void firePoseUpdated() {
+        for (int i = _poseListeners.size(); --i >= 0;) {
+            // Pull out pose
+            final PoseListener listener = _poseListeners.get(i);
+
+            // notify
+            listener.poseUpdated(this);
+        }
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends SkeletonPose> getClassTag() {
+        return this.getClass();
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_skeleton, "skeleton", null);
+        capsule.write(_localTransforms, "localTransforms", null);
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        final Skeleton skeleton = (Skeleton) capsule.readSavable("skeleton", null);
+        final Savable[] localTransformValues = capsule.readSavableArray("localTransforms", null);
+        try {
+            final Field field1 = this.getClass().getDeclaredField("_skeleton");
+            field1.setAccessible(true);
+            field1.set(this, skeleton);
+
+            final int jointCount = _skeleton.getJoints().length;
+
+            // init local transforms
+            final Transform[] localTransforms = new Transform[jointCount];
+            final Field field2 = this.getClass().getDeclaredField("_localTransforms");
+            field2.setAccessible(true);
+            field2.set(this, localTransforms);
+            for (int i = 0; i < jointCount; i++) {
+                _localTransforms[i] = (Transform) localTransformValues[i];
+            }
+
+            // init global transforms
+            final Transform[] globalTransforms = new Transform[jointCount];
+            for (int i = 0; i < jointCount; i++) {
+                globalTransforms[i] = new Transform();
+            }
+            final Field field3 = this.getClass().getDeclaredField("_globalTransforms");
+            field3.setAccessible(true);
+            field3.set(this, globalTransforms);
+
+            // init palette
+            final Matrix4[] matrixPalette = new Matrix4[jointCount];
+            for (int i = 0; i < jointCount; i++) {
+                matrixPalette[i] = new Matrix4();
+            }
+            final Field field4 = this.getClass().getDeclaredField("_matrixPalette");
+            field4.setAccessible(true);
+            field4.set(this, matrixPalette);
+
+            updateTransforms();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static SkeletonPose initSavable() {
+        return new SkeletonPose();
+    }
+
+    protected SkeletonPose() {
+        _skeleton = null;
+        _localTransforms = null;
+        _globalTransforms = null;
+        _matrixPalette = null;
     }
 }

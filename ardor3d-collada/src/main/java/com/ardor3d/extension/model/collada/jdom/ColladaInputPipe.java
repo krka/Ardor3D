@@ -12,7 +12,6 @@ package com.ardor3d.extension.model.collada.jdom;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +38,7 @@ public class ColladaInputPipe {
     private int _texCoord = 0;
 
     public enum Type {
-        VERTEX, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, //
+        VERTEX, POSITION, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, //
         INV_BIND_MATRIX, INPUT, IN_TANGENT, OUT_TANGENT, OUTPUT, INTERPOLATION, UNKNOWN
     }
 
@@ -123,7 +122,7 @@ public class ColladaInputPipe {
         }
 
         // add a hook to our params from the technique_common
-        final Element accessor = ColladaInputPipe.getCommonAccessor(_source);
+        final Element accessor = getCommonAccessor(_source);
         if (accessor != null) {
             if (ColladaInputPipe.logger.isLoggable(Level.FINE)) {
                 ColladaInputPipe.logger.fine("Creating buffers for: " + _source.getAttributeValue("id"));
@@ -180,7 +179,7 @@ public class ColladaInputPipe {
         // we'll use the params from the common technique accessor:
         final int size = _paramCount * numEntries;
         switch (_type) {
-            case VERTEX:
+            case POSITION:
                 _buffer = BufferUtils.createFloatBuffer(size);
                 meshData.setVertexBuffer(_buffer);
                 break;
@@ -227,28 +226,7 @@ public class ColladaInputPipe {
         }
     }
 
-    /**
-     * Push the values at the given indices of currentVal onto the buffers defined in pipes.
-     * 
-     * @param pipes
-     * @param currentVal
-     * @return the vertex index referenced in the given indices based on the pipes. Integer.MIN_VALUE is returned if no
-     *         vertex pipe is found.
-     */
-    public static int processPipes(final LinkedList<ColladaInputPipe> pipes, final int[] currentVal) {
-        // go through our pipes. use the indices in currentVal to pull the correct float val
-        // from our source and set into our buffer.
-        int rVal = Integer.MIN_VALUE;
-        for (final ColladaInputPipe pipe : pipes) {
-            pipe.pushValues(currentVal[pipe._offset]);
-            if (pipe._type == Type.VERTEX) {
-                rVal = currentVal[pipe._offset];
-            }
-        }
-        return rVal;
-    }
-
-    private static Element getCommonAccessor(final Element source) {
+    private Element getCommonAccessor(final Element source) {
         final Element techniqueCommon = source.getChild("technique_common");
         if (techniqueCommon != null) {
             return techniqueCommon.getChild("accessor");

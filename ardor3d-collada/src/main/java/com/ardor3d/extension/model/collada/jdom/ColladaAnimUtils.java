@@ -435,14 +435,33 @@ public class ColladaAnimUtils {
 
                     // Use pairs map and vertWeightMap to build our weights and joint indices.
                     {
+                        // count number of weights used
+                        int maxWeightsPerVert = 0;
+                        int weightCount;
+                        for (final int originalIndex : pairsMap.getIndices()) {
+                            weightCount = 0;
+
+                            // get first 4 weights and joints at original index and add weights up to get divisor sum
+                            final int[] data = vertWeightMap[originalIndex];
+                            for (int i = 0; i < data.length; i += maxOffset + 1) {
+                                final float weight = jointWeights.get(data[i + weightOff]);
+                                if (weight != 0) {
+                                    weightCount++;
+                                }
+                            }
+                            if (weightCount > maxWeightsPerVert) {
+                                maxWeightsPerVert = weightCount;
+                            }
+                        }
+
                         final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.getIndices().length
-                                * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
+                                * maxWeightsPerVert);
                         final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.getIndices().length
-                                * SkinnedMesh.MAX_JOINTS_PER_VERTEX);
+                                * maxWeightsPerVert);
                         int j;
                         float sum = 0;
-                        final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
-                        final short[] indices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX];
+                        final float[] weights = new float[maxWeightsPerVert];
+                        final short[] indices = new short[maxWeightsPerVert];
                         for (final int originalIndex : pairsMap.getIndices()) {
                             j = 0;
                             sum = 0;
@@ -452,18 +471,13 @@ public class ColladaAnimUtils {
                             for (int i = 0; i < data.length; i += maxOffset + 1) {
                                 final float weight = jointWeights.get(data[i + weightOff]);
                                 if (weight != 0) {
-                                    if (j >= SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
-                                        logger.warning("Max of " + SkinnedMesh.MAX_JOINTS_PER_VERTEX
-                                                + " joints supported per vertex.  Found " + (j + 1));
-                                    } else {
-                                        weights[j] = jointWeights.get(data[i + weightOff]);
-                                        indices[j] = (short) order[jointIndices.get(data[i + indOff])];
-                                        sum += weights[j++];
-                                    }
+                                    weights[j] = jointWeights.get(data[i + weightOff]);
+                                    indices[j] = (short) order[jointIndices.get(data[i + indOff])];
+                                    sum += weights[j++];
                                 }
                             }
                             // add extra padding as needed
-                            while (j < SkinnedMesh.MAX_JOINTS_PER_VERTEX) {
+                            while (j < maxWeightsPerVert) {
                                 weights[j] = 0;
                                 indices[j++] = 0;
                             }
@@ -477,6 +491,7 @@ public class ColladaAnimUtils {
 
                         skMesh.setWeights(weightBuffer);
                         skMesh.setJointIndices(jointIndexBuffer);
+                        skMesh.setWeightsPerVert(maxWeightsPerVert);
                     }
 
                     // add to the skinNode.
@@ -543,7 +558,8 @@ public class ColladaAnimUtils {
      * @param colladaRoot
      */
     public void parseLibraryAnimations(final Element colladaRoot) {
-        if (colladaRoot.getChild("library_animations") == null) {
+        if (colladaRoot.getChild("library_animations") == null
+                || colladaRoot.getChild("library_animations").getChildren().isEmpty()) {
             logger.warning("No animations found in collada file!");
             return;
         }
@@ -688,7 +704,8 @@ public class ColladaAnimUtils {
         final Joint joint = _dataCache.getElementJointMapping().get(parentElement);
         if (joint == null) {
             final String str = getElementString(parentElement, 0, false);
-            logger.warning("No element-joint mapping found for element: " + str);
+            logger.warning("No element-joint mapping found for element: " + str
+                    + "\nCheck if element is of type JOINT.");
             return;
         }
         final int jointIndex = joint.getIndex();
@@ -752,7 +769,7 @@ public class ColladaAnimUtils {
             for (final Element animationElement : (List<Element>) animationRoot.getChildren("animation")) {
                 parseAnimations(channelMap, animationElement, animationItem);
             }
-        } else {
+        } else if (animationRoot.getChild("channel") != null) {
             logger.fine("\n-- Parsing animation --");
             final Element channel = animationRoot.getChild("channel");
             final String source = channel.getAttributeValue("source");
@@ -766,6 +783,11 @@ public class ColladaAnimUtils {
                 // throw new ColladaException("No target transform node found for target: " + target, target);
                 return;
             }
+            if ("rotate".equals(targetNode.getName())) {
+                target.accessorType = AccessorType.Vector;
+                target.accessorIndexX = 3;
+            }
+
             final Element parentElement = targetNode.getParentElement();
 
             List<TargetChannel> targetList = channelMap.get(parentElement);

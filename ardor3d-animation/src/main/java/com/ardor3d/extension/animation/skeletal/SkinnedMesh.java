@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
@@ -18,19 +19,26 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class SkinnedMesh extends Mesh {
+public class SkinnedMesh extends Mesh implements PoseListener, Savable {
 
-    /** Maximum number of joints per vertex. */
-    public static final int MAX_JOINTS_PER_VERTEX = 4;
+    /**
+     * Number of weights per vertex. If using GPU skinning, use 4 entries per vertex and pad with 0 any extra space.
+     */
+    protected int _weightsPerVert = 1;
 
-    /** Storage for per vertex joint indices. There should be 4 entries per vertex. */
+    /**
+     * Storage for per vertex joint indices. There should be "weightsPerVert" entries per vertex.
+     */
     protected ShortBuffer _jointIndices;
 
     /**
      * Storage for per vertex joint indices. These should already be normalized (all joints affecting the vertex add to
-     * 1.) There should be 4 entries per vertex.
+     * 1.) There should be "weightsPerVert" entries per vertex.
      */
     protected FloatBuffer _weights;
 
@@ -55,6 +63,18 @@ public class SkinnedMesh extends Mesh {
      * The shader state to update with GLSL attributes/uniforms related to GPU skinning. See class doc for more.
      */
     private GLSLShaderObjectsState _gpuShader;
+
+    /**
+     * Flag for enabling automatically updating the skin's model bound when the pose changes. Only effective in CPU
+     * skinning mode. Default is false as this is currently expensive. XXX: If we can find a better way to update the
+     * bounds, maybe we should make this default to true or remove this altogether.
+     */
+    private boolean _autoUpdateSkinBound = false;
+
+    /**
+     * Custom update apply logic.
+     */
+    private SkinPoseApplyLogic _customApplier = null;
 
     /**
      * Constructs a new SkinnedMesh.
@@ -91,6 +111,22 @@ public class SkinnedMesh extends Mesh {
     }
 
     /**
+     * @return the number of weights and jointIndices this skin uses per vertex.
+     */
+    public int getWeightsPerVert() {
+        return _weightsPerVert;
+    }
+
+    /**
+     * @param weightsPerVert
+     *            the number of weights and jointIndices this skin should use per vertex. Make sure this value matches
+     *            up with the contents of jointIndices and weights.
+     */
+    public void setWeightsPerVert(final int weightsPerVert) {
+        _weightsPerVert = weightsPerVert;
+    }
+
+    /**
      * @return this skinned mesh's joint influences as indices into a Skeleton's Joint array.
      * @see #setJointIndices(ShortBuffer)
      */
@@ -99,8 +135,8 @@ public class SkinnedMesh extends Mesh {
     }
 
     /**
-     * Sets the joint indices used by this skinned mesh to compute mesh deformation. There should be 4 entries per
-     * vertex. Each entry is interpreted as an 16bit signed integer index into a Skeleton's Joint.
+     * Sets the joint indices used by this skinned mesh to compute mesh deformation. Each entry is interpreted as an
+     * 16bit signed integer index into a Skeleton's Joint.
      * 
      * @param jointIndices
      */
@@ -117,7 +153,7 @@ public class SkinnedMesh extends Mesh {
     }
 
     /**
-     * Sets the joint weights used by this skinned mesh. There should be 4 entries per bind pose vertex.
+     * Sets the joint weights used by this skinned mesh.
      * 
      * @param weights
      *            the new weights.
@@ -138,7 +174,28 @@ public class SkinnedMesh extends Mesh {
      *            the representation responsible for the pose and skeleton to use for morphing this mesh.
      */
     public void setCurrentPose(final SkeletonPose currentPose) {
+        if (_currentPose != null) {
+            _currentPose.removePoseListener(this);
+        }
         _currentPose = currentPose;
+        _currentPose.addPoseListener(this);
+    }
+
+    /**
+     * @return true if we should automatically update our model bounds when our pose updates. If useGPU is true, bounds
+     *         are ignored.
+     */
+    public boolean isAutoUpdateSkinBounds() {
+        return _autoUpdateSkinBound;
+    }
+
+    /**
+     * @param autoUpdateSkinBound
+     *            true if we should automatically update our model bounds when our pose updates. If useGPU is true,
+     *            bounds are ignored.
+     */
+    public void setAutoUpdateSkinBounds(final boolean autoUpdateSkinBound) {
+        _autoUpdateSkinBound = autoUpdateSkinBound;
     }
 
     /**
@@ -175,6 +232,26 @@ public class SkinnedMesh extends Mesh {
     }
 
     /**
+     * @return any custom apply logic set on this skin or null if default logic is used.
+     * @see #setCustomApplier(SkinPoseApplyLogic)
+     */
+    public SkinPoseApplyLogic getCustomApplier() {
+        return _customApplier;
+    }
+
+    /**
+     * Set custom logic for how this skin should react when it is told its pose has updated. This might include
+     * throttling skin application, ignoring skin application when the skin is outside of the camera view, etc. If null,
+     * (the default) the skin will always apply the new pose and optionally update the model bound.
+     * 
+     * @param customApplier
+     *            the new custom logic, or null to use the default behavior.
+     */
+    public void setCustomApplier(final SkinPoseApplyLogic customApplier) {
+        _customApplier = customApplier;
+    }
+
+    /**
      * Apply skinning values for GPU or CPU skinning.
      */
     public void applyPose() {
@@ -185,8 +262,8 @@ public class SkinnedMesh extends Mesh {
                 _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
             }
         } else {
-            final float[] weights = new float[SkinnedMesh.MAX_JOINTS_PER_VERTEX * _bindPoseData.getVertexCount()];
-            final short[] jointIndices = new short[SkinnedMesh.MAX_JOINTS_PER_VERTEX * _bindPoseData.getVertexCount()];
+            final float[] weights = new float[_weights.capacity()];
+            final short[] jointIndices = new short[_jointIndices.capacity()];
 
             // pull in joint data
             _weights.rewind();
@@ -254,8 +331,8 @@ public class SkinnedMesh extends Mesh {
                 }
 
                 // for each joint where the weight != 0
-                for (int j = 0; j < SkinnedMesh.MAX_JOINTS_PER_VERTEX; j++) {
-                    final int index = i * SkinnedMesh.MAX_JOINTS_PER_VERTEX + j;
+                for (int j = 0; j < getWeightsPerVert(); j++) {
+                    final int index = i * getWeightsPerVert() + j;
                     if (weights[index] == 0) {
                         continue;
                     }
@@ -317,6 +394,74 @@ public class SkinnedMesh extends Mesh {
             super.render(renderer);
         } else {
             super.render(renderer, getBindPoseData());
+        }
+    }
+
+    /**
+     * Calls to apply our pose on pose update.
+     */
+    public void poseUpdated(final SkeletonPose pose) {
+        // custom behavior?
+        if (_customApplier != null) {
+            _customApplier.doApply(this, pose);
+        }
+
+        // Just run our default behavior
+        else {
+            // update our pose
+            applyPose();
+
+            // update our model bounds
+            if (!isUseGPU() && isAutoUpdateSkinBounds()) {
+                updateModelBound();
+            }
+        }
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public Class<? extends SkinnedMesh> getClassTag() {
+        return this.getClass();
+    }
+
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
+        capsule.write(_weightsPerVert, "weightsPerVert", 1);
+        capsule.write(_jointIndices, "jointIndices", null);
+        capsule.write(_weights, "weights", null);
+        capsule.write(_bindPoseData, "bindPoseData", null);
+        capsule.write(_currentPose, "currentPose", null);
+        capsule.write(_useGPU, "useGPU", false);
+        capsule.write(_gpuShader, "gpuShader", null);
+        capsule.write(_autoUpdateSkinBound, "autoUpdateSkinBound", false);
+        if (_customApplier instanceof Savable) {
+            capsule.write((Savable) _customApplier, "customApplier", null);
+        }
+    }
+
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
+        _weightsPerVert = capsule.readInt("weightsPerVert", 1);
+        _jointIndices = capsule.readShortBuffer("jointIndices", null);
+        _weights = capsule.readFloatBuffer("weights", null);
+        _bindPoseData = (MeshData) capsule.readSavable("bindPoseData", null);
+        _currentPose = (SkeletonPose) capsule.readSavable("currentPose", null);
+        _useGPU = capsule.readBoolean("useGPU", false);
+        _gpuShader = (GLSLShaderObjectsState) capsule.readSavable("gpuShader", null);
+        _autoUpdateSkinBound = capsule.readBoolean("autoUpdateSkinBound", false);
+        final SkinPoseApplyLogic customApplier = (SkinPoseApplyLogic) capsule.readSavable("customApplier", null);
+        if (customApplier != null) {
+            _customApplier = customApplier;
+        }
+
+        // make sure pose listener added
+        if (_currentPose != null) {
+            _currentPose.addPoseListener(this);
         }
     }
 }

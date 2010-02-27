@@ -10,12 +10,21 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+
+import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
+
 /**
  * Describes a collection of Joints. This class represents the hierarchy of a Skeleton and its original aspect (via the
  * Joint class). This does not support posing the joints in any way... Use with a SkeletonPose to describe a skeleton in
  * a specific pose.
  */
-public class Skeleton {
+@SavableFactory(factoryMethod = "initSavable")
+public class Skeleton implements Savable {
 
     /**
      * An array of Joints associated with this Skeleton.
@@ -64,5 +73,47 @@ public class Skeleton {
             }
         }
         return -1;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends Skeleton> getClassTag() {
+        return this.getClass();
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_name, "name", null);
+        capsule.write(_joints, "joints", null);
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        final String name = capsule.readString("name", null);
+        final Savable[] joints = capsule.readSavableArray("joints", null);
+        try {
+            final Field field1 = this.getClass().getDeclaredField("_name");
+            field1.setAccessible(true);
+            field1.set(this, name);
+
+            final Field field2 = this.getClass().getDeclaredField("_joints");
+            field2.setAccessible(true);
+            field2.set(this, new Joint[joints.length]);
+            int i = 0;
+            for (final Savable joint : joints) {
+                _joints[i++] = (Joint) joint;
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Skeleton initSavable() {
+        return new Skeleton();
+    }
+
+    protected Skeleton() {
+        _name = null;
+        _joints = null;
     }
 }

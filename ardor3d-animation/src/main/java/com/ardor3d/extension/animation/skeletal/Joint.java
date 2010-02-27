@@ -10,18 +10,26 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.type.ReadOnlyTransform;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
 /**
  * Representation of a Joint in a Skeleton. Meant to be used within a specific Skeleton object.
  */
-public class Joint {
+@SavableFactory(factoryMethod = "initSavable")
+public class Joint implements Savable {
     /** Root node ID */
     public static final short NO_PARENT = Short.MIN_VALUE;
 
     /** The inverse transform of this Joint in its bind position. */
-    protected ReadOnlyTransform _inverseBindPose = Transform.IDENTITY;
+    private final Transform _inverseBindPose = new Transform(Transform.IDENTITY);
 
     /** A name, for display or debugging purposes. */
     private final String _name;
@@ -49,7 +57,7 @@ public class Joint {
     }
 
     public void setInverseBindPose(final ReadOnlyTransform inverseBindPose) {
-        _inverseBindPose = inverseBindPose;
+        _inverseBindPose.set(inverseBindPose);
     }
 
     /**
@@ -84,5 +92,44 @@ public class Joint {
     @Override
     public String toString() {
         return "Joint: '" + getName() + "'";
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    public Class<? extends Joint> getClassTag() {
+        return this.getClass();
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_name, "name", null);
+        capsule.write(_index, "index", (short) 0);
+        capsule.write(_parentIndex, "parentIndex", (short) 0);
+        capsule.write(_inverseBindPose, "inverseBindPose", (Savable) Transform.IDENTITY);
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        final String name = capsule.readString("name", null);
+        try {
+            final Field field1 = this.getClass().getDeclaredField("_name");
+            field1.setAccessible(true);
+            field1.set(this, name);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        _index = capsule.readShort("index", (short) 0);
+        _parentIndex = capsule.readShort("parentIndex", (short) 0);
+
+        setInverseBindPose((ReadOnlyTransform) capsule.readSavable("inverseBindBose", (Savable) Transform.IDENTITY));
+    }
+
+    public static Joint initSavable() {
+        return new Joint();
+    }
+
+    protected Joint() {
+        _name = null;
     }
 }
