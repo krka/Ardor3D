@@ -50,6 +50,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -62,6 +63,7 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -77,6 +79,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.google.common.collect.Lists;
 
@@ -94,6 +97,9 @@ public class ExampleRunner extends JFrame {
     private final JLabel lStatus;
     private final Action runSelectedAction;
     private final Action browseSelectedAction;
+    private final Action firstMatchAction;
+    private final Action nextMatchAction;
+    private final Action previousMatchAction;
     private final ErasableTextField tfPattern;
     private final JTabbedPane tabbedPane;
     private final DisplayConsole console;
@@ -116,6 +122,7 @@ public class ExampleRunner extends JFrame {
 
         model = new ClassTreeModel();
         tree = new JTree(model);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new ClassNameCellRenderer(model));
         tfPattern = new ErasableTextField(10);
         tfPattern.getDocument().addDocumentListener(new DocumentListener() {
@@ -137,8 +144,8 @@ public class ExampleRunner extends JFrame {
             private static final long serialVersionUID = 1L;
 
             {
-                putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
-                        .getResource("/com/ardor3d/example/media/icons/view-list-tree.png")));
+                // putValue(Action.NAME, "Expand nodes");
+                putValue(Action.SMALL_ICON, getIcon("view-list-tree.png"));
                 putValue(Action.SHORT_DESCRIPTION, "Expand all branches");
             }
 
@@ -176,40 +183,100 @@ public class ExampleRunner extends JFrame {
             private static final long serialVersionUID = 1L;
 
             {
-                putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
-                        .getResource("/com/ardor3d/example/media/icons/media-playback-start.png")));
-                putValue(Action.SHORT_DESCRIPTION, "Run the selected example.");
                 putValue(Action.NAME, "Run");
+                putValue(Action.SMALL_ICON, getIcon("media-playback-start.png"));
+                putValue(Action.SHORT_DESCRIPTION, "Run the selected example Ctrl-R");
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control R"));
             }
 
             public void actionPerformed(final ActionEvent e) {
                 runSelected();
             }
         };
-        final JButton runButton = new JButton(runSelectedAction);
-        runButton.setBorder(null);
 
         browseSelectedAction = new AbstractAction() {
 
             private static final long serialVersionUID = 1L;
 
             {
-                putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
-                        .getResource("/com/ardor3d/example/media/icons/world.png")));
-                putValue(Action.SHORT_DESCRIPTION, "View the source code. (Requires active Internet connection.)");
+                putValue(Action.NAME, "Browse");
+                putValue(Action.SMALL_ICON, getIcon("world.png"));
+                putValue(Action.SHORT_DESCRIPTION,
+                        "View the source code. (Requires active Internet connection.) Ctrl-B");
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control B"));
             }
 
             public void actionPerformed(final ActionEvent e) {
                 browseSelected();
             }
         };
-        final JButton browseButton = new JButton(browseSelectedAction);
-        browseButton.setBorder(null);
+
+        previousMatchAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
+            {
+                putValue(Action.NAME, "Previous match");
+                putValue(Action.SMALL_ICON, getIcon("go-up-search.png"));
+                putValue(Action.SHORT_DESCRIPTION, "Go to previous match Ctrl-P");
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control P"));
+            }
+
+            public void actionPerformed(final ActionEvent e) {
+                navigateInMatches(-1);
+            }
+        };
+
+        nextMatchAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
+            {
+                putValue(Action.NAME, "Next match");
+                putValue(Action.SMALL_ICON, getIcon("go-down-search.png"));
+                putValue(Action.SHORT_DESCRIPTION, "Go to next match Ctrl-N");
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control N"));
+            }
+
+            public void actionPerformed(final ActionEvent e) {
+                navigateInMatches(1);
+            }
+        };
+
+        firstMatchAction = new AbstractAction() {
+
+            private static final long serialVersionUID = 1L;
+            {
+                putValue(Action.NAME, "First match");
+                putValue(Action.SMALL_ICON, getIcon("go-top-search.png"));
+                putValue(Action.SHORT_DESCRIPTION, "Go to first match Ctrl-F");
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control F"));
+            }
+
+            public void actionPerformed(final ActionEvent e) {
+                tree.setSelectionRow(0);
+                navigateInMatches(1);
+            }
+        };
 
         toolbar.add(btExpand);
+        toolbar.addSeparator();
         toolbar.add(tfPattern);
-        toolbar.add(runButton);
-        toolbar.add(browseButton);
+        toolbar.add(firstMatchAction);
+        toolbar.add(nextMatchAction);
+        toolbar.add(previousMatchAction);
+        toolbar.addSeparator();
+        toolbar.add(runSelectedAction);
+        toolbar.add(browseSelectedAction);
+
+        for (final Action action : new Action[] { firstMatchAction, nextMatchAction, previousMatchAction,
+                runSelectedAction, browseSelectedAction }) {
+            toolbar.getActionMap().put(action.getValue(Action.NAME), action);
+            toolbar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                    (KeyStroke) action.getValue(Action.ACCELERATOR_KEY), action.getValue(Action.NAME));
+        }
+
+        // add a handler for return (enter key) on the tree
+        tree.getActionMap().put(runSelectedAction.getValue(Action.NAME), runSelectedAction);
+        tree.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), runSelectedAction.getValue(Action.NAME));
 
         lDescription = new JLabel();
         lDescription.setVerticalTextPosition(SwingConstants.TOP);
@@ -221,10 +288,8 @@ public class ExampleRunner extends JFrame {
         console = new DisplayConsole();
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabPlacement(SwingConstants.BOTTOM);
-        tabbedPane.addTab("Description", new ImageIcon(ExampleRunner.class
-                .getResource("/com/ardor3d/example/media/icons/declaration.png")), pExample);
-        tabbedPane.addTab("Console", new ImageIcon(ExampleRunner.class
-                .getResource("/com/ardor3d/example/media/icons/console.png")), console);
+        tabbedPane.addTab("Description", getIcon("declaration.png"), pExample);
+        tabbedPane.addTab("Console", getIcon("console.png"), console);
 
         splitPane = new JSplitPane();
         splitPane.setDividerLocation(300);
@@ -249,12 +314,32 @@ public class ExampleRunner extends JFrame {
         updateActionStatus();
     }
 
+    private void navigateInMatches(final int dir) {
+        int current = tree.getSelectionModel().getLeadSelectionRow();
+        for (;;) {
+            current += dir;
+            if (current >= tree.getRowCount()) {
+                current = 0;
+            } else if (current < 0) {
+                current = tree.getRowCount() - 1;
+            }
+            final TreePath tp = tree.getPathForRow(current);
+            final Object node = tp.getLastPathComponent();
+            if (node instanceof Class<?> && model.matches(node)) {
+                tree.setSelectionPath(tp);
+                tree.scrollPathToVisible(tp);
+                return;
+            }
+        }
+    }
+
     private void search() {
         final String pattern = tfPattern.getText();
         final int matches = model.updateMatches(pattern);
         tfPattern.setWarning(pattern.length() > 0 && matches == 0);
         tree.repaint();
         lStatus.setText("Examples: " + model.getSize() + (matches > 0 ? (" | matched: " + matches) : ""));
+        updateActionStatus();
     }
 
     private void updateActionStatus() {
@@ -262,6 +347,9 @@ public class ExampleRunner extends JFrame {
         final boolean canRun = tp != null && tp.getLastPathComponent() instanceof Class<?>;
         runSelectedAction.setEnabled(canRun);
         browseSelectedAction.setEnabled(canRun);
+        previousMatchAction.setEnabled(model.getMatchCount() > 0);
+        nextMatchAction.setEnabled(model.getMatchCount() > 0);
+        firstMatchAction.setEnabled(model.getMatchCount() > 0);
     }
 
     private void updateDescription() {
@@ -313,6 +401,9 @@ public class ExampleRunner extends JFrame {
     }
 
     private String getHtmlDescription(final Purpose purpose) {
+        if (purpose == null) {
+            return "";
+        }
         try {
             final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale.getDefault(),
                     getClass().getClassLoader());
@@ -379,6 +470,10 @@ public class ExampleRunner extends JFrame {
      * "\n" + ex.getMessage()); }
      */}
 
+    private static ImageIcon getIcon(final String name) {
+        return new ImageIcon(ExampleRunner.class.getResource("/com/ardor3d/example/media/icons/" + name));
+    }
+
     interface SearchFilter {
 
         public boolean matches(final Object value);
@@ -396,6 +491,7 @@ public class ExampleRunner extends JFrame {
         private String root = "all examples";
         private FileFilter classFileFilter;
         private int size;
+        private int matchCount = 0;
 
         public void addTreeModelListener(final TreeModelListener l) {
             listeners.add(TreeModelListener.class, l);
@@ -452,6 +548,8 @@ public class ExampleRunner extends JFrame {
             int numberMatches = 0;
             final String lcPattern = pattern.toLowerCase();
             packageMatches.clear();
+            TreePath firstPath = null;
+            int firstRow = Integer.MAX_VALUE;
             for (final Entry<Class<?>, Boolean> entry : classMatches.entrySet()) {
                 final String className = entry.getKey().getSimpleName();
                 boolean matches = false;
@@ -471,6 +569,14 @@ public class ExampleRunner extends JFrame {
                 entry.setValue(matches);
                 logger.fine(pattern + ": " + entry.getKey() + " set to " + matches);
                 if (matches) {
+                    final TreePath path = new TreePath(
+                            new Object[] { root, entry.getKey().getPackage(), entry.getKey() });
+                    final int row = tree.getRowForPath(path);
+                    if (row < firstRow) {
+                        firstPath = path;
+                        firstRow = row;
+                    }
+
                     numberMatches++;
                     final Package pkg = entry.getKey().getPackage();
                     packageMatches.put(pkg, true);
@@ -480,6 +586,13 @@ public class ExampleRunner extends JFrame {
                     }
                 }
             }
+            if (firstPath == null) {
+                tree.clearSelection();
+            } else {
+                tree.setSelectionPath(firstPath);
+                tree.scrollPathToVisible(firstPath);
+            }
+            matchCount = numberMatches;
             return numberMatches;
         }
 
@@ -691,6 +804,10 @@ public class ExampleRunner extends JFrame {
                 }
             }
         }
+
+        public int getMatchCount() {
+            return matchCount;
+        }
     }
 
     class ClassNameCellRenderer implements TreeCellRenderer {
@@ -826,8 +943,7 @@ public class ExampleRunner extends JFrame {
 
                 {
                     putValue(Action.SHORT_DESCRIPTION, "Clear search pattern");
-                    putValue(Action.SMALL_ICON, new ImageIcon(ExampleRunner.class
-                            .getResource("/com/ardor3d/example/media/icons/edit-clear-locationbar-rtl.png")));
+                    putValue(Action.SMALL_ICON, getIcon("edit-clear-locationbar-rtl.png"));
                 }
 
                 public void actionPerformed(final ActionEvent e) {
@@ -837,6 +953,8 @@ public class ExampleRunner extends JFrame {
             btClear.setPreferredSize(new Dimension(20, 20));
             btClear.setFocusable(false);
             btClear.setBorder(null);
+            // keep it from taking all the space in a toolbar
+            setMaximumSize(new Dimension(120, 20));
             add(textField);
             add(btClear, BorderLayout.EAST);
         }
@@ -863,8 +981,7 @@ public class ExampleRunner extends JFrame {
         } catch (final Exception e) {
         }
         final ExampleRunner app = new ExampleRunner();
-        app.setIconImage(new ImageIcon(ExampleRunner.class
-                .getResource("/com/ardor3d/example/media/icons/ardor3d_white_24.png")).getImage());
+        app.setIconImage(getIcon("ardor3d_white_24.png").getImage());
         app.setSize(800, 400);
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setLocationRelativeTo(null);
