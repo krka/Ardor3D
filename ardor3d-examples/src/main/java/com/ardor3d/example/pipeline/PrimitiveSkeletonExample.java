@@ -11,8 +11,6 @@
 package com.ardor3d.example.pipeline;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
@@ -94,8 +92,8 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
         arm.setWeightsPerVert(4);
 
-        final FloatBuffer weights = BufferUtils.createFloatBuffer( //
-                1, 0, 0, 0, //
+        final float[] weights = { //
+        1, 0, 0, 0, //
                 1, 0, 0, 0, //
                 1, 0, 0, 0, //
                 1, 0, 0, 0, //
@@ -124,12 +122,15 @@ public class PrimitiveSkeletonExample extends ExampleBase {
                 0, 1, 0, 0, //
                 0, 1, 0, 0, //
                 0, 1, 0, 0 //
-                );
+        };
         arm.setWeights(weights);
 
-        final ShortBuffer indices = BufferUtils.createShortBuffer(4 * 27);
+        final short[] indices = new short[4 * 27];
         for (int i = 0; i < 27; i++) {
-            indices.put(new short[] { 0, 1, 0, 0 });
+            indices[i * 4 + 0] = 0;
+            indices[i * 4 + 1] = 1;
+            indices[i * 4 + 2] = 0;
+            indices[i * 4 + 3] = 0;
         }
         arm.setJointIndices(indices);
 

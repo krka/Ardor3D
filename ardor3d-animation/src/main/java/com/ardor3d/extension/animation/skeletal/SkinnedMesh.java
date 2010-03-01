@@ -34,13 +34,15 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
     /**
      * Storage for per vertex joint indices. There should be "weightsPerVert" entries per vertex.
      */
-    protected ShortBuffer _jointIndices;
+    protected short[] _jointIndices;
+    protected ShortBuffer _jointIndicesBuf;
 
     /**
      * Storage for per vertex joint indices. These should already be normalized (all joints affecting the vertex add to
      * 1.) There should be "weightsPerVert" entries per vertex.
      */
-    protected FloatBuffer _weights;
+    protected float[] _weights;
+    protected FloatBuffer _weightsBuf;
 
     /**
      * The original bind pose form of this SkinnedMesh. When doing CPU skinning, this will be used as a source and the
@@ -130,7 +132,7 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
      * @return this skinned mesh's joint influences as indices into a Skeleton's Joint array.
      * @see #setJointIndices(ShortBuffer)
      */
-    public ShortBuffer getJointIndices() {
+    public short[] getJointIndices() {
         return _jointIndices;
     }
 
@@ -140,15 +142,23 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
      * 
      * @param jointIndices
      */
-    public void setJointIndices(final ShortBuffer jointIndices) {
+    public void setJointIndices(final short[] jointIndices) {
         _jointIndices = jointIndices;
+        if (_jointIndices != null && _jointIndicesBuf != null) {
+            if (_jointIndicesBuf.capacity() == _jointIndices.length) {
+                _jointIndicesBuf.rewind();
+                _jointIndicesBuf.put(_jointIndices);
+            } else {
+                _jointIndicesBuf = BufferUtils.createShortBuffer(_jointIndices);
+            }
+        }
     }
 
     /**
      * @return this skinned mesh's joint weights.
      * @see #setWeights(FloatBuffer)
      */
-    public FloatBuffer getWeights() {
+    public float[] getWeights() {
         return _weights;
     }
 
@@ -158,8 +168,16 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
      * @param weights
      *            the new weights.
      */
-    public void setWeights(final FloatBuffer weights) {
+    public void setWeights(final float[] weights) {
         _weights = weights;
+        if (_weights != null && _weightsBuf != null) {
+            if (_weightsBuf.capacity() == _weights.length) {
+                _weightsBuf.rewind();
+                _weightsBuf.put(_weights);
+            } else {
+                _weightsBuf = BufferUtils.createFloatBuffer(_weights);
+            }
+        }
     }
 
     /**
@@ -257,20 +275,17 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
     public void applyPose() {
         if (isUseGPU()) {
             if (_gpuShader != null) {
-                _gpuShader.setAttributePointer("Weights", 4, false, 0, _weights);
-                _gpuShader.setAttributePointer("JointIDs", 4, false, false, 0, _jointIndices);
+                if (_weightsBuf == null) {
+                    _weightsBuf = BufferUtils.createFloatBuffer(_weights);
+                }
+                _gpuShader.setAttributePointer("Weights", 4, false, 0, _weightsBuf);
+                if (_jointIndicesBuf == null) {
+                    _jointIndicesBuf = BufferUtils.createShortBuffer(_jointIndices);
+                }
+                _gpuShader.setAttributePointer("JointIDs", 4, false, false, 0, _jointIndicesBuf);
                 _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
             }
         } else {
-            final float[] weights = new float[_weights.capacity()];
-            final short[] jointIndices = new short[_jointIndices.capacity()];
-
-            // pull in joint data
-            _weights.rewind();
-            _weights.get(weights);
-            _jointIndices.rewind();
-            _jointIndices.get(jointIndices);
-
             // Get a handle to the source and dest vertices buffers
             final FloatBuffer bindVerts = _bindPoseData.getVertexBuffer();
             FloatBuffer storeVerts = _meshData.getVertexBuffer();
@@ -333,13 +348,13 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
                 // for each joint where the weight != 0
                 for (int j = 0; j < getWeightsPerVert(); j++) {
                     final int index = i * getWeightsPerVert() + j;
-                    if (weights[index] == 0) {
+                    if (_weights[index] == 0) {
                         continue;
                     }
 
-                    jointIndex = jointIndices[index];
+                    jointIndex = _jointIndices[index];
                     jntMat = _currentPose.getMatrixPalette()[jointIndex];
-                    weight = weights[index];
+                    weight = _weights[index];
 
                     // Multiply our vertex by the matrix palette entry
                     tempX = jntMat.getValue(0, 0) * bindVX + jntMat.getValue(0, 1) * bindVY + jntMat.getValue(0, 2)
@@ -447,8 +462,8 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _weightsPerVert = capsule.readInt("weightsPerVert", 1);
-        _jointIndices = capsule.readShortBuffer("jointIndices", null);
-        _weights = capsule.readFloatBuffer("weights", null);
+        _jointIndices = capsule.readShortArray("jointIndices", null);
+        _weights = capsule.readFloatArray("weights", null);
         _bindPoseData = (MeshData) capsule.readSavable("bindPoseData", null);
         _currentPose = (SkeletonPose) capsule.readSavable("currentPose", null);
         _useGPU = capsule.readBoolean("useGPU", false);

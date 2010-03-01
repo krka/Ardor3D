@@ -489,8 +489,16 @@ public class ColladaAnimUtils {
                             jointIndexBuffer.put(indices);
                         }
 
-                        skMesh.setWeights(weightBuffer);
-                        skMesh.setJointIndices(jointIndexBuffer);
+                        final float[] totalWeights = new float[weightBuffer.capacity()];
+                        weightBuffer.flip();
+                        weightBuffer.get(totalWeights);
+                        skMesh.setWeights(totalWeights);
+
+                        final short[] totalIndices = new short[jointIndexBuffer.capacity()];
+                        jointIndexBuffer.flip();
+                        jointIndexBuffer.get(totalIndices);
+                        skMesh.setJointIndices(totalIndices);
+
                         skMesh.setWeightsPerVert(maxWeightsPerVert);
                     }
 

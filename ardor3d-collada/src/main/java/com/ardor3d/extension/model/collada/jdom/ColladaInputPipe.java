@@ -210,7 +210,8 @@ public class ColladaInputPipe {
         }
 
         if (memberIndex >= _sourceData.count) {
-            ColladaInputPipe.logger.warning("Accessed invalid count " + memberIndex + " on source " + _source + ".");
+            ColladaInputPipe.logger.warning("Accessed invalid index " + memberIndex + " on source " + _source
+                    + ".  Count: " + _sourceData.count);
             return;
         }
 
