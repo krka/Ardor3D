@@ -418,7 +418,7 @@ public class BMFont {
             final Document doc = db.parse(source.openStream());
 
             doc.getDocumentElement().normalize();
-            recurse(doc.getFirstChild());
+            recurse(doc.getElementsByTagName("font").item(0));
 
             // db.reset();
         } catch (final Throwable t) {
