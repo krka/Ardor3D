@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jdom.DataConversionException;
 import org.jdom.Element;
 
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.Type;
@@ -29,7 +28,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.geom.BufferUtils;
-import com.google.common.collect.Lists;
 
 /**
  * Methods for parsing Collada data related to meshes.
@@ -224,39 +222,8 @@ public class ColladaMeshUtils {
         // Build and set RenderStates for our material
         _colladaMaterialUtils.applyMaterial(polys.getAttributeValue("material"), polyMesh);
 
-        final List<Element> inputs = Lists.newArrayList();
-        for (final Element input : (List<Element>) polys.getChildren("input")) {
-            try {
-                final Type type = Type.valueOf(input.getAttributeValue("semantic"));
-                if (type == Type.VERTEX) {
-                    final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
-                        vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
-                        vertexInput.setAttribute("isVertexDefined", "true");
-                        inputs.add(vertexInput);
-                    }
-                } else {
-                    inputs.add(input);
-                }
-            } catch (final Exception ex) {
-                logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
-                continue;
-            }
-        }
-
-        // Pull inputs out... what is max offset? what values will we be using?
-        int maxOffset = 0;
         final LinkedList<ColladaInputPipe> pipes = new LinkedList<ColladaInputPipe>();
-        for (final Element input : inputs) {
-            // Construct an input pipe...
-            final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, input);
-            pipes.add(pipe);
-            try {
-                maxOffset = Math.max(maxOffset, input.getAttribute("offset").getIntValue());
-            } catch (final DataConversionException e) {
-                e.printStackTrace();
-            }
-        }
+        final int maxOffset = extractPipes(polys, pipes);
         final int interval = maxOffset + 1;
 
         // use interval & sum of sizes of p entries to determine buffer sizes.
@@ -335,7 +302,6 @@ public class ColladaMeshUtils {
         return polyMesh;
     }
 
-    @SuppressWarnings("unchecked")
     public Mesh buildMeshPolylist(final Element colladaGeometry, final Element polys) {
         if (polys == null || polys.getChild("input") == null) {
             return null;
@@ -346,39 +312,8 @@ public class ColladaMeshUtils {
         // Build and set RenderStates for our material
         _colladaMaterialUtils.applyMaterial(polys.getAttributeValue("material"), polyMesh);
 
-        final List<Element> inputs = Lists.newArrayList();
-        for (final Element input : (List<Element>) polys.getChildren("input")) {
-            try {
-                final Type type = Type.valueOf(input.getAttributeValue("semantic"));
-                if (type == Type.VERTEX) {
-                    final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
-                        vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
-                        vertexInput.setAttribute("isVertexDefined", "true");
-                        inputs.add(vertexInput);
-                    }
-                } else {
-                    inputs.add(input);
-                }
-            } catch (final Exception ex) {
-                logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
-                continue;
-            }
-        }
-
-        // Pull inputs out... what is max offset? what values will we be using?
-        int maxOffset = 0;
         final LinkedList<ColladaInputPipe> pipes = new LinkedList<ColladaInputPipe>();
-        for (final Element i : inputs) {
-            // Construct an input pipe...
-            final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, i);
-            pipes.add(pipe);
-            try {
-                maxOffset = Math.max(maxOffset, i.getAttribute("offset").getIntValue());
-            } catch (final DataConversionException e) {
-                e.printStackTrace();
-            }
-        }
+        final int maxOffset = extractPipes(polys, pipes);
         final int interval = maxOffset + 1;
 
         // use interval & sum of sizes of vcount to determine buffer sizes.
@@ -454,7 +389,6 @@ public class ColladaMeshUtils {
         return polyMesh;
     }
 
-    @SuppressWarnings("unchecked")
     public Mesh buildMeshTriangles(final Element colladaGeometry, final Element tris) {
         if (tris == null || tris.getChild("input") == null || tris.getChild("p") == null) {
             return null;
@@ -465,39 +399,8 @@ public class ColladaMeshUtils {
         // Build and set RenderStates for our material
         _colladaMaterialUtils.applyMaterial(tris.getAttributeValue("material"), triMesh);
 
-        final List<Element> inputs = Lists.newArrayList();
-        for (final Element input : (List<Element>) tris.getChildren("input")) {
-            try {
-                final Type type = Type.valueOf(input.getAttributeValue("semantic"));
-                if (type == Type.VERTEX) {
-                    final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
-                        vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
-                        vertexInput.setAttribute("isVertexDefined", "true");
-                        inputs.add(vertexInput);
-                    }
-                } else {
-                    inputs.add(input);
-                }
-            } catch (final Exception ex) {
-                logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
-                continue;
-            }
-        }
-
-        // Pull inputs out... what is max offset? what values will we be using?
-        int maxOffset = 0;
         final LinkedList<ColladaInputPipe> pipes = new LinkedList<ColladaInputPipe>();
-        for (final Element i : inputs) {
-            // Construct an input pipe...
-            final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, i);
-            pipes.add(pipe);
-            try {
-                maxOffset = Math.max(maxOffset, i.getAttribute("offset").getIntValue());
-            } catch (final DataConversionException e) {
-                e.printStackTrace();
-            }
-        }
+        final int maxOffset = extractPipes(tris, pipes);
         final int interval = maxOffset + 1;
 
         // use interval & size of p array to determine buffer sizes.
@@ -533,7 +436,6 @@ public class ColladaMeshUtils {
         return triMesh;
     }
 
-    @SuppressWarnings("unchecked")
     public Line buildMeshLines(final Element colladaGeometry, final Element lines) {
         if (lines == null || lines.getChild("input") == null || lines.getChild("p") == null) {
             return null;
@@ -543,39 +445,8 @@ public class ColladaMeshUtils {
         // Build and set RenderStates for our material
         _colladaMaterialUtils.applyMaterial(lines.getAttributeValue("material"), lineMesh);
 
-        final List<Element> inputs = Lists.newArrayList();
-        for (final Element input : (List<Element>) lines.getChildren("input")) {
-            try {
-                final Type type = Type.valueOf(input.getAttributeValue("semantic"));
-                if (type == Type.VERTEX) {
-                    final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
-                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
-                        vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
-                        vertexInput.setAttribute("isVertexDefined", "true");
-                        inputs.add(vertexInput);
-                    }
-                } else {
-                    inputs.add(input);
-                }
-            } catch (final Exception ex) {
-                logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
-                continue;
-            }
-        }
-
-        // Pull inputs out... what is max offset? what values will we be using?
-        int maxOffset = 0;
         final LinkedList<ColladaInputPipe> pipes = new LinkedList<ColladaInputPipe>();
-        for (final Element i : inputs) {
-            // Construct an input pipe...
-            final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, i);
-            pipes.add(pipe);
-            try {
-                maxOffset = Math.max(maxOffset, i.getAttribute("offset").getIntValue());
-            } catch (final DataConversionException e) {
-                e.printStackTrace();
-            }
-        }
+        final int maxOffset = extractPipes(lines, pipes);
         final int interval = maxOffset + 1;
 
         // use interval & size of p array to determine buffer sizes.
@@ -609,6 +480,39 @@ public class ColladaMeshUtils {
         lineMesh.updateModelBound();
 
         return lineMesh;
+    }
+
+    /**
+     * Extract our pipes from the given parent element.
+     * 
+     * @param inputsParent
+     * @param pipesStore
+     *            the store for our pipes
+     * @return the max offset of our pipes.
+     */
+    @SuppressWarnings("unchecked")
+    private int extractPipes(final Element inputsParent, final LinkedList<ColladaInputPipe> pipesStore) {
+        int maxOffset = 0;
+        for (final Element input : (List<Element>) inputsParent.getChildren("input")) {
+            maxOffset = Math.max(maxOffset, _colladaDOMUtil.getAttributeIntValue(input, "offset", 0));
+            try {
+                final Type type = Type.valueOf(input.getAttributeValue("semantic"));
+                if (type == Type.VERTEX) {
+                    final Element vertexElement = _colladaDOMUtil.findTargetWithId(input.getAttributeValue("source"));
+                    for (final Element vertexInput : (List<Element>) vertexElement.getChildren("input")) {
+                        vertexInput.setAttribute("offset", input.getAttributeValue("offset"));
+                        vertexInput.setAttribute("isVertexDefined", "true");
+                        pipesStore.add(new ColladaInputPipe(_colladaDOMUtil, vertexInput));
+                    }
+                } else {
+                    pipesStore.add(new ColladaInputPipe(_colladaDOMUtil, input));
+                }
+            } catch (final Exception ex) {
+                logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
+                continue;
+            }
+        }
+        return maxOffset;
     }
 
     /**
