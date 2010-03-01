@@ -245,6 +245,10 @@ public final class Debugger {
                 } else {
                     rSize = 1.0;
                 }
+
+                if (Double.isInfinite(rSize) || Double.isNaN(rSize)) {
+                    rSize = 1.0;
+                }
             }
 
             final FloatBuffer norms = mesh.getMeshData().getNormalBuffer();
