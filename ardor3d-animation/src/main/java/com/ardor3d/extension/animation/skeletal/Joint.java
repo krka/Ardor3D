@@ -122,7 +122,7 @@ public class Joint implements Savable {
         _index = capsule.readShort("index", (short) 0);
         _parentIndex = capsule.readShort("parentIndex", (short) 0);
 
-        setInverseBindPose((ReadOnlyTransform) capsule.readSavable("inverseBindBose", (Savable) Transform.IDENTITY));
+        setInverseBindPose((ReadOnlyTransform) capsule.readSavable("inverseBindPose", (Savable) Transform.IDENTITY));
     }
 
     public static Joint initSavable() {
