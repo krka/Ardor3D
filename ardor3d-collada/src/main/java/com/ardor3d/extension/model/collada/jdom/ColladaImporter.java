@@ -103,7 +103,7 @@ public class ColladaImporter {
      *            the name of the resource to find.
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
      */
-    private ColladaStorage load(final ResourceSource resource) {
+    public ColladaStorage load(final ResourceSource resource) {
         final ColladaStorage colladaStorage = new ColladaStorage();
         final DataCache dataCache = new DataCache();
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);

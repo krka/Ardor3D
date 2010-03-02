@@ -11,8 +11,7 @@
 package com.ardor3d.example.pipeline;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -58,7 +57,8 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.ardor3d.util.resource.ResourceSource;
+import com.ardor3d.util.resource.URLResourceSource;
 
 /**
  * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
@@ -102,7 +102,7 @@ public class ColladaExample extends ExampleBase {
         _lightState.attach(light);
 
         // Load collada model
-        loadColladaModel("collada/sony/Seymour.dae");
+        loadColladaModel(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "collada/sony/Seymour.dae"));
 
         final File rootDir = new File(".");
         daeFiles = findFiles(rootDir, ".dae", null);
@@ -142,9 +142,9 @@ public class ColladaExample extends ExampleBase {
             public void actionPerformed(final ActionEvent event) {
                 final File file = daeFiles.get(fileIndex);
                 try {
-                    loadColladaModel(file.toURI());
+                    loadColladaModel(new URLResourceSource(file.toURL()));
                     t1.setText(file.getName());
-                } catch (final URISyntaxException e) {
+                } catch (final MalformedURLException e) {
                     e.printStackTrace();
                 }
                 fileIndex = (fileIndex + 1) % daeFiles.size();
@@ -201,21 +201,7 @@ public class ColladaExample extends ExampleBase {
         UIComponent.setUseTransparency(true);
     }
 
-    private void loadColladaModel(final URI modelURI) throws URISyntaxException {
-        // add a temporary resource locator since this is potentially outside our normal model location.
-        final SimpleResourceLocator loc = new SimpleResourceLocator(modelURI.resolve("./"));
-        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
-        final SimpleResourceLocator loc2 = new SimpleResourceLocator(modelURI.resolve("./"));
-        ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, loc2);
-
-        loadColladaModel(modelURI.toString());
-
-        // remove locator
-        ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc);
-        ResourceLocatorTool.removeResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, loc2);
-    }
-
-    private void loadColladaModel(final String file) {
+    private void loadColladaModel(final ResourceSource source) {
         try {
             // detach the old colladaNode, if present.
             _root.detachChild(colladaNode);
@@ -224,13 +210,13 @@ public class ColladaExample extends ExampleBase {
             final ColladaImporter colladaImporter = new ColladaImporter();
 
             // Load the collada scene
-            final ColladaStorage storage = colladaImporter.load(file);
+            final ColladaStorage storage = colladaImporter.load(source);
             colladaNode = storage.getScene();
 
             setupSkins(storage);
             setupAnimations(storage);
 
-            System.out.println("Importing: " + file);
+            System.out.println("Importing: " + source);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
             // Add colladaNode to root
