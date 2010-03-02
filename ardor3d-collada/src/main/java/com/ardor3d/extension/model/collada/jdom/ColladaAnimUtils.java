@@ -384,7 +384,7 @@ public class ColladaAnimUtils {
 
             // Visit our Node and pull out any Mesh children. Turn them into SkinnedMeshes
             for (final Spatial spat : meshNode.getChildren()) {
-                if (spat instanceof Mesh) {
+                if (spat instanceof Mesh && ((Mesh) spat).getMeshData().getVertexCount() > 0) {
                     final Mesh sourceMesh = (Mesh) spat;
                     final SkinnedMesh skMesh = new SkinnedMesh(sourceMesh.getName());
                     skMesh.setCurrentPose(skPose);
