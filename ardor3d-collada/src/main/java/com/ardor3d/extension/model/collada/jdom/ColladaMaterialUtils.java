@@ -26,6 +26,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocator;
@@ -103,7 +104,7 @@ public class ColladaMaterialUtils {
                             final Element propertyValue = (Element) property.getChildren().get(0);
                             if ("color".equals(propertyValue.getName())) {
                                 final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                                mState.setDiffuse(color);
+                                mState.setDiffuse(MaterialFace.FrontAndBack, color);
                             } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
                                 TextureState tState = (TextureState) mesh
                                         .getLocalRenderState(RenderState.StateType.Texture);
@@ -117,7 +118,7 @@ public class ColladaMaterialUtils {
                             final Element propertyValue = (Element) property.getChildren().get(0);
                             if ("color".equals(propertyValue.getName())) {
                                 final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                                mState.setAmbient(color);
+                                mState.setAmbient(MaterialFace.FrontAndBack, color);
                             }
                         } else if ("transparent".equals(property.getName())) {
                             final Element propertyValue = (Element) property.getChildren().get(0);
@@ -139,12 +140,14 @@ public class ColladaMaterialUtils {
                         } else if ("emission".equals(property.getName())) {
                             final Element propertyValue = (Element) property.getChildren().get(0);
                             if ("color".equals(propertyValue.getName())) {
-                                mState.setEmissive(_colladaDOMUtil.getColor(propertyValue.getText()));
+                                mState.setEmissive(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
+                                        .getText()));
                             }
                         } else if ("specular".equals(property.getName())) {
                             final Element propertyValue = (Element) property.getChildren().get(0);
                             if ("color".equals(propertyValue.getName())) {
-                                mState.setSpecular(_colladaDOMUtil.getColor(propertyValue.getText()));
+                                mState.setSpecular(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
+                                        .getText()));
                             }
                         } else if ("shininess".equals(property.getName())) {
                             final Element propertyValue = (Element) property.getChildren().get(0);
@@ -157,11 +160,11 @@ public class ColladaMaterialUtils {
                                             + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
                                 } else if (shininess < 0 || shininess > 128) {
                                     final float oldShininess = shininess;
-                                    shininess = (float) MathUtils.clamp(shininess, 0, 128);
+                                    shininess = MathUtils.clamp(shininess, 0, 128);
                                     logger.warning("Shininess must be between 0 and 128. Shininess " + oldShininess
                                             + " was clamped to " + shininess);
                                 }
-                                mState.setShininess(shininess);
+                                mState.setShininess(MaterialFace.FrontAndBack, shininess);
                             }
                         }
                     }
