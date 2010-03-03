@@ -107,17 +107,27 @@ public class MaterialState extends RenderState {
     public MaterialState() {}
 
     /**
-     * @return the front face color of this material.
+     * @return the ambient color (or front face color, if two sided lighting is used) of this material.
      */
-    public ReadOnlyColorRGBA getFrontAmbient() {
+    public ReadOnlyColorRGBA getAmbient() {
         return _frontAmbient;
     }
 
     /**
-     * @return the back face color of this material.
+     * @return the ambient back face color of this material. This is only used if two sided lighting is used.
      */
     public ReadOnlyColorRGBA getBackAmbient() {
         return _backAmbient;
+    }
+
+    /**
+     * Sets the ambient color for front and back to the given value.
+     * 
+     * @param ambient
+     *            the new ambient color
+     */
+    public void setAmbient(final ReadOnlyColorRGBA ambient) {
+        setAmbient(MaterialFace.FrontAndBack, ambient);
     }
 
     /**
@@ -137,17 +147,27 @@ public class MaterialState extends RenderState {
     }
 
     /**
-     * @return the front face diffuse color of this material.
+     * @return the diffuse color (or front face color, if two sided lighting is used) of this material.
      */
-    public ReadOnlyColorRGBA getFrontDiffuse() {
+    public ReadOnlyColorRGBA getDiffuse() {
         return _frontDiffuse;
     }
 
     /**
-     * @return the back face diffuse color of this material.
+     * @return the diffuse back face color of this material. This is only used if two sided lighting is used.
      */
     public ReadOnlyColorRGBA getBackDiffuse() {
         return _backDiffuse;
+    }
+
+    /**
+     * Sets the diffuse color for front and back to the given value.
+     * 
+     * @param diffuse
+     *            the new diffuse color
+     */
+    public void setDiffuse(final ReadOnlyColorRGBA diffuse) {
+        setDiffuse(MaterialFace.FrontAndBack, diffuse);
     }
 
     /**
@@ -167,17 +187,27 @@ public class MaterialState extends RenderState {
     }
 
     /**
-     * @return the front face emissive color of this material.
+     * @return the emissive color (or front face color, if two sided lighting is used) of this material.
      */
-    public ReadOnlyColorRGBA getFrontEmissive() {
+    public ReadOnlyColorRGBA getEmissive() {
         return _frontEmissive;
     }
 
     /**
-     * @return the back face emissive color of this material.
+     * @return the emissive back face color of this material. This is only used if two sided lighting is used.
      */
     public ReadOnlyColorRGBA getBackEmissive() {
         return _backEmissive;
+    }
+
+    /**
+     * Sets the emissive color for front and back to the given value.
+     * 
+     * @param emissive
+     *            the new emissive color
+     */
+    public void setEmissive(final ReadOnlyColorRGBA emissive) {
+        setDiffuse(MaterialFace.FrontAndBack, emissive);
     }
 
     /**
@@ -197,17 +227,27 @@ public class MaterialState extends RenderState {
     }
 
     /**
-     * @return the front face specular color of this material.
+     * @return the specular color (or front face color, if two sided lighting is used) of this material.
      */
-    public ReadOnlyColorRGBA getFrontSpecular() {
+    public ReadOnlyColorRGBA getSpecular() {
         return _frontSpecular;
     }
 
     /**
-     * @return the back face specular color of this material.
+     * @return the specular back face color of this material. This is only used if two sided lighting is used.
      */
     public ReadOnlyColorRGBA getBackSpecular() {
         return _backSpecular;
+    }
+
+    /**
+     * Sets the specular color for front and back to the given value.
+     * 
+     * @param specular
+     *            the new specular color
+     */
+    public void setSpecular(final ReadOnlyColorRGBA specular) {
+        setDiffuse(MaterialFace.FrontAndBack, specular);
     }
 
     /**
@@ -227,17 +267,28 @@ public class MaterialState extends RenderState {
     }
 
     /**
-     * @return the shininess value of the material.
+     * @return the shininess value (or front face shininess value, if two sided lighting is used) of the material.
      */
     public float getFrontShininess() {
         return _frontShininess;
     }
 
     /**
-     * @return the shininess value of the material.
+     * @return the shininess value of the back face of this material. This is only used if two sided lighting is used.
      */
     public float getBackShininess() {
         return _backShininess;
+    }
+
+    /**
+     * Sets the shininess value for front and back to the given value.
+     * 
+     * @param shininess
+     *            the new shininess for this material. Must be between 0 and 128. Higher numbers result in "tighter"
+     *            specular reflections.
+     */
+    public void setShininess(final float shininess) {
+        setShininess(MaterialFace.FrontAndBack, shininess);
     }
 
     /**

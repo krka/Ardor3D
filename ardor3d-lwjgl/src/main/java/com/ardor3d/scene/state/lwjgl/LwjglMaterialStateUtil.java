@@ -35,10 +35,10 @@ public abstract class LwjglMaterialStateUtil {
             applyColorMaterial(state.getColorMaterial(), state.getColorMaterialFace(), record);
 
             // apply colors, if needed and not what is currently set.
-            applyColor(ColorMaterial.Ambient, state.getFrontAmbient(), state.getBackAmbient(), record);
-            applyColor(ColorMaterial.Diffuse, state.getFrontDiffuse(), state.getBackDiffuse(), record);
-            applyColor(ColorMaterial.Emissive, state.getFrontEmissive(), state.getBackEmissive(), record);
-            applyColor(ColorMaterial.Specular, state.getFrontSpecular(), state.getBackSpecular(), record);
+            applyColor(ColorMaterial.Ambient, state.getAmbient(), state.getBackAmbient(), record);
+            applyColor(ColorMaterial.Diffuse, state.getDiffuse(), state.getBackDiffuse(), record);
+            applyColor(ColorMaterial.Emissive, state.getEmissive(), state.getBackEmissive(), record);
+            applyColor(ColorMaterial.Specular, state.getSpecular(), state.getBackSpecular(), record);
 
             // set our shine
             applyShininess(state.getFrontShininess(), state.getBackShininess(), record);
