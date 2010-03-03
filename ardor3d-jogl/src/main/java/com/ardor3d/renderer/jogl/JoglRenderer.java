@@ -842,7 +842,6 @@ public class JoglRenderer extends AbstractRenderer {
                 } else if (indices.getBuffer() instanceof ByteBuffer) {
                     gl.glDrawElements(glIndexMode, count, type, indices.getBuffer());
                 }
-                gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, indices.getBuffer());
 
                 if (Constants.stats) {
                     addStats(indexModes[indexModeCounter], count);
