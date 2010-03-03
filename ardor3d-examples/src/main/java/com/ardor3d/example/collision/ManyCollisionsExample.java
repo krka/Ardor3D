@@ -25,6 +25,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
@@ -116,7 +117,7 @@ public class ManyCollisionsExample extends ExampleBase {
         n2.setTranslation(new Vector3(0, 0, -200));
 
         final MaterialState ms = new MaterialState();
-        ms.setDiffuse(ColorRGBA.RED);
+        ms.setDiffuse(MaterialFace.FrontAndBack, ColorRGBA.RED);
         n2.setRenderState(ms);
 
         _root.attachChild(n2);

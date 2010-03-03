@@ -27,6 +27,7 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.GLSLShaderDataLogic;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.DataMode;
@@ -67,10 +68,10 @@ public class GeometryClipmapTerrain extends Node {
         setRenderState(cs);
 
         final MaterialState materialState = new MaterialState();
-        materialState.setAmbient(new ColorRGBA(1, 1, 1, 1));
-        materialState.setDiffuse(new ColorRGBA(1, 1, 1, 1));
-        materialState.setSpecular(new ColorRGBA(1, 1, 1, 1));
-        materialState.setShininess(64.0f);
+        materialState.setAmbient(MaterialFace.FrontAndBack, new ColorRGBA(1, 1, 1, 1));
+        materialState.setDiffuse(MaterialFace.FrontAndBack, new ColorRGBA(1, 1, 1, 1));
+        materialState.setSpecular(MaterialFace.FrontAndBack, new ColorRGBA(1, 1, 1, 1));
+        materialState.setShininess(MaterialFace.FrontAndBack, 64.0f);
         setRenderState(materialState);
 
         try {

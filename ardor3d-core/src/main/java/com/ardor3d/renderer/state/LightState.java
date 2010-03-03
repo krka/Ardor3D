@@ -175,7 +175,9 @@ public class LightState extends RenderState {
     }
 
     /**
-     * Sets if two sided lighting should be enabled for this LightState.
+     * Sets if two sided lighting should be enabled for this LightState. Two sided lighting will cause the back of
+     * surfaces to be colored using the inverse of the surface normal as well as the Material properties set for
+     * MaterialFace.Back.
      * 
      * @param twoSidedOn
      *            If true, two sided lighting is enabled.

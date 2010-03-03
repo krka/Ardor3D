@@ -26,13 +26,17 @@ public class MaterialStateRecord extends StateRecord {
     public ColorRGBA frontDiffuse = new ColorRGBA(-1, -1, -1, -1);
     public ColorRGBA frontSpecular = new ColorRGBA(-1, -1, -1, -1);
     public ColorRGBA frontEmissive = new ColorRGBA(-1, -1, -1, -1);
+    public float frontShininess = Float.NEGATIVE_INFINITY;
+
     public ColorRGBA backAmbient = new ColorRGBA(-1, -1, -1, -1);
     public ColorRGBA backDiffuse = new ColorRGBA(-1, -1, -1, -1);
     public ColorRGBA backSpecular = new ColorRGBA(-1, -1, -1, -1);
     public ColorRGBA backEmissive = new ColorRGBA(-1, -1, -1, -1);
-    public float shininess = Float.NEGATIVE_INFINITY;
+    public float backShininess = Float.NEGATIVE_INFINITY;
+
     public ColorMaterial colorMaterial = null;
-    public MaterialFace face = null;
+    public MaterialFace colorMaterialFace = null;
+
     public FloatBuffer tempColorBuff = BufferUtils.createColorBuffer(1);
 
     public boolean isSetColor(final MaterialFace face, final ColorMaterial glMatColor, final ReadOnlyColorRGBA color,
@@ -76,6 +80,17 @@ public class MaterialStateRecord extends StateRecord {
                 default:
                     logger.warning("bad isSetColor");
             }
+        }
+        return false;
+    }
+
+    public boolean isSetShininess(final MaterialFace face, final float shininess, final MaterialStateRecord record) {
+        if (face == MaterialFace.Front) {
+            return shininess == frontShininess;
+        } else if (face == MaterialFace.FrontAndBack) {
+            return shininess == frontShininess && shininess == backShininess;
+        } else if (face == MaterialFace.Back) {
+            return shininess == backShininess;
         }
         return false;
     }
@@ -170,12 +185,15 @@ public class MaterialStateRecord extends StateRecord {
         frontDiffuse.set(-1, -1, -1, -1);
         frontSpecular.set(-1, -1, -1, -1);
         frontEmissive.set(-1, -1, -1, -1);
+        frontShininess = Float.NEGATIVE_INFINITY;
+
         backAmbient.set(-1, -1, -1, -1);
         backDiffuse.set(-1, -1, -1, -1);
         backSpecular.set(-1, -1, -1, -1);
         backEmissive.set(-1, -1, -1, -1);
-        shininess = Float.NEGATIVE_INFINITY;
+        backShininess = Float.NEGATIVE_INFINITY;
+
         colorMaterial = null;
-        face = null;
+        colorMaterialFace = null;
     }
 }

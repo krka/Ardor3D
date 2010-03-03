@@ -27,6 +27,7 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
+import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -179,7 +180,7 @@ public class DisplayListDelegateExample extends ExampleBase {
             final Box box = new Box("b" + i, new Vector3(0, 0, 0), new Vector3(0.1f, 0.1f, 0.1f));
             box.setRandomColors();
             final MaterialState ms = new MaterialState();
-            ms.setDiffuse(new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1));
+            ms.setDiffuse(MaterialFace.FrontAndBack, new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1));
             box.setRenderState(ms);
             box.setTranslation(new Vector3(r.nextFloat(), r.nextFloat(), r.nextFloat()));
             box.setRotation(new Quaternion(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1));

@@ -26,52 +26,33 @@ import com.ardor3d.renderer.state.record.MaterialStateRecord;
 public abstract class JoglMaterialStateUtil {
 
     public static void apply(final JoglRenderer renderer, final MaterialState state) {
-        final GL gl = GLU.getCurrentGL();
-
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final MaterialStateRecord record = (MaterialStateRecord) context.getStateRecord(StateType.Material);
         context.setCurrentState(StateType.Material, state);
 
         if (state.isEnabled()) {
-            final MaterialFace face = state.getMaterialFace();
-
-            // setup color material, if changed.
-            applyColorMaterial(state.getColorMaterial(), face, record);
+            // setup colormaterial, if changed.
+            applyColorMaterial(state.getColorMaterial(), state.getColorMaterialFace(), record);
 
             // apply colors, if needed and not what is currently set.
-            applyColor(ColorMaterial.Ambient, state.getAmbient(), face, record);
-            applyColor(ColorMaterial.Diffuse, state.getDiffuse(), face, record);
-            applyColor(ColorMaterial.Emissive, state.getEmissive(), face, record);
-            applyColor(ColorMaterial.Specular, state.getSpecular(), face, record);
+            applyColor(ColorMaterial.Ambient, state.getFrontAmbient(), state.getBackAmbient(), record);
+            applyColor(ColorMaterial.Diffuse, state.getFrontDiffuse(), state.getBackDiffuse(), record);
+            applyColor(ColorMaterial.Emissive, state.getFrontEmissive(), state.getBackEmissive(), record);
+            applyColor(ColorMaterial.Specular, state.getFrontSpecular(), state.getBackSpecular(), record);
 
             // set our shine
-            if (!record.isValid() || face != record.face || record.shininess != state.getShininess()) {
-                final int glFace = getGLMaterialFace(state.getMaterialFace());
-                gl.glMaterialf(glFace, GL.GL_SHININESS, state.getShininess());
-                record.shininess = state.getShininess();
-            }
-
-            record.face = face;
+            applyShininess(state.getFrontShininess(), state.getBackShininess(), record);
         } else {
             // apply defaults
-            final MaterialFace face = MaterialState.DEFAULT_MATERIAL_FACE;
+            applyColorMaterial(MaterialState.DEFAULT_COLOR_MATERIAL, MaterialState.DEFAULT_COLOR_MATERIAL_FACE, record);
 
-            applyColorMaterial(MaterialState.DEFAULT_COLOR_MATERIAL, face, record);
+            applyColor(ColorMaterial.Ambient, MaterialState.DEFAULT_AMBIENT, MaterialState.DEFAULT_AMBIENT, record);
+            applyColor(ColorMaterial.Diffuse, MaterialState.DEFAULT_DIFFUSE, MaterialState.DEFAULT_DIFFUSE, record);
+            applyColor(ColorMaterial.Emissive, MaterialState.DEFAULT_EMISSIVE, MaterialState.DEFAULT_EMISSIVE, record);
+            applyColor(ColorMaterial.Specular, MaterialState.DEFAULT_SPECULAR, MaterialState.DEFAULT_SPECULAR, record);
 
-            applyColor(ColorMaterial.Ambient, MaterialState.DEFAULT_AMBIENT, face, record);
-            applyColor(ColorMaterial.Diffuse, MaterialState.DEFAULT_DIFFUSE, face, record);
-            applyColor(ColorMaterial.Emissive, MaterialState.DEFAULT_EMISSIVE, face, record);
-            applyColor(ColorMaterial.Specular, MaterialState.DEFAULT_SPECULAR, face, record);
-
-            // set our shine
-            if (!record.isValid() || face != record.face || record.shininess != MaterialState.DEFAULT_SHININESS) {
-                final int glFace = getGLMaterialFace(state.getMaterialFace());
-                gl.glMaterialf(glFace, GL.GL_SHININESS, MaterialState.DEFAULT_SHININESS);
-                record.shininess = MaterialState.DEFAULT_SHININESS;
-            }
-
-            record.face = face;
+            applyShininess(MaterialState.DEFAULT_SHININESS, MaterialState.DEFAULT_SHININESS, record);
         }
 
         if (!record.isValid()) {
@@ -79,26 +60,53 @@ public abstract class JoglMaterialStateUtil {
         }
     }
 
-    private static void applyColor(final ColorMaterial glMatColor, final ReadOnlyColorRGBA color,
-            final MaterialFace face, final MaterialStateRecord record) {
+    private static void applyColor(final ColorMaterial glMatColor, final ReadOnlyColorRGBA frontColor,
+            final ReadOnlyColorRGBA backColor, final MaterialStateRecord record) {
         final GL gl = GLU.getCurrentGL();
 
-        if (!isVertexProvidedColor(glMatColor, record)
-                && (!record.isValid() || face != record.face || !record.isSetColor(face, glMatColor, color, record))) {
+        final int glMat = getGLColorMaterial(glMatColor);
+        if (frontColor.equals(backColor)) {
+            // consolidate to one call
+            if (!isVertexProvidedColor(MaterialFace.FrontAndBack, glMatColor, record)) {
+                if (!record.isValid() || !record.isSetColor(MaterialFace.FrontAndBack, glMatColor, frontColor, record)) {
+                    record.tempColorBuff.clear();
+                    record.tempColorBuff.put(frontColor.getRed()).put(frontColor.getGreen()).put(frontColor.getBlue())
+                            .put(frontColor.getAlpha());
+                    record.tempColorBuff.flip();
+                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.FrontAndBack), glMat, record.tempColorBuff);
+                    record.setColor(MaterialFace.FrontAndBack, glMatColor, frontColor);
+                }
+            }
+        } else {
+            if (!isVertexProvidedColor(MaterialFace.Front, glMatColor, record)) {
+                if (!record.isValid() || !record.isSetColor(MaterialFace.Front, glMatColor, frontColor, record)) {
+                    record.tempColorBuff.clear();
+                    record.tempColorBuff.put(frontColor.getRed()).put(frontColor.getGreen()).put(frontColor.getBlue())
+                            .put(frontColor.getAlpha());
+                    record.tempColorBuff.flip();
+                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.Front), glMat, record.tempColorBuff);
+                    record.setColor(MaterialFace.Front, glMatColor, frontColor);
+                }
+            }
 
-            record.tempColorBuff.clear();
-            record.tempColorBuff.put(color.getRed()).put(color.getGreen()).put(color.getBlue()).put(color.getAlpha());
-            record.tempColorBuff.flip();
-
-            final int glFace = getGLMaterialFace(face);
-            final int glMat = getGLColorMaterial(glMatColor);
-            gl.glMaterialfv(glFace, glMat, record.tempColorBuff);
-
-            record.setColor(face, glMatColor, color);
+            if (!isVertexProvidedColor(MaterialFace.Back, glMatColor, record)) {
+                if (!record.isValid() || !record.isSetColor(MaterialFace.Back, glMatColor, backColor, record)) {
+                    record.tempColorBuff.clear();
+                    record.tempColorBuff.put(backColor.getRed()).put(backColor.getGreen()).put(backColor.getBlue())
+                            .put(backColor.getAlpha());
+                    record.tempColorBuff.flip();
+                    gl.glMaterialfv(getGLMaterialFace(MaterialFace.Back), glMat, record.tempColorBuff);
+                    record.setColor(MaterialFace.Back, glMatColor, backColor);
+                }
+            }
         }
     }
 
-    private static boolean isVertexProvidedColor(final ColorMaterial glMatColor, final MaterialStateRecord record) {
+    private static boolean isVertexProvidedColor(final MaterialFace face, final ColorMaterial glMatColor,
+            final MaterialStateRecord record) {
+        if (face != record.colorMaterialFace) {
+            return false;
+        }
         switch (glMatColor) {
             case Ambient:
                 return record.colorMaterial == ColorMaterial.Ambient
@@ -116,9 +124,9 @@ public abstract class JoglMaterialStateUtil {
 
     private static void applyColorMaterial(final ColorMaterial colorMaterial, final MaterialFace face,
             final MaterialStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
+        if (!record.isValid() || face != record.colorMaterialFace || colorMaterial != record.colorMaterial) {
+            final GL gl = GLU.getCurrentGL();
 
-        if (!record.isValid() || face != record.face || colorMaterial != record.colorMaterial) {
             if (colorMaterial == ColorMaterial.None) {
                 gl.glDisable(GL.GL_COLOR_MATERIAL);
             } else {
@@ -130,6 +138,30 @@ public abstract class JoglMaterialStateUtil {
                 record.resetColorsForCM(face, colorMaterial);
             }
             record.colorMaterial = colorMaterial;
+            record.colorMaterialFace = face;
+        }
+    }
+
+    private static void applyShininess(final float frontShininess, final float backShininess,
+            final MaterialStateRecord record) {
+        final GL gl = GLU.getCurrentGL();
+
+        if (frontShininess == backShininess) {
+            // consolidate to one call
+            if (!record.isValid() || frontShininess != record.frontShininess || record.backShininess != backShininess) {
+                gl.glMaterialf(getGLMaterialFace(MaterialFace.FrontAndBack), GL.GL_SHININESS, frontShininess);
+                record.backShininess = record.frontShininess = frontShininess;
+            }
+        } else {
+            if (!record.isValid() || frontShininess != record.frontShininess) {
+                gl.glMaterialf(getGLMaterialFace(MaterialFace.Front), GL.GL_SHININESS, frontShininess);
+                record.frontShininess = frontShininess;
+            }
+
+            if (!record.isValid() || backShininess != record.backShininess) {
+                gl.glMaterialf(getGLMaterialFace(MaterialFace.Back), GL.GL_SHININESS, backShininess);
+                record.backShininess = backShininess;
+            }
         }
     }
 
