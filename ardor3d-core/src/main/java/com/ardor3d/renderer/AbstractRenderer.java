@@ -73,21 +73,8 @@ public abstract class AbstractRenderer implements Renderer {
             StatCollector.startStat(StatType.STAT_STATES_TIMER);
         }
 
+        final RenderState tempState = getProperRenderState(type, state);
         final RenderContext context = ContextManager.getCurrentContext();
-
-        // first look up in enforced states
-        RenderState tempState = context.getEnforcedState(type);
-
-        // Not there? Use the state we received
-        if (tempState == null) {
-            tempState = state;
-        }
-
-        // Still null? Use our default state
-        if (tempState == null) {
-            tempState = defaultStateList.get(type);
-        }
-
         if (!RenderState._quickCompare.contains(type) || tempState.needsRefresh()
                 || tempState != context.getCurrentState(type)) {
             doApplyState(tempState);
@@ -170,5 +157,23 @@ public abstract class AbstractRenderer implements Renderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord record = context.getRendererRecord();
         return record.isClippingTestEnabled();
+    }
+
+    public RenderState getProperRenderState(final StateType type, final RenderState current) {
+        final RenderContext context = ContextManager.getCurrentContext();
+
+        // first look up in enforced states
+        final RenderState state = context.getEnforcedState(type);
+
+        // Not there? Use the state we received
+        if (state == null) {
+            if (current != null) {
+                return current;
+            } else {
+                return defaultStateList.get(type);
+            }
+        } else {
+            return state;
+        }
     }
 }

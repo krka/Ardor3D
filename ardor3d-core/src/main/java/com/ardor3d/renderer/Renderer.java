@@ -556,4 +556,12 @@ public interface Renderer {
      * @return true if the renderer believes clipping is enabled
      */
     boolean isClipTestEnabled();
+
+    /**
+     * @param type
+     *            the state type to grab
+     * @return the appropriate render state for the current context for the current type. This is the enforced state if
+     *         one exists or the given current state if not null. Otherwise, the Renderer's default state is returned.
+     */
+    RenderState getProperRenderState(StateType type, RenderState current);
 }

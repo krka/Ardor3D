@@ -207,10 +207,13 @@ public class Mesh extends Spatial implements Renderable {
     public void render(final Renderer renderer, final MeshData meshData) {
         // Set up MeshData in GLSLShaderObjectsState if necessary
         // XXX: considered a hack until we settle on our shader model.
-        final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) _states.get(RenderState.StateType.GLSLShader);
-        if (glsl != null && glsl.getShaderDataLogic() != null) {
-            glsl.setMesh(this);
-            glsl.setNeedsRefresh(true);
+        {
+            final GLSLShaderObjectsState glsl = (GLSLShaderObjectsState) renderer.getProperRenderState(
+                    RenderState.StateType.GLSLShader, _states.get(RenderState.StateType.GLSLShader));
+            if (glsl != null && glsl.getShaderDataLogic() != null) {
+                glsl.setMesh(this);
+                glsl.setNeedsRefresh(true);
+            }
         }
 
         // Apply fixed function states before mesh transforms for proper function
