@@ -772,7 +772,7 @@ public class LwjglRenderer extends AbstractRenderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            indices.getBuffer().rewind();
+            indices.getBuffer().position(0);
             if (indices.getBuffer() instanceof IntBuffer) {
                 GL11.glDrawElements(glIndexMode, (IntBuffer) indices.getBuffer());
             } else if (indices.getBuffer() instanceof ShortBuffer) {

@@ -809,11 +809,18 @@ public class JoglRenderer extends AbstractRenderer {
 
         final GL gl = GLU.getCurrentGL();
 
+        final int type = getGLDataType(indices);
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
             indices.getBuffer().position(0);
-            gl.glDrawElements(glIndexMode, indices.getBufferLimit(), GL.GL_UNSIGNED_INT, indices.getBuffer());
+            if (indices.getBuffer() instanceof IntBuffer) {
+                gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
+            } else if (indices.getBuffer() instanceof ShortBuffer) {
+                gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
+            } else if (indices.getBuffer() instanceof ByteBuffer) {
+                gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
+            }
 
             if (Constants.stats) {
                 addStats(indexModes[0], indices.getBufferLimit());
@@ -828,6 +835,13 @@ public class JoglRenderer extends AbstractRenderer {
 
                 indices.getBuffer().position(offset);
                 indices.getBuffer().limit(offset + count);
+                if (indices.getBuffer() instanceof IntBuffer) {
+                    gl.glDrawElements(glIndexMode, count, type, indices.getBuffer());
+                } else if (indices.getBuffer() instanceof ShortBuffer) {
+                    gl.glDrawElements(glIndexMode, count, type, indices.getBuffer());
+                } else if (indices.getBuffer() instanceof ByteBuffer) {
+                    gl.glDrawElements(glIndexMode, count, type, indices.getBuffer());
+                }
                 gl.glDrawElements(glIndexMode, count, GL.GL_UNSIGNED_INT, indices.getBuffer());
 
                 if (Constants.stats) {
