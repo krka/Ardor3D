@@ -207,7 +207,7 @@ public class MaterialState extends RenderState {
      *            the new emissive color
      */
     public void setEmissive(final ReadOnlyColorRGBA emissive) {
-        setDiffuse(MaterialFace.FrontAndBack, emissive);
+        setEmissive(MaterialFace.FrontAndBack, emissive);
     }
 
     /**
@@ -247,7 +247,7 @@ public class MaterialState extends RenderState {
      *            the new specular color
      */
     public void setSpecular(final ReadOnlyColorRGBA specular) {
-        setDiffuse(MaterialFace.FrontAndBack, specular);
+        setSpecular(MaterialFace.FrontAndBack, specular);
     }
 
     /**
@@ -269,7 +269,7 @@ public class MaterialState extends RenderState {
     /**
      * @return the shininess value (or front face shininess value, if two sided lighting is used) of the material.
      */
-    public float getFrontShininess() {
+    public float getShininess() {
         return _frontShininess;
     }
 
