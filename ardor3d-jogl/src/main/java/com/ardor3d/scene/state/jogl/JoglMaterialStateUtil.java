@@ -42,7 +42,7 @@ public abstract class JoglMaterialStateUtil {
             applyColor(ColorMaterial.Specular, state.getSpecular(), state.getBackSpecular(), record);
 
             // set our shine
-            applyShininess(state.getFrontShininess(), state.getBackShininess(), record);
+            applyShininess(state.getShininess(), state.getBackShininess(), record);
         } else {
             // apply defaults
             applyColorMaterial(MaterialState.DEFAULT_COLOR_MATERIAL, MaterialState.DEFAULT_COLOR_MATERIAL_FACE, record);
