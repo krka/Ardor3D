@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import org.jdom.Attribute;
 import org.jdom.DataConversionException;
@@ -45,8 +44,6 @@ import com.ardor3d.util.resource.ResourceSource;
  * </p>
  */
 public class ColladaImporter {
-    private static final Logger logger = Logger.getLogger(ColladaImporter.class.getName());
-
     private boolean _loadTextures = true;
     private boolean _loadAnimations = true;
     private ResourceLocator _textureLocator;
@@ -62,12 +59,12 @@ public class ColladaImporter {
         return this;
     }
 
-    public ColladaImporter textureLocator(final ResourceLocator textureLocator) {
+    public ColladaImporter setTextureLocator(final ResourceLocator textureLocator) {
         _textureLocator = textureLocator;
         return this;
     }
 
-    public ColladaImporter modelLocator(final ResourceLocator modelLocator) {
+    public ColladaImporter setModelLocator(final ResourceLocator modelLocator) {
         _modelLocator = modelLocator;
         return this;
     }
