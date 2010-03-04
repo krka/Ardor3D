@@ -142,7 +142,7 @@ public class ColladaExample extends ExampleBase {
             public void actionPerformed(final ActionEvent event) {
                 final File file = daeFiles.get(fileIndex);
                 try {
-                    loadColladaModel(new URLResourceSource(file.toURL()));
+                    loadColladaModel(new URLResourceSource(file.toURI().toURL()));
                     t1.setText(file.getName());
                 } catch (final MalformedURLException e) {
                     e.printStackTrace();
