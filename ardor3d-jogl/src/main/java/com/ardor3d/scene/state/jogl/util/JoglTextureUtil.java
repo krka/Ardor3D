@@ -172,6 +172,14 @@ public abstract class JoglTextureUtil {
             case Intensity32F:
             case LuminanceAlpha32F:
                 return GL.GL_FLOAT;
+            case Alpha16:
+            case Luminance16:
+            case Luminance16Alpha16:
+            case Intensity16:
+            case RGB16:
+            case RGBA16:
+            case Depth16:
+                return GL.GL_SHORT;
             default:
                 return GL.GL_UNSIGNED_BYTE;
         }

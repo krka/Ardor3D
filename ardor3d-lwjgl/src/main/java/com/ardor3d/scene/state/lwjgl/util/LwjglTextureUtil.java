@@ -181,6 +181,14 @@ public abstract class LwjglTextureUtil {
             case Intensity32F:
             case LuminanceAlpha32F:
                 return GL11.GL_FLOAT;
+            case Alpha16:
+            case Luminance16:
+            case Luminance16Alpha16:
+            case Intensity16:
+            case RGB16:
+            case RGBA16:
+            case Depth16:
+                return GL11.GL_SHORT;
             default:
                 return GL11.GL_UNSIGNED_BYTE;
         }
