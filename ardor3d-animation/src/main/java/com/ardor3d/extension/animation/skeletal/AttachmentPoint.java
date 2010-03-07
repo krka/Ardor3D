@@ -18,7 +18,7 @@ public class AttachmentPoint implements PoseListener {
 
     private int _jointIndex;
     private Spatial _attachment;
-    private ReadOnlyTransform _offset;
+    private final Transform _offset = new Transform();
     private final Transform _store = new Transform();
 
     public AttachmentPoint() {}
@@ -50,12 +50,12 @@ public class AttachmentPoint implements PoseListener {
     }
 
     public void setOffset(final ReadOnlyTransform offset) {
-        _offset = offset;
+        _offset.set(offset);
     }
 
     public void poseUpdated(final SkeletonPose pose) {
         final Transform t = pose.getGlobalJointTransforms()[_jointIndex];
-        _offset.multiply(t, _store);
+        t.multiply(_offset, _store);
         _attachment.setTransform(_store);
     }
 }
