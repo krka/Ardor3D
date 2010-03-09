@@ -1248,7 +1248,7 @@ public class LwjglRenderer extends AbstractRenderer {
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
                 final int type = getGLDataType(indices);
-                final int byteSize = getByteSize(type);
+                final int byteSize = indices.getByteCount();
                 // offset in this call is done in bytes.
                 GL11.glDrawElements(glIndexMode, count, type, offset * byteSize);
                 if (Constants.stats) {
@@ -1387,18 +1387,6 @@ public class LwjglRenderer extends AbstractRenderer {
         }
 
         throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
-    }
-
-    private int getByteSize(final int glValue) {
-        switch (glValue) {
-            case GL11.GL_UNSIGNED_BYTE:
-                return 1;
-            case GL11.GL_UNSIGNED_SHORT:
-                return 2;
-            case GL11.GL_UNSIGNED_INT:
-                return 4;
-        }
-        throw new IllegalArgumentException("Unsupported value: " + glValue);
     }
 
     public void setModelViewMatrix(final FloatBuffer matrix) {

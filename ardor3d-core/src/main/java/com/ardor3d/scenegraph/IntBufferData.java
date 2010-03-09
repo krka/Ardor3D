@@ -99,4 +99,14 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
             }
         }
     }
+
+    @Override
+    public int getByteCount() {
+        return 4;
+    }
+
+    @Override
+    public IntBuffer getBuffer() {
+        return _buffer;
+    }
 }

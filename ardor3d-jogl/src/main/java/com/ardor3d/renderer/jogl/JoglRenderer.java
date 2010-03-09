@@ -1294,7 +1294,7 @@ public class JoglRenderer extends AbstractRenderer {
                 final int glIndexMode = getGLIndexMode(indexModes[indexModeCounter]);
 
                 final int type = getGLDataType(indices);
-                final int byteSize = getByteSize(type);
+                final int byteSize = indices.getByteCount();
                 // offset in this call is done in bytes.
                 gl.glDrawElements(glIndexMode, count, type, offset * byteSize);
 
@@ -1438,18 +1438,6 @@ public class JoglRenderer extends AbstractRenderer {
         }
 
         throw new IllegalArgumentException("Unknown buffer type: " + indices.getBuffer());
-    }
-
-    private int getByteSize(final int glValue) {
-        switch (glValue) {
-            case GL.GL_UNSIGNED_BYTE:
-                return 1;
-            case GL.GL_UNSIGNED_SHORT:
-                return 2;
-            case GL.GL_UNSIGNED_INT:
-                return 4;
-        }
-        throw new IllegalArgumentException("Unsupported value: " + glValue);
     }
 
     public void setModelViewMatrix(final FloatBuffer matrix) {

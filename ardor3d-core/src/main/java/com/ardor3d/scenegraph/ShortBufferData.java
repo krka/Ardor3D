@@ -99,4 +99,14 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
             }
         }
     }
+
+    @Override
+    public int getByteCount() {
+        return 2;
+    }
+
+    @Override
+    public ShortBuffer getBuffer() {
+        return _buffer;
+    }
 }

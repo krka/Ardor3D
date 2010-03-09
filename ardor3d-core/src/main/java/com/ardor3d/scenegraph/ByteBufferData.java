@@ -99,4 +99,14 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
             }
         }
     }
+
+    @Override
+    public int getByteCount() {
+        return 1;
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return _buffer;
+    }
 }
