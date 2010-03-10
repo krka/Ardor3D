@@ -20,6 +20,7 @@ import org.jdom.xpath.XPath;
 
 import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
+import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.image.Texture;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -49,6 +50,7 @@ public class DataCache {
     private final Map<Element, Joint> _elementJointMapping;
     private JointNode _rootJointNode;
     private final Map<Joint, Skeleton> _jointSkeletonMapping;
+    private final Map<Skeleton, SkeletonPose> _skeletonPoseMapping;
     private final List<Skeleton> _skeletons;
     private final List<ControllerStore> _controllers;
 
@@ -73,6 +75,7 @@ public class DataCache {
         _elementJointMapping = Maps.newHashMap();
         _skeletons = Lists.newArrayList();
         _jointSkeletonMapping = Maps.newHashMap();
+        _skeletonPoseMapping = Maps.newHashMap();
         _controllers = Lists.newArrayList();
     }
 
@@ -160,6 +163,10 @@ public class DataCache {
 
     public Map<Joint, Skeleton> getJointSkeletonMapping() {
         return _jointSkeletonMapping;
+    }
+
+    public Map<Skeleton, SkeletonPose> getSkeletonPoseMapping() {
+        return _skeletonPoseMapping;
     }
 
     public List<ControllerStore> getControllers() {

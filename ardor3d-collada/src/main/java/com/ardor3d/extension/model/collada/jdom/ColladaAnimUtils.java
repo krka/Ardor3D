@@ -296,10 +296,15 @@ public class ColladaAnimUtils {
                 order[i] = joint.getIndex();
             }
 
-            // Make our skeleton
-            final SkeletonPose skPose = new SkeletonPose(ourSkeleton);
-            // Skeleton's default to bind position, so update the global transforms.
-            skPose.updateTransforms();
+            // Make our skeleton pose
+            SkeletonPose skPose = _dataCache.getSkeletonPoseMapping().get(ourSkeleton);
+            if (skPose == null) {
+                skPose = new SkeletonPose(ourSkeleton);
+                _dataCache.getSkeletonPoseMapping().put(ourSkeleton, skPose);
+
+                // Skeleton's default to bind position, so update the global transforms.
+                skPose.updateTransforms();
+            }
 
             // Read in our vertex_weights node
             final Element weightsEL = skin.getChild("vertex_weights");
