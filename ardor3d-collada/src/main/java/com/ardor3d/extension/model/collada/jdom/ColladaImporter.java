@@ -152,7 +152,7 @@ public class ColladaImporter {
             // return storage
             return colladaStorage;
         } catch (final Exception e) {
-            throw new RuntimeException("Unable to load collada resource from URL: " + resource, e);
+            throw new Error("Unable to load collada resource from URL: " + resource, e);
         }
     }
 
