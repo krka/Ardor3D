@@ -7,6 +7,7 @@
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-collada,ardor3d-collada"/>
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-effects,ardor3d-effects"/>
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-examples,ardor3d-examples"/>
+<project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-extras,ardor3d-extras"/>
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-jogl,ardor3d-jogl"/>
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-lwjgl,ardor3d-lwjgl"/>
 <project reference="0.9.3,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-swt,ardor3d-swt"/>
