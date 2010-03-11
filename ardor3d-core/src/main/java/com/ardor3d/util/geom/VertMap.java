@@ -10,6 +10,8 @@
 
 package com.ardor3d.util.geom;
 
+import java.util.Map;
+
 import com.ardor3d.scenegraph.Mesh;
 
 public class VertMap {
@@ -31,20 +33,11 @@ public class VertMap {
         return _lookupTable[oldIndex];
     }
 
-    public void replaceIndex(final int oldIndex, final int newIndex) {
-        for (int x = 0; x < _lookupTable.length; x++) {
-            if (_lookupTable[x] == oldIndex) {
-                _lookupTable[x] = newIndex;
+    public void applyRemapping(final Map<Integer, Integer> indexRemap) {
+        for (int i = 0; i < _lookupTable.length; i++) {
+            if (indexRemap.containsKey(_lookupTable[i])) {
+                _lookupTable[i] = indexRemap.get(_lookupTable[i]);
             }
         }
     }
-
-    public void decrementIndices(final int above) {
-        for (int x = _lookupTable.length; --x >= 0;) {
-            if (_lookupTable[x] >= above) {
-                _lookupTable[x]--;
-            }
-        }
-    }
-
 }

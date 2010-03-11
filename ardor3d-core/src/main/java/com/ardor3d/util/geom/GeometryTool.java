@@ -10,35 +10,78 @@
 
 package com.ardor3d.util.geom;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.EnumSet;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.scenegraph.FloatBufferDataUtil;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.google.common.collect.Maps;
 
 /**
- * Note: Does not work with geometry using texcoords other than 2d coords.
+ * This tool assists in reducing geometry information.<br>
+ * 
+ * Note: Does not work with geometry using texcoords other than 2d coords. <br>
+ * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.
  */
 public abstract class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
 
-    public static final int MV_SAME_NORMALS = 1;
-    public static final int MV_SAME_TEXS = 2;
-    public static final int MV_SAME_COLORS = 4;
+    /**
+     * Condition options for determining if one vertex is "equal" to another.
+     */
+    public enum MatchCondition {
+        /** Vertices must have identical normals. */
+        Normal,
+        /** Vertices must have identical texture coords on all channels. */
+        UVs,
+        /** Vertices must have identical vertex coloring. */
+        Color,
+        /** Vertices must be in same group. */
+        Group;
+    }
 
-    @SuppressWarnings("unchecked")
-    public static VertMap minimizeVerts(final Mesh mesh, final int options) {
+    /**
+     * Attempt to collapse duplicate vertex data in a given mesh. Vertices are consider duplicate if they occupy the
+     * same place in space and match the supplied conditions. All vertices in the mesh are considered part of the same
+     * vertex "group".
+     * 
+     * @param mesh
+     *            the mesh to reduce
+     * @param conditions
+     *            our match conditions.
+     * @return a mapping of old vertex positions to their new positions.
+     */
+    public static VertMap minimizeVerts(final Mesh mesh, final EnumSet<MatchCondition> conditions) {
+        final VertGroupData groupData = new VertGroupData();
+        groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP, conditions);
+        return minimizeVerts(mesh, groupData);
+    }
+
+    /**
+     * Attempt to collapse duplicate vertex data in a given mesh. Vertices are consider duplicate if they occupy the
+     * same place in space and match the supplied conditions. The conditions are supplied per vertex group.
+     * 
+     * @param mesh
+     *            the mesh to reduce
+     * @param groupData
+     *            grouping data for the vertices in this mesh.
+     * @return a mapping of old vertex positions to their new positions.
+     */
+    public static VertMap minimizeVerts(final Mesh mesh, final VertGroupData groupData) {
+        final long start = System.currentTimeMillis();
+
         int vertCount = -1;
         final int oldCount = mesh.getMeshData().getVertexCount();
         int newCount = 0;
 
         final VertMap result = new VertMap(mesh);
 
+        // while we have not run through this optimization and ended up the same...
+        // XXX: could optimize this to run all in arrays, then write to buffer after while loop.
         while (vertCount != newCount) {
             vertCount = mesh.getMeshData().getVertexCount();
             // go through each vert...
@@ -48,11 +91,13 @@ public abstract class GeometryTool {
                 norms = BufferUtils.getVector3Array(mesh.getMeshData().getNormalBuffer());
             }
 
+            // see if we have vertex colors
             ColorRGBA[] colors = null;
             if (mesh.getMeshData().getColorBuffer() != null) {
                 colors = BufferUtils.getColorArray(mesh.getMeshData().getColorBuffer());
             }
 
+            // see if we have uv coords
             final Vector2[][] tex = new Vector2[mesh.getMeshData().getNumberOfUnits()][];
             for (int x = 0; x < tex.length; x++) {
                 if (mesh.getMeshData().getTextureCoords(x) != null) {
@@ -60,90 +105,90 @@ public abstract class GeometryTool {
                 }
             }
 
+            // grab indices
             final int[] inds = BufferUtils.getIntArray(mesh.getMeshData().getIndices());
 
-            final HashMap<VertKey, Integer> store = new HashMap<VertKey, Integer>();
+            final Map<VertKey, Integer> store = Maps.newHashMap();
+            final Map<Integer, Integer> indexRemap = Maps.newHashMap();
             int good = 0;
+            int group;
             for (int x = 0, max = verts.length; x < max; x++) {
+                group = groupData.getGroupForVertex(x);
                 final VertKey vkey = new VertKey(verts[x], norms != null ? norms[x] : null, colors != null ? colors[x]
-                        : null, getTexs(tex, x), options);
-                // if we've already seen it, mark it for deletion and repoint
-                // the corresponding index
+                        : null, getTexs(tex, x), groupData.getGroupConditions(group), group);
+                // if we've already seen it, swap it for the max, and decrease max.
                 if (store.containsKey(vkey)) {
                     final int newInd = store.get(vkey);
-                    result.replaceIndex(x, newInd);
-                    findReplace(x, newInd, inds);
-                    verts[x] = null;
-                    if (norms != null) {
-                        norms[newInd].addLocal(norms[x].normalizeLocal());
+                    if (indexRemap.containsKey(x)) {
+                        indexRemap.put(max, newInd);
+                    } else {
+                        indexRemap.put(x, newInd);
                     }
-                    if (colors != null) {
-                        colors[x] = null;
+                    max--;
+                    if (x != max) {
+                        indexRemap.put(max, x);
+                        verts[x] = verts[max];
+                        verts[max] = null;
+                        if (norms != null) {
+                            norms[newInd].addLocal(norms[x].normalizeLocal());
+                            norms[x] = norms[max];
+                        }
+                        if (colors != null) {
+                            colors[x] = colors[max];
+                        }
+                        for (int y = 0; y < tex.length; y++) {
+                            if (mesh.getMeshData().getTextureCoords(y) != null) {
+                                tex[y][x] = tex[y][max];
+                            }
+                        }
+                        x--;
+                    } else {
+                        verts[max] = null;
                     }
-                } else {
+                }
+
+                // otherwise just store it
+                else {
                     store.put(vkey, x);
                     good++;
                 }
             }
 
-            final List<Vector3> newVects = new ArrayList<Vector3>(good);
-            final List<Vector3> newNorms = new ArrayList<Vector3>(good);
-            final List<ColorRGBA> newColors = new ArrayList<ColorRGBA>(good);
-            final List[] newTexs = new ArrayList[mesh.getMeshData().getNumberOfUnits()];
-            for (int x = 0; x < newTexs.length; x++) {
-                if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    newTexs[x] = new ArrayList<Vector2>(good);
-                }
-            }
-
-            // go through each vert
-            // add non-duped verts, texs, normals to new buffers
-            // and set into mesh.
-            int off = 0;
-            for (int x = 0, max = verts.length; x < max; x++) {
-                if (verts[x] == null) {
-                    // shift indices above this down a notch.
-                    decrementIndices(x - off, inds);
-                    result.decrementIndices(x - off);
-                    off++;
-                } else {
-                    newVects.add(verts[x]);
-                    if (norms != null) {
-                        newNorms.add(norms[x].normalizeLocal());
-                    }
-                    if (colors != null) {
-                        newColors.add(colors[x]);
-                    }
-                    for (int y = 0; y < newTexs.length; y++) {
-                        if (mesh.getMeshData().getTextureCoords(y) != null) {
-                            newTexs[y].add(tex[y][x]);
-                        }
-                    }
-                }
-            }
-
-            mesh.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(newVects.toArray(new Vector3[0])));
             if (norms != null) {
-                mesh.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(newNorms.toArray(new Vector3[0])));
+                for (final Vector3 norm : norms) {
+                    norm.normalizeLocal();
+                }
+            }
+
+            mesh.getMeshData().setVertexBuffer(BufferUtils.createFloatBuffer(0, good, verts));
+            if (norms != null) {
+                mesh.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(0, good, norms));
             }
             if (colors != null) {
-                mesh.getMeshData().setColorBuffer(BufferUtils.createFloatBuffer(newColors.toArray(new ColorRGBA[0])));
+                mesh.getMeshData().setColorBuffer(BufferUtils.createFloatBuffer(0, good, colors));
             }
 
-            for (int x = 0; x < newTexs.length; x++) {
-                if (mesh.getMeshData().getTextureCoords(x) != null) {
-                    mesh.getMeshData().setTextureCoords(
-                            FloatBufferDataUtil.makeNew((Vector2[]) newTexs[x].toArray(new Vector2[0])), x);
+            for (int x = 0; x < tex.length; x++) {
+                if (tex[x] != null) {
+                    mesh.getMeshData().setTextureBuffer(BufferUtils.createFloatBuffer(0, good, tex[x]), x);
                 }
             }
 
-            mesh.getMeshData().getIndexBuffer().clear();
+            final IndexBufferData<?> indexBuffer = mesh.getMeshData().getIndices();
+            indexBuffer.rewind();
             for (final int i : inds) {
-                mesh.getMeshData().getIndices().put(i);
+                if (indexRemap.containsKey(i)) {
+                    indexBuffer.put(indexRemap.get(i));
+                } else {
+                    indexBuffer.put(i);
+                }
             }
+            result.applyRemapping(indexRemap);
             newCount = mesh.getMeshData().getVertexCount();
         }
-        logger.info("mesh: " + mesh + " old: " + oldCount + " new: " + newCount);
+
+        logger.info("Vertex reduction complete on: " + mesh + "  old vertex count: " + oldCount + " new vertex count: "
+                + newCount + " (in " + (System.currentTimeMillis() - start) + " ms)");
 
         return result;
     }
@@ -157,21 +202,4 @@ public abstract class GeometryTool {
         }
         return res;
     }
-
-    private static void findReplace(final int oldI, final int newI, final int[] indices) {
-        for (int x = indices.length; --x >= 0;) {
-            if (indices[x] == oldI) {
-                indices[x] = newI;
-            }
-        }
-    }
-
-    private static void decrementIndices(final int above, final int[] inds) {
-        for (int x = inds.length; --x >= 0;) {
-            if (inds[x] >= above) {
-                inds[x]--;
-            }
-        }
-    }
-
 }

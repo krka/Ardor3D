@@ -10,75 +10,90 @@
 
 package com.ardor3d.util.geom;
 
+import java.util.EnumSet;
+
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 
 public class VertKey {
 
     private final Vector3 _vert;
-    private Vector3 _norm;
-    private ColorRGBA _color;
-    private Vector2[] _texs;
-    private final int _options;
+    private final Vector3 _norm;
+    private final ColorRGBA _color;
+    private final Vector2[] _texs;
+    private final int _smoothGroup;
+    private final EnumSet<MatchCondition> _options;
+    private int _hashCode = 0;
 
     public VertKey(final Vector3 vert, final Vector3 norm, final ColorRGBA color, final Vector2[] texs,
-            final int options) {
+            final EnumSet<MatchCondition> options) {
+        this(vert, norm, color, texs, options, 0);
+    }
+
+    public VertKey(final Vector3 vert, final Vector3 norm, final ColorRGBA color, final Vector2[] texs,
+            final EnumSet<MatchCondition> options, final int smoothGroup) {
         _vert = vert;
-        if ((options & GeometryTool.MV_SAME_NORMALS) != 0) {
-            _norm = norm;
-        }
-        if ((options & GeometryTool.MV_SAME_COLORS) != 0) {
-            _color = color;
-        }
-        if ((options & GeometryTool.MV_SAME_TEXS) != 0) {
-            _texs = texs;
-        }
-        _options = options;
+        _norm = (options.contains(MatchCondition.Normal)) ? norm : null;
+        _color = (options.contains(MatchCondition.Color)) ? color : null;
+        _texs = (options.contains(MatchCondition.UVs)) ? texs : null;
+        _smoothGroup = (options.contains(MatchCondition.Group)) ? smoothGroup : 0;
+        _options = options != null ? options : EnumSet.noneOf(MatchCondition.class);
     }
 
     @Override
     public int hashCode() {
-        int rez = _vert.hashCode();
-        if ((_options & GeometryTool.MV_SAME_NORMALS) != 0 && _norm != null) {
+        if (_hashCode != 0) {
+            return _hashCode;
+        }
+        _hashCode = _vert.hashCode();
+        if (_options.contains(MatchCondition.Normal) && _norm != null) {
             final long x = Double.doubleToLongBits(_norm.getX());
-            rez += 31 * rez + (int) (x ^ (x >>> 32));
+            _hashCode += 31 * _hashCode + (int) (x ^ (x >>> 32));
 
             final long y = Double.doubleToLongBits(_norm.getY());
-            rez += 31 * rez + (int) (y ^ (y >>> 32));
+            _hashCode += 31 * _hashCode + (int) (y ^ (y >>> 32));
 
             final long z = Double.doubleToLongBits(_norm.getZ());
-            rez += 31 * rez + (int) (z ^ (z >>> 32));
+            _hashCode += 31 * _hashCode + (int) (z ^ (z >>> 32));
         }
-        if ((_options & GeometryTool.MV_SAME_COLORS) != 0 && _color != null) {
+        if (_options.contains(MatchCondition.Color) && _color != null) {
             final int r = Float.floatToIntBits(_color.getRed());
-            rez += 31 * rez + r;
+            _hashCode += 31 * _hashCode + r;
 
             final int g = Float.floatToIntBits(_color.getGreen());
-            rez += 31 * rez + g;
+            _hashCode += 31 * _hashCode + g;
 
             final int b = Float.floatToIntBits(_color.getBlue());
-            rez += 31 * rez + b;
+            _hashCode += 31 * _hashCode + b;
 
             final int a = Float.floatToIntBits(_color.getAlpha());
-            rez += 31 * rez + a;
+            _hashCode += 31 * _hashCode + a;
         }
-        if ((_options & GeometryTool.MV_SAME_TEXS) != 0 && _texs != null) {
+        if (_options.contains(MatchCondition.UVs) && _texs != null) {
             for (int i = 0; i < _texs.length; i++) {
                 if (_texs[i] != null) {
                     final long x = Double.doubleToLongBits(_texs[i].getX());
-                    rez += 31 * rez + (int) (x ^ (x >>> 32));
+                    _hashCode += 31 * _hashCode + (int) (x ^ (x >>> 32));
 
                     final long y = Double.doubleToLongBits(_texs[i].getY());
-                    rez += 31 * rez + (int) (y ^ (y >>> 32));
+                    _hashCode += 31 * _hashCode + (int) (y ^ (y >>> 32));
                 }
             }
         }
-        return rez;
+        if (_options.contains(MatchCondition.Group)) {
+            _hashCode += 31 * _hashCode + _smoothGroup;
+        }
+        return _hashCode;
     }
 
     @Override
     public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
         if (!(obj instanceof VertKey)) {
             return false;
         }
@@ -92,7 +107,7 @@ public class VertKey {
             return false;
         }
 
-        if ((_options & GeometryTool.MV_SAME_NORMALS) != 0) {
+        if (_options.contains(MatchCondition.Normal)) {
             if (_norm != null) {
                 if (!_norm.equals(other._norm)) {
                     return false;
@@ -102,7 +117,7 @@ public class VertKey {
             }
         }
 
-        if ((_options & GeometryTool.MV_SAME_COLORS) != 0) {
+        if (_options.contains(MatchCondition.Color)) {
             if (_color != null) {
                 if (!_color.equals(other._color)) {
                     return false;
@@ -112,7 +127,7 @@ public class VertKey {
             }
         }
 
-        if ((_options & GeometryTool.MV_SAME_TEXS) != 0) {
+        if (_options.contains(MatchCondition.UVs)) {
             if (_texs != null) {
                 if (other._texs == null || other._texs.length != _texs.length) {
                     return false;
@@ -127,6 +142,12 @@ public class VertKey {
                     }
                 }
             } else if (other._texs != null) {
+                return false;
+            }
+        }
+
+        if (_options.contains(MatchCondition.Group)) {
+            if (other._smoothGroup != _smoothGroup) {
                 return false;
             }
         }
