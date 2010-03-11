@@ -60,8 +60,26 @@ public final class BufferUtils {
         if (data == null) {
             return null;
         }
-        final FloatBuffer buff = createFloatBuffer(4 * data.length);
-        for (int x = 0; x < data.length; x++) {
+        return createFloatBuffer(0, data.length, data);
+    }
+
+    /**
+     * Generate a new FloatBuffer using the given array of ColorRGBA objects. The FloatBuffer will be 4 * data.length
+     * long and contain the color data as data[0].r, data[0].g, data[0].b, data[0].a, data[1].r... etc.
+     * 
+     * @param offset
+     *            the starting index to read from in our data array
+     * @param length
+     *            the number of colors to read
+     * @param data
+     *            array of ColorRGBA objects to place into a new FloatBuffer
+     */
+    public static FloatBuffer createFloatBuffer(final int offset, final int length, final ReadOnlyColorRGBA... data) {
+        if (data == null) {
+            return null;
+        }
+        final FloatBuffer buff = createFloatBuffer(4 * length);
+        for (int x = offset; x < length; x++) {
             if (data[x] != null) {
                 buff.put(data[x].getRed()).put(data[x].getGreen()).put(data[x].getBlue()).put(data[x].getAlpha());
             } else {
@@ -174,6 +192,10 @@ public final class BufferUtils {
      * Generate a new FloatBuffer using the given array of Vector4 objects. The FloatBuffer will be 4 * data.length long
      * and contain the vector data as data[0].x, data[0].y, data[0].z, data[0].w, data[1].x... etc.
      * 
+     * @param offset
+     *            the starting index to read from in our data array
+     * @param length
+     *            the number of vectors to read
      * @param data
      *            array of Vector4 objects to place into a new FloatBuffer
      */
@@ -181,8 +203,22 @@ public final class BufferUtils {
         if (data == null) {
             return null;
         }
-        final FloatBuffer buff = createFloatBuffer(4 * data.length);
-        for (int x = 0; x < data.length; x++) {
+        return createFloatBuffer(0, data.length, data);
+    }
+
+    /**
+     * Generate a new FloatBuffer using the given array of Vector4 objects. The FloatBuffer will be 4 * data.length long
+     * and contain the vector data as data[0].x, data[0].y, data[0].z, data[0].w, data[1].x... etc.
+     * 
+     * @param data
+     *            array of Vector4 objects to place into a new FloatBuffer
+     */
+    public static FloatBuffer createFloatBuffer(final int offset, final int length, final ReadOnlyVector4... data) {
+        if (data == null) {
+            return null;
+        }
+        final FloatBuffer buff = createFloatBuffer(4 * length);
+        for (int x = offset; x < length; x++) {
             if (data[x] != null) {
                 buff.put(data[x].getXf()).put(data[x].getYf()).put(data[x].getZf()).put(data[x].getWf());
             } else {
@@ -384,8 +420,26 @@ public final class BufferUtils {
         if (data == null) {
             return null;
         }
-        final FloatBuffer buff = createFloatBuffer(3 * data.length);
-        for (int x = 0; x < data.length; x++) {
+        return createFloatBuffer(0, data.length, data);
+    }
+
+    /**
+     * Generate a new FloatBuffer using the given array of Vector3 objects. The FloatBuffer will be 3 * data.length long
+     * and contain the vector data as data[0].x, data[0].y, data[0].z, data[1].x... etc.
+     * 
+     * @param offset
+     *            the starting index to read from in our data array
+     * @param length
+     *            the number of vectors to read
+     * @param data
+     *            array of Vector3 objects to place into a new FloatBuffer
+     */
+    public static FloatBuffer createFloatBuffer(final int offset, final int length, final ReadOnlyVector3... data) {
+        if (data == null) {
+            return null;
+        }
+        final FloatBuffer buff = createFloatBuffer(3 * length);
+        for (int x = offset; x < length; x++) {
             if (data[x] != null) {
                 buff.put(data[x].getXf()).put(data[x].getYf()).put(data[x].getZf());
             } else {
@@ -584,8 +638,26 @@ public final class BufferUtils {
         if (data == null) {
             return null;
         }
-        final FloatBuffer buff = createFloatBuffer(2 * data.length);
-        for (int x = 0; x < data.length; x++) {
+        return createFloatBuffer(0, data.length, data);
+    }
+
+    /**
+     * Generate a new FloatBuffer using the given array of Vector2 objects. The FloatBuffer will be 2 * data.length long
+     * and contain the vector data as data[0].x, data[0].y, data[1].x... etc.
+     * 
+     * @param offset
+     *            the starting index to read from in our data array
+     * @param length
+     *            the number of vectors to read
+     * @param data
+     *            array of Vector2 objects to place into a new FloatBuffer
+     */
+    public static FloatBuffer createFloatBuffer(final int offset, final int length, final ReadOnlyVector2... data) {
+        if (data == null) {
+            return null;
+        }
+        final FloatBuffer buff = createFloatBuffer(2 * length);
+        for (int x = offset; x < length; x++) {
             if (data[x] != null) {
                 buff.put(data[x].getXf()).put(data[x].getYf());
             } else {
@@ -807,7 +879,7 @@ public final class BufferUtils {
      * @return a new int array populated from the IndexBufferData
      */
     public static int[] getIntArray(final IndexBufferData<?> buff) {
-        if (buff == null || buff.getBuffer() == null) {
+        if (buff == null || buff.getBufferLimit() == 0) {
             return null;
         }
         buff.getBuffer().rewind();
