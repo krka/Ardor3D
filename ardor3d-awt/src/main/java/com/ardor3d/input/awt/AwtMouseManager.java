@@ -50,7 +50,6 @@ public class AwtMouseManager implements MouseManager {
     /** Our cursor prior to a setGrabbed(GRABBED) operation. Stored to be used when cursor is "ungrabbed" */
     private Cursor _pregrabCursor;
 
-    
     public AwtMouseManager(final Component component) {
         _component = component;
 
@@ -64,7 +63,11 @@ public class AwtMouseManager implements MouseManager {
 
     public void setCursor(final MouseCursor cursor) {
         if (cursor == MouseCursor.SYSTEM_DEFAULT) {
-            _component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            if (_grabbedState == GrabbedState.GRABBED) {
+                _pregrabCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+            } else {
+                _component.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
             return;
         }
 
@@ -77,8 +80,11 @@ public class AwtMouseManager implements MouseManager {
                 cursor.getHotspotY(), (int) bestCursorSize.getHeight() - 1));
 
         final Cursor awtCursor = Toolkit.getDefaultToolkit().createCustomCursor(image, hotSpot, cursor.getName());
-
-        _component.setCursor(awtCursor);
+        if (_grabbedState == GrabbedState.GRABBED) {
+            _pregrabCursor = awtCursor;
+        } else {
+            _component.setCursor(awtCursor);
+        }
     }
 
     public void setPosition(final int x, final int y) {
