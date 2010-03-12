@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-collada"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-animation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-ui"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardor3d-extras"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
