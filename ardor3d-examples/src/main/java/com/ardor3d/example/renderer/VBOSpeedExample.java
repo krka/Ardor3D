@@ -31,6 +31,7 @@ import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -98,6 +99,9 @@ public class VBOSpeedExample extends ExampleBase {
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
                 Format.Guess, true));
 
+        final Node sphereBase = new Node("node");
+        _root.attachChild(sphereBase);
+
         final Random rand = new Random(1337);
         for (int i = 0; i < 100; i++) {
             final Sphere sphere = new Sphere("Sphere", 32, 32, 2);
@@ -107,7 +111,7 @@ public class VBOSpeedExample extends ExampleBase {
             sphere.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
                     .nextDouble() * 100.0 - 250.0));
 
-            _root.attachChild(sphere);
+            sphereBase.attachChild(sphere);
         }
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
@@ -115,23 +119,23 @@ public class VBOSpeedExample extends ExampleBase {
                 vboMode = (vboMode + 1) % 3;
                 if (vboMode == 0) {
                     t.setText("[SPACE] VBO Off");
-                    _root.getSceneHints().setDataMode(DataMode.Arrays);
+                    sphereBase.getSceneHints().setDataMode(DataMode.Arrays);
                     // run this in the opengl thread
                     GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).render(
                             new Callable<Void>() {
                                 public Void call() throws Exception {
                                     final DeleteVBOsVisitor viz = new DeleteVBOsVisitor(_canvas.getCanvasRenderer()
                                             .getRenderer());
-                                    _root.acceptVisitor(viz, false);
+                                    sphereBase.acceptVisitor(viz, false);
                                     return null;
                                 }
                             });
                 } else if (vboMode == 1) {
                     t.setText("[SPACE] VBO On");
-                    _root.getSceneHints().setDataMode(DataMode.VBO);
+                    sphereBase.getSceneHints().setDataMode(DataMode.VBO);
                 } else if (vboMode == 2) {
                     t.setText("[SPACE] VBO Interleaved On");
-                    _root.getSceneHints().setDataMode(DataMode.VBOInterleaved);
+                    sphereBase.getSceneHints().setDataMode(DataMode.VBOInterleaved);
                 }
             }
         }));

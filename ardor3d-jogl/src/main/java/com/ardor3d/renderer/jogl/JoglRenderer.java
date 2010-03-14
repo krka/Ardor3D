@@ -1107,8 +1107,17 @@ public class JoglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
-        if (interleaved.getVBOID(context.getGlContextRep()) <= 0 || interleaved.isNeedsRefresh()) {
-            initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords);
+        final int length = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
+        int currLength = 0;
+        if (interleaved.getBufferLimit() > 0) {
+            interleaved.getBuffer().rewind();
+            currLength = Math.round(interleaved.getBuffer().get());
+        }
+
+        if (length != currLength || interleaved.getVBOID(context.getGlContextRep()) <= 0
+                || interleaved.isNeedsRefresh()) {
+            initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords,
+                    length);
         }
 
         final int vboID = interleaved.getVBOID(context.getGlContextRep());
@@ -1209,7 +1218,16 @@ public class JoglRenderer extends AbstractRenderer {
 
     private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
             final FloatBufferData vertexCoords, final FloatBufferData normalCoords, final FloatBufferData colorCoords,
-            final List<FloatBufferData> textureCoords) {
+            final List<FloatBufferData> textureCoords, final int bufferSize) {
+
+        // keep around buffer size
+        if (interleaved.getBufferCapacity() != 1) {
+            final FloatBuffer buffer = BufferUtils.createFloatBufferOnHeap(1);
+            interleaved.setBuffer(buffer);
+        }
+        interleaved.getBuffer().rewind();
+        interleaved.getBuffer().put(bufferSize);
+
         final GL gl = GLU.getCurrentGL();
 
         final RendererRecord rendRecord = context.getRendererRecord();
@@ -1220,7 +1238,6 @@ public class JoglRenderer extends AbstractRenderer {
 
         rendRecord.invalidateVBO();
         JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-        final int bufferSize = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
         gl
                 .glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, bufferSize, null, getGLVBOAccessMode(interleaved
                         .getVboAccessMode()));
