@@ -53,10 +53,14 @@ public class JoglCanvas extends Frame implements NativeCanvas {
     private JoglAwtCanvas _glCanvas;
 
     public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
+        this(canvasRenderer, settings, false);
+    }
+
+    public JoglCanvas(final JoglCanvasRenderer canvasRenderer, final DisplaySettings settings, final boolean debugMode) {
         _settings = settings;
 
         // Create the OpenGL canvas
-        _glCanvas = new JoglAwtCanvas(_settings, canvasRenderer);
+        _glCanvas = new JoglAwtCanvas(_settings, canvasRenderer, debugMode);
     }
 
     @Override
