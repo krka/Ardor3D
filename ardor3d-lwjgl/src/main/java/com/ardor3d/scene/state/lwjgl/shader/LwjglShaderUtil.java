@@ -17,6 +17,10 @@ import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.ARBVertexShader;
 
+import com.ardor3d.renderer.ContextCapabilities;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
@@ -229,14 +233,23 @@ public abstract class LwjglShaderUtil {
     /**
      * Updates an attribute shadervariable.
      * 
+     * @param renderer
+     *            the current renderer
      * @param shaderVariable
      *            variable to update
      */
-    public static void updateShaderAttribute(final ShaderVariable shaderVariable) {
+    public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable) {
         if (shaderVariable.variableID == -1) {
             // attribute is not bound, or was not found in shader.
             return;
         }
+
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+        if (caps.isVBOSupported()) {
+            renderer.unbindVBO();
+        }
+
         if (shaderVariable instanceof ShaderVariablePointerFloat) {
             updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariablePointerByte) {

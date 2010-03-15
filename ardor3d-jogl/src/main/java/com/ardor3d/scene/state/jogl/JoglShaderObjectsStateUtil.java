@@ -218,7 +218,7 @@ public abstract class JoglShaderObjectsStateUtil {
                                 JoglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
                                 shaderVariable.needsRefresh = false;
                             }
-                            JoglShaderUtil.updateShaderAttribute(shaderVariable);
+                            JoglShaderUtil.updateShaderAttribute(renderer, shaderVariable);
                         }
 
                         final List<ShaderVariable> uniforms = state.getShaderUniforms();
