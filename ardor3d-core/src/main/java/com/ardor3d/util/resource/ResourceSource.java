@@ -20,6 +20,8 @@ import com.ardor3d.util.export.Savable;
  */
 public interface ResourceSource extends Savable {
 
+    public static final String UNKNOWN_TYPE = "-unknown-";
+
     /**
      * @return the name of this resource.
      */
