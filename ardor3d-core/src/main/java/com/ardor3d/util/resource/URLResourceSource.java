@@ -28,19 +28,49 @@ public class URLResourceSource implements ResourceSource {
     private URL _url;
     private String _type;
 
+    /**
+     * Construct a new URLResourceSource. Must set URL separately.
+     */
     public URLResourceSource() {}
 
+    /**
+     * Construct a new URLResourceSource from a specific URL.
+     * 
+     * @param sourceUrl
+     *            The url to load the resource from. Must not be null. If the URL has a valid URL filename (see
+     *            {@link URL#getFile()}) and an extension (eg. http://url/myFile.png) then the extension (.png in this
+     *            case) is used as the type.
+     */
     public URLResourceSource(final URL sourceUrl) {
         assert (sourceUrl != null) : "sourceUrl must not be null";
         _url = sourceUrl;
 
+        // add type, if present
         final String fileName = _url.getFile();
-        assert (sourceUrl != null) : "sourceUrl must contain a valid filename";
+        if (fileName != null) {
+            final int dot = fileName.lastIndexOf('.');
+            if (dot >= 0) {
+                _type = fileName.substring(dot);
+            } else {
+                _type = UNKNOWN_TYPE;
+            }
+        }
+    }
 
-        final int dot = fileName.lastIndexOf('.');
-        assert (dot >= 0) : "sourceUrl must contain a filename with an extension";
+    /**
+     * Construct a new URLResourceSource from a specific URL and type.
+     * 
+     * @param sourceUrl
+     *            The url to load the resource from. Must not be null.
+     * @param type
+     *            our type. Usually a file extension such as .png. Required for generic loading when multiple resource
+     *            handlers could be used.
+     */
+    public URLResourceSource(final URL sourceUrl, final String type) {
+        assert (sourceUrl != null) : "sourceUrl must not be null";
+        _url = sourceUrl;
 
-        _type = fileName.substring(dot);
+        _type = type;
     }
 
     public ResourceSource getRelativeSource(final String name) {
@@ -64,6 +94,10 @@ public class URLResourceSource implements ResourceSource {
         return null;
     }
 
+    public void setURL(final URL url) {
+        _url = url;
+    }
+
     public URL getURL() {
         return _url;
     }
@@ -74,6 +108,10 @@ public class URLResourceSource implements ResourceSource {
 
     public String getType() {
         return _type;
+    }
+
+    public void setType(final String type) {
+        _type = type;
     }
 
     public InputStream openStream() throws IOException {
