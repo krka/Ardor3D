@@ -888,13 +888,13 @@ public class JoglRenderer extends AbstractRenderer {
     }
 
     private void updateVBO(final FloatBufferData data, final RendererRecord rendRecord, final int vboID,
-            final int offset) {
+            final int offsetBytes) {
         if (data.isNeedsRefresh()) {
             final GL gl = GLU.getCurrentGL();
             final FloatBuffer dataBuffer = data.getBuffer();
             dataBuffer.rewind();
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, dataBuffer.limit() * 4, dataBuffer);
+            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offsetBytes, dataBuffer.limit() * 4, dataBuffer);
             data.setNeedsRefresh(false);
         }
     }
@@ -1107,38 +1107,38 @@ public class JoglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
-        final int length = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
-        int currLength = 0;
+        final int lengthBytes = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
+        int currLengthBytes = 0;
         if (interleaved.getBufferLimit() > 0) {
             interleaved.getBuffer().rewind();
-            currLength = Math.round(interleaved.getBuffer().get());
+            currLengthBytes = Math.round(interleaved.getBuffer().get());
         }
 
-        if (length != currLength || interleaved.getVBOID(context.getGlContextRep()) <= 0
+        if (lengthBytes != currLengthBytes || interleaved.getVBOID(context.getGlContextRep()) <= 0
                 || interleaved.isNeedsRefresh()) {
             initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords,
-                    length);
+                    lengthBytes);
         }
 
         final int vboID = interleaved.getVBOID(context.getGlContextRep());
         JoglRendererUtil.setBoundVBO(rendRecord, vboID);
 
-        int offset = 0;
+        int offsetBytes = 0;
 
         if (normalCoords != null) {
-            updateVBO(normalCoords, rendRecord, vboID, offset);
-            gl.glNormalPointer(GL.GL_FLOAT, 0, offset);
+            updateVBO(normalCoords, rendRecord, vboID, offsetBytes);
+            gl.glNormalPointer(GL.GL_FLOAT, 0, offsetBytes);
             gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-            offset += normalCoords.getBufferLimit() * 4;
+            offsetBytes += normalCoords.getBufferLimit() * 4;
         } else {
             gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
         }
 
         if (colorCoords != null) {
-            updateVBO(colorCoords, rendRecord, vboID, offset);
-            gl.glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offset);
+            updateVBO(colorCoords, rendRecord, vboID, offsetBytes);
+            gl.glColorPointer(colorCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
             gl.glEnableClientState(GL.GL_COLOR_ARRAY);
-            offset += colorCoords.getBufferLimit() * 4;
+            offsetBytes += colorCoords.getBufferLimit() * 4;
         } else {
             gl.glDisableClientState(GL.GL_COLOR_ARRAY);
         }
@@ -1183,7 +1183,7 @@ public class JoglRenderer extends AbstractRenderer {
 
                         // grab a vboID and make sure it exists and is up to date.
                         final FloatBufferData textureBufferData = textureCoords.get(i);
-                        updateVBO(textureBufferData, rendRecord, vboID, offset);
+                        updateVBO(textureBufferData, rendRecord, vboID, offsetBytes);
 
                         if (!valid || !wasOn) {
                             // enable bit in tracking int
@@ -1194,8 +1194,8 @@ public class JoglRenderer extends AbstractRenderer {
                         }
 
                         // send data
-                        gl.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, offset);
-                        offset += textureBufferData.getBufferLimit() * 4;
+                        gl.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
+                        offsetBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
             }
@@ -1205,10 +1205,9 @@ public class JoglRenderer extends AbstractRenderer {
         }
 
         if (vertexCoords != null) {
-            updateVBO(vertexCoords, rendRecord, vboID, offset);
-            gl.glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offset);
+            updateVBO(vertexCoords, rendRecord, vboID, offsetBytes);
+            gl.glVertexPointer(vertexCoords.getValuesPerTuple(), GL.GL_FLOAT, 0, offsetBytes);
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-            offset += vertexCoords.getBufferLimit() * 4;
         } else {
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
         }
@@ -1278,7 +1277,6 @@ public class JoglRenderer extends AbstractRenderer {
             vertexCoords.getBuffer().rewind();
             gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, vertexCoords.getBufferLimit() * 4, vertexCoords
                     .getBuffer());
-            offset += vertexCoords.getBufferLimit() * 4;
         }
 
         interleaved.setNeedsRefresh(false);

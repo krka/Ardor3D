@@ -116,33 +116,38 @@ public abstract class AbstractRenderer implements Renderer {
             final List<FloatBufferData> textureCoords) {
         final ContextCapabilities caps = context.getCapabilities();
 
-        int bufferSize = 0;
+        int bufferSizeBytes = 0;
         if (normalCoords != null) {
-            bufferSize += normalCoords.getBufferLimit() * 4;
+            bufferSizeBytes += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
-            bufferSize += colorCoords.getBufferLimit() * 4;
+            bufferSizeBytes += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
             if (ts != null) {
-                for (int i = 0; i <= ts.getMaxTextureIndexUsed() && i < caps.getNumberOfFragmentTexCoordUnits(); i++) {
-                    if (textureCoords == null || i >= textureCoords.size()) {
+                final int max = caps.isMultitextureSupported() ? Math.min(caps.getNumberOfFragmentTexCoordUnits(),
+                        TextureState.MAX_TEXTURES) : 1;
+                boolean exists;
+                for (int i = 0; i < max; i++) {
+                    exists = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null;
+
+                    if (!exists) {
                         continue;
                     }
 
                     final FloatBufferData textureBufferData = textureCoords.get(i);
                     if (textureBufferData != null) {
-                        bufferSize += textureBufferData.getBufferLimit() * 4;
+                        bufferSizeBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
             }
         }
         if (vertexCoords != null) {
-            bufferSize += vertexCoords.getBufferLimit() * 4;
+            bufferSizeBytes += vertexCoords.getBufferLimit() * 4;
         }
 
-        return bufferSize;
+        return bufferSizeBytes;
     }
 
     public int getStencilClearValue() {

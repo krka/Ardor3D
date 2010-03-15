@@ -845,12 +845,12 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     private void updateVBO(final FloatBufferData data, final RendererRecord rendRecord, final int vboID,
-            final int offset) {
+            final int offsetBytes) {
         if (data.isNeedsRefresh()) {
             final FloatBuffer dataBuffer = data.getBuffer();
             dataBuffer.rewind();
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, dataBuffer);
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, dataBuffer);
             data.setNeedsRefresh(false);
         }
     }
@@ -1066,38 +1066,38 @@ public class LwjglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
-        final int length = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
-        int currLength = 0;
+        final int lengthBytes = getTotalInterleavedSize(context, vertexCoords, normalCoords, colorCoords, textureCoords);
+        int currLengthBytes = 0;
         if (interleaved.getBufferLimit() > 0) {
             interleaved.getBuffer().rewind();
-            currLength = Math.round(interleaved.getBuffer().get());
+            currLengthBytes = Math.round(interleaved.getBuffer().get());
         }
 
-        if (length != currLength || interleaved.getVBOID(context.getGlContextRep()) <= 0
+        if (lengthBytes != currLengthBytes || interleaved.getVBOID(context.getGlContextRep()) <= 0
                 || interleaved.isNeedsRefresh()) {
             initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords,
-                    length);
+                    lengthBytes);
         }
 
         final int vboID = interleaved.getVBOID(context.getGlContextRep());
         LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
 
-        int offset = 0;
+        int offsetBytes = 0;
 
         if (normalCoords != null) {
-            updateVBO(normalCoords, rendRecord, vboID, offset);
-            GL11.glNormalPointer(GL11.GL_FLOAT, 0, offset);
+            updateVBO(normalCoords, rendRecord, vboID, offsetBytes);
+            GL11.glNormalPointer(GL11.GL_FLOAT, 0, offsetBytes);
             GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-            offset += normalCoords.getBufferLimit() * 4;
+            offsetBytes += normalCoords.getBufferLimit() * 4;
         } else {
             GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
         }
 
         if (colorCoords != null) {
-            updateVBO(colorCoords, rendRecord, vboID, offset);
-            GL11.glColorPointer(colorCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+            updateVBO(colorCoords, rendRecord, vboID, offsetBytes);
+            GL11.glColorPointer(colorCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offsetBytes);
             GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-            offset += colorCoords.getBufferLimit() * 4;
+            offsetBytes += colorCoords.getBufferLimit() * 4;
         } else {
             GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
         }
@@ -1142,7 +1142,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
                         // grab a vboID and make sure it exists and is up to date.
                         final FloatBufferData textureBufferData = textureCoords.get(i);
-                        updateVBO(textureBufferData, rendRecord, vboID, offset);
+                        updateVBO(textureBufferData, rendRecord, vboID, offsetBytes);
 
                         if (!valid || !wasOn) {
                             // enable bit in tracking int
@@ -1153,8 +1153,8 @@ public class LwjglRenderer extends AbstractRenderer {
                         }
 
                         // send data
-                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
-                        offset += textureBufferData.getBufferLimit() * 4;
+                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL11.GL_FLOAT, 0, offsetBytes);
+                        offsetBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
             }
@@ -1164,10 +1164,9 @@ public class LwjglRenderer extends AbstractRenderer {
         }
 
         if (vertexCoords != null) {
-            updateVBO(vertexCoords, rendRecord, vboID, offset);
-            GL11.glVertexPointer(vertexCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offset);
+            updateVBO(vertexCoords, rendRecord, vboID, offsetBytes);
+            GL11.glVertexPointer(vertexCoords.getValuesPerTuple(), GL11.GL_FLOAT, 0, offsetBytes);
             GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            offset += vertexCoords.getBufferLimit() * 4;
         } else {
             GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
         }
@@ -1198,18 +1197,18 @@ public class LwjglRenderer extends AbstractRenderer {
         ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, bufferSize,
                 getGLVBOAccessMode(interleaved.getVboAccessMode()));
 
-        int offset = 0;
+        int offsetBytes = 0;
         if (normalCoords != null) {
             normalCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, normalCoords
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, normalCoords
                     .getBuffer());
-            offset += normalCoords.getBufferLimit() * 4;
+            offsetBytes += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
             colorCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, colorCoords
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, colorCoords
                     .getBuffer());
-            offset += colorCoords.getBufferLimit() * 4;
+            offsetBytes += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
             final TextureState ts = (TextureState) context.getCurrentState(RenderState.StateType.Texture);
@@ -1223,18 +1222,17 @@ public class LwjglRenderer extends AbstractRenderer {
                     final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
                     if (textureBuffer != null) {
                         textureBuffer.rewind();
-                        ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset,
+                        ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
                                 textureBuffer);
-                        offset += textureBufferData.getBufferLimit() * 4;
+                        offsetBytes += textureBufferData.getBufferLimit() * 4;
                     }
                 }
             }
         }
         if (vertexCoords != null) {
             vertexCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offset, vertexCoords
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, vertexCoords
                     .getBuffer());
-            offset += vertexCoords.getBufferLimit() * 4;
         }
 
         interleaved.setNeedsRefresh(false);
