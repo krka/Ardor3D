@@ -394,7 +394,7 @@ public abstract class LwjglTextureStateUtil {
                 // Here we handle textures that are either compressed or have predefined mipmaps.
                 // Get mipmap data sizes and amount of mipmaps to send to opengl. Then loop through all mipmaps and send
                 // them.
-                int[] mipSizes = image.getMipMapSizes();
+                int[] mipSizes = image.getMipMapByteSizes();
                 ByteBuffer data = null;
 
                 if (type == Type.CubeMap) {

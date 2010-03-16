@@ -416,14 +416,13 @@ public class Image implements Serializable, Savable {
     }
 
     /**
-     * Sets the mipmap sizes stored in this image's data buffer. Mipmaps are stored sequentially, and the first mipmap
-     * is the main image data. To specify no mipmaps, pass null and this will automatically be expanded into a single
-     * mipmap of the full
+     * Sets the mipmap data sizes stored in this image's data buffer. Mipmaps are stored sequentially, and the first
+     * mipmap is the main image data. To specify no mipmaps, pass null.
      * 
      * @param mipMapSizes
-     *            the mipmap sizes array, or null for a single image map.
+     *            the mipmap sizes array, or null to indicate no mip maps.
      */
-    public void setMipMapSizes(int[] mipMapSizes) {
+    public void setMipMapByteSizes(int[] mipMapSizes) {
         if (mipMapSizes != null && mipMapSizes.length <= 1) {
             mipMapSizes = null;
         }
@@ -554,7 +553,7 @@ public class Image implements Serializable, Savable {
      * 
      * @return the mipmap sizes for this image.
      */
-    public int[] getMipMapSizes() {
+    public int[] getMipMapByteSizes() {
         return _mipMapSizes;
     }
 
@@ -582,10 +581,10 @@ public class Image implements Serializable, Savable {
         if (this.getData() == null && that.getData() != null) {
             return false;
         }
-        if (getMipMapSizes() != null && !Arrays.equals(getMipMapSizes(), that.getMipMapSizes())) {
+        if (getMipMapByteSizes() != null && !Arrays.equals(getMipMapByteSizes(), that.getMipMapByteSizes())) {
             return false;
         }
-        if (getMipMapSizes() == null && that.getMipMapSizes() != null) {
+        if (getMipMapByteSizes() == null && that.getMipMapByteSizes() != null) {
             return false;
         }
 

@@ -54,7 +54,7 @@ public abstract class ColorMipMapGenerator {
             mipLengths[x] = mipLengths[x - 1] >> 1;
             bufLength += (mipLengths[x]);
         }
-        rVal.setMipMapSizes(mipLengths);
+        rVal.setMipMapByteSizes(mipLengths);
 
         final ByteBuffer bb = BufferUtils.createByteBuffer(bufLength);
 
