@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.util.dds.DdsLoader;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.resource.ResourceSource;
 
