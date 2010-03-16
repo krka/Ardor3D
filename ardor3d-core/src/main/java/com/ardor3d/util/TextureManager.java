@@ -21,6 +21,7 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.renderer.ContextManager;
@@ -199,6 +200,8 @@ final public class TextureManager {
         if (result == null) {
             if (img.getData().size() == 6) {
                 result = new TextureCubeMap();
+            } else if (img.getData().size() != 1) {
+                result = new Texture3D();
             } else {
                 result = new Texture2D();
             }
