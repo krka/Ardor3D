@@ -201,7 +201,7 @@ public abstract class JoglTextureUtil {
             // If we specified a precise format, return that one.
             return getGLPixelFormat(requestedFormat);
 
-        } else if (requestedFormat == Image.Format.Guess) {
+        } else if (requestedFormat == Image.Format.Guess && caps.isGenericTCSupported()) {
             if (imageFormat == Image.Format.RGB8) {
                 return getGLPixelFormat(Image.Format.CompressedRGB);
             } else if (imageFormat == Image.Format.RGBA8) {

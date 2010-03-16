@@ -151,6 +151,9 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         // Check for LA texture compression capability.
         _supportsLATCCompression = caps.GL_EXT_texture_compression_latc;
 
+        // Check for generic texture compression capability.
+        _supportsGenericCompression = caps.GL_ARB_texture_compression;
+
         // Check for 3D texture capability.
         _supportsTexture3D = caps.OpenGL12;
 

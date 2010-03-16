@@ -90,6 +90,9 @@ public class ContextCapabilities {
     /** True if LATC compression is supported. */
     protected boolean _supportsLATCCompression = false;
 
+    /** True if generic (non-specific) texture compression is supported. */
+    protected boolean _supportsGenericCompression = false;
+
     /** True if Texture3D is supported. */
     protected boolean _supportsTexture3D = false;
 
@@ -361,6 +364,15 @@ public class ContextCapabilities {
      */
     public boolean isLATCSupported() {
         return _supportsLATCCompression;
+    }
+
+    /**
+     * Returns if generic (non-specific) compression is available for textures.
+     * 
+     * @return true if available.
+     */
+    public boolean isGenericTCSupported() {
+        return _supportsGenericCompression;
     }
 
     /**
