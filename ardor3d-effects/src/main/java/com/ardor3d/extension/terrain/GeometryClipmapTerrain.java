@@ -166,8 +166,7 @@ public class GeometryClipmapTerrain extends Node {
     public void updateShader() {
         if (_geometryClipmapShader != null) {
             getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
-            _geometryClipmapShader.setUniform("eyePosition", getWorldTransform().applyInverse(
-                    _terrainCamera.getLocation(), transformedFrustumPos));
+            _geometryClipmapShader.setUniform("eyePosition", transformedFrustumPos);
 
             return;
         }

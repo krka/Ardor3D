@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.extension.texturing.TextureClipmap;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -51,6 +52,8 @@ public class TexturedGeometryClipmapTerrain extends Node {
     private GLSLShaderObjectsState _geometryClipmapShader;
 
     private final TextureClipmap _textureClipmap;
+
+    private final Vector3 transformedFrustumPos = new Vector3();
 
     private final float _heightScale;
 
@@ -145,8 +148,7 @@ public class TexturedGeometryClipmapTerrain extends Node {
 
     @Override
     public void draw(final Renderer r) {
-        updateShader();
-        _textureClipmap.update(r, _terrainCamera.getLocation());
+        updateShader(r);
 
         if (!_initialized) {
             for (int i = _clips.size() - 1; i >= _visibleLevels; i--) {
@@ -171,9 +173,11 @@ public class TexturedGeometryClipmapTerrain extends Node {
     /**
      * Initialize/Update shaders
      */
-    public void updateShader() {
+    public void updateShader(final Renderer r) {
         if (_geometryClipmapShader != null) {
-            _geometryClipmapShader.setUniform("eyePosition", _terrainCamera.getLocation());
+            getWorldTransform().applyInverse(_terrainCamera.getLocation(), transformedFrustumPos);
+            _geometryClipmapShader.setUniform("eyePosition", transformedFrustumPos);
+            _textureClipmap.update(r, transformedFrustumPos);
 
             return;
         }
