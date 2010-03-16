@@ -59,19 +59,7 @@ public class DdsUtils {
      * @return the int value
      */
     static final int getInt(final String string) {
-        final char[] chars = string.toCharArray();
-        int rVal = 0;
-        rVal |= ((chars[0]) << 0);
-        if (chars.length > 1) {
-            rVal |= ((chars[1]) << 8);
-        }
-        if (chars.length > 2) {
-            rVal |= ((chars[2]) << 16);
-        }
-        if (chars.length > 3) {
-            rVal |= ((chars[3]) << 24);
-        }
-        return rVal;
+        return getInt(string.getBytes());
     }
 
     /**
@@ -124,6 +112,7 @@ public class DdsUtils {
                 switch (format) {
                     case NativeDXT1:
                     case NativeDXT1A:
+                    case NativeLATC_L:
                         System.arraycopy(rawData, source, returnData, target, 4);
                         returnData[target + 4] = rawData[source + 7];
                         returnData[target + 5] = rawData[source + 6];
@@ -156,6 +145,21 @@ public class DdsUtils {
                         // extract 3 bits each and flip them
                         getBytesFromUInt24(returnData, target + 5, flipUInt24(getUInt24(rawData, source + 2)));
                         getBytesFromUInt24(returnData, target + 2, flipUInt24(getUInt24(rawData, source + 5)));
+
+                        // Color
+                        System.arraycopy(rawData, source + 8, returnData, target + 8, 4);
+                        returnData[target + 12] = rawData[source + 15];
+                        returnData[target + 13] = rawData[source + 14];
+                        returnData[target + 14] = rawData[source + 13];
+                        returnData[target + 15] = rawData[source + 12];
+                        break;
+                    case NativeLATC_LA:
+                        // alpha
+                        System.arraycopy(rawData, source, returnData, target, 4);
+                        returnData[target + 4] = rawData[source + 7];
+                        returnData[target + 5] = rawData[source + 6];
+                        returnData[target + 6] = rawData[source + 5];
+                        returnData[target + 7] = rawData[source + 4];
 
                         // Color
                         System.arraycopy(rawData, source + 8, returnData, target + 8, 4);

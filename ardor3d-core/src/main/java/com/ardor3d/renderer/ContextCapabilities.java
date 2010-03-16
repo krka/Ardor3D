@@ -87,6 +87,9 @@ public class ContextCapabilities {
     /** True if S3TC compression is supported. */
     protected boolean _supportsS3TCCompression = false;
 
+    /** True if LATC compression is supported. */
+    protected boolean _supportsLATCCompression = false;
+
     /** True if Texture3D is supported. */
     protected boolean _supportsTexture3D = false;
 
@@ -349,6 +352,15 @@ public class ContextCapabilities {
      */
     public boolean isS3TCSupported() {
         return _supportsS3TCCompression;
+    }
+
+    /**
+     * Returns if LATC compression is available for textures.
+     * 
+     * @return true if LATC is available.
+     */
+    public boolean isLATCSupported() {
+        return _supportsLATCCompression;
     }
 
     /**

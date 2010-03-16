@@ -153,6 +153,9 @@ public final class JoglContextCapabilities extends ContextCapabilities {
         // Check for S3 texture compression capability.
         _supportsS3TCCompression = gl.isExtensionAvailable("GL_EXT_texture_compression_s3tc");
 
+        // Check for LA texture compression capability.
+        _supportsLATCCompression = gl.isExtensionAvailable("GL_EXT_texture_compression_latc");
+
         // Check for 3D texture capability.
         _supportsTexture3D = _supportsGL1_2;
 

@@ -35,6 +35,8 @@ public abstract class JoglTextureUtil {
             case NativeDXT1A:
             case NativeDXT3:
             case NativeDXT5:
+            case NativeLATC_L:
+            case NativeLATC_LA:
                 return true;
             default:
                 return false;
@@ -50,18 +52,26 @@ public abstract class JoglTextureUtil {
                 return GL.GL_RGB8;
             case Alpha8:
                 return GL.GL_ALPHA8;
-            case RGB_TO_DXT1:
+            case CompressedRGBA:
+                return GL.GL_COMPRESSED_RGBA;
+            case CompressedRGB:
+                return GL.GL_COMPRESSED_RGB;
+            case CompressedLuminance:
+                return GL.GL_COMPRESSED_LUMINANCE;
+            case CompressedLuminanceAlpha:
+                return GL.GL_COMPRESSED_LUMINANCE_ALPHA;
             case NativeDXT1:
                 return GL.GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-            case RGBA_TO_DXT1:
             case NativeDXT1A:
                 return GL.GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-            case RGBA_TO_DXT3:
             case NativeDXT3:
                 return GL.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-            case RGBA_TO_DXT5:
             case NativeDXT5:
                 return GL.GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+            case NativeLATC_L:
+                return GL.GL_COMPRESSED_LUMINANCE_LATC1_EXT;
+            case NativeLATC_LA:
+                return GL.GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
 
                 // The rest...
             case Alpha4:
@@ -191,13 +201,15 @@ public abstract class JoglTextureUtil {
             // If we specified a precise format, return that one.
             return getGLPixelFormat(requestedFormat);
 
-        } else if (requestedFormat == Image.Format.Guess && caps.isS3TCSupported()) {
-            // Enable S3TC DXT compression if available and we're guessing
-            // format.
+        } else if (requestedFormat == Image.Format.Guess) {
             if (imageFormat == Image.Format.RGB8) {
-                return getGLPixelFormat(Image.Format.RGB_TO_DXT1);
+                return getGLPixelFormat(Image.Format.CompressedRGB);
             } else if (imageFormat == Image.Format.RGBA8) {
-                return getGLPixelFormat(Image.Format.RGBA_TO_DXT5);
+                return getGLPixelFormat(Image.Format.CompressedRGBA);
+            } else if (imageFormat == Image.Format.Luminance8) {
+                return getGLPixelFormat(Image.Format.CompressedLuminance);
+            } else if (imageFormat == Image.Format.Luminance8Alpha8) {
+                return getGLPixelFormat(Image.Format.CompressedLuminanceAlpha);
             }
         }
 
@@ -215,11 +227,9 @@ public abstract class JoglTextureUtil {
             case RGB10A2:
             case RGBA12:
             case RGBA16:
-            case RGBA_TO_DXT1:
+            case CompressedRGBA:
             case NativeDXT1A:
-            case RGBA_TO_DXT3:
             case NativeDXT3:
-            case RGBA_TO_DXT5:
             case NativeDXT5:
             case RGBA16F:
             case RGBA32F:
@@ -231,7 +241,7 @@ public abstract class JoglTextureUtil {
             case RGB10:
             case RGB12:
             case RGB16:
-            case RGB_TO_DXT1:
+            case CompressedRGB:
             case NativeDXT1:
             case RGB16F:
             case RGB32F:
@@ -249,6 +259,8 @@ public abstract class JoglTextureUtil {
             case Luminance16:
             case Luminance16F:
             case Luminance32F:
+            case CompressedLuminance:
+            case NativeLATC_L:
                 return GL.GL_LUMINANCE;
             case Intensity4:
             case Intensity8:
@@ -265,6 +277,8 @@ public abstract class JoglTextureUtil {
             case Luminance16Alpha16:
             case LuminanceAlpha16F:
             case LuminanceAlpha32F:
+            case CompressedLuminanceAlpha:
+            case NativeLATC_LA:
                 return GL.GL_LUMINANCE_ALPHA;
             case Depth16:
             case Depth24:

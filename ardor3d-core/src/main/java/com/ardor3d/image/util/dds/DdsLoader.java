@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.ImageLoader;
 import com.ardor3d.util.LittleEndianDataInput;
 import com.ardor3d.util.geom.BufferUtils;
@@ -37,6 +38,7 @@ import com.google.common.collect.Lists;
  * <li>DXT1A</li>
  * <li>DXT3</li>
  * <li>DXT5</li>
+ * <li>LATC</li>
  * </ul>
  * Uncompressed:<br>
  * <ul>
@@ -46,7 +48,8 @@ import com.google.common.collect.Lists;
  * <li>LuminanceAlpha</li>
  * <li>Alpha</li>
  * </ul>
- * Note that Cubemaps must have all 6 faces defined to load properly.
+ * Note that Cubemaps must have all 6 faces defined to load properly. FIXME: Needs a software inflater for compressed
+ * formats in cases where support is not present?  Maybe JSquish?
  */
 public class DdsLoader implements ImageLoader {
     private static final Logger logger = Logger.getLogger(DdsLoader.class.getName());
@@ -160,10 +163,21 @@ public class DdsLoader implements ImageLoader {
             }
 
             // DXT10 info present...
-            else if (fourCC == getInt("DXT10")) {
-                logger.finest("DDS format: DXT10");
-                // TODO: supply this
-                throw new Error("DXT10 not yet supported.");
+            else if (fourCC == getInt("DX10")) {
+                switch (info.headerDX10.dxgiFormat) {
+                    case DXGI_FORMAT_BC4_UNORM:
+                        logger.finest("DXGI format: BC4_UNORM");
+                        info.bpp = 4;
+                        image.setFormat(Format.NativeLATC_L);
+                        break;
+                    case DXGI_FORMAT_BC5_UNORM:
+                        logger.finest("DXGI format: BC5_UNORM");
+                        info.bpp = 8;
+                        image.setFormat(Format.NativeLATC_LA);
+                        break;
+                    default:
+                        throw new Error("dxgiFormat not supported: " + info.headerDX10.dxgiFormat);
+                }
             }
 
             // DXT2 format - unsupported

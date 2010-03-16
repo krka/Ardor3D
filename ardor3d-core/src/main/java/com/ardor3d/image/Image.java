@@ -171,21 +171,21 @@ public class Image implements Serializable, Savable {
          */
         RGBA16,
         /**
-         * 8 bits per red, green and blue. Compressed and stored by the card in DXT1 format.
+         * RGB, potentially compressed and stored by the card.
          */
-        RGB_TO_DXT1,
+        CompressedRGB,
         /**
-         * 8 bits per red, green, blue and alpha. Compressed and stored by the card in DXT1 format.
+         * RGBA, potentially compressed and stored by the card.
          */
-        RGBA_TO_DXT1,
+        CompressedRGBA,
         /**
-         * 8 bits per red, green, blue and alpha. Compressed and stored by the card in DXT3 format.
+         * Luminance, potentially compressed and stored by the card.
          */
-        RGBA_TO_DXT3,
+        CompressedLuminance,
         /**
-         * 8 bits per red, green, blue and alpha. Compressed and stored by the card in DXT5 format.
+         * LuminanceAlpha, potentially compressed and stored by the card.
          */
-        RGBA_TO_DXT5,
+        CompressedLuminanceAlpha,
         /**
          * Image data already in DXT1 format.
          */
@@ -202,6 +202,14 @@ public class Image implements Serializable, Savable {
          * Image data already in DXT5 format.
          */
         NativeDXT5,
+        /**
+         * Image data already in LATC format - Luminance only
+         */
+        NativeLATC_L,
+        /**
+         * Image data already in LATC format - Luminance+Alpha
+         */
+        NativeLATC_LA,
         /**
          * 16 bit depth component format
          */
@@ -632,10 +640,9 @@ public class Image implements Serializable, Savable {
             case Luminance4Alpha4:
             case Luminance6Alpha2:
 
-            case RGBA_TO_DXT1: // DXT1 = 1/8 * blocksize of 8 (.125 * 8 == 1)
+            case NativeDXT1: // DXT1 = 1/8 * blocksize of 8 (.125 * 8 == 1)
             case NativeDXT1A:
-            case RGB_TO_DXT1:
-            case NativeDXT1:
+            case NativeLATC_L:
                 return 1;
 
             case R3G3B2: // (usually forced to 2 byte by the card)
@@ -657,10 +664,9 @@ public class Image implements Serializable, Savable {
             case Luminance8Alpha8:
             case Luminance12Alpha4:
 
-            case RGBA_TO_DXT3: // DXT3,5 = 1/8 * blocksize of 16 (.125 * 16 == 2)
-            case NativeDXT3:
-            case RGBA_TO_DXT5:
+            case NativeDXT3: // DXT3,5 = 1/8 * blocksize of 16 (.125 * 16 == 2)
             case NativeDXT5:
+            case NativeLATC_LA:
             case Depth16:
                 return 2;
 
@@ -698,6 +704,12 @@ public class Image implements Serializable, Savable {
 
             case RGBA32F:
                 return 16;
+
+            case CompressedLuminance: // FIXME: implement something real here?
+            case CompressedLuminanceAlpha:
+            case CompressedRGB:
+            case CompressedRGBA:
+                return 2;
         }
         throw new IllegalArgumentException("unknown image format type: " + format);
     }
