@@ -12,13 +12,14 @@ package com.ardor3d.util.screen;
 
 import java.nio.ByteBuffer;
 
-import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
 
 public interface ScreenExportable {
 
     /**
-     * Export the image data we are given in a manner of our choosing. Note that this data object should be treated as
-     * immutable and temporary. If you need access to it after returning from the method, make a copy.
+     * Export the given image data (byte buffer) in a manner of our choosing. Note that this byte buffer should be
+     * treated by the implementing class as immutable and temporary. If you need access to it after returning from the
+     * method, make a copy.
      * 
      * @param data
      *            the data from the screen. Please respect the data's limit() value.
@@ -29,8 +30,8 @@ public interface ScreenExportable {
 
     /**
      * 
-     * @return the image format we care about using on the next export.
+     * @return the image data format we'd like to pull in.
      */
-    public Image.Format getFormat();
+    public ImageDataFormat getFormat();
 
 }

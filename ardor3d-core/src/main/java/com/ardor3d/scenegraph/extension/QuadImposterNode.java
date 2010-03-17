@@ -18,6 +18,7 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -340,6 +341,7 @@ public class QuadImposterNode extends Node {
         _texture.setWrap(Texture.WrapMode.EdgeClamp);
         _texture.setMinificationFilter(Texture.MinificationFilter.BilinearNoMipMaps);
         _texture.setMagnificationFilter(Texture.MagnificationFilter.Bilinear);
+        _texture.setTextureStoreFormat(TextureStoreFormat.RGBA8);
         _tRenderer.setupTexture(_texture);
         final TextureState ts = new TextureState();
         ts.setEnabled(true);

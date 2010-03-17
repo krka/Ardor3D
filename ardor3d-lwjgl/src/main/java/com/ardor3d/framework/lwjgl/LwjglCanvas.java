@@ -25,6 +25,8 @@ import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.input.FocusWrapper;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
@@ -210,12 +212,17 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
         final ByteBuffer[] iconData = new ByteBuffer[iconImages.length];
         for (int i = 0; i < iconData.length; i++) {
             // Image.Format.RGBA8 is the format that LWJGL requires, so try to convert if it's not.
-            if (iconImages[i].getFormat() != Image.Format.RGBA8) {
-                try {
-                    iconImages[i] = _RGB888_to_RGBA8888(iconImages[i]);
-                } catch (final Ardor3dException ex) {
-                    throw new Ardor3dException("Your icon is in a format that could not be converted to RGBA8", ex);
+            if (iconImages[i].getDataType() != ImageDataType.UnsignedByte) {
+                throw new Ardor3dException(
+                        "Your icon is in a format that could not be converted to UnsignedByte - RGBA");
+            }
+
+            if (iconImages[i].getDataFormat() != ImageDataFormat.RGBA) {
+                if (iconImages[i].getDataFormat() != ImageDataFormat.RGB) {
+                    throw new Ardor3dException(
+                            "Your icon is in a format that could not be converted to UnsignedByte - RGBA");
                 }
+                iconImages[i] = _RGB888_to_RGBA8888(iconImages[i]);
             }
 
             iconData[i] = iconImages[i].getData(0);
@@ -238,7 +245,8 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
                 rgba8888.put(rgb.get());
             }
         }
-        return new Image(Image.Format.RGBA8, rgb888.getWidth(), rgb888.getHeight(), rgba8888);
+        return new Image(ImageDataFormat.RGBA, ImageDataType.UnsignedByte, rgb888.getWidth(), rgb888.getHeight(),
+                rgba8888, null);
     }
 
     public void setTitle(final String title) {

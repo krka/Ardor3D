@@ -18,7 +18,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.util.GeneratedImageFactory;
@@ -57,18 +57,22 @@ public class Texture3DExample extends ExampleBase {
     private Texture createTexture() {
         final Texture3D tex = new Texture3D();
         tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-        tex.setTextureKey(TextureKey.getKey(null, false, Format.RGBA8, MinificationFilter.BilinearNoMipMaps));
+        tex.setTextureKey(TextureKey
+                .getKey(null, false, TextureStoreFormat.RGBA8, MinificationFilter.BilinearNoMipMaps));
         final Image img = new Image();
         img.setWidth(32);
         img.setHeight(32);
         img.setDepth(32);
-        img.setFormat(Format.RGB8);
 
         final List<ByteBuffer> data = Lists.newArrayList();
         for (int i = 0; i < 32; i++) {
             final Image colorImage = GeneratedImageFactory
                     .createSolidColorImage(ColorRGBA.randomColor(null), false, 32);
             data.add(colorImage.getData(0));
+            if (i == 0) {
+                img.setDataFormat(colorImage.getDataFormat());
+                img.setDataType(colorImage.getDataType());
+            }
         }
         img.setData(data);
         tex.setImage(img);

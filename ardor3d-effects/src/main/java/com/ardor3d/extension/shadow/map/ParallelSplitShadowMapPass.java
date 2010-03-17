@@ -18,9 +18,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.DepthTextureCompareFunc;
 import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
@@ -352,7 +352,7 @@ public class ParallelSplitShadowMapPass extends Pass {
             _shadowMapTexture[i].setBorderColor(ColorRGBA.WHITE);
 
             _shadowMapTexture[i].setEnvironmentalMapMode(Texture.EnvironmentalMapMode.EyeLinear);
-            _shadowMapTexture[i].setRenderToTextureFormat(Image.Format.Depth24);
+            _shadowMapTexture[i].setTextureStoreFormat(TextureStoreFormat.Depth24);
             _shadowMapTexture[i].setDepthCompareMode(DepthTextureCompareMode.RtoTexture);
             _shadowMapTexture[i].setDepthCompareFunc(DepthTextureCompareFunc.GreaterThanEqual);
             _shadowMapTexture[i].setDepthMode(DepthTextureMode.Alpha);

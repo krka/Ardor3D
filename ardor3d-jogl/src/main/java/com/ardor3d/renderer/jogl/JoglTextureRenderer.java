@@ -86,12 +86,12 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
         JoglTextureStateUtil.doTextureBind(tex, 0, true);
-        final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
-        final int pixFormat = JoglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
-        final int pixDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
 
         // Initialize our texture with some default data.
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType, null);
+        final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, GL.GL_UNSIGNED_BYTE, null);
 
         // Initialize mipmapping for this texture, if requested
         if (tex.getMinificationFilter().usesMipMapLevels()) {
@@ -164,7 +164,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
             final LinkedList<Texture> colors = new LinkedList<Texture>();
             for (int i = 0; i < texs.size(); i++) {
                 final Texture tex = texs.get(i);
-                if (tex.getRenderToTextureFormat().isDepthFormat()) {
+                if (tex.getTextureStoreFormat().isDepthFormat()) {
                     depths.add(tex);
                 } else {
                     colors.add(tex);
@@ -238,7 +238,11 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
 
-        if (tex.getRenderToTextureFormat().isDepthFormat()) {
+        if (tex.getTextureStoreFormat().isDepthFormat()) {
+            // No color buffer
+            gl.glFramebufferRenderbufferEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_RENDERBUFFER_EXT,
+                    0);
+
             // Setup depth texture into FBO
             gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_DEPTH_ATTACHMENT_EXT, GL.GL_TEXTURE_2D,
                     textureId, 0);

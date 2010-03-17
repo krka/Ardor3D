@@ -48,13 +48,19 @@ public class ColladaImporter {
     private boolean _loadAnimations = true;
     private ResourceLocator _textureLocator;
     private ResourceLocator _modelLocator;
+    private boolean _compressTextures = false;
 
-    public ColladaImporter loadTextures(final boolean loadTextures) {
+    public ColladaImporter setLoadTextures(final boolean loadTextures) {
         _loadTextures = loadTextures;
         return this;
     }
 
-    public ColladaImporter loadAnimations(final boolean loadAnimations) {
+    public ColladaImporter setCompressTextures(final boolean compressTextures) {
+        _compressTextures = compressTextures;
+        return this;
+    }
+
+    public ColladaImporter setLoadAnimations(final boolean loadAnimations) {
         _loadAnimations = loadAnimations;
         return this;
     }
@@ -105,7 +111,7 @@ public class ColladaImporter {
         final DataCache dataCache = new DataCache();
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
         final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(_loadTextures, dataCache,
-                colladaDOMUtil, _textureLocator);
+                colladaDOMUtil, _textureLocator, _compressTextures);
         final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils);
         final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
                 colladaMeshUtils);

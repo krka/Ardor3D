@@ -90,12 +90,12 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
         JoglTextureStateUtil.doTextureBind(tex, 0, true);
-        final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
-        final int pixFormat = JoglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
-        final int pixDataType = JoglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
 
         // Initialize our texture with some default data.
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType, null);
+        final int internalFormat = JoglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = JoglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, GL.GL_UNSIGNED_BYTE, null);
 
         // Setup filtering and wrap
         final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
@@ -121,7 +121,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 initPbuffer();
             }
 
-            if (_useDirectRender && !tex.getRenderToTextureFormat().isDepthFormat()) {
+            if (_useDirectRender && !tex.getTextureStoreFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexture();
                 activate();
@@ -177,7 +177,7 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
                 initPbuffer();
             }
 
-            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
+            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getTextureStoreFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 JoglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();

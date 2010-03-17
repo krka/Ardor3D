@@ -22,8 +22,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.image.util.ImageLoader;
+import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.util.LittleEndianDataInput;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -49,7 +51,7 @@ import com.google.common.collect.Lists;
  * <li>Alpha</li>
  * </ul>
  * Note that Cubemaps must have all 6 faces defined to load properly. FIXME: Needs a software inflater for compressed
- * formats in cases where support is not present?  Maybe JSquish?
+ * formats in cases where support is not present? Maybe JSquish?
  */
 public class DdsLoader implements ImageLoader {
     private static final Logger logger = Logger.getLogger(DdsLoader.class.getName());
@@ -141,10 +143,10 @@ public class DdsLoader implements ImageLoader {
                 // if (isSet(flags, DdsPixelFormat.DDPF_ALPHAPIXELS)) {
                 // XXX: many authoring tools do not set alphapixels, so we'll error on the side of alpha
                 logger.finest("DDS format: DXT1A");
-                image.setFormat(Image.Format.NativeDXT1A);
+                image.setDataFormat(ImageDataFormat.PrecompressedDXT1A);
                 // } else {
                 // logger.finest("DDS format: DXT1");
-                // image.setFormat(Image.Format.NativeDXT1);
+                // image.setDataFormat(ImageDataFormat.PrecompressedDXT1);
                 // }
             }
 
@@ -152,14 +154,14 @@ public class DdsLoader implements ImageLoader {
             else if (fourCC == getInt("DXT3")) {
                 logger.finest("DDS format: DXT3");
                 info.bpp = 8;
-                image.setFormat(Image.Format.NativeDXT3);
+                image.setDataFormat(ImageDataFormat.PrecompressedDXT3);
             }
 
             // DXT5 format
             else if (fourCC == getInt("DXT5")) {
                 logger.finest("DDS format: DXT5");
                 info.bpp = 8;
-                image.setFormat(Image.Format.NativeDXT5);
+                image.setDataFormat(ImageDataFormat.PrecompressedDXT5);
             }
 
             // DXT10 info present...
@@ -168,12 +170,12 @@ public class DdsLoader implements ImageLoader {
                     case DXGI_FORMAT_BC4_UNORM:
                         logger.finest("DXGI format: BC4_UNORM");
                         info.bpp = 4;
-                        image.setFormat(Format.NativeLATC_L);
+                        image.setDataFormat(ImageDataFormat.PrecompressedLATC_L);
                         break;
                     case DXGI_FORMAT_BC5_UNORM:
                         logger.finest("DXGI format: BC5_UNORM");
                         info.bpp = 8;
-                        image.setFormat(Format.NativeLATC_LA);
+                        image.setDataFormat(ImageDataFormat.PrecompressedLATC_LA);
                         break;
                     default:
                         throw new Error("dxgiFormat not supported: " + info.headerDX10.dxgiFormat);
@@ -202,6 +204,7 @@ public class DdsLoader implements ImageLoader {
         else {
             // TODO: more use of bit masks?
             // TODO: Use bit size instead of hardcoded 8 bytes? (need to also implement in readUncompressed)
+            image.setDataType(ImageDataType.UnsignedByte);
 
             info.bpp = info.header.ddpf.dwRGBBitCount;
 
@@ -209,10 +212,10 @@ public class DdsLoader implements ImageLoader {
             if (rgb) {
                 if (alphaPixels) {
                     logger.finest("DDS format: uncompressed rgba");
-                    image.setFormat(Image.Format.RGBA8);
+                    image.setDataFormat(ImageDataFormat.RGBA);
                 } else {
                     logger.finest("DDS format: uncompressed rgb ");
-                    image.setFormat(Image.Format.RGB8);
+                    image.setDataFormat(ImageDataFormat.RGB);
                 }
             }
 
@@ -220,17 +223,17 @@ public class DdsLoader implements ImageLoader {
             else if (lum || alphaPixels) {
                 if (lum && alphaPixels) {
                     logger.finest("DDS format: uncompressed LumAlpha");
-                    image.setFormat(Image.Format.Luminance8Alpha8);
+                    image.setDataFormat(ImageDataFormat.LuminanceAlpha);
                 }
 
                 else if (lum) {
                     logger.finest("DDS format: uncompressed Lum");
-                    image.setFormat(Image.Format.Luminance8);
+                    image.setDataFormat(ImageDataFormat.Luminance);
                 }
 
                 else if (alpha) {
                     logger.finest("DDS format: uncompressed Alpha");
-                    image.setFormat(Image.Format.Alpha8);
+                    image.setDataFormat(ImageDataFormat.Alpha);
                 }
             } // end luminance/alpha type
 
@@ -279,7 +282,7 @@ public class DdsLoader implements ImageLoader {
             if (!info.flipVertically) {
                 buffer.put(data);
             } else {
-                final byte[] flipped = flipDXT(data, mipWidth, mipHeight, image.getFormat());
+                final byte[] flipped = flipDXT(data, mipWidth, mipHeight, image.getDataFormat());
                 buffer.put(flipped);
 
                 mipWidth = Math.max(mipWidth / 2, 1);
@@ -299,7 +302,7 @@ public class DdsLoader implements ImageLoader {
         final int alphaShift = shiftCount(info.header.ddpf.dwABitMask);
 
         final int sourcebytesPP = info.header.ddpf.dwRGBBitCount / 8;
-        final int targetBytesPP = Image.getEstimatedByteSize(image.getFormat());
+        final int targetBytesPP = ImageUtils.getPixelByteSize(image.getDataFormat(), image.getDataType());
 
         final ByteBuffer dataBuffer = BufferUtils.createByteBuffer(totalSize);
 

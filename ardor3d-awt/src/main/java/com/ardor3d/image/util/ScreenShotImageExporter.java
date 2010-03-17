@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.util.screen.ScreenExportable;
 
 public class ScreenShotImageExporter implements ScreenExportable {
@@ -107,11 +107,11 @@ public class ScreenShotImageExporter implements ScreenExportable {
         }
     }
 
-    public Format getFormat() {
+    public ImageDataFormat getFormat() {
         if (_useAlpha) {
-            return Format.RGBA8;
+            return ImageDataFormat.RGBA;
         } else {
-            return Format.RGB8;
+            return ImageDataFormat.RGB;
         }
     }
 

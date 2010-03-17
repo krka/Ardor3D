@@ -27,8 +27,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
@@ -390,7 +390,8 @@ public class BMFont {
             if (_useMipMaps) {
                 minFilter = Texture.MinificationFilter.Trilinear;
             }
-            final TextureKey tkey = TextureKey.getKey(texSrc, false, Image.Format.GuessNoCompression, minFilter);
+            final TextureKey tkey = TextureKey.getKey(texSrc, false, TextureStoreFormat.GuessNoCompressedFormat,
+                    minFilter);
             _pageTexture = TextureManager.loadFromKey(tkey, null, null);
             _pageTexture.setMagnificationFilter(magFilter);
 

@@ -18,7 +18,7 @@ import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.layout.UILayout;
 import com.ardor3d.extension.ui.util.UIQuad;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture.WrapMode;
@@ -483,7 +483,7 @@ public abstract class UIContainer extends UIComponent {
         _fakeTexture = new Texture2D();
         _fakeTexture.setMagnificationFilter(MagnificationFilter.Bilinear);
         _fakeTexture.setMinificationFilter(_minificationFilter);
-        _fakeTexture.setRenderToTextureFormat(Format.RGBA8);
+        _fakeTexture.setTextureStoreFormat(TextureStoreFormat.RGBA8);
         _fakeTexture.setWrap(WrapMode.EdgeClamp);
         UIContainer._textureRenderer.setupTexture(_fakeTexture);
 

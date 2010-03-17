@@ -13,7 +13,6 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.util.TextureProjector;
 import com.ardor3d.math.ColorRGBA;
@@ -81,7 +80,7 @@ public class TextureProjectionExample extends ExampleBase {
         // Add a texture to the scene.
         final TextureState ts = new TextureState();
         projectedTexture = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true);
+                true);
         ts.setTexture(projectedTexture);
         projectedTexture.setTextureMatrix(new Matrix4());
         projectedTexture.setWrap(Texture.WrapMode.BorderClamp);

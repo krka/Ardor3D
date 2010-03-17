@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -430,10 +432,11 @@ public final class TgaLoader implements ImageLoader {
         // Create the ardor3d.image.Image object
         final com.ardor3d.image.Image textureImage = new com.ardor3d.image.Image();
         if (dl == 4) {
-            textureImage.setFormat(com.ardor3d.image.Image.Format.RGBA8);
+            textureImage.setDataFormat(ImageDataFormat.RGBA);
         } else {
-            textureImage.setFormat(com.ardor3d.image.Image.Format.RGB8);
+            textureImage.setDataFormat(ImageDataFormat.RGB);
         }
+        textureImage.setDataType(ImageDataType.UnsignedByte);
         textureImage.setWidth(width);
         textureImage.setHeight(height);
         textureImage.setData(scratch);

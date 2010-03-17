@@ -12,8 +12,9 @@ package com.ardor3d.scene.state.jogl.util;
 
 import javax.media.opengl.GL;
 
-import com.ardor3d.image.Image;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionAlpha;
 import com.ardor3d.image.Texture.CombinerFunctionRGB;
@@ -25,25 +26,11 @@ import com.ardor3d.image.Texture.DepthTextureCompareMode;
 import com.ardor3d.image.Texture.DepthTextureMode;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.state.TextureState.CorrectionType;
 
 public abstract class JoglTextureUtil {
-    public static boolean isCompressedType(final Format format) {
-        switch (format) {
-            case NativeDXT1:
-            case NativeDXT1A:
-            case NativeDXT3:
-            case NativeDXT5:
-            case NativeLATC_L:
-            case NativeLATC_LA:
-                return true;
-            default:
-                return false;
-        }
-    }
 
-    public static int getGLInternalFormat(final Format format) {
+    public static int getGLInternalFormat(final TextureStoreFormat format) {
         switch (format) {
             // first some frequently used formats
             case RGBA8:
@@ -132,12 +119,16 @@ public abstract class JoglTextureUtil {
                 return GL.GL_RGBA12;
             case RGBA16:
                 return GL.GL_RGBA16;
+            case Depth:
+                return GL.GL_DEPTH_COMPONENT;
             case Depth16:
                 return GL.GL_DEPTH_COMPONENT16_ARB;
             case Depth24:
                 return GL.GL_DEPTH_COMPONENT24_ARB;
             case Depth32:
                 return GL.GL_DEPTH_COMPONENT32_ARB;
+            case Depth32F:
+                return GL.GL_DEPTH_COMPONENT32F_NV;
             case RGB16F:
                 return GL.GL_RGB16F_ARB;
             case RGB32F:
@@ -166,59 +157,64 @@ public abstract class JoglTextureUtil {
         throw new IllegalArgumentException("Incorrect format set: " + format);
     }
 
-    public static int getGLPixelDataType(final Format format) {
-        switch (format) {
-            case RGBA16F:
-            case RGB16F:
-            case Alpha16F:
-            case Luminance16F:
-            case Intensity16F:
-            case LuminanceAlpha16F:
-                return GL.GL_HALF_FLOAT_ARB;
-            case RGBA32F:
-            case RGB32F:
-            case Alpha32F:
-            case Luminance32F:
-            case Intensity32F:
-            case LuminanceAlpha32F:
+    public static int getGLPixelDataType(final ImageDataType type) {
+        switch (type) {
+            case Byte:
+                return GL.GL_BYTE;
+            case Float:
                 return GL.GL_FLOAT;
-            case Alpha16:
-            case Luminance16:
-            case Luminance16Alpha16:
-            case Intensity16:
-            case RGB16:
-            case RGBA16:
-            case Depth16:
+            case HalfFloat:
+                return GL.GL_HALF_FLOAT_ARB;
+            case Short:
                 return GL.GL_SHORT;
-            default:
+            case UnsignedShort:
+                return GL.GL_UNSIGNED_SHORT;
+            case Int:
+                return GL.GL_INT;
+            case UnsignedInt:
+                return GL.GL_UNSIGNED_INT;
+            case UnsignedByte:
                 return GL.GL_UNSIGNED_BYTE;
+            default:
+                throw new Error("Unhandled type: " + type);
         }
     }
 
-    public static int getGLPixelFormat(final Format requestedFormat, final Format imageFormat,
-            final ContextCapabilities caps) {
-        if (requestedFormat != Image.Format.GuessNoCompression && requestedFormat != Image.Format.Guess) {
-            // If we specified a precise format, return that one.
-            return getGLPixelFormat(requestedFormat);
-
-        } else if (requestedFormat == Image.Format.Guess && caps.isGenericTCSupported()) {
-            if (imageFormat == Image.Format.RGB8) {
-                return getGLPixelFormat(Image.Format.CompressedRGB);
-            } else if (imageFormat == Image.Format.RGBA8) {
-                return getGLPixelFormat(Image.Format.CompressedRGBA);
-            } else if (imageFormat == Image.Format.Luminance8) {
-                return getGLPixelFormat(Image.Format.CompressedLuminance);
-            } else if (imageFormat == Image.Format.Luminance8Alpha8) {
-                return getGLPixelFormat(Image.Format.CompressedLuminanceAlpha);
-            }
+    public static int getGLPixelFormat(final ImageDataFormat format) {
+        switch (format) {
+            case RGBA:
+                return GL.GL_RGBA;
+            case RGB:
+                return GL.GL_RGB;
+            case Alpha:
+                return GL.GL_ALPHA;
+            case Luminance:
+                return GL.GL_LUMINANCE;
+            case Intensity:
+                return GL.GL_INTENSITY;
+            case LuminanceAlpha:
+                return GL.GL_LUMINANCE_ALPHA;
+            case Depth:
+                return GL.GL_DEPTH_COMPONENT;
+            case BGR:
+                return GL.GL_BGR;
+            case BGRA:
+                return GL.GL_BGRA;
+            case Red:
+                return GL.GL_RED;
+            case Blue:
+                return GL.GL_BLUE;
+            case Green:
+                return GL.GL_GREEN;
+            case ColorIndex:
+                return GL.GL_COLOR_INDEX;
+            case StencilIndex:
+                return GL.GL_STENCIL_INDEX;
         }
-
-        // requested format was GuessNoCompression, or we don't support compression, or it's a format we don't compress,
-        // so just use image format.
-        return getGLPixelFormat(imageFormat);
+        throw new IllegalArgumentException("Incorrect format set: " + format);
     }
 
-    public static int getGLPixelFormat(final Format format) {
+    public static int getGLPixelFormatFromStoreFormat(final TextureStoreFormat format) {
         switch (format) {
             case RGBA2:
             case RGBA4:
@@ -280,9 +276,11 @@ public abstract class JoglTextureUtil {
             case CompressedLuminanceAlpha:
             case NativeLATC_LA:
                 return GL.GL_LUMINANCE_ALPHA;
+            case Depth:
             case Depth16:
             case Depth24:
             case Depth32:
+            case Depth32F:
                 return GL.GL_DEPTH_COMPONENT;
         }
         throw new IllegalArgumentException("Incorrect format set: " + format);
@@ -517,57 +515,5 @@ public abstract class JoglTextureUtil {
                 return GL.GL_DOT3_RGBA;
         }
         throw new IllegalArgumentException("invalid CombinerFunctionRGB type: " + combineFunc);
-    }
-
-    public static int bytesPerPixel(final int format, final int type) {
-        int n, m;
-
-        switch (format) {
-            case GL.GL_COLOR_INDEX:
-            case GL.GL_STENCIL_INDEX:
-            case GL.GL_DEPTH_COMPONENT:
-            case GL.GL_RED:
-            case GL.GL_GREEN:
-            case GL.GL_BLUE:
-            case GL.GL_ALPHA:
-            case GL.GL_LUMINANCE:
-                n = 1;
-                break;
-            case GL.GL_LUMINANCE_ALPHA:
-                n = 2;
-                break;
-            case GL.GL_RGB:
-            case GL.GL_BGR:
-                n = 3;
-                break;
-            case GL.GL_RGBA:
-            case GL.GL_BGRA:
-                n = 4;
-                break;
-            default:
-                n = 0;
-        }
-
-        switch (type) {
-            case GL.GL_UNSIGNED_BYTE:
-            case GL.GL_BYTE:
-            case GL.GL_BITMAP:
-                m = 1;
-                break;
-            case GL.GL_UNSIGNED_SHORT:
-            case GL.GL_SHORT:
-            case GL.GL_HALF_FLOAT_ARB:
-                m = 2;
-                break;
-            case GL.GL_UNSIGNED_INT:
-            case GL.GL_INT:
-            case GL.GL_FLOAT:
-                m = 4;
-                break;
-            default:
-                m = 0;
-        }
-
-        return n * m;
     }
 }

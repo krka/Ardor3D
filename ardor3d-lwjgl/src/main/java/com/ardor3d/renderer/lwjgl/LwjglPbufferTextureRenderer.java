@@ -11,7 +11,6 @@
 package com.ardor3d.renderer.lwjgl;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 import java.util.logging.Level;
@@ -100,18 +99,13 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
         LwjglTextureStateUtil.doTextureBind(tex, 0, true);
-        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
-        final int pixFormat = LwjglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
-        final int pixDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
 
         // Initialize our texture with some default data.
-        if (pixDataType == GL11.GL_UNSIGNED_BYTE) {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
-                    (ByteBuffer) null);
-        } else {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
-                    (FloatBuffer) null);
-        }
+        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = LwjglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, GL11.GL_UNSIGNED_BYTE,
+                (ByteBuffer) null);
 
         // Setup filtering and wrap
         final TextureRecord texRecord = record.getTextureRecord(textureId, tex.getType());
@@ -142,7 +136,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 initPbuffer();
             }
 
-            if (_useDirectRender && !tex.getRenderToTextureFormat().isDepthFormat()) {
+            if (_useDirectRender && !tex.getTextureStoreFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 _pbuffer.releaseTexImage(Pbuffer.FRONT_LEFT_BUFFER);
                 activate();
@@ -203,7 +197,7 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 initPbuffer();
             }
 
-            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getRenderToTextureFormat().isDepthFormat()) {
+            if (texs.size() == 1 && _useDirectRender && !texs.get(0).getTextureStoreFormat().isDepthFormat()) {
                 // setup and render directly to a 2d texture.
                 LwjglTextureStateUtil.doTextureBind(texs.get(0), 0, true);
                 activate();

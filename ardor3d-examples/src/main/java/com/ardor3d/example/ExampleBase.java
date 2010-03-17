@@ -29,7 +29,7 @@ import com.ardor3d.framework.jogl.JoglCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.image.util.ScreenShotImageExporter;
 import com.ardor3d.input.GrabbedState;
@@ -281,7 +281,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
         if (_showDepth) {
             renderer.renderBuckets();
-            Debugger.drawBuffer(Format.Depth16, Debugger.NORTHEAST, renderer);
+            Debugger.drawBuffer(TextureStoreFormat.Depth16, Debugger.NORTHEAST, renderer);
         }
     }
 

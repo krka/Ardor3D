@@ -14,6 +14,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.ardor3d.annotation.Immutable;
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -27,8 +29,8 @@ public class MouseCursor {
      * This constant is used to identify that the native operating system's default cursor should be used. It is not a
      * valid mouse cursor in itself.
      */
-    public static final MouseCursor SYSTEM_DEFAULT = new MouseCursor("system default", new Image(Image.Format.Guess, 1,
-            1, BufferUtils.createByteBuffer(1)), 0, 0);
+    public static final MouseCursor SYSTEM_DEFAULT = new MouseCursor("system default", new Image(ImageDataFormat.RGBA,
+            ImageDataType.UnsignedByte, 1, 1, BufferUtils.createByteBuffer(4), null), 0, 0);
 
     private final String _name;
     private final Image _image;

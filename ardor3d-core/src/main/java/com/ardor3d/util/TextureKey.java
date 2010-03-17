@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.util.export.InputCapsule;
@@ -39,8 +38,8 @@ final public class TextureKey implements Savable {
     /** Whether we had asked the loader of the image to flip vertically. */
     protected boolean _flipped;
 
-    /** The format of our image. */
-    protected Image.Format _format = Image.Format.Guess;
+    /** The stored format of our image. */
+    protected TextureStoreFormat _format = TextureStoreFormat.GuessCompressedFormat;
 
     /**
      * An optional id, used to differentiate keys where the rest of the values are the same. RTT operations are a good
@@ -83,22 +82,22 @@ final public class TextureKey implements Savable {
             _uniqueTK.set(Integer.MIN_VALUE);
             val = Integer.MIN_VALUE;
         }
-        return getKey(null, false, Format.Guess, "RTT_" + val, minFilter);
+        return getKey(null, false, TextureStoreFormat.GuessCompressedFormat, "RTT_" + val, minFilter);
     }
 
     public static synchronized TextureKey getKey(final ResourceSource source, final boolean flipped,
-            final Image.Format imageType, final Texture.MinificationFilter minFilter) {
-        return getKey(source, flipped, imageType, null, minFilter);
+            final TextureStoreFormat storeFormat, final Texture.MinificationFilter minFilter) {
+        return getKey(source, flipped, storeFormat, null, minFilter);
     }
 
     public static synchronized TextureKey getKey(final ResourceSource source, final boolean flipped,
-            final Image.Format imageType, final String id, final Texture.MinificationFilter minFilter) {
+            final TextureStoreFormat storeFormat, final String id, final Texture.MinificationFilter minFilter) {
         final TextureKey key = new TextureKey();
 
         key._source = source;
         key._flipped = flipped;
         key._minFilter = minFilter;
-        key._format = imageType;
+        key._format = storeFormat;
         key._id = id;
         key._code = Integer.MAX_VALUE;
 
@@ -244,7 +243,7 @@ final public class TextureKey implements Savable {
         return _minFilter;
     }
 
-    public Image.Format getFormat() {
+    public TextureStoreFormat getFormat() {
         return _format;
     }
 
@@ -284,7 +283,7 @@ final public class TextureKey implements Savable {
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_source, "source", null);
         capsule.write(_flipped, "flipped", false);
-        capsule.write(_format, "format", Image.Format.Guess);
+        capsule.write(_format, "format", TextureStoreFormat.GuessCompressedFormat);
         capsule.write(_minFilter, "minFilter", MinificationFilter.Trilinear);
         capsule.write(_id, "id", null);
     }
@@ -292,7 +291,7 @@ final public class TextureKey implements Savable {
     public void read(final InputCapsule capsule) throws IOException {
         _source = (ResourceSource) capsule.readSavable("source", null);
         _flipped = capsule.readBoolean("flipped", false);
-        _format = capsule.readEnum("format", Image.Format.class, Image.Format.Guess);
+        _format = capsule.readEnum("format", TextureStoreFormat.class, TextureStoreFormat.GuessCompressedFormat);
         _minFilter = capsule.readEnum("minFilter", MinificationFilter.class, MinificationFilter.Trilinear);
         _id = capsule.readString("id", null);
         _code = Integer.MAX_VALUE;

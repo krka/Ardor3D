@@ -14,7 +14,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.Texture.ApplyMode;
 import com.ardor3d.image.Texture.CombinerFunctionRGB;
 import com.ardor3d.image.Texture.CombinerOperandRGB;
@@ -51,7 +50,7 @@ public class TexCombineExample extends ExampleBase {
         _root.attachChild(quad);
 
         final Texture ardorLogo = TextureManager.load("images/ardor3d_white_256.jpg",
-                Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true);
+                Texture.MinificationFilter.Trilinear, true);
         addTexture(ardorLogo, 0, blend);
         quad.setRenderState(ts);
     }

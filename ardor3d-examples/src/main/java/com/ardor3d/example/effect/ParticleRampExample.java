@@ -17,7 +17,7 @@ import com.ardor3d.extension.effect.particle.ParticleFactory;
 import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.effect.particle.RampEntry;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -87,8 +87,8 @@ public class ParticleRampExample extends ExampleBase {
         particles.setRenderState(blend);
 
         final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear, Format.Guess,
-                true));
+        ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
+                TextureStoreFormat.GuessCompressedFormat, true));
         ts.setEnabled(true);
         particles.setRenderState(ts);
 

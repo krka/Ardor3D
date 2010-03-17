@@ -16,7 +16,7 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
@@ -113,7 +113,7 @@ public class ShapesExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.Guess, true));
+                TextureStoreFormat.GuessCompressedFormat, true));
         _root.setRenderState(ts);
 
         final BlendState bs = new BlendState();

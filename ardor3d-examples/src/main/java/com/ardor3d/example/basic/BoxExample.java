@@ -14,7 +14,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -80,8 +79,7 @@ public class BoxExample extends ExampleBase {
 
         // Add a texture to the box.
         final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         box.setRenderState(ts);
 
         // Add a material to the box, to show both vertex color and lighting/shading.

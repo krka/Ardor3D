@@ -19,6 +19,7 @@ import org.lwjgl.input.Mouse;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.MouseCursor;
 import com.ardor3d.input.MouseManager;
@@ -70,7 +71,7 @@ public class LwjglMouseManager implements MouseManager {
 
         final Image image = cursor.getImage();
 
-        final boolean isRgba = image.getFormat() == Image.Format.RGBA8;
+        final boolean isRgba = image.getDataFormat() == ImageDataFormat.RGBA;
         final int imageWidth = image.getWidth();
         final int imageHeight = image.getHeight();
 

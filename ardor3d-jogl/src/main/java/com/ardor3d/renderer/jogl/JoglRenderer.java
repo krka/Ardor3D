@@ -25,7 +25,7 @@ import javax.media.opengl.GLContext;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
-import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -285,12 +285,12 @@ public class JoglRenderer extends AbstractRenderer {
         _inOrthoMode = false;
     }
 
-    public void grabScreenContents(final ByteBuffer buff, final Image.Format format, final int x, final int y,
+    public void grabScreenContents(final ByteBuffer store, final ImageDataFormat format, final int x, final int y,
             final int w, final int h) {
         final GL gl = GLU.getCurrentGL();
 
         final int pixFormat = JoglTextureUtil.getGLPixelFormat(format);
-        gl.glReadPixels(x, y, w, h, pixFormat, GL.GL_UNSIGNED_BYTE, buff);
+        gl.glReadPixels(x, y, w, h, pixFormat, GL.GL_UNSIGNED_BYTE, store);
     }
 
     public void draw(final Spatial s) {
@@ -546,7 +546,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
 
         // Grab pixel format
-        final int pixelFormat = JoglTextureUtil.getGLPixelFormat(destination.getImage().getFormat());
+        final int pixelFormat = JoglTextureUtil.getGLPixelFormat(destination.getImage().getDataFormat());
 
         // bind...
         JoglTextureStateUtil.doTextureBind(destination, 0, false);

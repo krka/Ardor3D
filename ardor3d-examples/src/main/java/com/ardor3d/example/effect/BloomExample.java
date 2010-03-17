@@ -17,9 +17,7 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -106,8 +104,7 @@ public class BloomExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         _root.setRenderState(ts);
 
         final MaterialState ms = new MaterialState();
@@ -263,15 +260,15 @@ public class BloomExample extends ExampleBase {
         });
 
         Texture t0 = TextureManager.load("images/ardor3d_white_256.jpg",
-                Texture.MinificationFilter.BilinearNearestMipMap, Image.Format.GuessNoCompression, true);
+                Texture.MinificationFilter.BilinearNearestMipMap, true);
         ts.setTexture(t0, 0);
         ts.setEnabled(true);
         torus.setRenderState(ts);
         objects.attachChild(torus);
 
         ts = new TextureState();
-        t0 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.BilinearNearestMipMap,
-                Image.Format.GuessNoCompression, true);
+        t0 = TextureManager
+                .load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.BilinearNearestMipMap, true);
         t0.setWrap(Texture.WrapMode.Repeat);
         ts.setTexture(t0);
 
@@ -296,8 +293,8 @@ public class BloomExample extends ExampleBase {
         objects.attachChild(box);
 
         ts = new TextureState();
-        t0 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.BilinearNearestMipMap,
-                Image.Format.GuessNoCompression, true);
+        t0 = TextureManager
+                .load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.BilinearNearestMipMap, true);
         t0.setWrap(Texture.WrapMode.Repeat);
         ts.setTexture(t0);
 

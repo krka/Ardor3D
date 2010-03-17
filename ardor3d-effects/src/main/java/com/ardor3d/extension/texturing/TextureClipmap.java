@@ -18,9 +18,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.math.MathUtils;
@@ -466,8 +468,9 @@ public class TextureClipmap {
         img.setWidth(textureSize);
         img.setHeight(textureSize);
         img.setDepth(textureLevels);
-        img.setFormat(Format.RGB8);
-        textureClipmap.setTextureKey(TextureKey.getKey(null, false, img.getFormat(), textureClipmap
+        img.setDataFormat(ImageDataFormat.RGB);
+        img.setDataType(ImageDataType.UnsignedByte);
+        textureClipmap.setTextureKey(TextureKey.getKey(null, false, TextureStoreFormat.RGB8, textureClipmap
                 .getMinificationFilter()));
 
         for (int l = 0; l < textureLevels; l++) {
@@ -478,7 +481,6 @@ public class TextureClipmap {
             }
         }
         textureClipmap.setImage(img);
-        System.err.println(textureClipmap.getMemoryReq());
 
         return textureClipmap;
     }

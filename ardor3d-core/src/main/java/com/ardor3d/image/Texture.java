@@ -12,9 +12,7 @@ package com.ardor3d.image;
 
 import java.io.IOException;
 
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Vector4;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -454,7 +452,6 @@ public abstract class Texture implements Savable {
     private ApplyMode _apply = ApplyMode.Modulate;
     private MinificationFilter _minificationFilter = MinificationFilter.NearestNeighborNoMipMaps;
     private MagnificationFilter _magnificationFilter = MagnificationFilter.Bilinear;
-    private Image.Format _rttFormat = Format.RGBA8;
 
     private EnvironmentalMapMode _envMapMode = EnvironmentalMapMode.None;
 
@@ -463,7 +460,6 @@ public abstract class Texture implements Savable {
     private Vector4 _envPlaneR = null;
     private Vector4 _envPlaneQ = null;
 
-    private int _memReq = 0;
     private boolean _hasBorder = false;
 
     // The following will only used if apply is set to ApplyMode.Combine
@@ -486,6 +482,7 @@ public abstract class Texture implements Savable {
     private CombinerScale _combineScaleAlpha = CombinerScale.One;
 
     private TextureKey _key = null;
+    private TextureStoreFormat _storeFormat = TextureStoreFormat.RGBA8;
     private transient boolean _storeImage = DEFAULT_STORE_IMAGE;
 
     private DepthTextureCompareMode _depthCompareMode = DepthTextureCompareMode.None;
@@ -495,9 +492,7 @@ public abstract class Texture implements Savable {
     /**
      * Constructor instantiates a new <code>Texture</code> object with default attributes.
      */
-    public Texture() {
-        _memReq = 0;
-    }
+    public Texture() {}
 
     /**
      * sets a color that is used with CombinerSource.Constant
@@ -606,7 +601,6 @@ public abstract class Texture implements Savable {
      */
     public void setImage(final Image image) {
         _image = image;
-        updateMemoryReq();
     }
 
     /**
@@ -1269,13 +1263,12 @@ public abstract class Texture implements Savable {
         rVal.setEnvPlaneR(_envPlaneR);
         rVal.setEnvPlaneQ(_envPlaneQ);
         rVal.setHasBorder(_hasBorder);
+        rVal.setTextureStoreFormat(_storeFormat);
         rVal.setImage(_image); // NOT CLONED.
         rVal.setLodBias(_lodBias);
         rVal.setMinificationFilter(_minificationFilter);
         rVal.setMagnificationFilter(_magnificationFilter);
-        rVal.setRenderToTextureFormat(_rttFormat);
         rVal.setStoreImage(_storeImage);
-        rVal._memReq = _memReq;
         rVal.setTextureMatrix(_texMatrix);
         if (getTextureKey() != null) {
             rVal.setTextureKey(getTextureKey());
@@ -1289,51 +1282,6 @@ public abstract class Texture implements Savable {
 
     public void setTextureMatrix(final ReadOnlyMatrix4 matrix) {
         _texMatrix.set(matrix);
-    }
-
-    /**
-     * @return Returns the Image.Format used to describe the data type that RTT operations will use to draw to this
-     *         texture.
-     */
-    public Format getRenderToTextureFormat() {
-        return _rttFormat;
-    }
-
-    /**
-     * @param rttFormat
-     *            The Image.Format used to describe the data type that RTT operations to use when drawing to this
-     *            texture.
-     * @throws IllegalArgumentException
-     *             if rttFormat is null
-     */
-    public void setRenderToTextureFormat(final Format rttFormat) {
-        if (rttFormat == null) {
-            throw new IllegalArgumentException("invalid RenderToTextureType: null");
-        }
-        _rttFormat = rttFormat;
-    }
-
-    /**
-     * @return the estimated footprint of this texture in bytes
-     */
-    public int getMemoryReq() {
-        return _memReq;
-    }
-
-    public void updateMemoryReq() {
-        if (_image != null) {
-            final int width = _image.getWidth(), height = _image.getHeight(), depth = _image.getDepth();
-            _memReq = width * height * depth;
-            final int bpp = Image.getEstimatedByteSize(_image.getFormat());
-            _memReq *= bpp;
-            if (getMinificationFilter().usesMipMapLevels() || _image.hasMipmaps()) {
-                if (MathUtils.isPowerOfTwo(_image.getWidth()) && MathUtils.isPowerOfTwo(_image.getHeight())) {
-                    _memReq *= 1.33333f;
-                } else {
-                    _memReq *= 2.0f; // XXX: Is this right?
-                }
-            }
-        }
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
@@ -1354,8 +1302,6 @@ public abstract class Texture implements Savable {
         capsule.write(_envPlaneT, "envPlaneT", null);
         capsule.write(_envPlaneR, "envPlaneR", null);
         capsule.write(_envPlaneQ, "envPlaneQ", null);
-        capsule.write(_rttFormat, "rttFormat", Image.Format.RGBA8);
-        capsule.write(_memReq, "memReq", 0);
         capsule.write(_combineFuncRGB, "combineFuncRGB", CombinerFunctionRGB.Replace);
         capsule.write(_combineFuncAlpha, "combineFuncAlpha", CombinerFunctionAlpha.Replace);
         capsule.write(_combineSrc0RGB, "combineSrc0RGB", CombinerSource.CurrentTexture);
@@ -1372,6 +1318,7 @@ public abstract class Texture implements Savable {
         capsule.write(_combineOp2Alpha, "combineOp2Alpha", CombinerOperandAlpha.SourceAlpha);
         capsule.write(_combineScaleRGB, "combineScaleRGB", CombinerScale.One);
         capsule.write(_combineScaleAlpha, "combineScaleAlpha", CombinerScale.One);
+        capsule.write(_storeFormat, "storeFormat", TextureStoreFormat.RGBA8);
         if (!_storeImage) {
             capsule.write(_key, "textureKey", null);
         }
@@ -1402,8 +1349,6 @@ public abstract class Texture implements Savable {
         _envPlaneT = (Vector4) capsule.readSavable("envPlaneT", null);
         _envPlaneR = (Vector4) capsule.readSavable("envPlaneR", null);
         _envPlaneQ = (Vector4) capsule.readSavable("envPlaneQ", null);
-        _rttFormat = capsule.readEnum("rttSource", Image.Format.class, Format.RGBA8);
-        _memReq = capsule.readInt("memReq", 0);
         _combineFuncRGB = capsule.readEnum("combineFuncRGB", CombinerFunctionRGB.class, CombinerFunctionRGB.Replace);
         _combineFuncAlpha = capsule.readEnum("combineFuncAlpha", CombinerFunctionAlpha.class,
                 CombinerFunctionAlpha.Replace);
@@ -1424,6 +1369,7 @@ public abstract class Texture implements Savable {
                 CombinerOperandAlpha.SourceAlpha);
         _combineScaleRGB = capsule.readEnum("combineScaleRGB", CombinerScale.class, CombinerScale.One);
         _combineScaleAlpha = capsule.readEnum("combineScaleAlpha", CombinerScale.class, CombinerScale.One);
+        _storeFormat = capsule.readEnum("storeFormat", TextureStoreFormat.class, TextureStoreFormat.RGBA8);
     }
 
     public Class<? extends Texture> getClassTag() {
@@ -1436,6 +1382,14 @@ public abstract class Texture implements Savable {
 
     public TextureKey getTextureKey() {
         return _key;
+    }
+
+    public void setTextureStoreFormat(final TextureStoreFormat storeFormat) {
+        _storeFormat = storeFormat;
+    }
+
+    public TextureStoreFormat getTextureStoreFormat() {
+        return _storeFormat;
     }
 
     public boolean isStoreImage() {

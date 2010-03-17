@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scenegraph.Spatial;
@@ -28,6 +27,7 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.resource.URLResourceSource;
 
 /**
  * <code>TextureState</code> maintains a texture state for a given node and it's children. The number of states that a
@@ -77,8 +77,8 @@ public class TextureState extends RenderState {
                 defaultTextureLoaded = true;
 
                 try {
-                    _defaultTexture = TextureManager.load(TextureState.class.getResource("notloaded.tga"),
-                            Texture.MinificationFilter.Trilinear, Format.GuessNoCompression, true);
+                    _defaultTexture = TextureManager.load(new URLResourceSource(TextureState.class
+                            .getResource("notloaded.tga")), Texture.MinificationFilter.Trilinear, true);
                 } catch (final Exception e) {
                     logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
                 }

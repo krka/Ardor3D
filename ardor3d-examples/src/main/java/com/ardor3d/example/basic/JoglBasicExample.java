@@ -20,7 +20,6 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.jogl.JoglCanvas;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.MathUtils;
@@ -172,8 +171,7 @@ public class JoglBasicExample implements Scene {
         // Create a texture from the Ardor3D logo.
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         _root.setRenderState(ts);
     }
 

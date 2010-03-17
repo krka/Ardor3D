@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataType;
 import com.google.common.collect.Lists;
 
 /**
@@ -43,7 +44,9 @@ public abstract class SWTImageUtil {
      * multiple layers (for example, in the case of cube maps or 3D textures). The given SWT Color is used to modulate
      * or "tint" the returned image.
      * 
-     * TODO: Add support for more formats.
+     * TODO: Add support for more formats.<br/>
+     * XXX: Note that only images of data type ImageDataType.UnsignedByte and ImageDataFormat of RGB or RGBA are
+     * currently supported.
      * 
      * @param input
      *            the Ardor3D Image to convert
@@ -52,6 +55,9 @@ public abstract class SWTImageUtil {
      * @return the ImageData object(s) created in the conversion
      */
     public static List<ImageData> convertToSWT(final Image input, final Color tint, final double alphaTint) {
+        if (input.getDataType() != ImageDataType.UnsignedByte) {
+            throw new Error("Unhandled Ardor3D image data type: " + input.getDataType());
+        }
         // count the number of layers we will be converting.
         final int size = input.getData().size();
 
@@ -73,11 +79,11 @@ public abstract class SWTImageUtil {
             final ByteBuffer data = input.getData(i);
             data.rewind();
             boolean alpha = false;
-            switch (input.getFormat()) {
-                case RGBA8:
+            switch (input.getDataFormat()) {
+                case RGBA:
                     alpha = true;
                     // Falls through on purpose.
-                case RGB8:
+                case RGB:
                     if (alpha) {
                         // use alpha data... XXX: Is this right?
                         image = new ImageData(width, height, 32, new PaletteData(0xFF0000, 0x00FF00, 0x0000FF));
@@ -117,7 +123,7 @@ public abstract class SWTImageUtil {
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException("Unhandled image format: " + input.getFormat());
+                    throw new Error("Unhandled image data format: " + input.getDataFormat());
             }
 
             // add to our list

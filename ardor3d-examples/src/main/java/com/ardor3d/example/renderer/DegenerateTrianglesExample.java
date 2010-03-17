@@ -17,7 +17,7 @@ import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -84,7 +84,7 @@ public class DegenerateTrianglesExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.Guess, true));
+                TextureStoreFormat.GuessCompressedFormat, true));
 
         final double maxSize = Math.max(xSize, ySize);
         final double requiredDistance = (maxSize / 2)

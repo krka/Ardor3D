@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.functions.Function3D;
@@ -48,8 +50,8 @@ public abstract class GeneratedImageFactory {
             data.put(b);
         }
         data.rewind();
-        final Image.Format fmt = useAlpha ? Image.Format.RGBA8 : Image.Format.RGB8;
-        return new Image(fmt, side, side, data);
+        final ImageDataFormat fmt = useAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB;
+        return new Image(fmt, ImageDataType.UnsignedByte, side, side, data, null);
     }
 
     /**
@@ -74,8 +76,8 @@ public abstract class GeneratedImageFactory {
             }
         }
         data.rewind();
-        final Image.Format fmt = (useAlpha) ? Image.Format.RGBA8 : Image.Format.RGB8;
-        return new Image(fmt, colors.length, 1, data);
+        final ImageDataFormat fmt = (useAlpha) ? ImageDataFormat.RGBA : ImageDataFormat.RGB;
+        return new Image(fmt, ImageDataType.UnsignedByte, colors.length, 1, data, null);
     }
 
     /**
@@ -172,7 +174,7 @@ public abstract class GeneratedImageFactory {
             dataList.add(dataBuf);
         }
 
-        return new Image(Image.Format.Luminance8, width, height, dataList);
+        return new Image(ImageDataFormat.Luminance, ImageDataType.UnsignedByte, width, height, dataList, null);
     }
 
     /**
@@ -217,8 +219,8 @@ public abstract class GeneratedImageFactory {
             dataList.add(out);
         }
 
-        return new Image(useAlpha ? Image.Format.RGBA8 : Image.Format.RGB8, lumImage.getWidth(), lumImage.getHeight(),
-                dataList);
+        return new Image(useAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB, ImageDataType.UnsignedByte, lumImage
+                .getWidth(), lumImage.getHeight(), dataList, null);
     }
 
     /**

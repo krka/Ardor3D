@@ -16,9 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Plane;
@@ -274,7 +274,7 @@ public class WaterNode extends Node {
         tRenderer.setupTexture(textureReflect);
 
         normalmapTexture = TextureManager.load(normalMapTextureString, Texture.MinificationFilter.Trilinear,
-                Image.Format.Guess, true);
+                TextureStoreFormat.GuessCompressedFormat, true);
         textureState.setTexture(normalmapTexture, 0);
         normalmapTexture.setWrap(Texture.WrapMode.Repeat);
 
@@ -287,7 +287,7 @@ public class WaterNode extends Node {
         textureState.setTexture(textureReflectBlur, 1);
 
         dudvTexture = TextureManager.load(dudvMapTextureString, Texture.MinificationFilter.Trilinear,
-                Image.Format.GuessNoCompression, true);
+                TextureStoreFormat.GuessNoCompressedFormat, true);
         matrix = new Matrix4();
         matrix.setValue(0, 0, 0.8);
         matrix.setValue(1, 1, 0.8);
@@ -304,7 +304,7 @@ public class WaterNode extends Node {
             textureDepth = new Texture2D();
             textureDepth.setWrap(Texture.WrapMode.EdgeClamp);
             textureDepth.setMagnificationFilter(Texture.MagnificationFilter.NearestNeighbor);
-            textureDepth.setRenderToTextureFormat(Image.Format.Depth24);
+            textureDepth.setTextureStoreFormat(TextureStoreFormat.Depth24);
             tRenderer.setupTexture(textureDepth);
 
             textureState.setTexture(textureRefract, 3);
@@ -313,7 +313,7 @@ public class WaterNode extends Node {
 
         if (useProjectedShader) {
             foamTexture = TextureManager.load(foamMapTextureString, Texture.MinificationFilter.Trilinear,
-                    Image.Format.Guess, true);
+                    TextureStoreFormat.GuessCompressedFormat, true);
             if (useRefraction) {
                 textureState.setTexture(foamTexture, 5);
             } else {
@@ -333,7 +333,7 @@ public class WaterNode extends Node {
         fallbackTextureState.setEnabled(true);
 
         fallbackTexture = TextureManager.load(fallbackMapTextureString, Texture.MinificationFilter.Trilinear,
-                Image.Format.Guess, true);
+                TextureStoreFormat.GuessCompressedFormat, true);
         fallbackTextureState.setTexture(fallbackTexture, 0);
         fallbackTexture.setWrap(Texture.WrapMode.Repeat);
 
@@ -612,8 +612,6 @@ public class WaterNode extends Node {
         tRenderer.getCamera().update();
         tRenderer.getCamera().getModelViewMatrix();
         tRenderer.getCamera().getProjectionMatrix();
-        final Camera cam1 = cam;
-        final Camera cam2 = tRenderer.getCamera();
 
         tRenderer.render(renderList, texArray, Renderer.BUFFER_COLOR_AND_DEPTH);
 

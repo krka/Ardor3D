@@ -15,7 +15,7 @@ import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.List;
 
-import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture1D;
 import com.ardor3d.image.Texture2D;
@@ -156,7 +156,7 @@ public interface Renderer {
      * <code>grabScreenContents</code> reads a block of data as bytes from the current framebuffer. The format
      * determines how many bytes per pixel are read and thus how big the buffer must be that you pass in.
      * 
-     * @param buff
+     * @param store
      *            a buffer to store contents in.
      * @param format
      *            the format to read in bytes for.
@@ -169,7 +169,7 @@ public interface Renderer {
      * @param h
      *            - height of block
      */
-    void grabScreenContents(ByteBuffer buff, Image.Format format, int x, int y, int w, int h);
+    void grabScreenContents(ByteBuffer store, ImageDataFormat format, int x, int y, int w, int h);
 
     /**
      * <code>draw</code> renders a scene. As it receives a base class of <code>Spatial</code> the renderer hands off

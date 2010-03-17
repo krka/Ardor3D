@@ -61,6 +61,9 @@ public class JoglCanvas extends Frame implements NativeCanvas {
 
         // Create the OpenGL canvas
         _glCanvas = new JoglAwtCanvas(_settings, canvasRenderer, debugMode);
+
+        // Default is not-resizeable. If you turn on resizeable, know what you are doing.
+        setResizable(false);
     }
 
     @Override

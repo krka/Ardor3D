@@ -14,7 +14,6 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -80,12 +79,10 @@ public class MultiPassTextureExample extends ExampleBase {
 
         // Create our states to use in the passes
         final TextureState ts1 = new TextureState();
-        ts1.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts1.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
 
         final TextureState ts2 = new TextureState();
-        ts2.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts2.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear, true));
 
         final BlendState as = new BlendState();
         as.setBlendEnabled(true);

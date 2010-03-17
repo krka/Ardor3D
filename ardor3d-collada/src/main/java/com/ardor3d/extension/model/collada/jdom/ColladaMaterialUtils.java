@@ -17,8 +17,8 @@ import org.jdom.Element;
 
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.SamplerTypes;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -42,13 +42,15 @@ public class ColladaMaterialUtils {
     private final DataCache _dataCache;
     private final ColladaDOMUtil _colladaDOMUtil;
     private final ResourceLocator _textureLocator;
+    private final boolean _compressTextures;
 
     public ColladaMaterialUtils(final boolean loadTextures, final DataCache dataCache,
-            final ColladaDOMUtil colladaDOMUtil, final ResourceLocator textureLocator) {
+            final ColladaDOMUtil colladaDOMUtil, final ResourceLocator textureLocator, final boolean compressTextures) {
         _loadTextures = loadTextures;
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
         _textureLocator = textureLocator;
+        _compressTextures = compressTextures;
     }
 
     /**
@@ -59,6 +61,7 @@ public class ColladaMaterialUtils {
      * @param mesh
      *            the mesh to apply material to.
      */
+    @SuppressWarnings("unchecked")
     public void applyMaterial(final String materialName, final Mesh mesh) {
         if (materialName == null) {
             logger.warning("materialName is null");
@@ -75,8 +78,8 @@ public class ColladaMaterialUtils {
             return;
         }
 
-        final Element effectNode = _colladaDOMUtil.findTargetWithId(mat.getChild("instance_effect").getAttributeValue(
-                "url"));
+        final Element child = mat.getChild("instance_effect");
+        final Element effectNode = _colladaDOMUtil.findTargetWithId(child.getAttributeValue("url"));
         if (effectNode == null) {
             logger.warning("material effect not found: " + mat.getChild("instance_material").getAttributeValue("url"));
         }
@@ -364,10 +367,13 @@ public class ColladaMaterialUtils {
 
         final Texture texture;
         if (_textureLocator == null) {
-            texture = TextureManager.load(path, minFilter, Image.Format.Guess, true);
+            texture = TextureManager.load(path, minFilter, _compressTextures ? TextureStoreFormat.GuessCompressedFormat
+                    : TextureStoreFormat.GuessNoCompressedFormat, true);
         } else {
             final ResourceSource source = _textureLocator.locateResource(path);
-            texture = TextureManager.load(source, minFilter, Image.Format.Guess, true);
+            texture = TextureManager.load(source, minFilter,
+                    _compressTextures ? TextureStoreFormat.GuessCompressedFormat
+                            : TextureStoreFormat.GuessNoCompressedFormat, true);
         }
         _dataCache.addTexture(path, texture);
 

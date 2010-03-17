@@ -25,7 +25,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
@@ -97,7 +96,7 @@ public class UpdateTextureExample extends ExampleBase {
             case 2: {
                 final Image nextImage = AWTImageLoader.makeArdor3dImage(img, false);
                 final Texture nextTexture = TextureManager.loadFromImage(nextImage,
-                        Texture.MinificationFilter.Trilinear, Image.Format.GuessNoCompression, false);
+                        Texture.MinificationFilter.Trilinear);
                 final TextureState ts = (TextureState) _root.getLocalRenderState(RenderState.StateType.Texture);
                 ts.setTexture(nextTexture);
                 break;
@@ -175,8 +174,7 @@ public class UpdateTextureExample extends ExampleBase {
 
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, false));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, false));
 
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);

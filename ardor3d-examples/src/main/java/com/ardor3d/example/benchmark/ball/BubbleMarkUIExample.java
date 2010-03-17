@@ -27,7 +27,7 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -205,7 +205,7 @@ public class BubbleMarkUIExample extends ExampleBase {
 
         // Create a texture for our balls to use.
         final SubTex tex = new SubTex(TextureManager.load("images/ball.png",
-                Texture.MinificationFilter.NearestNeighborNoMipMaps, Format.Guess, true));
+                Texture.MinificationFilter.NearestNeighborNoMipMaps, TextureStoreFormat.GuessCompressedFormat, true));
 
         // Add balls
         for (int i = 0; i < balls.length; i++) {

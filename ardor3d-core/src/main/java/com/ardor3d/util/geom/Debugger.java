@@ -16,8 +16,8 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.OrientedBoundingBox;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -526,12 +526,13 @@ public final class Debugger {
         bQuad.getSceneHints().setCullHint(CullHint.Never);
     }
 
-    public static void drawBuffer(final Image.Format rttFormat, final int location, final Renderer r) {
+    public static void drawBuffer(final TextureStoreFormat rttFormat, final int location, final Renderer r) {
         final Camera cam = Camera.getCurrentCamera();
         drawBuffer(rttFormat, location, r, cam.getWidth() / 6.25);
     }
 
-    public static void drawBuffer(final Image.Format rttFormat, final int location, final Renderer r, final double size) {
+    public static void drawBuffer(final TextureStoreFormat rttFormat, final int location, final Renderer r,
+            final double size) {
         final Camera cam = Camera.getCurrentCamera();
         r.flushGraphics();
         double locationX = cam.getWidth(), locationY = cam.getHeight();
@@ -542,8 +543,6 @@ public final class Debugger {
             ts.setTexture(bufTexture);
             bQuad.setRenderState(ts);
         }
-
-        bufTexture.setRenderToTextureFormat(rttFormat);
 
         int width = cam.getWidth();
         if (!MathUtils.isPowerOfTwo(width)) {

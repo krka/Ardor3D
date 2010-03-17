@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
@@ -78,16 +77,15 @@ public class ExportImportExample extends ExampleBase {
         _canvas.setTitle("TestExportImport");
 
         final Texture bg = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true);
+                true);
         final TextureState bgts = new TextureState();
         bgts.setTexture(bg);
         bgts.setEnabled(true);
 
         final TextureState ts = new TextureState();
         final Texture t0 = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true);
-        final Texture t1 = TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true);
+                true);
+        final Texture t1 = TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear, true);
         t1.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
         ts.setTexture(t0, 0);
         ts.setTexture(t1, 1);

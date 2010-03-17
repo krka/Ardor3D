@@ -14,7 +14,7 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -43,7 +43,7 @@ public class SphereComparisonsExample extends ExampleBase {
     protected void initExample() {
         final TextureState ts = new TextureState();
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.Guess, true));
+                TextureStoreFormat.GuessCompressedFormat, true));
         _root.setRenderState(ts);
 
         final Node globesNode = new Node("globes");

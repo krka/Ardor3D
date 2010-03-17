@@ -12,7 +12,6 @@ package com.ardor3d.example.applet;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -68,9 +67,7 @@ public class LwjglBoxApplet extends LwjglBaseApplet {
         // Create a texture from the Ardor3D logo.
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
-        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true));
+        ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear, true));
         box.setRenderState(ts);
     }
-
 }

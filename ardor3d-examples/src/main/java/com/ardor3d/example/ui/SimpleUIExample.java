@@ -41,7 +41,6 @@ import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.TransformedSubTex;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
@@ -97,7 +96,7 @@ public class SimpleUIExample extends ExampleBase {
         final TextureState ts = new TextureState();
 
         final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, true);
+                true);
         ts.setTexture(tex);
         box.setRenderState(ts);
         _root.attachChild(box);
@@ -185,7 +184,7 @@ public class SimpleUIExample extends ExampleBase {
 
         final UIButton button = new UIButton("Button A");
         final Texture tex = TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, false);
+                false);
         button.setIcon(new SubTex(tex));
         button.setIconDimensions(new Dimension(26, 26));
         button.setGap(10);
@@ -244,8 +243,7 @@ public class SimpleUIExample extends ExampleBase {
         final MultiImageBackdrop multiImgBD = new MultiImageBackdrop(ColorRGBA.BLACK_NO_ALPHA);
         clockPanel.setBackdrop(multiImgBD);
 
-        final Texture clockTex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, false);
+        final Texture clockTex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear, false);
 
         final TransformedSubTex clockBack = new TransformedSubTex(new SubTex(clockTex, 64, 65, 446, 446));
 
@@ -285,8 +283,7 @@ public class SimpleUIExample extends ExampleBase {
     }
 
     private UIPanel makeScrollPanel() {
-        final Texture tex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear,
-                Format.GuessNoCompression, false);
+        final Texture tex = TextureManager.load("images/clock.png", Texture.MinificationFilter.Trilinear, false);
         final UILabel comp = new UILabel("");
         comp.setIcon(new SubTex(tex));
         comp.updateIconDimensionsFromIcon();

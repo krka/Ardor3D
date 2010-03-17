@@ -11,7 +11,6 @@
 package com.ardor3d.util;
 
 import java.lang.ref.ReferenceQueue;
-import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -23,21 +22,22 @@ import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.Texture3D;
 import com.ardor3d.image.TextureCubeMap;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.ImageLoaderUtil;
+import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
-import com.ardor3d.util.resource.URLResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
 
 /**
- * <code>TextureManager</code> provides static methods for building a <code>Texture</code> object. Typically, the
- * information supplied is the filename and the texture properties.
+ * <code>TextureManager</code> provides static methods for building or retrieving a <code>Texture</code> object from
+ * cache.
  */
 final public class TextureManager {
     private static final Logger logger = Logger.getLogger(TextureManager.class.getName());
@@ -49,119 +49,125 @@ final public class TextureManager {
     private TextureManager() {}
 
     /**
-     * <code>loadTexture</code> loads a new texture defined by the parameter string. Filter parameters are used to
-     * define the filtering of the texture. If there is an error loading the file, null is returned.
+     * Loads a texture by attempting to locate the given name using ResourceLocatorTool.
      * 
      * @param name
      *            the name of the texture image.
      * @param minFilter
-     *            the filter for the near values.
-     * @param magFilter
-     *            the filter for the far values.
-     * @param imageType
-     *            the type to use for image data
-     * @param flipped
-     *            If true, the images Y values are flipped.
-     * @return the loaded texture. If there is a problem loading the texture, null is returned.
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @param flipVertically
+     *            If true, the image is flipped vertically during image loading.
+     * @return the loaded texture.
      */
     public static Texture load(final String name, final Texture.MinificationFilter minFilter,
-            final Image.Format imageType, final boolean flipped) {
-        return load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, name), minFilter, imageType,
-                flipped);
+            final boolean flipVertically) {
+        return load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, name), minFilter,
+                TextureStoreFormat.GuessNoCompressedFormat, flipVertically);
     }
 
     /**
-     * <code>loadTexture</code> loads a new texture defined by the parameter url. Filter parameters are used to define
-     * the filtering of the texture. If there is an error loading the file, null is returned.
+     * Loads a texture by attempting to locate the given name using ResourceLocatorTool.
+     * 
+     * @param name
+     *            the name of the texture image.
+     * @param minFilter
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @param format
+     *            the specific format to use when storing this texture on the card.
+     * @param flipVertically
+     *            If true, the image is flipped vertically during image loading.
+     * @return the loaded texture.
+     */
+    public static Texture load(final String name, final Texture.MinificationFilter minFilter,
+            final TextureStoreFormat format, final boolean flipVertically) {
+        return load(ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, name), minFilter, format,
+                flipVertically);
+    }
+
+    /**
+     * Loads a texture from the given source.
      * 
      * @param source
      *            the source of the texture image.
      * @param minFilter
-     *            the filter for the near values.
-     * @param magFilter
-     *            the filter for the far values.
-     * @param imageType
-     *            the image type to use. if Image.Format.Guess, the type is determined by ardor3d. If S3TC/DXT is
-     *            available we use that. if Image.Format.GuessNoCompression, the type is determined by ardor3d without
-     *            using S3TC, even if available. See com.ardor3d.image.Image.Format for possible types.
-     * @param flipped
-     *            If true, the images Y values are flipped.
-     * @return the loaded texture. If there is a problem loading the texture, null is returned.
-     * @see Image.Format
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @param flipVertically
+     *            If true, the image is flipped vertically during image loading.
+     * @return the loaded texture.
      */
     public static Texture load(final ResourceSource source, final Texture.MinificationFilter minFilter,
-            final Image.Format imageType, final boolean flipped) {
+            final boolean flipVertically) {
+        return load(source, minFilter, TextureStoreFormat.GuessNoCompressedFormat, flipVertically);
+    }
+
+    /**
+     * Loads a texture from the given source.
+     * 
+     * @param source
+     *            the source of the texture image.
+     * @param minFilter
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @param format
+     *            the specific format to use when storing this texture on the card.
+     * @param flipVertically
+     *            If true, the image is flipped vertically during image loading.
+     * @return the loaded texture.
+     */
+    public static Texture load(final ResourceSource source, final Texture.MinificationFilter minFilter,
+            final TextureStoreFormat format, final boolean flipVertically) {
 
         if (null == source) {
             logger.warning("Could not load image...  source was null. defaultTexture used.");
             return TextureState.getDefaultTexture();
         }
 
-        final TextureKey tkey = TextureKey.getKey(source, flipped, imageType, minFilter);
+        final TextureKey tkey = TextureKey.getKey(source, flipVertically, format, minFilter);
 
         return loadFromKey(tkey, null, null);
     }
 
     /**
-     * <code>loadTexture</code> loads a new texture defined by the parameter url. Filter parameters are used to define
-     * the filtering of the texture. If there is an error loading the file, null is returned.
+     * Creates a texture from a given Ardor3D Image object.
      * 
-     * @param loc
-     *            the url of the texture image.
+     * @param image
+     *            the Ardor3D image.
      * @param minFilter
-     *            the filter for the near values.
-     * @param magFilter
-     *            the filter for the far values.
-     * @param imageType
-     *            the image type to use. if Image.Format.Guess, the type is determined by ardor3d. If S3TC/DXT is
-     *            available we use that. if Image.Format.GuessNoCompression, the type is determined by ardor3d without
-     *            using S3TC, even if available. See com.ardor3d.image.Image.Format for possible types.
-     * @param flipped
-     *            If true, the images Y values are flipped.
-     * @return the loaded texture. If there is a problem loading the texture, null is returned.
-     * @see Image.Format
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @return the loaded texture.
      */
-    public static Texture load(final URL loc, final Texture.MinificationFilter minFilter, final Image.Format imageType,
-            final boolean flipped) {
-
-        if (null == loc) {
-            logger.warning("Could not load image...  URL was null. defaultTexture used.");
-            return TextureState.getDefaultTexture();
-        }
-
-        final String fileName = loc.getFile();
-        if (fileName == null) {
-            logger.warning("Could not load image...  URL's fileName was null. defaultTexture used.");
-            return TextureState.getDefaultTexture();
-        }
-
-        final TextureKey tkey = TextureKey.getKey(new URLResourceSource(loc), flipped, imageType, minFilter);
-
-        return loadFromKey(tkey, null, null);
+    public static Texture loadFromImage(final Image image, final Texture.MinificationFilter minFilter) {
+        return loadFromImage(image, minFilter, TextureStoreFormat.GuessNoCompressedFormat);
     }
 
     /**
-     * <code>loadTexture</code> loads a new texture defined by the parameter string. Filter parameters are used to
-     * define the filtering of the texture. If there is an error loading the file, null is returned.
+     * Creates a texture from a given Ardor3D Image object.
      * 
-     * @param file
-     *            the filename of the texture image.
+     * @param image
+     *            the Ardor3D image.
      * @param minFilter
-     *            the filter for the near values.
-     * @param magFilter
-     *            the filter for the far values.
-     * @param imageType
-     *            the type to use for image data
-     * @param wasFlipped
-     *            If true, the images Y values were flipped - for cache check purposes only.
-     * @return the loaded texture. If there is a problem loading the texture, null is returned.
+     *            the filter for the near values. Used to determine if we should generate mipmaps.
+     * @param format
+     *            the specific format to use when storing this texture on the card.
+     * @return the loaded texture.
      */
     public static Texture loadFromImage(final Image image, final Texture.MinificationFilter minFilter,
-            final Image.Format imageType, final boolean wasFlipped) {
-        final TextureKey key = TextureKey.getKey(null, wasFlipped, imageType, "img_" + image.hashCode(), minFilter);
+            final TextureStoreFormat format) {
+        final TextureKey key = TextureKey.getKey(null, false, format, "img_" + image.hashCode(), minFilter);
         return loadFromKey(key, image, null);
     }
 
+    /**
+     * Load a texture from the given TextureKey. If imageData is given, use that, otherwise load it using the key's
+     * source information. If store is given, populate and return that Texture object.
+     * 
+     * @param tkey
+     *            our texture key. Must not be null.
+     * @param imageData
+     *            optional Image data. If present, this is used instead of loading from source.
+     * @param store
+     *            if not null, this Texture object is populated and returned instead of a new Texture object.
+     * @return the resulting texture.
+     */
     public static Texture loadFromKey(final TextureKey tkey, final Image imageData, final Texture store) {
         if (tkey == null) {
             logger.warning("TextureKey is null, cannot load");
@@ -176,11 +182,11 @@ final public class TextureManager {
         if (cache != null) {
             // look into cache.
             if (result == null) {
-                final Texture tClone = cache.createSimpleClone();
-                if (tClone.getTextureKey() == null) {
-                    tClone.setTextureKey(tkey);
+                result = cache.createSimpleClone();
+                if (result.getTextureKey() == null) {
+                    result.setTextureKey(tkey);
                 }
-                return tClone;
+                return result;
             }
             cache.createSimpleClone(result);
             return result;
@@ -208,21 +214,36 @@ final public class TextureManager {
         }
 
         result.setTextureKey(tkey);
-        result.setMinificationFilter(tkey.getMinificationFilter());
         result.setImage(img);
+        result.setMinificationFilter(tkey.getMinificationFilter());
+        result.setTextureStoreFormat(ImageUtils.getTextureStoreFormat(tkey.getFormat(), result.getImage()));
 
         // Cache the no-context version
         addToCache(result);
         return result;
     }
 
-    public static void addToCache(final Texture t) {
+    /**
+     * Add a given texture to the cache
+     * 
+     * @param texture
+     *            our texture
+     */
+    public static void addToCache(final Texture texture) {
         if (TextureState.getDefaultTexture() == null
-                || (t != TextureState.getDefaultTexture() && t.getImage() != TextureState.getDefaultTextureImage())) {
-            _tCache.put(t.getTextureKey(), t);
+                || (texture != TextureState.getDefaultTexture() && texture.getImage() != TextureState
+                        .getDefaultTextureImage())) {
+            _tCache.put(texture.getTextureKey(), texture);
         }
     }
 
+    /**
+     * Locate a texture in the cache by key
+     * 
+     * @param textureKey
+     *            our key
+     * @return the texture, or null if not found.
+     */
     public static Texture findCachedTexture(final TextureKey textureKey) {
         return _tCache.get(textureKey);
     }

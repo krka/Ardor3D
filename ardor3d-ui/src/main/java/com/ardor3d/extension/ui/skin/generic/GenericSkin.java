@@ -10,8 +10,6 @@
 
 package com.ardor3d.extension.ui.skin.generic;
 
-import java.net.URL;
-
 import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
@@ -41,10 +39,11 @@ import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceSource;
 
 public class GenericSkin extends Skin {
     protected Texture _sharedTex;
@@ -59,22 +58,22 @@ public class GenericSkin extends Skin {
 
     protected void loadTexture(final String skinTexture) {
         try {
-            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear, Format.GuessNoCompression,
-                    false);
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear,
+                    TextureStoreFormat.GuessNoCompressedFormat, false);
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public GenericSkin(final URL skinTexture) {
+    public GenericSkin(final ResourceSource skinTexture) {
         loadTexture(skinTexture);
     }
 
-    protected void loadTexture(final URL skinTexture) {
+    protected void loadTexture(final ResourceSource skinTexture) {
         try {
-            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear, Format.GuessNoCompression,
-                    false);
+            _sharedTex = TextureManager.load(skinTexture, MinificationFilter.Trilinear,
+                    TextureStoreFormat.GuessNoCompressedFormat, false);
         } catch (final Exception e) {
             e.printStackTrace();
         }

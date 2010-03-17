@@ -10,7 +10,7 @@
 
 package com.ardor3d.image.util.dds;
 
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.ImageDataFormat;
 
 public class DdsUtils {
 
@@ -97,12 +97,12 @@ public class DdsUtils {
      *            our image's format
      * @return the flipped image as raw bytes.
      */
-    public static byte[] flipDXT(final byte[] rawData, final int width, final int height, final Format format) {
+    public static byte[] flipDXT(final byte[] rawData, final int width, final int height, final ImageDataFormat format) {
         final byte[] returnData = new byte[rawData.length];
 
         final int blocksPerColumn = (width + 3) >> 2;
         final int blocksPerRow = (height + 3) >> 2;
-        final int bytesPerBlock = format == Format.NativeDXT1 || format == Format.NativeDXT1A ? 8 : 16;
+        final int bytesPerBlock = format.getComponents() * 8;
 
         for (int sourceRow = 0; sourceRow < blocksPerRow; sourceRow++) {
             final int targetRow = blocksPerRow - sourceRow - 1;
@@ -110,16 +110,16 @@ public class DdsUtils {
                 final int target = (targetRow * blocksPerColumn + column) * bytesPerBlock;
                 final int source = (sourceRow * blocksPerColumn + column) * bytesPerBlock;
                 switch (format) {
-                    case NativeDXT1:
-                    case NativeDXT1A:
-                    case NativeLATC_L:
+                    case PrecompressedDXT1:
+                    case PrecompressedDXT1A:
+                    case PrecompressedLATC_L:
                         System.arraycopy(rawData, source, returnData, target, 4);
                         returnData[target + 4] = rawData[source + 7];
                         returnData[target + 5] = rawData[source + 6];
                         returnData[target + 6] = rawData[source + 5];
                         returnData[target + 7] = rawData[source + 4];
                         break;
-                    case NativeDXT3:
+                    case PrecompressedDXT3:
                         // Alpha
                         returnData[target + 0] = rawData[source + 6];
                         returnData[target + 1] = rawData[source + 7];
@@ -137,7 +137,7 @@ public class DdsUtils {
                         returnData[target + 14] = rawData[source + 13];
                         returnData[target + 15] = rawData[source + 12];
                         break;
-                    case NativeDXT5:
+                    case PrecompressedDXT5:
                         // Alpha, the first 2 bytes remain
                         returnData[target + 0] = rawData[source + 0];
                         returnData[target + 1] = rawData[source + 1];
@@ -153,7 +153,7 @@ public class DdsUtils {
                         returnData[target + 14] = rawData[source + 13];
                         returnData[target + 15] = rawData[source + 12];
                         break;
-                    case NativeLATC_LA:
+                    case PrecompressedLATC_LA:
                         // alpha
                         System.arraycopy(rawData, source, returnData, target, 4);
                         returnData[target + 4] = rawData[source + 7];

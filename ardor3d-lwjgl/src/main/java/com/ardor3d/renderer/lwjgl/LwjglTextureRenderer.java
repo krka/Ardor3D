@@ -11,7 +11,6 @@
 package com.ardor3d.renderer.lwjgl;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,18 +90,13 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         tex.setTextureIdForContext(context.getGlContextRep(), textureId);
 
         LwjglTextureStateUtil.doTextureBind(tex, 0, true);
-        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getRenderToTextureFormat());
-        final int pixFormat = LwjglTextureUtil.getGLPixelFormat(tex.getRenderToTextureFormat());
-        final int pixDataType = LwjglTextureUtil.getGLPixelDataType(tex.getRenderToTextureFormat());
 
         // Initialize our texture with some default data.
-        if (pixDataType == GL11.GL_UNSIGNED_BYTE) {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
-                    (ByteBuffer) null);
-        } else {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, pixFormat, pixDataType,
-                    (FloatBuffer) null);
-        }
+        final int internalFormat = LwjglTextureUtil.getGLInternalFormat(tex.getTextureStoreFormat());
+        final int dataFormat = LwjglTextureUtil.getGLPixelFormatFromStoreFormat(tex.getTextureStoreFormat());
+
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, dataFormat, GL11.GL_UNSIGNED_BYTE,
+                (ByteBuffer) null);
 
         // Initialize mipmapping for this texture, if requested
         if (tex.getMinificationFilter().usesMipMapLevels()) {
@@ -174,7 +168,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
             final LinkedList<Texture> colors = new LinkedList<Texture>();
             for (int i = 0; i < texs.size(); i++) {
                 final Texture tex = texs.get(i);
-                if (tex.getRenderToTextureFormat().isDepthFormat()) {
+                if (tex.getTextureStoreFormat().isDepthFormat()) {
                     depths.add(tex);
                 } else {
                     colors.add(tex);
@@ -249,7 +243,11 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final int textureId = tex.getTextureIdForContext(context.getGlContextRep());
 
-        if (tex.getRenderToTextureFormat().isDepthFormat()) {
+        if (tex.getTextureStoreFormat().isDepthFormat()) {
+            // No color buffer
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
+                    EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
+
             // Setup depth texture into FBO
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT,
                     EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, textureId, 0);

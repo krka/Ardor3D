@@ -13,9 +13,9 @@ package com.ardor3d.example.renderer;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
@@ -149,7 +149,7 @@ public class RenderTextureSideBySideExample extends ExampleBase {
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ardor3d_white_256.jpg", Texture.MinificationFilter.Trilinear,
-                Image.Format.Guess, true));
+                TextureStoreFormat.GuessCompressedFormat, true));
 
         _root.setRenderState(ts);
     }

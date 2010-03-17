@@ -22,7 +22,7 @@ import com.ardor3d.framework.jogl.JoglCanvasRenderer;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.AWTImageLoader;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.ColorRGBA;
@@ -164,7 +164,7 @@ public class BubbleMarkExample implements Scene {
         final TextureState ts = new TextureState();
         ts.setEnabled(true);
         ts.setTexture(TextureManager.load("images/ball.png", Texture.MinificationFilter.NearestNeighborNoMipMaps,
-                Format.Guess, true));
+                TextureStoreFormat.GuessCompressedFormat, true));
         root.setRenderState(ts);
 
         // Add blending.

@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import com.ardor3d.image.Image;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
@@ -109,7 +111,9 @@ public class AWTImageLoader implements ImageLoader {
         scratch.put(data);
         scratch.flip();
         final Image ardorImage = new Image();
-        ardorImage.setFormat(grayscale ? Image.Format.Luminance8 : hasAlpha ? Image.Format.RGBA8 : Image.Format.RGB8);
+        ardorImage.setDataFormat(grayscale ? ImageDataFormat.Luminance : hasAlpha ? ImageDataFormat.RGBA
+                : ImageDataFormat.RGB);
+        ardorImage.setDataType(ImageDataType.UnsignedByte);
         ardorImage.setWidth(tex.getWidth());
         ardorImage.setHeight(tex.getHeight());
         ardorImage.setData(scratch);
@@ -137,7 +141,9 @@ public class AWTImageLoader implements ImageLoader {
         scratch.put(data);
         scratch.flip();
         final Image ardorImage = new Image();
-        ardorImage.setFormat(grayscale ? Image.Format.Luminance8 : hasAlpha ? Image.Format.RGBA8 : Image.Format.RGB8);
+        ardorImage.setDataFormat(grayscale ? ImageDataFormat.Luminance : hasAlpha ? ImageDataFormat.RGBA
+                : ImageDataFormat.RGB);
+        ardorImage.setDataType(ImageDataType.UnsignedByte);
         ardorImage.setWidth(image.getWidth());
         ardorImage.setHeight(image.getHeight());
         ardorImage.setData(scratch);

@@ -20,6 +20,7 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MagnificationFilter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.util.GeneratedImageFactory;
@@ -327,7 +328,7 @@ public class GeneratedTexturesExample extends ExampleBase {
         final Texture tex = new Texture2D();
         final Image img = GeneratedImageFactory.create1DColorImage(false, terrainColors);
         tex.setImage(img);
-        tex.setTextureKey(TextureKey.getKey(null, false, img.getFormat(), MinificationFilter.Trilinear));
+        tex.setTextureKey(TextureKey.getKey(null, false, TextureStoreFormat.RGB8, MinificationFilter.Trilinear));
         tex.setMagnificationFilter(MagnificationFilter.NearestNeighbor);
         tex.setMinificationFilter(MinificationFilter.Trilinear);
 

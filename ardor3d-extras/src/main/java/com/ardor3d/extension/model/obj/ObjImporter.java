@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.ardor3d.image.Image;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
@@ -477,13 +476,13 @@ public class ObjImporter {
                     final String textureName = line.substring("map_Kd".length()).trim();
                     if (_textureLocator == null) {
                         currentMaterial.map_Kd = TextureManager.load(textureName, getMinificationFilter(),
-                                isUseCompression() ? Format.Guess : Image.Format.GuessNoCompression,
-                                isFlipTextureVertically());
+                                isUseCompression() ? TextureStoreFormat.GuessCompressedFormat
+                                        : TextureStoreFormat.GuessNoCompressedFormat, isFlipTextureVertically());
                     } else {
                         final ResourceSource source = _textureLocator.locateResource(textureName);
                         currentMaterial.map_Kd = TextureManager.load(source, getMinificationFilter(),
-                                isUseCompression() ? Format.Guess : Image.Format.GuessNoCompression,
-                                isFlipTextureVertically());
+                                isUseCompression() ? TextureStoreFormat.GuessCompressedFormat
+                                        : TextureStoreFormat.GuessNoCompressedFormat, isFlipTextureVertically());
                     }
                 }
             }

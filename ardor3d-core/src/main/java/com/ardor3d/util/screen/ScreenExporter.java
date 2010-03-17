@@ -12,8 +12,9 @@ package com.ardor3d.util.screen;
 
 import java.nio.ByteBuffer;
 
-import com.ardor3d.image.Image;
-import com.ardor3d.image.Image.Format;
+import com.ardor3d.image.ImageDataFormat;
+import com.ardor3d.image.ImageDataType;
+import com.ardor3d.image.util.ImageUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.util.geom.BufferUtils;
@@ -23,12 +24,12 @@ public class ScreenExporter {
     static ByteBuffer _scratch = BufferUtils.createByteBuffer(1);
 
     public synchronized static void exportCurrentScreen(final Renderer renderer, final ScreenExportable exportable) {
-        final Format format = exportable.getFormat();
+        final ImageDataFormat format = exportable.getFormat();
         final Camera camera = Camera.getCurrentCamera();
         final int width = camera.getWidth(), height = camera.getHeight();
 
         // prepare our data buffer
-        final int size = width * height * Image.getEstimatedByteSize(format);
+        final int size = width * height * ImageUtils.getPixelByteSize(format, ImageDataType.UnsignedByte);
         if (_scratch.capacity() < size) {
             _scratch = BufferUtils.createByteBuffer(size);
         } else {
