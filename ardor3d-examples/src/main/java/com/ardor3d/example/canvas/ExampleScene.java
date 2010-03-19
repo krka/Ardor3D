@@ -14,8 +14,11 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.GameTaskQueue;
+import com.ardor3d.util.GameTaskQueueManager;
 
 /**
  * The framework should provide a default implementation of a scene, probably with a root node and a stats node, just
@@ -34,6 +37,10 @@ public final class ExampleScene implements Scene {
 
     @MainThread
     public boolean renderUnto(final Renderer renderer) {
+        // Execute renderQueue item
+        GameTaskQueueManager.getManager(ContextManager.getCurrentContext()).getQueue(GameTaskQueue.RENDER).execute(
+                renderer);
+
         renderer.draw(root);
         return true;
     }
