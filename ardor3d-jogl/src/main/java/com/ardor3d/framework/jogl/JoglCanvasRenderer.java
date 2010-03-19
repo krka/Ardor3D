@@ -130,18 +130,30 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _context = context;
     }
 
+    public int MAX_CONTEXT_GRAB_ATTEMPTS = 10;
+
     @MainThread
     public boolean draw() {
 
         // set up context for rendering this canvas
         ContextManager.switchContext(_context);
         if (MULTI_CANVAS_MODE && !_context.equals(GLContext.getCurrent())) {
-            while (_context.makeCurrent() == GLContext.CONTEXT_NOT_CURRENT) {
+            int value;
+            int attempt = 1;
+            while ((value = _context.makeCurrent()) == GLContext.CONTEXT_NOT_CURRENT) {
+                if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
+                    // failed, return false to avoid back buffer swap.
+                    return false;
+                }
+                attempt++;
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(5);
                 } catch (final InterruptedException e1) {
                     e1.printStackTrace();
                 }
+            }
+            if (value == GLContext.CONTEXT_CURRENT_NEW) {
+                ContextManager.getCurrentContext().contextLost();
             }
         }
 

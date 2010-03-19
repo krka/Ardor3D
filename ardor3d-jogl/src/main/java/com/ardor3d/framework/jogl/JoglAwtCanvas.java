@@ -64,12 +64,15 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         }
 
         if (_useDebug && !_debugSet) {
-            // XXX: there might be a nicer place to put this.  Constructor does not work though.  Init only works if called via draw.
+            // XXX: there might be a nicer place to put this. Constructor does not work though. Init only works if
+            // called via draw.
             setGL(new DebugGL(getGL()));
             _debugSet = true;
         }
 
-        _canvasRenderer.draw();
+        if (isShowing()) {
+            _canvasRenderer.draw();
+        }
         if (latch != null) {
             latch.countDown();
         }
