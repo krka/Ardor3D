@@ -13,7 +13,9 @@ package com.ardor3d.util.scenegraph;
 import java.lang.ref.ReferenceQueue;
 import java.util.Map;
 
+import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.scenegraph.Spatial;
@@ -29,6 +31,14 @@ public class DisplayListDelegate implements RenderDelegate {
     private static final Object STATIC_REF = new Object();
 
     private static ReferenceQueue<DisplayListDelegate> _refQueue = new ReferenceQueue<DisplayListDelegate>();
+
+    static {
+        ContextManager.addContextCleanListener(new ContextCleanListener() {
+            public void cleanForContext(final RenderContext renderContext) {
+            // TODO: Need a way to call back to the creator of the display list?
+            }
+        });
+    }
 
     private final SimpleContextIdReference<DisplayListDelegate> _id;
 

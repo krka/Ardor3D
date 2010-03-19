@@ -15,6 +15,7 @@ import java.nio.Buffer;
 import java.util.Map;
 import java.util.Set;
 
+import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -32,6 +33,14 @@ public abstract class AbstractBufferData<T extends Buffer> {
     private static final Object STATIC_REF = new Object();
 
     private static ReferenceQueue<AbstractBufferData<?>> _vboRefQueue = new ReferenceQueue<AbstractBufferData<?>>();
+
+    static {
+        ContextManager.addContextCleanListener(new ContextCleanListener() {
+            public void cleanForContext(final RenderContext renderContext) {
+                AbstractBufferData.cleanAllVBOs(null, renderContext);
+            }
+        });
+    }
 
     protected transient ContextIdReference<AbstractBufferData<T>> _vboIdCache;
 
@@ -182,6 +191,27 @@ public abstract class AbstractBufferData<T extends Buffer> {
                     }
                 } else {
                     idMap.put(ContextManager.getCurrentContext().getGlContextRep(), buf.getVBOID(null));
+                }
+            }
+        }
+
+        handleVBODelete(deleter, idMap);
+    }
+
+    public static void cleanAllVBOs(final Renderer deleter, final RenderContext context) {
+        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
+
+        // gather up expired vbos... these don't exist in our cache
+        gatherGCdIds(idMap);
+
+        final Object glRep = context.getGlContextRep();
+        // Walk through the cached items and delete those too.
+        for (final AbstractBufferData<?> buf : _identityCache.keySet()) {
+            if (buf._vboIdCache != null) {
+                final int id = buf._vboIdCache.get(glRep);
+                if (id != 0) {
+                    idMap.put(context.getGlContextRep(), id);
+                    buf._vboIdCache.remove(glRep);
                 }
             }
         }

@@ -168,6 +168,19 @@ final public class TextureKey implements Savable {
     }
 
     /**
+     * <p>
+     * Clears all currently associated texture ids for this texture.
+     * </p>
+     * <p>
+     * Note: This does not remove the texture from the card and is provided for use by code that does remove textures
+     * from the card.
+     * </p>
+     */
+    public void removeFromIdCache() {
+        _idCache.clear();
+    }
+
+    /**
      * Sets the id for a texture in regards to the given OpenGL context.
      * 
      * @param glContext

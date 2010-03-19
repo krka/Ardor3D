@@ -209,4 +209,17 @@ public class RenderContext {
             top.activate();
         }
     }
+
+    public void contextLost() {
+        // Notify any interested parties of the deletion.
+        ContextManager.fireCleanContextEvent(this);
+
+        // invalidate our render states
+        invalidateStates();
+
+        // force camera update
+        if (_currentCamera != null) {
+            _currentCamera.update();
+        }
+    }
 }

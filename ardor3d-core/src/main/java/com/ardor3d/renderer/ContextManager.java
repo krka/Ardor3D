@@ -10,13 +10,17 @@
 
 package com.ardor3d.renderer;
 
+import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 public class ContextManager {
 
     protected static RenderContext currentContext = null;
+
+    private static List<ContextCleanListener> _cleanListeners = Lists.newArrayList();
 
     protected static final Map<Object, RenderContext> contextStore = new MapMaker().weakKeys().makeMap();
 
@@ -63,5 +67,15 @@ public class ContextManager {
             }
         }
         return null;
+    }
+
+    public static void fireCleanContextEvent(final RenderContext renderContext) {
+        for (final ContextCleanListener listener : _cleanListeners) {
+            listener.cleanForContext(renderContext);
+        }
+    }
+
+    public static void addContextCleanListener(final ContextCleanListener listener) {
+        _cleanListeners.add(listener);
     }
 }

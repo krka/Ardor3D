@@ -25,7 +25,9 @@ import com.ardor3d.image.TextureCubeMap;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.image.util.ImageUtils;
+import com.ardor3d.renderer.ContextCleanListener;
 import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.renderer.state.TextureState;
@@ -45,6 +47,14 @@ final public class TextureManager {
     private static Map<TextureKey, Texture> _tCache = new MapMaker().weakKeys().weakValues().makeMap();
 
     private static ReferenceQueue<TextureKey> _textureRefQueue = new ReferenceQueue<TextureKey>();
+
+    static {
+        ContextManager.addContextCleanListener(new ContextCleanListener() {
+            public void cleanForContext(final RenderContext renderContext) {
+                TextureManager.cleanAllTextures(null, renderContext, null);
+            }
+        });
+    }
 
     private TextureManager() {}
 
@@ -302,6 +312,51 @@ final public class TextureManager {
                 }
             } else {
                 idMap.put(ContextManager.getCurrentContext().getGlContextRep(), key.getTextureIdForContext(null));
+            }
+            key.removeFromIdCache();
+        }
+
+        // delete the ids
+        if (!idMap.isEmpty()) {
+            handleTextureDelete(deleter, idMap, futureStore);
+        }
+    }
+
+    /**
+     * Deletes all textures from card for a specific gl context. This will gather all texture ids believed to be on the
+     * card for the given context and try to delete them. If a deleter is passed in, textures that are part of the
+     * currently active context (if one is active) will be deleted immediately. If a deleter is not passed in, we do not
+     * have an active context, or we encounter textures that are not part of the current context, then we will queue
+     * those textures to be deleted later using the GameTaskQueueManager.
+     * 
+     * If a non null map is passed into futureStore, it will be populated with Future objects for each queued context.
+     * These objects may be used to discover when the deletion tasks have all completed.
+     * 
+     * @param deleter
+     *            if not null, this renderer will be used to immediately delete any textures in the currently active
+     *            context. All other textures will be queued to delete in their own contexts.
+     * @param context
+     *            the context to delete for.
+     * @param futureStore
+     *            if not null, this map will be populated with any Future task handles created during cleanup.
+     */
+    public static void cleanAllTextures(final Renderer deleter, final RenderContext context,
+            final Map<Object, Future<Void>> futureStore) {
+        // gather up expired textures... these don't exist in our cache
+        Multimap<Object, Integer> idMap = gatherGCdIds();
+
+        final Object glRep = context.getGlContextRep();
+        // Walk through the cached items and gather those too.
+        for (final TextureKey key : _tCache.keySet()) {
+            // possibly lazy init
+            if (idMap == null) {
+                idMap = ArrayListMultimap.create();
+            }
+
+            final int id = key.getTextureIdForContext(glRep);
+            if (id != 0) {
+                idMap.put(context.getGlContextRep(), id);
+                key.removeFromIdCache(glRep);
             }
         }
 
