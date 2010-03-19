@@ -11,6 +11,8 @@
 package com.ardor3d.example.canvas;
 
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
@@ -182,6 +185,17 @@ public class JoglAwtDesktopExample {
         }));
 
         frameWork.addCanvas(theCanvas);
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(final ComponentEvent e) {
+                final Camera cam = theCanvas.getCanvasRenderer().getCamera();
+                if (cam != null) {
+                    cam.resize(theCanvas.getWidth(), theCanvas.getHeight());
+                    cam.setFrustumPerspective(cam.getFovY(), theCanvas.getWidth() / (float) theCanvas.getHeight(), cam
+                            .getFrustumNear(), cam.getFrustumFar());
+                }
+            }
+        });
         frame.setLocation(20 * index, 20 * index);
         frame.add(theCanvas);
         frame.pack();
