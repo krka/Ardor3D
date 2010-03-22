@@ -18,6 +18,9 @@ import javax.media.opengl.GLCanvas;
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.renderer.ContextCleanListener;
+import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.RenderContext;
 
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
@@ -46,6 +49,14 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         setAutoSwapBufferMode(false);
 
         _canvasRenderer.setContext(getContext());
+
+        if (_useDebug) {
+            ContextManager.addContextCleanListener(new ContextCleanListener() {
+                public void cleanForContext(final RenderContext renderContext) {
+                    _debugSet = false;
+                }
+            });
+        }
     }
 
     @MainThread
