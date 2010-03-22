@@ -15,13 +15,18 @@ import java.util.List;
 
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture3D;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.EnvironmentalMapMode;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.util.GeneratedImageFactory;
+import com.ardor3d.input.Key;
+import com.ardor3d.input.logical.InputTrigger;
+import com.ardor3d.input.logical.KeyPressedCondition;
+import com.ardor3d.input.logical.TriggerAction;
+import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.shape.Sphere;
@@ -52,13 +57,21 @@ public class Texture3DExample extends ExampleBase {
 
         final Sphere sp = new Sphere("sphere", 16, 16, 2);
         _root.attachChild(sp);
+
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                final Texture tex = createTexture();
+                tex.setEnvironmentalMapMode(EnvironmentalMapMode.ObjectLinear);
+                ts.setTexture(tex);
+                ts.setNeedsRefresh(true);
+            }
+        }));
     }
 
     private Texture createTexture() {
         final Texture3D tex = new Texture3D();
         tex.setMinificationFilter(MinificationFilter.BilinearNoMipMaps);
-        tex.setTextureKey(TextureKey
-                .getKey(null, false, TextureStoreFormat.RGBA8, MinificationFilter.BilinearNoMipMaps));
+        tex.setTextureKey(TextureKey.getRTTKey(MinificationFilter.BilinearNoMipMaps));
         final Image img = new Image();
         img.setWidth(32);
         img.setHeight(32);
