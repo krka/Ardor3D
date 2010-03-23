@@ -399,6 +399,9 @@ public class JoglTextureStateUtil {
                                 max = mipSizes.length;
                             }
 
+                            // set max mip level
+                            gl.glTexParameteri(getGLCubeMapFace(face), GL.GL_TEXTURE_MAX_LEVEL, max - 1);
+
                             for (int m = 0; m < max; m++) {
                                 final int width = Math.max(1, image.getWidth() >> m);
                                 final int height = Math.max(1, image.getHeight() >> m);
@@ -433,6 +436,20 @@ public class JoglTextureStateUtil {
                     } else if (texture.getMinificationFilter().usesMipMapLevels()) {
                         max = mipSizes.length;
                     }
+
+                    // Set max mip level
+                    switch (type) {
+                        case TwoDimensional:
+                            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                        case ThreeDimensional:
+                            gl.glTexParameteri(GL.GL_TEXTURE_3D, GL.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                        case OneDimensional:
+                            gl.glTexParameteri(GL.GL_TEXTURE_1D, GL.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                    }
+
                     if (type == Type.ThreeDimensional) {
                         if (caps.isTexture3DSupported()) {
                             // concat data into single buffer:
@@ -465,7 +482,6 @@ public class JoglTextureStateUtil {
                     for (int m = 0; m < max; m++) {
                         final int width = Math.max(1, image.getWidth() >> m);
                         final int height = Math.max(1, image.getHeight() >> m);
-                        final int depth = Math.max(1, image.getDepth() >> m);
 
                         data.position(pos);
                         data.limit(pos + mipSizes[m]);
@@ -496,6 +512,7 @@ public class JoglTextureStateUtil {
                                 }
                                 break;
                             case ThreeDimensional:
+                                final int depth = Math.max(1, image.getDepth() >> m);
                                 // already checked for support above...
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     gl.glCompressedTexImage3D(GL.GL_TEXTURE_3D, m, JoglTextureUtil

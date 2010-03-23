@@ -411,6 +411,9 @@ public abstract class LwjglTextureStateUtil {
                                 max = mipSizes.length;
                             }
 
+                            // set max mip level
+                            GL11.glTexParameteri(getGLCubeMapFace(face), GL12.GL_TEXTURE_MAX_LEVEL, max - 1);
+
                             for (int m = 0; m < max; m++) {
                                 final int width = Math.max(1, image.getWidth() >> m);
                                 final int height = Math.max(1, image.getHeight() >> m);
@@ -447,6 +450,19 @@ public abstract class LwjglTextureStateUtil {
                         max = mipSizes.length;
                     }
 
+                    // Set max mip level
+                    switch (type) {
+                        case TwoDimensional:
+                            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                        case ThreeDimensional:
+                            GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                        case OneDimensional:
+                            GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL12.GL_TEXTURE_MAX_LEVEL, max - 1);
+                            break;
+                    }
+
                     if (type == Type.ThreeDimensional) {
                         if (caps.isTexture3DSupported()) {
                             // concat data into single buffer:
@@ -479,7 +495,6 @@ public abstract class LwjglTextureStateUtil {
                     for (int m = 0; m < max; m++) {
                         final int width = Math.max(1, image.getWidth() >> m);
                         final int height = Math.max(1, image.getHeight() >> m);
-                        final int depth = Math.max(1, image.getDepth() >> m);
 
                         data.position(pos);
                         data.limit(pos + mipSizes[m]);
@@ -511,6 +526,7 @@ public abstract class LwjglTextureStateUtil {
                                 }
                                 break;
                             case ThreeDimensional:
+                                final int depth = Math.max(1, image.getDepth() >> m);
                                 // already checked for support above...
                                 if (texture.getTextureStoreFormat().isCompressed()) {
                                     ARBTextureCompression.glCompressedTexImage3DARB(GL12.GL_TEXTURE_3D, m,
