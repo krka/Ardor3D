@@ -10,6 +10,9 @@
 
 package com.ardor3d.framework.jogl;
 
+import java.util.logging.Logger;
+
+import javax.media.opengl.DebugGL;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 import javax.media.opengl.GLDrawableFactory;
@@ -30,6 +33,9 @@ import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
+
+    private static final Logger LOGGER = Logger.getLogger(JoglCanvasRenderer.class.getName());
+
 
     /**
      * Set to true to be safe when rendering in multiple canvases. Set to false for a faster, single canvas mode.
@@ -60,8 +66,24 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     private RenderContext _currentContext;
 
+    /**
+     * <code>true</code> if debugging (checking for error codes on each GL call)
+     * is desired.
+     */
+    private boolean _useDebug;
+    
+    /**
+     * <code>true</code> if debugging is currently enabled for this GLContext.
+     */
+    private boolean _debugEnabled = false;
+    
     public JoglCanvasRenderer(final Scene scene) {
+        this(scene, false);
+    }
+
+    public JoglCanvasRenderer(final Scene scene, final boolean useDebug) {
         _scene = scene;
+        _useDebug = useDebug;
     }
 
     public void setCurrentContext() {
@@ -154,7 +176,19 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
             if (value == GLContext.CONTEXT_CURRENT_NEW) {
                 ContextManager.getCurrentContext().contextLost();
+                
+                // Whenever the context is created or replaced, the GL chain
+                // is lost.  Debug will have to be added if desired.
+                _debugEnabled = false;
             }
+        }
+
+        // Enable Debugging if requested.
+        if (_useDebug != _debugEnabled) {
+            _context.setGL(new DebugGL(_context.getGL()));
+            _debugEnabled = true;
+            
+            LOGGER.info("DebugGL Enabled");
         }
 
         // render stuff, first apply our camera if we have one

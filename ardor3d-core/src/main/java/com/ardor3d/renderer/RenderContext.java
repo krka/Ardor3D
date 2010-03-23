@@ -210,6 +210,9 @@ public class RenderContext {
         }
     }
 
+    /**
+     * Should only be called on a thread with an active context.
+     */
     public void contextLost() {
         // Notify any interested parties of the deletion.
         ContextManager.fireCleanContextEvent(this);

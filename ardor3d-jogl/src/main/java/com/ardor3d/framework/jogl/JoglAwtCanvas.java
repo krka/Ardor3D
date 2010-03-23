@@ -12,35 +12,25 @@ package com.ardor3d.framework.jogl;
 
 import java.util.concurrent.CountDownLatch;
 
-import javax.media.opengl.DebugGL;
 import javax.media.opengl.GLCanvas;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
-import com.ardor3d.renderer.ContextCleanListener;
-import com.ardor3d.renderer.ContextManager;
-import com.ardor3d.renderer.RenderContext;
 
 public class JoglAwtCanvas extends GLCanvas implements Canvas {
 
     private static final long serialVersionUID = 1L;
 
     private final JoglCanvasRenderer _canvasRenderer;
-    private boolean _inited = false, _debugSet = false;
+    private boolean _inited = false;
+
     private final DisplaySettings _settings;
 
-    private final boolean _useDebug;
-
     public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer) {
-        this(settings, canvasRenderer, false);
-    }
-
-    public JoglAwtCanvas(final DisplaySettings settings, final JoglCanvasRenderer canvasRenderer, final boolean useDebug) {
         super(CapsUtil.getCapsForSettings(settings));
         _settings = settings;
         _canvasRenderer = canvasRenderer;
-        _useDebug = useDebug;
 
         setFocusable(true);
         requestFocus();
@@ -49,14 +39,6 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
         setAutoSwapBufferMode(false);
 
         _canvasRenderer.setContext(getContext());
-
-        if (_useDebug) {
-            ContextManager.addContextCleanListener(new ContextCleanListener() {
-                public void cleanForContext(final RenderContext renderContext) {
-                    _debugSet = false;
-                }
-            });
-        }
     }
 
     @MainThread
@@ -72,13 +54,6 @@ public class JoglAwtCanvas extends GLCanvas implements Canvas {
     public void draw(final CountDownLatch latch) {
         if (!_inited) {
             init();
-        }
-
-        if (_useDebug && !_debugSet) {
-            // XXX: there might be a nicer place to put this. Constructor does not work though. Init only works if
-            // called via draw.
-            setGL(new DebugGL(getGL()));
-            _debugSet = true;
         }
 
         if (isShowing()) {
