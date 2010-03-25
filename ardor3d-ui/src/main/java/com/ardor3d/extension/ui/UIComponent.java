@@ -42,6 +42,7 @@ import com.ardor3d.renderer.state.BlendState.DestinationFunction;
 import com.ardor3d.renderer.state.BlendState.SourceFunction;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BasicText;
@@ -969,30 +970,38 @@ public abstract class UIComponent extends Node {
      */
     protected void updateWorldTransform(final boolean recurse, final boolean self) {
         if (self) {
-            super.updateWorldTransform(false);
+            if (_parent != null) {
+                if (_parent instanceof UIComponent) {
+                    final UIComponent gPar = (UIComponent) _parent;
+
+                    // grab our parent's world transform
+                    final Transform t = Transform.fetchTempInstance();
+                    t.set(_parent.getWorldTransform());
+
+                    // shift our origin by total left/bottom
+                    final Vector3 v = Vector3.fetchTempInstance();
+                    v.set(gPar.getTotalLeft(), gPar.getTotalBottom(), 0);
+                    t.applyForwardVector(v);
+                    t.translate(v);
+                    Vector3.releaseTempInstance(v);
+
+                    // apply our local transform
+                    t.multiply(_localTransform, _worldTransform);
+                    Transform.releaseTempInstance(t);
+                } else {
+                    _parent.getWorldTransform().multiply(_localTransform, _worldTransform);
+                }
+            } else {
+                _worldTransform.set(_localTransform);
+            }
         }
 
-        final Node parent = getParent();
-        if (parent instanceof UIComponent) {
-            final UIComponent gPar = (UIComponent) parent;
-            final Vector3 v = Vector3.fetchTempInstance();
-            v.set(gPar.getTotalLeft(), gPar.getTotalBottom(), 0);
-
-            final Transform t = Transform.fetchTempInstance();
-            t.set(getWorldTransform());
-            t.applyForwardVector(v);
-            t.translate(v);
-            Vector3.releaseTempInstance(v);
-
-            setWorldTransform(t);
-
-            Transform.releaseTempInstance(t);
-        }
         if (recurse) {
             for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
                 getChild(i).updateWorldTransform(true);
             }
         }
+        clearDirty(DirtyType.Transform);
     }
 
     @Override
