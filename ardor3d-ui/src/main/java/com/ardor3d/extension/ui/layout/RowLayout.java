@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
  */
 public class RowLayout extends UILayout {
 
-    private static final int MAX_LOOPS = 50;
+    private static final int MAX_ADDITIONS = 50;
     private final boolean _horizontal;
     private final boolean _expandsHorizontally;
     private final boolean _expandsVertically;
@@ -114,16 +114,14 @@ public class RowLayout extends UILayout {
             // How much space do we actually have?
             int freeSpace = (_horizontal ? container.getContentWidth() : container.getContentHeight()) - reqSpace;
 
-            // container is not big enough for contents.
-            if (freeSpace < 0) {
-                freeSpace = 0;
-            }
-
-            int loops = 0;
+            int additions = 0;
             do {
                 final UIComponent comp = comps.remove(0);
                 Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
                 final Rectangle2 origRect = storeB.set(rect);
+                if (freeSpace < 0) {
+                    freeSpace = 0;
+                }
                 final int extraSize = freeSpace / (comps.size() + 1);
                 if (_horizontal) {
                     final int height = _expandsVertically ? container.getContentHeight() : rect.getHeight();
@@ -136,6 +134,7 @@ public class RowLayout extends UILayout {
                     rect = comp.getRelativeComponentBounds(storeA);
                     if (Math.abs(rect.getWidth() - width) <= 1) {
                         comps.add(comp);
+                        additions++;
                     }
                     freeSpace -= rect.getWidth() - origRect.getWidth();
                 } else {
@@ -149,10 +148,11 @@ public class RowLayout extends UILayout {
                     rect = comp.getRelativeComponentBounds(storeA);
                     if (Math.abs(rect.getHeight() - height) <= 1) {
                         comps.add(comp);
+                        additions++;
                     }
                     freeSpace -= rect.getHeight() - origRect.getHeight();
                 }
-            } while (freeSpace > 1 && comps.size() > 0 && ++loops <= RowLayout.MAX_LOOPS);
+            } while (comps.size() > 0 && additions <= RowLayout.MAX_ADDITIONS);
 
             int x = 0;
             int y = !_expandsVertically && !_horizontal ? container.getContentHeight() - reqSpace : 0;

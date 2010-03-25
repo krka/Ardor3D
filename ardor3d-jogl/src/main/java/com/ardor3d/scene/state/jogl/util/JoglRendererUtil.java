@@ -87,7 +87,7 @@ public abstract class JoglRendererUtil {
             Rectangle2.releaseTempInstance(init);
         } else {
             // no clips, so disable
-            gl.glDisable(GL.GL_SCISSOR_TEST);
+            setClippingEnabled(rendRecord, false);
         }
     }
 
