@@ -514,40 +514,51 @@ public class BoundingSphere extends BoundingVolume {
         return this;
     }
 
-    private BoundingVolume merge(final double temp_radius, final ReadOnlyVector3 tempCenter, final BoundingSphere rVal) {
-        final Vector3 diff = tempCenter.subtract(_center, Vector3.fetchTempInstance());
+    private BoundingVolume merge(final double otherRadius, final ReadOnlyVector3 otherCenter, final BoundingSphere store) {
+        final Vector3 diff = otherCenter.subtract(_center, Vector3.fetchTempInstance());
         final double lengthSquared = diff.lengthSquared();
-        final double radiusDiff = temp_radius - getRadius();
+        final double radiusDiff = otherRadius - getRadius();
+        final double radiusDiffSqr = radiusDiff * radiusDiff;
 
-        final double fRDiffSqr = radiusDiff * radiusDiff;
-
-        if (fRDiffSqr >= lengthSquared) {
+        // if one sphere wholly contains the other
+        if (radiusDiffSqr >= lengthSquared) {
             Vector3.releaseTempInstance(diff);
+            // if we contain the other
             if (radiusDiff <= 0.0) {
-                return this;
+                store.setCenter(_center);
+                store.setRadius(_radius);
+                return store;
             }
-
-            rVal.setCenter(tempCenter);
-            rVal.setRadius(temp_radius);
-            return rVal;
+            // else the other contains us
+            else {
+                store.setCenter(otherCenter);
+                store.setRadius(otherRadius);
+                return store;
+            }
         }
 
+        // distance between sphere centers
         final double length = Math.sqrt(lengthSquared);
 
+        // init a center var using our center
         final Vector3 rCenter = Vector3.fetchTempInstance();
-        if (length > radiusEpsilon) {
+        rCenter.set(_center);
+
+        // if our centers are at least a tiny amount apart from each other...
+        if (length > MathUtils.EPSILON) {
+            // place us between the two centers, weighted by radii
             final double coeff = (length + radiusDiff) / (2.0 * length);
-            rCenter.set(_center.addLocal(diff.multiplyLocal(coeff)));
-        } else {
-            rCenter.set(_center);
+            rCenter.addLocal(diff.multiplyLocal(coeff));
         }
-
-        rVal.setCenter(rCenter);
-        rVal.setRadius(0.5 * (length + getRadius() + temp_radius));
-
         Vector3.releaseTempInstance(diff);
+
+        // set center on our resulting bounds
+        store.setCenter(rCenter);
         Vector3.releaseTempInstance(rCenter);
-        return rVal;
+
+        // Set radius
+        store.setRadius(0.5 * (length + getRadius() + otherRadius));
+        return store;
     }
 
     /**
