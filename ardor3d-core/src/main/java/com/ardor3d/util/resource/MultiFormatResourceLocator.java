@@ -73,7 +73,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
     @Override
     public ResourceSource locateResource(final String resourceName) {
         if (_trySpecifiedFormatFirst) {
-            final ResourceSource src = super.locateResource(resourceName);
+            final ResourceSource src = doRecursiveLocate(resourceName);
             if (src != null) {
                 return src;
             }
@@ -81,7 +81,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
 
         final String baseFileName = getBaseFileName(resourceName);
         for (final String extension : _extensions) {
-            final ResourceSource src = super.locateResource(baseFileName + extension);
+            final ResourceSource src = doRecursiveLocate(baseFileName + extension);
             if (src != null) {
                 return src;
             }
@@ -89,7 +89,7 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
 
         if (!_trySpecifiedFormatFirst) {
             // If all else fails, just try the original name.
-            return super.locateResource(resourceName);
+            return doRecursiveLocate(resourceName);
         } else {
             return null;
         }

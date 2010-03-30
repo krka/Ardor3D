@@ -71,7 +71,11 @@ public class SimpleResourceLocator implements ResourceLocator {
         return _baseDir;
     }
 
-    public ResourceSource locateResource(String resourceName) {
+    public ResourceSource locateResource(final String resourceName) {
+        return doRecursiveLocate(resourceName);
+    }
+
+    protected ResourceSource doRecursiveLocate(String resourceName) {
         // Trim off any prepended local dir.
         while (resourceName.startsWith("./") && resourceName.length() > 2) {
             resourceName = resourceName.substring(2);
@@ -101,7 +105,7 @@ public class SimpleResourceLocator implements ResourceLocator {
         if (resourceName == null) {
             return null;
         } else {
-            return locateResource(resourceName);
+            return doRecursiveLocate(resourceName);
         }
     }
 
