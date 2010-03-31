@@ -231,8 +231,10 @@ public class Functions {
      */
     public static Function3D simplexNoise() {
         return new Function3D() {
+            SimplexNoise noiseGenerator = new SimplexNoise();
+
             public double eval(final double x, final double y, final double z) {
-                return SimplexNoise.noise(x, y, z);
+                return noiseGenerator.noise(x, y, z);
             }
         };
     }
