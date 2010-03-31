@@ -48,12 +48,9 @@ public abstract class ObjectPool<T extends Poolable> {
 
         final List<T> objects = _pool.get();
         if (objects.size() < _maxSize) {
-            reset(object);
             objects.add(object);
         }
     }
-
-    private void reset(final T object) {}
 
     public static <T extends Poolable> ObjectPool<T> create(final Class<T> clazz, final int maxSize) {
         return new ObjectPool<T>(maxSize) {
