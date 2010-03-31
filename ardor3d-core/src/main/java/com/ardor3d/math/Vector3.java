@@ -678,10 +678,15 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
             result = new Vector3();
         }
 
-        final double x = (1.0 - scalar) * beginVec.getX() + scalar * endVec.getX();
-        final double y = (1.0 - scalar) * beginVec.getY() + scalar * endVec.getY();
-        final double z = (1.0 - scalar) * beginVec.getZ() + scalar * endVec.getZ();
-        return result.set(x, y, z);
+        // Check for equality and skip operation if possible.
+        if (!beginVec.equals(endVec)) {
+            final double x = (1.0 - scalar) * beginVec.getX() + scalar * endVec.getX();
+            final double y = (1.0 - scalar) * beginVec.getY() + scalar * endVec.getY();
+            final double z = (1.0 - scalar) * beginVec.getZ() + scalar * endVec.getZ();
+            return result.set(x, y, z);
+        } else {
+            return result.set(beginVec);
+        }
     }
 
     /**
@@ -698,9 +703,14 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *             if beginVec or endVec are null.
      */
     public Vector3 lerpLocal(final ReadOnlyVector3 beginVec, final ReadOnlyVector3 endVec, final double scalar) {
-        setX((1.0 - scalar) * beginVec.getX() + scalar * endVec.getX());
-        setY((1.0 - scalar) * beginVec.getY() + scalar * endVec.getY());
-        setZ((1.0 - scalar) * beginVec.getZ() + scalar * endVec.getZ());
+        // Check for equality and skip operation if possible.
+        if (!beginVec.equals(endVec)) {
+            setX((1.0 - scalar) * beginVec.getX() + scalar * endVec.getX());
+            setY((1.0 - scalar) * beginVec.getY() + scalar * endVec.getY());
+            setZ((1.0 - scalar) * beginVec.getZ() + scalar * endVec.getZ());
+        } else {
+            set(beginVec);
+        }
         return this;
     }
 
