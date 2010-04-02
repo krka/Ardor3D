@@ -945,7 +945,7 @@ public class BinaryInputCapsule implements InputCapsule {
      * UTF-8 codepoints map to UTF-16 codepoints and vv, which is what Java uses for it's Strings. (so a UTF-8 codepoint
      * can contain all possible values for a Java char)
      * 
-     * A UTF-8 codepoint can be 1, 2 or 3 bytes long. How long a codepint is can be told by reading the first byte: b <
+     * A UTF-8 codepoint can be 1, 2 or 3 bytes long. How long a codepoint is can be told by reading the first byte: b <
      * 0x80, 1 byte (b & 0xC0) == 0xC0, 2 bytes (b & 0xE0) == 0xE0, 3 bytes
      * 
      * However there is an additional restriction to UTF-8, to enable you to find the start of a UTF-8 codepoint, if you
@@ -966,9 +966,7 @@ public class BinaryInputCapsule implements InputCapsule {
         }
 
         /*
-         * @see ISSUE 276
-         * 
-         * We'll transfer the bytes into a seperate byte array. While we do that we'll take the opportunity to check if
+         * We'll transfer the bytes into a separate byte array. While we do that we'll take the opportunity to check if
          * the byte data is valid UTF-8.
          * 
          * If it is not UTF-8 it is most likely saved with the BinaryOutputCapsule bug, that saves Strings using their
@@ -994,7 +992,7 @@ public class BinaryInputCapsule implements InputCapsule {
          * a "high" codepoint - use a "low" codepoint after "high" codepoint, after a "high" codepoint that starts with
          * 1110
          * 
-         * In practise this means that unless 2 or 3 "high" codepoints are used after each other in proper order, we'll
+         * In practice this means that unless 2 or 3 "high" codepoints are used after each other in proper order, we'll
          * detect the string was not originally UTF-8 encoded.
          */
         final byte[] bytes = new byte[length];
