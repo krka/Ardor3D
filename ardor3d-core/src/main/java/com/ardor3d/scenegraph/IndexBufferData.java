@@ -11,6 +11,9 @@
 package com.ardor3d.scenegraph;
 
 import java.nio.Buffer;
+import java.nio.IntBuffer;
+
+import com.ardor3d.util.geom.BufferUtils;
 
 public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferData<T> {
 
@@ -28,6 +31,19 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      *         int should return unsigned values.
      */
     public abstract int get(int index);
+
+    /**
+     * @return a new, non-direct IntBuffer containing a snapshot of the contents of this buffer.
+     */
+    public IntBuffer asIntBuffer() {
+        rewind();
+        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(limit());
+        for (int i = 0, max = limit(); i < max; i++) {
+            buff.put(get());
+        }
+        buff.flip();
+        return buff;
+    }
 
     /**
      * Sets the value of this buffer at the current position, incrementing our position by 1 entry.

@@ -109,4 +109,13 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
     public IntBuffer getBuffer() {
         return _buffer;
     }
+
+    @Override
+    public IntBuffer asIntBuffer() {
+        rewind();
+        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(limit());
+        buff.put(getBuffer());
+        buff.flip();
+        return buff;
+    }
 }
