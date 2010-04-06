@@ -112,9 +112,10 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
 
     @Override
     public IntBuffer asIntBuffer() {
-        rewind();
-        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(limit());
-        buff.put(getBuffer());
+        final IntBuffer source = getBuffer().duplicate();
+        source.rewind();
+        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(source.limit());
+        buff.put(source);
         buff.flip();
         return buff;
     }

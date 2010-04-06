@@ -12,6 +12,7 @@ package com.ardor3d.scenegraph;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -108,5 +109,17 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
     @Override
     public ByteBuffer getBuffer() {
         return _buffer;
+    }
+
+    @Override
+    public IntBuffer asIntBuffer() {
+        final ByteBuffer source = getBuffer().duplicate();
+        source.rewind();
+        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(source.limit());
+        for (int i = 0, max = source.limit(); i < max; i++) {
+            buff.put(source.get() & 0xFF);
+        }
+        buff.flip();
+        return buff;
     }
 }

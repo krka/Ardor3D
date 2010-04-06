@@ -11,6 +11,7 @@
 package com.ardor3d.scenegraph;
 
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 import com.ardor3d.util.export.InputCapsule;
@@ -108,5 +109,17 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
     @Override
     public ShortBuffer getBuffer() {
         return _buffer;
+    }
+
+    @Override
+    public IntBuffer asIntBuffer() {
+        final ShortBuffer source = getBuffer().duplicate();
+        source.rewind();
+        final IntBuffer buff = BufferUtils.createIntBufferOnHeap(source.limit());
+        for (int i = 0, max = source.limit(); i < max; i++) {
+            buff.put(source.get() & 0xFFFF);
+        }
+        buff.flip();
+        return buff;
     }
 }
