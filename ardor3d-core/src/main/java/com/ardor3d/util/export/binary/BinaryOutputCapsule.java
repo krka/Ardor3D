@@ -805,11 +805,14 @@ public class BinaryOutputCapsule implements OutputCapsule {
     // NIO BUFFERS
 
     // float buffer
-    protected void write(final FloatBuffer value) throws IOException {
-        if (value == null) {
+    protected void write(final FloatBuffer source) throws IOException {
+        if (source == null) {
             write(NULL_OBJECT);
             return;
         }
+
+        // duplicate buffer to allow modification of limit/position without changing original.
+        final FloatBuffer value = source.duplicate();
 
         // write length
         final int length = value.limit();
@@ -821,11 +824,10 @@ public class BinaryOutputCapsule implements OutputCapsule {
         // create little endian store
         final ByteBuffer buf = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
 
-        // place buffer into store. Rewind buffers
+        // place buffer into store.
         value.rewind();
         buf.asFloatBuffer().put(value);
         buf.rewind();
-        value.rewind();
 
         // Pull out store as array
         final byte[] array = new byte[buf.capacity()];
@@ -836,11 +838,14 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
 
     // int buffer
-    protected void write(final IntBuffer value) throws IOException {
-        if (value == null) {
+    protected void write(final IntBuffer source) throws IOException {
+        if (source == null) {
             write(NULL_OBJECT);
             return;
         }
+
+        // duplicate buffer to allow modification of limit/position without changing original.
+        final IntBuffer value = source.duplicate();
 
         // write length
         final int length = value.limit();
@@ -856,7 +861,6 @@ public class BinaryOutputCapsule implements OutputCapsule {
         value.rewind();
         buf.asIntBuffer().put(value);
         buf.rewind();
-        value.rewind();
 
         // Pull out store as array
         final byte[] array = new byte[buf.capacity()];
@@ -867,11 +871,14 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
 
     // short buffer
-    protected void write(final ShortBuffer value) throws IOException {
-        if (value == null) {
+    protected void write(final ShortBuffer source) throws IOException {
+        if (source == null) {
             write(NULL_OBJECT);
             return;
         }
+
+        // duplicate buffer to allow modification of limit/position without changing original.
+        final ShortBuffer value = source.duplicate();
 
         // write length
         final int length = value.limit();
@@ -887,7 +894,6 @@ public class BinaryOutputCapsule implements OutputCapsule {
         value.rewind();
         buf.asShortBuffer().put(value);
         buf.rewind();
-        value.rewind();
 
         // Pull out store as array
         final byte[] array = new byte[buf.capacity()];
@@ -898,11 +904,14 @@ public class BinaryOutputCapsule implements OutputCapsule {
     }
 
     // byte buffer
-    protected void write(final ByteBuffer value) throws IOException {
-        if (value == null) {
+    protected void write(final ByteBuffer source) throws IOException {
+        if (source == null) {
             write(NULL_OBJECT);
             return;
         }
+
+        // duplicate buffer to allow modification of limit/position without changing original.
+        final ByteBuffer value = source.duplicate();
 
         // write length
         final int length = value.limit();
