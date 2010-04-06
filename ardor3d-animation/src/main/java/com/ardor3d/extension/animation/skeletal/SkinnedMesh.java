@@ -24,6 +24,9 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * Mesh supporting deformation via skeletal animation.
+ */
 public class SkinnedMesh extends Mesh implements PoseListener, Savable {
 
     /**
@@ -67,9 +70,13 @@ public class SkinnedMesh extends Mesh implements PoseListener, Savable {
     private GLSLShaderObjectsState _gpuShader;
 
     /**
+     * <p>
      * Flag for enabling automatically updating the skin's model bound when the pose changes. Only effective in CPU
-     * skinning mode. Default is false as this is currently expensive. XXX: If we can find a better way to update the
-     * bounds, maybe we should make this default to true or remove this altogether.
+     * skinning mode. Default is false as this is currently expensive.
+     * </p>
+     * 
+     * XXX: If we can find a better way to update the bounds, maybe we should make this default to true or remove this
+     * altogether.
      */
     private boolean _autoUpdateSkinBound = false;
 

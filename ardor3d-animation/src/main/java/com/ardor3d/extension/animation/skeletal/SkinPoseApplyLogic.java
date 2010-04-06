@@ -16,6 +16,14 @@ package com.ardor3d.extension.animation.skeletal;
  */
 public interface SkinPoseApplyLogic {
 
+    /**
+     * Apply, in some way, the given pose to the given mesh.
+     * 
+     * @param skinnedMesh
+     *            the mesh to apply to.
+     * @param pose
+     *            the pose to apply.
+     */
     void doApply(SkinnedMesh skinnedMesh, SkeletonPose pose);
 
 }

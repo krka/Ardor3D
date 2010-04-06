@@ -13,44 +13,68 @@ package com.ardor3d.extension.animation.skeletal.blendtree;
 import java.util.List;
 import java.util.Map;
 
-import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.JointChannel;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * Provides the associated clip as a BlendTreeSource, excluding a given set of channels by name.
+ * Similar to a ClipSource, this class samples and returns values from the channels of an AnimationClip.
+ * ExclusiveClipSource further filters this result set, excluding a given set of channels by name.
  */
 public class ExclusiveClipSource extends ClipSource {
 
-    private List<String> _disabledChannels;
+    /** Our List of channels to exclude by name. */
+    private final List<String> _disabledChannels = Lists.newArrayList();
 
+    /**
+     * Construct a new source. Clip and Manager must be set separately before use.
+     */
     public ExclusiveClipSource() {}
 
+    /**
+     * Construct a new source using the given clip and manager.
+     * 
+     * @param clip
+     *            our source clip.
+     * @param manager
+     *            the manager used to track clip state.
+     */
     public ExclusiveClipSource(final AnimationClip clip, final AnimationManager manager) {
         super(clip, manager);
     }
 
-    public void setDisabledChannels(final List<String> disabledChannels) {
-        if (_disabledChannels == null) {
-            _disabledChannels = Lists.newArrayList(disabledChannels);
-        } else {
-            _disabledChannels.clear();
-            _disabledChannels.addAll(disabledChannels);
+    /**
+     * Clears all disabled channels/joints from this source.
+     */
+    public void clearDisabled() {
+        _disabledChannels.clear();
+    }
+
+    /**
+     * @param disabledChannels
+     *            a list of channel names to exclude when returning clip results.
+     */
+    public void addDisabledChannels(final String... disabledChannels) {
+        for (final String channelName : disabledChannels) {
+            if (!_disabledChannels.contains(channelName)) {
+                _disabledChannels.add(channelName);
+            }
         }
     }
 
-    public void setDisabledJoints(final List<Integer> disabledJoints) {
-        if (_disabledChannels == null) {
-            _disabledChannels = Lists.newArrayList();
-        } else {
-            _disabledChannels.clear();
-        }
-        for (final Integer i : disabledJoints) {
-            if (i != null) {
-                _disabledChannels.add(JointChannel.JOINT_CHANNEL_NAME + i.intValue());
+    /**
+     * @param disabledJoints
+     *            a list of joint indices to exclude when returning clip results. These are converted to channel names
+     *            and stored in our disabledChannels list.
+     */
+    public void addDisabledJoints(final int... disabledJoints) {
+        for (final int i : disabledJoints) {
+            final String channelName = JointChannel.JOINT_CHANNEL_NAME + i;
+            if (!_disabledChannels.contains(channelName)) {
+                _disabledChannels.add(channelName);
             }
         }
     }
@@ -63,11 +87,11 @@ public class ExclusiveClipSource extends ClipSource {
     }
 
     @Override
-    public Map<String, Object> getSourceData() {
-        final Map<String, Object> orig = super.getSourceData();
+    public Map<String, ? extends Object> getSourceData(final AnimationManager manager) {
+        final Map<String, ? extends Object> orig = super.getSourceData(manager);
 
         // make a copy, removing specific channels
-        final Map<String, Object> data = Maps.newHashMap(orig);
+        final Map<String, ? extends Object> data = Maps.newHashMap(orig);
         if (_disabledChannels != null) {
             for (final String key : _disabledChannels) {
                 data.remove(key);
@@ -76,5 +100,4 @@ public class ExclusiveClipSource extends ClipSource {
 
         return data;
     }
-
 }

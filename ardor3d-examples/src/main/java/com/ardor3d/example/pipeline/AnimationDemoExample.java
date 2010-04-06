@@ -18,19 +18,22 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.JointChannel;
+import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
-import com.ardor3d.extension.animation.skeletal.TransformChannel;
-import com.ardor3d.extension.animation.skeletal.TransformData;
-import com.ardor3d.extension.animation.skeletal.blendtree.BinaryTransformLERPSource;
-import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
-import com.ardor3d.extension.animation.skeletal.blendtree.InclusiveClipSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.ManagedTransformSource;
-import com.ardor3d.extension.animation.skeletal.blendtree.TransformApplier;
+import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.TriggerCallback;
+import com.ardor3d.extension.animation.skeletal.clip.TriggerChannel;
+import com.ardor3d.extension.animation.skeletal.state.loader.InputStore;
+import com.ardor3d.extension.animation.skeletal.state.loader.JSLayerImporter;
+import com.ardor3d.extension.animation.skeletal.state.loader.OutputStore;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
+import com.ardor3d.extension.effect.particle.ParticleControllerListener;
+import com.ardor3d.extension.effect.particle.ParticleFactory;
+import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
@@ -41,29 +44,43 @@ import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
+import com.ardor3d.extension.ui.util.ButtonGroup;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.controller.SpatialController;
+import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.google.common.collect.Lists;
+import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceSource;
+import com.ardor3d.util.resource.URLResourceSource;
 
 /**
- * Illustrates loading several animations from Collada and arranging them in a controllable blend tree.
+ * Illustrates loading several animations from Collada and arranging them in an animation state machine.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationDemoExample", //
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
@@ -74,6 +91,7 @@ public class AnimationDemoExample extends ExampleBase {
     private boolean showSkeleton = false, showJointLabels = false;
 
     private UILabel frameRateLabel;
+    private UICheckBox headCheck;
     private UIHud hud;
 
     private int frames = 0;
@@ -82,16 +100,9 @@ public class AnimationDemoExample extends ExampleBase {
     private AnimationManager manager;
     private SkeletonPose pose;
 
-    private BinaryTransformLERPSource moveBlend, punchBlend, headBlend;
-    private int headJoint;
-    private ManagedTransformSource headSource;
-
-    private BlendController moveBlendController;
-    private BlendController punchBlendController;
-    private AnimationClip punchClip;
-
-    private final Quaternion headRotation = new Quaternion();
     private UIButton runWalkButton, punchButton;
+    private OutputStore layerOutput;
+    private Cylinder staff;
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
@@ -112,6 +123,9 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Load collada model
         createCharacter();
+
+        // Create our staff object for attaching.
+        staff = new Cylinder("staff", 4, 9, 1, 40, true);
 
         // Create our options frame and fps label
         createHUD();
@@ -136,13 +150,19 @@ public class AnimationDemoExample extends ExampleBase {
         runWalkButton = new UIButton("Start running...");
         runWalkButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, basePanel, Alignment.TOP_LEFT, 5, -5));
         runWalkButton.addActionListener(new ActionListener() {
+            boolean walk = true;
+
             public void actionPerformed(final ActionEvent event) {
-                if (moveBlendController.getBlendDirection() == BlendDirection.Up) {
-                    moveBlendController.setBlendDirection(BlendDirection.Down);
-                    runWalkButton.setText("Start running...");
+                if (!walk) {
+                    if (manager.getBaseAnimationLayer().doTransition("walk")) {
+                        runWalkButton.setText("Start running...");
+                        walk = true;
+                    }
                 } else {
-                    moveBlendController.setBlendDirection(BlendDirection.Up);
-                    runWalkButton.setText("Start walking...");
+                    if (manager.getBaseAnimationLayer().doTransition("run")) {
+                        runWalkButton.setText("Start walking...");
+                        walk = false;
+                    }
                 }
             }
         });
@@ -152,20 +172,21 @@ public class AnimationDemoExample extends ExampleBase {
         punchButton
                 .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
         punchButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(final ActionEvent event) {
-                punchBlendController.setBlendDirection(BlendDirection.Up);
-                manager.resetClip(punchClip);
+                manager.findAnimationLayer("punch").setCurrentState("punch_right", true);
                 punchButton.setEnabled(false);
             }
         });
         basePanel.add(punchButton);
 
-        final UICheckBox headCheck = new UICheckBox("Procedurally turn head");
+        headCheck = new UICheckBox("Procedurally turn head");
         headCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, punchButton, Alignment.BOTTOM_LEFT, 0, -5));
         headCheck.setSelected(true);
         headCheck.addActionListener(new ActionListener() {
+
             public void actionPerformed(final ActionEvent event) {
-                headBlend.setBlendWeight(headCheck.isSelected() ? 1 : 0);
+                manager.getValuesStore().put("head_blend", headCheck.isSelected() ? 1.0 : 0.0);
             }
         });
         basePanel.add(headCheck);
@@ -174,6 +195,7 @@ public class AnimationDemoExample extends ExampleBase {
         skinCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
         skinCheck.setSelected(true);
         skinCheck.addActionListener(new ActionListener() {
+
             public void actionPerformed(final ActionEvent event) {
                 colladaNode.getSceneHints().setCullHint(skinCheck.isSelected() ? CullHint.Dynamic : CullHint.Always);
             }
@@ -185,6 +207,7 @@ public class AnimationDemoExample extends ExampleBase {
         skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
+
             public void actionPerformed(final ActionEvent event) {
                 showSkeleton = skeletonCheck.isSelected();
                 boneLabelCheck.setEnabled(showSkeleton);
@@ -197,11 +220,53 @@ public class AnimationDemoExample extends ExampleBase {
         boneLabelCheck.setSelected(false);
         boneLabelCheck.setEnabled(showSkeleton);
         boneLabelCheck.addActionListener(new ActionListener() {
+
             public void actionPerformed(final ActionEvent event) {
                 showJointLabels = boneLabelCheck.isSelected();
             }
         });
         basePanel.add(boneLabelCheck);
+
+        final UILabel attachLabel = new UILabel("Attach Staff to...");
+        attachLabel
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, boneLabelCheck, Alignment.BOTTOM_LEFT, 0, -8));
+        basePanel.add(attachLabel);
+
+        final ButtonGroup attachGroup = new ButtonGroup();
+        final UIRadioButton attachNoneButton = new UIRadioButton("none");
+        attachNoneButton.setSelected(true);
+        attachNoneButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, attachLabel, Alignment.BOTTOM_LEFT, 0,
+                -5));
+        attachNoneButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                for (final AttachmentPoint p : layerOutput.getAttachmentPoints()) {
+                    p.setAttachment(null);
+                }
+                staff.removeFromParent();
+            }
+        });
+        attachNoneButton.setGroup(attachGroup);
+        basePanel.add(attachNoneButton);
+
+        UIRadioButton last = attachNoneButton;
+        for (final AttachmentPoint p : layerOutput.getAttachmentPoints()) {
+            final UIRadioButton attachPButton = new UIRadioButton(p.getName());
+            attachPButton.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, last, Alignment.BOTTOM_LEFT, 0, -5));
+            attachPButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent event) {
+                    _root.attachChild(staff);
+                    p.setAttachment(staff);
+                    for (final AttachmentPoint p2 : layerOutput.getAttachmentPoints()) {
+                        if (p2 != p) {
+                            p2.setAttachment(null);
+                        }
+                    }
+                }
+            });
+            attachPButton.setGroup(attachGroup);
+            basePanel.add(attachPButton);
+            last = attachPButton;
+        }
 
         optionsFrame.updateMinimumSizeFromContents();
         optionsFrame.layout();
@@ -258,81 +323,138 @@ public class AnimationDemoExample extends ExampleBase {
     }
 
     private void createAnimation(final ColladaImporter colladaImporter) {
-        final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/skeleton.walk.dae");
-        final ColladaStorage storage2 = colladaImporter.load("collada/skeleton/skeleton.run.dae");
-        final ColladaStorage storage3 = colladaImporter.load("collada/skeleton/skeleton.punch.dae");
 
         // Make our manager
         manager = new AnimationManager(_timer, pose);
 
-        final AnimationClip walkClip = new AnimationClip();
-        for (final JointChannel channel : storage1.getJointChannels()) {
-            // add it to a clip
-            walkClip.addChannel(channel);
-        }
-        final AnimationClip runClip = new AnimationClip();
-        for (final JointChannel channel : storage2.getJointChannels()) {
-            // add it to a clip
-            runClip.addChannel(channel);
-        }
-        punchClip = new AnimationClip();
-        for (final JointChannel channel : storage3.getJointChannels()) {
-            // add it to a clip
-            punchClip.addChannel(channel);
-        }
-
-        // add the clip
-        manager.addClip(walkClip);
-        manager.addClip(runClip);
-        manager.addClip(punchClip);
-
-        // XXX: The next bits might be setup by an Animation state machine of some sort.
-
-        // Set some clip instance specific data - repeat, time scaling
-        manager.getClipState(walkClip).setLoopCount(Integer.MAX_VALUE);
-        manager.getClipState(runClip).setLoopCount(Integer.MAX_VALUE);
-        manager.getClipState(punchClip).setLoopCount(1);
-        manager.getClipState(punchClip).setActive(false);
-
         // Add our "applier logic".
-        manager.setApplier(new TransformApplier());
+        final SimpleAnimationApplier applier = new SimpleAnimationApplier();
+        manager.setApplier(applier);
 
-        // Add our "blend tree"
-        // walk to run blend
-        final ClipSource walkSource = new ClipSource(walkClip, manager);
-        final ClipSource runSource = new ClipSource(runClip, manager);
-        moveBlend = new BinaryTransformLERPSource(walkSource, runSource);
-        moveBlendController = new BlendController(moveBlend, 0.01);
+        // Add our clips...
+        final InputStore input = new InputStore();
+        {
+            final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/skeleton.walk.dae");
+            input.getClips().put(storage1.extractChannelsAsClip("skeleton.walk"));
+        }
+        {
+            final ColladaStorage storage2 = colladaImporter.load("collada/skeleton/skeleton.run.dae");
+            input.getClips().put(storage2.extractChannelsAsClip("skeleton.run"));
+        }
+        {
+            final ColladaStorage storage3 = colladaImporter.load("collada/skeleton/skeleton.punch.dae");
+            final AnimationClip punchClip = storage3.extractChannelsAsClip("skeleton.punch");
+            input.getClips().put(punchClip);
+            addFireballTrigger(applier, punchClip);
+        }
 
-        // punch blend
-        final InclusiveClipSource punchSourceArm = new InclusiveClipSource(punchClip, manager);
-        punchSourceArm.setEnabledJoints(Lists.newArrayList(11, 12, 13, 14, 15));
-        punchBlend = new BinaryTransformLERPSource(moveBlend, punchSourceArm);
-        punchBlendController = new BlendController(punchBlend, 0.01);
-        punchBlendController.addBlendControllerListener(new BlendControllerListener() {
+        // Load our layer and states from script
+        try {
+            final ResourceSource layersFile = new URLResourceSource(JSLayerImporter.class.getClassLoader().getResource(
+                    "com/ardor3d/example/pipeline/AnimationDemoExample.js"));
+            layerOutput = JSLayerImporter.addLayers(layersFile, manager, input);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
 
-            public void blendDone(final BlendController blendController) {
-                if (blendController.getBlendDirection() == BlendDirection.Down) {
-                    punchButton.setEnabled(true);
+        // kick things off by setting our starting states
+        manager.getBaseAnimationLayer().setCurrentState("walk_anim", true);
+        manager.findAnimationLayer("head").setCurrentState("head_rotate", true);
+
+        // add a head rotator
+        final int headJoint = pose.getSkeleton().findJointByName("Bip01_Head");
+        final ManagedTransformSource headSource = (ManagedTransformSource) manager.findAnimationLayer("head")
+                .getSteadyState("head_rotate").getSourceTree();
+        colladaNode.addController(new SpatialController<Node>() {
+            private final Quaternion headRotation = new Quaternion();
+
+            public void update(final double time, final Node caller) {
+                // update the head's position
+                if (headCheck != null && headCheck.isSelected()) {
+                    double angle = _timer.getTimeInSeconds();
+                    // range 0 to 180 degrees
+                    angle %= MathUtils.PI;
+                    // range -90 to 90 degrees
+                    angle -= MathUtils.HALF_PI;
+                    // range is now 0 to 90 degrees, reflected
+                    angle = Math.abs(angle);
+                    // range is now -45 to 45 degrees
+                    angle -= MathUtils.HALF_PI / 2.0;
+
+                    headRotation.fromAngleAxis(angle, Vector3.UNIT_X);
+                    headSource.setJointRotation(headJoint, headRotation);
                 }
             }
         });
-        manager.getClipState(punchClip).addAnimationListener(new AnimationListener() {
 
+        // add callback for our UI
+        manager.findClipInstance("skeleton.punch").addAnimationListener(new AnimationListener() {
             public void animationFinished() {
-                punchBlendController.setBlendDirection(BlendDirection.Down);
+                punchButton.setEnabled(true);
             }
         });
+    }
 
-        headSource = new ManagedTransformSource();
-        headJoint = storage1.getSkins().get(0).getPose().getSkeleton().findJointByName("Bip01_Head");
-        headSource.setJointTransformData(headJoint, ((TransformChannel) walkClip
-                .findChannelByName(JointChannel.JOINT_CHANNEL_NAME + headJoint)).getTransformData(0,
-                new TransformData()));
-        headBlend = new BinaryTransformLERPSource(punchBlend, headSource);
-        headBlend.setBlendWeight(1.0);
+    private void addFireballTrigger(final SimpleAnimationApplier applier, final AnimationClip punchClip) {
+        final float max = punchClip.getMaxTimeIndex();
+        final TriggerChannel triggerChannel = new TriggerChannel("punch_fire", new float[] { 0, max / 2,
+                max / 2 + 0.25f }, new String[] { null, "fist_fire", null });
+        punchClip.addChannel(triggerChannel);
+        applier.addTriggerCallback("fist_fire", new TriggerCallback() {
+            public void doTrigger() {
+                addParticles();
+            }
+        });
+    }
 
-        manager.setBlendRoot(headBlend);
+    private void addParticles() {
+        // find location of fist
+        final Transform loc = pose.getGlobalJointTransforms()[15];
+
+        // Spawn a short lived explosion
+        final ParticleSystem explosion = ParticleFactory.buildParticles("big", 80);
+        explosion.setEmissionDirection(new Vector3(0.0f, 1.0f, 0.0f));
+        explosion.setMaximumAngle(MathUtils.PI);
+        explosion.setSpeed(0.9f);
+        explosion.setMinimumLifeTime(300.0f);
+        explosion.setMaximumLifeTime(500.0f);
+        explosion.setStartSize(2.0f);
+        explosion.setEndSize(5.0f);
+        explosion.setStartColor(new ColorRGBA(1.0f, 0.312f, 0.121f, 1.0f));
+        explosion.setEndColor(new ColorRGBA(1.0f, 0.24313726f, 0.03137255f, 0.0f));
+        explosion.setControlFlow(false);
+        explosion.setInitialVelocity(0.04f);
+        explosion.setParticleSpinSpeed(0.0f);
+        explosion.setRepeatType(RepeatType.CLAMP);
+
+        // attach to root, at fist location
+        explosion.setTransform(loc);
+
+        explosion.getParticleController().addListener(new ParticleControllerListener() {
+            @Override
+            public void onDead(final ParticleSystem particles) {
+                explosion.removeFromParent();
+            }
+        });
+        _root.attachChild(explosion);
+        explosion.forceRespawn();
+
+        final BlendState blend = new BlendState();
+        blend.setBlendEnabled(true);
+        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        blend.setDestinationFunction(BlendState.DestinationFunction.One);
+        explosion.setRenderState(blend);
+
+        final TextureState ts = new TextureState();
+        ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
+                TextureStoreFormat.GuessCompressedFormat, true));
+        ts.getTexture().setWrap(WrapMode.BorderClamp);
+        ts.setEnabled(true);
+        explosion.setRenderState(ts);
+
+        final ZBufferState zstate = new ZBufferState();
+        zstate.setWritable(false);
+        explosion.setRenderState(zstate);
     }
 
     private void positionCamera(final ReadOnlyVector3 upAxis) {
@@ -374,25 +496,6 @@ public class AnimationDemoExample extends ExampleBase {
     protected void updateExample(final ReadOnlyTimer timer) {
         hud.updateGeometricState(timer.getTimePerFrame());
 
-        // update the head's position
-        {
-            double angle = timer.getTimeInSeconds();
-            // range 0 to 180 degrees
-            angle %= MathUtils.PI;
-            // range -90 to 90 degrees
-            angle -= MathUtils.HALF_PI;
-            // range is now 0 to 90 degrees, reflected
-            angle = Math.abs(angle);
-            // range is now -45 to 45 degrees
-            angle -= MathUtils.HALF_PI / 2.0;
-
-            headRotation.fromAngleAxis(angle, Vector3.UNIT_X);
-            headSource.setJointRotation(headJoint, headRotation);
-        }
-
-        moveBlendController.update();
-        punchBlendController.update();
-
         final long now = System.currentTimeMillis();
         final long dt = now - startTime;
         if (dt > 200) {
@@ -427,57 +530,5 @@ public class AnimationDemoExample extends ExampleBase {
         if (showSkeleton) {
             SkeletalDebugger.drawSkeletons(_root, renderer, false, showJointLabels);
         }
-    }
-
-    private enum BlendDirection {
-        Up, Down
-    }
-
-    private class BlendController {
-        private final double blendSpeed;
-        private final BinaryTransformLERPSource blendSource;
-        private BlendDirection blendDirection = BlendDirection.Down;
-        private boolean doBlend;
-        private final List<BlendControllerListener> blendControllerListeners;
-
-        public BlendController(final BinaryTransformLERPSource blendSource, final double blendSpeed) {
-            this.blendSource = blendSource;
-            this.blendSpeed = blendSpeed;
-            blendControllerListeners = Lists.newArrayList();
-        }
-
-        public BlendDirection getBlendDirection() {
-            return blendDirection;
-        }
-
-        public void setBlendDirection(final BlendDirection blendDirection) {
-            this.blendDirection = blendDirection;
-            doBlend = true;
-        }
-
-        public void addBlendControllerListener(final BlendControllerListener blendControllerListener) {
-            blendControllerListeners.add(blendControllerListener);
-        }
-
-        public void update() {
-            if (!doBlend) {
-                return;
-            }
-
-            final double blendChange = blendDirection == BlendDirection.Up ? blendSpeed : -blendSpeed;
-            double blend = blendSource.getBlendWeight() + blendChange;
-            if (blend < 0 || blend > 1) {
-                blend = MathUtils.clamp(blend, 0.0, 1.0);
-                doBlend = false;
-                for (final BlendControllerListener blendControllerListener : blendControllerListeners) {
-                    blendControllerListener.blendDone(this);
-                }
-            }
-            blendSource.setBlendWeight(blend);
-        }
-    }
-
-    private interface BlendControllerListener {
-        void blendDone(BlendController blendController);
     }
 }

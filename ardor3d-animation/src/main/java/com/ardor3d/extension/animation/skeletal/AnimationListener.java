@@ -10,6 +10,14 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+/**
+ * Describes a class interested in receiving notice when an animation has changed state.
+ */
 public interface AnimationListener {
+
+    /**
+     * Called when an animation reaches the end of its complete play time (maxTime * loops)
+     */
     void animationFinished();
+
 }

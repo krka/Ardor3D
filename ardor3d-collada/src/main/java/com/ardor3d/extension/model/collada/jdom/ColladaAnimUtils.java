@@ -29,12 +29,12 @@ import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Element;
 
-import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.Joint;
-import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.ParamType;
 import com.ardor3d.extension.model.collada.jdom.ColladaInputPipe.Type;
 import com.ardor3d.extension.model.collada.jdom.data.AnimationItem;
@@ -721,13 +721,12 @@ public class ColladaAnimUtils {
                     + "\nCheck if element is of type JOINT.");
             return;
         }
-        final int jointIndex = joint.getIndex();
-        final JointChannel jointChannel = new JointChannel(jointIndex, time, transforms);
+        final JointChannel jointChannel = new JointChannel(joint, time, transforms);
 
         final AnimationItem animationItemRoot = targetList.get(0).animationItemRoot;
         AnimationClip animationClip = animationItemRoot.getAnimationClip();
         if (animationClip == null) {
-            animationClip = new AnimationClip();
+            animationClip = new AnimationClip(animationItemRoot.getName());
             animationItemRoot.setAnimationClip(animationClip);
         }
         animationClip.addChannel(jointChannel);

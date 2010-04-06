@@ -10,8 +10,17 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+/**
+ * Describes a class interested in being notified of SkeletonPose updates.
+ */
 public interface PoseListener {
 
+    /**
+     * Call-back method on skeleton pose updates.
+     * 
+     * @param pose
+     *            the pose that was updated.
+     */
     void poseUpdated(SkeletonPose pose);
 
 }

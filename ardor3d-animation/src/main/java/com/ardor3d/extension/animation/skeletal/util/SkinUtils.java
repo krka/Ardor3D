@@ -14,6 +14,9 @@ import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
 
+/**
+ * General utility methods useful for Skin manipulation.
+ */
 public class SkinUtils {
 
     /**

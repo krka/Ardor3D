@@ -21,12 +21,13 @@ import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
-import com.ardor3d.extension.animation.skeletal.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.JointChannel;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
-import com.ardor3d.extension.animation.skeletal.blendtree.TransformApplier;
+import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
+import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
@@ -247,24 +248,25 @@ public class ColladaExample extends ExampleBase {
         // Make our manager
         manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
 
-        final AnimationClip clipA = new AnimationClip();
+        final AnimationClip clipA = new AnimationClip("clipA");
         for (final JointChannel channel : storage.getJointChannels()) {
             // add it to a clip
             clipA.addChannel(channel);
         }
 
-        // add the clip
-        manager.addClip(clipA);
-
         // Set some clip instance specific data - repeat, time scaling
-        manager.getClipState(clipA).setLoopCount(Integer.MAX_VALUE);
-        manager.getClipState(clipA).setTimeScale(1.0);
+        manager.getClipInstance(clipA).setLoopCount(Integer.MAX_VALUE);
 
         // Add our "applier logic".
-        manager.setApplier(new TransformApplier());
+        manager.setApplier(new SimpleAnimationApplier());
 
-        // Add our "blend tree"
-        manager.setBlendRoot(new ClipSource(clipA, manager));
+        // Add our clip as a state in the default animation layer
+        final SteadyState animState = new SteadyState("anim_state");
+        animState.setSourceTree(new ClipSource(clipA, manager));
+        manager.getBaseAnimationLayer().addSteadyState(animState);
+
+        // Set the current animation state on default layer
+        manager.getBaseAnimationLayer().setCurrentState("anim_state", true);
     }
 
     private void positionCamera(final ReadOnlyVector3 upAxis) {

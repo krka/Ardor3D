@@ -12,7 +12,8 @@ package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.util.List;
 
-import com.ardor3d.extension.animation.skeletal.JointChannel;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.scenegraph.Node;
 import com.google.common.collect.Lists;
 
@@ -64,5 +65,13 @@ public class ColladaStorage {
 
     public void setAnimationItemRoot(final AnimationItem animationItemRoot) {
         this.animationItemRoot = animationItemRoot;
+    }
+
+    public AnimationClip extractChannelsAsClip(final String name) {
+        final AnimationClip clip = new AnimationClip(name);
+        for (final JointChannel channel : getJointChannels()) {
+            clip.addChannel(channel);
+        }
+        return clip;
     }
 }

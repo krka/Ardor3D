@@ -12,36 +12,36 @@ package com.ardor3d.extension.model.collada.jdom.data;
 
 import java.util.List;
 
-import com.ardor3d.extension.animation.skeletal.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.google.common.collect.Lists;
 
 public class AnimationItem {
-    private final String name;
-    private final List<AnimationItem> children = Lists.newArrayList();
-    private AnimationClip animationClip;
+    private final String _name;
+    private final List<AnimationItem> _children = Lists.newArrayList();
+    private AnimationClip _animationClip;
 
     public AnimationItem(final String name) {
-        this.name = name;
+        this._name = name;
     }
 
     public AnimationClip getAnimationClip() {
-        return animationClip;
+        return _animationClip;
     }
 
     public void setAnimationClip(final AnimationClip animationClip) {
-        this.animationClip = animationClip;
+        this._animationClip = animationClip;
     }
 
     public String getName() {
-        return name;
+        return _name;
     }
 
     public List<AnimationItem> getChildren() {
-        return children;
+        return _children;
     }
 
     @Override
     public String toString() {
-        return "AnimationItem [name=" + name + (animationClip != null ? ", " + animationClip.toString() : "") + "]";
+        return "AnimationItem [name=" + _name + (_animationClip != null ? ", " + _animationClip.toString() : "") + "]";
     }
 }

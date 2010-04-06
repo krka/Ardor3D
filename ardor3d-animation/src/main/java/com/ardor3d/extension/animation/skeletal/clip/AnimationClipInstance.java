@@ -8,24 +8,49 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.animation.skeletal;
+package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.util.List;
 import java.util.Map;
 
+import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class AnimationClipState {
+/**
+ * Maintains state information about an instance of a specific animation clip, such as time scaling applied, active
+ * flag, start time of the instance, etc.
+ */
+public class AnimationClipInstance {
 
+    /** Active flag - if true, the instance is currently playing. */
     private boolean _active = true;
+
+    /** Number of loops this clip should play. */
     private int _loopCount = 0;
+
+    /**
+     * A scale value to apply to our timing. Values greater than 1 will speed up playback, less than 1 will slow down
+     * playback. Negative values can be used to reverse playback.
+     */
     private double _timeScale = 1.0;
+
+    /** The global start time of our clip instance. */
     private double _startTime = 0.0;
+
+    /** Map of channel name -> state tracking objects. */
     private final Map<String, Object> _clipStateObjects = Maps.newHashMap();
+
+    /** List of callbacks for animation events. */
     private List<AnimationListener> animationListeners = null;
 
+    /**
+     * Add an animation listener to our callback list.
+     * 
+     * @param animationListener
+     *            the listener to add.
+     */
     public void addAnimationListener(final AnimationListener animationListener) {
         if (animationListeners == null) {
             animationListeners = Lists.newArrayList();
@@ -33,14 +58,22 @@ public class AnimationClipState {
         animationListeners.add(animationListener);
     }
 
-    public void removeAnimationListener(final AnimationListener animationListener) {
+    /**
+     * Remove an animation listener from our callback list.
+     * 
+     * @param animationListener
+     *            the listener to remove.
+     * @return true if the listener was found in our list
+     */
+    public boolean removeAnimationListener(final AnimationListener animationListener) {
         if (animationListeners == null) {
-            return;
+            return false;
         }
-        animationListeners.remove(animationListener);
+        final boolean rVal = animationListeners.remove(animationListener);
         if (animationListeners.isEmpty()) {
             animationListeners = null;
         }
+        return rVal;
     }
 
     /**
@@ -85,7 +118,7 @@ public class AnimationClipState {
         _startTime = startTime;
     }
 
-    public Object getApplyTo(final AbstractAnimationChannel<?> channel) {
+    public Object getApplyTo(final AbstractAnimationChannel channel) {
         final String channelName = channel.getChannelName();
         Object rVal = _clipStateObjects.get(channelName);
         if (rVal == null) {
@@ -99,6 +132,9 @@ public class AnimationClipState {
         return _clipStateObjects;
     }
 
+    /**
+     * Tell any animation listeners on this instance that the associated clip has finished playing.
+     */
     public void fireAnimationFinished() {
         if (animationListeners == null) {
             return;

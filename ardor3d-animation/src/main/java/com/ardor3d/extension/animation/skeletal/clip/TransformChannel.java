@@ -8,10 +8,12 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.animation.skeletal;
+package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Quaternion;
@@ -24,20 +26,39 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
 /**
- * NOTE: Could optimize memory by reusing math objects that are the same from one index to the next. Could optimize
- * execution time by then checking object equality and skipping (s)lerps.
+ * An animation channel consisting of a series of transforms interpolated over time.
  */
 @SavableFactory(factoryMethod = "initSavable")
-public class TransformChannel extends AbstractAnimationChannel<TransformData> {
+public class TransformChannel extends AbstractAnimationChannel {
 
+    private static final Logger logger = Logger.getLogger(TransformChannel.class.getName());
+
+    // XXX: Perhaps we could optimize memory by reusing sample objects that are the same from one index to the next.
+    // XXX: Could then also optimize execution time by checking object equality (==) and skipping (s)lerps.
+
+    /** Our rotation samples. */
     private final ReadOnlyQuaternion[] _rotations;
+
+    /** Our translation samples. */
     private final ReadOnlyVector3[] _translations;
+
+    /** Our scale samples. */
     private final ReadOnlyVector3[] _scales;
 
-    private transient final Quaternion _workR = new Quaternion();
-    private transient final Vector3 _workT = new Vector3();
-    private transient final Vector3 _workS = new Vector3();
-
+    /**
+     * Construct a new TransformChannel.
+     * 
+     * @param channelName
+     *            our name.
+     * @param times
+     *            our time offset values.
+     * @param rotations
+     *            the rotations to set on this channel at each time offset.
+     * @param translations
+     *            the translations to set on this channel at each time offset.
+     * @param scales
+     *            the scales to set on this channel at each time offset.
+     */
     public TransformChannel(final String channelName, final float[] times, final ReadOnlyQuaternion[] rotations,
             final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
         super(channelName, times);
@@ -47,24 +68,23 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
         }
 
         // Construct our data
-        _rotations = TransformChannel.copyOf(rotations, new ReadOnlyQuaternion[rotations.length]);
-        _translations = TransformChannel.copyOf(translations, new ReadOnlyVector3[translations.length]);
-        _scales = TransformChannel.copyOf(scales, new ReadOnlyVector3[scales.length]);
+        _rotations = Arrays.copyOf(rotations, rotations.length);
+        _translations = Arrays.copyOf(translations, translations.length);
+        _scales = Arrays.copyOf(scales, scales.length);
     }
 
     /**
-     * XXX: REPLACE THIS ONCE WE SWITCH TO JAVA 6.0 (with Arrays.copyOf)
+     * Construct a new TransformChannel.
      * 
-     * @param <T>
-     * @param srcArray
-     * @param dstArray
-     * @return
+     * @param channelName
+     *            our name.
+     * @param times
+     *            our time offset values.
+     * @param transforms
+     *            the transform to set on this channel at each time offset. These are separated into rotation, scale and
+     *            translation components. Note that supplying transforms with non-rotational matrices (with built in
+     *            shear, scale.) will produce a warning and may not give you the expected result.
      */
-    private static <T> T[] copyOf(final T[] srcArray, final T[] dstArray) {
-        System.arraycopy(srcArray, 0, dstArray, 0, Math.min(srcArray.length, dstArray.length));
-        return dstArray;
-    }
-
     public TransformChannel(final String channelName, final float[] times, final ReadOnlyTransform[] transforms) {
         super(channelName, times);
 
@@ -76,7 +96,8 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
         for (int i = 0; i < transforms.length; i++) {
             final ReadOnlyTransform transform = transforms[i];
             if (!transform.isRotationMatrix()) {
-                throw new IllegalArgumentException("Transforms that have non-rotational matrices are not supported.");
+                TransformChannel.logger
+                        .warning("TransformChannel supplied transform with non-rotational matrices.  May have unexpected results.");
             }
             _rotations[i] = new Quaternion().fromRotationMatrix(transform.getMatrix());
             _translations[i] = new Vector3(transform.getTranslation());
@@ -84,34 +105,46 @@ public class TransformChannel extends AbstractAnimationChannel<TransformData> {
         }
     }
 
-    public void setCurrentSample(final int sampleIndex, final TransformData applyTo) {
-        applyTo.setRotation(_rotations[sampleIndex]);
-        applyTo.setTranslation(_translations[sampleIndex]);
-        applyTo.setScale(_scales[sampleIndex]);
-    }
-
     @Override
-    public void setCurrentSample(final int sampleIndex, final double progressPercent, final TransformData applyTo) {
-        // shortcut
+    public void setCurrentSample(final int sampleIndex, final double progressPercent, final Object applyTo) {
+        final TransformData transformData = (TransformData) applyTo;
+
+        // shortcut if we are fully on one sample or the next
         if (progressPercent == 0.0f) {
-            setCurrentSample(sampleIndex, applyTo);
+            transformData.setRotation(_rotations[sampleIndex]);
+            transformData.setTranslation(_translations[sampleIndex]);
+            transformData.setScale(_scales[sampleIndex]);
             return;
         } else if (progressPercent == 1.0f) {
-            setCurrentSample(sampleIndex + 1, applyTo);
+            transformData.setRotation(_rotations[sampleIndex + 1]);
+            transformData.setTranslation(_translations[sampleIndex + 1]);
+            transformData.setScale(_scales[sampleIndex + 1]);
             return;
         }
 
-        // Apply lerp
-        _workR.slerpLocal(_rotations[sampleIndex], _rotations[sampleIndex + 1], progressPercent);
-        _workT.lerpLocal(_translations[sampleIndex], _translations[sampleIndex + 1], progressPercent);
-        _workS.lerpLocal(_scales[sampleIndex], _scales[sampleIndex + 1], progressPercent);
+        // Apply (s)lerp and set in transform
+        final Quaternion workR = Quaternion.fetchTempInstance();
+        workR.slerpLocal(_rotations[sampleIndex], _rotations[sampleIndex + 1], progressPercent);
+        transformData.setRotation(workR);
+        Quaternion.releaseTempInstance(workR);
 
-        // Set in transform
-        applyTo.setRotation(_workR);
-        applyTo.setTranslation(_workT);
-        applyTo.setScale(_workS);
+        final Vector3 workTS = Vector3.fetchTempInstance();
+        workTS.lerpLocal(_translations[sampleIndex], _translations[sampleIndex + 1], progressPercent);
+        transformData.setTranslation(workTS);
+        workTS.lerpLocal(_scales[sampleIndex], _scales[sampleIndex + 1], progressPercent);
+        transformData.setScale(workTS);
+        Vector3.releaseTempInstance(workTS);
     }
 
+    /**
+     * Apply a specific index of this channel to a TransformData object.
+     * 
+     * @param index
+     *            the index to grab.
+     * @param store
+     *            the TransformData to store in. If null, a new one is created.
+     * @return our resulting TransformData.
+     */
     public TransformData getTransformData(final int index, final TransformData store) {
         TransformData rVal = store;
         if (rVal == null) {

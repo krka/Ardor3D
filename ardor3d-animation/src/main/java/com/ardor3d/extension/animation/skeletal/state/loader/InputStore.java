@@ -8,12 +8,16 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.animation.skeletal.blendtree;
+package com.ardor3d.extension.animation.skeletal.state.loader;
 
-import com.ardor3d.extension.animation.skeletal.SkeletonPose;
+/**
+ * Storage class for items required during Layer import.
+ */
+public class InputStore {
 
-public interface BlendTreeApplier {
+    private final ImportClipMap clips = new ImportClipMap();
 
-    void applyTo(SkeletonPose applyToPose, BlendTreeSource blendTreeRoot);
-
+    public ImportClipMap getClips() {
+        return clips;
+    }
 }
