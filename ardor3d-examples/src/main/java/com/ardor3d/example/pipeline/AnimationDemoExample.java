@@ -12,6 +12,7 @@ package com.ardor3d.example.pipeline;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -74,6 +75,7 @@ import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
+import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceSource;
@@ -402,7 +404,14 @@ public class AnimationDemoExample extends ExampleBase {
         punchClip.addChannel(triggerChannel);
         applier.addTriggerCallback("fist_fire", new TriggerCallback() {
             public void doTrigger() {
-                addParticles();
+                GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).update(
+                        new Callable<Void>() {
+                            @Override
+                            public Void call() throws Exception {
+                                addParticles();
+                                return null;
+                            }
+                        });
             }
         });
     }
@@ -429,6 +438,9 @@ public class AnimationDemoExample extends ExampleBase {
 
         // attach to root, at fist location
         explosion.setTransform(loc);
+        explosion.warmUp(1);
+        _root.attachChild(explosion);
+        _root.updateWorldTransform(true);
 
         explosion.getParticleController().addListener(new ParticleControllerListener() {
             @Override
@@ -436,7 +448,6 @@ public class AnimationDemoExample extends ExampleBase {
                 explosion.removeFromParent();
             }
         });
-        _root.attachChild(explosion);
         explosion.forceRespawn();
 
         final BlendState blend = new BlendState();
