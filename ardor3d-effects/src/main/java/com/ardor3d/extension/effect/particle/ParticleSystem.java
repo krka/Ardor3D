@@ -915,9 +915,7 @@ public abstract class ParticleSystem extends Node {
         }
 
         if (_particlesInWorldCoords) {
-            _emitterTransform.setRotation(getWorldRotation());
-            _emitterTransform.setTranslation(getWorldTranslation());
-            _emitterTransform.setScale(getWorldScale());
+            _emitterTransform.set(getWorldTransform());
 
             _originCenter.set(getWorldTranslation()).addLocal(_originOffset);
 
