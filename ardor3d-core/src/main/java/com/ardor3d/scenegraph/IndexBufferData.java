@@ -87,7 +87,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
      * @see Buffer#position();
      */
     public int position() {
-        return getBuffer().limit();
+        return getBuffer().position();
     }
 
     /**
