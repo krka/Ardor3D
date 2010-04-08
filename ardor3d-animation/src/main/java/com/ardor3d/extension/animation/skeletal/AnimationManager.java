@@ -12,6 +12,7 @@ package com.ardor3d.extension.animation.skeletal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
@@ -35,6 +36,9 @@ import com.google.common.collect.MapMaker;
  * </p>
  */
 public class AnimationManager {
+
+    /** our class logger */
+    private static final Logger logger = Logger.getLogger(AnimationManager.class.getName());
 
     /**
      * A timer to use as our "global" time keeper. All animation sources under this manager will use this timer as their
@@ -192,8 +196,12 @@ public class AnimationManager {
         }
 
         // call apply on blend module, passing in pose
-        for (final SkeletonPose pose : _applyToPoses) {
-            _applier.applyTo(pose, this);
+        if (!_applyToPoses.isEmpty()) {
+            for (final SkeletonPose pose : _applyToPoses) {
+                _applier.applyTo(pose, this);
+            }
+        } else {
+            AnimationManager.logger.warning("No poses to apply to.");
         }
     }
 

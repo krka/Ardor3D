@@ -88,10 +88,38 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
     @Override
     public final AbstractFiniteState doTransition(final String key, final AnimationLayer layer) {
         final double time = layer.getManager().getCurrentGlobalTime() - layer.getCurrentState().getGlobalStartTime();
-        if ((getStartWindow() <= 0 || getStartWindow() <= time) && (getEndWindow() <= 0 || getEndWindow() >= time)) {
+        if (isInTimeWindow(time)) {
             return getTransitionState(key, layer);
         } else {
             return null;
+        }
+    }
+
+    /**
+     * @param localTime
+     *            the state's local time
+     * @return true if the given time lands within our window.
+     */
+    private boolean isInTimeWindow(final double localTime) {
+        if (getStartWindow() <= 0) {
+            if (getEndWindow() <= 0) {
+                // no window, so true
+                return true;
+            } else {
+                // just check end
+                return localTime <= getEndWindow();
+            }
+        } else {
+            if (getEndWindow() <= 0) {
+                // just check start
+                return localTime >= getStartWindow();
+            } else if (getStartWindow() <= getEndWindow()) {
+                // check between start and end
+                return getStartWindow() <= localTime && localTime <= getEndWindow();
+            } else {
+                // start is greater than end, so there are two windows.
+                return localTime >= getStartWindow() || localTime <= getEndWindow();
+            }
         }
     }
 
