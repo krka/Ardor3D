@@ -8,16 +8,10 @@
  * LICENSE file or at <http://www.ardor3d.com/LICENSE>.
  */
 
-package com.ardor3d.extension.animation.skeletal.state.loader;
+package com.ardor3d.extension.animation.skeletal.util;
 
-/**
- * Storage class for items required during Layer import.
- */
-public class InputStore {
+public interface MissingCallback<KEY, VALUE> {
 
-    private final ImportClipMap _clips = new ImportClipMap();
+    VALUE getValue(KEY key);
 
-    public ImportClipMap getClips() {
-        return _clips;
-    }
 }

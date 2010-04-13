@@ -31,7 +31,7 @@ public class ImportClipMap extends LoggingMap<String, AnimationClip> {
      *            the clip to add.
      */
     public void put(final AnimationClip clip) {
-        if (_wrappedMap.put(clip.getName(), clip) != null) {
+        if (_wrappedMap.put(clip.getName(), clip) != null && isLogOnReplace()) {
             ImportClipMap.logger.warning("Replaced clip in ImportClipStore with same name. " + clip.getName());
         }
     }

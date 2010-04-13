@@ -16,25 +16,30 @@ import java.util.logging.Logger;
 import com.google.common.collect.Maps;
 
 /**
- * This class essentially just wraps a S->T HashMap, providing extra logging when a T is not found, or duplicate T
- * objects are added.
+ * This class essentially just wraps a KEY->VALUE HashMap, providing extra logging when a VALUE is not found, or
+ * duplicate VALUE objects are added. An optional callback may be provided to try to load values not present in this
+ * map. These are loaded using the string representation of the key and casting the return from Object to the value
+ * class. If the value is still null, a default value is returned.
  */
-public class LoggingMap<S, T> {
+public class LoggingMap<KEY, VALUE> {
 
     /** our class logger */
     private static final Logger logger = Logger.getLogger(LoggingMap.class.getName());
 
     /** Our map of values. */
-    protected final Map<S, T> _wrappedMap = Maps.newHashMap();
+    protected final Map<KEY, VALUE> _wrappedMap = Maps.newHashMap();
+
+    /** If not null, this callback is asked to load the missing value using the key. */
+    private MissingCallback<KEY, VALUE> _missCallback = null;
 
     /** A default value to return if a key is requested that does not exist. Defaults to null. */
-    private T defaultValue = null;
+    private VALUE _defaultValue = null;
 
     /** If true, we'll log anytime we set a key/value where the key already existed in the map. Defaults to true. */
-    private boolean logOnReplace = true;
+    private boolean _logOnReplace = true;
 
     /** If true, we'll log anytime we try to retrieve a value by a key that is not in the map. Defaults to true. */
-    private boolean logOnMissing = true;
+    private boolean _logOnMissing = true;
 
     /**
      * Add a value to the store. Logs a warning if a value by the same key was already in the store and logOnReplace is
@@ -45,7 +50,7 @@ public class LoggingMap<S, T> {
      * @param value
      *            the value to add.
      */
-    public void put(final S key, final T value) {
+    public void put(final KEY key, final VALUE value) {
         if (_wrappedMap.put(key, value) != null) {
             if (isLogOnReplace()) {
                 LoggingMap.logger.warning("Replaced value in map with same key. " + key);
@@ -61,14 +66,21 @@ public class LoggingMap<S, T> {
      *            the key of the value to find.
      * @return the associated value, or null if none is found.
      */
-    public T get(final S key) {
-        final T value = _wrappedMap.get(key);
+    public VALUE get(final KEY key) {
+        VALUE value = _wrappedMap.get(key);
+        // value is null? ask callback.
+        if (value == null && getMissCallback() != null) {
+            value = getMissCallback().getValue(key);
+            // save for next time.
+            _wrappedMap.put(key, value);
+        }
+        // value still null...
         if (value == null) {
             if (isLogOnMissing()) {
                 LoggingMap.logger.warning("Value not found with key: " + key + " Returning defaultValue: "
-                        + defaultValue);
+                        + _defaultValue);
             }
-            return defaultValue;
+            return getDefaultValue();
         }
         return value;
     }
@@ -80,7 +92,7 @@ public class LoggingMap<S, T> {
      *            the key of the value to remove.
      * @return the previously associated value, or null if none was found.
      */
-    public T remove(final S key) {
+    public VALUE remove(final KEY key) {
         return _wrappedMap.remove(key);
     }
 
@@ -91,27 +103,35 @@ public class LoggingMap<S, T> {
         return _wrappedMap.size();
     }
 
-    public void setDefaultValue(final T defaultValue) {
-        this.defaultValue = defaultValue;
+    public void setDefaultValue(final VALUE defaultValue) {
+        this._defaultValue = defaultValue;
     }
 
-    public T getDefaultValue() {
-        return defaultValue;
+    public VALUE getDefaultValue() {
+        return _defaultValue;
     }
 
     public void setLogOnReplace(final boolean logOnReplace) {
-        this.logOnReplace = logOnReplace;
+        this._logOnReplace = logOnReplace;
     }
 
     public boolean isLogOnReplace() {
-        return logOnReplace;
+        return _logOnReplace;
     }
 
     public void setLogOnMissing(final boolean logOnMissing) {
-        this.logOnMissing = logOnMissing;
+        this._logOnMissing = logOnMissing;
     }
 
     public boolean isLogOnMissing() {
-        return logOnMissing;
+        return _logOnMissing;
+    }
+
+    public MissingCallback<KEY, VALUE> getMissCallback() {
+        return _missCallback;
+    }
+
+    public void setMissCallback(final MissingCallback<KEY, VALUE> missCallback) {
+        _missCallback = missCallback;
     }
 }

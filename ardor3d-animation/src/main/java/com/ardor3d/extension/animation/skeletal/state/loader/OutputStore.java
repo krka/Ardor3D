@@ -22,6 +22,8 @@ public class OutputStore {
 
     private final List<AttachmentPoint> _attachments = Lists.newArrayList();
 
+    private final ImportClipMap _usedClips = new ImportClipMap();
+
     public void addAttachmentPoint(final AttachmentPoint attach) {
         _attachments.add(attach);
     }
@@ -37,5 +39,9 @@ public class OutputStore {
             }
         }
         return null;
+    }
+
+    public ImportClipMap getUsedClips() {
+        return _usedClips;
     }
 }

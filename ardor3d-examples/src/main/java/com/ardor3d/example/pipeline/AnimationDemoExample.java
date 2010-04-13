@@ -31,6 +31,7 @@ import com.ardor3d.extension.animation.skeletal.clip.TriggerChannel;
 import com.ardor3d.extension.animation.skeletal.state.loader.InputStore;
 import com.ardor3d.extension.animation.skeletal.state.loader.JSLayerImporter;
 import com.ardor3d.extension.animation.skeletal.state.loader.OutputStore;
+import com.ardor3d.extension.animation.skeletal.util.MissingCallback;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.effect.particle.ParticleControllerListener;
 import com.ardor3d.extension.effect.particle.ParticleFactory;
@@ -333,22 +334,17 @@ public class AnimationDemoExample extends ExampleBase {
         final SimpleAnimationApplier applier = new SimpleAnimationApplier();
         manager.setApplier(applier);
 
-        // Add our clips...
+        // Add a call back to load clips.
         final InputStore input = new InputStore();
-        {
-            final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/skeleton.walk.dae");
-            input.getClips().put(storage1.extractChannelsAsClip("skeleton.walk"));
-        }
-        {
-            final ColladaStorage storage2 = colladaImporter.load("collada/skeleton/skeleton.run.dae");
-            input.getClips().put(storage2.extractChannelsAsClip("skeleton.run"));
-        }
-        {
-            final ColladaStorage storage3 = colladaImporter.load("collada/skeleton/skeleton.punch.dae");
-            final AnimationClip punchClip = storage3.extractChannelsAsClip("skeleton.punch");
-            input.getClips().put(punchClip);
-            addFireballTrigger(applier, punchClip);
-        }
+        input.getClips().setMissCallback(new MissingCallback<String, AnimationClip>() {
+            public AnimationClip getValue(final String key) {
+                final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/" + key + ".dae");
+                return storage1.extractChannelsAsClip(key);
+            }
+        });
+
+        // Add a special trigger channel to the punch clip.
+        addFireballTrigger(applier, input.getClips().get("skeleton.punch"));
 
         // Load our layer and states from script
         try {
