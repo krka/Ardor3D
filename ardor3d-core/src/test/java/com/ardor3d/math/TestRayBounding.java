@@ -20,7 +20,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.IntersectionRecord;
 
-public class TestBounding {
+public class TestRayBounding {
     @Test
     public void testRayAABBIntersection() throws Exception {
         final BoundingBox obb = new BoundingBox();

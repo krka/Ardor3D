@@ -56,6 +56,7 @@ import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -178,6 +179,12 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested textures. */
     private boolean _useSceneTexturing = false;
+
+    /**
+     * True if we want to use the culling set on the objects instead of always culling front face (which is done for
+     * shadow precision)
+     */
+    private boolean _useObjectCullFace = false;
 
     /**
      * Create a pssm shadow map pass casting shadows from a light with the direction given.
@@ -319,12 +326,18 @@ public class ParallelSplitShadowMapPass extends Pass {
         // Enforce performance enhancing states on the renderer.
         _shadowMapRenderer.enforceState(_noClip);
         _shadowMapRenderer.enforceState(_colorDisabled);
-        _shadowMapRenderer.enforceState(_cullFrontFace);
+        if (!_useObjectCullFace) {
+            _shadowMapRenderer.enforceState(_cullFrontFace);
+        } else {
+            _shadowMapRenderer.clearEnforcedState(StateType.Cull);
+        }
         _shadowMapRenderer.enforceState(_noLights);
         _shadowMapRenderer.enforceState(_flat);
         _shadowMapRenderer.enforceState(_shadowOffsetState);
-        if (!isUseSceneTexturing()) {
+        if (!_useSceneTexturing) {
             _shadowMapRenderer.enforceState(_noTexture);
+        } else {
+            _shadowMapRenderer.clearEnforcedState(RenderState.StateType.Texture);
         }
 
         if (_light instanceof DirectionalLight) {
@@ -885,6 +898,21 @@ public class ParallelSplitShadowMapPass extends Pass {
     }
 
     // TODO: Move to debugger
+
+    public boolean isUseObjectCullFace() {
+        return _useObjectCullFace;
+    }
+
+    public void setUseObjectCullFace(final boolean useObjectCullFace) {
+        _useObjectCullFace = useObjectCullFace;
+        if (_shadowMapRenderer != null) {
+            if (!_useObjectCullFace) {
+                _shadowMapRenderer.enforceState(_cullFrontFace);
+            } else {
+                _shadowMapRenderer.clearEnforcedState(StateType.Cull);
+            }
+        }
+    }
 
     /** The debug line frustum. */
     private static Line lineFrustum;

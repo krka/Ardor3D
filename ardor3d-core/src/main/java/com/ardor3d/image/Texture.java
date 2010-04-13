@@ -1438,7 +1438,8 @@ public abstract class Texture implements Savable {
     /**
      * Set the depth texture apply mode
      * 
-     * param depthMode The depth texture apply mode
+     * @param depthMode
+     *            The depth texture apply mode
      */
     public void setDepthMode(final DepthTextureMode depthMode) {
         _depthMode = depthMode;
