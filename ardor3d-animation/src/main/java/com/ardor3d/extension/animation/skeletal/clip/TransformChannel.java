@@ -68,7 +68,7 @@ public class TransformChannel extends AbstractAnimationChannel {
         }
 
         // Construct our data
-        _rotations = Arrays.copyOf(rotations, rotations.length);
+        _rotations = Arrays.copyOf((Quaternion[]) rotations, rotations.length);
         _translations = Arrays.copyOf(translations, translations.length);
         _scales = Arrays.copyOf(scales, scales.length);
     }
@@ -172,9 +172,17 @@ public class TransformChannel extends AbstractAnimationChannel {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write((Savable[]) _rotations, "rotations", null);
-        capsule.write((Savable[]) _scales, "scales", null);
-        capsule.write((Savable[]) _translations, "translations", null);
+        capsule.write(asSavableArray(_rotations), "rotations", null);
+        capsule.write(asSavableArray(_scales), "scales", null);
+        capsule.write(asSavableArray(_translations), "translations", null);
+    }
+
+    private Savable[] asSavableArray(final Object[] values) {
+        final Savable[] rVal = new Savable[values.length];
+        for (int i = 0; i < values.length; i++) {
+            rVal[i] = (Savable) values[i];
+        }
+        return rVal;
     }
 
     @Override
