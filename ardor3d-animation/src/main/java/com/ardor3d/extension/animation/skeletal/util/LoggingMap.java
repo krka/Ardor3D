@@ -10,7 +10,9 @@
 
 package com.ardor3d.extension.animation.skeletal.util;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
@@ -133,5 +135,13 @@ public class LoggingMap<KEY, VALUE> {
 
     public void setMissCallback(final MissingCallback<KEY, VALUE> missCallback) {
         _missCallback = missCallback;
+    }
+
+    public Set<KEY> keySet() {
+        return _wrappedMap.keySet();
+    }
+
+    public Collection<VALUE> values() {
+        return _wrappedMap.values();
     }
 }

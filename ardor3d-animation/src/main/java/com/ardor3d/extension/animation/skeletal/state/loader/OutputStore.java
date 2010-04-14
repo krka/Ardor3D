@@ -20,11 +20,11 @@ import com.google.common.collect.Lists;
  */
 public class OutputStore {
 
-    /** List of attachment points created furing layer import. */
+    /** List of attachment points created during layer import. */
     private final List<AttachmentPoint> _attachments = Lists.newArrayList();
 
-    /** List of animation clips actually used during layer import. */
-    private final ImportClipMap _usedClips = new ImportClipMap();
+    /** List of animation clip sources encountered during layer import. */
+    private final OuputClipSourceMap _usedClipSources = new OuputClipSourceMap();
 
     public void addAttachmentPoint(final AttachmentPoint attach) {
         _attachments.add(attach);
@@ -43,7 +43,7 @@ public class OutputStore {
         return null;
     }
 
-    public ImportClipMap getUsedClips() {
-        return _usedClips;
+    public OuputClipSourceMap getClipSources() {
+        return _usedClipSources;
     }
 }
