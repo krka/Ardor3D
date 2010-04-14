@@ -17,8 +17,9 @@ function _steadyState(json) {
 	// check if we are simple and just have a clip
 	if (json.clip) {
 		// convert clip to source
-		state.sourceTree = new ClipSource(INPUTSTORE.clips.get(json.clip),
-				MANAGER);
+		var clip = INPUTSTORE.clips.get(json.clip);
+		OUTPUTSTORE.usedClips.put(clip);
+		state.sourceTree = new ClipSource(clip, MANAGER);
 	}
 	// else we should have a tree
 	else if (json.tree) {
@@ -102,6 +103,7 @@ function _treeSource(json) {
 	if (json.clip) {
 		root = json.clip;
 		var clip = INPUTSTORE.clips.get(root.name);
+		OUTPUTSTORE.usedClips.put(clip);
 		// create source
 		source = new ClipSource(clip, MANAGER);
 		_populateClipSource(source, clip, root);
@@ -111,6 +113,7 @@ function _treeSource(json) {
 	else if (json.inclusiveClip) {
 		root = json.inclusiveClip;
 		var clip = INPUTSTORE.clips.get(root.name);
+		OUTPUTSTORE.usedClips.put(clip);
 		// create source
 		source = new InclusiveClipSource(clip, MANAGER);
 		_populateClipSource(source, clip, root);
@@ -125,6 +128,7 @@ function _treeSource(json) {
 	else if (json.exclusiveClip) {
 		root = json.exclusiveClip;
 		var clip = INPUTSTORE.clips.get(root.name);
+		OUTPUTSTORE.usedClips.put(clip);
 		// create source
 		source = new ExclusiveClipSource(clip, MANAGER);
 		_populateClipSource(source, clip, root);
