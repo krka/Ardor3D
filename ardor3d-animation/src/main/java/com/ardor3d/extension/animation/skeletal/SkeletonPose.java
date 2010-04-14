@@ -17,6 +17,7 @@ import java.util.List;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.math.Transform;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -224,29 +225,26 @@ public class SkeletonPose implements Savable {
 
     public void read(final InputCapsule capsule) throws IOException {
         final Skeleton skeleton = (Skeleton) capsule.readSavable("skeleton", null);
-        final Savable[] localTransformValues = capsule.readSavableArray("localTransforms", null);
+        final Transform[] localTransforms = CapsuleUtils.asArray(capsule.readSavableArray("localTransforms", null),
+                Transform.class);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_skeleton");
+            final Field field1 = SkeletonPose.class.getDeclaredField("_skeleton");
             field1.setAccessible(true);
             field1.set(this, skeleton);
 
             final int jointCount = _skeleton.getJoints().length;
 
             // init local transforms
-            final Transform[] localTransforms = new Transform[jointCount];
-            final Field field2 = this.getClass().getDeclaredField("_localTransforms");
+            final Field field2 = SkeletonPose.class.getDeclaredField("_localTransforms");
             field2.setAccessible(true);
             field2.set(this, localTransforms);
-            for (int i = 0; i < jointCount; i++) {
-                _localTransforms[i] = (Transform) localTransformValues[i];
-            }
 
             // init global transforms
             final Transform[] globalTransforms = new Transform[jointCount];
             for (int i = 0; i < jointCount; i++) {
                 globalTransforms[i] = new Transform();
             }
-            final Field field3 = this.getClass().getDeclaredField("_globalTransforms");
+            final Field field3 = SkeletonPose.class.getDeclaredField("_globalTransforms");
             field3.setAccessible(true);
             field3.set(this, globalTransforms);
 
@@ -255,7 +253,7 @@ public class SkeletonPose implements Savable {
             for (int i = 0; i < jointCount; i++) {
                 matrixPalette[i] = new Matrix4();
             }
-            final Field field4 = this.getClass().getDeclaredField("_matrixPalette");
+            final Field field4 = SkeletonPose.class.getDeclaredField("_matrixPalette");
             field4.setAccessible(true);
             field4.set(this, matrixPalette);
 

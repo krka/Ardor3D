@@ -40,6 +40,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.Hintable;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.visitor.Visitor;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -1075,11 +1076,11 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     public void read(final InputCapsule capsule) throws IOException {
         _name = capsule.readString("name", null);
 
-        final Savable[] savs = capsule.readSavableArray("renderStateList", null);
+        final RenderState[] states = CapsuleUtils.asArray(capsule.readSavableArray("renderStateList", null),
+                RenderState.class);
         _renderStateList.clear();
-        if (savs != null) {
-            for (int x = 0; x < savs.length; x++) {
-                final RenderState state = (RenderState) savs[x];
+        if (states != null) {
+            for (final RenderState state : states) {
                 _renderStateList.put(state.getType(), state);
             }
         }

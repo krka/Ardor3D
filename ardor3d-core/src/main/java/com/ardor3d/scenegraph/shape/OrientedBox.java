@@ -15,9 +15,9 @@ import java.io.IOException;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -399,17 +399,7 @@ public class OrientedBox extends Mesh {
         _texTopLeft = (Vector2) capsule.readSavable("texTopLeft", new Vector2(1, 0));
         _texBotRight = (Vector2) capsule.readSavable("texBotRight", new Vector2(0, 1));
         _texBotLeft = (Vector2) capsule.readSavable("texBotLeft", new Vector2(0, 0));
-
-        final Savable[] savs = capsule.readSavableArray("vectorStore", new Vector3[8]);
-        if (savs == null) {
-            _vectorStore = null;
-        } else {
-            _vectorStore = new Vector3[savs.length];
-            for (int x = 0; x < savs.length; x++) {
-                _vectorStore[x] = (Vector3) savs[x];
-            }
-        }
-
+        _vectorStore = CapsuleUtils.asArray(capsule.readSavableArray("vectorStore", new Vector3[8]), Vector3.class);
         _correctCorners = capsule.readBoolean("correctCorners", false);
     }
 }

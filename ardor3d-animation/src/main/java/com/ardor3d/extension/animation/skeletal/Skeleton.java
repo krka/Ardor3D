@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.ardor3d.annotation.SavableFactory;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -90,19 +91,15 @@ public class Skeleton implements Savable {
 
     public void read(final InputCapsule capsule) throws IOException {
         final String name = capsule.readString("name", null);
-        final Savable[] joints = capsule.readSavableArray("joints", null);
+        final Joint[] joints = CapsuleUtils.asArray(capsule.readSavableArray("joints", null), Joint.class);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_name");
+            final Field field1 = Skeleton.class.getDeclaredField("_name");
             field1.setAccessible(true);
             field1.set(this, name);
 
-            final Field field2 = this.getClass().getDeclaredField("_joints");
+            final Field field2 = Skeleton.class.getDeclaredField("_joints");
             field2.setAccessible(true);
-            field2.set(this, new Joint[joints.length]);
-            int i = 0;
-            for (final Savable joint : joints) {
-                _joints[i++] = (Joint) joint;
-            }
+            field2.set(this, joints);
         } catch (final Exception e) {
             e.printStackTrace();
         }

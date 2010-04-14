@@ -21,9 +21,9 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 
 /**
  * An animation channel consisting of a series of transforms interpolated over time.
@@ -172,35 +172,30 @@ public class TransformChannel extends AbstractAnimationChannel {
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
-        capsule.write(asSavableArray(_rotations), "rotations", null);
-        capsule.write(asSavableArray(_scales), "scales", null);
-        capsule.write(asSavableArray(_translations), "translations", null);
-    }
-
-    private Savable[] asSavableArray(final Object[] values) {
-        final Savable[] rVal = new Savable[values.length];
-        for (int i = 0; i < values.length; i++) {
-            rVal[i] = (Savable) values[i];
-        }
-        return rVal;
+        capsule.write(CapsuleUtils.asSavableArray(_rotations), "rotations", null);
+        capsule.write(CapsuleUtils.asSavableArray(_scales), "scales", null);
+        capsule.write(CapsuleUtils.asSavableArray(_translations), "translations", null);
     }
 
     @Override
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
-        final ReadOnlyQuaternion[] rotations = (ReadOnlyQuaternion[]) capsule.readSavableArray("rotations", null);
-        final ReadOnlyVector3[] scales = (ReadOnlyVector3[]) capsule.readSavableArray("scales", null);
-        final ReadOnlyVector3[] translations = (ReadOnlyVector3[]) capsule.readSavableArray("translations", null);
+        final ReadOnlyQuaternion[] rotations = CapsuleUtils.asArray(capsule.readSavableArray("rotations", null),
+                ReadOnlyQuaternion.class);
+        final ReadOnlyVector3[] scales = CapsuleUtils.asArray(capsule.readSavableArray("scales", null),
+                ReadOnlyVector3.class);
+        final ReadOnlyVector3[] translations = CapsuleUtils.asArray(capsule.readSavableArray("translations", null),
+                ReadOnlyVector3.class);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_rotations");
+            final Field field1 = TransformChannel.class.getDeclaredField("_rotations");
             field1.setAccessible(true);
             field1.set(this, rotations);
 
-            final Field field2 = this.getClass().getDeclaredField("_scales");
+            final Field field2 = TransformChannel.class.getDeclaredField("_scales");
             field2.setAccessible(true);
             field2.set(this, scales);
 
-            final Field field3 = this.getClass().getDeclaredField("_translations");
+            final Field field3 = TransformChannel.class.getDeclaredField("_translations");
             field3.setAccessible(true);
             field3.set(this, translations);
         } catch (final Exception e) {

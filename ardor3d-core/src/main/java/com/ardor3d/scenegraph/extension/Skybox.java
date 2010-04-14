@@ -28,9 +28,9 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 
 /**
  * A Box made of textured quads that simulate having a sky, horizon and so forth around your scene. Either attach to a
@@ -253,13 +253,6 @@ public class Skybox extends Node {
         _xExtent = capsule.readFloat("xExtent", 0);
         _yExtent = capsule.readFloat("yExtent", 0);
         _zExtent = capsule.readFloat("zExtent", 0);
-        final Savable[] savs = capsule.readSavableArray("skyboxQuads", null);
-        if (savs != null) {
-            _skyboxQuads = new Quad[savs.length];
-            for (int x = 0; x < savs.length; x++) {
-                _skyboxQuads[x] = (Quad) savs[x];
-            }
-        }
-
+        _skyboxQuads = CapsuleUtils.asArray(capsule.readSavableArray("skyboxQuads", null), Quad.class);
     }
 }

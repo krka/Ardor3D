@@ -17,6 +17,7 @@ import java.util.EnumMap;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -111,11 +112,10 @@ public class PassNodeState implements Savable, Serializable {
     public void read(final InputCapsule capsule) throws IOException {
         final InputCapsule ic = capsule;
         _enabled = ic.readBoolean("enabled", true);
-        final Savable[] temp = ic.readSavableArray("passStates", null);
+        final RenderState[] states = CapsuleUtils.asArray(ic.readSavableArray("passStates", null), RenderState.class);
         _passStates.clear();
-        if (temp != null) {
-            for (int x = 0; x < temp.length; x++) {
-                final RenderState state = (RenderState) temp[x];
+        if (states != null) {
+            for (final RenderState state : states) {
                 _passStates.put(state.getType(), state);
             }
         }

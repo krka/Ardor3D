@@ -95,7 +95,7 @@ public class JointChannel extends TransformChannel {
         super.read(capsule);
         final String jointName = capsule.readString("jointName", null);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_jointName");
+            final Field field1 = JointChannel.class.getDeclaredField("_jointName");
             field1.setAccessible(true);
             field1.set(this, jointName);
         } catch (final Exception e) {

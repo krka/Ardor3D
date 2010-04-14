@@ -75,7 +75,7 @@ public class TriggerChannel extends AbstractAnimationChannel {
         super.read(capsule);
         final String[] keys = capsule.readStringArray("keys", null);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_keys");
+            final Field field1 = TriggerChannel.class.getDeclaredField("_keys");
             field1.setAccessible(true);
             field1.set(this, keys);
         } catch (final Exception e) {

@@ -111,19 +111,19 @@ public abstract class AbstractAnimationChannel implements Savable {
     // /////////////////
 
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(_channelName, "rotation", null);
-        capsule.write(_times, "scale", null);
+        capsule.write(_channelName, "channelName", null);
+        capsule.write(_times, "times", null);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
         final String channelName = capsule.readString("channelName", null);
         final float[] times = capsule.readFloatArray("times", null);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_channelName");
+            final Field field1 = AbstractAnimationChannel.class.getDeclaredField("_channelName");
             field1.setAccessible(true);
             field1.set(this, channelName);
 
-            final Field field2 = this.getClass().getDeclaredField("_times");
+            final Field field2 = AbstractAnimationChannel.class.getDeclaredField("_times");
             field2.setAccessible(true);
             field2.set(this, times);
         } catch (final Exception e) {

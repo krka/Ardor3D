@@ -160,7 +160,7 @@ public class AnimationClip implements Savable {
     public void read(final InputCapsule capsule) throws IOException {
         final String name = capsule.readString("name", null);
         try {
-            final Field field1 = this.getClass().getDeclaredField("_name");
+            final Field field1 = AnimationClip.class.getDeclaredField("_name");
             field1.setAccessible(true);
             field1.set(this, name);
         } catch (final Exception e) {
