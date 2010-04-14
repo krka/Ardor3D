@@ -17,7 +17,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
@@ -154,7 +157,10 @@ public class ParallelSplitShadowMapPass extends Pass {
     private final Matrix4 _shadowMatrix = new Matrix4();
 
     /** Bounding of scene for packing frustum. */
-    protected BoundingVolume _receiverBounds;
+    protected BoundingBox _receiverBounds = new BoundingBox();
+
+    /** Indicates if we have any valid reciever bounds to use for frustum packing */
+    protected boolean hasValidBounds = false;
 
     /** Special camera with functionality for packing frustum etc. */
     protected PSSMCamera _pssmCam;
@@ -393,11 +399,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         // Update receiving scene bounds to prepare for frustum packing
         updateReceiverBounds();
 
-        // Don't continue if no scene boundings exist
-        if (_receiverBounds == null) {
-            return;
-        }
-
         // If updating camera is true (can be turned off for debugging), copy from main
         // camera and pack frustum.
         if (_updateMainCamera) {
@@ -406,7 +407,10 @@ public class ParallelSplitShadowMapPass extends Pass {
             _pssmCam.set(cam);
 
             // Calculate the closest fitting near and far planes.
-            _pssmCam.pack(_receiverBounds);
+            if (hasValidBounds) {
+                _pssmCam.pack(_receiverBounds);
+            }
+            _pssmCam.restrictFarPlane();
         }
 
         // Calculate the split distances
@@ -663,15 +667,54 @@ public class ParallelSplitShadowMapPass extends Pass {
      * Update receiver bounds.
      */
     private void updateReceiverBounds() {
+        hasValidBounds = false;
+        boolean firstRun = true;
         for (int i = 0, cSize = _spatials.size(); i < cSize; i++) {
             final Spatial child = _spatials.get(i);
-            if (child != null && child.getWorldBound() != null) {
-                if (_receiverBounds != null) {
-                    _receiverBounds.mergeLocal(child.getWorldBound());
-                } else {
-                    _receiverBounds = child.getWorldBound().clone(null);
+            if (child != null && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
+                if (firstRun) {
+                    _receiverBounds.setCenter(child.getWorldBound().getCenter());
+                    _receiverBounds.setXExtent(0);
+                    _receiverBounds.setYExtent(0);
+                    _receiverBounds.setZExtent(0);
+                    firstRun = false;
                 }
+                _receiverBounds.mergeLocal(child.getWorldBound());
+                hasValidBounds = true;
             }
+        }
+    }
+
+    /**
+     * Checks if a bounding volume is valid.
+     * 
+     * @param volume
+     * @return
+     */
+    private boolean boundIsValid(final BoundingVolume volume) {
+        if (!Vector3.isValid(volume.getCenter())) {
+            return false;
+        }
+        switch (volume.getType()) {
+            case AABB: {
+                final BoundingBox vBox = (BoundingBox) volume;
+                return !(Double.isInfinite(vBox.getXExtent()) || Double.isInfinite(vBox.getYExtent())
+                        || Double.isInfinite(vBox.getZExtent()) || Double.isNaN(vBox.getXExtent())
+                        || Double.isNaN(vBox.getYExtent()) || Double.isNaN(vBox.getZExtent()));
+            }
+
+            case Sphere: {
+                final BoundingSphere vSphere = (BoundingSphere) volume;
+                return !(Double.isInfinite(vSphere.getRadius()) || Double.isNaN(vSphere.getRadius()));
+            }
+
+            case OBB: {
+                final OrientedBoundingBox obb = (OrientedBoundingBox) volume;
+                return Vector3.isValid(obb.getExtent());
+            }
+
+            default:
+                return true;
         }
     }
 

@@ -160,10 +160,15 @@ public class PSSMCamera extends Camera {
         optimalCameraNear = Math.min(Math.max(getFrustumNear(), optimalCameraNear), getFrustumFar());
         optimalCameraFar = Math.max(optimalCameraNear, Math.min(getFrustumFar(), optimalCameraFar));
 
-        optimalCameraFar = Math.min(_maxFarPlaneDistance, optimalCameraFar);
-
         setFrustumNear(optimalCameraNear);
         setFrustumFar(optimalCameraFar);
+    }
+
+    /**
+     * Make sure the far plane does not go beyond our max far plane setting.
+     */
+    public void restrictFarPlane() {
+        setFrustumFar(Math.min(_maxFarPlaneDistance, getFrustumFar()));
     }
 
     /**
