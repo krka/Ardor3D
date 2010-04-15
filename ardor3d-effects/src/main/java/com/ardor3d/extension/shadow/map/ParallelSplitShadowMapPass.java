@@ -214,7 +214,9 @@ public class ParallelSplitShadowMapPass extends Pass {
      *            The spatial to add as an occluder
      */
     public void addOccluder(final Spatial occluder) {
-        _occluderNodes.add(occluder);
+        if (!_occluderNodes.contains(occluder)) {
+            _occluderNodes.add(occluder);
+        }
     }
 
     /**
