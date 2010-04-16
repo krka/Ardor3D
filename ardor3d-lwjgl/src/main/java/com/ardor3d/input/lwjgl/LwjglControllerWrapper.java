@@ -88,6 +88,8 @@ public class LwjglControllerWrapper implements ControllerWrapper {
                 Controllers.create();
             } catch (final Exception e) {
                 e.printStackTrace();
+            } finally {
+                inited = true;
             }
         }
     }
