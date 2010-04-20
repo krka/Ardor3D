@@ -10,18 +10,16 @@
 
 package com.ardor3d.util.stat;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
 import com.ardor3d.util.Timer;
+import com.google.common.collect.Lists;
 
 /**
  * This class acts as a centralized data store for statistics. As data is added to the collector, a sum total is kept as
@@ -55,7 +53,7 @@ public abstract class StatCollector {
 
     protected static double lastTimeCheckMS = 0;
 
-    protected static List<WeakReference<StatListener>> listeners = new ArrayList<WeakReference<StatListener>>();
+    protected static List<StatListener> listeners = Lists.newArrayList();
 
     protected static double startOffset = 0;
 
@@ -237,7 +235,7 @@ public abstract class StatCollector {
      *            the listener to add
      */
     public static void addStatListener(final StatListener listener) {
-        listeners.add(new WeakReference<StatListener>(listener));
+        listeners.add(listener);
     }
 
     /**
@@ -248,7 +246,7 @@ public abstract class StatCollector {
      *            the listener to remove
      */
     public static boolean removeStatListener(final StatListener listener) {
-        return listeners.remove(new WeakReference<StatListener>(listener));
+        return listeners.remove(listener);
     }
 
     /**
@@ -289,15 +287,8 @@ public abstract class StatCollector {
      * Notifies all registered listeners that a new stats aggregate was created.
      */
     public static void fireActionEvent() {
-        for (final Iterator<WeakReference<StatListener>> it = listeners.iterator(); it.hasNext();) {
-            final WeakReference<StatListener> ref = it.next();
-            final StatListener l = ref.get();
-            if (l == null) {
-                it.remove();
-                continue;
-            } else {
-                l.statsUpdated();
-            }
+        for (final StatListener l : listeners) {
+            l.statsUpdated();
         }
     }
 
@@ -323,6 +314,13 @@ public abstract class StatCollector {
 
     public static List<MultiStatSample> getHistorical() {
         return historical;
+    }
+
+    public static MultiStatSample getLastHistorical() {
+        if (historical == null || historical.isEmpty()) {
+            return null;
+        }
+        return historical.get(historical.size() - 1);
     }
 
     public static MultiStatSample lastStats() {
