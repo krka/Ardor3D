@@ -316,13 +316,6 @@ public abstract class StatCollector {
         return historical;
     }
 
-    public static MultiStatSample getLastHistorical() {
-        if (historical == null || historical.isEmpty()) {
-            return null;
-        }
-        return historical.get(historical.size() - 1);
-    }
-
     public static MultiStatSample lastStats() {
         if (historical.size() == 0) {
             return null;
