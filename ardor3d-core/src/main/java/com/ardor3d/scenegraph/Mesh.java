@@ -138,7 +138,8 @@ public class Mesh extends Spatial implements Renderable {
      */
     public void updateModelBound() {
         if (_modelBound != null && _meshData.getVertexBuffer() != null) {
-            _modelBound.computeFromPoints(_meshData.getVertexBuffer());
+            // using duplicate to allow walking through buffer without altering current position, etc.
+            _modelBound.computeFromPoints(_meshData.getVertexBuffer().duplicate());
             markDirty(DirtyType.Bounding);
         }
     }
