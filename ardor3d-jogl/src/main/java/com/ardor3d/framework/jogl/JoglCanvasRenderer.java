@@ -36,7 +36,6 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     private static final Logger LOGGER = Logger.getLogger(JoglCanvasRenderer.class.getName());
 
-
     /**
      * Set to true to be safe when rendering in multiple canvases. Set to false for a faster, single canvas mode.
      */
@@ -67,16 +66,15 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     private RenderContext _currentContext;
 
     /**
-     * <code>true</code> if debugging (checking for error codes on each GL call)
-     * is desired.
+     * <code>true</code> if debugging (checking for error codes on each GL call) is desired.
      */
-    private boolean _useDebug;
-    
+    private final boolean _useDebug;
+
     /**
      * <code>true</code> if debugging is currently enabled for this GLContext.
      */
     private boolean _debugEnabled = false;
-    
+
     public JoglCanvasRenderer(final Scene scene) {
         this(scene, false);
     }
@@ -88,6 +86,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public void setCurrentContext() {
         _context.makeCurrent();
+        ContextManager.switchContext(_context);
     }
 
     public void releaseCurrentContext() {
@@ -101,7 +100,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             _context = GLDrawableFactory.getFactory().createExternalGLContext();
         }
 
-        setCurrentContext();
+        _context.makeCurrent();
 
         // Look up a shared context, if a shared JoglCanvasRenderer is given.
         RenderContext sharedContext = null;
@@ -114,6 +113,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _currentContext = new RenderContext(_context, caps, sharedContext);
 
         ContextManager.addContext(_context, _currentContext);
+        ContextManager.switchContext(_context);
 
         _renderer = new JoglRenderer();
 
@@ -176,9 +176,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
             if (value == GLContext.CONTEXT_CURRENT_NEW) {
                 ContextManager.getCurrentContext().contextLost();
-                
+
                 // Whenever the context is created or replaced, the GL chain
-                // is lost.  Debug will have to be added if desired.
+                // is lost. Debug will have to be added if desired.
                 _debugEnabled = false;
             }
         }
@@ -187,7 +187,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         if (_useDebug != _debugEnabled) {
             _context.setGL(new DebugGL(_context.getGL()));
             _debugEnabled = true;
-            
+
             LOGGER.info("DebugGL Enabled");
         }
 

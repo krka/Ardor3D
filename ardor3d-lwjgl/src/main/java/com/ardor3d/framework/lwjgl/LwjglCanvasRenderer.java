@@ -70,12 +70,17 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                     .getContextKey());
         }
 
-        setCurrentContext();
+        try {
+            GLContext.useContext(_context);
+        } catch (final LWJGLException e) {
+            throw new RuntimeException(e);
+        }
 
         final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
         _currentContext = new RenderContext(this, caps, sharedContext);
 
         ContextManager.addContext(this, _currentContext);
+        ContextManager.switchContext(this);
 
         _renderer = new LwjglRenderer();
 
@@ -109,7 +114,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        ContextManager.switchContext(this);
         setCurrentContext();
 
         // render stuff, first apply our camera if we have one
@@ -144,6 +148,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public void setCurrentContext() {
         try {
             GLContext.useContext(_context);
+            ContextManager.switchContext(this);
         } catch (final LWJGLException e) {
             throw new RuntimeException(e);
         }
