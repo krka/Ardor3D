@@ -145,6 +145,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
             ioe.printStackTrace();
         }
         arm.setGPUShader(gpuShader);
+        arm.setUseGPU(useGPU);
 
         _root.attachChild(arm);
 
@@ -154,7 +155,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         t1.setTranslation(new Vector3(5, 2 * (t1.getHeight() + 5) + 10, 0));
         _root.attachChild(t1);
 
-        t2 = BasicText.createDefaultTextLabel("Text2", "[G] GPU Skinning is OFF.");
+        t2 = BasicText.createDefaultTextLabel("Text2", "[G] GPU Skinning is " + (useGPU ? "ON." : "OFF."));
         t2.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
         t2.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         t2.setTranslation(new Vector3(5, 1 * (t1.getHeight() + 5) + 10, 0));
