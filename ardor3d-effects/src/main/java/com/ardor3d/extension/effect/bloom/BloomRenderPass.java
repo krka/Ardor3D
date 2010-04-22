@@ -30,9 +30,7 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Renderable;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
@@ -121,31 +119,6 @@ public class BloomRenderPass extends Pass {
         resetParameters();
     }
 
-    /**
-     * Helper class to get all spatials rendered in one TextureRenderer.render() call.
-     */
-    private class SpatialsRenderNode extends Node {
-        private static final long serialVersionUID = 7367501683137581101L;
-
-        @Override
-        public void draw(final Renderer r) {
-            Spatial child;
-            for (int i = 0, cSize = _spatials.size(); i < cSize; i++) {
-                child = _spatials.get(i);
-                if (child != null) {
-                    child.onDraw(r);
-                }
-            }
-        }
-
-        @Override
-        public void onDraw(final Renderer r) {
-            draw(r);
-        }
-    }
-
-    private final SpatialsRenderNode spatialsRenderNode = new SpatialsRenderNode();
-
     @Override
     protected void doUpdate(final double tpf) {
         super.doUpdate(tpf);
@@ -192,7 +165,7 @@ public class BloomRenderPass extends Pass {
                 ts.setTexture(screenTexture, 0);
             } else {
                 // Render scene to texture
-                tRenderer.render(spatialsRenderNode, mainTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
+                tRenderer.render(_spatials, mainTexture, Renderer.BUFFER_COLOR_AND_DEPTH);
                 ts.setTexture(mainTexture, 0);
             }
 
