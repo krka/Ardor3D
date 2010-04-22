@@ -13,7 +13,9 @@ package com.ardor3d.renderer.pass;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRenderer;
 
 /**
  * <code>BasicPassManager</code> controls a set of passes and sends through calls to render and update.
@@ -64,6 +66,13 @@ public class BasicPassManager {
         for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
             final Pass p = _passes.get(i);
             p.renderPass(r);
+        }
+    }
+
+    public void renderPasses(final TextureRenderer r, final int clear, final List<Texture> texs) {
+        for (int i = 0, sSize = _passes.size(); i < sSize; i++) {
+            final Pass p = _passes.get(i);
+            p.renderPass(r, clear, texs);
         }
     }
 

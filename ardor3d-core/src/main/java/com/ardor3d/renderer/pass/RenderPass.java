@@ -10,7 +10,11 @@
 
 package com.ardor3d.renderer.pass;
 
+import java.util.List;
+
+import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.scenegraph.Spatial;
 
 /**
@@ -28,5 +32,10 @@ public class RenderPass extends Pass {
             r.draw(s);
         }
         r.renderBuckets();
+    }
+
+    @Override
+    public void doRender(final TextureRenderer r, final int clear, final List<Texture> texs) {
+        r.render(_spatials, texs, clear);
     }
 }

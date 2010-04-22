@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
+import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.scenegraph.Spatial;
 
@@ -63,6 +65,19 @@ public abstract class Pass implements Serializable {
         _context = null;
     }
 
+    /** if enabled, set the states for this pass and then render. */
+    public final void renderPass(final TextureRenderer r, final int clear, final List<Texture> texs) {
+        if (!_enabled) {
+            return;
+        }
+        _context = ContextManager.getCurrentContext();
+        _context.pushEnforcedStates();
+        _context.enforceStates(_passStates);
+        doRender(r, clear, texs);
+        _context.popEnforcedStates();
+        _context = null;
+    }
+
     /**
      * Enforce a particular state. In other words, the given state will override any state of the same type set on a
      * scene object. Remember to clear the state when done enforcing. Very useful for multipass techniques where
@@ -95,6 +110,10 @@ public abstract class Pass implements Serializable {
     }
 
     protected abstract void doRender(Renderer r);
+
+    protected void doRender(final TextureRenderer r, final int clear, final List<Texture> texs) {
+        throw new UnsupportedOperationException("This pass type does not support RTT use.");
+    }
 
     /** if enabled, call doUpdate to update information for this pass. */
     public final void updatePass(final double tpf) {
