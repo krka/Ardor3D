@@ -74,7 +74,7 @@ public class UISliderKnob extends UIContainer {
      */
     public void setPosition(final float newPosition) {
         // ensure we are in the valid range.
-        assert _position >= 0 && _position <= 1 : "newPosition must be in [0f, 1f]";
+        assert newPosition >= 0 && newPosition <= 1 : "newPosition must be in [0f, 1f]";
         _position = newPosition;
 
         // Set our handles relative location using the position, our size and the size of the handle
