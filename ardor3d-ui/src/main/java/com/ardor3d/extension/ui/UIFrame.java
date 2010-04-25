@@ -50,6 +50,14 @@ public class UIFrame extends UIContainer {
     /** If true, show a resize handle on this frame and allow its use. */
     private boolean _resizeable = true;
 
+    /** if true, the frame is maximized and can be restored */
+    private boolean _maximized = false;
+
+    private int widthBeforeMaximizing;
+    private int heightBeforeMaximizing;
+    private int hudXBeforeMaximizing;
+    private int hudYBeforeMaximizing;
+
     /**
      * Construct a new UIFrame with the given title and default buttons (CLOSE).
      * 
@@ -110,6 +118,32 @@ public class UIFrame extends UIContainer {
         } else {
             _basePanel.add(_statusBar);
         }
+    }
+
+    public void maximize() {
+        final UIHud hud = getHud();
+        if (_maximized || hud == null) {
+            return;
+        }
+        widthBeforeMaximizing = getLocalComponentWidth();
+        heightBeforeMaximizing = getLocalComponentHeight();
+        hudXBeforeMaximizing = getHudX();
+        hudYBeforeMaximizing = getHudY();
+        setLocalComponentSize(hud.getWidth(), hud.getHeight());
+        setHudXY(0, 0);
+        layout();
+        _maximized = true;
+    }
+
+    public void restore() {
+        final UIHud hud = getHud();
+        if (!_maximized || hud == null) {
+            return;
+        }
+        setLocalComponentSize(widthBeforeMaximizing, heightBeforeMaximizing);
+        setHudXY(hudXBeforeMaximizing, hudYBeforeMaximizing);
+        layout();
+        _maximized = false;
     }
 
     /**
@@ -402,5 +436,9 @@ public class UIFrame extends UIContainer {
      */
     public enum FrameButtons {
         CLOSE, MINIMIZE, MAXIMIZE, HELP;
+    }
+
+    public boolean isMaximized() {
+        return _maximized;
     }
 }

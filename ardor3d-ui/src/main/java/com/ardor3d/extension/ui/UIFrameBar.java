@@ -72,7 +72,13 @@ public class UIFrameBar extends UIPanel {
             _maximizeButton = createFrameButton("^");
             _maximizeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
-                // TODO: Implement
+                    // XXX: Should this also update the button img?
+                    final UIFrame frame = (UIFrame) getParent();
+                    if (frame.isMaximized()) {
+                        frame.restore();
+                    } else {
+                        frame.maximize();
+                    }
                 }
             });
             attachChild(_maximizeButton);
