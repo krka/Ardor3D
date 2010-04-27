@@ -484,6 +484,12 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             }
         }));
 
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.C), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+                System.out.println("Camera: " + _canvas.getCanvasRenderer().getCamera());
+            }
+        }));
+
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.N), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
                 _showNormals = !_showNormals;
