@@ -28,12 +28,16 @@ public class TextureProjector extends Camera {
     }
 
     public void updateTextureMatrix(final Texture texture) {
+        final Matrix4 texMat = Matrix4.fetchTempInstance();
+        updateTextureMatrix(texMat);
+        texture.setTextureMatrix(texMat);
+        Matrix4.releaseTempInstance(texMat);
+    }
+
+    public void updateTextureMatrix(final Matrix4 matrixStore) {
         update();
         final ReadOnlyMatrix4 projectorView = getModelViewMatrix();
         final ReadOnlyMatrix4 projectorProjection = getProjectionMatrix();
-        final Matrix4 texMat = Matrix4.fetchTempInstance();
-        texMat.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
-        texture.setTextureMatrix(texMat);
-        Matrix4.releaseTempInstance(texMat);
+        matrixStore.set(projectorView).multiplyLocal(projectorProjection).multiplyLocal(BIAS);
     }
 }
