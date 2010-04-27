@@ -18,39 +18,39 @@ import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyTransform {
-    public ReadOnlyMatrix3 getMatrix();
+    ReadOnlyMatrix3 getMatrix();
 
-    public ReadOnlyVector3 getTranslation();
+    ReadOnlyVector3 getTranslation();
 
-    public ReadOnlyVector3 getScale();
+    ReadOnlyVector3 getScale();
 
-    public boolean isIdentity();
+    boolean isIdentity();
 
-    public boolean isRotationMatrix();
+    boolean isRotationMatrix();
 
-    public boolean isUniformScale();
+    boolean isUniformScale();
 
-    public Vector3 applyForward(final Vector3 point);
+    Vector3 applyForward(Vector3 point);
 
-    public Vector3 applyForward(final ReadOnlyVector3 point, final Vector3 store);
+    Vector3 applyForward(ReadOnlyVector3 point, Vector3 store);
 
-    public Vector3 applyInverse(final Vector3 point);
+    Vector3 applyInverse(Vector3 point);
 
-    public Vector3 applyInverse(final ReadOnlyVector3 point, final Vector3 store);
+    Vector3 applyInverse(ReadOnlyVector3 point, Vector3 store);
 
-    public Vector3 applyForwardVector(final Vector3 vector);
+    Vector3 applyForwardVector(Vector3 vector);
 
-    public Vector3 applyForwardVector(final ReadOnlyVector3 vector, final Vector3 store);
+    Vector3 applyForwardVector(ReadOnlyVector3 vector, Vector3 store);
 
-    public Vector3 applyInverseVector(final Vector3 vector);
+    Vector3 applyInverseVector(Vector3 vector);
 
-    public Vector3 applyInverseVector(final ReadOnlyVector3 vector, final Vector3 store);
+    Vector3 applyInverseVector(ReadOnlyVector3 vector, Vector3 store);
 
-    public Transform multiply(final ReadOnlyTransform transformBy, final Transform store);
+    Transform multiply(ReadOnlyTransform transformBy, Transform store);
 
-    public Transform invert(final Transform store);
+    Transform invert(Transform store);
 
-    public Matrix4 getHomogeneousMatrix(final Matrix4 store);
+    Matrix4 getHomogeneousMatrix(Matrix4 store);
 
     /**
      * Populates an nio double buffer with data from this transform to use as a model view matrix in OpenGL. This is
@@ -60,7 +60,7 @@ public interface ReadOnlyTransform {
      *            double buffer to store in. Assumes a size of 16 and that position 3, 7 and 11 are already set as 0.0
      *            and 15 is already 1.0.
      */
-    public void getGLApplyMatrix(DoubleBuffer store);
+    void getGLApplyMatrix(DoubleBuffer store);
 
     /**
      * Populates an nio float buffer with data from this transform to use as a model view matrix in OpenGL. This is done
@@ -70,6 +70,6 @@ public interface ReadOnlyTransform {
      *            float buffer to store in. Assumes a size of 16 and that position 3, 7 and 11 are already set as 0.0f
      *            and 15 is already 1.0f.
      */
-    public void getGLApplyMatrix(FloatBuffer store);
+    void getGLApplyMatrix(FloatBuffer store);
 
 }

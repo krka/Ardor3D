@@ -29,12 +29,12 @@ public interface ReadOnlyPlane {
         Neither;
     }
 
-    public double getConstant();
+    double getConstant();
 
-    public ReadOnlyVector3 getNormal();
+    ReadOnlyVector3 getNormal();
 
-    public double pseudoDistance(final ReadOnlyVector3 point);
+    double pseudoDistance(ReadOnlyVector3 point);
 
-    public Side whichSide(final ReadOnlyVector3 point);
+    Side whichSide(ReadOnlyVector3 point);
 
 }

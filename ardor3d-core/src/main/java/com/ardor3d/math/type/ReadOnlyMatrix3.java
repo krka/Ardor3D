@@ -18,49 +18,49 @@ import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyMatrix3 {
 
-    public double getValue(final int row, final int column);
+    double getValue(int row, int column);
 
-    public float getValuef(final int row, final int column);
+    float getValuef(int row, int column);
 
-    public boolean isIdentity();
+    boolean isIdentity();
 
-    public Vector3 getColumn(final int index, final Vector3 store);
+    Vector3 getColumn(int index, Vector3 store);
 
-    public Vector3 getRow(final int index, final Vector3 store);
+    Vector3 getRow(int index, Vector3 store);
 
-    public DoubleBuffer toDoubleBuffer(final DoubleBuffer store);
+    DoubleBuffer toDoubleBuffer(DoubleBuffer store);
 
-    public DoubleBuffer toDoubleBuffer(final DoubleBuffer store, final boolean rowMajor);
+    DoubleBuffer toDoubleBuffer(DoubleBuffer store, boolean rowMajor);
 
-    public FloatBuffer toFloatBuffer(final FloatBuffer store);
+    FloatBuffer toFloatBuffer(FloatBuffer store);
 
-    public FloatBuffer toFloatBuffer(final FloatBuffer store, final boolean rowMajor);
+    FloatBuffer toFloatBuffer(FloatBuffer store, boolean rowMajor);
 
-    public double[] toArray(final double[] store);
+    double[] toArray(double[] store);
 
-    public double[] toArray(final double[] store, final boolean rowMajor);
+    double[] toArray(double[] store, boolean rowMajor);
 
-    public double[] toAngles(final double[] store);
+    double[] toAngles(double[] store);
 
-    public Matrix3 multiply(final ReadOnlyMatrix3 matrix, final Matrix3 store);
+    Matrix3 multiply(ReadOnlyMatrix3 matrix, Matrix3 store);
 
-    public Vector3 applyPre(final ReadOnlyVector3 vec, final Vector3 store);
+    Vector3 applyPre(ReadOnlyVector3 vec, Vector3 store);
 
-    public Vector3 applyPost(final ReadOnlyVector3 vec, final Vector3 store);
+    Vector3 applyPost(ReadOnlyVector3 vec, Vector3 store);
 
-    public Matrix3 multiplyDiagonalPre(final ReadOnlyVector3 vec, final Matrix3 store);
+    Matrix3 multiplyDiagonalPre(ReadOnlyVector3 vec, Matrix3 store);
 
-    public Matrix3 multiplyDiagonalPost(final ReadOnlyVector3 vec, final Matrix3 store);
+    Matrix3 multiplyDiagonalPost(ReadOnlyVector3 vec, Matrix3 store);
 
-    public Matrix3 add(final ReadOnlyMatrix3 matrix, final Matrix3 store);
+    Matrix3 add(ReadOnlyMatrix3 matrix, Matrix3 store);
 
-    public Matrix3 scale(final ReadOnlyVector3 scale, final Matrix3 store);
+    Matrix3 scale(ReadOnlyVector3 scale, Matrix3 store);
 
-    public Matrix3 transpose(final Matrix3 store);
+    Matrix3 transpose(Matrix3 store);
 
-    public Matrix3 invert(final Matrix3 store);
+    Matrix3 invert(Matrix3 store);
 
-    public Matrix3 adjugate(final Matrix3 store);
+    Matrix3 adjugate(Matrix3 store);
 
-    public double determinant();
+    double determinant();
 }

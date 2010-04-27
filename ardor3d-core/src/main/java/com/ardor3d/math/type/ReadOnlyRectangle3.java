@@ -13,11 +13,13 @@ package com.ardor3d.math.type;
 import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyRectangle3 {
-    public ReadOnlyVector3 getA();
 
-    public ReadOnlyVector3 getB();
+    ReadOnlyVector3 getA();
 
-    public ReadOnlyVector3 getC();
+    ReadOnlyVector3 getB();
 
-    public Vector3 random(Vector3 result);
+    ReadOnlyVector3 getC();
+
+    Vector3 random(Vector3 result);
+
 }

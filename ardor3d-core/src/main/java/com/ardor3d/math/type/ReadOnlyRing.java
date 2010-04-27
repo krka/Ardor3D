@@ -13,14 +13,15 @@ package com.ardor3d.math.type;
 import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyRing {
-    public ReadOnlyVector3 getCenter();
 
-    public ReadOnlyVector3 getUp();
+    ReadOnlyVector3 getCenter();
 
-    public double getInnerRadius();
+    ReadOnlyVector3 getUp();
 
-    public double getOuterRadius();
+    double getInnerRadius();
 
-    public Vector3 random(final Vector3 store);
+    double getOuterRadius();
+
+    Vector3 random(Vector3 store);
 
 }

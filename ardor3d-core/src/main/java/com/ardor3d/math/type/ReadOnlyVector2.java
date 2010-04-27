@@ -14,64 +14,64 @@ import com.ardor3d.math.Vector2;
 
 public interface ReadOnlyVector2 {
 
-    public double getX();
+    double getX();
 
-    public double getY();
+    double getY();
 
-    public float getXf();
+    float getXf();
 
-    public float getYf();
+    float getYf();
 
-    public double getValue(final int index);
+    double getValue(int index);
 
-    public double[] toArray(double[] store);
+    double[] toArray(double[] store);
 
-    public Vector2 add(final double x, final double y, final Vector2 store);
+    Vector2 add(double x, double y, Vector2 store);
 
-    public Vector2 add(final ReadOnlyVector2 source, final Vector2 store);
+    Vector2 add(ReadOnlyVector2 source, Vector2 store);
 
-    public Vector2 subtract(final double x, final double y, final Vector2 store);
+    Vector2 subtract(double x, double y, Vector2 store);
 
-    public Vector2 subtract(final ReadOnlyVector2 source, final Vector2 store);
+    Vector2 subtract(ReadOnlyVector2 source, Vector2 store);
 
-    public Vector2 multiply(final double scalar, final Vector2 store);
+    Vector2 multiply(double scalar, Vector2 store);
 
-    public Vector2 multiply(final ReadOnlyVector2 scale, final Vector2 store);
+    Vector2 multiply(ReadOnlyVector2 scale, Vector2 store);
 
-    public Vector2 divide(final double scalar, final Vector2 store);
+    Vector2 divide(double scalar, Vector2 store);
 
-    public Vector2 divide(final ReadOnlyVector2 scale, final Vector2 store);
+    Vector2 divide(ReadOnlyVector2 scale, Vector2 store);
 
-    public Vector2 scaleAdd(final double scale, final ReadOnlyVector2 add, final Vector2 store);
+    Vector2 scaleAdd(double scale, ReadOnlyVector2 add, Vector2 store);
 
-    public Vector2 negate(final Vector2 store);
+    Vector2 negate(Vector2 store);
 
-    public Vector2 normalize(final Vector2 store);
+    Vector2 normalize(Vector2 store);
 
-    public Vector2 rotateAroundOrigin(double angle, final boolean clockwise, final Vector2 store);
+    Vector2 rotateAroundOrigin(double angle, boolean clockwise, Vector2 store);
 
-    public Vector2 lerp(final ReadOnlyVector2 endVec, final double scalar, final Vector2 store);
+    Vector2 lerp(ReadOnlyVector2 endVec, double scalar, Vector2 store);
 
-    public double length();
+    double length();
 
-    public double lengthSquared();
+    double lengthSquared();
 
-    public double distanceSquared(final double x, final double y);
+    double distanceSquared(double x, double y);
 
-    public double distanceSquared(final ReadOnlyVector2 destination);
+    double distanceSquared(ReadOnlyVector2 destination);
 
-    public double distance(final double x, final double y);
+    double distance(double x, double y);
 
-    public double distance(final ReadOnlyVector2 destination);
+    double distance(ReadOnlyVector2 destination);
 
-    public double dot(final double x, final double y);
+    double dot(double x, double y);
 
-    public double dot(final ReadOnlyVector2 vec);
+    double dot(ReadOnlyVector2 vec);
 
-    public double getPolarAngle();
+    double getPolarAngle();
 
-    public double angleBetween(final ReadOnlyVector2 otherVector);
+    double angleBetween(ReadOnlyVector2 otherVector);
 
-    public double smallestAngleBetween(final ReadOnlyVector2 otherVector);
+    double smallestAngleBetween(ReadOnlyVector2 otherVector);
 
 }

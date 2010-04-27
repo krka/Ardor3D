@@ -18,47 +18,47 @@ import com.ardor3d.math.Vector4;
 
 public interface ReadOnlyMatrix4 {
 
-    public double getValue(final int row, final int column);
+    double getValue(int row, int column);
 
-    public float getValuef(final int row, final int column);
+    float getValuef(int row, int column);
 
-    public boolean isIdentity();
+    boolean isIdentity();
 
-    public Vector4 getColumn(final int index, final Vector4 store);
+    Vector4 getColumn(int index, Vector4 store);
 
-    public Vector4 getRow(final int index, final Vector4 store);
+    Vector4 getRow(int index, Vector4 store);
 
-    public DoubleBuffer toDoubleBuffer(final DoubleBuffer store);
+    DoubleBuffer toDoubleBuffer(DoubleBuffer store);
 
-    public DoubleBuffer toDoubleBuffer(final DoubleBuffer store, final boolean rowMajor);
+    DoubleBuffer toDoubleBuffer(DoubleBuffer store, boolean rowMajor);
 
-    public FloatBuffer toFloatBuffer(final FloatBuffer store);
+    FloatBuffer toFloatBuffer(FloatBuffer store);
 
-    public FloatBuffer toFloatBuffer(final FloatBuffer store, final boolean rowMajor);
+    FloatBuffer toFloatBuffer(FloatBuffer store, boolean rowMajor);
 
-    public double[] toArray(final double[] store);
+    double[] toArray(double[] store);
 
-    public double[] toArray(final double[] store, final boolean rowMajor);
+    double[] toArray(double[] store, boolean rowMajor);
 
-    public Matrix4 multiply(final ReadOnlyMatrix4 matrix, final Matrix4 store);
+    Matrix4 multiply(ReadOnlyMatrix4 matrix, Matrix4 store);
 
-    public Vector4 applyPre(final ReadOnlyVector4 vec, final Vector4 store);
+    Vector4 applyPre(ReadOnlyVector4 vec, Vector4 store);
 
-    public Vector4 applyPost(final ReadOnlyVector4 vec, final Vector4 store);
+    Vector4 applyPost(ReadOnlyVector4 vec, Vector4 store);
 
-    public Matrix4 multiplyDiagonalPre(final ReadOnlyVector4 vec, final Matrix4 store);
+    Matrix4 multiplyDiagonalPre(ReadOnlyVector4 vec, Matrix4 store);
 
-    public Matrix4 multiplyDiagonalPost(final ReadOnlyVector4 vec, final Matrix4 store);
+    Matrix4 multiplyDiagonalPost(ReadOnlyVector4 vec, Matrix4 store);
 
-    public Matrix4 add(final ReadOnlyMatrix4 matrix, final Matrix4 store);
+    Matrix4 add(ReadOnlyMatrix4 matrix, Matrix4 store);
 
-    public Matrix4 scale(final ReadOnlyVector4 scale, final Matrix4 store);
+    Matrix4 scale(ReadOnlyVector4 scale, Matrix4 store);
 
-    public Matrix4 transpose(final Matrix4 store);
+    Matrix4 transpose(Matrix4 store);
 
-    public Matrix4 invert(final Matrix4 store);
+    Matrix4 invert(Matrix4 store);
 
-    public Matrix4 adjugate(final Matrix4 store);
+    Matrix4 adjugate(Matrix4 store);
 
-    public double determinant();
+    double determinant();
 }

@@ -13,10 +13,11 @@ package com.ardor3d.math.type;
 import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyLine3Base {
-    public ReadOnlyVector3 getOrigin();
 
-    public ReadOnlyVector3 getDirection();
+    ReadOnlyVector3 getOrigin();
 
-    public double distanceSquared(final ReadOnlyVector3 point, Vector3 store);
+    ReadOnlyVector3 getDirection();
+
+    double distanceSquared(ReadOnlyVector3 point, Vector3 store);
 
 }

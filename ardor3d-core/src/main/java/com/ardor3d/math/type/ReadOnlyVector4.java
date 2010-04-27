@@ -14,65 +14,67 @@ import com.ardor3d.math.Vector4;
 
 public interface ReadOnlyVector4 {
 
-    public double getX();
+    double getX();
 
-    public double getY();
+    double getY();
 
-    public double getZ();
+    double getZ();
 
-    public double getW();
+    double getW();
 
-    public float getXf();
+    float getXf();
 
-    public float getYf();
+    float getYf();
 
-    public float getZf();
+    float getZf();
 
-    public float getWf();
+    float getWf();
 
-    public double getValue(final int index);
+    double getValue(int index);
 
-    public Vector4 add(final double x, final double y, final double z, final double w, final Vector4 store);
+    Vector4 add(double x, double y, double z, double w, Vector4 store);
 
-    public Vector4 add(final ReadOnlyVector4 source, final Vector4 store);
+    Vector4 add(ReadOnlyVector4 source, Vector4 store);
 
-    public Vector4 subtract(final double x, final double y, final double z, final double w, final Vector4 store);
+    Vector4 subtract(double x, double y, double z, double w, Vector4 store);
 
-    public Vector4 subtract(final ReadOnlyVector4 source, final Vector4 store);
+    Vector4 subtract(ReadOnlyVector4 source, Vector4 store);
 
-    public Vector4 multiply(final double scalar, final Vector4 store);
+    Vector4 multiply(double scalar, Vector4 store);
 
-    public Vector4 multiply(final ReadOnlyVector4 scale, final Vector4 store);
+    Vector4 multiply(ReadOnlyVector4 scale, Vector4 store);
 
-    public Vector4 divide(final double scalar, final Vector4 store);
+    Vector4 divide(double scalar, Vector4 store);
 
-    public Vector4 divide(final ReadOnlyVector4 scale, final Vector4 store);
+    Vector4 divide(ReadOnlyVector4 scale, Vector4 store);
 
-    public Vector4 scaleAdd(final double scale, final ReadOnlyVector4 add, final Vector4 store);
+    Vector4 scaleAdd(double scale, ReadOnlyVector4 add, Vector4 store);
 
-    public Vector4 negate(final Vector4 store);
+    Vector4 negate(Vector4 store);
 
-    public Vector4 normalize(final Vector4 store);
+    Vector4 normalize(Vector4 store);
 
-    public Vector4 lerp(final ReadOnlyVector4 endVec, final double scalar, final Vector4 store);
+    Vector4 lerp(ReadOnlyVector4 endVec, double scalar, Vector4 store);
 
-    public double length();
+    double length();
 
-    public double lengthSquared();
+    double lengthSquared();
 
-    public double distanceSquared(final double x, final double y, final double z, final double w);
+    double distanceSquared(double x, double y, double z, double w);
 
-    public double distanceSquared(final ReadOnlyVector4 destination);
+    double distanceSquared(ReadOnlyVector4 destination);
 
-    public double distance(final double x, final double y, final double z, final double w);
+    double distance(double x, double y, double z, double w);
 
-    public double distance(final ReadOnlyVector4 destination);
+    double distance(ReadOnlyVector4 destination);
 
-    public double dot(final double x, final double y, final double z, final double w);
+    double dot(double x, double y, double z, double w);
 
-    public double dot(final ReadOnlyVector4 vec);
+    double dot(ReadOnlyVector4 vec);
 
-    public double determinant(final double x, final double y, final double z, final double w);
+    double determinant(double x, double y, double z, double w);
 
-    public double determinant(final ReadOnlyVector4 vec);
+    double determinant(ReadOnlyVector4 vec);
+
+    double[] toArray(double[] store);
 }

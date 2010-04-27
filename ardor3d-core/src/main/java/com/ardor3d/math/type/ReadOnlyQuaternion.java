@@ -17,59 +17,59 @@ import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyQuaternion {
 
-    public double getX();
+    double getX();
 
-    public double getY();
+    double getY();
 
-    public double getZ();
+    double getZ();
 
-    public double getW();
+    double getW();
 
-    public float getXf();
+    float getXf();
 
-    public float getYf();
+    float getYf();
 
-    public float getZf();
+    float getZf();
 
-    public float getWf();
+    float getWf();
 
-    public double[] toArray(final double[] store);
+    double[] toArray(double[] store);
 
-    public double[] toEulerAngles(final double[] store);
+    double[] toEulerAngles(double[] store);
 
-    public Matrix3 toRotationMatrix(final Matrix3 store);
+    Matrix3 toRotationMatrix(Matrix3 store);
 
-    public Matrix4 toRotationMatrix(final Matrix4 store);
+    Matrix4 toRotationMatrix(Matrix4 store);
 
-    public Vector3 getRotationColumn(final int index, final Vector3 store);
+    Vector3 getRotationColumn(int index, Vector3 store);
 
-    public double toAngleAxis(final Vector3 axisStore);
+    double toAngleAxis(Vector3 axisStore);
 
-    public Quaternion normalize(final Quaternion store);
+    Quaternion normalize(Quaternion store);
 
-    public Quaternion invert(final Quaternion store);
+    Quaternion invert(Quaternion store);
 
-    public Quaternion add(final ReadOnlyQuaternion quat, final Quaternion store);
+    Quaternion add(ReadOnlyQuaternion quat, Quaternion store);
 
-    public Quaternion subtract(final ReadOnlyQuaternion quat, final Quaternion store);
+    Quaternion subtract(ReadOnlyQuaternion quat, Quaternion store);
 
-    public Quaternion multiply(final double scalar, final Quaternion store);
+    Quaternion multiply(double scalar, Quaternion store);
 
-    public Quaternion multiply(final ReadOnlyQuaternion quat, Quaternion store);
+    Quaternion multiply(ReadOnlyQuaternion quat, Quaternion store);
 
-    public Vector3 apply(final ReadOnlyVector3 vec, Vector3 store);
+    Vector3 apply(ReadOnlyVector3 vec, Vector3 store);
 
-    public void toAxes(final Vector3 axes[]);
+    void toAxes(Vector3 axes[]);
 
-    public Quaternion slerp(final ReadOnlyQuaternion endQuat, final double changeAmnt, final Quaternion store);
+    Quaternion slerp(ReadOnlyQuaternion endQuat, double changeAmnt, Quaternion store);
 
-    public double magnitudeSquared();
+    double magnitudeSquared();
 
-    public double magnitude();
+    double magnitude();
 
-    public double dot(final double x, final double y, final double z, final double w);
+    double dot(double x, double y, double z, double w);
 
-    public double dot(final ReadOnlyQuaternion quat);
+    double dot(ReadOnlyQuaternion quat);
 
-    public boolean isIdentity();
+    boolean isIdentity();
 }

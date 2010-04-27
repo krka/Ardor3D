@@ -14,40 +14,40 @@ import com.ardor3d.math.ColorRGBA;
 
 public interface ReadOnlyColorRGBA {
 
-    public float getRed();
+    float getRed();
 
-    public float getGreen();
+    float getGreen();
 
-    public float getBlue();
+    float getBlue();
 
-    public float getAlpha();
+    float getAlpha();
 
-    public float getValue(final int index);
+    float getValue(int index);
 
-    public float[] toArray(float[] store);
+    float[] toArray(float[] store);
 
-    public ColorRGBA clamp(final ColorRGBA store);
+    ColorRGBA clamp(ColorRGBA store);
 
-    public int asIntARGB();
+    int asIntARGB();
 
-    public int asIntRGBA();
+    int asIntRGBA();
 
-    public ColorRGBA add(final float r, final float g, final float b, final float a, final ColorRGBA store);
+    ColorRGBA add(float r, float g, float b, float a, ColorRGBA store);
 
-    public ColorRGBA add(final ReadOnlyColorRGBA source, final ColorRGBA store);
+    ColorRGBA add(ReadOnlyColorRGBA source, ColorRGBA store);
 
-    public ColorRGBA subtract(final float r, final float g, final float b, final float a, final ColorRGBA store);
+    ColorRGBA subtract(float r, float g, float b, float a, ColorRGBA store);
 
-    public ColorRGBA subtract(final ReadOnlyColorRGBA source, final ColorRGBA store);
+    ColorRGBA subtract(ReadOnlyColorRGBA source, ColorRGBA store);
 
-    public ColorRGBA multiply(final float scalar, final ColorRGBA store);
+    ColorRGBA multiply(float scalar, ColorRGBA store);
 
-    public ColorRGBA multiply(final ReadOnlyColorRGBA scale, final ColorRGBA store);
+    ColorRGBA multiply(ReadOnlyColorRGBA scale, ColorRGBA store);
 
-    public ColorRGBA divide(final float scalar, final ColorRGBA store);
+    ColorRGBA divide(float scalar, ColorRGBA store);
 
-    public ColorRGBA divide(final ReadOnlyColorRGBA scale, final ColorRGBA store);
+    ColorRGBA divide(ReadOnlyColorRGBA scale, ColorRGBA store);
 
-    public ColorRGBA lerp(final ReadOnlyColorRGBA endColor, final float scalar, final ColorRGBA store);
+    ColorRGBA lerp(ReadOnlyColorRGBA endColor, float scalar, ColorRGBA store);
 
 }

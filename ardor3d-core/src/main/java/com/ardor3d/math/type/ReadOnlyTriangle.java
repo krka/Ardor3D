@@ -11,17 +11,17 @@
 package com.ardor3d.math.type;
 
 public interface ReadOnlyTriangle {
-    public int getIndex();
+    int getIndex();
 
-    public ReadOnlyVector3 get(final int index);
+    ReadOnlyVector3 get(int index);
 
-    public ReadOnlyVector3 getA();
+    ReadOnlyVector3 getA();
 
-    public ReadOnlyVector3 getB();
+    ReadOnlyVector3 getB();
 
-    public ReadOnlyVector3 getC();
+    ReadOnlyVector3 getC();
 
-    public ReadOnlyVector3 getNormal();
+    ReadOnlyVector3 getNormal();
 
-    public ReadOnlyVector3 getCenter();
+    ReadOnlyVector3 getCenter();
 }

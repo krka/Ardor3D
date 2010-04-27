@@ -15,20 +15,20 @@ public interface ReadOnlyRectangle2 {
     /**
      * @return the x coordinate of the origin of this rectangle.
      */
-    public int getX();
+    int getX();
 
     /**
      * @return the y coordinate of the origin of this rectangle.
      */
-    public int getY();
+    int getY();
 
     /**
      * @return the width of this rectangle.
      */
-    public int getWidth();
+    int getWidth();
 
     /**
      * @return the height of this rectangle.
      */
-    public int getHeight();
+    int getHeight();
 }

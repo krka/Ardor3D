@@ -14,67 +14,69 @@ import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyVector3 {
 
-    public double getX();
+    double getX();
 
-    public double getY();
+    double getY();
 
-    public double getZ();
+    double getZ();
 
-    public float getXf();
+    float getXf();
 
-    public float getYf();
+    float getYf();
 
-    public float getZf();
+    float getZf();
 
-    public double getValue(final int index);
+    double getValue(int index);
 
-    public Vector3 add(final double x, final double y, final double z, final Vector3 store);
+    Vector3 add(double x, double y, double z, Vector3 store);
 
-    public Vector3 add(final ReadOnlyVector3 source, final Vector3 store);
+    Vector3 add(ReadOnlyVector3 source, Vector3 store);
 
-    public Vector3 subtract(final double x, final double y, final double z, final Vector3 store);
+    Vector3 subtract(double x, double y, double z, Vector3 store);
 
-    public Vector3 subtract(final ReadOnlyVector3 source, final Vector3 store);
+    Vector3 subtract(ReadOnlyVector3 source, Vector3 store);
 
-    public Vector3 multiply(final double scalar, final Vector3 store);
+    Vector3 multiply(double scalar, Vector3 store);
 
-    public Vector3 multiply(final ReadOnlyVector3 scale, final Vector3 store);
+    Vector3 multiply(ReadOnlyVector3 scale, Vector3 store);
 
-    public Vector3 divide(final double scalar, final Vector3 store);
+    Vector3 divide(double scalar, Vector3 store);
 
-    public Vector3 divide(final ReadOnlyVector3 scale, final Vector3 store);
+    Vector3 divide(ReadOnlyVector3 scale, Vector3 store);
 
-    public Vector3 scaleAdd(final double scale, final ReadOnlyVector3 add, final Vector3 store);
+    Vector3 scaleAdd(double scale, ReadOnlyVector3 add, Vector3 store);
 
-    public Vector3 negate(final Vector3 store);
+    Vector3 negate(Vector3 store);
 
-    public Vector3 normalize(final Vector3 store);
+    Vector3 normalize(Vector3 store);
 
-    public Vector3 lerp(final ReadOnlyVector3 endVec, final double scalar, final Vector3 store);
+    Vector3 lerp(ReadOnlyVector3 endVec, double scalar, Vector3 store);
 
-    public double length();
+    double length();
 
-    public double lengthSquared();
+    double lengthSquared();
 
-    public double distanceSquared(final double x, final double y, final double z);
+    double distanceSquared(double x, double y, double z);
 
-    public double distanceSquared(final ReadOnlyVector3 destination);
+    double distanceSquared(ReadOnlyVector3 destination);
 
-    public double distance(final double x, final double y, final double z);
+    double distance(double x, double y, double z);
 
-    public double distance(final ReadOnlyVector3 destination);
+    double distance(ReadOnlyVector3 destination);
 
-    public double dot(final double x, final double y, final double z);
+    double dot(double x, double y, double z);
 
-    public double dot(final ReadOnlyVector3 vec);
+    double dot(ReadOnlyVector3 vec);
 
-    public Vector3 cross(final double x, final double y, final double z, final Vector3 store);
+    Vector3 cross(double x, double y, double z, Vector3 store);
 
-    public Vector3 cross(final ReadOnlyVector3 vec, final Vector3 store);
+    Vector3 cross(ReadOnlyVector3 vec, Vector3 store);
 
-    public double determinant(final double x, final double y, final double z);
+    double determinant(double x, double y, double z);
 
-    public double determinant(final ReadOnlyVector3 vec);
+    double determinant(ReadOnlyVector3 vec);
 
-    public double smallestAngleBetween(final ReadOnlyVector3 otherVector);
+    double smallestAngleBetween(ReadOnlyVector3 otherVector);
+
+    double[] toArray(double[] store);
 }

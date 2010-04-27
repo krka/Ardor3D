@@ -14,12 +14,12 @@ import com.ardor3d.math.Vector3;
 
 public interface ReadOnlyRay3 extends ReadOnlyLine3Base {
 
-    public boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC,
-            final Vector3 locationStore, final boolean triangle);
+    boolean intersects(ReadOnlyVector3 pointA, ReadOnlyVector3 pointB, ReadOnlyVector3 pointC, Vector3 locationStore,
+            boolean triangle);
 
-    public boolean intersectsPlanar(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
-            final ReadOnlyVector3 pointC, final Vector3 locationStore, final boolean triangle);
+    boolean intersectsPlanar(ReadOnlyVector3 pointA, ReadOnlyVector3 pointB, ReadOnlyVector3 pointC,
+            Vector3 locationStore, boolean triangle);
 
-    public boolean intersects(final ReadOnlyPlane plane, final Vector3 locationStore);
+    boolean intersects(ReadOnlyPlane plane, Vector3 locationStore);
 
 }
