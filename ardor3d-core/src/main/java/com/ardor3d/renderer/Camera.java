@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
@@ -1603,6 +1604,13 @@ public class Camera implements Savable, Externalizable, Cloneable {
         out.writeInt(_height);
         out.writeDouble(_depthRangeNear);
         out.writeDouble(_depthRangeFar);
+    }
+
+    @Override
+    public String toString() {
+        return "com.ardor3d.renderer.Camera: loc - " + Arrays.toString(getLocation().toArray(null)) + " dir - "
+                + Arrays.toString(getDirection().toArray(null)) + " up - " + Arrays.toString(getUp().toArray(null))
+                + " left - " + Arrays.toString(getLeft().toArray(null));
     }
 
     public Class<? extends Camera> getClassTag() {
