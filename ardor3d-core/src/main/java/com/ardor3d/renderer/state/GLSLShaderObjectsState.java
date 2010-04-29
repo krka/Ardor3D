@@ -56,6 +56,7 @@ import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableMatrix4Array;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerByte;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerFloat;
+import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerFloatMatrix;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerInt;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariablePointerShort;
 
@@ -754,6 +755,31 @@ public class GLSLShaderObjectsState extends RenderState {
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
         shaderUniform.stride = stride;
+        shaderUniform.data = data;
+
+        setNeedsRefresh(true);
+    }
+
+    /**
+     * Set an attribute pointer value for this shader object.
+     * 
+     * @param name
+     *            attribute variable to change
+     * @param size
+     *            the number of rows and cols in the matrix. Must be 2, 3, or 4.
+     * @param normalized
+     *            Specifies whether fixed-point data values should be normalized or converted directly as fixed-point
+     *            values when they are accessed.
+     * @param data
+     *            The actual data to use as attribute pointer
+     */
+    public void setAttributePointerMatrix(final String name, final int size, final boolean normalized,
+            final FloatBuffer data) {
+        final ShaderVariablePointerFloatMatrix shaderUniform = getShaderAttribute(name,
+                ShaderVariablePointerFloatMatrix.class);
+        shaderUniform.size = size;
+        shaderUniform.normalized = normalized;
+        shaderUniform.stride = 0;
         shaderUniform.data = data;
 
         setNeedsRefresh(true);
