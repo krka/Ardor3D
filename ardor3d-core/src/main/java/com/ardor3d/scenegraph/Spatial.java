@@ -48,6 +48,9 @@ import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 
+/**
+ * Base class for all scenegraph objects.
+ */
 public abstract class Spatial implements Cloneable, Savable, Hintable {
 
     /** This spatial's name. */
@@ -59,7 +62,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /** Spatial's absolute transform. */
     protected final Transform _worldTransform;
 
-    /** Spatial's world bounding volume */
+    /** Spatial's world bounding volume. */
     protected BoundingVolume _worldBound;
 
     /** Spatial's parent, or null if it has none. */
@@ -89,6 +92,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
 
     /** The render delegates to use for this Spatial, mapped by glContext reference. */
     protected transient Map<Object, RenderDelegate> _delegateMap = null;
+
+    /** The default delegate reference to use if none provided. */
     private static final Object defaultDelegateRef = new Object();
 
     /**
@@ -131,6 +136,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
+     * Sets the render delegate.
      * 
      * @param delegate
      *            the new delegate, or null for default behavior
@@ -165,6 +171,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
+     * Gets the render delegate.
      * 
      * @param glContextRef
      *            if null, retrieve the default render delegate for this spatial. Otherwise, retrieve the delegate used
@@ -232,11 +239,16 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         }
     }
 
+    /**
+     * @see Hintable#getParentHintable()
+     */
     public Hintable getParentHintable() {
         return _parent;
     }
 
     /**
+     * Gets the scene hints.
+     * 
      * @return the scene hints set on this Spatial
      */
     public SceneHints getSceneHints() {
@@ -266,6 +278,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * Mark this node as dirty. Can be marked as Transform, Bounding, Attached, Detached, Destroyed or RenderState
      * 
      * @param dirtyType
+     *            the dirty type
      */
     public void markDirty(final DirtyType dirtyType) {
         markDirty(this, dirtyType);
@@ -275,7 +288,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * Mark this node as dirty. Can be marked as Transform, Bounding, Attached, Detached, Destroyed or RenderState
      * 
      * @param caller
+     *            the spatial where the marking was initiated
      * @param dirtyType
+     *            the dirty type
      */
     protected void markDirty(final Spatial caller, final DirtyType dirtyType) {
         switch (dirtyType) {
@@ -311,7 +326,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
-     * Test if this spatial is marked as dirty in respect to the supplied DirtyType
+     * Test if this spatial is marked as dirty in respect to the supplied DirtyType.
      * 
      * @param dirtyType
      *            dirty type to test against
@@ -332,9 +347,10 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
-     * Propagate the dirty mark up the tree hierarchy
+     * Propagate the dirty mark up the tree hierarchy.
      * 
      * @param dirtyType
+     *            the dirty type
      */
     protected void propagateDirtyUp(final DirtyType dirtyType) {
         _dirtyMark.add(dirtyType);
@@ -345,9 +361,10 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
-     * Propagate the dirty mark down the tree hierarchy
+     * Propagate the dirty mark down the tree hierarchy.
      * 
      * @param dirtyType
+     *            the dirty type
      */
     protected void propagateDirtyDown(final DirtyType dirtyType) {
         _dirtyMark.add(dirtyType);
@@ -358,7 +375,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * propagation is stopped.
      * 
      * @param spatial
+     *            the spatial
      * @param dirtyType
+     *            the dirty type
      */
     protected void propageEventUp(final Spatial spatial, final DirtyType dirtyType) {
         boolean consumed = false;
@@ -371,55 +390,137 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         }
     }
 
+    /**
+     * Gets the local rotation matrix.
+     * 
+     * @return the rotation
+     */
     public ReadOnlyMatrix3 getRotation() {
         return _localTransform.getMatrix();
     }
 
+    /**
+     * Gets the local scale vector.
+     * 
+     * @return the scale
+     */
     public ReadOnlyVector3 getScale() {
         return _localTransform.getScale();
     }
 
+    /**
+     * Gets the local translation vector.
+     * 
+     * @return the translation
+     */
     public ReadOnlyVector3 getTranslation() {
         return _localTransform.getTranslation();
     }
 
+    /**
+     * Gets the local transform.
+     * 
+     * @return the transform
+     */
     public ReadOnlyTransform getTransform() {
         return _localTransform;
     }
 
+    /**
+     * Sets the local transform.
+     * 
+     * @param transform
+     *            the new transform
+     */
     public void setTransform(final ReadOnlyTransform transform) {
         _localTransform.set(transform);
         markDirty(DirtyType.Transform);
     }
 
+    /**
+     * Sets the world rotation matrix.
+     * 
+     * @param rotation
+     *            the new world rotation
+     */
     public void setWorldRotation(final ReadOnlyMatrix3 rotation) {
         _worldTransform.setRotation(rotation);
     }
 
+    /**
+     * Sets the world rotation quaternion.
+     * 
+     * @param rotation
+     *            the new world rotation
+     */
     public void setWorldRotation(final ReadOnlyQuaternion rotation) {
         _worldTransform.setRotation(rotation);
     }
 
+    /**
+     * Sets the world scale.
+     * 
+     * @param scale
+     *            the new world scale vector
+     */
     public void setWorldScale(final ReadOnlyVector3 scale) {
         _worldTransform.setScale(scale);
     }
 
+    /**
+     * Sets the world scale.
+     * 
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param z
+     *            the z coordinate
+     */
     public void setWorldScale(final double x, final double y, final double z) {
         _worldTransform.setScale(x, y, z);
     }
 
+    /**
+     * Sets the world scale.
+     * 
+     * @param scale
+     *            the new world scale
+     */
     public void setWorldScale(final double scale) {
         _worldTransform.setScale(scale);
     }
 
+    /**
+     * Sets the world translation vector.
+     * 
+     * @param translation
+     *            the new world translation
+     */
     public void setWorldTranslation(final ReadOnlyVector3 translation) {
         _worldTransform.setTranslation(translation);
     }
 
+    /**
+     * Sets the world translation.
+     * 
+     * @param x
+     *            the x coordinate
+     * @param y
+     *            the y coordinate
+     * @param z
+     *            the z coordinate
+     */
     public void setWorldTranslation(final double x, final double y, final double z) {
         _worldTransform.setTranslation(x, y, z);
     }
 
+    /**
+     * Sets the world transform.
+     * 
+     * @param transform
+     *            the new world transform
+     */
     public void setWorldTransform(final ReadOnlyTransform transform) {
         _worldTransform.set(transform);
     }
@@ -451,8 +552,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * Sets the rotation and potentially scale of this spatial. This marks the spatial as DirtyType.Transform.
      * 
-     * @param rotation
-     *            the new rotation of this spatial
+     * @param matrix
+     *            the new matrix
      * @see Transform#setMatrix(Matrix3)
      */
     public void setMatrix(final ReadOnlyMatrix3 matrix) {
@@ -486,8 +587,11 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * sets the scale of this spatial. This marks the spatial as DirtyType.Transform.
      * 
      * @param x
+     *            the x scale factor
      * @param y
+     *            the y scale factor
      * @param z
+     *            the z scale factor
      */
     public void setScale(final double x, final double y, final double z) {
         _localTransform.setScale(x, y, z);
@@ -509,8 +613,11 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * sets the translation of this spatial. This marks the spatial as DirtyType.Transform.
      * 
      * @param x
+     *            the x coordinate
      * @param y
+     *            the y coordinate
      * @param z
+     *            the z coordinate
      */
     public void setTranslation(final double x, final double y, final double z) {
         _localTransform.setTranslation(x, y, z);
@@ -522,6 +629,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * as DirtyType.Transform.
      * 
      * @param translation
+     *            the translation vector
      */
     public void addTranslation(final ReadOnlyVector3 translation) {
         addTranslation(translation.getX(), translation.getY(), translation.getZ());
@@ -531,26 +639,49 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * adds to the current translation of this spatial. This marks the spatial as DirtyType.Transform.
      * 
      * @param x
+     *            the x amount
      * @param y
+     *            the y amount
      * @param z
+     *            the z amount
      */
     public void addTranslation(final double x, final double y, final double z) {
         _localTransform.translate(x, y, z);
         markDirty(DirtyType.Transform);
     }
 
+    /**
+     * Gets the world rotation matrix.
+     * 
+     * @return the world rotation
+     */
     public ReadOnlyMatrix3 getWorldRotation() {
         return _worldTransform.getMatrix();
     }
 
+    /**
+     * Gets the world scale vector.
+     * 
+     * @return the world scale
+     */
     public ReadOnlyVector3 getWorldScale() {
         return _worldTransform.getScale();
     }
 
+    /**
+     * Gets the world translation vector.
+     * 
+     * @return the world translation
+     */
     public ReadOnlyVector3 getWorldTranslation() {
         return _worldTransform.getTranslation();
     }
 
+    /**
+     * Gets the world transform.
+     * 
+     * @return the world transform
+     */
     public ReadOnlyTransform getWorldTransform() {
         return _worldTransform;
     }
@@ -633,6 +764,13 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         return delegate;
     }
 
+    /**
+     * Update geometric state.
+     * 
+     * @param time
+     *            the time
+     * @see #updateGeometricState(double, boolean)
+     */
     public void updateGeometricState(final double time) {
         updateGeometricState(time, true);
     }
@@ -669,11 +807,20 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
 
     /**
      * TODO: This is a hack to allow objects like Node to traverse it's children.
+     * 
+     * @param time
+     *            the time
      */
     protected void updateChildren(final double time) {
 
     }
 
+    /**
+     * Update all controllers set on this spatial.
+     * 
+     * @param time
+     *            the time
+     */
     @SuppressWarnings("unchecked")
     public void updateControllers(final double time) {
         if (_controllers != null) {
@@ -693,7 +840,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
-     * Updates the worldTransform
+     * Updates the worldTransform.
      * 
      * @param recurse
      *            usually false when updating the tree. Set to true when you just want to update the world transforms
@@ -745,6 +892,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * Updates the render state values of this Spatial and and children it has. Should be called whenever render states
      * change.
+     * 
+     * @param recurse
+     *            true to recurse down the scenegraph tree
      */
     public void updateWorldRenderStates(final boolean recurse) {
         updateWorldRenderStates(recurse, null);
@@ -753,6 +903,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * Called internally. Updates the render states of this Spatial. The stack contains parent render states.
      * 
+     * @param recurse
+     *            true to recurse down the scenegraph tree
      * @param stateStacks
      *            The parent render states, or null if we are starting at this point in the scenegraph.
      */
@@ -794,6 +946,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * children it may have. By default, this function does nothing.
      * 
      * @param recurse
+     *            true to recurse down the scenegraph tree
      * @param states
      *            An array of stacks for each state.
      */
@@ -887,6 +1040,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * updates the bounding volume of the world. Abstract, geometry transforms the bound while node merges the
      * children's bound. In most cases, users will want to call updateModelBound() and let this function be called
      * automatically during updateGeometricState().
+     * 
+     * @param recurse
+     *            true to recurse down the scenegraph tree
      */
     public abstract void updateWorldBound(boolean recurse);
 
@@ -900,11 +1056,18 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         }
     }
 
+    /**
+     * Gets the Spatial specific user data.
+     * 
+     * @return the user data
+     */
     public Object getUserData() {
         return _userData;
     }
 
     /**
+     * Sets the Spatial specific user data.
+     * 
      * @param userData
      *            Some Spatial specific user data. Note: If this object is not explicitly of type Savable, it will be
      *            ignored during read/write.
@@ -996,6 +1159,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     }
 
     /**
+     * Gets the controller count.
+     * 
      * @return the number of controllers set on this Spatial.
      */
     public int getControllerCount() {
@@ -1022,7 +1187,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * example.)
      * 
      * @param frustumIntersects
-     *            the new value
+     *            the new frustum intersection value
      */
     public void setLastFrustumIntersection(final Camera.FrustumIntersect frustumIntersects) {
         _frustumIntersects = frustumIntersects;
@@ -1056,6 +1221,9 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     // Method for Cloneable
     // /////////////////
 
+    /**
+     * @see Object#clone()
+     */
     @Override
     public Spatial clone() {
         try {
@@ -1069,10 +1237,20 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     // Methods for Savable
     // /////////////////
 
+    /**
+     * @see Savable#getClassTag()
+     */
     public Class<? extends Spatial> getClassTag() {
         return this.getClass();
     }
 
+    /**
+     * @param capsule
+     *            the input capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#read(InputCapsule)
+     */
     public void read(final InputCapsule capsule) throws IOException {
         _name = capsule.readString("name", null);
 
@@ -1104,6 +1282,13 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         }
     }
 
+    /**
+     * @param capsule
+     *            the capsule
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     * @see Savable#write(OutputCapsule)
+     */
     public void write(final OutputCapsule capsule) throws IOException {
         capsule.write(_name, "name", null);
 
