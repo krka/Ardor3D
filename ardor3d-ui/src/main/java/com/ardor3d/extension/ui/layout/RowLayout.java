@@ -86,6 +86,10 @@ public class RowLayout extends UILayout {
     public void layoutContents(final UIContainer container) {
 
         final List<Spatial> content = container.getChildren();
+        if (content == null) {
+            return;
+        }
+
         final Rectangle2 storeA = new Rectangle2();
         final Rectangle2 storeB = new Rectangle2();
 
@@ -106,7 +110,7 @@ public class RowLayout extends UILayout {
             }
         }
 
-        if (content != null && comps.size() > 0) {
+        if (comps.size() > 0) {
 
             // Determine how much space we feel we need.
             final int reqSpace = _horizontal ? getSumOfAllWidths(content) : getSumOfAllHeights(content);

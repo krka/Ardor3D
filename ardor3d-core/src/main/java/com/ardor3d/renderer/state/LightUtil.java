@@ -71,7 +71,7 @@ public abstract class LightUtil {
         if (val == null) {
             return 0;
         }
-        if (l.isAttenuate() && val != null) {
+        if (l.isAttenuate()) {
             final ReadOnlyVector3 location = l.getLocation();
             final double dist = val.distanceTo(location);
 

@@ -431,11 +431,9 @@ public final class Debugger {
                     lineInds.put((x * 2) + 1);
                 }
 
-                if (mesh != null) {
-                    normalLines.setWorldTranslation(mesh.getWorldTranslation());
-                    normalLines.setWorldRotation(mesh.getWorldRotation());
-                    normalLines.onDraw(r);
-                }
+                normalLines.setWorldTranslation(mesh.getWorldTranslation());
+                normalLines.setWorldRotation(mesh.getWorldRotation());
+                normalLines.onDraw(r);
             }
 
         }

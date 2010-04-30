@@ -82,11 +82,13 @@ public abstract class LwjglTextureStateUtil {
         final Texture.Type type = texture.getType();
 
         final RenderContext context = ContextManager.getCurrentContext();
-        final ContextCapabilities caps = context.getCapabilities();
-        TextureStateRecord record = null;
-        if (context != null) {
-            record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
+        if (context == null) {
+            logger.warning("RenderContext is null for texture: " + texture);
+            return;
         }
+
+        final ContextCapabilities caps = context.getCapabilities();
+        final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(StateType.Texture);
 
         // Check we are in the right unit
         if (record != null) {

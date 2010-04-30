@@ -39,7 +39,7 @@ public class VertKey {
         _color = (options.contains(MatchCondition.Color)) ? color : null;
         _texs = (options.contains(MatchCondition.UVs)) ? texs : null;
         _smoothGroup = (options.contains(MatchCondition.Group)) ? smoothGroup : 0;
-        _options = options != null ? options : EnumSet.noneOf(MatchCondition.class);
+        _options = options;
     }
 
     @Override

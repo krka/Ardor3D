@@ -70,6 +70,8 @@ public abstract class Light implements Serializable, Savable {
 
     private boolean _enabled;
 
+    private String name;
+
     /** when true, indicates the lights in this lightState will cast shadows. */
     protected boolean _shadowCaster;
 
@@ -307,6 +309,14 @@ public abstract class Light implements Serializable, Savable {
         _quadratic = light._quadratic;
         _shadowCaster = light._shadowCaster;
         specular.set(light.specular);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public void write(final OutputCapsule capsule) throws IOException {

@@ -13,14 +13,14 @@ package com.ardor3d.util;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class MockInputStream extends InputStream  {
+public class MockInputStream extends InputStream {
     private int bytesAvailable = 0;
     private boolean eof = false;
-    
 
+    @Override
     public int read() throws IOException {
         while (true) {
-            int result = returnSomething();
+            final int result = returnSomething();
 
             if (result != 0) {
                 return result;
@@ -28,7 +28,7 @@ public class MockInputStream extends InputStream  {
 
             try {
                 Thread.sleep(2);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -43,7 +43,7 @@ public class MockInputStream extends InputStream  {
             bytesAvailable--;
             return 1;
         }
-        
+
         return 0;
     }
 
@@ -52,11 +52,11 @@ public class MockInputStream extends InputStream  {
         return bytesAvailable;
     }
 
-    public synchronized void addBytesAvailable(int bytesAvailable) {
+    public synchronized void addBytesAvailable(final int bytesAvailable) {
         this.bytesAvailable += bytesAvailable;
     }
 
-    public synchronized void setEof(boolean eof) {
+    public synchronized void setEof(final boolean eof) {
         this.eof = eof;
     }
 }
