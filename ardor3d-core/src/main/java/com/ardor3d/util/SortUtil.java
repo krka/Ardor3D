@@ -21,7 +21,7 @@ public abstract class SortUtil {
     /**
      * Quick sorts the supplied array using the specified comparator.
      */
-    public static void qsort(final Object[] a, final Comparator comp) {
+    public static <T> void qsort(final T[] a, final Comparator<? super T> comp) {
         qsort(a, 0, a.length - 1, comp);
     }
 
@@ -33,15 +33,14 @@ public abstract class SortUtil {
      * @param hi0
      *            the index of the highest element to include in the sort.
      */
-    @SuppressWarnings("unchecked")
-    public static void qsort(final Object[] a, final int lo0, final int hi0, final Comparator comp) {
+    public static <T> void qsort(final T[] a, final int lo0, final int hi0, final Comparator<? super T> comp) {
         // bail out if we're already done
         if (hi0 <= lo0) {
             return;
         }
 
         // if this is a two element list, do a simple sort on it
-        Object t;
+        T t;
         if (hi0 - lo0 == 1) {
             // if they're not already sorted, swap them
             if (comp.compare(a[hi0], a[lo0]) < 0) {
@@ -53,7 +52,7 @@ public abstract class SortUtil {
         }
 
         // the middle element in the array is our partitioning element
-        final Object mid = a[(lo0 + hi0) / 2];
+        final T mid = a[(lo0 + hi0) / 2];
 
         // set up our partitioning boundaries
         int lo = lo0 - 1, hi = hi0 + 1;
@@ -95,7 +94,7 @@ public abstract class SortUtil {
         }
     }
 
-    public static void qsort(final int[] a, final int lo0, final int hi0, final Comparator comp) {
+    public static void qsort(final int[] a, final int lo0, final int hi0, final Comparator<Integer> comp) {
         // bail out if we're already done
         if (hi0 <= lo0) {
             return;
@@ -164,7 +163,7 @@ public abstract class SortUtil {
      * @param dest
      *            must contain the same values as the src array.
      */
-    public static void msort(final Object[] src, final Object[] dest, final Comparator comp) {
+    public static <T> void msort(final T[] src, final T[] dest, final Comparator<? super T> comp) {
         msort(src, dest, 0, src.length, 0, comp);
     }
 
@@ -176,21 +175,20 @@ public abstract class SortUtil {
      * @param dest
      *            must contain the same values as the src array.
      */
-    public static void msort(final Object[] src, final Object[] dest, final int low, final int high,
-            final Comparator comp) {
+    public static <T> void msort(final T[] src, final T[] dest, final int low, final int high,
+            final Comparator<? super T> comp) {
         msort(src, dest, low, high, 0, comp);
     }
 
     /** Implements the actual merge sort. */
-    @SuppressWarnings("unchecked")
-    protected static void msort(final Object[] src, final Object[] dest, int low, int high, final int offset,
-            final Comparator comp) {
+    protected static <T> void msort(final T[] src, final T[] dest, int low, int high, final int offset,
+            final Comparator<? super T> comp) {
         // use an insertion sort on small arrays
         final int length = high - low;
         if (length < INSERTION_SORT_THRESHOLD) {
             for (int ii = low; ii < high; ii++) {
                 for (int jj = ii; jj > low && comp.compare(dest[jj - 1], dest[jj]) > 0; jj--) {
-                    final Object temp = dest[jj];
+                    final T temp = dest[jj];
                     dest[jj] = dest[jj - 1];
                     dest[jj - 1] = temp;
                 }

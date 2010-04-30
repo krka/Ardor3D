@@ -27,7 +27,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * Mesh supporting deformation via skeletal animation.
  */
-public class SkinnedMesh extends Mesh implements PoseListener, Savable {
+public class SkinnedMesh extends Mesh implements PoseListener {
 
     /**
      * Number of weights per vertex. If using GPU skinning, use 4 entries per vertex and pad with 0 any extra space.

@@ -11,12 +11,13 @@
 package com.ardor3d.extension.texturing;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ardor3d.extension.effect.water.ImprovedNoise;
 import com.ardor3d.math.MathUtils;
@@ -24,6 +25,8 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.google.common.collect.Lists;
 
 public class SimpleFileTextureStreamer implements TextureStreamer {
+    private static final Logger logger = Logger.getLogger(SimpleFileTextureStreamer.class.getName());
+
     private final int sourceSize;
     private final int textureSize;
     private final int validLevels;
@@ -117,10 +120,9 @@ public class SimpleFileTextureStreamer implements TextureStreamer {
             try {
                 destBuffer = new RandomAccessFile("texture" + l, "rw").getChannel().map(FileChannel.MapMode.READ_WRITE,
                         0, currentSize * currentSize * 3);
-            } catch (final FileNotFoundException ex) {
-                ex.printStackTrace();
-            } catch (final IOException ex) {
-                ex.printStackTrace();
+            } catch (final Exception e) {
+                logger.log(Level.SEVERE, "Exception creating texture file", e);
+                return;
             }
 
             for (int y = 0; y < currentSize; y++) {

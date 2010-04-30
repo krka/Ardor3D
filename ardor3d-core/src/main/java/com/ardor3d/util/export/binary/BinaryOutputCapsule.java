@@ -935,7 +935,6 @@ public class BinaryOutputCapsule implements OutputCapsule {
         }
         if (value == null) {
             write(NULL_OBJECT);
-            return;
         } else {
             write(value.name(), name, null);
         }
@@ -944,7 +943,6 @@ public class BinaryOutputCapsule implements OutputCapsule {
     public void write(final Enum<?>[] value, final String name) throws IOException {
         if (value == null) {
             write(NULL_OBJECT);
-            return;
         } else {
             final String[] toWrite = new String[value.length];
             int i = 0;

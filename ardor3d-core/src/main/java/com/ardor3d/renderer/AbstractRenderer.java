@@ -130,7 +130,7 @@ public abstract class AbstractRenderer implements Renderer {
                         TextureState.MAX_TEXTURES) : 1;
                 boolean exists;
                 for (int i = 0; i < max; i++) {
-                    exists = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null;
+                    exists = i < textureCoords.size() && textureCoords.get(i) != null;
 
                     if (!exists) {
                         continue;

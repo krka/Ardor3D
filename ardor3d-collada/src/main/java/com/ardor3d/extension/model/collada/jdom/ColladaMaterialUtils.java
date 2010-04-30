@@ -82,6 +82,7 @@ public class ColladaMaterialUtils {
         final Element effectNode = _colladaDOMUtil.findTargetWithId(child.getAttributeValue("url"));
         if (effectNode == null) {
             logger.warning("material effect not found: " + mat.getChild("instance_material").getAttributeValue("url"));
+            return;
         }
 
         if ("effect".equals(effectNode.getName())) {

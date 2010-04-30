@@ -20,10 +20,9 @@ import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class StripBox extends Mesh implements Savable {
+public class StripBox extends Mesh {
     private static final long serialVersionUID = 1L;
 
     public double _xExtent, _yExtent, _zExtent;

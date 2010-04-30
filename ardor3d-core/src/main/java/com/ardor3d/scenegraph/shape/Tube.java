@@ -16,10 +16,9 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Tube extends Mesh implements Savable {
+public class Tube extends Mesh {
 
     private static final long serialVersionUID = 1L;
 

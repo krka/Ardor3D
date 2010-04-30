@@ -24,7 +24,6 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.util.SortUtil;
 
 /**
  * CollisionTree defines a well balanced red black tree used for triangle accurate collision detection. The
@@ -574,7 +573,8 @@ public class CollisionTree implements Serializable {
         }
 
         _comparator.setMesh(getMesh());
-        SortUtil.qsort(_primitiveIndices, _start, _end - 1, _comparator);
+        // TODO: broken atm
+        // SortUtil.qsort(_primitiveIndices, _start, _end - 1, _comparator);
     }
 
     /**

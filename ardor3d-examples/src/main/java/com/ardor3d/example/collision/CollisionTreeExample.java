@@ -61,6 +61,7 @@ public class CollisionTreeExample extends ExampleBase {
         _lightState.setEnabled(false);
 
         CollisionTreeManager.getInstance().setTreeType(CollisionTree.Type.AABB);
+        CollisionTreeManager.getInstance().setDoSort(true);
 
         results = new PrimitiveCollisionResults();
         sphere = new Sphere("sphere", 10, 10, 2);

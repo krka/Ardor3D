@@ -19,14 +19,13 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
-import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * <code>Box</code> is an axis-aligned rectangular prism defined by a center point and x, y, and z extents from that
  * center (essentially radii.)
  */
-public class Box extends Mesh implements Savable {
+public class Box extends Mesh {
 
     private double _xExtent, _yExtent, _zExtent;
 
