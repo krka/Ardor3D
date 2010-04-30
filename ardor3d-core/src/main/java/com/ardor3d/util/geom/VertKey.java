@@ -35,11 +35,11 @@ public class VertKey {
     public VertKey(final Vector3 vert, final Vector3 norm, final ColorRGBA color, final Vector2[] texs,
             final EnumSet<MatchCondition> options, final int smoothGroup) {
         _vert = vert;
+        _options = options != null ? options : EnumSet.noneOf(MatchCondition.class);
         _norm = (options.contains(MatchCondition.Normal)) ? norm : null;
         _color = (options.contains(MatchCondition.Color)) ? color : null;
         _texs = (options.contains(MatchCondition.UVs)) ? texs : null;
         _smoothGroup = (options.contains(MatchCondition.Group)) ? smoothGroup : 0;
-        _options = options;
     }
 
     @Override
