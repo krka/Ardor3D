@@ -402,10 +402,8 @@ public class PropertiesGameSettings {
         }
 
         try {
-            if (fin != null) {
-                prop.load(fin);
-                fin.close();
-            }
+            prop.load(fin);
+            fin.close();
         } catch (final IOException e) {
             logger.warning("Could not load properties. Creating a new one.");
             return false;
