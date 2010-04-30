@@ -430,8 +430,13 @@ public class ObjImporter {
                     store.put(tokens[1], currentMaterial);
                 }
 
+                if (currentMaterial == null) {
+                    ObjImporter.logger.warning("No material is set");
+                    return;
+                }
+
                 // if ambient value
-                else if ("Ka".equals(keyword)) {
+                if ("Ka".equals(keyword)) {
                     currentMaterial.Ka = new float[] { Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2]),
                             Float.parseFloat(tokens[3]) };
                 }
