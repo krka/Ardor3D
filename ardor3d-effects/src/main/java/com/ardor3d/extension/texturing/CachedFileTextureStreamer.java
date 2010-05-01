@@ -33,7 +33,7 @@ public class CachedFileTextureStreamer implements TextureStreamer {
 
     private final int textureSize;
     private final int validLevels;
-    private final int cacheCount = 5;
+    private static final int cacheCount = 5;
 
     class MemData {
         public int sizeX, sizeY;

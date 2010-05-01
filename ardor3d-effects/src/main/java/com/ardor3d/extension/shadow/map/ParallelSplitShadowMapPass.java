@@ -620,7 +620,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         _context.popEnforcedStates();
     }
 
-    RenderLogic logic = new RenderLogic() {
+    private static RenderLogic logic = new RenderLogic() {
         private CullState cullState;
         private Face cullFace;
         private boolean isVisible;

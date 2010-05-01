@@ -137,6 +137,9 @@ public abstract class ParticleSystem extends Node {
     protected abstract void initializeParticles(int numParticles);
 
     public static int getVertsForParticleType(final ParticleType type) {
+        if (type == null) {
+            throw new NullPointerException("type is null");
+        }
         switch (type) {
             case Triangle:
             case GeomMesh:
@@ -147,9 +150,6 @@ public abstract class ParticleSystem extends Node {
                 return 2;
             case Quad:
                 return 4;
-        }
-        if (type == null) {
-            throw new NullPointerException("type is null");
         }
         throw new IllegalArgumentException("Invalid ParticleType: " + type);
     }

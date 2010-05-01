@@ -314,8 +314,8 @@ public class ClipmapLevel extends Mesh {
         } else {
             // indices of heightvalues we can use
             // for the second height to avoid cracks
-            float xLow = (x / vertexDistance);
-            float zLow = (z / vertexDistance);
+            float xLow = (x / (float) vertexDistance);
+            float zLow = (z / (float) vertexDistance);
             if (xLow < 0) {
                 xLow -= 1.0f;
             }

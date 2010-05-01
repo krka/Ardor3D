@@ -31,7 +31,7 @@ public class SimpleFileTextureStreamer implements TextureStreamer {
     private final int textureSize;
     private final int validLevels;
 
-    class MemData {
+    private static class MemData {
         public int sizeX, sizeY;
         public ByteBuffer imageSource;
     }

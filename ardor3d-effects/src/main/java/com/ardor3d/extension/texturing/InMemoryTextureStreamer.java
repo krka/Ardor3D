@@ -13,9 +13,7 @@ package com.ardor3d.extension.texturing;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.util.geom.BufferUtils;
 import com.google.common.collect.Lists;
 
@@ -24,7 +22,7 @@ public class InMemoryTextureStreamer implements TextureStreamer {
     private final int textureSize;
     private final int validLevels;
 
-    class MemData {
+    private static class MemData {
         public int sizeX, sizeY;
         public ByteBuffer imageSource;
     }
@@ -79,8 +77,6 @@ public class InMemoryTextureStreamer implements TextureStreamer {
         return powers;
     }
 
-    ReadOnlyColorRGBA[] terrainColors;
-
     private void createMipmaps(ByteBuffer sourceBuffer) {
         int currentSize = sourceSize;
         int parentSize = currentSize;
@@ -92,7 +88,6 @@ public class InMemoryTextureStreamer implements TextureStreamer {
 
         currentSize /= 2;
 
-        final ColorRGBA col = new ColorRGBA();
         for (int l = 1; l < validLevels; l++) {
             final ByteBuffer destBuffer = BufferUtils.createByteBuffer(currentSize * currentSize * 3);
 
