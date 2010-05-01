@@ -99,6 +99,9 @@ public class BloomRenderPass extends Pass {
         if (tRenderer != null) {
             tRenderer.cleanup();
         }
+        if (fullTRenderer != null) {
+            fullTRenderer.cleanup();
+        }
     }
 
     public boolean isSupported() {

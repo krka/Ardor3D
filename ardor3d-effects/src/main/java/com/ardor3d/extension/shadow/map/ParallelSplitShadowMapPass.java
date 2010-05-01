@@ -41,6 +41,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.RenderLogic;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRenderer;
 import com.ardor3d.renderer.TextureRendererFactory;
@@ -58,11 +59,13 @@ import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
@@ -444,7 +447,7 @@ public class ParallelSplitShadowMapPass extends Pass {
             }
 
             // Render shadowmap from light view for current split
-            updateShadowMap(iSplit);
+            updateShadowMap(iSplit, r);
 
             // Update texture matrix for shadowmap
             updateTextureMatrix(iSplit);
@@ -617,13 +620,51 @@ public class ParallelSplitShadowMapPass extends Pass {
         _context.popEnforcedStates();
     }
 
+    RenderLogic logic = new RenderLogic() {
+        private CullState cullState;
+        private Face cullFace;
+        private boolean isVisible;
+
+        public void apply(final Renderable renderable) {
+            if (renderable instanceof Mesh) {
+                final Mesh mesh = (Mesh) renderable;
+
+                isVisible = mesh.isVisible();
+                if (!mesh.isCastsShadows()) {
+                    mesh.setVisible(false);
+                }
+
+                cullState = (CullState) mesh.getWorldRenderState(StateType.Cull);
+                if (cullState != null) {
+                    cullFace = cullState.getCullFace();
+                    if (cullFace != Face.None) {
+                        cullState.setCullFace(Face.Front);
+                    }
+                }
+            }
+        }
+
+        public void restore(final Renderable renderable) {
+            if (renderable instanceof Mesh) {
+                final Mesh mesh = (Mesh) renderable;
+
+                mesh.setVisible(isVisible);
+
+                if (cullState != null) {
+                    cullState.setCullFace(cullFace);
+                }
+            }
+        }
+    };
+
     /**
      * Update the shadow map.
      * 
      * @param index
      *            shadow map texture index to update
      */
-    private void updateShadowMap(final int index) {
+    private void updateShadowMap(final int index, final Renderer r) {
+        r.setRenderLogic(logic);
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = true;
         }
@@ -631,6 +672,7 @@ public class ParallelSplitShadowMapPass extends Pass {
         if (!_useSceneTexturing) {
             Mesh.RENDER_VERTEX_ONLY = false;
         }
+        r.setRenderLogic(null);
     }
 
     /**
@@ -941,8 +983,6 @@ public class ParallelSplitShadowMapPass extends Pass {
         }
 
     }
-
-    // TODO: Move to debugger
 
     public boolean isUseObjectCullFace() {
         return _useObjectCullFace;

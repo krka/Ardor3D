@@ -564,4 +564,13 @@ public interface Renderer {
      *         one exists or the given current state if not null. Otherwise, the Renderer's default state is returned.
      */
     RenderState getProperRenderState(StateType type, RenderState current);
+
+    /**
+     * Set rendering logic that will be called during drawing of renderables
+     * 
+     * @param logic
+     *            logic to use in rendering. call with null to reset rendering.
+     * @see RenderLogic
+     */
+    void setRenderLogic(RenderLogic logic);
 }

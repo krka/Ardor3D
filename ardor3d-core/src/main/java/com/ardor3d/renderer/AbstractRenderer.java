@@ -40,6 +40,8 @@ public abstract class AbstractRenderer implements Renderer {
 
     protected int _stencilClearValue;
 
+    protected RenderLogic renderLogic;
+
     /** List of default rendering states for this specific renderer type */
     protected final EnumMap<RenderState.StateType, RenderState> defaultStateList = new EnumMap<RenderState.StateType, RenderState>(
             RenderState.StateType.class);
@@ -180,5 +182,9 @@ public abstract class AbstractRenderer implements Renderer {
         } else {
             return state;
         }
+    }
+
+    public void setRenderLogic(final RenderLogic renderLogic) {
+        this.renderLogic = renderLogic;
     }
 }

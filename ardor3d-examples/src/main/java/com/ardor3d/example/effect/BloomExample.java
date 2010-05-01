@@ -243,7 +243,7 @@ public class BloomExample extends ExampleBase {
     private Node createObjects() {
         final Node objects = new Node("objects");
 
-        final Torus torus = new Torus("Torus", 50, 50, 8, 17);
+        final Torus torus = new Torus("Torus", 30, 20, 8, 17);
         torus.setTranslation(new Vector3(50, -5, 20));
         TextureState ts = new TextureState();
         torus.addController(new SpatialController<Torus>() {

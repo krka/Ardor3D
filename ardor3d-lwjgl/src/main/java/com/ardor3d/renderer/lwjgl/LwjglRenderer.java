@@ -615,7 +615,13 @@ public class LwjglRenderer extends AbstractRenderer {
     }
 
     public void draw(final Renderable renderable) {
+        if (renderLogic != null) {
+            renderLogic.apply(renderable);
+        }
         renderable.render(this);
+        if (renderLogic != null) {
+            renderLogic.restore(renderable);
+        }
     }
 
     public boolean doTransforms(final ReadOnlyTransform transform) {

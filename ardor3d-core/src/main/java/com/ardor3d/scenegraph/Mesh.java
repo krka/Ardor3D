@@ -70,6 +70,8 @@ public class Mesh extends Spatial implements Renderable {
 
     protected boolean _castsShadows = true;
 
+    protected boolean _isVisible = true;
+
     /**
      * Constructs a new Mesh.
      */
@@ -202,7 +204,9 @@ public class Mesh extends Spatial implements Renderable {
     }
 
     public void render(final Renderer renderer) {
-        render(renderer, getMeshData());
+        if (isVisible()) {
+            render(renderer, getMeshData());
+        }
     }
 
     public void render(final Renderer renderer, final MeshData meshData) {
@@ -356,6 +360,14 @@ public class Mesh extends Spatial implements Renderable {
 
     public void setCastsShadows(final boolean castsShadows) {
         _castsShadows = castsShadows;
+    }
+
+    public boolean isVisible() {
+        return _isVisible;
+    }
+
+    public void setVisible(final boolean isVisible) {
+        _isVisible = isVisible;
     }
 
     /**
