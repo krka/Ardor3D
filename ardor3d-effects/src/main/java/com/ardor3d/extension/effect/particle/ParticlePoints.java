@@ -78,7 +78,7 @@ public class ParticlePoints extends ParticleSystem {
 
         }
         updateWorldRenderStates(true);
-        _particleMesh.setCastsShadows(false);
+        _particleMesh.getSceneHints().setCastsShadows(false);
     }
 
     @Override

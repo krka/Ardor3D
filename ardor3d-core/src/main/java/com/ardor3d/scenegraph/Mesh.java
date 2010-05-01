@@ -66,10 +66,10 @@ public class Mesh extends Spatial implements Renderable {
     /** The compiled lightState for this mesh */
     protected LightState _lightState;
 
+    /** Default color to use when no per vertex colors are set */
     protected ColorRGBA _defaultColor = new ColorRGBA(ColorRGBA.WHITE);
 
-    protected boolean _castsShadows = true;
-
+    /** Visibility setting that can be used after the scenegraph hierarchical culling */
     protected boolean _isVisible = true;
 
     /**
@@ -354,14 +354,6 @@ public class Mesh extends Spatial implements Renderable {
         }
     }
 
-    public boolean isCastsShadows() {
-        return _castsShadows;
-    }
-
-    public void setCastsShadows(final boolean castsShadows) {
-        _castsShadows = castsShadows;
-    }
-
     public boolean isVisible() {
         return _isVisible;
     }
@@ -482,7 +474,6 @@ public class Mesh extends Spatial implements Renderable {
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(_meshData, "meshData", null);
-        capsule.write(_castsShadows, "castsShadows", true);
         capsule.write(_modelBound, "modelBound", null);
         capsule.write(_defaultColor, "defaultColor", new ColorRGBA(ColorRGBA.WHITE));
     }
@@ -491,7 +482,6 @@ public class Mesh extends Spatial implements Renderable {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         _meshData = (MeshData) capsule.readSavable("meshData", null);
-        _castsShadows = capsule.readBoolean("castsShadows", true);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
         _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
     }

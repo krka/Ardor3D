@@ -137,7 +137,7 @@ public class ParticleMesh extends ParticleSystem {
         }
         Vector2.releaseTempInstance(temp);
         updateWorldRenderStates(true);
-        _particleMesh.setCastsShadows(false);
+        _particleMesh.getSceneHints().setCastsShadows(false);
     }
 
     @Override

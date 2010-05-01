@@ -73,6 +73,11 @@ public class SceneHints implements Savable {
      */
     private TransparencyType _transpType = TransparencyType.Inherit;
 
+    /**
+     * Hint for shadow implementations
+     */
+    protected boolean _castsShadows = true;
+
     public SceneHints(final Hintable source) {
         _source = source;
     }
@@ -422,6 +427,21 @@ public class SceneHints implements Savable {
         _transpType = type;
     }
 
+    /**
+     * @return true if this object should cast shadows
+     */
+    public boolean isCastsShadows() {
+        return _castsShadows;
+    }
+
+    /**
+     * @param castsShadows
+     *            set if this object should cast shadows
+     */
+    public void setCastsShadows(final boolean castsShadows) {
+        _castsShadows = castsShadows;
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
@@ -440,6 +460,7 @@ public class SceneHints implements Savable {
         _normalsMode = capsule.readEnum("normalsMode", NormalsMode.class, NormalsMode.Inherit);
         _dataMode = capsule.readEnum("dataMode", DataMode.class, DataMode.Inherit);
         _transpType = capsule.readEnum("transpType", TransparencyType.class, TransparencyType.Inherit);
+        _castsShadows = capsule.readBoolean("castsShadows", true);
         final PickingHint[] pickHints = capsule.readEnumArray("pickingHints", PickingHint.class, null);
         _pickingHints.clear();
         if (pickHints != null) {
@@ -464,5 +485,6 @@ public class SceneHints implements Savable {
         capsule.write(_dataMode, "dataMode", DataMode.Inherit);
         capsule.write(_pickingHints.toArray(new PickingHint[] {}), "pickingHints");
         capsule.write(_transpType, "transpType", TransparencyType.Inherit);
+        capsule.write(_castsShadows, "castsShadows", true);
     }
 }

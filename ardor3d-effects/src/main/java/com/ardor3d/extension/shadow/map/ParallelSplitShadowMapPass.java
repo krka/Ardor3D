@@ -630,7 +630,7 @@ public class ParallelSplitShadowMapPass extends Pass {
                 final Mesh mesh = (Mesh) renderable;
 
                 isVisible = mesh.isVisible();
-                if (!mesh.isCastsShadows()) {
+                if (!mesh.getSceneHints().isCastsShadows()) {
                     mesh.setVisible(false);
                 }
 
