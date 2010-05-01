@@ -133,7 +133,6 @@ public class TriangleTriangleIntersect {
                 index = 1;
             }
             if (cc > max) {
-                max = cc;
                 vp0 = v0.getZ();
                 vp1 = v1.getZ();
                 vp2 = v2.getZ();

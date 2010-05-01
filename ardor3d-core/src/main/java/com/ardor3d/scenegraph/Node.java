@@ -34,7 +34,6 @@ import com.ardor3d.util.scenegraph.RenderDelegate;
  * merging said children into a single bound to allow for very fast culling of multiple nodes. Node allows for any
  * number of children to be attached.
  */
-
 public class Node extends Spatial {
     private static final Logger logger = Logger.getLogger(Node.class.getName());
 

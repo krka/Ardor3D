@@ -136,7 +136,7 @@ public class MapperFunction3D implements Function3D {
         _entries.clear();
     }
 
-    class Entry {
+    private static class Entry {
         double offsetStart;
         double easeIn, easeOut;
         Function3D source;

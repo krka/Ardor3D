@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.ardor3d.util.export.ByteUtils;
 import com.ardor3d.util.export.OutputCapsule;
@@ -755,8 +756,8 @@ public class BinaryOutputCapsule implements OutputCapsule {
             return;
         }
         write(array.size());
-        for (final Savable key : array.keySet()) {
-            write(new Savable[] { key, array.get(key) });
+        for (final Entry<? extends Savable, ? extends Savable> entry : array.entrySet()) {
+            write(new Savable[] { entry.getKey(), entry.getValue() });
         }
     }
 

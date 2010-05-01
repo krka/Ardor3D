@@ -128,7 +128,7 @@ public abstract class PickResults {
     /**
      * Implementation of comparator that uses the distance set in the pick data to order the objects.
      */
-    private class DistanceComparator implements Comparator<PickData> {
+    private static class DistanceComparator implements Comparator<PickData> {
 
         public int compare(final PickData o1, final PickData o2) {
             if (o1.getIntersectionRecord().getClosestDistance() <= o2.getIntersectionRecord().getClosestDistance()) {

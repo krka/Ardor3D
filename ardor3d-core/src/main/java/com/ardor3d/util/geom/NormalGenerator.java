@@ -715,24 +715,24 @@ public class NormalGenerator {
 
         @Override
         public String toString() {
-            String result = "Triangle (";
+            final StringBuilder result = new StringBuilder("Triangle (");
             for (int i = 0; i < 3; i++) {
                 final Edge edge = edges[i];
                 if (edge == null) {
-                    result += "?";
+                    result.append("?");
                 } else {
                     if (edge.newI0 > -1) {
-                        result += edge.newI0;
+                        result.append(edge.newI0);
                     } else {
-                        result += edge.i0;
+                        result.append(edge.i0);
                     }
                 }
                 if (i < 2) {
-                    result += ", ";
+                    result.append(", ");
                 }
             }
-            result += ")";
-            return result;
+            result.append(")");
+            return result.toString();
         }
     }
 

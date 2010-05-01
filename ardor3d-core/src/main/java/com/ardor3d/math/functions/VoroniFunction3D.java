@@ -152,7 +152,7 @@ public class VoroniFunction3D implements Function3D {
         _seed = seed;
     }
 
-    class Key {
+    private static class Key {
         int x, y, z;
 
         public Key() {}

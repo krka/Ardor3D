@@ -34,7 +34,7 @@ public class OrthoRenderBucket extends AbstractRenderBucket {
         }
     }
 
-    private class OrthoComparator implements Comparator<Spatial> {
+    private static class OrthoComparator implements Comparator<Spatial> {
         public int compare(final Spatial o1, final Spatial o2) {
             if (o2.getSceneHints().getOrthoOrder() == o1.getSceneHints().getOrthoOrder()) {
                 return 0;

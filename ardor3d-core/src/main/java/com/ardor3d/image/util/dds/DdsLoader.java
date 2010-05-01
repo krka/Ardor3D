@@ -354,7 +354,7 @@ public class DdsLoader implements ImageLoader {
         return dataBuffer;
     }
 
-    final class DdsImageInfo {
+    private final static class DdsImageInfo {
         boolean flipVertically;
         int bpp = 0;
         DdsHeader header;

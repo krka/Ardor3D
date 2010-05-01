@@ -29,6 +29,10 @@ public class StereoCamera extends Camera {
     private double _eyeSeparation = _focalDistance / 30;
     private double _aperture = 45 * MathUtils.DEG_TO_RAD;
 
+    public StereoCamera() {
+        this(100, 100);
+    }
+
     /**
      * 
      * @param width

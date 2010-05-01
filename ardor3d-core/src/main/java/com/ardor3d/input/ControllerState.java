@@ -16,8 +16,10 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.ardor3d.annotation.Immutable;
+import com.google.common.collect.Maps;
 
 @Immutable
 public class ControllerState {
@@ -78,20 +80,10 @@ public class ControllerState {
     }
 
     private Map<String, Map<String, Float>> duplicateStates() {
-        final Map<String, Map<String, Float>> duplicate = new LinkedHashMap<String, Map<String, Float>>();
+        final Map<String, Map<String, Float>> duplicate = Maps.newLinkedHashMap();
 
-        for (final String controllerStateKey : controllerStates.keySet()) {
-            duplicate.put(controllerStateKey, duplicateState(controllerStates.get(controllerStateKey)));
-        }
-
-        return duplicate;
-    }
-
-    private Map<String, Float> duplicateState(final Map<String, Float> original) {
-        final Map<String, Float> duplicate = new LinkedHashMap<String, Float>();
-
-        for (final String key : original.keySet()) {
-            duplicate.put(key, original.get(key));
+        for (final Entry<String, Map<String, Float>> entry : controllerStates.entrySet()) {
+            duplicate.put(entry.getKey(), Maps.newLinkedHashMap(entry.getValue()));
         }
 
         return duplicate;

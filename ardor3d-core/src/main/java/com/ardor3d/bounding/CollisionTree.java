@@ -79,7 +79,7 @@ public class CollisionTree implements Serializable {
     protected int _start, _end;
 
     // Required Spatial information
-    protected WeakReference<Mesh> _mesh;
+    protected transient WeakReference<Mesh> _mesh;
     protected int _section;
 
     // Comparator used to sort triangle indices
