@@ -779,7 +779,6 @@ public class GLSLShaderObjectsState extends RenderState {
                 ShaderVariablePointerFloatMatrix.class);
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
-        shaderUniform.stride = 0;
         shaderUniform.data = data;
 
         setNeedsRefresh(true);

@@ -277,12 +277,15 @@ public abstract class LwjglShaderUtil {
     private static void updateShaderAttribute(final ShaderVariablePointerFloatMatrix shaderUniform) {
         final FloatBuffer data = shaderUniform.data.duplicate();
         final int size = shaderUniform.size;
+        final int length = data.capacity() / size;
+        int pos = 0;
         for (int i = 0; i < size; i++) {
-            data.position((i * size) + (i * shaderUniform.stride));
-            data.limit(data.position() + size);
+            pos = (i * length);
+            data.limit(pos + length - 1);
+            data.position(pos);
             ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID + i);
-            ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID + i, size, shaderUniform.normalized,
-                    shaderUniform.stride, data);
+            ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID + i, size, shaderUniform.normalized, 0,
+                    data);
         }
     }
 

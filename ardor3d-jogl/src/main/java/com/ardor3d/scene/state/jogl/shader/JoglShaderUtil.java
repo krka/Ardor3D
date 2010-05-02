@@ -295,12 +295,15 @@ public abstract class JoglShaderUtil {
         final GL gl = GLU.getCurrentGL();
         final FloatBuffer data = shaderUniform.data.duplicate();
         final int size = shaderUniform.size;
+        final int length = data.capacity() / size;
+        int pos = 0;
         for (int i = 0; i < size; i++) {
-            data.position((i * size) + (i * shaderUniform.stride));
-            data.limit(data.position() + size);
+            pos = (i * length);
+            data.limit(pos + length - 1);
+            data.position(pos);
             gl.glEnableVertexAttribArrayARB(shaderUniform.variableID + i);
-            gl.glVertexAttribPointerARB(shaderUniform.variableID + i, size, GL.GL_FLOAT, shaderUniform.normalized,
-                    shaderUniform.stride, data);
+            gl.glVertexAttribPointerARB(shaderUniform.variableID + i, size, GL.GL_FLOAT, shaderUniform.normalized, 0,
+                    data);
         }
     }
 

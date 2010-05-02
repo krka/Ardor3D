@@ -17,17 +17,14 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.shader.ShaderVariable;
 
-/** ShaderVariablePointerFloatMatrix */
+/**
+ * ShaderVariablePointerFloatMatrix - data is stored by row... all matrices row 0, then all matrices row 1, etc.
+ */
 public class ShaderVariablePointerFloatMatrix extends ShaderVariable {
     /**
      * Specifies the number of rows and cols in the matrix. Must be 2, 3, or 4.
      */
     public int size;
-    /**
-     * Specifies the byte offset between consecutive attribute values. If stride is 0 (the initial value), the attribute
-     * values are understood to be tightly packed in the array.
-     */
-    public int stride;
     /**
      * Specifies whether fixed-point data values should be normalized (true) or converted directly as fixed-point values
      * (false) when they are accessed.
@@ -40,7 +37,6 @@ public class ShaderVariablePointerFloatMatrix extends ShaderVariable {
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(size, "size", 0);
-        capsule.write(stride, "stride", 0);
         capsule.write(normalized, "normalized", false);
         capsule.write(data, "data", null);
     }
@@ -49,7 +45,6 @@ public class ShaderVariablePointerFloatMatrix extends ShaderVariable {
     public void read(final InputCapsule capsule) throws IOException {
         super.read(capsule);
         size = capsule.readInt("size", 0);
-        stride = capsule.readInt("stride", 0);
         normalized = capsule.readBoolean("normalized", false);
         data = capsule.readFloatBuffer("data", null);
     }
