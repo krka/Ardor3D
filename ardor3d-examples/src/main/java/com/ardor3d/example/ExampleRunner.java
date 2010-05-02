@@ -810,7 +810,7 @@ public class ExampleRunner extends JFrame {
         }
     }
 
-    class ClassNameCellRenderer implements TreeCellRenderer {
+    private static class ClassNameCellRenderer implements TreeCellRenderer {
 
         DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
         JLabel classNameLabel = new JLabel(" ");
@@ -828,19 +828,25 @@ public class ExampleRunner extends JFrame {
 
         public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected,
                 final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-            if ((value != null) && (value instanceof Class<?>)) {
-                final Class<?> clazz = (Class<?>) value;
-                classNameLabel.setText(clazz.getSimpleName());
-            } else if ((value != null) && value instanceof Package) {
-                String name = ((Package) value).getName();
-                if (name.startsWith(tree.getModel().getRoot().toString())) {
-                    name = name.substring(tree.getModel().getRoot().toString().length() + 1);
-                }
-                classNameLabel.setText(name);
+            if (value == null) {
+                classNameLabel.setText("Null"); // Throw an exception?
+                classNameLabel.setFont(defaultFont);
             } else {
-                classNameLabel.setText(value.toString());
+                if ((value != null) && (value instanceof Class<?>)) {
+                    final Class<?> clazz = (Class<?>) value;
+                    classNameLabel.setText(clazz.getSimpleName());
+                } else if ((value != null) && value instanceof Package) {
+                    String name = ((Package) value).getName();
+                    if (name.startsWith(tree.getModel().getRoot().toString())) {
+                        name = name.substring(tree.getModel().getRoot().toString().length() + 1);
+                    }
+                    classNameLabel.setText(name);
+                } else {
+                    classNameLabel.setText(value.toString());
+                }
+                classNameLabel.setFont(searchFilter.matches(value) ? matchFont : defaultFont);
             }
-            classNameLabel.setFont(searchFilter.matches(value) ? matchFont : defaultFont);
+
             if (selected) {
                 classNameLabel.setBackground(defaultRenderer.getBackgroundSelectionColor());
                 classNameLabel.setForeground(defaultRenderer.getTextSelectionColor());
@@ -853,7 +859,7 @@ public class ExampleRunner extends JFrame {
         }
     }
 
-    class ConsoleStreamer extends Thread {
+    private static class ConsoleStreamer extends Thread {
 
         InputStream is;
         DisplayConsole console;
@@ -880,10 +886,10 @@ public class ExampleRunner extends JFrame {
         }
     }
 
-    class DisplayConsole extends JPanel {
+    private static class DisplayConsole extends JPanel {
 
         private static final long serialVersionUID = 1L;
-        final int MAX_CHARACTERS = 50000;
+        private static final int MAX_CHARACTERS = 50000;
         private final JTextArea textArea;
         private final JScrollPane scrollPane;
 
@@ -925,7 +931,7 @@ public class ExampleRunner extends JFrame {
         }
     }
 
-    class ErasableTextField extends JPanel {
+    private static class ErasableTextField extends JPanel {
 
         private static final long serialVersionUID = 1L;
         private final JTextField textField;

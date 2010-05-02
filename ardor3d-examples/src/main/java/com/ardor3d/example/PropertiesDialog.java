@@ -579,7 +579,7 @@ public final class PropertiesDialog extends JDialog {
      * Utility class for sorting <code>DisplayMode</code>s. Sorts by resolution, then bit depth, and then finally
      * refresh rate.
      */
-    private class DisplayModeSorter implements Comparator<DisplayMode> {
+    private static class DisplayModeSorter implements Comparator<DisplayMode> {
         /**
          * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
          */
@@ -612,7 +612,7 @@ public final class PropertiesDialog extends JDialog {
         return cancelled;
     }
 
-    class ModeValidator implements Runnable {
+    private static class ModeValidator implements Runnable {
 
         boolean ready = false, valid = true;
 
@@ -649,7 +649,7 @@ public final class PropertiesDialog extends JDialog {
         }
     }
 
-    class ModesRetriever implements Runnable {
+    private static class ModesRetriever implements Runnable {
 
         boolean ready = false;
         DisplayMode[] modes = null;

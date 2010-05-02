@@ -52,7 +52,7 @@ public class ScenegraphTree {
         frame.setVisible(true);
     }
 
-    class ArdorListener implements TreeSelectionListener {
+    private static class ArdorListener implements TreeSelectionListener {
         JTextArea textArea;
 
         public ArdorListener(final JTextArea textArea) {
@@ -94,7 +94,7 @@ public class ScenegraphTree {
         }
     }
 
-    class ArdorModel implements TreeModel {
+    private static class ArdorModel implements TreeModel {
         private final Node rootNode;
 
         public ArdorModel(final Node node) {

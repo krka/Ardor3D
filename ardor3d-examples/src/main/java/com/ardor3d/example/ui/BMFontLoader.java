@@ -65,7 +65,7 @@ public class BMFontLoader {
         logger.info("defaultFont = " + _fontList.get(0).getStyleName());
     }
 
-    private class FontLoad {
+    private static class FontLoad {
         String fontName;
         boolean useMipMaps;
 
