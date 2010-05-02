@@ -36,10 +36,10 @@ public class VertKey {
             final EnumSet<MatchCondition> options, final int smoothGroup) {
         _vert = vert;
         _options = options != null ? options : EnumSet.noneOf(MatchCondition.class);
-        _norm = (options.contains(MatchCondition.Normal)) ? norm : null;
-        _color = (options.contains(MatchCondition.Color)) ? color : null;
-        _texs = (options.contains(MatchCondition.UVs)) ? texs : null;
-        _smoothGroup = (options.contains(MatchCondition.Group)) ? smoothGroup : 0;
+        _norm = (_options.contains(MatchCondition.Normal)) ? norm : null;
+        _color = (_options.contains(MatchCondition.Color)) ? color : null;
+        _texs = (_options.contains(MatchCondition.UVs)) ? texs : null;
+        _smoothGroup = (_options.contains(MatchCondition.Group)) ? smoothGroup : 0;
     }
 
     @Override
