@@ -11,33 +11,35 @@
 package com.ardor3d.image;
 
 public enum ImageDataFormat {
-    RGB(3, false), //
-    RGBA(4, false), //
-    BGR(3, false), //
-    BGRA(4, false), //
-    Luminance(1, false), //
-    LuminanceAlpha(2, false), //
-    Alpha(1, false), //
-    Intensity(1, false), //
-    Red(1, false), //
-    Green(1, false), //
-    Blue(1, false), //
-    StencilIndex(1, false), //
-    ColorIndex(1, false), //
-    Depth(1, false), //
-    PrecompressedDXT1(1, true), //
-    PrecompressedDXT1A(1, true), //
-    PrecompressedDXT3(2, true), //
-    PrecompressedDXT5(2, true), //
-    PrecompressedLATC_L(1, true), //
-    PrecompressedLATC_LA(2, true);
+    RGB(3, false, false), //
+    RGBA(4, false, true), //
+    BGR(3, false, false), //
+    BGRA(4, false, true), //
+    Luminance(1, false, false), //
+    LuminanceAlpha(2, false, true), //
+    Alpha(1, false, true), //
+    Intensity(1, false, false), //
+    Red(1, false, false), //
+    Green(1, false, false), //
+    Blue(1, false, false), //
+    StencilIndex(1, false, false), //
+    ColorIndex(1, false, false), //
+    Depth(1, false, false), //
+    PrecompressedDXT1(1, true, false), //
+    PrecompressedDXT1A(1, true, true), //
+    PrecompressedDXT3(2, true, true), //
+    PrecompressedDXT5(2, true, true), //
+    PrecompressedLATC_L(1, true, true), //
+    PrecompressedLATC_LA(2, true, true);
 
     private final int _components;
     private final boolean _compressed;
+    private final boolean _hasAlpha;
 
-    ImageDataFormat(final int components, final boolean isCompressed) {
+    ImageDataFormat(final int components, final boolean isCompressed, final boolean hasAlpha) {
         _components = components;
         _compressed = isCompressed;
+        _hasAlpha = hasAlpha;
     }
 
     public int getComponents() {
@@ -46,5 +48,9 @@ public enum ImageDataFormat {
 
     public boolean isCompressed() {
         return _compressed;
+    }
+
+    public boolean hasAlpha() {
+        return _hasAlpha;
     }
 }
