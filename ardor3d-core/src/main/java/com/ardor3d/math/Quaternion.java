@@ -391,7 +391,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
             result = new Matrix3();
         }
 
-        final double norm = magnitude();
+        final double norm = magnitudeSquared();
         final double s = (norm > 0.0 ? 2.0 / norm : 0.0);
 
         // compute xs/ys/zs first to save 6 multiplications, since xs/ys/zs
