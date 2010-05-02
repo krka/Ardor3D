@@ -333,7 +333,7 @@ public class ColladaDOMUtil {
      */
     public ColorRGBA getColor(final String colorDescription) {
         if (colorDescription == null) {
-            throw new ColladaException("Null color description not allowed", colorDescription);
+            throw new ColladaException("Null color description not allowed", null);
         }
 
         final String[] values = _dataCache.getPattern().split(colorDescription.replace(",", "."));

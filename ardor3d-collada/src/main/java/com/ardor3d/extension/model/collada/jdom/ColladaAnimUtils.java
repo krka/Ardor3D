@@ -737,7 +737,7 @@ public class ColladaAnimUtils {
     /**
      * Storing animation data to use for merging into jointchannels
      */
-    class TargetChannel {
+    private static class TargetChannel {
         Target target;
         Element targetNode;
         String source;
@@ -1090,7 +1090,7 @@ public class ColladaAnimUtils {
         None, Vector, Matrix
     }
 
-    private class Target {
+    private static class Target {
         public String id;
         public List<String> sids = Lists.newArrayList();
         public AccessorType accessorType = AccessorType.None;

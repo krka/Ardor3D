@@ -184,9 +184,6 @@ public class ColladaImporter {
                     };
                 }
             };
-            //
-            // final SAXBuilder builder = new SAXBuilder();
-            // builder.setFactory(new ArdorSimpleFactory());
 
             final Document doc = builder.build(resource.openStream());
             final Element collada = doc.getRootElement();
@@ -196,30 +193,6 @@ public class ColladaImporter {
             return collada;
         } catch (final Exception e) {
             throw new RuntimeException("Unable to load collada resource from source: " + resource, e);
-        }
-    }
-
-    final class ArdorSimpleFactory extends DefaultJDOMFactory {
-        private final DataCache dataCache;
-
-        ArdorSimpleFactory(final DataCache dataCache) {
-            this.dataCache = dataCache;
-        }
-
-        @Override
-        public Text text(final String text) {
-            return new Text(Text.normalizeString(text));
-        }
-
-        @Override
-        public void setAttribute(final Element parent, final Attribute a) {
-            if ("id".equals(a.getName())) {
-                dataCache.getIdCache().put(a.getValue(), parent);
-            } else if ("sid".equals(a.getName())) {
-                dataCache.getSidCache().put(a.getValue(), parent);
-            }
-
-            super.setAttribute(parent, a);
         }
     }
 

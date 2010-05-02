@@ -97,6 +97,7 @@ public class ColladaMaterialUtils {
                                     .getChild("lambert");
                     final MaterialState mState = new MaterialState();
 
+                    // TODO: implement proper transparency handling
                     Texture diffuseTexture = null;
                     ColorRGBA transparent = new ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
                     float transparency = 1.0f;

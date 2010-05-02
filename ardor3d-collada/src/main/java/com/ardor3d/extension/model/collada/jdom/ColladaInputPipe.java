@@ -42,7 +42,7 @@ public class ColladaInputPipe {
         INV_BIND_MATRIX, INPUT, IN_TANGENT, OUT_TANGENT, OUTPUT, INTERPOLATION, UNKNOWN
     }
 
-    class SourceData {
+    static class SourceData {
         int count;
         int stride;
         int offset;
