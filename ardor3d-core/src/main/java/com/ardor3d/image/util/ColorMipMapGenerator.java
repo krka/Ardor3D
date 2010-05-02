@@ -11,7 +11,6 @@
 package com.ardor3d.image.util;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
@@ -47,8 +46,6 @@ public abstract class ColorMipMapGenerator {
         }
 
         final int mips = (int) (MathUtils.log(size, 2)) + 1;
-        final Image rVal = new Image(ImageDataFormat.RGBA, ImageDataType.UnsignedByte, size, size,
-                (List<ByteBuffer>) null, null);
 
         int bufLength = size * size * 4;
         final int[] mipLengths = new int[mips];
@@ -57,7 +54,6 @@ public abstract class ColorMipMapGenerator {
             mipLengths[x] = mipLengths[x - 1] >> 1;
             bufLength += (mipLengths[x]);
         }
-        rVal.setMipMapByteSizes(mipLengths);
 
         final ByteBuffer bb = BufferUtils.createByteBuffer(bufLength);
 
@@ -82,8 +78,6 @@ public abstract class ColorMipMapGenerator {
         }
         bb.rewind();
 
-        rVal.setData(bb);
-
-        return rVal;
+        return new Image(ImageDataFormat.RGBA, ImageDataType.UnsignedByte, size, size, bb, mipLengths);
     }
 }
