@@ -119,42 +119,49 @@ public class URLResourceSource implements ResourceSource {
     }
 
     /**
-     * @return the string representation of this vector.
+     * @return the string representation of this URLResourceSource.
      */
     @Override
     public String toString() {
         return "URLResourceSource [url=" + _url + ", type=" + _type + "]";
     }
 
-    /**
-     * @return returns a unique code for this vector object based on its values. If two vectors are numerically equal,
-     *         they will return the same hash code value.
-     */
     @Override
     public int hashCode() {
-        int result = 17;
-
-        result += 31 * result + _url.hashCode();
-        result += 31 * result + _type.hashCode();
-
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((_type == null) ? 0 : _type.hashCode());
+        result = prime * result + ((_url == null) ? 0 : _url.toString().hashCode());
         return result;
     }
 
-    /**
-     * @param o
-     *            the object to compare for equality
-     * @return true if this vector and the provided vector have the same x, y and z values.
-     */
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof URLResourceSource)) {
+        if (obj == null) {
             return false;
         }
-        final URLResourceSource comp = (URLResourceSource) o;
-        return _type.equals(comp._type) && _url.equals(comp._url);
+        if (!(obj instanceof URLResourceSource)) {
+            return false;
+        }
+        final URLResourceSource other = (URLResourceSource) obj;
+        if (_type == null) {
+            if (other._type != null) {
+                return false;
+            }
+        } else if (!_type.equals(other._type)) {
+            return false;
+        }
+        if (_url == null) {
+            if (other._url != null) {
+                return false;
+            }
+        } else if (!_url.toString().equals(other._url.toString())) {
+            return false;
+        }
+        return true;
     }
 
     public Class<?> getClassTag() {

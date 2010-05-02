@@ -126,7 +126,17 @@ final public class TextureKey implements Savable {
     }
 
     public static synchronized boolean clearKey(final TextureKey key) {
-        return _keyCache.remove(key);
+        WeakReference<TextureKey> ref;
+        TextureKey check;
+        for (final Iterator<WeakReference<TextureKey>> it = _keyCache.iterator(); it.hasNext();) {
+            ref = it.next();
+            check = ref.get();
+            if (check != null && check.equals(key)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
