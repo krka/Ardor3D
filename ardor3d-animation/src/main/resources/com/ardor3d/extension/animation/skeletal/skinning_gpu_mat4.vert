@@ -9,12 +9,12 @@
  */
 
 /**
- * Uses a vec4 for joints and indices, allowing for up to 4 bone influences
- * per vertex.
+ * Uses a mat4 for joints and indices, allowing for up to 16 bone influences
+ * per vertex. (but using a total of 8 vertex attributes to do so)
  */
 
-attribute vec4 Weights;
-attribute vec4 JointIDs;
+attribute mat4 Weights;
+attribute mat4 JointIDs;
 
 uniform mat4 JointPalette[50];
 
@@ -23,8 +23,12 @@ varying vec3 N;
 void main(void) {
     mat4 mat = mat4(0.0);
     
-    for ( int i = 0; i < 4; i++) {
-        mat += JointPalette[int(JointIDs[i])] * Weights[i];
+    for (int i = 0; i < 4; i++) {
+        vec4 w = Weights[i];
+        vec4 d = JointIDs[i];
+        for (int j = 0; j < 4; j++) {
+            mat += JointPalette[int(d[j])] * w[j];
+        }
     }
     
     gl_Position = gl_ModelViewProjectionMatrix * (mat * gl_Vertex);

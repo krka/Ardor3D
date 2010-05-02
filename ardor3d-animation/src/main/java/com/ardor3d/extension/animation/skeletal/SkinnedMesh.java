@@ -30,15 +30,27 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SkinnedMesh extends Mesh implements PoseListener {
 
     /**
-     * Number of weights per vertex. If using GPU skinning, use 4 entries per vertex and pad with 0 any extra space.
+     * Number of weights per vertex.
      */
     protected int _weightsPerVert = 1;
+
+    /**
+     * If true and we are using gpu skinning, we'll reorder our weights for matrix attribute use.
+     */
+    protected boolean _gpuUseMatrixAttribute = false;
+
+    /**
+     * Size to pad our attributes to. If we are using matrices (see {@link #setGpuUseMatrixAttribute(boolean)}) then
+     * this is the size of an edge of the matrix. eg. 4 would mean either a vec4 or a mat4 object is expected in the
+     * shader.
+     */
+    protected int _gpuAttributeSize = 4;
 
     /**
      * Storage for per vertex joint indices. There should be "weightsPerVert" entries per vertex.
      */
     protected short[] _jointIndices;
-    protected ShortBuffer _jointIndicesBuf;
+    protected FloatBuffer _jointIndicesBuf;
 
     /**
      * Storage for per vertex joint indices. These should already be normalized (all joints affecting the vertex add to
@@ -136,6 +148,40 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     /**
+     * @return true if we should use a matrix to send joints and weights to a gpu shader.
+     */
+    public boolean isGpuUseMatrixAttribute() {
+        return _gpuUseMatrixAttribute;
+    }
+
+    /**
+     * @param useMatrix
+     *            true if we should use a matrix to send joints and weights to a gpu shader.
+     */
+    public void setGpuUseMatrixAttribute(final boolean useMatrix) {
+        _gpuUseMatrixAttribute = useMatrix;
+    }
+
+    /**
+     * @return size to pad our attributes to. If we are using matrices (see {@link #setGpuUseMatrixAttribute(boolean)})
+     *         then this is the size of an edge of the matrix. eg. 4 would mean either a vec4 or a mat4 object is
+     *         expected in the shader.
+     */
+    public int getGpuAttributeSize() {
+        return _gpuAttributeSize;
+    }
+
+    /**
+     * @param size
+     *            Size to pad our attributes to. If we are using matrices (see
+     *            {@link #setGpuUseMatrixAttribute(boolean)}) then this is the size of an edge of the matrix. eg. 4
+     *            would mean either a vec4 or a mat4 object is expected in the shader.
+     */
+    public void setGpuAttributeSize(final int size) {
+        _gpuAttributeSize = size;
+    }
+
+    /**
      * @return this skinned mesh's joint influences as indices into a Skeleton's Joint array.
      * @see #setJointIndices(ShortBuffer)
      */
@@ -152,12 +198,8 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setJointIndices(final short[] jointIndices) {
         _jointIndices = jointIndices;
         if (_jointIndices != null && _jointIndicesBuf != null) {
-            if (_jointIndicesBuf.capacity() == _jointIndices.length) {
-                _jointIndicesBuf.rewind();
-                _jointIndicesBuf.put(_jointIndices);
-            } else {
-                _jointIndicesBuf = BufferUtils.createShortBuffer(_jointIndices);
-            }
+            createJointBuffer();
+            updateWeightsAndJointsOnGPUShader();
         }
     }
 
@@ -178,12 +220,8 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setWeights(final float[] weights) {
         _weights = weights;
         if (_weights != null && _weightsBuf != null) {
-            if (_weightsBuf.capacity() == _weights.length) {
-                _weightsBuf.rewind();
-                _weightsBuf.put(_weights);
-            } else {
-                _weightsBuf = BufferUtils.createFloatBuffer(_weights);
-            }
+            createWeightBuffer();
+            updateWeightsAndJointsOnGPUShader();
         }
     }
 
@@ -236,6 +274,22 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      */
     public void setUseGPU(final boolean useGPU) {
         _useGPU = useGPU;
+
+        updateWeightsAndJointsOnGPUShader();
+
+    }
+
+    private void updateWeightsAndJointsOnGPUShader() {
+        if (isUseGPU() && _gpuShader != null) {
+            if (_weightsBuf == null) {
+                createWeightBuffer();
+            }
+            _gpuShader.setAttributePointerMatrix("Weights", getGpuAttributeSize(), false, _weightsBuf);
+            if (_jointIndicesBuf == null) {
+                createJointBuffer();
+            }
+            _gpuShader.setAttributePointerMatrix("JointIDs", getGpuAttributeSize(), false, _jointIndicesBuf);
+        }
     }
 
     /**
@@ -282,14 +336,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void applyPose() {
         if (isUseGPU()) {
             if (_gpuShader != null) {
-                if (_weightsBuf == null) {
-                    _weightsBuf = BufferUtils.createFloatBuffer(_weights);
-                }
-                _gpuShader.setAttributePointer("Weights", 4, false, 0, _weightsBuf);
-                if (_jointIndicesBuf == null) {
-                    _jointIndicesBuf = BufferUtils.createShortBuffer(_jointIndices);
-                }
-                _gpuShader.setAttributePointer("JointIDs", 4, false, false, 0, _jointIndicesBuf);
                 _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
             }
         } else {
@@ -485,5 +531,73 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         if (_currentPose != null) {
             _currentPose.addPoseListener(this);
         }
+    }
+
+    private void createJointBuffer() {
+        final float[] data = reorderAndPad(convert(_jointIndices), getWeightsPerVert(), getGpuAttributeSize());
+        _jointIndicesBuf = BufferUtils.createFloatBuffer(_jointIndicesBuf, data);
+    }
+
+    private void createWeightBuffer() {
+        final float[] data = reorderAndPad(_weights, getWeightsPerVert(), getGpuAttributeSize());
+        _weightsBuf = BufferUtils.createFloatBuffer(_weightsBuf, data);
+    }
+
+    /**
+     * Convert a short array to a float array
+     * 
+     * @param shorts
+     *            the short values
+     * @return our new float array
+     */
+    private float[] convert(final short... shorts) {
+        final float[] rval = new float[shorts.length];
+        for (int i = 0; i < rval.length; i++) {
+            rval[i] = shorts[i];
+        }
+        return rval;
+    }
+
+    /**
+     * Rearrange the data from data per element, to a list of matSide x matSide matrices, output by row as such:
+     * 
+     * row0element0, row0element1, row0element2...<br>
+     * row1element0, row1element1, row1element2...<br>
+     * row2element0, row2element1, row2element2...<br>
+     * 
+     * If there is not enough values in the source data to fill out a row, 0 is used.
+     * 
+     * @param src
+     *            our source data, stored as element0, element1, etc.
+     * @param size
+     *            the number of values per element in our source element
+     * @param matSide
+     *            the size of the matrix edge... eg. 4 would mean a 4x4 matrix.
+     * @return our new data array.
+     */
+    private float[] reorderAndPad(final float[] src, final int size, final int matSide) {
+        final int elements = src.length / size;
+        final float[] rVal = new float[elements * matSide * matSide];
+
+        // size of each attribute (a row from each element)
+        final int length = matSide * elements;
+
+        for (int i = 0; i < elements; i++) {
+            // index into src for our element data
+            final int srcStart = i * size;
+            // index into a destination row.
+            final int dstOffset = i * matSide;
+
+            // Go through each row of the current src element. Go through only as many rows of data as we have.
+            // (eg. if size is 6 and matSide is 4, we only need to go through j=0 and j=1)
+            for (int j = 0; j <= (size - 1) / matSide; j++) {
+                // How much to copy. Generally matSide, except for last bit of data.
+                final int copySize = Math.min(size - j * matSide, matSide);
+                // Copy the data from src to rVal
+                System.arraycopy(src, srcStart + j * matSide, rVal, j * length + dstOffset, copySize);
+            }
+        }
+
+        return rVal;
     }
 }

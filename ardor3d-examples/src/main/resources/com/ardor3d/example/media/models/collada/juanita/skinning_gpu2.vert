@@ -13,10 +13,10 @@ varying float lightDistance;
 void main(void) {
     mat4 mat = mat4(0.0);
 
-    for ( int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
+        vec4 w = Weights[i];
+        vec4 d = JointIDs[i];
         for (int j = 0; j < 4; j++) {
-            vec4 w = Weights[i];
-            vec4 d = JointIDs[i];
             mat += JointPalette[int(d[j])] * w[j];
         }
     }

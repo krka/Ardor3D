@@ -1024,10 +1024,26 @@ public final class BufferUtils {
      *            array of float primitives to place into a new FloatBuffer
      */
     public static FloatBuffer createFloatBuffer(final float... data) {
+        return createFloatBuffer(null, data);
+    }
+
+    /**
+     * Generate a new FloatBuffer using the given array of float primitives.
+     * 
+     * @param data
+     *            array of float primitives to place into a new FloatBuffer
+     */
+    public static FloatBuffer createFloatBuffer(final FloatBuffer reuseStore, final float... data) {
         if (data == null) {
             return null;
         }
-        final FloatBuffer buff = createFloatBuffer(data.length);
+        final FloatBuffer buff;
+        if (reuseStore == null || reuseStore.capacity() != data.length) {
+            buff = createFloatBuffer(data.length);
+        } else {
+            buff = reuseStore;
+            buff.clear();
+        }
         buff.clear();
         buff.put(data);
         buff.flip();
