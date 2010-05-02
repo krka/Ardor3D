@@ -1,6 +1,6 @@
 
-attribute mat4 Weights;
-attribute mat4 JointIDs;
+attribute mat3 Weights;
+attribute mat3 JointIDs;
 
 uniform mat4 JointPalette[50];
 
@@ -13,10 +13,10 @@ varying float lightDistance;
 void main(void) {
     mat4 mat = mat4(0.0);
 
-    for (int i = 0; i < 4; i++) {
-        vec4 w = Weights[i];
-        vec4 d = JointIDs[i];
-        for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < 3; i++) {
+        vec3 w = Weights[i];
+        vec3 d = JointIDs[i];
+        for (int j = 0; j < 3; j++) {
             mat += JointPalette[int(d[j])] * w[j];
         }
     }

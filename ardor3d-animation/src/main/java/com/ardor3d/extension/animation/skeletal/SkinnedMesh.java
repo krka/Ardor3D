@@ -269,6 +269,8 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     /**
+     * This should be set after setting up gpu attribute params.
+     * 
      * @param useGPU
      *            true if we should do skinning on the card (GPU) or false if on the CPU.
      */
@@ -276,7 +278,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _useGPU = useGPU;
 
         updateWeightsAndJointsOnGPUShader();
-
     }
 
     private void updateWeightsAndJointsOnGPUShader() {

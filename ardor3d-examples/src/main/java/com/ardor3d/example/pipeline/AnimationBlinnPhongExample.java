@@ -325,9 +325,9 @@ public class AnimationBlinnPhongExample extends ExampleBase {
                             }
                             skinnedMesh.setRenderState(ts);
                         }
-                        skinnedMesh.setUseGPU(true);
-                        skinnedMesh.setGpuAttributeSize(4);
+                        skinnedMesh.setGpuAttributeSize(3);
                         skinnedMesh.setGpuUseMatrixAttribute(true);
+                        skinnedMesh.setUseGPU(true);
 
                         skinnedMesh.updateWorldRenderStates(true);
                     }
