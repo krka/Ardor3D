@@ -49,8 +49,11 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 
+/**
+ * Illustrates gpu skinning with normal map, specular map and diffuse coloring.
+ */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationBlinnPhongExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
+thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationBlinnPhongExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationBlinnPhongExample extends ExampleBase {
     private ColladaImporter colladaImporter;
