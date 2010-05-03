@@ -402,7 +402,10 @@ public class DOMInputCapsule implements InputCapsule {
     public long readLong(final String name, final long defVal) throws IOException {
         long ret = defVal;
         try {
-            ret = Long.parseLong(_currentElem.getAttribute(name));
+            final String s = _currentElem.getAttribute(name);
+            if (s.length() > 0) {
+                ret = Long.parseLong(s);
+            }
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
@@ -477,7 +480,10 @@ public class DOMInputCapsule implements InputCapsule {
     public short readShort(final String name, final short defVal) throws IOException {
         short ret = defVal;
         try {
-            ret = Short.parseShort(_currentElem.getAttribute(name));
+            final String s = _currentElem.getAttribute(name);
+            if (s.length() > 0) {
+                ret = Short.parseShort(s);
+            }
         } catch (final Exception e) {
             final IOException ex = new IOException();
             ex.initCause(e);
