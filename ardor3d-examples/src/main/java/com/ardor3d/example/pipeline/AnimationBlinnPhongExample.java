@@ -92,17 +92,6 @@ public class AnimationBlinnPhongExample extends ExampleBase {
     protected void initExample() {
         importDogDae();
 
-        final List<SkinData> skinDataList = colladaStorage.getSkins();
-        final SkinData skinData = skinDataList.get(0);
-        final SkeletonPose pose = skinData.getPose();
-        final Joint[] joints = pose.getSkeleton().getJoints();
-
-        for (int i = 0; i < joints.length; i++) {
-            final Joint joint = joints[i];
-
-            System.out.println("joint[" + i + "].getName() = " + joint.getName());
-        }
-
         p = new PointLight();
         p.setDiffuse(new ColorRGBA(0.75f, 0.65f, 0.65f, 0.65f));
         p.setAmbient(new ColorRGBA(0.5f, 0.5f, 0.5f, 1.0f));
@@ -117,15 +106,6 @@ public class AnimationBlinnPhongExample extends ExampleBase {
         pp.setConstant(.1f);
         pp.setLinear(0.0000008f);
         pp.setQuadratic(0.0000008f);
-        // type lightSpot
-        // ambient 0.0 0.0 0.0 1.0
-        // diffuse 0.39 0.39 0.5 1.0
-        // specular 0.2 0.2 0.2 1.0
-        // constantAttenuation 0.1
-        // linearAttenuation 0.0000008
-        // quadraticAttenuation 0.0000008
-
-        _root.updateWorldRenderStates(true);
 
         final Box sb = new Box("SkyBox", Vector3.ZERO, 50, 50, 50);
         sb.setModelBound(new BoundingBox());
@@ -296,43 +276,30 @@ public class AnimationBlinnPhongExample extends ExampleBase {
             gpuShader.setUniform("normalMap", 1);
             gpuShader.setUniform("specularMap", 2);
 
-            // gpuShader.setUniform("invRadius", 4f);
-
             colladaNode.acceptVisitor(new Visitor() {
                 public void visit(final Spatial spatial) {
                     if (spatial instanceof SkinnedMesh) {
                         final SkinnedMesh skinnedMesh = (SkinnedMesh) spatial;
                         skinnedMesh.setGPUShader(gpuShader);
-                        System.out.println("skinnedMesh.getWeightsPerVert() = " + skinnedMesh.getWeightsPerVert());
-
-                        System.out.println("skinnedMesh.getName() = " + skinnedMesh.getName());
 
                         final TextureState ts = (TextureState) skinnedMesh
                                 .getLocalRenderState(RenderState.StateType.Texture);
+                        if (ts != null) {
+                            ts.setTexture(t, 1);
+                            ts.setTexture(specular, 2);
+                            skinnedMesh.setRenderState(ts);
+                        }
+
                         final MaterialState ms = new MaterialState();
                         ms.setAmbient(MaterialState.MaterialFace.FrontAndBack, ColorRGBA.WHITE);
                         ms.setDiffuse(MaterialState.MaterialFace.FrontAndBack, ColorRGBA.WHITE);
                         ms.setSpecular(MaterialState.MaterialFace.FrontAndBack, ColorRGBA.WHITE);
                         ms.setShininess(32);
-                        // ms.setColorMaterial(MaterialState.ColorMaterial.AmbientAndDiffuse);
                         skinnedMesh.setRenderState(ms);
-                        if (ts != null) {
-                            ts.setTexture(t, 1);
-                            ts.setTexture(specular, 2);
 
-                            final int length = ts.getNumberOfSetTextures();
-                            System.out.println("Texture length = " + length);
-                            for (int i = 0; i < length; i++) {
-                                final Texture t = ts.getTexture(i);
-                                System.out.println("t.getTextureKey() = " + t.getTextureKey());
-                            }
-                            skinnedMesh.setRenderState(ts);
-                        }
                         skinnedMesh.setGpuAttributeSize(3);
                         skinnedMesh.setGpuUseMatrixAttribute(true);
                         skinnedMesh.setUseGPU(true);
-
-                        skinnedMesh.updateWorldRenderStates(true);
                     }
                 }
             }, false);
@@ -342,7 +309,6 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
         final Node rot = new Node("Model Rotation");
 
-        // addTailWagger(colladaStorage.getSkins().get(0).getPose());
         rot.getSceneHints().setDataMode(DataMode.VBO);
         rot.attachChild(colladaNode);
         _root.attachChild(rot);
@@ -371,37 +337,22 @@ public class AnimationBlinnPhongExample extends ExampleBase {
             final double time = timer.getTimeInSeconds();
 
             // Neck
-
-            // targetJoint(pose, 12, headBindDir, ballPos, 1.0);
-            // targetJoint(pose, 19, headBindDir, ballPos, 1.0);
-
             final Quaternion q = Quaternion.fetchTempInstance();
-            // final double vv = (time % (3d * 2d)) / 3d - 1d;
             final double vv = (time % (LOOP_TIME * 2d)) / LOOP_TIME - 1d;
             final double v = (vv > 0) ? vv : -vv;
-            // final double v = (time % 3d) / 3d;
             q.fromAngleAxis(v * 60 * MathUtils.DEG_TO_RAD - 30 * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
             targetJoint(pose, 13, q);
 
             q.fromAngleAxis(v * 5 * MathUtils.DEG_TO_RAD - 35 * MathUtils.DEG_TO_RAD, Vector3.UNIT_X);
-            // targetJoint(pose, 3, q);
             q.fromAngleAxis(v * 75 * MathUtils.DEG_TO_RAD, Vector3.UNIT_X);
-            // targetJoint(pose, 4, q);
-            // final double v = time % MathUtils.TWO_PI - MathUtils.PI;
-            // q.fromAngleAxis( v, Vector3.UNIT_X);
-            // targetJoint(pose, 12, q);
 
             Quaternion.releaseTempInstance(q);
-            // targetJoint(pose, 13, bindDirections2[12], ballPos, 1.0);
 
             p.setLocation(Math.sin(time) * 5, Math.cos(time) * 5 + 10, 5);
-            // pp.setLocation(Math.sin(time) * 5, Math.cos(time) * 5 + 10, 5);
             if (updateLight) {
                 lightTime = time;
             }
-            // //final double lightTime = this.lightTime % MathUtils.TWO_PI;
             pp.setLocation(Math.sin(lightTime / 5) * 5, Math.cos(lightTime / 5) * 5 + 10, 5);
-            _root.updateWorldRenderStates(true);
 
             pose.updateTransforms();
 
@@ -428,7 +379,6 @@ public class AnimationBlinnPhongExample extends ExampleBase {
     private void targetJoint(final SkeletonPose pose, final int jointIndex, final Quaternion rotation) {
         final Joint[] joints = pose.getSkeleton().getJoints();
         final Transform[] transforms = pose.getLocalJointTransforms();
-        final Transform[] globalTransforms = pose.getGlobalJointTransforms();
 
         final short parentIndex = joints[jointIndex].getParentIndex();
 
@@ -437,21 +387,8 @@ public class AnimationBlinnPhongExample extends ExampleBase {
         final ReadOnlyTransform inverseNeckBindGlobalTransform = joints[jointIndex].getInverseBindPose();
         final ReadOnlyTransform neckBindGlobalTransform = inverseNeckBindGlobalTransform.invert(calcTrans1);
 
-        // // Get a vector representing forward direction in neck space, use inverse to take from world -> neck space.
-        // forwardDirection.set(bindPoseDirection);
-        // inverseNeckBindGlobalTransform.applyForwardVector(forwardDirection, forwardDirection);
-        //
-        // // Get a vector representing a direction to the camera in neck space.
-        // targetPos.subtract(globalTransforms[jointIndex].getTranslation(), cameraDirection);
-        // cameraDirection.normalizeLocal();
-        // inverseNeckBindGlobalTransform.applyForwardVector(cameraDirection, cameraDirection);
-
         calcQuat1.fromRotationMatrix(neckBindGlobalTransform.getMatrix());
-        // calcQuat1.slerpLocal(Quaternion.IDENTITY, calcQuat1, 1);
         calcQuat1.slerpLocal(calcQuat1, rotation, 1);
-        // // Calculate a rotation to go from one direction to the other and set that rotation on a blank transform.
-        // calcQuat1.fromVectorToVector(forwardDirection, cameraDirection);
-        // calcQuat1.slerpLocal(Quaternion.IDENTITY, calcQuat1, targetStrength);
 
         final Transform subTransform = calcTrans2.setIdentity();
         subTransform.setRotation(calcQuat1);
