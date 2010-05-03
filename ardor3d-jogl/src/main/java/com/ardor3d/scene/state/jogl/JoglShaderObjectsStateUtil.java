@@ -233,6 +233,14 @@ public abstract class JoglShaderObjectsStateUtil {
                     }
                 } else {
                     gl.glUseProgramObjectARB(0);
+
+                    // go through and disable any enabled attributes
+                    if (!record.enabledAttributes.isEmpty()) {
+                        for (final int id : record.enabledAttributes) {
+                            gl.glDisableVertexAttribArrayARB(id);
+                        }
+                        record.enabledAttributes.clear();
+                    }
                 }
             }
 

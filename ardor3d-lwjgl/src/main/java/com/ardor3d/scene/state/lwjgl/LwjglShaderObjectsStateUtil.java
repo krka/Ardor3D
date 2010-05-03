@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
+import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -216,6 +217,14 @@ public abstract class LwjglShaderObjectsStateUtil {
                     }
                 } else {
                     ARBShaderObjects.glUseProgramObjectARB(0);
+
+                    // go through and disable any enabled attributes
+                    if (!record.enabledAttributes.isEmpty()) {
+                        for (final int id : record.enabledAttributes) {
+                            ARBVertexProgram.glDisableVertexAttribArrayARB(id);
+                        }
+                        record.enabledAttributes.clear();
+                    }
                 }
             }
 

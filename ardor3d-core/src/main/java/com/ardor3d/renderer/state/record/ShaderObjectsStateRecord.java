@@ -10,13 +10,18 @@
 
 package com.ardor3d.renderer.state.record;
 
+import java.util.Set;
+
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.google.common.collect.Sets;
 
 public class ShaderObjectsStateRecord extends StateRecord {
     // XXX NOTE: This is non-standard. Due to the fact that shader implementations
     // XXX will be changed this record simply makes use of the old reference
     // XXX checking system.
     GLSLShaderObjectsState reference = null;
+
+    public Set<Integer> enabledAttributes = Sets.newHashSet();
 
     public GLSLShaderObjectsState getReference() {
         return reference;
@@ -31,5 +36,6 @@ public class ShaderObjectsStateRecord extends StateRecord {
         super.invalidate();
 
         reference = null;
+        enabledAttributes.clear();
     }
 }

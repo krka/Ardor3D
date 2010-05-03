@@ -20,6 +20,8 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat2;
@@ -267,6 +269,8 @@ public abstract class JoglShaderUtil {
             renderer.unbindVBO();
         }
 
+        final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context.getStateRecord(StateType.GLSLShader);
+
         if (shaderVariable instanceof ShaderVariablePointerFloat) {
             updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariablePointerFloatMatrix) {
@@ -279,7 +283,10 @@ public abstract class JoglShaderUtil {
             updateShaderAttribute((ShaderVariablePointerShort) shaderVariable);
         } else {
             logger.warning("updateShaderAttribute: Unknown shaderVariable type!");
+            return;
         }
+
+        record.enabledAttributes.add(shaderVariable.variableID);
     }
 
     private static void updateShaderAttribute(final ShaderVariablePointerFloat shaderUniform) {
