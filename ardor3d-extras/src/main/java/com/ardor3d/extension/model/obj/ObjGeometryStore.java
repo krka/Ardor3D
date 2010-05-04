@@ -37,6 +37,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class ObjGeometryStore {
+    private static final String DEFAULT_GROUP = "_default_";
+
     private final ObjDataStore _dataStore = new ObjDataStore();
 
     private int _totalPoints = 0;
@@ -341,8 +343,13 @@ public class ObjGeometryStore {
     }
 
     private void mapToGroups(final Spatial target) {
-        for (final String groupName : _currentGroupNames) {
-            _groupMap.put(groupName, target);
+        if (_currentGroupNames != null) {
+            for (final String groupName : _currentGroupNames) {
+                _groupMap.put(groupName, target);
+            }
+        } else {
+            _groupMap.put(ObjGeometryStore.DEFAULT_GROUP, target);
         }
+
     }
 }
