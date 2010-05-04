@@ -26,6 +26,6 @@ public class ColladaException extends RuntimeException {
     }
 
     private static String createMessage(final String message, final Object source) {
-        return "Collada problem for source: " + source.toString() + ": " + message;
+        return "Collada problem for source: " + source != null ? source.toString() : "null" + ": " + message;
     }
 }
