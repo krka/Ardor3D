@@ -22,6 +22,7 @@ import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Transform;
+import com.ardor3d.math.ValidatingTransform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyMatrix3;
 import com.ardor3d.math.type.ReadOnlyQuaternion;
@@ -40,6 +41,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.Hintable;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.visitor.Visitor;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -100,8 +102,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * Constructs a new Spatial. Initializes the transform fields.
      */
     public Spatial() {
-        _localTransform = new Transform();
-        _worldTransform = new Transform();
+        _localTransform = Constants.useValidatingTransform ? new ValidatingTransform() : new Transform();
+        _worldTransform = Constants.useValidatingTransform ? new ValidatingTransform() : new Transform();
         _sceneHints = new SceneHints(this);
     }
 

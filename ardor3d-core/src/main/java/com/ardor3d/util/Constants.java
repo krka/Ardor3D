@@ -31,4 +31,6 @@ public class Constants {
 
     public static final int maxPoolSize = (System.getProperty("ardor3d.maxPoolSize") != null ? Integer.parseInt(System
             .getProperty("ardor3d.maxPoolSize")) : 11);
+
+    public static boolean useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
 }
