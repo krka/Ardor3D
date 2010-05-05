@@ -20,11 +20,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.visitor.Visitor;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.scenegraph.RenderDelegate;
@@ -403,6 +405,11 @@ public class Node extends Spatial {
                     // merge current world bound with child world bound
                     worldBound.mergeLocal(child.getWorldBound());
 
+                    // simple check to catch NaN issues
+                    if (!Vector3.isValid(worldBound.getCenter())) {
+                        throw new Ardor3dException("WorldBound center is invalid after merge between " + this + " and "
+                                + child);
+                    }
                 } else {
                     // set world bound to first non-null child world bound
                     if (child.getWorldBound() != null) {
