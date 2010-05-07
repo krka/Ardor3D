@@ -515,6 +515,13 @@ public class BoundingSphere extends BoundingVolume {
     }
 
     private BoundingVolume merge(final double otherRadius, final ReadOnlyVector3 otherCenter, final BoundingSphere store) {
+        // check for infinite bounds... is so, return infinite bounds with center at origin
+        if (Double.isInfinite(otherRadius) || Double.isInfinite(getRadius())) {
+            store.setCenter(Vector3.ZERO);
+            store.setRadius(Double.POSITIVE_INFINITY);
+            return store;
+        }
+
         final Vector3 diff = otherCenter.subtract(_center, Vector3.fetchTempInstance());
         final double lengthSquared = diff.lengthSquared();
         final double radiusDiff = otherRadius - getRadius();
