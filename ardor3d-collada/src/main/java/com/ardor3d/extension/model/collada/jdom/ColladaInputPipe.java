@@ -189,8 +189,7 @@ public class ColladaInputPipe {
                 break;
             case TEXCOORD:
                 _buffer = BufferUtils.createFloatBuffer(size);
-                // TODO: Is doing texCoord++ the best we can do?
-                meshData.setTextureCoords(new FloatBufferData(_buffer, _paramCount), _texCoord++);
+                meshData.setTextureCoords(new FloatBufferData(_buffer, _paramCount), _texCoord);
                 break;
             case COLOR:
                 _buffer = BufferUtils.createFloatBuffer(size);
@@ -225,6 +224,10 @@ public class ColladaInputPipe {
             }
             index++;
         }
+    }
+
+    public void setTexCoord(final int texCoord) {
+        _texCoord = texCoord;
     }
 
     private Element getCommonAccessor(final Element source) {

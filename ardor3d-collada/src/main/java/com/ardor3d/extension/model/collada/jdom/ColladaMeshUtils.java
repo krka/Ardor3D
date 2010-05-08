@@ -493,6 +493,7 @@ public class ColladaMeshUtils {
     @SuppressWarnings("unchecked")
     private int extractPipes(final Element inputsParent, final LinkedList<ColladaInputPipe> pipesStore) {
         int maxOffset = 0;
+        int texCount = 0;
         for (final Element input : (List<Element>) inputsParent.getChildren("input")) {
             maxOffset = Math.max(maxOffset, _colladaDOMUtil.getAttributeIntValue(input, "offset", 0));
             try {
@@ -505,7 +506,11 @@ public class ColladaMeshUtils {
                         pipesStore.add(new ColladaInputPipe(_colladaDOMUtil, vertexInput));
                     }
                 } else {
-                    pipesStore.add(new ColladaInputPipe(_colladaDOMUtil, input));
+                    final ColladaInputPipe pipe = new ColladaInputPipe(_colladaDOMUtil, input);
+                    if (pipe.getType() == Type.TEXCOORD) {
+                        pipe.setTexCoord(texCount++);
+                    }
+                    pipesStore.add(pipe);
                 }
             } catch (final Exception ex) {
                 logger.warning("Unknown input type: " + input.getAttributeValue("semantic"));
