@@ -138,7 +138,9 @@ public class ObjImporter {
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));
             String line;
+            int lineNo = 0;
             while ((line = reader.readLine()) != null) {
+                lineNo++;
                 line.trim();
                 // handle line continuation marker \
                 while (line.endsWith("\\")) {
@@ -197,37 +199,38 @@ public class ObjImporter {
                 // if parameter space vertices
                 else if ("vp".equals(keyword)) {
                     // TODO: Add support for vp
-                    ObjImporter.logger.warning("ObjModelImporter: vp not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: vp not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if curve/surface type
                 else if ("cstype".equals(keyword)) {
                     // TODO: Add support for cstype
-                    ObjImporter.logger.warning("ObjModelImporter: cstype not supported.");
+                    ObjImporter.logger
+                            .warning("ObjModelImporter: cstype not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if degree
                 else if ("deg".equals(keyword)) {
                     // TODO: Add support for degree
-                    ObjImporter.logger.warning("ObjModelImporter: deg not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: deg not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if basis matrix
                 else if ("bmat".equals(keyword)) {
                     // TODO: Add support for basis matrix
-                    ObjImporter.logger.warning("ObjModelImporter: bmat not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: bmat not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if step size
                 else if ("step".equals(keyword)) {
                     // TODO: Add support for step size
-                    ObjImporter.logger.warning("ObjModelImporter: step not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: step not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if step size
                 else if ("step".equals(keyword)) {
                     // TODO: Add support for step size
-                    ObjImporter.logger.warning("ObjModelImporter: step not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: step not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // -------- GROUPING KEYWORDS --------
@@ -235,7 +238,8 @@ public class ObjImporter {
                 // if group name(s)
                 else if ("g".equals(keyword)) {
                     if (tokens.length < 2) {
-                        throw new Error("wrong number of args.  g must have at least 1 argument.");
+                        throw new Error("wrong number of args.  g must have at least 1 argument.  (line " + lineNo
+                                + ") " + line);
                     }
 
                     // Each token is a name
@@ -247,7 +251,7 @@ public class ObjImporter {
                 // if smoothing group
                 else if ("s".equals(keyword)) {
                     if (tokens.length != 2) {
-                        throw new Error("wrong number of args.  s must have 1 argument.");
+                        throw new Error("wrong number of args.  s must have 1 argument.  (line " + lineNo + ") " + line);
                     }
 
                     if ("off".equalsIgnoreCase(tokens[1])) {
@@ -260,13 +264,13 @@ public class ObjImporter {
                 // if merge group
                 else if ("mg".equals(keyword)) {
                     // TODO: Add support for merge groups
-                    ObjImporter.logger.warning("ObjModelImporter: mg not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: mg not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if object name
                 else if ("o".equals(keyword)) {
                     if (tokens.length < 2) {
-                        throw new Error("wrong number of args.  o must have 1 argument.");
+                        throw new Error("wrong number of args.  o must have 1 argument.  (line " + lineNo + ") " + line);
                     }
                     store.setCurrentObjectName(tokens[1]);
                 }
@@ -276,7 +280,8 @@ public class ObjImporter {
                 // if material library(ies)
                 else if ("mtllib".equals(keyword)) {
                     if (tokens.length < 2) {
-                        throw new Error("wrong number of args.  mtllib must have at least 1 argument.");
+                        throw new Error("wrong number of args.  mtllib must have at least 1 argument.  (line " + lineNo
+                                + ") " + line);
                     }
 
                     // load material libraries
@@ -288,7 +293,8 @@ public class ObjImporter {
                 // if use material command
                 else if ("usemtl".equals(keyword)) {
                     if (tokens.length != 2) {
-                        throw new Error("wrong number of args.  usemtl must have 1 argument.");
+                        throw new Error("wrong number of args.  usemtl must have 1 argument.  (line " + lineNo + ") "
+                                + line);
                     }
 
                     // set new material
@@ -299,6 +305,11 @@ public class ObjImporter {
 
                 // if point
                 else if ("p".equals(keyword) && tokens.length > 1) {
+                    if (tokens.length < 2) {
+                        throw new Error("wrong number of args.  p must have at least 1 vertex.  (line " + lineNo + ") "
+                                + line);
+                    }
+
                     // Each token corresponds to 1 vertex entry
                     final List<ObjIndexSet> indices = Lists.newArrayList();
                     for (int i = 1; i < tokens.length; i++) {
@@ -309,6 +320,11 @@ public class ObjImporter {
 
                 // if line
                 else if ("l".equals(keyword) && tokens.length > 1) {
+                    if (tokens.length < 3) {
+                        throw new Error("wrong number of args.  l must have at least 2 vertices.  (line " + lineNo
+                                + ") " + line);
+                    }
+
                     // Each token corresponds to 1 vertex entry and possibly one texture entry
                     final List<ObjIndexSet> indices = Lists.newArrayList();
                     for (int i = 1; i < tokens.length; i++) {
@@ -319,6 +335,11 @@ public class ObjImporter {
 
                 // if face
                 else if (("f".equals(keyword) || "fo".equals(keyword)) && tokens.length > 1) {
+                    if (tokens.length < 4) {
+                        throw new Error("wrong number of args.  f must have at least 3 vertices.  (line " + lineNo
+                                + ") " + line);
+                    }
+
                     // Each token corresponds to 1 vertex entry and possibly one texture entry and normal entry.
                     final List<ObjIndexSet> indices = Lists.newArrayList();
                     for (int i = 1; i < tokens.length; i++) {
@@ -330,19 +351,19 @@ public class ObjImporter {
                 // if curve
                 else if ("curv".equals(keyword)) {
                     // TODO: Add support for curves
-                    ObjImporter.logger.warning("ObjModelImporter: curv not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: curv not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if 2d curve
                 else if ("curv2".equals(keyword)) {
                     // TODO: Add support for 2d curves
-                    ObjImporter.logger.warning("ObjModelImporter: curv2 not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: curv2 not supported.  (line " + lineNo + ") " + line);
                 }
 
                 // if surface
                 else if ("surf".equals(keyword)) {
                     // TODO: Add support for surfaces
-                    ObjImporter.logger.warning("ObjModelImporter: surf not supported.");
+                    ObjImporter.logger.warning("ObjModelImporter: surf not supported.  (line " + lineNo + ") " + line);
                 }
             }
 

@@ -25,7 +25,8 @@ import com.google.common.collect.Maps;
  * This tool assists in reducing geometry information.<br>
  * 
  * Note: Does not work with geometry using texcoords other than 2d coords. <br>
- * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.
+ * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.<br>
+ * TODO: Does not yet work with models that do not have indices.
  */
 public abstract class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
