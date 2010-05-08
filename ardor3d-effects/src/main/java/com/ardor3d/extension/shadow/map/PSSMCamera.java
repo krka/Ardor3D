@@ -180,11 +180,11 @@ public class PSSMCamera extends Camera {
      *            the far distance
      */
     public void calculateFrustum(final double fNear, final double fFar) {
-        double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5;
-        double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5;
+        double fNearPlaneHeight = (_frustumTop - _frustumBottom) * fNear * 0.5 / _frustumNear;
+        double fNearPlaneWidth = (_frustumRight - _frustumLeft) * fNear * 0.5 / _frustumNear;
 
-        double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5;
-        double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5;
+        double fFarPlaneHeight = (_frustumTop - _frustumBottom) * fFar * 0.5 / _frustumNear;
+        double fFarPlaneWidth = (_frustumRight - _frustumLeft) * fFar * 0.5 / _frustumNear;
 
         if (getProjectionMode() == ProjectionMode.Parallel) {
             fNearPlaneHeight = (_frustumTop - _frustumBottom) * 0.5;
