@@ -75,13 +75,14 @@ class DdsHeader {
     int dwLinearSize;
     int dwDepth;
     int dwMipMapCount;
-    int[] dwReserved1 = new int[11];
+    int dwAlphaBitDepth;
+    int[] dwReserved1 = new int[10];
     DdsPixelFormat ddpf;
     int dwCaps;
     int dwCaps2;
     int dwCaps3;
     int dwCaps4;
-    int dwReserved2;
+    int dwTextureStage;
 
     static DdsHeader read(final LittleEndianDataInput in) throws IOException {
         final DdsHeader header = new DdsHeader();
@@ -95,6 +96,7 @@ class DdsHeader {
         header.dwLinearSize = in.readInt();
         header.dwDepth = in.readInt();
         header.dwMipMapCount = in.readInt();
+        header.dwAlphaBitDepth = in.readInt();
         for (int i = 0; i < header.dwReserved1.length; i++) {
             header.dwReserved1[i] = in.readInt();
         }
@@ -103,7 +105,7 @@ class DdsHeader {
         header.dwCaps2 = in.readInt();
         header.dwCaps3 = in.readInt();
         header.dwCaps4 = in.readInt();
-        header.dwReserved2 = in.readInt();
+        header.dwTextureStage = in.readInt();
 
         final int expectedMipmaps = 1 + (int) Math.ceil(Math.log(Math.max(header.dwHeight, header.dwWidth))
                 / Math.log(2));
