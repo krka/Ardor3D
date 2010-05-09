@@ -123,8 +123,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private final FloatBuffer _transformBuffer = BufferUtils.createFloatBuffer(16);
     {
-        _transformBuffer.position(15);
-        _transformBuffer.put(1.0f);
+        _transformBuffer.limit(16);
     }
 
     private final Matrix4 _transformMatrix = new Matrix4();

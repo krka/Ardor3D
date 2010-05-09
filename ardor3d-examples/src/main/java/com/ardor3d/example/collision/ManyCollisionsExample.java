@@ -51,6 +51,10 @@ public class ManyCollisionsExample extends ExampleBase {
     private Node n1;
     private Node n2;
 
+    /** Console fps output */
+    private double counter = 0;
+    private int frames = 0;
+
     public static void main(final String[] args) {
         start(ManyCollisionsExample.class);
     }
@@ -71,6 +75,15 @@ public class ManyCollisionsExample extends ExampleBase {
 
         n2.setRotation(rotation.fromAngles(-time, -time, -time));
         n2.setTranslation(Math.cos(time * 0.7) * 20.0, 0, -200);
+
+        counter += timer.getTimePerFrame();
+        frames++;
+        if (counter > 1) {
+            final double fps = (frames / counter);
+            counter = 0;
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
+        }
     }
 
     @Override

@@ -765,77 +765,61 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
     }
 
     public void getGLApplyMatrix(final DoubleBuffer store) {
-        store.position(0);
         if (_rotationMatrix) {
-            store.put(_scale.getX() * _matrix._data[0][0]);
-            store.put(_scale.getX() * _matrix._data[1][0]);
-            store.put(_scale.getX() * _matrix._data[2][0]);
-            store.position(4);
-            store.put(_scale.getY() * _matrix._data[0][1]);
-            store.put(_scale.getY() * _matrix._data[1][1]);
-            store.put(_scale.getY() * _matrix._data[2][1]);
-            store.position(8);
-            store.put(_scale.getZ() * _matrix._data[0][2]);
-            store.put(_scale.getZ() * _matrix._data[1][2]);
-            store.put(_scale.getZ() * _matrix._data[2][2]);
-            store.position(12);
+            store.put(0, _scale.getX() * _matrix._data[0][0]);
+            store.put(1, _scale.getX() * _matrix._data[1][0]);
+            store.put(2, _scale.getX() * _matrix._data[2][0]);
+            store.put(4, _scale.getY() * _matrix._data[0][1]);
+            store.put(5, _scale.getY() * _matrix._data[1][1]);
+            store.put(6, _scale.getY() * _matrix._data[2][1]);
+            store.put(8, _scale.getZ() * _matrix._data[0][2]);
+            store.put(9, _scale.getZ() * _matrix._data[1][2]);
+            store.put(10, _scale.getZ() * _matrix._data[2][2]);
         } else {
-            store.put(_matrix._data[0][0]);
-            store.put(_matrix._data[1][0]);
-            store.put(_matrix._data[2][0]);
-            store.position(4);
-            store.put(_matrix._data[0][1]);
-            store.put(_matrix._data[1][1]);
-            store.put(_matrix._data[2][1]);
-            store.position(8);
-            store.put(_matrix._data[0][2]);
-            store.put(_matrix._data[1][2]);
-            store.put(_matrix._data[2][2]);
-            store.position(12);
+            store.put(0, _matrix._data[0][0]);
+            store.put(1, _matrix._data[1][0]);
+            store.put(2, _matrix._data[2][0]);
+            store.put(4, _matrix._data[0][1]);
+            store.put(5, _matrix._data[1][1]);
+            store.put(6, _matrix._data[2][1]);
+            store.put(8, _matrix._data[0][2]);
+            store.put(9, _matrix._data[1][2]);
+            store.put(10, _matrix._data[2][2]);
         }
 
-        store.put(_translation.getX());
-        store.put(_translation.getY());
-        store.put(_translation.getZ());
-        store.put(1.0);
-        store.rewind();
+        store.put(12, _translation.getX());
+        store.put(13, _translation.getY());
+        store.put(14, _translation.getZ());
+        store.put(15, 1.0);
     }
 
     public void getGLApplyMatrix(final FloatBuffer store) {
-        store.position(0);
         if (_rotationMatrix) {
-            store.put((float) (_scale.getX() * _matrix._data[0][0]));
-            store.put((float) (_scale.getX() * _matrix._data[1][0]));
-            store.put((float) (_scale.getX() * _matrix._data[2][0]));
-            store.position(4);
-            store.put((float) (_scale.getY() * _matrix._data[0][1]));
-            store.put((float) (_scale.getY() * _matrix._data[1][1]));
-            store.put((float) (_scale.getY() * _matrix._data[2][1]));
-            store.position(8);
-            store.put((float) (_scale.getZ() * _matrix._data[0][2]));
-            store.put((float) (_scale.getZ() * _matrix._data[1][2]));
-            store.put((float) (_scale.getZ() * _matrix._data[2][2]));
-            store.position(12);
+            store.put(0, (float) (_scale.getX() * _matrix._data[0][0]));
+            store.put(1, (float) (_scale.getX() * _matrix._data[1][0]));
+            store.put(2, (float) (_scale.getX() * _matrix._data[2][0]));
+            store.put(4, (float) (_scale.getY() * _matrix._data[0][1]));
+            store.put(5, (float) (_scale.getY() * _matrix._data[1][1]));
+            store.put(6, (float) (_scale.getY() * _matrix._data[2][1]));
+            store.put(8, (float) (_scale.getZ() * _matrix._data[0][2]));
+            store.put(9, (float) (_scale.getZ() * _matrix._data[1][2]));
+            store.put(10, (float) (_scale.getZ() * _matrix._data[2][2]));
         } else {
-            store.put((float) _matrix._data[0][0]);
-            store.put((float) _matrix._data[1][0]);
-            store.put((float) _matrix._data[2][0]);
-            store.position(4);
-            store.put((float) _matrix._data[0][1]);
-            store.put((float) _matrix._data[1][1]);
-            store.put((float) _matrix._data[2][1]);
-            store.position(8);
-            store.put((float) _matrix._data[0][2]);
-            store.put((float) _matrix._data[1][2]);
-            store.put((float) _matrix._data[2][2]);
-            store.position(12);
+            store.put(0, (float) _matrix._data[0][0]);
+            store.put(1, (float) _matrix._data[1][0]);
+            store.put(2, (float) _matrix._data[2][0]);
+            store.put(4, (float) _matrix._data[0][1]);
+            store.put(5, (float) _matrix._data[1][1]);
+            store.put(6, (float) _matrix._data[2][1]);
+            store.put(8, (float) _matrix._data[0][2]);
+            store.put(9, (float) _matrix._data[1][2]);
+            store.put(10, (float) _matrix._data[2][2]);
         }
 
-        store.put(_translation.getXf());
-        store.put(_translation.getYf());
-        store.put(_translation.getZf());
-        store.put(1.0f);
-        store.rewind();
+        store.put(12, _translation.getXf());
+        store.put(13, _translation.getYf());
+        store.put(14, _translation.getZf());
+        store.put(15, 1.0f);
     }
 
     /**
