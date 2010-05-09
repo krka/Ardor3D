@@ -117,9 +117,6 @@ public class JoglRenderer extends AbstractRenderer {
     private final FloatBuffer[] _oldTextureBuffers;
 
     private final FloatBuffer _transformBuffer = BufferUtils.createFloatBuffer(16);
-    {
-        _transformBuffer.limit(16);
-    }
 
     private final Matrix4 _transformMatrix = new Matrix4();
 
