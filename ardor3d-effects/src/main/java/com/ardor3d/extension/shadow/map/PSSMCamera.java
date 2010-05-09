@@ -157,18 +157,18 @@ public class PSSMCamera extends Camera {
         Vector4.releaseTempInstance(position);
 
         // XXX: use of getFrustumNear and getFrustumFar seems suspicious...
+        // XXX: It depends on the frustum being reset each update
         optimalCameraNear = Math.min(Math.max(getFrustumNear(), optimalCameraNear), getFrustumFar());
-        optimalCameraFar = Math.max(optimalCameraNear, Math.min(getFrustumFar(), optimalCameraFar));
+        optimalCameraFar = Math.max(optimalCameraNear, Math.min(_maxFarPlaneDistance, optimalCameraFar));
+
+        final double change = optimalCameraNear / _frustumNear;
+        setFrustumLeft(getFrustumLeft() * change);
+        setFrustumRight(getFrustumRight() * change);
+        setFrustumTop(getFrustumTop() * change);
+        setFrustumBottom(getFrustumBottom() * change);
 
         setFrustumNear(optimalCameraNear);
         setFrustumFar(optimalCameraFar);
-    }
-
-    /**
-     * Make sure the far plane does not go beyond our max far plane setting.
-     */
-    public void restrictFarPlane() {
-        setFrustumFar(Math.min(_maxFarPlaneDistance, getFrustumFar()));
     }
 
     /**

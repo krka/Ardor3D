@@ -415,7 +415,6 @@ public class ParallelSplitShadowMapPass extends Pass {
             if (hasValidBounds) {
                 _pssmCam.pack(_receiverBounds);
             }
-            _pssmCam.restrictFarPlane();
         }
 
         // Calculate the split distances
