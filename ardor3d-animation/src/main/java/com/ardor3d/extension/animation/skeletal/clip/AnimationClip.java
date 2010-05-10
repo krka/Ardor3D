@@ -18,6 +18,7 @@ import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 /**
@@ -116,6 +117,13 @@ public class AnimationClip implements Savable {
         final boolean rVal = _channels.remove(channel);
         updateMaxTimeIndex();
         return rVal;
+    }
+
+    /**
+     * @return an immutable copy of the channels in this clip.
+     */
+    public ImmutableList<AbstractAnimationChannel> getChannels() {
+        return ImmutableList.copyOf(_channels);
     }
 
     /**

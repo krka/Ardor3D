@@ -22,7 +22,6 @@ import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
@@ -68,8 +67,6 @@ import com.ardor3d.util.resource.URLResourceSource;
 thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
 maxHeapMemory = 128)
 public class ColladaExample extends ExampleBase {
-    private static final double UPDATE_RATE = 1.0 / 60.0;
-    private double time = 0.0;
 
     private Node colladaNode;
     private boolean showSkeleton = false, showJointLabels = false;
@@ -327,15 +324,6 @@ public class ColladaExample extends ExampleBase {
 
         if (manager != null) {
             manager.update();
-        }
-
-        time += timer.getTimePerFrame();
-        if (time > ColladaExample.UPDATE_RATE) {
-            time -= ColladaExample.UPDATE_RATE;
-            for (final SkinData skinData : skinDatas) {
-                final SkeletonPose pose = skinData.getPose();
-                pose.updateTransforms();
-            }
         }
     }
 

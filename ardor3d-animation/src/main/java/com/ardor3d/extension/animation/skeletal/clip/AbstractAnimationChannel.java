@@ -46,8 +46,19 @@ public abstract class AbstractAnimationChannel implements Savable {
         }
     }
 
+    /**
+     * @return the number of samples in this channel.
+     */
+    public int getSampleCount() {
+        return _times.length;
+    }
+
     public String getChannelName() {
         return _channelName;
+    }
+
+    public float[] getTimes() {
+        return _times;
     }
 
     /**
@@ -98,6 +109,36 @@ public abstract class AbstractAnimationChannel implements Savable {
      * @return an Object suitable for storing information for this type of animation channel.
      */
     public abstract Object createStateDataObject();
+
+    /**
+     * Returns a new channel of the same name and content as this, but trimmed to just the times between start and end
+     * sample.
+     * 
+     * @param startSample
+     *            the sample to start with (inclusive)
+     * @param endSample
+     *            the sample to end with (inclusive)
+     * @return the new channel.
+     */
+    public AbstractAnimationChannel getSubchannelBySample(final int startSample, final int endSample) {
+        return getSubchannelBySample(getChannelName(), startSample, endSample);
+    }
+
+    /**
+     * 
+     * Returns a new channel of the same content as this, but trimmed to just the times between start and end sample.
+     * 
+     * @param name
+     *            the new name for our subchannel.
+     * @param startSample
+     *            the sample to start with (inclusive). Sample counting starts at 0.
+     * @param endSample
+     *            the sample to end with (inclusive). max is getSampleCount() - 1.
+     * @return the new channel.
+     * @throws IllegalArgumentException
+     *             if start > end or end >= getSampleCount.
+     */
+    public abstract AbstractAnimationChannel getSubchannelBySample(String name, int startSample, int endSample);
 
     /**
      * @return the local time index of the last sample in this channel.

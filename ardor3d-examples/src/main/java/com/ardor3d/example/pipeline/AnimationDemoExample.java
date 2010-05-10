@@ -515,7 +515,6 @@ public class AnimationDemoExample extends ExampleBase {
         frames++;
 
         manager.update();
-        pose.updateTransforms();
     }
 
     @Override

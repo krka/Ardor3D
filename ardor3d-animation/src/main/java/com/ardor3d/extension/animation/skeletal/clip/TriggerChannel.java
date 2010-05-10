@@ -56,6 +56,27 @@ public class TriggerChannel extends AbstractAnimationChannel {
         triggerData.arm(_keys[index], index);
     }
 
+    @Override
+    public AbstractAnimationChannel getSubchannelBySample(final String name, final int startSample, final int endSample) {
+        if (startSample > endSample) {
+            throw new IllegalArgumentException("startSample > endSample");
+        }
+        if (endSample >= getSampleCount()) {
+            throw new IllegalArgumentException("endSample >= getSampleCount()");
+        }
+
+        final int samples = endSample - startSample + 1;
+        final float[] times = new float[samples];
+        final String[] keys = new String[samples];
+
+        for (int i = 0; i <= samples; i++) {
+            times[i] = _times[i + startSample];
+            keys[i] = _keys[i + startSample];
+        }
+
+        return new TriggerChannel(name, times, keys);
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////

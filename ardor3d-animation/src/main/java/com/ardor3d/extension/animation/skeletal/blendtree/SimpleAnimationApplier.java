@@ -23,7 +23,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 /**
- * Very simple applier. Just applies joint transform data.
+ * Very simple applier. Just applies joint transform data, calls any callbacks and updates the pose's global transforms.
  */
 public class SimpleAnimationApplier implements AnimationApplier {
 
@@ -53,6 +53,8 @@ public class SimpleAnimationApplier implements AnimationApplier {
                     }
                 }
             }
+
+            applyToPose.updateTransforms();
         }
     }
 

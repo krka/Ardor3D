@@ -65,6 +65,16 @@ public class AnimationManager {
     private final LoggingMap<String, Double> _valuesStore = new LoggingMap<String, Double>();
 
     /**
+     * The throttle rate of animation. Default is 60fps (1/60.0). Set to 0 to disable throttling.
+     */
+    private double _updateRate = 1.0 / 60.0;
+
+    /**
+     * The global time we last processed an animation. (To use when checking our throttle.)
+     */
+    private double _lastUpdate = 0.0;
+
+    /**
      * Construct a new AnimationManager.
      * 
      * @param globalTimer
@@ -186,6 +196,16 @@ public class AnimationManager {
     public void update() {
         // grab current global time
         final double globalTime = _globalTimer.getTimeInSeconds();
+
+        // check throttle
+        if (_updateRate != 0.0) {
+            if (globalTime - _lastUpdate < _updateRate) {
+                return;
+            }
+
+            // we subtract a bit to maintain our desired rate, even if there are some gc pauses, etc.
+            _lastUpdate = globalTime - (globalTime - _lastUpdate) % _updateRate;
+        }
 
         // move the time forward on the layers
         for (final AnimationLayer layer : _layers) {
@@ -322,6 +342,21 @@ public class AnimationManager {
      */
     public AnimationLayer getBaseAnimationLayer() {
         return _layers.get(0);
+    }
+
+    /**
+     * @return the amount of time in seconds between frame rate updates. (throttle) default is 60fps (1.0/60.0).
+     */
+    public double getUpdateRate() {
+        return _updateRate;
+    }
+
+    /**
+     * @param updateRate
+     *            the new throttle rate. Default is 60fps (1.0/60.0). Set to 0 to disable throttling.
+     */
+    public void setUpdateRate(final double updateRate) {
+        _updateRate = updateRate;
     }
 
     /**

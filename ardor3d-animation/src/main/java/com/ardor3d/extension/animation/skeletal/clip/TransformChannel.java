@@ -157,6 +157,31 @@ public class TransformChannel extends AbstractAnimationChannel {
     }
 
     @Override
+    public TransformChannel getSubchannelBySample(final String name, final int startSample, final int endSample) {
+        if (startSample > endSample) {
+            throw new IllegalArgumentException("startSample > endSample");
+        }
+        if (endSample >= getSampleCount()) {
+            throw new IllegalArgumentException("endSample >= getSampleCount()");
+        }
+
+        final int samples = endSample - startSample + 1;
+        final float[] times = new float[samples];
+        final ReadOnlyQuaternion[] rotations = new ReadOnlyQuaternion[samples];
+        final ReadOnlyVector3[] translations = new ReadOnlyVector3[samples];
+        final ReadOnlyVector3[] scales = new ReadOnlyVector3[samples];
+
+        for (int i = 0; i <= samples; i++) {
+            times[i] = _times[i + startSample];
+            rotations[i] = _rotations[i + startSample];
+            translations[i] = _translations[i + startSample];
+            scales[i] = _scales[i + startSample];
+        }
+
+        return new TransformChannel(name, times, rotations, translations, scales);
+    }
+
+    @Override
     public TransformData createStateDataObject() {
         return new TransformData();
     }
