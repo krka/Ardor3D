@@ -74,6 +74,8 @@ public class GeometryClipmapTerrain extends Node {
         materialState.setShininess(MaterialFace.FrontAndBack, 64.0f);
         setRenderState(materialState);
 
+        getSceneHints().setAllPickingHints(false);
+
         try {
             _clips = new ArrayList<ClipmapLevel>();
 
