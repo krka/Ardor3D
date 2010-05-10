@@ -479,6 +479,13 @@ public class BoundingSphere extends BoundingVolume {
      * @return This sphere, after merging.
      */
     private BoundingSphere mergeLocalOBB(final OrientedBoundingBox volume) {
+        // check for infinite bounds to prevent NaN values... is so, return infinite bounds with center at origin
+        if (Double.isInfinite(getRadius()) || Vector3.isInfinite(volume.getExtent())) {
+            setCenter(Vector3.ZERO);
+            setRadius(Double.POSITIVE_INFINITY);
+            return this;
+        }
+
         // compute edge points from the obb
         if (!volume.correctCorners) {
             volume.computeCorners();

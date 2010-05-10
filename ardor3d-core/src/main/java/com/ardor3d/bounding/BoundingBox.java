@@ -443,6 +443,16 @@ public class BoundingBox extends BoundingVolume {
      * @return This AABB extended to fit the given OBB.
      */
     private BoundingBox mergeOBB(final OrientedBoundingBox volume) {
+        // check for infinite bounds to prevent NaN values
+        if (Double.isInfinite(getXExtent()) || Double.isInfinite(getYExtent()) || Double.isInfinite(getZExtent())
+                || Vector3.isInfinite(volume.getExtent())) {
+            setCenter(Vector3.ZERO);
+            setXExtent(Double.POSITIVE_INFINITY);
+            setYExtent(Double.POSITIVE_INFINITY);
+            setZExtent(Double.POSITIVE_INFINITY);
+            return this;
+        }
+
         if (!volume.correctCorners) {
             volume.computeCorners();
         }
@@ -505,6 +515,16 @@ public class BoundingBox extends BoundingVolume {
      */
     private BoundingBox merge(final Vector3 boxCenter, final double boxX, final double boxY, final double boxZ,
             final BoundingBox rVal) {
+        // check for infinite bounds to prevent NaN values
+        if (Double.isInfinite(getXExtent()) || Double.isInfinite(getYExtent()) || Double.isInfinite(getZExtent())
+                || Double.isInfinite(boxX) || Double.isInfinite(boxY) || Double.isInfinite(boxZ)) {
+            rVal.setCenter(Vector3.ZERO);
+            rVal.setXExtent(Double.POSITIVE_INFINITY);
+            rVal.setYExtent(Double.POSITIVE_INFINITY);
+            rVal.setZExtent(Double.POSITIVE_INFINITY);
+            return rVal;
+        }
+
         final Vector3 compVect1 = Vector3.fetchTempInstance();
         final Vector3 compVect2 = Vector3.fetchTempInstance();
 

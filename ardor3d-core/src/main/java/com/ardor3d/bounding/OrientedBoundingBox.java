@@ -202,6 +202,13 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     private BoundingVolume mergeSphere(final BoundingSphere volume) {
+        // check for infinite bounds to prevent NaN values
+        if (Vector3.isInfinite(getExtent()) || Double.isInfinite(volume.getRadius())) {
+            setCenter(Vector3.ZERO);
+            _extent.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+            return this;
+        }
+
         final BoundingSphere mergeSphere = volume;
         if (!correctCorners) {
             computeCorners();
@@ -245,6 +252,14 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     private BoundingVolume mergeAABB(final BoundingBox volume) {
+        // check for infinite bounds to prevent NaN values
+        if (Vector3.isInfinite(getExtent()) || Double.isInfinite(volume.getXExtent())
+                || Double.isInfinite(volume.getYExtent()) || Double.isInfinite(volume.getZExtent())) {
+            setCenter(Vector3.ZERO);
+            _extent.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+            return this;
+        }
+
         final BoundingBox mergeBox = volume;
         if (!correctCorners) {
             computeCorners();
@@ -288,6 +303,13 @@ public class OrientedBoundingBox extends BoundingVolume {
     }
 
     private BoundingVolume mergeOBB(final OrientedBoundingBox volume) {
+        // check for infinite bounds to prevent NaN values
+        if (Vector3.isInfinite(getExtent()) || Vector3.isInfinite(volume.getExtent())) {
+            setCenter(Vector3.ZERO);
+            _extent.set(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+            return this;
+        }
+
         // OrientedBoundingBox mergeBox=(OrientedBoundingBox) volume;
         // if (!correctCorners) this.computeCorners();
         // if (!mergeBox.correctCorners) mergeBox.computeCorners();

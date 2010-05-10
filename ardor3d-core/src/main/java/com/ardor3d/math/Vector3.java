@@ -906,6 +906,23 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     }
 
     /**
+     * Check if a vector has infinite values
+     * 
+     * @param vector
+     *            the vector to check
+     * @return true or false as stated above.
+     */
+    public static boolean isInfinite(final ReadOnlyVector3 vector) {
+        if (vector == null) {
+            throw new IllegalArgumentException("vector is null");
+        }
+        if (Double.isInfinite(vector.getX()) || Double.isInfinite(vector.getY()) || Double.isInfinite(vector.getZ())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @return the string representation of this vector.
      */
     @Override
