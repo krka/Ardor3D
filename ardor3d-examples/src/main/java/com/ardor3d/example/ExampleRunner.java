@@ -66,6 +66,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -922,12 +923,17 @@ public class ExampleRunner extends JFrame {
         }
 
         public void appendLine(final String line) {
-            String content = textArea.getText() + "\n" + line;
-            if (content.length() > MAX_CHARACTERS) {
-                content = content.substring(content.length() - MAX_CHARACTERS);
-            }
-            textArea.setText(content);
-            textArea.setCaretPosition(textArea.getText().length());
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    String content = textArea.getText() + "\n" + line;
+                    if (content.length() > MAX_CHARACTERS) {
+                        content = content.substring(content.length() - MAX_CHARACTERS);
+                    }
+                    textArea.setText(content);
+                    textArea.setCaretPosition(textArea.getText().length());
+                }
+            });
         }
     }
 
