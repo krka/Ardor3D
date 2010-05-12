@@ -21,7 +21,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 
 /**
- * Curve class contains a list of control points and a spline. It also contains method for visualizing itself as a
+ * Curve class contains a list of control points and a spline. It also contains method for visualising itself as a
  * renderable series of points or a line.
  */
 public class Curve {
@@ -30,7 +30,7 @@ public class Curve {
     private List<ReadOnlyVector3> _controlPoints;
 
     /** @see #setSpline(Spline) */
-    private Spline _spline = new CatmullRomSpline();
+    private Spline _spline;
 
     /**
      * Creates a new instance of <code>Curve</code>.
@@ -53,7 +53,8 @@ public class Curve {
      * 
      * @param steps
      *            The number of iterations to perform between control points, the higher this number the more points
-     *            will be shown, but it will also contain more vertices, must be greater than one.
+     *            will be shown, but it will also contain more vertices, must be greater than one. Use two to just show
+     *            the actual control points set for the curve.
      * @return A <code>Point</code> containing all the curve points, will not be <code>null</code>.
      */
     public Point toRenderablePoint(final int steps) {
@@ -133,17 +134,21 @@ public class Curve {
      * </p>
      * 
      * @param steps
-     *            The number of iterations to perform between control points, the higher this number the smoother the
-     *            returned line will be, but it will also contain more vertices, must be greater than one.
+     *            The number of iterations to perform between control points, the higher this number the more accurate
+     *            the returned result will be.
      * @return The length of this curve.
-     * @see #getLength(int, int, int)
+     * @see #getApproximateLength(int, int, int)
      */
-    public double getLength(final int steps) {
-        return getLength(1, getControlPointCount() - 2, steps);
+    public double getApproximateLength(final int steps) {
+        return getApproximateLength(1, getControlPointCount() - 2, steps);
     }
 
     /**
      * Calculates the length between the given control point indices.
+     * <p>
+     * <strong>Important note:</strong><br />
+     * See the Javadoc for the {@link #getApproximateLength(int)} method for important information.
+     * </p>
      * 
      * @param start
      *            The index of the control point to start from, must be greater than or equal to one and less than
@@ -152,12 +157,12 @@ public class Curve {
      *            The index of the control point to end with, must be less than {@link #getControlPointCount()
      *            controlPointCount} minus one and greater than <code>start</code>.
      * @param steps
-     *            The number of iterations to perform between control points, the higher this number the smoother the
-     *            returned line will be, but it will also contain more vertices, must be greater than one.
+     *            The number of iterations to perform between control points, the higher this number the more accurate
+     *            the returned result will be.
      * @return The length between the given control points.
-     * @see #getLength(int)
+     * @see #getApproximateLength(int)
      */
-    public double getLength(final int start, final int end, final int steps) {
+    public double getApproximateLength(final int start, final int end, final int steps) {
         double length = 0.0;
 
         final Vector3[] vectors = toVector3(start, end, steps);
@@ -167,6 +172,50 @@ public class Curve {
         }
 
         return length;
+    }
+
+    /**
+     * Interpolates between the control points at the given indices.
+     * 
+     * @param start
+     *            The index of the control point to start from.
+     * @param end
+     *            The index of the control point to end at.
+     * @param t
+     *            Should be between zero and one. Zero will return point <code>start</code> while one will return
+     *            <code>end</code>, a value in between will return an interpolated vector between the two.
+     * @return The interpolated vector.
+     */
+    public ReadOnlyVector3 interpolate(final int start, final int end, final double t) {
+        return interpolate(start, end, t, new Vector3());
+    }
+
+    /**
+     * Interpolates between the control points at the given indices.
+     * 
+     * @param start
+     *            The index of the control point to start from.
+     * @param end
+     *            The index of the control point to end at.
+     * @param t
+     *            Should be between zero and one. Zero will return point <code>start</code> while one will return
+     *            <code>end</code>, a value in between will return an interpolated vector between the two.
+     * @param result
+     *            The result of the interpolation will be stored in this vector.
+     * @return The result vector as a convenience.
+     */
+    public ReadOnlyVector3 interpolate(final int start, final int end, final double t, final Vector3 result) {
+        if (start <= 0) {
+            throw new IllegalArgumentException("start must be > 0! start=" + start);
+        }
+        if (end >= (getControlPointCount() - 1)) {
+            throw new IllegalArgumentException("end must be < " + (getControlPointCount() - 1) + "! end=" + end);
+        }
+
+        final List<ReadOnlyVector3> points = getControlPoints();
+
+        return getSpline().interpolate(points.get(start - 1), points.get(start), points.get(end), points.get(end + 1),
+                t, result);
     }
 
     /**

@@ -52,10 +52,9 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
     }
 
     /**
-     * Defines how this controller should repeat itself. This can be one of RT_CLAMP, RT_WRAP, RT_CYCLE, or an
-     * application specific repeat flag.
+     * Defines how this controller should repeat itself. Default is {@link RepeatType#CLAMP}.
      */
-    private RepeatType _repeatType;
+    private RepeatType _repeatType = RepeatType.CLAMP;
 
     /**
      * The controller's minimum cycle time
@@ -145,12 +144,16 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
     }
 
     /**
-     * Sets the repeat type of this controller.
+     * Sets the repeat type of this controller. The default is {@link RepeatType#CLAMP}.
      * 
      * @param repeatType
-     *            The new repeat type.
+     *            The new repeat type, can not be <code>null</code>.
      */
     public void setRepeatType(final RepeatType repeatType) {
+        if (null == repeatType) {
+            throw new IllegalArgumentException("repeatType can not be null!");
+        }
+
         _repeatType = repeatType;
     }
 

@@ -12,11 +12,11 @@ package com.ardor3d.example.interpolation;
 
 import com.ardor3d.example.Purpose;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.controller.interpolation.LinearVector3InterpolationController;
-import com.ardor3d.scenegraph.controller.interpolation.Vector3InterpolationController.UpdateField;
 
 /**
  * A demonstration of the LinearVector3InterpolationController class; which will move a Node through a set of 3D
@@ -35,13 +35,18 @@ public class LinearVector3InterpolationControllerExample extends
     @Override
     protected LinearVector3InterpolationController createController() {
         // Create our control point vectors
-        final Vector3[] vectors = { new Vector3(15, 0, -10), //
-                new Vector3(35, -10, -20), //
+        // final Vector3[] vectors = { new Vector3(0, 0, 0), //
+        // new Vector3(30, 0, 0), //
+        // new Vector3(90, 0, 0), //
+        // new Vector3(210, 0, 0) };
+
+        final ReadOnlyVector3[] vectors = { new Vector3(10, 10, 10), //
+                new Vector3(0, 10, 0), //
                 new Vector3(-5, 0, -30), //
                 new Vector3(-15, 20, -40), //
                 new Vector3(0, 0, 20), //
-                new Vector3(20, 30, -80), //
-                new Vector3(15, 0, -10) };
+                new Vector3(10, 0, 0), //
+                new Vector3(10, 10, 10) };
 
         // Create a line from our vectors
         final Line line = new Line("line", vectors, null, null, null);
@@ -57,7 +62,7 @@ public class LinearVector3InterpolationControllerExample extends
         final LinearVector3InterpolationController controller = new LinearVector3InterpolationController();
         controller.setControls(vectors);
         controller.setActive(true);
-        controller.setUpdateField(UpdateField.LOCAL_TRANSLATION);
+        controller.setSpeed(1.0);
 
         return controller;
     }

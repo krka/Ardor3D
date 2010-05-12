@@ -39,13 +39,20 @@ public class CurveInterpolationControllerExample extends InterpolationController
     @Override
     protected CurveInterpolationController createController() {
         // Create our control point vectors
+        // final ReadOnlyVector3[] vectors = { new Vector3(-15, 0, 0), //
+        // new Vector3(0, 0, 0), //
+        // new Vector3(30, 0, 0), //
+        // new Vector3(90, 0, 0), //
+        // new Vector3(210, 0, 0), //
+        // new Vector3(390, 0, 0) };
+
         final ReadOnlyVector3[] vectors = { new Vector3(10, 10, 10), //
                 new Vector3(0, 10, 0), //
                 new Vector3(-5, 0, -30), //
                 new Vector3(-15, 20, -40), //
                 new Vector3(0, 0, 20), //
                 new Vector3(10, 0, 0), //
-                new Vector3(10, 10, 10), // 
+                new Vector3(10, 10, 10), //
                 new Vector3(0, 10, 0), //
                 new Vector3(-5, 0, -30) };
 
@@ -55,7 +62,7 @@ public class CurveInterpolationControllerExample extends InterpolationController
         final Curve curve = new Curve(controls, new CatmullRomSpline());
 
         // Create a line from the curve so its easy to check the box is following it
-        final Line line = curve.toRenderableLine(50);
+        final Line line = curve.toRenderableLine(10);
         line.setRandomColors();
 
         _root.attachChild(line);
@@ -64,10 +71,6 @@ public class CurveInterpolationControllerExample extends InterpolationController
         final Point point = curve.toRenderablePoint(2);
         point.setPointSize(10f);
 
-        // Create some points from our vectors
-        // final Point point = new Point("point", vectors, null, null, null);
-        // point.setPointSize(10f);
-
         _root.attachChild(point);
 
         // Create our controller
@@ -75,7 +78,9 @@ public class CurveInterpolationControllerExample extends InterpolationController
         controller.setCurve(curve);
         controller.setActive(true);
         controller.setUpdateField(UpdateField.LOCAL_TRANSLATION);
-        controller.setSpeed(0.2);
+        controller.setSpeed(10.0);
+        controller.setConstantSpeed(true);
+        controller.generateArcLengths(10, true); // we must pass true as can switch to cycle repeat type at runtime
 
         return controller;
     }

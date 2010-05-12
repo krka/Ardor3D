@@ -54,6 +54,7 @@ public class CatmullRomSpline implements Spline {
      *            its >= 1.0 it will contain the exact same values as p2.
      * @param result
      *            The results from the interpolation will be stored in this vector.
+     * @return The result vector as a convenience.
      */
     public Vector3 interpolate(final ReadOnlyVector3 p0, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2,
             final ReadOnlyVector3 p3, final double t, final Vector3 result) {

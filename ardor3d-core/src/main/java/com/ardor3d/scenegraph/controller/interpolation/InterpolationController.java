@@ -35,10 +35,10 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
     private static final long serialVersionUID = 1L;
 
     /** The minimum allowed delta */
-    private static final double DELTA_MIN = 0.0;
+    public static final double DELTA_MIN = 0.0;
 
     /** The maximum allowed delta */
-    private static final double DELTA_MAX = 1.0;
+    public static final double DELTA_MAX = 1.0;
 
     /** @see #setControls(List) */
     private List<C> _controls = null;
@@ -164,7 +164,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
         incrementDelta(getSpeed() * time);
 
         /* If >= DELTA_MAX then we need to start interpolating between next set of points */
-        if (getDelta() >= DELTA_MAX) {
+        while (getDelta() >= DELTA_MAX) {
             /* Adjust delta for new set of points */
             decrementDelta(DELTA_MAX);
 

@@ -22,8 +22,11 @@ public abstract class Vector3InterpolationController extends InterpolationContro
     /** Serial UID */
     private static final long serialVersionUID = 1L;
 
+    /** @see #setConstantSpeed(boolean) */
+    private boolean _constantSpeed;
+
     /** @see #setUpdateField(UpdateField) */
-    private UpdateField updateField = UpdateField.LOCAL_TRANSLATION;
+    private UpdateField _updateField = UpdateField.LOCAL_TRANSLATION;
 
     /**
      * Implemented by sub classes to perform the actual interpolation.
@@ -56,23 +59,6 @@ public abstract class Vector3InterpolationController extends InterpolationContro
 
         final Vector3 target = Vector3.fetchTempInstance();
 
-        switch (getUpdateField()) {
-            case LOCAL_SCALE:
-                target.set(caller.getScale());
-                break;
-            case LOCAL_TRANSLATION:
-                target.set(caller.getTranslation());
-                break;
-            case WORLD_SCALE:
-                target.set(caller.getWorldScale());
-                break;
-            case WORLD_TRANSLATION:
-                target.set(caller.getWorldTranslation());
-                break;
-            default:
-                target.set(caller.getTranslation());
-        }
-
         final ReadOnlyVector3 interpolated = interpolateVectors(from, to, delta, target);
 
         switch (getUpdateField()) {
@@ -97,12 +83,32 @@ public abstract class Vector3InterpolationController extends InterpolationContro
     }
 
     /**
+     * @param constantSpeed
+     *            <code>true</code> to interpolate between vectors at a constant speed, <code>false</code> to
+     *            interpolate at a constant time.
+     * @see #isConstantSpeed()
+     */
+    public void setConstantSpeed(final boolean constantSpeed) {
+        _constantSpeed = constantSpeed;
+    }
+
+    /**
+     * See the setters Javadoc for more information.
+     * 
+     * @return <code>true</code> if interpolating at a constant speed, <code>false</code> otherwise.
+     * @see #setConstantSpeed(boolean)
+     */
+    public boolean isConstantSpeed() {
+        return _constantSpeed;
+    }
+
+    /**
      * @param updateField
      *            The new field to update.
      * @see #getUpdateField()
      */
     public void setUpdateField(final UpdateField updateField) {
-        this.updateField = updateField;
+        _updateField = updateField;
     }
 
     /**
@@ -110,7 +116,7 @@ public abstract class Vector3InterpolationController extends InterpolationContro
      * @see #setUpdateField(UpdateField)
      */
     public UpdateField getUpdateField() {
-        return updateField;
+        return _updateField;
     }
 
     /**
