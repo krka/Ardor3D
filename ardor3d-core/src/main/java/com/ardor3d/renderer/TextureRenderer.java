@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
-import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -96,7 +95,7 @@ public interface TextureRenderer {
      * @param c
      *            the color to set the background to.
      */
-    void setBackgroundColor(ColorRGBA c);
+    void setBackgroundColor(ReadOnlyColorRGBA c);
 
     /**
      * <code>getBackgroundColor</code> retrieves the color used for the window background.

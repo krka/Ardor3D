@@ -139,7 +139,7 @@ public abstract class AbstractPbufferTextureRenderer implements TextureRenderer 
         return _camera;
     }
 
-    public void setBackgroundColor(final ColorRGBA c) {
+    public void setBackgroundColor(final ReadOnlyColorRGBA c) {
         _backgroundColor.set(c);
         _bgColorDirty = true;
     }
