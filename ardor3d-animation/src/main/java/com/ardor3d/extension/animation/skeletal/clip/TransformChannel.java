@@ -13,6 +13,7 @@ package com.ardor3d.extension.animation.skeletal.clip;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.SavableFactory;
@@ -24,6 +25,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.google.common.collect.Lists;
 
 /**
  * An animation channel consisting of a series of transforms interpolated over time.
@@ -178,6 +180,58 @@ public class TransformChannel extends AbstractAnimationChannel {
             scales[i] = _scales[i + startSample];
         }
 
+        return newChannel(name, times, rotations, translations, scales);
+    }
+
+    @Override
+    public AbstractAnimationChannel getSubchannelByTime(final String name, final float startTime, final float endTime) {
+        if (startTime > endTime) {
+            throw new IllegalArgumentException("startTime > endTime");
+        }
+        final List<Float> times = Lists.newArrayList();
+        final List<ReadOnlyQuaternion> rotations = Lists.newArrayList();
+        final List<ReadOnlyVector3> translations = Lists.newArrayList();
+        final List<ReadOnlyVector3> scales = Lists.newArrayList();
+
+        final TransformData tData = new TransformData();
+
+        // Add start sample
+        updateSample(startTime, tData);
+        times.add(0f);
+        rotations.add(tData.getRotation());
+        translations.add(tData.getTranslation());
+        scales.add(tData.getScale());
+
+        // Add mid samples
+        for (int i = 0; i < getSampleCount(); i++) {
+            final float time = _times[i];
+            if (time > startTime && time < endTime) {
+                times.add(time - startTime);
+                rotations.add(_rotations[i]);
+                translations.add(_translations[i]);
+                scales.add(_scales[i]);
+            }
+        }
+
+        // Add end sample
+        updateSample(endTime, tData);
+        times.add(endTime - startTime);
+        rotations.add(tData.getRotation());
+        translations.add(tData.getTranslation());
+        scales.add(tData.getScale());
+
+        final float[] timesArray = new float[times.size()];
+        int i = 0;
+        for (final float time : times) {
+            timesArray[i++] = time;
+        }
+        // return
+        return newChannel(name, timesArray, rotations.toArray(new ReadOnlyQuaternion[] {}), translations
+                .toArray(new ReadOnlyVector3[] {}), scales.toArray(new ReadOnlyVector3[] {}));
+    }
+
+    protected TransformChannel newChannel(final String name, final float[] times, final ReadOnlyQuaternion[] rotations,
+            final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
         return new TransformChannel(name, times, rotations, translations, scales);
     }
 

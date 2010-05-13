@@ -13,9 +13,11 @@ package com.ardor3d.extension.animation.skeletal.clip;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.google.common.collect.Lists;
 
 /**
  * An animation source channel consisting of keyword samples indicating when a specific trigger condition is met. Each
@@ -75,6 +77,45 @@ public class TriggerChannel extends AbstractAnimationChannel {
         }
 
         return new TriggerChannel(name, times, keys);
+    }
+
+    @Override
+    public AbstractAnimationChannel getSubchannelByTime(final String name, final float startTime, final float endTime) {
+        if (startTime > endTime) {
+            throw new IllegalArgumentException("startTime > endTime");
+        }
+        final List<Float> times = Lists.newArrayList();
+        final List<String> keys = Lists.newArrayList();
+
+        final TriggerData tData = new TriggerData();
+
+        // Add start sample
+        updateSample(startTime, tData);
+        times.add(0f);
+        keys.add(tData.getCurrentTrigger());
+
+        // Add mid samples
+        for (int i = 0; i < getSampleCount(); i++) {
+            final float time = _times[i];
+            updateSample(time, tData);
+            if (time > startTime && time < endTime) {
+                times.add(time - startTime);
+                keys.add(_keys[i]);
+            }
+        }
+
+        // Add end sample
+        updateSample(endTime, tData);
+        times.add(endTime - startTime);
+        keys.add(tData.getCurrentTrigger());
+
+        final float[] timesArray = new float[times.size()];
+        int i = 0;
+        for (final float time : times) {
+            timesArray[i++] = time;
+        }
+        // return
+        return new TriggerChannel(name, timesArray, keys.toArray(new String[] {}));
     }
 
     // /////////////////

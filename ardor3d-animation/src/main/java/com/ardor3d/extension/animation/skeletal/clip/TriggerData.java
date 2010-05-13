@@ -37,8 +37,8 @@ public class TriggerData implements Savable {
         return _currentTrigger;
     }
 
-    public String getCurrentIndex() {
-        return _currentTrigger;
+    public int getCurrentIndex() {
+        return _currentIndex;
     }
 
     public void setArmed(final boolean armed) {

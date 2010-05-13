@@ -36,8 +36,8 @@ public class JointChannel extends TransformChannel {
     /**
      * Construct a new JointChannel.
      * 
-     * @param jointIndex
-     *            the index of the joint.
+     * @param joint
+     *            the joint to pull name and index from.
      * @param times
      *            our time offset values.
      * @param rotations
@@ -51,6 +51,28 @@ public class JointChannel extends TransformChannel {
             final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
         super(JointChannel.JOINT_CHANNEL_NAME + joint.getIndex(), times, rotations, translations, scales);
         _jointName = joint.getName();
+    }
+
+    /**
+     * Construct a new JointChannel.
+     * 
+     * @param jointName
+     *            the human readable name of the joint
+     * @param jointIndex
+     *            the index of the joint.
+     * @param times
+     *            our time offset values.
+     * @param rotations
+     *            the rotations to set on this channel at each time offset.
+     * @param translations
+     *            the translations to set on this channel at each time offset.
+     * @param scales
+     *            the scales to set on this channel at each time offset.
+     */
+    public JointChannel(final String jointName, final int jointIndex, final float[] times,
+            final ReadOnlyQuaternion[] rotations, final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
+        super(JointChannel.JOINT_CHANNEL_NAME + jointIndex, times, rotations, translations, scales);
+        _jointName = jointName;
     }
 
     /**
@@ -73,6 +95,13 @@ public class JointChannel extends TransformChannel {
      */
     public String getJointName() {
         return _jointName;
+    }
+
+    @Override
+    protected JointChannel newChannel(final String name, final float[] times, final ReadOnlyQuaternion[] rotations,
+            final ReadOnlyVector3[] translations, final ReadOnlyVector3[] scales) {
+        final int index = Integer.parseInt(name.substring(JointChannel.JOINT_CHANNEL_NAME.length()));
+        return new JointChannel(_jointName, index, times, rotations, translations, scales);
     }
 
     // /////////////////

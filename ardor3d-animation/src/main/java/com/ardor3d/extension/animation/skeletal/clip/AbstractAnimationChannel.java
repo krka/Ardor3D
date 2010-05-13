@@ -115,9 +115,9 @@ public abstract class AbstractAnimationChannel implements Savable {
      * sample.
      * 
      * @param startSample
-     *            the sample to start with (inclusive)
+     *            the sample to start with (inclusive). Sample counting starts at 0.
      * @param endSample
-     *            the sample to end with (inclusive)
+     *            the sample to end with (inclusive). max is getSampleCount() - 1.
      * @return the new channel.
      */
     public AbstractAnimationChannel getSubchannelBySample(final int startSample, final int endSample) {
@@ -139,6 +139,36 @@ public abstract class AbstractAnimationChannel implements Savable {
      *             if start > end or end >= getSampleCount.
      */
     public abstract AbstractAnimationChannel getSubchannelBySample(String name, int startSample, int endSample);
+
+    /**
+     * Returns a new channel of the same name and content as this, but trimmed to just the times between start and end
+     * times.
+     * 
+     * @param startTime
+     *            the time to start with (inclusive)
+     * @param endTime
+     *            the time to end with (inclusive)
+     * @return the new channel.
+     */
+    public AbstractAnimationChannel getSubchannelByTime(final float startTime, final float endTime) {
+        return getSubchannelByTime(getChannelName(), startTime, endTime);
+    }
+
+    /**
+     * 
+     * Returns a new channel of the same content as this, but trimmed to just the times between start and end sample.
+     * 
+     * @param name
+     *            the new name for our subchannel.
+     * @param startTime
+     *            the time to start with (inclusive)
+     * @param endTime
+     *            the time to end with (inclusive)
+     * @return the new channel.
+     * @throws IllegalArgumentException
+     *             if start > end or end >= getSampleCount.
+     */
+    public abstract AbstractAnimationChannel getSubchannelByTime(String name, float startTime, float endTime);
 
     /**
      * @return the local time index of the last sample in this channel.
