@@ -143,7 +143,7 @@ public class PSSMCamera extends Camera {
         _corners[6].addLocal(-_extents.getX(), _extents.getY(), -_extents.getZ());
         _corners[7].addLocal(-_extents.getX(), -_extents.getY(), -_extents.getZ());
 
-        final ReadOnlyMatrix4 mvMatrix = getModelViewProjectionMatrix();
+        final ReadOnlyMatrix4 mvMatrix = getModelViewMatrix();
         double optimalCameraNear = Double.MAX_VALUE;
         double optimalCameraFar = -Double.MAX_VALUE;
         final Vector4 position = Vector4.fetchTempInstance();
@@ -151,8 +151,8 @@ public class PSSMCamera extends Camera {
             position.set(_corners[i].getX(), _corners[i].getY(), _corners[i].getZ(), 1);
             mvMatrix.applyPre(position, position);
 
-            optimalCameraNear = Math.min(position.getZ(), optimalCameraNear);
-            optimalCameraFar = Math.max(position.getZ(), optimalCameraFar);
+            optimalCameraNear = Math.min(-position.getZ(), optimalCameraNear);
+            optimalCameraFar = Math.max(-position.getZ(), optimalCameraFar);
         }
         Vector4.releaseTempInstance(position);
 
