@@ -43,14 +43,17 @@ public class ColladaMaterialUtils {
     private final ColladaDOMUtil _colladaDOMUtil;
     private final ResourceLocator _textureLocator;
     private final boolean _compressTextures;
+    private final boolean _flipTransparency;
 
     public ColladaMaterialUtils(final boolean loadTextures, final DataCache dataCache,
-            final ColladaDOMUtil colladaDOMUtil, final ResourceLocator textureLocator, final boolean compressTextures) {
+            final ColladaDOMUtil colladaDOMUtil, final ResourceLocator textureLocator, final boolean compressTextures,
+            final boolean flipTransparency) {
         _loadTextures = loadTextures;
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
         _textureLocator = textureLocator;
         _compressTextures = compressTextures;
+        _flipTransparency = flipTransparency;
     }
 
     /**
@@ -140,6 +143,10 @@ public class ColladaMaterialUtils {
                                 transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
                                 // TODO: use this
 
+                                if (_flipTransparency) {
+                                    transparency = 1f - transparency;
+                                }
+
                                 useTransparency = true;
                             }
                         } else if ("emission".equals(property.getName())) {
@@ -177,6 +184,11 @@ public class ColladaMaterialUtils {
                     // XXX: There are some issues with clarity on how to use alpha blending in OpenGL FFP.
                     // The best interpretation I have seen is that if transparent has a texture == diffuse,
                     // Turn on alpha blending and use diffuse alpha.
+
+                    // check to make sure we actually need this.
+                    if ("A_ONE".equals(opaqueMode) && ColorRGBA.WHITE.equals(transparent) && transparency == 1.0) {
+                        useTransparency = false;
+                    }
 
                     if (diffuseTexture != null && useTransparency) {
                         final BlendState blend = new BlendState();

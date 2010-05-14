@@ -45,6 +45,7 @@ import com.ardor3d.util.resource.ResourceSource;
  */
 public class ColladaImporter {
     private boolean _loadTextures = true;
+    private boolean _flipTransparency = false;
     private boolean _loadAnimations = true;
     private ResourceLocator _textureLocator;
     private ResourceLocator _modelLocator;
@@ -62,6 +63,16 @@ public class ColladaImporter {
 
     public ColladaImporter setLoadAnimations(final boolean loadAnimations) {
         _loadAnimations = loadAnimations;
+        return this;
+    }
+
+    /**
+     * @param flipTransparency
+     *            if true, invert the value of any "transparency" entries found - required for some exporters.
+     * @return this importer, for chaining
+     */
+    public ColladaImporter setFlipTransparency(final boolean flipTransparency) {
+        _flipTransparency = flipTransparency;
         return this;
     }
 
@@ -111,7 +122,7 @@ public class ColladaImporter {
         final DataCache dataCache = new DataCache();
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
         final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(_loadTextures, dataCache,
-                colladaDOMUtil, _textureLocator, _compressTextures);
+                colladaDOMUtil, _textureLocator, _compressTextures, _flipTransparency);
         final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils);
         final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
                 colladaMeshUtils);
