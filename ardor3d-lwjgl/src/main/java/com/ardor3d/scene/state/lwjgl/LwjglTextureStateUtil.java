@@ -64,7 +64,6 @@ import com.ardor3d.renderer.state.record.TextureUnitRecord;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.util.Constants;
-import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.stat.StatCollector;
@@ -77,9 +76,6 @@ public abstract class LwjglTextureStateUtil {
         if (texture == null) {
             return;
         }
-
-        // our texture type:
-        final Texture.Type type = texture.getType();
 
         final RenderContext context = ContextManager.getCurrentContext();
         if (context == null) {
@@ -96,20 +92,16 @@ public abstract class LwjglTextureStateUtil {
         }
 
         // Create the texture...
-        if (texture.getTextureKey() != null) {
+        // First, look for a texture in the cache just like ours
+        final Texture cached = TextureManager.findCachedTexture(texture.getTextureKey());
 
-            // Look for a texture in the cache just like ours
-            final TextureKey texKey = texture.getTextureKey();
-            final Texture cached = TextureManager.findCachedTexture(texKey);
-
-            if (cached == null) {
-                TextureManager.addToCache(texture);
-            } else {
-                final int textureId = cached.getTextureIdForContext(context.getGlContextRep());
-                if (textureId != 0) {
-                    doTextureBind(cached, unit, false);
-                    return;
-                }
+        if (cached == null) {
+            TextureManager.addToCache(texture);
+        } else {
+            final int textureId = cached.getTextureIdForContext(context.getGlContextRep());
+            if (textureId != 0) {
+                doTextureBind(cached, unit, false);
+                return;
             }
         }
 
@@ -121,6 +113,21 @@ public abstract class LwjglTextureStateUtil {
 
         // store the new id by our current gl context.
         texture.setTextureIdForContext(context.getGlContextRep(), textureId);
+
+        update(texture, unit);
+    }
+
+    /**
+     * bind texture and upload image data to card
+     */
+    public static void update(final Texture texture, final int unit) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        texture.getTextureKey().setClean(context.getGlContextRep());
+
+        // our texture type:
+        final Texture.Type type = texture.getType();
 
         // bind our texture id to this unit.
         doTextureBind(texture, unit, false);
@@ -620,6 +627,12 @@ public abstract class LwjglTextureStateUtil {
                     // texture not yet loaded.
                     // this will load and bind and set the records...
                     load(texture, i);
+                    textureId = texture.getTextureIdForContext(context.getGlContextRep());
+                    if (textureId == 0) {
+                        continue;
+                    }
+                } else if (texture.isDirty(context.getGlContextRep())) {
+                    update(texture, i);
                     textureId = texture.getTextureIdForContext(context.getGlContextRep());
                     if (textureId == 0) {
                         continue;

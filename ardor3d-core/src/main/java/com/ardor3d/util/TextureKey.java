@@ -52,7 +52,18 @@ final public class TextureKey implements Savable {
      */
     protected Texture.MinificationFilter _minFilter = MinificationFilter.Trilinear;
 
-    /** cache of opengl context specific texture ids for the associated texture. */
+    /**
+     * In multi-context rendering, this is used to track if this texture is in need of updating. An entry in this list
+     * means yes for the given Object (usually a RenderContext's glContextRep).
+     */
+    private final List<WeakReference<Object>> _dirtyContexts;
+
+    /**
+     * In single-context rendering this is used to track if this texture is in need of updating.
+     */
+    private boolean _dirty;
+
+    /** cache of OpenGL context specific texture ids for the associated texture. */
     protected final transient ContextIdReference<TextureKey> _idCache = new ContextIdReference<TextureKey>(this,
             TextureManager.getRefQueue());
 
@@ -65,8 +76,82 @@ final public class TextureKey implements Savable {
     /** RTT code use */
     private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
 
-    /** DO NOT USE. FOR SAVABLE USE ONLY */
-    public TextureKey() {}
+    /** DO NOT USE. FOR INTERNAL USE ONLY */
+    public TextureKey() {
+        if (Constants.useMultipleContexts) {
+            _dirtyContexts = Lists.newArrayList();
+        } else {
+            _dirtyContexts = null;
+        }
+    }
+
+    public void setDirty() {
+        if (Constants.useMultipleContexts) {
+            synchronized (_dirtyContexts) {
+                _dirtyContexts.clear();
+                // grab all contexts we currently have ids for and add them all as dirty
+                for (final Object context : _idCache.getContextObjects()) {
+                    final WeakReference<Object> ref = new WeakReference<Object>(context);
+                    _dirtyContexts.add(ref);
+                }
+            }
+        } else {
+            _dirty = true;
+        }
+    }
+
+    public boolean isDirty(final Object glContext) {
+        if (Constants.useMultipleContexts) {
+            synchronized (_dirtyContexts) {
+                // check if we are empty...
+                if (_dirtyContexts.isEmpty()) {
+                    return false;
+                } else {
+                    WeakReference<Object> ref;
+                    Object check;
+                    // look for a matching reference
+                    for (final Iterator<WeakReference<Object>> it = _dirtyContexts.iterator(); it.hasNext();) {
+                        ref = it.next();
+                        check = ref.get();
+                        if (check == null) {
+                            // found empty, clean up
+                            it.remove();
+                            continue;
+                        }
+
+                        if (check.equals(glContext)) {
+                            // found match, return true
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        } else {
+            return _dirty;
+        }
+    }
+
+    public void setClean(final Object glContext) {
+        if (Constants.useMultipleContexts) {
+            synchronized (_dirtyContexts) {
+                if (!_dirtyContexts.isEmpty()) {
+                    WeakReference<Object> ref;
+                    Object check;
+                    for (final Iterator<WeakReference<Object>> it = _dirtyContexts.iterator(); it.hasNext();) {
+                        ref = it.next();
+                        check = ref.get();
+                        if (check != null && check.equals(glContext)) {
+                            it.remove();
+                            return;
+                        }
+                    }
+                }
+            }
+        } else {
+            _dirty = false;
+        }
+    }
 
     /**
      * Get a new unique TextureKey. This is meant for use by RTT and other situations where we know we are making a

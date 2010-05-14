@@ -601,6 +601,7 @@ public abstract class Texture implements Savable {
      */
     public void setImage(final Image image) {
         _image = image;
+        setDirty();
     }
 
     /**
@@ -1143,6 +1144,104 @@ public abstract class Texture implements Savable {
         _lodBias = bias;
     }
 
+    public void setTextureKey(final TextureKey tkey) {
+        _key = tkey;
+    }
+
+    public TextureKey getTextureKey() {
+        return _key;
+    }
+
+    public void setTextureStoreFormat(final TextureStoreFormat storeFormat) {
+        _storeFormat = storeFormat;
+    }
+
+    public TextureStoreFormat getTextureStoreFormat() {
+        return _storeFormat;
+    }
+
+    public boolean isStoreImage() {
+        return _storeImage;
+    }
+
+    public void setStoreImage(final boolean store) {
+        _storeImage = store;
+    }
+
+    public boolean hasBorder() {
+        return _hasBorder;
+    }
+
+    public void setHasBorder(final boolean hasBorder) {
+        _hasBorder = hasBorder;
+    }
+
+    /**
+     * Get the depth texture compare function
+     * 
+     * @return The depth texture compare function
+     */
+    public DepthTextureCompareFunc getDepthCompareFunc() {
+        return _depthCompareFunc;
+    }
+
+    /**
+     * Set the depth texture compare function
+     * 
+     * param depthCompareFunc The depth texture compare function
+     */
+    public void setDepthCompareFunc(final DepthTextureCompareFunc depthCompareFunc) {
+        _depthCompareFunc = depthCompareFunc;
+    }
+
+    /**
+     * Get the depth texture apply mode
+     * 
+     * @return The depth texture apply mode
+     */
+    public DepthTextureMode getDepthMode() {
+        return _depthMode;
+    }
+
+    /**
+     * Set the depth texture apply mode
+     * 
+     * @param depthMode
+     *            The depth texture apply mode
+     */
+    public void setDepthMode(final DepthTextureMode depthMode) {
+        _depthMode = depthMode;
+    }
+
+    /**
+     * Get the depth texture compare mode
+     * 
+     * @return The depth texture compare mode
+     */
+    public DepthTextureCompareMode getDepthCompareMode() {
+        return _depthCompareMode;
+    }
+
+    /**
+     * Set the depth texture compare mode
+     * 
+     * @param depthCompareMode
+     *            The depth texture compare mode
+     */
+    public void setDepthCompareMode(final DepthTextureCompareMode depthCompareMode) {
+        _depthCompareMode = depthCompareMode;
+    }
+
+    public void setDirty() {
+        if (_key != null) {
+            _key.setDirty();
+        }
+    }
+
+    public boolean isDirty(final Object glContext) {
+        return _key.isDirty(glContext);
+    }
+
     @Override
     public boolean equals(final Object other) {
         if (other == this) {
@@ -1374,93 +1473,5 @@ public abstract class Texture implements Savable {
 
     public Class<? extends Texture> getClassTag() {
         return this.getClass();
-    }
-
-    public void setTextureKey(final TextureKey tkey) {
-        _key = tkey;
-    }
-
-    public TextureKey getTextureKey() {
-        return _key;
-    }
-
-    public void setTextureStoreFormat(final TextureStoreFormat storeFormat) {
-        _storeFormat = storeFormat;
-    }
-
-    public TextureStoreFormat getTextureStoreFormat() {
-        return _storeFormat;
-    }
-
-    public boolean isStoreImage() {
-        return _storeImage;
-    }
-
-    public void setStoreImage(final boolean store) {
-        _storeImage = store;
-    }
-
-    public boolean hasBorder() {
-        return _hasBorder;
-    }
-
-    public void setHasBorder(final boolean hasBorder) {
-        _hasBorder = hasBorder;
-    }
-
-    /**
-     * Get the depth texture compare function
-     * 
-     * @return The depth texture compare function
-     */
-    public DepthTextureCompareFunc getDepthCompareFunc() {
-        return _depthCompareFunc;
-    }
-
-    /**
-     * Set the depth texture compare function
-     * 
-     * param depthCompareFunc The depth texture compare function
-     */
-    public void setDepthCompareFunc(final DepthTextureCompareFunc depthCompareFunc) {
-        _depthCompareFunc = depthCompareFunc;
-    }
-
-    /**
-     * Get the depth texture apply mode
-     * 
-     * @return The depth texture apply mode
-     */
-    public DepthTextureMode getDepthMode() {
-        return _depthMode;
-    }
-
-    /**
-     * Set the depth texture apply mode
-     * 
-     * @param depthMode
-     *            The depth texture apply mode
-     */
-    public void setDepthMode(final DepthTextureMode depthMode) {
-        _depthMode = depthMode;
-    }
-
-    /**
-     * Get the depth texture compare mode
-     * 
-     * @return The depth texture compare mode
-     */
-    public DepthTextureCompareMode getDepthCompareMode() {
-        return _depthCompareMode;
-    }
-
-    /**
-     * Set the depth texture compare mode
-     * 
-     * @param depthCompareMode
-     *            The depth texture compare mode
-     */
-    public void setDepthCompareMode(final DepthTextureCompareMode depthCompareMode) {
-        _depthCompareMode = depthCompareMode;
     }
 }

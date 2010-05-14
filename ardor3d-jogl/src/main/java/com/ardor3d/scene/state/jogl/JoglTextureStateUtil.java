@@ -65,11 +65,6 @@ public class JoglTextureStateUtil {
         }
 
         final GL gl = GLU.getCurrentGL();
-        final GLU glu = new GLU();
-
-        // our texture type:
-        final Texture.Type type = texture.getType();
-
         final RenderContext context = ContextManager.getCurrentContext();
         if (context == null) {
             logger.warning("RenderContext is null for texture: " + texture);
@@ -109,6 +104,24 @@ public class JoglTextureStateUtil {
 
         // store the new id by our current gl context.
         texture.setTextureIdForContext(context.getGlContextRep(), textureId);
+
+        update(texture, unit);
+    }
+
+    /**
+     * bind texture and upload image data to card
+     */
+    public static void update(final Texture texture, final int unit) {
+        final RenderContext context = ContextManager.getCurrentContext();
+        final ContextCapabilities caps = context.getCapabilities();
+
+        texture.getTextureKey().setClean(context.getGlContextRep());
+
+        // our texture type:
+        final Texture.Type type = texture.getType();
+
+        final GL gl = GLU.getCurrentGL();
+        final GLU glu = new GLU();
 
         // bind our texture id to this unit.
         doTextureBind(texture, unit, false);
@@ -608,6 +621,12 @@ public class JoglTextureStateUtil {
                     // texture not yet loaded.
                     // this will load and bind and set the records...
                     load(texture, i);
+                    textureId = texture.getTextureIdForContext(context.getGlContextRep());
+                    if (textureId == 0) {
+                        continue;
+                    }
+                } else if (texture.isDirty(context.getGlContextRep())) {
+                    update(texture, i);
                     textureId = texture.getTextureIdForContext(context.getGlContextRep());
                     if (textureId == 0) {
                         continue;
