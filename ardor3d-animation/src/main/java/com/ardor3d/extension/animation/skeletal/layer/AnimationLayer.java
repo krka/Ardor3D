@@ -11,6 +11,7 @@
 package com.ardor3d.extension.animation.skeletal.layer;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
@@ -126,6 +127,13 @@ public class AnimationLayer implements StateOwner {
             }
         }
         return false;
+    }
+
+    /**
+     * @return a set containing the names of our steady states.
+     */
+    public Set<String> getSteadyStateNames() {
+        return _steadyStates.keySet();
     }
 
     /**
