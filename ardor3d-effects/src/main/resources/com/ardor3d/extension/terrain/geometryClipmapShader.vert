@@ -25,11 +25,10 @@ void main(void){
 	texCoord = position.xz * vec2(texelSize);
     	
 //////////// terrain blending
-    float fac = clipSideSize * vertexDistance * 0.5;
-    vec2 term = abs(position.xz - eyePosition.xz);
-    term = (term - vec2(fac*0.6)) / vec2(fac*0.3);
-    float result = max(term.x, term.y);
-    float blend = clamp(result, 0.0, 1.0);
+    float scaledClipSideSize = clipSideSize * vertexDistance * 0.5;
+    vec2 viewDistance = abs(position.xz - eyePosition.xz);
+    float maxDistance = max(viewDistance.x, viewDistance.y)/scaledClipSideSize;
+    float blend = clamp((maxDistance - 0.51) * 2.2, 0.0, 1.0);
 
     position.y = mix(position.y, position.w, blend);
     position.w = 1.0;
