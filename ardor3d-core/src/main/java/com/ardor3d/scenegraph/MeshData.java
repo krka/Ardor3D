@@ -325,7 +325,11 @@ public class MeshData implements Cloneable, Savable {
         if (_textureCoords.size() <= index) {
             return null;
         }
-        return _textureCoords.get(index).getBuffer();
+        final FloatBufferData textureCoord = _textureCoords.get(index);
+        if (textureCoord == null) {
+            return null;
+        }
+        return textureCoord.getBuffer();
     }
 
     /**
