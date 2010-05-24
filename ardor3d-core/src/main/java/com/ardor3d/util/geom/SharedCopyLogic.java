@@ -53,6 +53,7 @@ public class SharedCopyLogic implements CopyLogic {
         copy.setName(original.getName() + "_copy");
         copy.getSceneHints().set(original.getSceneHints());
         copy.setTransform(original.getTransform());
+        copy.setDefaultColor(original.getDefaultColor());
 
         for (final StateType type : StateType.values()) {
             final RenderState state = original.getLocalRenderState(type);
