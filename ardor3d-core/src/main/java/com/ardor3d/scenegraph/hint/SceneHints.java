@@ -92,6 +92,8 @@ public class SceneHints implements Savable {
         _orthoOrder = sceneHints._orthoOrder;
         _pickingHints.clear();
         _pickingHints.addAll(sceneHints._pickingHints);
+        _castsShadows = sceneHints._castsShadows;
+        _transpType = sceneHints._transpType;
     }
 
     /**
