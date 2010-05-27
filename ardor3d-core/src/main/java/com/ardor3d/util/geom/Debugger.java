@@ -21,6 +21,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.IndexMode;
@@ -39,11 +40,13 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.AxisRods;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.OrientedBox;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.scenegraph.shape.Sphere;
+import com.ardor3d.util.ExtendedCamera;
 
 /**
  * Debugger provides tools for viewing scene data such as boundings and normals.
@@ -599,4 +602,96 @@ public final class Debugger {
         bQuad.onDraw(r);
         r.flushGraphics();
     }
+
+    // -- **** METHODS FOR DISPLAYING CAMERAS **** -- //
+    private static Line lineFrustum;
+    private static final ExtendedCamera extendedCamera = new ExtendedCamera();
+
+    public static void drawCameraFrustum(final Renderer r, final Camera camera, final ReadOnlyColorRGBA color,
+            final short pattern, final boolean drawOriginConnector) {
+        drawCameraFrustum(r, camera, camera.getFrustumNear(), camera.getFrustumFar(), color, pattern,
+                drawOriginConnector);
+    }
+
+    public static void drawCameraFrustum(final Renderer r, final Camera camera, final double fNear, final double fFar,
+            final ReadOnlyColorRGBA color, final short pattern, final boolean drawOriginConnector) {
+        if (lineFrustum == null) {
+            final FloatBuffer verts = BufferUtils.createVector3Buffer(24);
+            final FloatBuffer colors = BufferUtils.createColorBuffer(24);
+
+            lineFrustum = new Line("Lines", verts, null, colors, null);
+            lineFrustum.getMeshData().setIndexModes(
+                    new IndexMode[] { IndexMode.LineLoop, IndexMode.LineLoop, IndexMode.Lines, IndexMode.Lines });
+            lineFrustum.getMeshData().setIndexLengths(new int[] { 4, 4, 8, 8 });
+            lineFrustum.setLineWidth(2);
+            lineFrustum.getSceneHints().setLightCombineMode(LightCombineMode.Off);
+
+            final BlendState lineBlendState = new BlendState();
+            lineBlendState.setEnabled(true);
+            lineBlendState.setBlendEnabled(true);
+            lineBlendState.setTestEnabled(true);
+            lineBlendState.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+            lineBlendState.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+            lineFrustum.setRenderState(lineBlendState);
+
+            final ZBufferState zstate = new ZBufferState();
+            lineFrustum.setRenderState(zstate);
+            lineFrustum.updateGeometricState(0.0);
+
+            lineFrustum.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
+        }
+
+        lineFrustum.setDefaultColor(color);
+        lineFrustum.setStipplePattern(pattern);
+
+        extendedCamera.set(camera);
+        extendedCamera.calculateFrustum(fNear, fFar);
+
+        final FloatBuffer colors = lineFrustum.getMeshData().getColorBuffer();
+        for (int i = 0; i < 16; i++) {
+            BufferUtils.setInBuffer(color, colors, i);
+        }
+        final float alpha = drawOriginConnector ? 0.4f : 0.0f;
+        for (int i = 16; i < 24; i++) {
+            colors.position(i * 4);
+            colors.put(color.getRed());
+            colors.put(color.getGreen());
+            colors.put(color.getBlue());
+            colors.put(alpha);
+        }
+
+        final Vector3[] corners = extendedCamera.getCorners();
+
+        final FloatBuffer verts = lineFrustum.getMeshData().getVertexBuffer();
+        BufferUtils.setInBuffer(corners[0], verts, 0);
+        BufferUtils.setInBuffer(corners[1], verts, 1);
+        BufferUtils.setInBuffer(corners[2], verts, 2);
+        BufferUtils.setInBuffer(corners[3], verts, 3);
+
+        BufferUtils.setInBuffer(corners[4], verts, 4);
+        BufferUtils.setInBuffer(corners[5], verts, 5);
+        BufferUtils.setInBuffer(corners[6], verts, 6);
+        BufferUtils.setInBuffer(corners[7], verts, 7);
+
+        BufferUtils.setInBuffer(corners[0], verts, 8);
+        BufferUtils.setInBuffer(corners[4], verts, 9);
+        BufferUtils.setInBuffer(corners[1], verts, 10);
+        BufferUtils.setInBuffer(corners[5], verts, 11);
+        BufferUtils.setInBuffer(corners[2], verts, 12);
+        BufferUtils.setInBuffer(corners[6], verts, 13);
+        BufferUtils.setInBuffer(corners[3], verts, 14);
+        BufferUtils.setInBuffer(corners[7], verts, 15);
+
+        BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 16);
+        BufferUtils.setInBuffer(corners[0], verts, 17);
+        BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 18);
+        BufferUtils.setInBuffer(corners[1], verts, 19);
+        BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 20);
+        BufferUtils.setInBuffer(corners[2], verts, 21);
+        BufferUtils.setInBuffer(extendedCamera.getLocation(), verts, 22);
+        BufferUtils.setInBuffer(corners[3], verts, 23);
+
+        lineFrustum.draw(r);
+    }
+
 }

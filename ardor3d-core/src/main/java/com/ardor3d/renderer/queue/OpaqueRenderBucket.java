@@ -12,7 +12,6 @@ package com.ardor3d.renderer.queue;
 
 import java.util.Comparator;
 
-import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
@@ -21,8 +20,8 @@ import com.ardor3d.util.TextureKey;
 
 public class OpaqueRenderBucket extends AbstractRenderBucket {
 
-    public OpaqueRenderBucket(final Renderer renderer) {
-        super(renderer);
+    public OpaqueRenderBucket() {
+        super();
 
         _comparator = new OpaqueComparator();
     }

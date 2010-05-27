@@ -10,6 +10,7 @@
 
 package com.ardor3d.renderer.queue;
 
+import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Spatial;
 
 public interface RenderBucket {
@@ -21,7 +22,7 @@ public interface RenderBucket {
 
     void sort();
 
-    void render();
+    void render(Renderer renderer);
 
     void pushBucket();
 

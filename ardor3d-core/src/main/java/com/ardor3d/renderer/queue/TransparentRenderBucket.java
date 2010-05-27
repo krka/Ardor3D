@@ -31,8 +31,8 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
     /** ZBufferState for two pass transparency rendering. */
     private final ZBufferState _transparentZBuff;
 
-    public TransparentRenderBucket(final Renderer renderer) {
-        super(renderer);
+    public TransparentRenderBucket() {
+        super();
 
         _tranparentCull = new CullState();
         _transparentZBuff = new ZBufferState();
@@ -43,7 +43,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
     }
 
     @Override
-    public void render() {
+    public void render(final Renderer renderer) {
         // Grab our render context - used to enforce renderstates
         final RenderContext context = ContextManager.getCurrentContext();
 
@@ -90,7 +90,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
                         // first render back-facing tris only
                         _tranparentCull.setCullFace(CullState.Face.Front);
-                        mesh.draw(_renderer);
+                        mesh.draw(renderer);
 
                         // revert z state
                         context.clearEnforcedState(StateType.ZBuffer);
@@ -100,7 +100,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
                         // render front-facing tris
                         _tranparentCull.setCullFace(CullState.Face.Back);
-                        mesh.draw(_renderer);
+                        mesh.draw(renderer);
 
                         // revert cull state
                         if (oldCullState != null) {
@@ -114,7 +114,7 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
             }
 
             // go ahead and draw as usual
-            spatial.draw(_renderer);
+            spatial.draw(renderer);
         }
     }
 

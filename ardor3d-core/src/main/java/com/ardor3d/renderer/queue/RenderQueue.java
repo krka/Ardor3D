@@ -17,24 +17,21 @@ import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.Ardor3dException;
 
 public class RenderQueue {
-    private final Renderer _renderer;
 
     private final EnumMap<RenderBucketType, RenderBucket> renderBuckets = new EnumMap<RenderBucketType, RenderBucket>(
             RenderBucketType.class);
 
-    public RenderQueue(final Renderer r) {
-        _renderer = r;
-
+    public RenderQueue() {
         setupDefaultBuckets();
     }
 
     private void setupDefaultBuckets() {
-        renderBuckets.put(RenderBucketType.PreBucket, new OpaqueRenderBucket(_renderer));
-        renderBuckets.put(RenderBucketType.Shadow, new OpaqueRenderBucket(_renderer));
-        renderBuckets.put(RenderBucketType.Opaque, new OpaqueRenderBucket(_renderer));
-        renderBuckets.put(RenderBucketType.Transparent, new TransparentRenderBucket(_renderer));
-        renderBuckets.put(RenderBucketType.Ortho, new OrthoRenderBucket(_renderer));
-        renderBuckets.put(RenderBucketType.PostBucket, new OpaqueRenderBucket(_renderer));
+        renderBuckets.put(RenderBucketType.PreBucket, new OpaqueRenderBucket());
+        renderBuckets.put(RenderBucketType.Shadow, new OpaqueRenderBucket());
+        renderBuckets.put(RenderBucketType.Opaque, new OpaqueRenderBucket());
+        renderBuckets.put(RenderBucketType.Transparent, new TransparentRenderBucket());
+        renderBuckets.put(RenderBucketType.Ortho, new OrthoRenderBucket());
+        renderBuckets.put(RenderBucketType.PostBucket, new OpaqueRenderBucket());
     }
 
     public void setRenderBucket(final RenderBucketType type, final RenderBucket renderBucket) {
@@ -83,16 +80,16 @@ public class RenderQueue {
         }
     }
 
-    public void renderOnly() {
+    public void renderOnly(final Renderer renderer) {
         for (final RenderBucket renderBucket : renderBuckets.values()) {
-            renderBucket.render();
+            renderBucket.render(renderer);
         }
     }
 
-    public void renderBuckets() {
+    public void renderBuckets(final Renderer renderer) {
         for (final RenderBucket renderBucket : renderBuckets.values()) {
             renderBucket.sort();
-            renderBucket.render();
+            renderBucket.render(renderer);
             renderBucket.clear();
         }
     }

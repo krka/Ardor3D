@@ -17,20 +17,20 @@ import com.ardor3d.scenegraph.Spatial;
 
 public class OrthoRenderBucket extends AbstractRenderBucket {
 
-    public OrthoRenderBucket(final Renderer renderer) {
-        super(renderer);
+    public OrthoRenderBucket() {
+        super();
 
         _comparator = new OrthoComparator();
     }
 
     @Override
-    public void render() {
+    public void render(final Renderer renderer) {
         if (_currentListSize > 0) {
-            _renderer.setOrtho();
+            renderer.setOrtho();
             for (int i = 0; i < _currentListSize; i++) {
-                _currentList[i].draw(_renderer);
+                _currentList[i].draw(renderer);
             }
-            _renderer.unsetOrtho();
+            renderer.unsetOrtho();
         }
     }
 

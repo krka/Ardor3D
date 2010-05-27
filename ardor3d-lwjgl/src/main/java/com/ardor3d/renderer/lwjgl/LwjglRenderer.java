@@ -132,7 +132,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         logger.fine("LwjglRenderer created.");
 
-        _queue = new RenderQueue(this);
+        _queue = new RenderQueue();
 
         _oldTextureBuffers = new FloatBuffer[TextureState.MAX_TEXTURES];
     }
@@ -148,7 +148,7 @@ public class LwjglRenderer extends AbstractRenderer {
      */
     public void renderBuckets() {
         _processingQueue = true;
-        _queue.renderBuckets();
+        _queue.renderBuckets(this);
         _processingQueue = false;
     }
 

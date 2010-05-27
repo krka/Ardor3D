@@ -23,7 +23,6 @@ import com.ardor3d.util.SortUtil;
 
 public class AbstractRenderBucket implements RenderBucket {
 
-    protected final Renderer _renderer;
     protected Comparator<Spatial> _comparator;
 
     protected Spatial[] _currentList, _tempList;
@@ -33,9 +32,7 @@ public class AbstractRenderBucket implements RenderBucket {
     protected Stack<Spatial[]> _listStackPool = new Stack<Spatial[]>();
     protected Stack<Integer> _listSizeStack = new Stack<Integer>();
 
-    public AbstractRenderBucket(final Renderer renderer) {
-        _renderer = renderer;
-
+    public AbstractRenderBucket() {
         _currentList = new Spatial[32];
     }
 
@@ -73,9 +70,9 @@ public class AbstractRenderBucket implements RenderBucket {
         _currentListSize = 0;
     }
 
-    public void render() {
+    public void render(final Renderer renderer) {
         for (int i = 0; i < _currentListSize; i++) {
-            _currentList[i].draw(_renderer);
+            _currentList[i].draw(renderer);
         }
     }
 
