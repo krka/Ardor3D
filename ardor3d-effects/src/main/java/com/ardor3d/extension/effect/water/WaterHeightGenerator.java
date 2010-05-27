@@ -119,4 +119,9 @@ public class WaterHeightGenerator implements HeightGenerator {
     public void setOctaves(final int octaves) {
         this.octaves = octaves;
     }
+
+    @Override
+    public double getMaximumHeight() {
+        return 15.0;
+    }
 }

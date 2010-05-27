@@ -26,4 +26,6 @@ public interface HeightGenerator {
      * @return height for specified position
      */
     public double getHeight(double x, double z, double time);
+
+    public double getMaximumHeight();
 }

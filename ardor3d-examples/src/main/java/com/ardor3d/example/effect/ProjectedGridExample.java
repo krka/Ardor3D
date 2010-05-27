@@ -23,6 +23,7 @@ import com.ardor3d.input.logical.KeyPressedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
@@ -44,8 +45,11 @@ public class ProjectedGridExample extends ExampleBase {
     /** The Projected Grid mesh */
     private ProjectedGrid projectedGrid;
 
+    private final Camera externalCamera = new Camera();
+    private boolean animateExternalCamera = false;
+
     /** Text fields used to present info about the example. */
-    private final BasicText _exampleInfo[] = new BasicText[2];
+    private final BasicText _exampleInfo[] = new BasicText[4];
 
     public static void main(final String[] args) {
         start(ProjectedGridExample.class);
@@ -56,6 +60,14 @@ public class ProjectedGridExample extends ExampleBase {
 
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
+        if (!animateExternalCamera) {
+            externalCamera.set(_canvas.getCanvasRenderer().getCamera());
+        } else {
+            final double time = _timer.getTimeInSeconds() * 0.5;
+            externalCamera.setLocation(0, Math.sin(time) * 100 + 110.0, 0);
+            externalCamera.lookAt(new Vector3(Math.sin(time * 1.5) * 100, 50, Math.cos(time) * 100), Vector3.UNIT_Y);
+        }
+
         counter += timer.getTimePerFrame();
         frames++;
         if (counter > 1) {
@@ -70,10 +82,17 @@ public class ProjectedGridExample extends ExampleBase {
     protected void initExample() {
         _canvas.setTitle("ProjectedGrid - Example");
 
-        _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 40, 0));
+        _controlHandle.setMoveSpeed(200);
 
-        projectedGrid = new ProjectedGrid("ProjectedGrid", _canvas.getCanvasRenderer().getCamera(), 100, 70, 0.01f,
-                new WaterHeightGenerator(), _timer);
+        _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 100, 200));
+        _canvas.getCanvasRenderer().getCamera().setFrustumPerspective(
+                40.0,
+                (float) _canvas.getCanvasRenderer().getCamera().getWidth()
+                        / (float) _canvas.getCanvasRenderer().getCamera().getHeight(), 1.0, 5000);
+        _canvas.getCanvasRenderer().getCamera().lookAt(new Vector3(0, 0, 0), Vector3.UNIT_Y);
+
+        projectedGrid = new ProjectedGrid("ProjectedGrid", externalCamera, 100, 70, 0.01f, new WaterHeightGenerator(),
+                _timer);
         _root.attachChild(projectedGrid);
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
@@ -91,6 +110,19 @@ public class ProjectedGridExample extends ExampleBase {
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.TWO), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 projectedGrid.setNrUpdateThreads(projectedGrid.getNrUpdateThreads() + 1);
+                updateText();
+            }
+        }));
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.THREE), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                projectedGrid.setDrawDebug(!projectedGrid.isDrawDebug());
+                updateText();
+            }
+        }));
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.FOUR), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                projectedGrid.setDrawDebug(true);
+                animateExternalCamera = !animateExternalCamera;
                 updateText();
             }
         }));
@@ -129,6 +161,8 @@ public class ProjectedGridExample extends ExampleBase {
      */
     private void updateText() {
         _exampleInfo[0].setText("[1/2] Number of update threads: " + projectedGrid.getNrUpdateThreads());
-        _exampleInfo[1].setText("[SPACE] Freeze update: " + projectedGrid.isFreezeUpdate());
+        _exampleInfo[1].setText("[3] Draw debug frustums: " + projectedGrid.isDrawDebug());
+        _exampleInfo[2].setText("[4] Animate external camera: " + animateExternalCamera);
+        _exampleInfo[3].setText("[SPACE] Freeze update: " + projectedGrid.isFreezeUpdate());
     }
 }

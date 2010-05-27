@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.TextureStoreFormat;
@@ -142,7 +141,7 @@ public class WaterNode extends Node {
         clipBias = 1.0;
         waterColorStart = new ColorRGBA(0.0f, 0.0f, 0.1f, 1.0f);
         waterColorEnd = new ColorRGBA(0.0f, 0.3f, 0.1f, 1.0f);
-        heightFalloffStart = 300.0;
+        heightFalloffStart = 400.0;
         heightFalloffSpeed = 500.0;
         speedReflection = 0.1;
         speedRefraction = -0.05;
@@ -450,9 +449,9 @@ public class WaterNode extends Node {
         waterShader._needSendShader = true;
 
         try {
-            blurShaderVertical.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setVertexShader(WaterNode.class.getClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setFragmentShader(WaterNode.class.getClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);

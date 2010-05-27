@@ -26,9 +26,6 @@ public class ExtendedCamera extends Camera {
     /** The corners of the camera frustum. */
     protected final Vector3[] _corners = new Vector3[8];
 
-    /** The center of the camera frustum. */
-    protected final Vector3 _center = new Vector3();
-
     /** Temporary vector used for storing extents during corner calculations. */
     protected final Vector3 _extents = new Vector3();
 
@@ -36,8 +33,7 @@ public class ExtendedCamera extends Camera {
      * Instantiates a new PSSM camera.
      */
     public ExtendedCamera() {
-        super(0, 0); // copy later
-        init();
+        this(0, 0); // copy later
     }
 
     /**
