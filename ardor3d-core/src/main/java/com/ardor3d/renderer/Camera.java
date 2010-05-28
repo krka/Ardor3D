@@ -1175,7 +1175,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
      *            the Ray to store the result in. If false, a new Ray is created and returned.
      * @return the resulting Ray.
      */
-    public Ray3 getPickRay(final Vector2 screenPosition, final boolean flipVertical, final Ray3 store) {
+    public Ray3 getPickRay(final ReadOnlyVector2 screenPosition, final boolean flipVertical, final Ray3 store) {
         final Vector2 pos = Vector2.fetchTempInstance().set(screenPosition);
         if (flipVertical) {
             pos.setY(getHeight() - screenPosition.getY());
