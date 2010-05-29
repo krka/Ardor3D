@@ -1011,6 +1011,7 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      */
     public void clearRenderState(final RenderState.StateType type) {
         _renderStateList.remove(type);
+        markDirty(DirtyType.RenderState);
     }
 
     /**
