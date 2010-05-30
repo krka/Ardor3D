@@ -24,7 +24,7 @@ public class OutputStore {
     private final List<AttachmentPoint> _attachments = Lists.newArrayList();
 
     /** List of animation clip sources encountered during layer import. */
-    private final OuputClipSourceMap _usedClipSources = new OuputClipSourceMap();
+    private final OutputClipSourceMap _usedClipSources = new OutputClipSourceMap();
 
     public void addAttachmentPoint(final AttachmentPoint attach) {
         _attachments.add(attach);
@@ -43,7 +43,7 @@ public class OutputStore {
         return null;
     }
 
-    public OuputClipSourceMap getClipSources() {
+    public OutputClipSourceMap getClipSources() {
         return _usedClipSources;
     }
 }

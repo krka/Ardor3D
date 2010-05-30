@@ -18,7 +18,6 @@ import java.util.List;
 import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
-import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -97,7 +96,7 @@ public class SkinData implements Savable {
     public void read(final InputCapsule capsule) throws IOException {
         final String name = capsule.readString("name", "");
         try {
-            final Field field1 = AnimationClip.class.getDeclaredField("_name");
+            final Field field1 = SkinData.class.getDeclaredField("_name");
             field1.setAccessible(true);
             field1.set(this, name);
         } catch (final Exception e) {

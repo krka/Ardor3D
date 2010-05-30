@@ -19,10 +19,10 @@ import com.ardor3d.extension.animation.skeletal.util.LoggingMap;
  * This class essentially just wraps a String->ClipSource HashMap, providing extra logging when a ClipSource is not
  * found, or duplicate ClipSources are added.
  */
-public class OuputClipSourceMap extends LoggingMap<String, ClipSource> {
+public class OutputClipSourceMap extends LoggingMap<String, ClipSource> {
 
     /** our class logger */
-    private static final Logger logger = Logger.getLogger(OuputClipSourceMap.class.getName());
+    private static final Logger logger = Logger.getLogger(OutputClipSourceMap.class.getName());
 
     /**
      * Add a ClipSource to the store. Logs a warning if a source by the same name was already in the store.
@@ -33,7 +33,7 @@ public class OuputClipSourceMap extends LoggingMap<String, ClipSource> {
     public void put(final ClipSource source) {
         final String key = source.getClip().getName();
         if (_wrappedMap.put(key, source) != null) {
-            OuputClipSourceMap.logger.warning("Replaced clip source in OuputClipSourceMap with same name. " + key);
+            OutputClipSourceMap.logger.warning("Replaced clip source in OutputClipSourceMap with same name. " + key);
         }
     }
 }
