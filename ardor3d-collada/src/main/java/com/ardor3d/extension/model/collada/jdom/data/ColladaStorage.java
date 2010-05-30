@@ -10,24 +10,29 @@
 
 package com.ardor3d.extension.model.collada.jdom.data;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 import com.google.common.collect.Lists;
 
 /**
  * Data storage object meant to hold objects parsed from a Collada file that the user might want to directly access.
  */
-public class ColladaStorage {
+public class ColladaStorage implements Savable {
 
     private Node _scene;
     private final List<SkinData> _skins = Lists.newArrayList();
-    private AssetData assetData;
+    private AssetData _assetData;
 
     private final List<JointChannel> _jointChannels = Lists.newArrayList();
-    private AnimationItem animationItemRoot;
+    private AnimationItem _animationItemRoot;
 
     public void setScene(final Node scene) {
         _scene = scene;
@@ -48,11 +53,11 @@ public class ColladaStorage {
     }
 
     public AssetData getAssetData() {
-        return assetData;
+        return _assetData;
     }
 
     public void setAssetData(final AssetData assetData) {
-        this.assetData = assetData;
+        _assetData = assetData;
     }
 
     public List<JointChannel> getJointChannels() {
@@ -60,11 +65,11 @@ public class ColladaStorage {
     }
 
     public AnimationItem getAnimationItemRoot() {
-        return animationItemRoot;
+        return _animationItemRoot;
     }
 
     public void setAnimationItemRoot(final AnimationItem animationItemRoot) {
-        this.animationItemRoot = animationItemRoot;
+        _animationItemRoot = animationItemRoot;
     }
 
     public AnimationClip extractChannelsAsClip(final String name) {
@@ -73,5 +78,31 @@ public class ColladaStorage {
             clip.addChannel(channel);
         }
         return clip;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public Class<?> getClassTag() {
+        return this.getClass();
+    }
+
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        _assetData = (AssetData) capsule.readSavable("assetData", null);
+        _scene = (Node) capsule.readSavable("scene", null);
+        _skins.addAll(capsule.readSavableList("skins", new LinkedList<SkinData>()));
+        _jointChannels.clear();
+        _jointChannels.addAll(capsule.readSavableList("jointChannels", new LinkedList<JointChannel>()));
+    }
+
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_assetData, "assetData", null);
+        capsule.write(_scene, "scene", null);
+        capsule.writeSavableList(_skins, "skins", new LinkedList<SkinData>());
+        capsule.writeSavableList(_jointChannels, "jointChannels", new LinkedList<JointChannel>());
     }
 }

@@ -10,12 +10,18 @@
 
 package com.ardor3d.extension.model.collada.jdom.data;
 
+import java.io.IOException;
+
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 
 /**
  * Holds data related to asset info.
  */
-public class AssetData {
+public class AssetData implements Savable {
+
     private String author;
     private String authoringTool;
     private String comments;
@@ -146,4 +152,50 @@ public class AssetData {
         this.upAxis = upAxis;
     }
 
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public Class<? extends AssetData> getClassTag() {
+        return getClass();
+    }
+
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        author = capsule.readString("author", null);
+        authoringTool = capsule.readString("authoringTool", null);
+        comments = capsule.readString("comments", null);
+        copyright = capsule.readString("copyright", null);
+        sourceData = capsule.readString("sourceData", null);
+        created = capsule.readString("created", null);
+        keywords = capsule.readString("keywords", null);
+        modified = capsule.readString("modified", null);
+        revision = capsule.readString("revision", null);
+        subject = capsule.readString("subject", null);
+        title = capsule.readString("title", null);
+        unitName = capsule.readString("unitName", null);
+        unitMeter = capsule.readFloat("unitMeter", 0f);
+        upAxis = (ReadOnlyVector3) capsule.readSavable("upAxis", null);
+    }
+
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(author, "author", null);
+        capsule.write(authoringTool, "authoringTool", null);
+        capsule.write(comments, "comments", null);
+        capsule.write(copyright, "copyright", null);
+        capsule.write(sourceData, "sourceData", null);
+        capsule.write(created, "created", null);
+        capsule.write(keywords, "keywords", null);
+        capsule.write(modified, "modified", null);
+        capsule.write(revision, "revision", null);
+        capsule.write(subject, "subject", null);
+        capsule.write(title, "title", null);
+        capsule.write(unitName, "unitName", null);
+        capsule.write(unitMeter, "unitMeter", 0f);
+        if (upAxis instanceof Savable) {
+            capsule.write((Savable) upAxis, "upAxis", null);
+        }
+    }
 }
