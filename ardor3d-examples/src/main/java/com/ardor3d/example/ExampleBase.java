@@ -65,6 +65,8 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.renderer.ContextCapabilities;
+import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.jogl.JoglTextureRendererProvider;
@@ -154,6 +156,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
 
     @MainThread
     public void init() {
+        final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
+        logger.info("Display Vendor: " + caps.getDisplayVendor());
+        logger.info("Display Renderer: " + caps.getDisplayRenderer());
+        logger.info("Display Version: " + caps.getDisplayVersion());
 
         registerInputTriggers();
 

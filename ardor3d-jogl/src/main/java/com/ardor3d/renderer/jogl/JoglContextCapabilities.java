@@ -190,5 +190,23 @@ public final class JoglContextCapabilities extends ContextCapabilities {
                 .isExtensionAvailable("GL_EXT_texture_mirror_clamp");
         _supportsBorderClamp = gl.isExtensionAvailable("GL_ARB_texture_border_clamp");
         _supportsEdgeClamp = _supportsGL1_2;
+
+        try {
+            _displayVendor = gl.glGetString(GL.GL_VENDOR);
+        } catch (final Exception e) {
+            _displayVendor = "Unable to retrieve vendor.";
+        }
+
+        try {
+            _displayRenderer = gl.glGetString(GL.GL_RENDERER);
+        } catch (final Exception e) {
+            _displayRenderer = "Unable to retrieve adapter details.";
+        }
+
+        try {
+            _displayVersion = gl.glGetString(GL.GL_VERSION);
+        } catch (final Exception e) {
+            _displayVersion = "Unable to retrieve API version.";
+        }
     }
 }

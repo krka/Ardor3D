@@ -115,6 +115,10 @@ public class ContextCapabilities {
     protected boolean _supportsBorderClamp;
     protected boolean _supportsEdgeClamp;
 
+    protected String _displayVendor;
+    protected String _displayRenderer;
+    protected String _displayVersion;
+
     /**
      * @return true if we support Vertex Buffer Objects.
      */
@@ -471,4 +475,30 @@ public class ContextCapabilities {
         return _maxFBOSamples;
     }
 
+    /**
+     * Returns the vendor of the graphics adapter
+     * 
+     * @return The vendor of the graphics adapter
+     */
+    public String getDisplayVendor() {
+        return _displayVendor;
+    }
+
+    /**
+     * Returns renderer details of the adapter
+     * 
+     * @return The adapter details
+     */
+    public String getDisplayRenderer() {
+        return _displayRenderer;
+    }
+
+    /**
+     * Returns the version supported
+     * 
+     * @return The version supported
+     */
+    public String getDisplayVersion() {
+        return _displayVersion;
+    }
 }

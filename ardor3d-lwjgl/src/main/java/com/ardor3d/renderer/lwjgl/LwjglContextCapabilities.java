@@ -187,6 +187,22 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _supportsBorderClamp = caps.GL_ARB_texture_border_clamp;
         _supportsEdgeClamp = _supportsGL1_2;
 
-    }
+        try {
+            _displayVendor = GL11.glGetString(GL11.GL_VENDOR);
+        } catch (final Exception e) {
+            _displayVendor = "Unable to retrieve vendor.";
+        }
 
+        try {
+            _displayRenderer = GL11.glGetString(GL11.GL_RENDERER);
+        } catch (final Exception e) {
+            _displayRenderer = "Unable to retrieve adapter details.";
+        }
+
+        try {
+            _displayVersion = GL11.glGetString(GL11.GL_VERSION);
+        } catch (final Exception e) {
+            _displayVersion = "Unable to retrieve API version.";
+        }
+    }
 }
