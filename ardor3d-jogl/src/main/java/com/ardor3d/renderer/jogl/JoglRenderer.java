@@ -757,9 +757,7 @@ public class JoglRenderer extends AbstractRenderer {
                     if (valid && !wasOn) {
                         continue;
                     } else {
-                        if (caps.isMultitextureSupported()) {
-                            gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                         // disable bit in tracking int
                         enabledTextures &= ~(2 << i);
@@ -773,9 +771,7 @@ public class JoglRenderer extends AbstractRenderer {
                         continue;
                     }
                 } else {
-                    if (caps.isMultitextureSupported()) {
-                        gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                    }
+                    checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                     if (!valid || !wasOn) {
                         // enable state
@@ -1038,9 +1034,7 @@ public class JoglRenderer extends AbstractRenderer {
                     if (valid && !wasOn) {
                         continue;
                     } else {
-                        if (caps.isMultitextureSupported()) {
-                            gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                         // disable bit in tracking int
                         enabledTextures &= ~(2 << i);
@@ -1054,10 +1048,7 @@ public class JoglRenderer extends AbstractRenderer {
                         continue;
                     }
                 } else {
-
-                    if (caps.isMultitextureSupported()) {
-                        gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                    }
+                    checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                     // grab a vboID and make sure it exists and is up to date.
                     final FloatBufferData data = textureCoords.get(i);
@@ -1161,9 +1152,7 @@ public class JoglRenderer extends AbstractRenderer {
                         if (valid && !wasOn) {
                             continue;
                         } else {
-                            if (caps.isMultitextureSupported()) {
-                                gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                            }
+                            checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                             // disable bit in tracking int
                             enabledTextures &= ~(2 << i);
@@ -1178,10 +1167,7 @@ public class JoglRenderer extends AbstractRenderer {
                         }
 
                     } else {
-
-                        if (caps.isMultitextureSupported()) {
-                            gl.glClientActiveTexture(GL.GL_TEXTURE0 + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, gl, rendRecord, caps);
 
                         // grab a vboID and make sure it exists and is up to date.
                         final FloatBufferData textureBufferData = textureCoords.get(i);
@@ -1747,5 +1733,13 @@ public class JoglRenderer extends AbstractRenderer {
         final RendererRecord record = context.getRendererRecord();
 
         JoglRendererUtil.setClippingEnabled(record, enabled);
+    }
+
+    public void checkAndSetTextureArrayUnit(final int unit, final GL gl, final RendererRecord record,
+            final ContextCapabilities caps) {
+        if (record.getCurrentTextureArraysUnit() != unit && caps.isMultitextureSupported()) {
+            gl.glClientActiveTexture(GL.GL_TEXTURE0 + unit);
+            record.setCurrentTextureArraysUnit(unit);
+        }
     }
 }

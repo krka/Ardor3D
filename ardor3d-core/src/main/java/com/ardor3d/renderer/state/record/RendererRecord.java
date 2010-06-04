@@ -30,6 +30,7 @@ public class RendererRecord extends StateRecord {
     private int _normalMode = -1; // signifies disabled
     private int _enabledTextures = 0;
     private boolean _texturesValid = false;
+    private int _currentTextureArraysUnit = 0;
 
     @Override
     public void invalidate() {
@@ -39,6 +40,7 @@ public class RendererRecord extends StateRecord {
         _clippingTestValid = false;
         _texturesValid = false;
         _normalMode = -1;
+        _currentTextureArraysUnit = -1;
     }
 
     @Override
@@ -159,5 +161,13 @@ public class RendererRecord extends StateRecord {
 
     public void setTexturesValid(final boolean texturesValid) {
         _texturesValid = texturesValid;
+    }
+
+    public int getCurrentTextureArraysUnit() {
+        return _currentTextureArraysUnit;
+    }
+
+    public void setCurrentTextureArraysUnit(final int currentTextureArraysUnit) {
+        _currentTextureArraysUnit = currentTextureArraysUnit;
     }
 }

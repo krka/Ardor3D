@@ -719,9 +719,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     if (valid && !wasOn) {
                         continue;
                     } else {
-                        if (caps.isMultitextureSupported()) {
-                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                         // disable bit in tracking int
                         enabledTextures &= ~(2 << i);
@@ -735,9 +733,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         continue;
                     }
                 } else {
-                    if (caps.isMultitextureSupported()) {
-                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                    }
+                    checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                     if (!valid || !wasOn) {
                         // enable state
@@ -999,9 +995,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     if (valid && !wasOn) {
                         continue;
                     } else {
-                        if (caps.isMultitextureSupported()) {
-                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                         // disable bit in tracking int
                         enabledTextures &= ~(2 << i);
@@ -1015,10 +1009,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         continue;
                     }
                 } else {
-
-                    if (caps.isMultitextureSupported()) {
-                        ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                    }
+                    checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                     // grab a vboID and make sure it exists and is up to date.
                     final FloatBufferData data = textureCoords.get(i);
@@ -1120,9 +1111,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         if (valid && !wasOn) {
                             continue;
                         } else {
-                            if (caps.isMultitextureSupported()) {
-                                ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                            }
+                            checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                             // disable bit in tracking int
                             enabledTextures &= ~(2 << i);
@@ -1137,10 +1126,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         }
 
                     } else {
-
-                        if (caps.isMultitextureSupported()) {
-                            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + i);
-                        }
+                        checkAndSetTextureArrayUnit(i, rendRecord, caps);
 
                         // grab a vboID and make sure it exists and is up to date.
                         final FloatBufferData textureBufferData = textureCoords.get(i);
@@ -1690,5 +1676,12 @@ public class LwjglRenderer extends AbstractRenderer {
         final RendererRecord record = context.getRendererRecord();
 
         LwjglRendererUtil.setClippingEnabled(record, enabled);
+    }
+
+    public void checkAndSetTextureArrayUnit(final int unit, final RendererRecord record, final ContextCapabilities caps) {
+        if (record.getCurrentTextureArraysUnit() != unit && caps.isMultitextureSupported()) {
+            ARBMultitexture.glClientActiveTextureARB(ARBMultitexture.GL_TEXTURE0_ARB + unit);
+            record.setCurrentTextureArraysUnit(unit);
+        }
     }
 }
