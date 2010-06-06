@@ -54,15 +54,15 @@ public class CurveInterpolationController extends Vector3InterpolationController
          * If constant speed we need to also check we aren't clamped at max index before we call lookup in the arc
          * length table because there would be no point
          */
-        if (isConstantSpeed() && (!RepeatType.CLAMP.equals(getRepeatType()) || getIndex() != getMaximumIndex())) {
+        if (isConstantSpeed()) {
             _distance += by;
 
             if (isCycleForward()) {
-                assert (null != _arcLengths) : "You need to call generateArcLengths() to create the required arc length tables!";
+                assert (null != _arcLengths) : "You need to call generateArcLengths(x, false) to create the required arc length table!";
 
                 delta = _arcLengths.getDelta(getIndex(), _distance);
             } else {
-                assert (null != _arcLengthsReverse) : "You need to call generateArcLengths() to create the required arc length tables!";
+                assert (null != _arcLengthsReverse) : "You need to call generateArcLengths(x, true) to create the required reverse arc length table!";
 
                 delta = _arcLengthsReverse.getDelta(getIndex(), _distance);
             }
@@ -75,6 +75,9 @@ public class CurveInterpolationController extends Vector3InterpolationController
         return delta;
     }
 
+    /*
+     * Overrides to handle updating the travelled distance correctly (used during constant speed mode)
+     */
     @Override
     protected int decrementIndex() {
         assert (null != _arcLengthsReverse) : "You need to call generateArcLengths() to create the required arc length tables!";
@@ -84,6 +87,9 @@ public class CurveInterpolationController extends Vector3InterpolationController
         return super.decrementIndex();
     }
 
+    /*
+     * Overrides to handle updating the travelled distance correctly (used during constant speed mode)
+     */
     @Override
     protected int incrementIndex() {
         assert (null != _arcLengths) : "You need to call generateArcLengths() to create the required arc length tables!";
@@ -232,7 +238,8 @@ public class CurveInterpolationController extends Vector3InterpolationController
      * @param step
      *            'See Also:' method for more info.
      * @param reverse
-     *            'See Also:' method for more info.
+     *            <code>true</code> to also generate a reverse look up table. This is only required if you plan to use
+     *            the {@link ComplexSpatialController.RepeatType#CYCLE} repeat type.
      * @see ArcLengthTable#generate(int, boolean)
      */
     public void generateArcLengths(final int step, final boolean reverse) {
@@ -263,6 +270,9 @@ public class CurveInterpolationController extends Vector3InterpolationController
         return super.getMinimumIndex() + 1;
     }
 
+    /*
+     * Overrides to also reset the distance.
+     */
     @Override
     public void reset() {
         super.reset();

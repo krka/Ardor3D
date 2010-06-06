@@ -204,7 +204,7 @@ public class ArcLengthTable implements Serializable {
                  * 0.998 for that index we'd fail to find a valid entry and error out)
                  */
                 if (t > InterpolationController.DELTA_MAX) {
-                    t = 1.0;
+                    t = InterpolationController.DELTA_MAX;
                 }
 
                 _curve.interpolate(startIndex, endIndex, t, target);
@@ -215,7 +215,7 @@ public class ArcLengthTable implements Serializable {
 
                 entries.add(new ArcLengthEntry(t, length));
 
-                if (t == 1.0) {
+                if (t == InterpolationController.DELTA_MAX) {
                     break;
                 }
             }

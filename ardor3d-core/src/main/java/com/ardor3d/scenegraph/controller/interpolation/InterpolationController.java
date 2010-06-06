@@ -81,7 +81,7 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
      */
     @Override
     public void update(final double time, final T caller) {
-        if (isActive() && null != caller && getSpeed() > 0.0) {
+        if (shouldUpdate(time, caller)) {
 
             updateDeltaAndIndex(time);
 
@@ -97,6 +97,10 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
             interpolate(getControlFrom(), getControlTo(), getDelta(), caller);
         }
+    }
+
+    private boolean shouldUpdate(final double time, final T caller) {
+        return isActive() && null != caller && time > 0.0 && getSpeed() > 0.0 && !isClamped();
     }
 
     /**
@@ -401,6 +405,14 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
         setCycleForward(true);
         setDelta(DELTA_MIN);
         setIndex(getMinimumIndex());
+    }
+
+    /**
+     * @return <code>true</code> if this controllers {@link #getRepeatType() repeat type} is
+     *         {@link ComplexSpatialController.RepeatType#CLAMP clamp} and its currently clamped at the maximum index.
+     */
+    public boolean isClamped() {
+        return isRepeatTypeClamp() && getIndex() == getMaximumIndex();
     }
 
 }

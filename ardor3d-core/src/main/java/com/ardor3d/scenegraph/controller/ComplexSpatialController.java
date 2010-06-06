@@ -78,9 +78,7 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
     private boolean _active = true;
 
     /**
-     * Returns the speed of this controller. Speed is 1 by default.
-     * 
-     * @return
+     * @return The speed of this controller. Speed is 1 by default.
      */
     public double getSpeed() {
         return _speed;
@@ -175,6 +173,30 @@ public abstract class ComplexSpatialController<T extends Spatial> implements Spa
      */
     public boolean isActive() {
         return _active;
+    }
+
+    /**
+     * @return <code>true</code> if the {@link #getRepeatType() repeat type} is {@link RepeatType#CLAMP clamp},
+     *         <code>false</code> otherwise.
+     */
+    public boolean isRepeatTypeClamp() {
+        return RepeatType.CLAMP.equals(getRepeatType());
+    }
+
+    /**
+     * @return <code>true</code> if the {@link #getRepeatType() repeat type} is {@link RepeatType#WRAP wrap},
+     *         <code>false</code> otherwise.
+     */
+    public boolean isRepeatTypeWrap() {
+        return RepeatType.WRAP.equals(getRepeatType());
+    }
+
+    /**
+     * @return <code>true</code> if the {@link #getRepeatType() repeat type} is {@link RepeatType#CYCLE cycle},
+     *         <code>false</code> otherwise.
+     */
+    public boolean isRepeatTypeCycle() {
+        return RepeatType.CYCLE.equals(getRepeatType());
     }
 
     public abstract void update(double time, T caller);
