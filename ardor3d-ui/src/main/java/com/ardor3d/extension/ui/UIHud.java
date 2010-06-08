@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
-import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
@@ -377,7 +376,7 @@ public class UIHud extends Node {
      * @param forwardTo
      *            a LogicalLayer to send unconsumed (by the UI) input events to.
      */
-    public void setupInput(final NativeCanvas canvas, final PhysicalLayer physicalLayer, final LogicalLayer forwardTo) {
+    public void setupInput(final Canvas canvas, final PhysicalLayer physicalLayer, final LogicalLayer forwardTo) {
         // Set up this logical layer to listen for events from the given canvas and PhysicalLayer
         _logicalLayer.registerInput(canvas, physicalLayer);
 
