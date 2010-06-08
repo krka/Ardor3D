@@ -45,7 +45,7 @@ public class UIFrame extends UIContainer {
     private boolean _decorated = true;
 
     /** The drag listener responsible for allowing repositioning of the frame by dragging the title label. */
-    private final FrameDragListener _dragListener = new FrameDragListener();
+    private FrameDragListener _dragListener = new FrameDragListener();
 
     /** If true, show a resize handle on this frame and allow its use. */
     private boolean _resizeable = true;
@@ -383,6 +383,23 @@ public class UIFrame extends UIContainer {
             return UIFrame.findParentFrame((UIComponent) component.getParent());
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Set a new drag listener on this frame.
+     * 
+     * @param listener
+     *            the drag listener. Must not be null.
+     */
+    public void setDragListener(final FrameDragListener listener) {
+        assert listener != null : "listener must not be null";
+        if (isAttachedToHUD()) {
+            getHud().removeDragListener(_dragListener);
+        }
+        _dragListener = listener;
+        if (isAttachedToHUD()) {
+            getHud().addDragListener(_dragListener);
         }
     }
 
