@@ -738,7 +738,8 @@ public abstract class UIComponent extends Node {
     public void attachedToHud() {}
 
     /**
-     * Override to provide an action to take when this component or its top level component are removed to a UIHud.
+     * Override to provide an action to take just before this component or its top level component are removed from a
+     * UIHud.
      */
     public void detachedFromHud() {}
 
