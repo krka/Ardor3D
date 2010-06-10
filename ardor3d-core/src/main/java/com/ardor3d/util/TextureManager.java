@@ -214,9 +214,9 @@ final public class TextureManager {
 
         // Default to Texture2D
         if (result == null) {
-            if (img.getData().size() == 6) {
+            if (img.getDataSize() == 6) {
                 result = new TextureCubeMap();
-            } else if (img.getData().size() != 1) {
+            } else if (img.getDataSize() > 1) {
                 result = new Texture3D();
             } else {
                 result = new Texture2D();

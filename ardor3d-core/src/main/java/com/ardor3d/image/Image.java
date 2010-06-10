@@ -275,6 +275,17 @@ public class Image implements Serializable, Savable {
     }
 
     /**
+     * @return the number of individual data buffers or slices in this Image.
+     */
+    public int getDataSize() {
+        if (_data == null) {
+            return 0;
+        } else {
+            return _data.size();
+        }
+    }
+
+    /**
      * <code>getData</code> returns the data for this image at a given index. If the data is undefined, null will be
      * returned.
      * 
