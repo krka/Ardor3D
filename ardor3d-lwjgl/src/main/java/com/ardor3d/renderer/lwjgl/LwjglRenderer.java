@@ -15,7 +15,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,7 +49,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.ColorMaskState;
@@ -110,31 +108,14 @@ import com.ardor3d.util.stat.StatType;
 public class LwjglRenderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(LwjglRenderer.class.getName());
 
-    // TODO: move these to a context record.
-    private FloatBuffer _oldVertexBuffer;
-
-    private FloatBuffer _oldNormalBuffer;
-
-    private FloatBuffer _oldColorBuffer;
-
-    private FloatBuffer _oldFogBuffer;
-
-    private final FloatBuffer[] _oldTextureBuffers;
-
     private final FloatBuffer _transformBuffer = BufferUtils.createFloatBuffer(16);
-
     private final Matrix4 _transformMatrix = new Matrix4();
 
     /**
      * Constructor instantiates a new <code>LwjglRenderer</code> object.
      */
     public LwjglRenderer() {
-
         logger.fine("LwjglRenderer created.");
-
-        _queue = new RenderQueue();
-
-        _oldTextureBuffers = new FloatBuffer[TextureState.MAX_TEXTURES];
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA color) {
@@ -216,8 +197,6 @@ public class LwjglRenderer extends AbstractRenderer {
     public void flushFrame(final boolean doSwap) {
         renderBuckets();
 
-        reset();
-
         GL11.glFlush();
         if (doSwap) {
             doApplyState(defaultStateList.get(RenderState.StateType.ColorMask));
@@ -234,12 +213,6 @@ public class LwjglRenderer extends AbstractRenderer {
         if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_FRAMES, 1);
         }
-    }
-
-    // XXX: look more at this
-    public void reset() {
-        _oldColorBuffer = _oldNormalBuffer = _oldVertexBuffer = null;
-        Arrays.fill(_oldTextureBuffers, null);
     }
 
     public void setOrtho() {
@@ -647,13 +620,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (vertexBuffer == null) {
             GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-        } else if (_oldVertexBuffer != vertexBuffer) {
+        } else {
             GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
             vertexBuffer.rewind();
             GL11.glVertexPointer(vertexBufferData.getValuesPerTuple(), 0, vertexBuffer);
         }
-
-        _oldVertexBuffer = vertexBuffer;
     }
 
     public void setupNormalData(final FloatBufferData normalBufferData) {
@@ -661,13 +632,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (normalBuffer == null) {
             GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-        } else if (_oldNormalBuffer != normalBuffer) {
+        } else {
             GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
             normalBuffer.rewind();
             GL11.glNormalPointer(0, normalBuffer);
         }
-
-        _oldNormalBuffer = normalBuffer;
     }
 
     public void setupColorData(final FloatBufferData colorBufferData) {
@@ -675,13 +644,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (colorBuffer == null) {
             GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
-        } else if (_oldColorBuffer != colorBuffer) {
+        } else {
             GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
             colorBuffer.rewind();
             GL11.glColorPointer(colorBufferData.getValuesPerTuple(), 0, colorBuffer);
         }
-
-        _oldColorBuffer = colorBuffer;
     }
 
     public void setupFogData(final FloatBufferData fogBufferData) {
@@ -689,13 +656,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
         if (fogBuffer == null) {
             GL11.glDisableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
-        } else if (_oldFogBuffer != fogBuffer) {
+        } else {
             GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
             fogBuffer.rewind();
             EXTFogCoord.glFogCoordPointerEXT(0, fogBuffer);
         }
-
-        _oldFogBuffer = fogBuffer;
     }
 
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
@@ -727,9 +692,6 @@ public class LwjglRenderer extends AbstractRenderer {
                         // disable state
                         GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
-                        // discard old comparison buffer
-                        _oldTextureBuffers[i] = null;
-
                         continue;
                     }
                 } else {
@@ -746,13 +708,9 @@ public class LwjglRenderer extends AbstractRenderer {
                     final FloatBufferData textureBufferData = textureCoords.get(i);
                     final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
 
-                    if (_oldTextureBuffers[i] != textureBuffer) {
-                        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        textureBuffer.rewind();
-                        GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), 0, textureBuffer);
-                    }
-
-                    _oldTextureBuffers[i] = textureBuffer;
+                    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    textureBuffer.rewind();
+                    GL11.glTexCoordPointer(textureBufferData.getValuesPerTuple(), 0, textureBuffer);
                 }
             }
         }
@@ -1003,9 +961,6 @@ public class LwjglRenderer extends AbstractRenderer {
                         // disable state
                         GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
-                        // discard old comparison buffer
-                        _oldTextureBuffers[i] = null;
-
                         continue;
                     }
                 } else {
@@ -1118,9 +1073,6 @@ public class LwjglRenderer extends AbstractRenderer {
 
                             // disable state
                             GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-
-                            // discard old comparison buffer
-                            _oldTextureBuffers[i] = null;
 
                             continue;
                         }
@@ -1634,9 +1586,6 @@ public class LwjglRenderer extends AbstractRenderer {
      */
     public void renderDisplayList(final int displayListID) {
         GL11.glCallList(displayListID);
-
-        // invalidate "current arrays"
-        reset();
     }
 
     public void clearClips() {

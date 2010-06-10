@@ -15,7 +15,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
@@ -46,7 +45,6 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.queue.RenderQueue;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.ColorMaskState;
@@ -106,18 +104,7 @@ import com.ardor3d.util.stat.StatType;
 public class JoglRenderer extends AbstractRenderer {
     private static final Logger logger = Logger.getLogger(JoglRenderer.class.getName());
 
-    private FloatBuffer _oldVertexBuffer;
-
-    private FloatBuffer _oldNormalBuffer;
-
-    private FloatBuffer _oldColorBuffer;
-
-    private FloatBuffer _oldFogBuffer;
-
-    private final FloatBuffer[] _oldTextureBuffers;
-
     private final FloatBuffer _transformBuffer = BufferUtils.createFloatBuffer(16);
-
     private final Matrix4 _transformMatrix = new Matrix4();
 
     /**
@@ -125,10 +112,6 @@ public class JoglRenderer extends AbstractRenderer {
      */
     public JoglRenderer() {
         logger.fine("JoglRenderer created.");
-
-        _queue = new RenderQueue();
-
-        _oldTextureBuffers = new FloatBuffer[TextureState.MAX_TEXTURES];
     }
 
     public void setBackgroundColor(final ReadOnlyColorRGBA c) {
@@ -215,8 +198,6 @@ public class JoglRenderer extends AbstractRenderer {
 
         renderBuckets();
 
-        reset();
-
         gl.glFlush();
         if (doSwap) {
 
@@ -236,12 +217,6 @@ public class JoglRenderer extends AbstractRenderer {
         if (Constants.stats) {
             StatCollector.addStat(StatType.STAT_FRAMES, 1);
         }
-    }
-
-    // XXX: look more at this
-    public void reset() {
-        _oldColorBuffer = _oldNormalBuffer = _oldVertexBuffer = null;
-        Arrays.fill(_oldTextureBuffers, null);
     }
 
     public void setOrtho() {
@@ -677,13 +652,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (vertexBuffer == null) {
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-        } else if (_oldVertexBuffer != vertexBuffer) {
+        } else {
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
             vertexBuffer.rewind();
             gl.glVertexPointer(vertexBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, vertexBuffer);
         }
-
-        _oldVertexBuffer = vertexBuffer;
     }
 
     public void setupNormalData(final FloatBufferData normalBufferData) {
@@ -693,13 +666,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (normalBuffer == null) {
             gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
-        } else if (_oldNormalBuffer != normalBuffer) {
+        } else {
             gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
             normalBuffer.rewind();
             gl.glNormalPointer(GL.GL_FLOAT, 0, normalBuffer);
         }
-
-        _oldNormalBuffer = normalBuffer;
     }
 
     public void setupColorData(final FloatBufferData colorBufferData) {
@@ -709,13 +680,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (colorBuffer == null) {
             gl.glDisableClientState(GL.GL_COLOR_ARRAY);
-        } else if (_oldColorBuffer != colorBuffer) {
+        } else {
             gl.glEnableClientState(GL.GL_COLOR_ARRAY);
             colorBuffer.rewind();
             gl.glColorPointer(colorBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, colorBuffer);
         }
-
-        _oldColorBuffer = colorBuffer;
     }
 
     public void setupFogData(final FloatBufferData fogBufferData) {
@@ -725,13 +694,11 @@ public class JoglRenderer extends AbstractRenderer {
 
         if (fogBuffer == null) {
             gl.glDisableClientState(GL.GL_FOG_COORDINATE_ARRAY);
-        } else if (_oldFogBuffer != fogBuffer) {
+        } else {
             gl.glEnableClientState(GL.GL_FOG_COORDINATE_ARRAY);
             fogBuffer.rewind();
             gl.glFogCoordPointer(GL.GL_FLOAT, 0, fogBuffer);
         }
-
-        _oldFogBuffer = fogBuffer;
     }
 
     public void setupTextureData(final List<FloatBufferData> textureCoords) {
@@ -765,9 +732,6 @@ public class JoglRenderer extends AbstractRenderer {
                         // disable state
                         gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
 
-                        // discard old comparison buffer
-                        _oldTextureBuffers[i] = null;
-
                         continue;
                     }
                 } else {
@@ -784,13 +748,9 @@ public class JoglRenderer extends AbstractRenderer {
                     final FloatBufferData textureBufferData = textureCoords.get(i);
                     final FloatBuffer textureBuffer = textureBufferData != null ? textureBufferData.getBuffer() : null;
 
-                    if (_oldTextureBuffers[i] != textureBuffer) {
-                        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                        textureBuffer.rewind();
-                        gl.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, textureBuffer);
-                    }
-
-                    _oldTextureBuffers[i] = textureBuffer;
+                    gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+                    textureBuffer.rewind();
+                    gl.glTexCoordPointer(textureBufferData.getValuesPerTuple(), GL.GL_FLOAT, 0, textureBuffer);
                 }
             }
         }
@@ -1042,9 +1002,6 @@ public class JoglRenderer extends AbstractRenderer {
                         // disable state
                         gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
 
-                        // discard old comparison buffer
-                        _oldTextureBuffers[i] = null;
-
                         continue;
                     }
                 } else {
@@ -1159,9 +1116,6 @@ public class JoglRenderer extends AbstractRenderer {
 
                             // disable state
                             gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-
-                            // discard old comparison buffer
-                            _oldTextureBuffers[i] = null;
 
                             continue;
                         }
@@ -1691,9 +1645,6 @@ public class JoglRenderer extends AbstractRenderer {
         final GL gl = GLU.getCurrentGL();
 
         gl.glCallList(displayListID);
-
-        // invalidate "current arrays"
-        reset();
     }
 
     public void clearClips() {

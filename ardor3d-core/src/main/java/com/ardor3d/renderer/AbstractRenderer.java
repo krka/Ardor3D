@@ -34,7 +34,7 @@ public abstract class AbstractRenderer implements Renderer {
 
     protected boolean _processingQueue;
 
-    protected RenderQueue _queue;
+    protected RenderQueue _queue = new RenderQueue();
 
     protected boolean _inOrthoMode;
 
