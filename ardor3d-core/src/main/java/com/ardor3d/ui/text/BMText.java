@@ -181,7 +181,7 @@ public class BMText extends Mesh {
         if (_font.getOutlineWidth() > 1) {
             _spacing = _font.getOutlineWidth() - 1;
         }
-        getMeshData().setIndexMode(IndexMode.Quads);
+        getMeshData().setIndexMode(IndexMode.Triangles);
         getSceneHints().setLightCombineMode(LightCombineMode.Off);
         getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
 
@@ -506,7 +506,7 @@ public class BMText extends Mesh {
      */
     protected void checkBuffers(final String text) {
         final int chunkSize = 20;
-        final int vertices = 4 * text.length();
+        final int vertices = 6 * text.length();
         final int chunks = 1 + (vertices / chunkSize);
         final int required = chunks * chunkSize;
         if (_indexBuffer == null || _indexBuffer.capacity() < required) {
@@ -617,8 +617,10 @@ public class BMText extends Mesh {
 
                 vertices.put(l).put(0).put(t); // left top
                 vertices.put(l).put(0).put(b); // left bottom
-                vertices.put(r).put(0).put(b); // right bottom
                 vertices.put(r).put(0).put(t); // right top
+                vertices.put(r).put(0).put(t); // right top
+                vertices.put(l).put(0).put(b); // left bottom
+                vertices.put(r).put(0).put(b); // right bottom
 
                 // -- tex coords ----------------
                 l = chr.x / txW;
@@ -628,8 +630,10 @@ public class BMText extends Mesh {
 
                 texCrds.put(l).put(t); // left top
                 texCrds.put(l).put(b); // left bottom
-                texCrds.put(r).put(b); // right bottom
                 texCrds.put(r).put(t); // right top
+                texCrds.put(r).put(t); // right top
+                texCrds.put(l).put(b); // left bottom
+                texCrds.put(r).put(b); // right bottom
 
                 int nextVal = 0;
                 if (i < strLen - 1) {
