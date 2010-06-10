@@ -423,7 +423,6 @@ public final class TgaLoader implements ImageLoader {
             }
         }
 
-        is.close();
         // Get a pointer to the image memory
         final ByteBuffer scratch = BufferUtils.createByteBuffer(rawData.length);
         scratch.clear();
