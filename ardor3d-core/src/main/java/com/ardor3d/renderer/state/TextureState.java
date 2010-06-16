@@ -27,6 +27,7 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 
 /**
@@ -68,6 +69,9 @@ public class TextureState extends RenderState {
 
     public transient TextureKey[] _keyCache = new TextureKey[MAX_TEXTURES];
 
+    public static ResourceSource DEFAULT_TEXTURE_SOURCE = new URLResourceSource(TextureState.class
+            .getResource("notloaded.tga"));
+
     /**
      * Constructor instantiates a new <code>TextureState</code> object.
      */
@@ -77,8 +81,8 @@ public class TextureState extends RenderState {
                 defaultTextureLoaded = true;
 
                 try {
-                    _defaultTexture = TextureManager.load(new URLResourceSource(TextureState.class
-                            .getResource("notloaded.tga")), Texture.MinificationFilter.Trilinear, true);
+                    _defaultTexture = TextureManager.load(DEFAULT_TEXTURE_SOURCE, Texture.MinificationFilter.Trilinear,
+                            true);
                 } catch (final Exception e) {
                     logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
                 }
