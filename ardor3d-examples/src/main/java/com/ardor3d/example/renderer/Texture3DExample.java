@@ -75,7 +75,6 @@ public class Texture3DExample extends ExampleBase {
         final Image img = new Image();
         img.setWidth(32);
         img.setHeight(32);
-        img.setDepth(32);
 
         final List<ByteBuffer> data = Lists.newArrayList();
         for (int i = 0; i < 32; i++) {
