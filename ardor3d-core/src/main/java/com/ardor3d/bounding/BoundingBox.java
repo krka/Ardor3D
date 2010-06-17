@@ -910,11 +910,4 @@ public class BoundingBox extends BoundingVolume {
     public double getVolume() {
         return (8 * getXExtent() * getYExtent() * getZExtent());
     }
-
-    public static void main(final String[] args) {
-        final BoundingBox bbox = new BoundingBox(new Vector3(), 8, 0, 12);
-        final BoundingBox bbox2 = new BoundingBox(new Vector3(), 8, 1, 12);
-        final BoundingBox bbox3 = (BoundingBox) bbox.merge(bbox2);
-        System.err.println(bbox3);
-    }
 }
