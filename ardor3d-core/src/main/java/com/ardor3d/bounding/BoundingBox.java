@@ -509,20 +509,20 @@ public class BoundingBox extends BoundingVolume {
      *            the y extent of the box to merge with.
      * @param boxZ
      *            the z extent of the box to merge with.
-     * @param rVal
-     *            the resulting merged box.
+     * @param store
+     *            the box to store our results in.
      * @return the resulting merged box.
      */
     private BoundingBox merge(final Vector3 boxCenter, final double boxX, final double boxY, final double boxZ,
-            final BoundingBox rVal) {
+            final BoundingBox store) {
         // check for infinite bounds to prevent NaN values
         if (Double.isInfinite(getXExtent()) || Double.isInfinite(getYExtent()) || Double.isInfinite(getZExtent())
                 || Double.isInfinite(boxX) || Double.isInfinite(boxY) || Double.isInfinite(boxZ)) {
-            rVal.setCenter(Vector3.ZERO);
-            rVal.setXExtent(Double.POSITIVE_INFINITY);
-            rVal.setYExtent(Double.POSITIVE_INFINITY);
-            rVal.setZExtent(Double.POSITIVE_INFINITY);
-            return rVal;
+            store.setCenter(Vector3.ZERO);
+            store.setXExtent(Double.POSITIVE_INFINITY);
+            store.setYExtent(Double.POSITIVE_INFINITY);
+            store.setZExtent(Double.POSITIVE_INFINITY);
+            return store;
         }
 
         final Vector3 compVect1 = Vector3.fetchTempInstance();
@@ -554,16 +554,16 @@ public class BoundingBox extends BoundingVolume {
             compVect2.setZ(boxCenter.getZ() + boxZ);
         }
 
-        _center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5);
+        store._center.set(compVect2).addLocal(compVect1).multiplyLocal(0.5);
 
-        setXExtent(compVect2.getX() - _center.getX());
-        setYExtent(compVect2.getY() - _center.getY());
-        setZExtent(compVect2.getZ() - _center.getZ());
+        store.setXExtent(compVect2.getX() - store._center.getX());
+        store.setYExtent(compVect2.getY() - store._center.getY());
+        store.setZExtent(compVect2.getZ() - store._center.getZ());
 
         Vector3.releaseTempInstance(compVect1);
         Vector3.releaseTempInstance(compVect2);
 
-        return rVal;
+        return store;
     }
 
     /**
@@ -909,5 +909,12 @@ public class BoundingBox extends BoundingVolume {
     @Override
     public double getVolume() {
         return (8 * getXExtent() * getYExtent() * getZExtent());
+    }
+
+    public static void main(final String[] args) {
+        final BoundingBox bbox = new BoundingBox(new Vector3(), 8, 0, 12);
+        final BoundingBox bbox2 = new BoundingBox(new Vector3(), 8, 1, 12);
+        final BoundingBox bbox3 = (BoundingBox) bbox.merge(bbox2);
+        System.err.println(bbox3);
     }
 }
