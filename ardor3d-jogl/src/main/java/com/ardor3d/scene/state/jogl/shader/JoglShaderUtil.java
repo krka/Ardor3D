@@ -101,8 +101,9 @@ public abstract class JoglShaderUtil {
         if (variable.variableID == -1) {
             variable.variableID = gl.glGetUniformLocationARB(programID, variable.name); // TODO Check variable.name
 
-            if (variable.variableID == -1) {
+            if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader uniform [" + variable.name + "] could not be located in shader");
+                variable.errorLogged = true;
             }
         }
     }
@@ -243,8 +244,9 @@ public abstract class JoglShaderUtil {
         if (variable.variableID == -1) {
             variable.variableID = gl.glGetAttribLocationARB(programID, variable.name); // TODO Check variable.name
 
-            if (variable.variableID == -1) {
+            if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader attribute [" + variable.name + "] could not be located in shader");
+                variable.errorLogged = true;
             }
         }
     }

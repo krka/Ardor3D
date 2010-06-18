@@ -107,8 +107,9 @@ public abstract class LwjglShaderUtil {
 
             variable.variableID = ARBShaderObjects.glGetUniformLocationARB(programID, nameBuf);
 
-            if (variable.variableID == -1) {
+            if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader uniform [" + variable.name + "] could not be located in shader");
+                variable.errorLogged = true;
             }
         }
     }
@@ -228,8 +229,9 @@ public abstract class LwjglShaderUtil {
 
             variable.variableID = ARBVertexShader.glGetAttribLocationARB(programID, nameBuf);
 
-            if (variable.variableID == -1) {
+            if (variable.variableID == -1 && !variable.errorLogged) {
                 logger.severe("Shader attribute [" + variable.name + "] could not be located in shader");
+                variable.errorLogged = true;
             }
         }
     }

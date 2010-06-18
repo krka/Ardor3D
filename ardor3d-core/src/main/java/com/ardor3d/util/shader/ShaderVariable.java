@@ -29,6 +29,8 @@ public class ShaderVariable implements Savable {
     /** Needs to be refreshed */
     public boolean needsRefresh = true;
 
+    public boolean errorLogged = false;
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof ShaderVariable) {
