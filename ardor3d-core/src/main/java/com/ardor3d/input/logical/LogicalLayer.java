@@ -76,12 +76,12 @@ public final class LogicalLayer {
                         tpf);
             } else {
                 // used to spread tpf evenly among triggered actions
-                final int quantity = newStates.size();
+                final double time = newStates.size() > 1 ? tpf / newStates.size() : tpf;
                 for (final InputState inputState : newStates) {
                     // no trigger is valid in the LOST_FOCUS state, so don't bother checking them
                     if (inputState != InputState.LOST_FOCUS) {
                         _applier.checkAndPerformTriggers(_triggers, is.source, new TwoInputStates(is.lastState,
-                                inputState), tpf / quantity);
+                                inputState), time);
                     }
 
                     is.lastState = inputState;
