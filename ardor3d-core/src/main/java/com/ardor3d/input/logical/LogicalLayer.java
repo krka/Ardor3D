@@ -31,7 +31,6 @@ public final class LogicalLayer {
     private final Set<InputTrigger> _triggers = new CopyOnWriteArraySet<InputTrigger>();
     private LogicalTriggersApplier _applier = new BasicTriggersApplier();
 
-    
     public LogicalLayer() {}
 
     public void registerInput(final Canvas source, final PhysicalLayer physicalLayer) {
@@ -76,11 +75,13 @@ public final class LogicalLayer {
                 _applier.checkAndPerformTriggers(_triggers, is.source, new TwoInputStates(is.lastState, is.lastState),
                         tpf);
             } else {
+                // used to spread tpf evenly among triggered actions
+                final int quantity = newStates.size();
                 for (final InputState inputState : newStates) {
                     // no trigger is valid in the LOST_FOCUS state, so don't bother checking them
                     if (inputState != InputState.LOST_FOCUS) {
                         _applier.checkAndPerformTriggers(_triggers, is.source, new TwoInputStates(is.lastState,
-                                inputState), tpf);
+                                inputState), tpf / quantity);
                     }
 
                     is.lastState = inputState;
