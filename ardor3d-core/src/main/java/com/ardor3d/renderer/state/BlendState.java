@@ -187,11 +187,11 @@ public class BlendState extends RenderState {
          */
         LessThanOrEqualTo,
         /**
-         * Pass the test if this alpha is less than the reference alpha.
+         * Pass the test if this alpha is greater than the reference alpha.
          */
         GreaterThan,
         /**
-         * Pass the test if this alpha is less than or equal to the reference alpha.
+         * Pass the test if this alpha is greater than or equal to the reference alpha.
          */
         GreaterThanOrEqualTo;
 
