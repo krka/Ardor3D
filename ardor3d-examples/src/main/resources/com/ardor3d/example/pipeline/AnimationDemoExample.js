@@ -1,8 +1,3 @@
-/**
- * Our base Layer
- */
-var baseLayer = MANAGER.baseAnimationLayer;
-
 // set up walk/run as our base layer as separate states.
 var walkState = {
 	"name" : "walk_anim",
@@ -23,8 +18,8 @@ var walkState = {
          ]
 };
 
-// add to layer
-baseLayer.addSteadyState(_steadyState(walkState));
+// add to default layer
+_steadyState(walkState);
 
 var runState = {
 	"name" : "run_anim",
@@ -45,8 +40,8 @@ var runState = {
 	         ]
 };
 
-// add to layer
-baseLayer.addSteadyState(_steadyState(runState));
+// add to default layer
+_steadyState(runState);
 
 /**
  * Our Punch Layer
@@ -57,13 +52,14 @@ var punchLayerInfo = {
 	"blendWeight" : 1.0,
 	"blendKey" : "punch_blend"
 };
-	
-var punchLayer = _animationLayer(punchLayerInfo);
-MANAGER.addAnimationLayer(punchLayer);
+
+//add new "punch" layer
+_animationLayer(punchLayerInfo);
 
 // set up punching state. Will not always be playing.
 var punchState = {
 	"name" : "punch_right",
+	"layer" : "punch",
 	"tree" : {
 		"inclusiveClip" : {
 			"name" : "skeleton.punch",
@@ -74,8 +70,8 @@ var punchState = {
 	}
 };
 
-// add to layer
-punchLayer.addSteadyState(_steadyState(punchState));
+// add to "punch" layer
+_steadyState(punchState);
 
 /**
  * Our Head Layer
@@ -86,13 +82,14 @@ var headLayerInfo = {
 	"blendWeight" : 1.0,
 	"blendKey" : "head_blend"
 };
-	
-var headLayer = _animationLayer(headLayerInfo);
-MANAGER.addAnimationLayer(headLayer);
+
+// add new "head" layer
+_animationLayer(headLayerInfo);
 
 // set up head turning state. Will not always be playing.
 var headState = {
 	"name" : "head_rotate",
+	"layer" : "head",
 	"tree" : {
 		"managed" : {
 			"initFromClip" : {
@@ -103,8 +100,8 @@ var headState = {
 	},
 };
 
-// add to layer
-headLayer.addSteadyState(_steadyState(headState));
+// add to head layer
+_steadyState(headState);
 
 // create attachment points
 _addAttachment("right_weapon", "Bip01_R_Finger0", 0, null);

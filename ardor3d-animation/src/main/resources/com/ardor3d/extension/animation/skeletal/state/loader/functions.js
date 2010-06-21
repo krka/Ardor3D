@@ -39,6 +39,13 @@ function _steadyState(json) {
 		}
 	}
 
+	var layerName=AnimationLayer.BASE_LAYER_NAME;
+	if (json.layer) {
+		layerName = json.layer;
+	}
+
+	MANAGER.findAnimationLayer(layerName).addSteadyState(state);
+
 	return state;
 }
 
@@ -247,6 +254,8 @@ function _animationLayer(json) {
 			break;
 		}
 	}
+
+	MANAGER.addAnimationLayer(layer);
 
 	return layer;
 }
