@@ -214,7 +214,7 @@ function _populateClipSource(source, clip, root) {
 	}
 	// add active flag
 	if (root.active) {
-		MANAGER.getClipInstance(clip).setActive(root.timeScale);
+		MANAGER.getClipInstance(clip).setActive(root.active);
 	}
 
 	return;
