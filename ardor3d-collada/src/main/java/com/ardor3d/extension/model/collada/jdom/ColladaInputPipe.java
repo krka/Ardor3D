@@ -38,7 +38,7 @@ public class ColladaInputPipe {
     private int _texCoord = 0;
 
     public enum Type {
-        VERTEX, POSITION, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, //
+        VERTEX, POSITION, NORMAL, TEXCOORD, COLOR, JOINT, WEIGHT, TEXTANGENT, TEXBINORMAL, //
         INV_BIND_MATRIX, INPUT, IN_TANGENT, OUT_TANGENT, OUTPUT, INTERPOLATION, UNKNOWN
     }
 
@@ -195,6 +195,14 @@ public class ColladaInputPipe {
                 _buffer = BufferUtils.createFloatBuffer(size);
                 meshData.setColorBuffer(_buffer);
                 break;
+            case TEXTANGENT:
+                _buffer = BufferUtils.createFloatBuffer(size);
+                meshData.setTangentBuffer(_buffer);
+                break;
+            // case TEXBINORMAL:
+            // _buffer = BufferUtils.createFloatBuffer(size);
+            // meshData.setTangentBuffer(_buffer);
+            // break;
             default:
         }
     }
