@@ -44,10 +44,13 @@ public class MultiStripExample extends ExampleBase {
         }
         if (pickResults.getNumber() > i) {
             final PickData pick = pickResults.getPickData(i);
-            final int section = pick.getTargetPrimitives().get(0).getSection();
-            System.err.println("picked: " + pick.getTargetMesh() + " section: " + section + " (type = "
-                    + pick.getTargetMesh().getMeshData().getIndexMode(section) + ") primitive: "
-                    + pick.getTargetPrimitives().get(0).getPrimitiveIndex());
+            final int section = pick.getIntersectionRecord().getIntersectionPrimitive(0).getSection();
+            if (pick.getTarget() instanceof Mesh) {
+                final Mesh hit = (Mesh) pick.getTarget();
+                System.err.println("picked: " + hit + " section: " + section + " (type = "
+                        + hit.getMeshData().getIndexMode(section) + ") primitive: "
+                        + pick.getIntersectionRecord().getIntersectionPrimitive(0).getPrimitiveIndex());
+            }
         } else {
             System.err.println("picked: nothing");
         }

@@ -205,6 +205,8 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         _root.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
 
         initExample();
+
+        _root.updateGeometricState(0);
     }
 
     protected abstract void initExample();
@@ -307,7 +309,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         }
         if (pickResults.getNumber() > i) {
             final PickData pick = pickResults.getPickData(i);
-            System.err.println("picked: " + pick.getTargetMesh() + " at: "
+            System.err.println("picked: " + pick.getTarget() + " at: "
                     + pick.getIntersectionRecord().getIntersectionPoint(0));
         } else {
             System.err.println("picked: nothing");

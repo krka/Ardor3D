@@ -21,10 +21,10 @@ import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.MouseMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.intersection.BoundingPickResults;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -121,7 +121,7 @@ public class ShapesExample extends ExampleBase {
         _root.setRenderState(bs);
 
         // Set up a reusable pick results
-        _pickResults = new PrimitivePickResults();
+        _pickResults = new BoundingPickResults();
         _pickResults.setCheckDistance(true);
 
         // Set up our pick label
@@ -157,8 +157,10 @@ public class ShapesExample extends ExampleBase {
 
                     // set our text to the name of the ancestor of this object that is right under the _root node.
                     final PickData pick = _pickResults.getPickData(0);
-                    final Spatial topLevel = getTopLevel(pick.getTargetMesh());
-                    _text.setText(topLevel.getName());
+                    if (pick.getTarget() instanceof Spatial) {
+                        final Spatial topLevel = getTopLevel((Spatial) pick.getTarget());
+                        _text.setText(topLevel.getName());
+                    }
                 } else {
                     // No pick, clear label.
                     _text.getSceneHints().setCullHint(CullHint.Always);
