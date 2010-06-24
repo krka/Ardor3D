@@ -16,12 +16,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.ardor3d.math.Ray3;
-import com.ardor3d.scenegraph.Mesh;
 
 /**
- * <code>PickResults</code> contains information resulting from a pick test. The results will contain a list of every
- * node that was "struck" during a pick test. Distance can be used to order the results. If <code>checkDistance</code>
- * is set, objects will be ordered with the first element in the list being the closest picked object.
+ * PickResults stores information created during ray intersection tests. The results will contain a list of every
+ * {@link Pickable} element encountered in a pick test. Distance can be used to order the results. If checkDistance is
+ * set to true, objects will be ordered with the first element in the list being the closest picked object.
  */
 public abstract class PickResults {
 
@@ -91,17 +90,17 @@ public abstract class PickResults {
      * 
      * @param ray
      *            the ray that was cast for the pick calculation.
-     * @param g
-     *            the object to add to the pick data.
+     * @param p
+     *            the pickable object to add to the pick data.
      */
-    public abstract void addPick(Ray3 ray, Mesh g);
+    public abstract void addPick(Ray3 ray, Pickable p);
 
     /**
      * Optional method that can be implemented by sub classes to define methods for handling picked objects. After
      * calculating all pick results this method is called.
      * 
      */
-    public abstract void processPick();
+    public void processPick() {}
 
     /**
      * Reports if these pick results will order the data by distance from the origin of the Ray.

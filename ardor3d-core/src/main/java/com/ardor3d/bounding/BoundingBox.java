@@ -601,12 +601,6 @@ public class BoundingBox extends BoundingVolume {
                 + getYExtent() + "  zExtent: " + getZExtent() + "]";
     }
 
-    /**
-     * intersects determines if this Bounding Box intersects with another given bounding volume. If so, true is
-     * returned, otherwise, false is returned.
-     * 
-     * @see com.ardor3d.bounding.BoundingVolume#intersects(com.ardor3d.bounding.BoundingVolume)
-     */
     @Override
     public boolean intersects(final BoundingVolume bv) {
         if (bv == null) {
@@ -616,11 +610,6 @@ public class BoundingBox extends BoundingVolume {
         return bv.intersectsBoundingBox(this);
     }
 
-    /**
-     * determines if this bounding box intersects a given bounding sphere.
-     * 
-     * @see com.ardor3d.bounding.BoundingVolume#intersectsSphere(com.ardor3d.bounding.BoundingSphere)
-     */
     @Override
     public boolean intersectsSphere(final BoundingSphere bs) {
         if (!Vector3.isValid(_center) || !Vector3.isValid(bs._center)) {
@@ -636,12 +625,6 @@ public class BoundingBox extends BoundingVolume {
         return false;
     }
 
-    /**
-     * determines if this bounding box intersects a given bounding box. If the two boxes intersect in any way, true is
-     * returned. Otherwise, false is returned.
-     * 
-     * @see com.ardor3d.bounding.BoundingVolume#intersectsBoundingBox(com.ardor3d.bounding.BoundingBox)
-     */
     @Override
     public boolean intersectsBoundingBox(final BoundingBox bb) {
         if (!Vector3.isValid(_center) || !Vector3.isValid(bb._center)) {
@@ -662,22 +645,11 @@ public class BoundingBox extends BoundingVolume {
         }
     }
 
-    /**
-     * determines if this bounding box intersects with a given oriented bounding box.
-     * 
-     * @see com.ardor3d.bounding.BoundingVolume#intersectsOrientedBoundingBox(com.ardor3d.bounding.OrientedBoundingBox)
-     */
     @Override
     public boolean intersectsOrientedBoundingBox(final OrientedBoundingBox obb) {
         return obb.intersectsBoundingBox(this);
     }
 
-    /**
-     * determines if this bounding box intersects with a given ray object. If an intersection has occurred, true is
-     * returned, otherwise false is returned.
-     * 
-     * @see com.ardor3d.bounding.BoundingVolume#intersects(com.ardor3d.math.Ray)
-     */
     @Override
     public boolean intersects(final ReadOnlyRay3 ray) {
         if (!Vector3.isValid(_center)) {
@@ -741,9 +713,6 @@ public class BoundingBox extends BoundingVolume {
         }
     }
 
-    /**
-     * @see com.ardor3d.bounding.BoundingVolume#intersectsWhere(com.ardor3d.math.Ray)
-     */
     @Override
     public IntersectionRecord intersectsWhere(final ReadOnlyRay3 ray) {
         final Vector3 compVect1 = Vector3.fetchTempInstance();
@@ -785,7 +754,7 @@ public class BoundingBox extends BoundingVolume {
             return record;
         }
 
-        return new IntersectionRecord();
+        return null;
 
     }
 

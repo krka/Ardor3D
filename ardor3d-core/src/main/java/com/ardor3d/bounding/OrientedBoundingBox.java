@@ -1297,7 +1297,7 @@ public class OrientedBoundingBox extends BoundingVolume {
                 return record;
             }
 
-            return new IntersectionRecord();
+            return null;
         } finally {
             Vector3.releaseTempInstance(diff);
             Vector3.releaseTempInstance(direction);

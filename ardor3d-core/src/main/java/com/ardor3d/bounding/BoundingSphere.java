@@ -690,12 +690,13 @@ public class BoundingSphere extends BoundingVolume {
         a1 = ray.getDirection().dot(diff);
         Vector3.releaseTempInstance(diff);
         if (a1 >= 0.0) {
-            return new IntersectionRecord();
+            // No intersection
+            return null;
         }
 
         discr = a1 * a1 - a;
         if (discr < 0.0) {
-            return new IntersectionRecord();
+            return null;
         } else if (discr >= MathUtils.ZERO_TOLERANCE) {
             root = Math.sqrt(discr);
             final double[] distances = new double[] { -a1 - root, -a1 + root };

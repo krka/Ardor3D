@@ -27,28 +27,20 @@ public abstract class PickingUtil {
             return;
         }
 
-        if (spatial instanceof Node) {
+        if (spatial instanceof Pickable) {
+            results.addPick(ray, (Pickable) spatial);
+        } else if (spatial instanceof Node) {
             final Node node = (Node) spatial;
 
             if (node.getNumberOfChildren() == 0 || node.getWorldBound() == null) {
                 return;
             }
+
             if (node.getWorldBound().intersects(ray)) {
                 // further checking needed.
                 for (int i = 0; i < node.getNumberOfChildren(); i++) {
                     PickingUtil.findPick(node.getChild(i), ray, results);
                 }
-            }
-        } else if (spatial instanceof Mesh) {
-            final Mesh mesh = (Mesh) spatial;
-
-            if (mesh.getWorldBound() == null) {
-                return;
-            }
-            if (mesh.getWorldBound().intersects(ray)) {
-                // find the primitive that is being hit.
-                // add this node and the primitive to the PickResults list.
-                results.addPick(ray, mesh);
             }
         }
     }
@@ -81,20 +73,6 @@ public abstract class PickingUtil {
                 } else {
                     results.addCollision(mesh, (Mesh) scene);
                 }
-            }
-        }
-    }
-
-    public static void findPrimitivePick(final Mesh mesh, final Ray3 toTest, final List<PrimitiveKey> results) {
-        if (mesh.getWorldBound() == null || !mesh.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
-            return;
-        }
-
-        if (mesh.getWorldBound().intersects(toTest)) {
-            final CollisionTree ct = CollisionTreeManager.getInstance().getCollisionTree(mesh);
-            if (ct != null) {
-                ct.getBounds().transform(mesh.getWorldTransform(), ct.getWorldBounds());
-                ct.intersect(toTest, results);
             }
         }
     }

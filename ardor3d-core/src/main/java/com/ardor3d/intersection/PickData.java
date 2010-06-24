@@ -10,92 +10,49 @@
 
 package com.ardor3d.intersection;
 
-import java.util.List;
-
 import com.ardor3d.math.Ray3;
-import com.ardor3d.scenegraph.Mesh;
 
 /**
- * 
  * PickData contains information about a picking operation (or Ray/Volume intersection). This data contains the mesh the
  * ray hit, the triangles it hit, and the ray itself.
  */
 public class PickData {
 
-    protected Ray3 _ray;
-    protected Mesh _targetMesh;
-    protected final List<PrimitiveKey> _targetPrimitives;
+    private final Ray3 _ray;
+    private final Pickable _target;
     protected IntersectionRecord _intersectionRecord;
-    protected double _closestDistance;
-
-    public PickData(final Ray3 ray, final Mesh targetMesh, final boolean calcPoints) {
-        this(ray, targetMesh, null, calcPoints);
-    }
 
     /**
-     * instantiates a new PickData object. Note: subclasses may want to make calc points null to prevent this extra
+     * instantiates a new PickData object. Note: subclasses may want to make calc points false to prevent this extra
      * work.
      */
-    public PickData(final Ray3 ray, final Mesh targetMesh, final List<PrimitiveKey> targetPrimitives,
-            final boolean calcPoints) {
+    public PickData(final Ray3 ray, final Pickable target, final boolean calcPoints) {
         _ray = ray;
-        _targetMesh = targetMesh;
-        _targetPrimitives = targetPrimitives;
+        _target = target;
 
         if (calcPoints) {
-            _intersectionRecord = targetMesh.getWorldBound().intersectsWhere(ray);
-            _closestDistance = _intersectionRecord.getClosestDistance();
+            _intersectionRecord = target.intersectsWorldBoundsWhere(ray);
         }
     }
 
     /**
-     * 
-     * <code>getTargetMesh</code> returns the geometry that was hit by the ray.
-     * 
-     * @return the geometry hit by the ray.
+     * @return the pickable hit by the ray.
      */
-    public Mesh getTargetMesh() {
-        return _targetMesh;
+    public Pickable getTarget() {
+        return _target;
     }
 
     /**
-     * 
-     * <code>setTargetMesh</code> sets the geometry hit by the ray.
-     * 
-     * @param mesh
-     *            the geometry hit by the ray.
-     */
-    public void setTargetMesh(final Mesh mesh) {
-        _targetMesh = mesh;
-    }
-
-    /**
-     * @return Returns the target primitives.
-     */
-    public List<PrimitiveKey> getTargetPrimitives() {
-        return _targetPrimitives;
-    }
-
-    /**
-     * @return Returns the ray.
+     * @return the ray used in the test.
      */
     public Ray3 getRay() {
         return _ray;
     }
 
     /**
-     * @param ray
-     *            The ray to set.
+     * @return the intersection record generated for this pick. Will be null if calcPoints was false.
      */
-    public void setRay(final Ray3 ray) {
-        _ray = ray;
-    }
-
     public IntersectionRecord getIntersectionRecord() {
         return _intersectionRecord;
-    }
-
-    public double getClosestDistance() {
-        return _closestDistance;
     }
 }

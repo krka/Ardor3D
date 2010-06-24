@@ -13,14 +13,20 @@ package com.ardor3d.scenegraph;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.bounding.CollisionTree;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.intersection.IntersectionRecord;
+import com.ardor3d.intersection.Pickable;
+import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -42,11 +48,12 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.stat.StatCollector;
 import com.ardor3d.util.stat.StatType;
+import com.google.common.collect.Lists;
 
 /**
  * Mesh
  */
-public class Mesh extends Spatial implements Renderable {
+public class Mesh extends Spatial implements Renderable, Pickable {
 
     public static boolean RENDER_VERTEX_ONLY = false;
 
@@ -64,7 +71,7 @@ public class Mesh extends Spatial implements Renderable {
             RenderState.StateType.class);
 
     /** The compiled lightState for this mesh */
-    protected LightState _lightState;
+    protected transient LightState _lightState;
 
     /** Default color to use when no per vertex colors are set */
     protected ColorRGBA _defaultColor = new ColorRGBA(ColorRGBA.WHITE);
@@ -470,12 +477,85 @@ public class Mesh extends Spatial implements Renderable {
         colorBuf.flip();
     }
 
+    // PICKABLE INTERFACE
+
+    @Override
+    public boolean intersectsWorldBound(final Ray3 ray) {
+        // should throw NPE if no bound.
+        return getWorldBound().intersects(ray);
+    }
+
+    @Override
+    public IntersectionRecord intersectsWorldBoundsWhere(final Ray3 ray) {
+        // should throw NPE if no bound.
+        return getWorldBound().intersectsWhere(ray);
+    }
+
+    @Override
+    public IntersectionRecord intersectsPrimitivesWhere(final Ray3 ray) {
+        final List<PrimitiveKey> primitives = Lists.newArrayList();
+
+        // What about Lines and Points?
+        final CollisionTree ct = CollisionTreeManager.getInstance().getCollisionTree(this);
+        if (ct != null) {
+            ct.getBounds().transform(getWorldTransform(), ct.getWorldBounds());
+            ct.intersect(ray, primitives);
+        }
+
+        if (primitives.isEmpty()) {
+            return null;
+        }
+
+        Vector3[] vertices = null;
+        final double[] distances = new double[primitives.size()];
+        for (int i = 0; i < primitives.size(); i++) {
+            final PrimitiveKey key = primitives.get(i);
+            vertices = getMeshData().getPrimitive(key.getPrimitiveIndex(), key.getSection(), vertices);
+            // convert to world coord space
+            final int max = getMeshData().getIndexMode(key.getSection()).getVertexCount();
+            for (final int j = 0; j < max; i++) {
+                if (vertices[j] != null) {
+                    getWorldTransform().applyForward(vertices[j]);
+                }
+            }
+            final double triDistanceSq = ray.getDistanceToPrimitive(vertices);
+            distances[i] = triDistanceSq;
+        }
+
+        // FIXME: optimize! ugly bubble sort for now
+        boolean sorted = false;
+        while (!sorted) {
+            sorted = true;
+            for (int sort = 0; sort < distances.length - 1; sort++) {
+                if (distances[sort] > distances[sort + 1]) {
+                    // swap
+                    sorted = false;
+                    final double temp = distances[sort + 1];
+                    distances[sort + 1] = distances[sort];
+                    distances[sort] = temp;
+
+                    // swap primitives too
+                    final PrimitiveKey temp2 = primitives.get(sort + 1);
+                    primitives.set(sort + 1, primitives.get(sort));
+                    primitives.set(sort, temp2);
+                }
+            }
+        }
+
+        final Vector3[] positions = new Vector3[distances.length];
+        for (int i = 0; i < distances.length; i++) {
+            positions[i] = ray.getDirection().multiply(distances[0], new Vector3()).addLocal(ray.getOrigin());
+        }
+        return new IntersectionRecord(distances, positions, primitives);
+    }
+
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(_meshData, "meshData", null);
         capsule.write(_modelBound, "modelBound", null);
         capsule.write(_defaultColor, "defaultColor", new ColorRGBA(ColorRGBA.WHITE));
+        capsule.write(_isVisible, "visible", true);
     }
 
     @Override
@@ -484,6 +564,7 @@ public class Mesh extends Spatial implements Renderable {
         _meshData = (MeshData) capsule.readSavable("meshData", null);
         _modelBound = (BoundingVolume) capsule.readSavable("modelBound", null);
         _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
+        _isVisible = capsule.readBoolean("visible", true);
     }
 
 }

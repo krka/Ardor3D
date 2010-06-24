@@ -325,4 +325,22 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
             RAY_POOL.release(ray);
         }
     }
+
+    /**
+     * @param worldVertices
+     *            an array of vectors describing a polygon
+     * @return the distance from our origin to the primitive or POSITIVE_INFINITY if we do not intersect.
+     */
+    public double getDistanceToPrimitive(final Vector3[] worldVertices) {
+        // Intersection test
+        final Vector3 intersect = Vector3.fetchTempInstance();
+        try {
+            if (intersects(worldVertices, intersect)) {
+                return getOrigin().distance(intersect);
+            }
+        } finally {
+            Vector3.releaseTempInstance(intersect);
+        }
+        return Double.POSITIVE_INFINITY;
+    }
 }

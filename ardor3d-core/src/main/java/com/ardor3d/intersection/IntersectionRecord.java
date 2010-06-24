@@ -10,40 +10,54 @@
 
 package com.ardor3d.intersection;
 
+import java.util.List;
+
 import com.ardor3d.math.Vector3;
 import com.ardor3d.util.Ardor3dException;
 
 public class IntersectionRecord {
 
-    private double[] _distances;
-    private Vector3[] _points;
+    private final double[] _distances;
+    private final Vector3[] _points;
+    private final List<PrimitiveKey> _primitives;
 
     /**
-     * Instantiates a new IntersectionRecord with no distances or points assigned.
-     * 
-     */
-    public IntersectionRecord() {}
-
-    /**
-     * Instantiates a new IntersectionRecord defining the distances and points. If the size of the distance and point
-     * arrays do not match, an exception is thrown.
+     * Instantiates a new IntersectionRecord defining the distances and points.
      * 
      * @param distances
      *            the distances of this intersection.
      * @param points
      *            the points of this intersection.
+     * @throws Ardor3dException
+     *             if distances.length != points.length
      */
     public IntersectionRecord(final double[] distances, final Vector3[] points) {
-        if (distances.length != points.length) {
-            throw new Ardor3dException("The distances and points variables must have an equal number of elements.");
-        }
-        _distances = distances;
-        _points = points;
+        this(distances, points, null);
     }
 
     /**
-     * Returns the number of intersections that occurred.
+     * Instantiates a new IntersectionRecord defining the distances and points.
      * 
+     * @param distances
+     *            the distances of this intersection.
+     * @param points
+     *            the points of this intersection.
+     * @param primitives
+     *            the primitives at each index. May be null.
+     * @throws Ardor3dException
+     *             if distances.length != points.length or points.length != primitives.size() (if primitives is not
+     *             null)
+     */
+    public IntersectionRecord(final double[] distances, final Vector3[] points, final List<PrimitiveKey> primitives) {
+        if (distances.length != points.length || (primitives != null && points.length != primitives.size())) {
+            throw new Ardor3dException("All arguments must have an equal number of elements.");
+        }
+        _distances = distances;
+        _points = points;
+        _primitives = primitives;
+    }
+
+    /**
      * @return the number of intersections that occurred.
      */
     public int getNumberOfIntersections() {
@@ -76,8 +90,18 @@ public class IntersectionRecord {
     }
 
     /**
-     * Returns the smallest distance in the distance array.
-     * 
+     * @param index
+     *            the index of the primitive to obtain.
+     * @return the primitive at the given index.
+     */
+    public PrimitiveKey getIntersectionPrimitive(final int index) {
+        if (_primitives == null) {
+            return null;
+        }
+        return _primitives.get(index);
+    }
+
+    /**
      * @return the smallest distance in the distance array.
      */
     public double getClosestDistance() {

@@ -11,33 +11,16 @@
 package com.ardor3d.intersection;
 
 import com.ardor3d.math.Ray3;
-import com.ardor3d.scenegraph.Mesh;
 
 /**
- * BoundingPickResults creates a PickResults object that only cares about bounding volume accuracy. PickData objects are
- * added to the pick list as they happen, these data objects only refer to the two meshes, not their triangle lists.
- * While BoundingPickResults defines a processPick method, it is empty and should be further defined by the user if so
- * desired.
+ * BoundingPickResults implements the addPick of PickResults to use PickData objects that calculate bounding volume
+ * level accurate ray picks.
  */
 public class BoundingPickResults extends PickResults {
-
-    /**
-     * adds a PickData object to this results list, the objects only refer to the picked meshes, not the triangles.
-     */
     @Override
-    public void addPick(final Ray3 ray, final Mesh g) {
-        final PickData data = new PickData(ray, g, willCheckDistance());
-        addPickData(data);
+    public void addPick(final Ray3 ray, final Pickable p) {
+        if (p.intersectsWorldBound(ray)) {
+            addPickData(new PickData(ray, p, willCheckDistance()));
+        }
     }
-
-    /**
-     * empty implementation, it is highly recommended that you override this method to handle any picks as needed.
-     * 
-     * @see com.ardor3d.intersection.PickResults#processPick()
-     */
-    @Override
-    public void processPick() {
-
-    }
-
 }
