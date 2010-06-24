@@ -32,7 +32,7 @@ public class TestRayBounding {
         Ray3 ray = new Ray3(new Vector3(2, -10, 0), Vector3.UNIT_Y);
         assertFalse(obb.intersects(ray));
         IntersectionRecord record = obb.intersectsWhere(ray);
-        assertEquals(0, record.getNumberOfIntersections());
+        assertEquals(null, record);
 
         final Quaternion rotation = new Quaternion();
         rotation.fromAngleAxis(MathUtils.QUARTER_PI, Vector3.UNIT_Z);
@@ -55,7 +55,7 @@ public class TestRayBounding {
         Ray3 ray = new Ray3(new Vector3(1.2, -10, 0), Vector3.UNIT_Y);
         assertFalse(obb.intersects(ray));
         IntersectionRecord record = obb.intersectsWhere(ray);
-        assertEquals(0, record.getNumberOfIntersections());
+        assertEquals(null, record);
 
         final Quaternion rotation = new Quaternion();
         rotation.fromAngleAxis(MathUtils.QUARTER_PI, Vector3.UNIT_Z);
