@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingSphere;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.intersection.IntersectionRecord;
 
@@ -66,6 +67,26 @@ public class TestRayBounding {
         ray = new Ray3(new Vector3(1.2, -10, 0), Vector3.UNIT_Y);
         assertTrue(obb.intersects(ray));
         record = obb.intersectsWhere(ray);
+        assertEquals(2, record.getNumberOfIntersections());
+    }
+
+    @Test
+    public void testRaySphereIntersection() throws Exception {
+        final BoundingSphere bs = new BoundingSphere();
+        bs.setCenter(Vector3.ZERO);
+        bs.setRadius(1);
+
+        final Ray3 ray = new Ray3(new Vector3(2, -3, 0), Vector3.UNIT_Y);
+        assertFalse(bs.intersects(ray));
+        IntersectionRecord record = bs.intersectsWhere(ray);
+        assertEquals(null, record);
+
+        final Transform transform = new Transform();
+        transform.setTranslation(2, 0, .5);
+        bs.transform(transform, bs);
+
+        assertTrue(bs.intersects(ray));
+        record = bs.intersectsWhere(ray);
         assertEquals(2, record.getNumberOfIntersections());
     }
 }
