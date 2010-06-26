@@ -513,7 +513,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             vertices = getMeshData().getPrimitive(key.getPrimitiveIndex(), key.getSection(), vertices);
             // convert to world coord space
             final int max = getMeshData().getIndexMode(key.getSection()).getVertexCount();
-            for (final int j = 0; j < max; i++) {
+            for (int j = 0; j < max; j++) {
                 if (vertices[j] != null) {
                     getWorldTransform().applyForward(vertices[j]);
                 }
