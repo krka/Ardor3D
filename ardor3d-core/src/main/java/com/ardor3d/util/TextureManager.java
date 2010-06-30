@@ -410,6 +410,7 @@ final public class TextureManager {
         Multimap<Object, Integer> idMap = null;
         // Pull all expired textures from ref queue and add to an id multimap.
         ContextIdReference<TextureKey> ref;
+        int id;
         while ((ref = (ContextIdReference<TextureKey>) _textureRefQueue.poll()) != null) {
             // lazy init
             if (idMap == null) {
@@ -418,11 +419,17 @@ final public class TextureManager {
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = ref.getContextObjects();
                 for (final Object o : contextObjects) {
-                    // Add id to map
-                    idMap.put(o, ref.get(o));
+                    id = ref.get(o);
+                    if (id != 0) {
+                        // Add id to map
+                        idMap.put(o, id);
+                    }
                 }
             } else {
-                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), ref.get(null));
+                id = ref.get(null);
+                if (id != 0) {
+                    idMap.put(ContextManager.getCurrentContext().getGlContextRep(), id);
+                }
             }
             ref.clear();
         }
