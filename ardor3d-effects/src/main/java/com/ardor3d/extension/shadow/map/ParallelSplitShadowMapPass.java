@@ -186,14 +186,23 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Debug drawing shader. */
     private boolean _drawShaderDebug = false;
 
-    /** True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested textures. */
+    /**
+     * True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested textures.
+     * Default is false.
+     */
     private boolean _useSceneTexturing = false;
 
     /**
      * True if we want to use the culling set on the objects instead of always culling front face (which is done for
-     * shadow precision)
+     * shadow precision). Default is false.
      */
     private boolean _useObjectCullFace = false;
+
+    /**
+     * When true (the default) the generated shadow map textures are drawn over the scene in a separate blend pass. If
+     * false, the shadows are generated, but not applied.
+     */
+    private boolean _renderShadowedScene = true;
 
     /**
      * Create a pssm shadow map pass casting shadows from a light with the direction given.
@@ -452,8 +461,10 @@ public class ParallelSplitShadowMapPass extends Pass {
             updateTextureMatrix(iSplit);
         }
 
-        // Render overlay scene
-        renderShadowedScene(r);
+        if (_renderShadowedScene) {
+            // Render overlay scene
+            renderShadowedScene(r);
+        }
     }
 
     /**
@@ -924,7 +935,9 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * @param updateMainCamera
-     *            the updateMainCamera to set
+     *            True (the default) if we want to copy the current rendering camera into this pass for use in shadow
+     *            generation. False if we will manage our shadow camera elsewhere.
+     * @see #getPssmCam()
      */
     public void setUpdateMainCamera(final boolean updateMainCamera) {
         _updateMainCamera = updateMainCamera;
@@ -939,7 +952,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * @param drawDebug
-     *            the drawDebug to set
+     *            True if we want to draw camera and light frustums for debugging purposes. Default is false.
      */
     public void setDrawDebug(final boolean drawDebug) {
         _drawDebug = drawDebug;
@@ -954,7 +967,7 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * @param drawShaderDebug
-     *            the drawShaderDebug to set
+     *            True if we want to draw debug colors over the shadows, showing which level they come from.
      */
     public void setDrawShaderDebug(final boolean drawShaderDebug) {
         _drawShaderDebug = drawShaderDebug;
@@ -969,7 +982,8 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /**
      * @param useSceneTexturing
-     *            the useSceneTexturing to set
+     *            True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested
+     *            textures. Default is false.
      */
     public void setUseSceneTexturing(final boolean useSceneTexturing) {
         _useSceneTexturing = useSceneTexturing;
@@ -987,6 +1001,11 @@ public class ParallelSplitShadowMapPass extends Pass {
         return _useObjectCullFace;
     }
 
+    /**
+     * @param useObjectCullFace
+     *            True if we want to use the culling set on the objects instead of always culling front face (which is
+     *            done for shadow precision). Default is false.
+     */
     public void setUseObjectCullFace(final boolean useObjectCullFace) {
         _useObjectCullFace = useObjectCullFace;
         if (_shadowMapRenderer != null) {
@@ -996,6 +1015,26 @@ public class ParallelSplitShadowMapPass extends Pass {
                 _shadowMapRenderer.clearEnforcedState(StateType.Cull);
             }
         }
+    }
+
+    public boolean isRenderShadowedScene() {
+        return _renderShadowedScene;
+    }
+
+    /**
+     * @param renderShadowedScene
+     *            When true (the default) the generated shadow map textures are drawn over the scene in a separate blend
+     *            pass. If false, the shadows are generated, but not applied.
+     */
+    public void setRenderShadowedScene(final boolean renderShadowedScene) {
+        _renderShadowedScene = renderShadowedScene;
+    }
+
+    /**
+     * @return the camera used internally to generate shadows.
+     */
+    public PSSMCamera getPssmCam() {
+        return _pssmCam;
     }
 
     /** The debug line frustum. */
