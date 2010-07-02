@@ -69,8 +69,15 @@ public class TextureState extends RenderState {
 
     public transient TextureKey[] _keyCache = new TextureKey[MAX_TEXTURES];
 
-    public static ResourceSource DEFAULT_TEXTURE_SOURCE = new URLResourceSource(TextureState.class
-            .getResource("notloaded.tga"));
+    public static ResourceSource DEFAULT_TEXTURE_SOURCE;
+    static {
+        try {
+            DEFAULT_TEXTURE_SOURCE = new URLResourceSource(TextureState.class.getResource("notloaded.tga"));
+        } catch (final Exception e) {
+            // ignore.
+            DEFAULT_TEXTURE_SOURCE = null;
+        }
+    }
 
     /**
      * Constructor instantiates a new <code>TextureState</code> object.
