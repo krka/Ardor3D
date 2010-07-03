@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.renderer.state.record.StateRecord;
 import com.ardor3d.renderer.state.record.TextureStateRecord;
 import com.ardor3d.scenegraph.Spatial;
@@ -84,16 +85,7 @@ public class TextureState extends RenderState {
      */
     public TextureState() {
         if (!defaultTextureLoaded) {
-            synchronized (logger) {
-                defaultTextureLoaded = true;
-
-                try {
-                    _defaultTexture = TextureManager.load(DEFAULT_TEXTURE_SOURCE, Texture.MinificationFilter.Trilinear,
-                            true);
-                } catch (final Exception e) {
-                    logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
-                }
-            }
+            loadDefaultTexture();
         }
     }
 
@@ -293,7 +285,25 @@ public class TextureState extends RenderState {
     }
 
     public static Texture getDefaultTexture() {
-        return _defaultTexture;
+        if (!defaultTextureLoaded) {
+            loadDefaultTexture();
+        }
+        return _defaultTexture.createSimpleClone();
+    }
+
+    private static void loadDefaultTexture() {
+        synchronized (logger) {
+            if (!defaultTextureLoaded) {
+                defaultTextureLoaded = true;
+                _defaultTexture = new Texture2D();
+                try {
+                    _defaultTexture = TextureManager.load(DEFAULT_TEXTURE_SOURCE, Texture.MinificationFilter.Trilinear,
+                            true);
+                } catch (final Exception e) {
+                    logger.log(Level.WARNING, "Failed to load default texture: notloaded.tga", e);
+                }
+            }
+        }
     }
 
     @Override
