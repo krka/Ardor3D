@@ -12,6 +12,7 @@ package com.ardor3d.scene.state.lwjgl;
 
 import org.lwjgl.opengl.GL11;
 
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
@@ -27,12 +28,15 @@ public abstract class LwjglClipStateUtil {
         final ClipStateRecord record = (ClipStateRecord) context.getStateRecord(StateType.Clip);
         context.setCurrentState(StateType.Clip, state);
 
+        final ContextCapabilities caps = context.getCapabilities();
+        final int max = Math.max(ClipState.MAX_CLIP_PLANES, caps.getMaxUserClipPlanes());
+
         if (state.isEnabled()) {
-            for (int i = 0; i < ClipState.MAX_CLIP_PLANES; i++) {
+            for (int i = 0; i < max; i++) {
                 enableClipPlane(i, state.getPlaneEnabled(i), state, record);
             }
         } else {
-            for (int i = 0; i < ClipState.MAX_CLIP_PLANES; i++) {
+            for (int i = 0; i < max; i++) {
                 enableClipPlane(i, false, state, record);
             }
         }

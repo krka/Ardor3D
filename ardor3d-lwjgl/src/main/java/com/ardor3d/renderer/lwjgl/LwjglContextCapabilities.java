@@ -52,6 +52,9 @@ public class LwjglContextCapabilities extends ContextCapabilities {
             _maxTextureLodBias = 0f;
         }
 
+        GL11.glGetInteger(GL11.GL_MAX_CLIP_PLANES, buf);
+        _maxUserClipPlanes = buf.get(0);
+
         _glslSupported = caps.GL_ARB_shader_objects && caps.GL_ARB_fragment_shader && caps.GL_ARB_vertex_shader
                 && caps.GL_ARB_shading_language_100;
 

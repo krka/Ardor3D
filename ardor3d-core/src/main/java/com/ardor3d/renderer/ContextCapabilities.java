@@ -40,6 +40,8 @@ public class ContextCapabilities {
     protected int _maxFBOColorAttachments = 1;
     protected int _maxFBOSamples = 0;
 
+    protected int _maxUserClipPlanes = 0;
+
     protected boolean _twoSidedStencilSupport = false;
     protected boolean _stencilWrapSupport = false;
 
@@ -473,6 +475,10 @@ public class ContextCapabilities {
 
     public int getMaxFBOSamples() {
         return _maxFBOSamples;
+    }
+
+    public int getMaxUserClipPlanes() {
+        return _maxUserClipPlanes;
     }
 
     /**

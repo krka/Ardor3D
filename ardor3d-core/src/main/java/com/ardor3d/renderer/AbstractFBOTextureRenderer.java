@@ -53,7 +53,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     public AbstractFBOTextureRenderer(final int width, final int height, final int depthBits, final int samples,
             final Renderer parentRenderer, final ContextCapabilities caps) {
         _parentRenderer = parentRenderer;
-        _samples = Math.min(samples, caps._maxFBOSamples);
+        _samples = Math.min(samples, caps.getMaxFBOSamples());
         _depthBits = depthBits;
         _supportsDepthTexture = caps.isDepthTextureSupported();
         _supportsMultisample = caps.getMaxFBOSamples() != 0;

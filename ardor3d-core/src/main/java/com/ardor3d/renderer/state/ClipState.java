@@ -22,18 +22,11 @@ import com.ardor3d.util.export.OutputCapsule;
  * geometric objects. ClipPlane can add an additional (to the normal frustum planes) six planes to clip against.
  */
 public class ClipState extends RenderState {
-    public static final int CLIP_PLANE0 = 0;
 
-    public static final int CLIP_PLANE1 = 1;
-
-    public static final int CLIP_PLANE2 = 2;
-
-    public static final int CLIP_PLANE3 = 3;
-
-    public static final int CLIP_PLANE4 = 4;
-
-    public static final int CLIP_PLANE5 = 5;
-
+    /**
+     * Max supported number of user-defined clip planes in Ardor3D. Note that a user may or may not have access to all 6
+     * (or even any!) or their particular platform. Check ContextCapabilities to confirm as necessary.
+     */
     public static final int MAX_CLIP_PLANES = 6;
 
     protected boolean[] enabledClipPlanes = new boolean[MAX_CLIP_PLANES];

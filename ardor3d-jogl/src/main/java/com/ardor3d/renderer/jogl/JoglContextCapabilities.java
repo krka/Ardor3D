@@ -54,6 +54,9 @@ public final class JoglContextCapabilities extends ContextCapabilities {
             _maxTextureLodBias = 0f;
         }
 
+        gl.glGetIntegerv(GL.GL_MAX_CLIP_PLANES, buf);
+        _maxUserClipPlanes = buf.get(0);
+
         _glslSupported = gl.isExtensionAvailable("GL_ARB_shader_objects")
                 && gl.isExtensionAvailable("GL_ARB_fragment_shader") && gl.isExtensionAvailable("GL_ARB_vertex_shader")
                 && gl.isExtensionAvailable("GL_ARB_shading_language_100");
