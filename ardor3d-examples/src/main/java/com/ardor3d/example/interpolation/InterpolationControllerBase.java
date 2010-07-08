@@ -25,6 +25,8 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
+import com.ardor3d.scenegraph.controller.interpolation.CurveInterpolationController;
+import com.ardor3d.scenegraph.controller.interpolation.CurveLookAtController;
 import com.ardor3d.scenegraph.controller.interpolation.InterpolationController;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
@@ -58,6 +60,11 @@ public abstract class InterpolationControllerBase<C extends InterpolationControl
         controller.setRepeatType(RepeatType.WRAP);
 
         box.addController(controller);
+
+        // If it's a curve interpolation controller also add a look at controller
+        if (controller instanceof CurveInterpolationController) {
+            box.addController(new CurveLookAtController((CurveInterpolationController) controller));
+        }
 
         // Add some text for informational purposes
         final BasicText speedText = BasicText.createDefaultTextLabel("text", getSpeedText(controller));
