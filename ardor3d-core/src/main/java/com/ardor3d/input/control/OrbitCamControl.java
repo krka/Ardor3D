@@ -374,8 +374,9 @@ public class OrbitCamControl {
             }
         };
 
-        _mouseTrigger = new InputTrigger(Predicates.or(scrollWheelMoved, dragOnly ? dragged : TriggerConditions
-                .mouseMoved()), mouseAction);
+        final Predicate<TwoInputStates> predicate = Predicates.or(scrollWheelMoved, dragOnly ? dragged
+                : TriggerConditions.mouseMoved());
+        _mouseTrigger = new InputTrigger(predicate, mouseAction);
         layer.registerTrigger(_mouseTrigger);
     }
 }
