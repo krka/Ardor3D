@@ -135,6 +135,11 @@ public class MathUtils {
     /**
      * Converts a point from Spherical coordinates to Cartesian (using positive Y as up) and stores the results in the
      * store var.
+     * 
+     * @param sphereCoords
+     *            (Radius, Azimuth, Polar)
+     * @param store
+     *            the vector to store the result in for return. If null, a new vector object is created and returned.
      */
     public static Vector3 sphericalToCartesian(final ReadOnlyVector3 sphereCoords, final Vector3 store) {
         final double a = sphereCoords.getX() * cos(sphereCoords.getZ());
@@ -142,12 +147,20 @@ public class MathUtils {
         final double y = sphereCoords.getX() * sin(sphereCoords.getZ());
         final double z = a * sin(sphereCoords.getY());
 
-        return store.set(x, y, z);
+        Vector3 rVal = store;
+        if (rVal == null) {
+            rVal = new Vector3();
+        }
+        return rVal.set(x, y, z);
     }
 
     /**
      * Converts a point from Cartesian coordinates (using positive Y as up) to Spherical and stores the results in the
      * store var. (Radius, Azimuth, Polar)
+     * 
+     * @param cartCoords
+     * @param store
+     *            the vector to store the result in for return. If null, a new vector object is created and returned.
      */
     public static Vector3 cartesianToSpherical(final ReadOnlyVector3 cartCoords, final Vector3 store) {
         final double cartX = Math.abs(cartCoords.getX()) <= EPSILON ? EPSILON : cartCoords.getX();
@@ -157,12 +170,22 @@ public class MathUtils {
         final double x = sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
         final double y = atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
         final double z = asin(cartY / x);
-        return store.set(x, y, z);
+
+        Vector3 rVal = store;
+        if (rVal == null) {
+            rVal = new Vector3();
+        }
+        return rVal.set(x, y, z);
     }
 
     /**
      * Converts a point from Spherical coordinates to Cartesian (using positive Z as up) and stores the results in the
      * store var.
+     * 
+     * @param sphereCoords
+     *            (Radius, Azimuth, Polar)
+     * @param store
+     *            the vector to store the result in for return. If null, a new vector object is created and returned.
      */
     public static Vector3 sphericalToCartesianZ(final ReadOnlyVector3 sphereCoords, final Vector3 store) {
         final double a = sphereCoords.getX() * cos(sphereCoords.getZ());
@@ -170,12 +193,20 @@ public class MathUtils {
         final double y = a * sin(sphereCoords.getY());
         final double z = sphereCoords.getX() * sin(sphereCoords.getZ());
 
-        return store.set(x, y, z);
+        Vector3 rVal = store;
+        if (rVal == null) {
+            rVal = new Vector3();
+        }
+        return rVal.set(x, y, z);
     }
 
     /**
      * Converts a point from Cartesian coordinates (using positive Z as up) to Spherical and stores the results in the
      * store var. (Radius, Azimuth, Polar)
+     * 
+     * @param cartCoords
+     * @param store
+     *            the vector to store the result in for return. If null, a new vector object is created and returned.
      */
     public static Vector3 cartesianZToSpherical(final ReadOnlyVector3 cartCoords, final Vector3 store) {
         final double cartX = Math.abs(cartCoords.getX()) <= EPSILON ? EPSILON : cartCoords.getX();
@@ -185,7 +216,12 @@ public class MathUtils {
         final double x = sqrt((cartX * cartX) + (cartY * cartY) + (cartZ * cartZ));
         final double y = asin(cartY / x);
         final double z = atan(cartZ / cartX) + (cartX < 0.0 ? PI : 0);
-        return store.set(x, y, z);
+
+        Vector3 rVal = store;
+        if (rVal == null) {
+            rVal = new Vector3();
+        }
+        return rVal.set(x, y, z);
     }
 
     /**
