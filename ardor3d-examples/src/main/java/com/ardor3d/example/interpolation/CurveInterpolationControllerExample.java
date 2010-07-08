@@ -79,8 +79,8 @@ public class CurveInterpolationControllerExample extends InterpolationController
         controller.setActive(true);
         controller.setUpdateField(UpdateField.LOCAL_TRANSLATION);
         controller.setSpeed(10.0);
-        controller.setConstantSpeed(true);
         controller.generateArcLengths(10, true); // we must pass true as can switch to cycle repeat type at runtime
+        controller.setConstantSpeed(true);
 
         return controller;
     }

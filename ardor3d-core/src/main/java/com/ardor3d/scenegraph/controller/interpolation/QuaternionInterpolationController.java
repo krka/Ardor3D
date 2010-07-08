@@ -23,7 +23,7 @@ public class QuaternionInterpolationController extends InterpolationController<R
     private static final long serialVersionUID = 1L;
 
     /** @see #setLocalRotation(boolean) */
-    private boolean localRotation = true;
+    private boolean _localRotation = true;
 
     /**
      * Interpolates between the given quaternions using the
@@ -56,7 +56,7 @@ public class QuaternionInterpolationController extends InterpolationController<R
      * @see #isLocalRotation()
      */
     public void setLocalRotation(final boolean localRotation) {
-        this.localRotation = localRotation;
+        _localRotation = localRotation;
     }
 
     /**
@@ -64,7 +64,7 @@ public class QuaternionInterpolationController extends InterpolationController<R
      * @see #setLocalRotation(boolean)
      */
     public boolean isLocalRotation() {
-        return localRotation;
+        return _localRotation;
     }
 
 }

@@ -22,6 +22,9 @@ import com.ardor3d.spline.Spline;
 
 /**
  * CurveInterpolationController class interpolates a {@link Spatial}s vectors using a {@link Curve}.
+ * <p>
+ * This class is stateful and can not be used by more than one controller at a time.
+ * </p>
  */
 public class CurveInterpolationController extends Vector3InterpolationController {
 
@@ -149,23 +152,23 @@ public class CurveInterpolationController extends Vector3InterpolationController
     protected ReadOnlyVector3 getCotnrolPointEnd() {
         ReadOnlyVector3 control = null;
 
-        final int toIndex = getIndex() + 1;
+        final int toIndex = getIndex();
 
         switch (getRepeatType()) {
             case CLAMP:
-                control = getControls().get(toIndex + 1);
+                control = getControls().get(toIndex + 2);
                 break;
 
             case CYCLE:
                 if (isCycleForward()) {
-                    control = getControls().get(toIndex + 1);
+                    control = getControls().get(toIndex + 2);
                 } else {
-                    control = getControls().get(toIndex - 1);
+                    control = getControls().get(toIndex - 2);
                 }
                 break;
 
             case WRAP:
-                control = getControls().get(toIndex + 1);
+                control = getControls().get(toIndex + 2);
                 break;
         }
 
