@@ -29,7 +29,7 @@ public abstract class LwjglClipStateUtil {
         context.setCurrentState(StateType.Clip, state);
 
         final ContextCapabilities caps = context.getCapabilities();
-        final int max = Math.max(ClipState.MAX_CLIP_PLANES, caps.getMaxUserClipPlanes());
+        final int max = Math.min(ClipState.MAX_CLIP_PLANES, caps.getMaxUserClipPlanes());
 
         if (state.isEnabled()) {
             for (int i = 0; i < max; i++) {
