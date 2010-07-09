@@ -150,7 +150,7 @@ public class GradientBackdrop extends UIBackdrop {
         final Mesh mesh = new Mesh();
         mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
         mesh.getMeshData().setColorBuffer(BufferUtils.createColorBuffer(4));
-        mesh.getMeshData().setIndexMode(IndexMode.Quads);
+        mesh.getMeshData().setIndexMode(IndexMode.TriangleFan);
 
         final BlendState blend = new BlendState();
         blend.setBlendEnabled(true);

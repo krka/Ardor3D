@@ -85,7 +85,7 @@ public class UIQuad extends Mesh {
         tbuf.put(1).put(0);
         tbuf.put(1).put(1);
 
-        _meshData.setIndexMode(IndexMode.Quads);
+        _meshData.setIndexMode(IndexMode.TriangleFan);
     }
 
     public double getWidth() {

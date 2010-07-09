@@ -345,7 +345,7 @@ public class SubTexUtil {
         final Mesh mesh = new Mesh();
         mesh.getMeshData().setVertexCoords(new FloatBufferData(BufferUtils.createVector2Buffer(4), 2));
         mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(4), 0);
-        mesh.getMeshData().setIndexMode(IndexMode.Quads);
+        mesh.getMeshData().setIndexMode(IndexMode.TriangleFan);
 
         mesh.setRenderState(SubTexUtil._tstate);
 
