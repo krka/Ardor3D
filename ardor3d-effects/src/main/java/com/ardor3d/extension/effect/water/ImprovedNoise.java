@@ -10,6 +10,8 @@
 
 package com.ardor3d.extension.effect.water;
 
+import com.ardor3d.math.MathUtils;
+
 /**
  * <code>ImprovedNoise</code> Fast perlin noise.
  * 
@@ -17,12 +19,12 @@ package com.ardor3d.extension.effect.water;
  */
 public final class ImprovedNoise {
     public static double noise(double x, double y, double z) {
-        final int X = (int) Math.floor(x) & 255, // FIND UNIT CUBE THAT
-        Y = (int) Math.floor(y) & 255, // CONTAINS POINT.
-        Z = (int) Math.floor(z) & 255;
-        x -= Math.floor(x); // FIND RELATIVE X,Y,Z
-        y -= Math.floor(y); // OF POINT IN CUBE.
-        z -= Math.floor(z);
+        final int X = (int) MathUtils.floor(x) & 255, // FIND UNIT CUBE THAT
+        Y = (int) MathUtils.floor(y) & 255, // CONTAINS POINT.
+        Z = (int) MathUtils.floor(z) & 255;
+        x -= MathUtils.floor(x); // FIND RELATIVE X,Y,Z
+        y -= MathUtils.floor(y); // OF POINT IN CUBE.
+        z -= MathUtils.floor(z);
         final double u = fade(x), // COMPUTE FADE CURVES
         v = fade(y), // FOR EACH OF X,Y,Z.
         w = fade(z);

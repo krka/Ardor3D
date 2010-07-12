@@ -482,12 +482,38 @@ public class MathUtils {
                 .getZ(), -direction.getZ());
     }
 
+    /**
+     * Faster floor function. Does not handle NaN and Infinity. (Not handled when doing Math.floor and just casting
+     * anyways, so question is if we want to handle it or not)
+     * 
+     * @param val
+     *            Value to floor
+     * @return Floored int value
+     */
     public static int floor(final float val) {
-        return (int) Math.floor(val);
+        final int intVal = (int) val;
+        return val < 0 ? (val == intVal ? intVal : intVal - 1) : intVal;
     }
 
+    /**
+     * Faster floor function. Does not handle NaN and Infinity. (Not handled when doing Math.floor and just casting
+     * anyways, so question is if we want to handle it or not)
+     * 
+     * @param val
+     *            Value to floor
+     * @return Floored long value
+     */
     public static long floor(final double val) {
-        return (long) Math.floor(val);
+        final long longVal = (long) val;
+        return val < 0 ? (val == longVal ? longVal : longVal - 1) : longVal;
+    }
+
+    public static int round(final float val) {
+        return floor(val + 0.5f);
+    }
+
+    public static long round(final double val) {
+        return floor(val + 0.5d);
     }
 
     public static double clamp(final double val, final double min, final double max) {

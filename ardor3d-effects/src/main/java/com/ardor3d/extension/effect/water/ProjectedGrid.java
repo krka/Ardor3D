@@ -531,10 +531,8 @@ public class ProjectedGrid extends Mesh {
      * @return the normal unit vector at the provided location.
      */
     public Vector3 getSurfaceNormal(final double x, final double z, Vector3 store) {
-        // x /= stepScale.x;
-        // z /= stepScale.z;
-        final double col = Math.floor(x);
-        final double row = Math.floor(z);
+        final double col = MathUtils.floor(x);
+        final double row = MathUtils.floor(z);
 
         if (col < 0 || row < 0 || col >= sizeX - 1 || row >= sizeY - 1) {
             return null;
