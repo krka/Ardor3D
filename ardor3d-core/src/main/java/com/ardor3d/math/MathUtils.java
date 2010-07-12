@@ -545,4 +545,18 @@ public class MathUtils {
         wrappedValue += wrappedValue < 0 ? size : 0;
         return wrappedValue;
     }
+
+    /**
+     * Simple 2^x
+     * 
+     * @param x
+     *            power
+     * @return 2^x
+     */
+    public static int pow2(final int x) {
+        if (x <= 0) {
+            return 1;
+        }
+        return 2 << x - 1;
+    }
 }
