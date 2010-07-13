@@ -155,6 +155,11 @@ public class UIHud extends Node {
      *            the component to remove
      */
     public void remove(final UIComponent component) {
+        // first lose focus, if appropriate
+        if (_focusedComponent != null && (_focusedComponent == component || _focusedComponent.hasAncestor(component))) {
+            setFocusedComponent(null);
+        }
+
         component.detachedFromHud();
         detachChild(component);
         for (final HudListener hl : _hudListeners) {
