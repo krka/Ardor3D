@@ -23,7 +23,7 @@ import com.ardor3d.scenegraph.hint.PickingHint;
 
 public abstract class PickingUtil {
     public static void findPick(final Spatial spatial, final Ray3 ray, final PickResults results) {
-        if (!spatial.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
+        if (spatial == null || !spatial.getSceneHints().isPickingHintEnabled(PickingHint.Pickable)) {
             return;
         }
 
