@@ -143,9 +143,19 @@ public interface Renderer {
     boolean isInOrthoMode();
 
     /**
-     * render queue if needed
+     * render queues - will first sort, then render, then finally clear the queue
      */
     void renderBuckets();
+
+    /**
+     * render queues
+     * 
+     * @param doSort
+     *            if true, the queues will be sorted prior to rendering.
+     * @param doClear
+     *            if true, the queues will be emptied after rendering.
+     */
+    void renderBuckets(boolean doSort, boolean doClear);
 
     /**
      * clear the render queue

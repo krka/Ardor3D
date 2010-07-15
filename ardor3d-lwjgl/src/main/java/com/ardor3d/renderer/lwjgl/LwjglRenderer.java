@@ -124,12 +124,25 @@ public class LwjglRenderer extends AbstractRenderer {
                 _backgroundColor.getAlpha());
     }
 
-    /**
-     * render queue if needed
-     */
+    @Override
     public void renderBuckets() {
+        renderBuckets(true, true);
+    }
+
+    @Override
+    public void renderBuckets(final boolean doSort, final boolean doClear) {
         _processingQueue = true;
-        _queue.renderBuckets(this);
+        if (doSort && doClear) {
+            _queue.renderBuckets(this);
+        } else {
+            if (doSort) {
+                _queue.sortBuckets();
+            }
+            _queue.renderOnly(this);
+            if (doClear) {
+                _queue.clearBuckets();
+            }
+        }
         _processingQueue = false;
     }
 
