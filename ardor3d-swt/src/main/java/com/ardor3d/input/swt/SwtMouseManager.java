@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -62,7 +63,8 @@ public class SwtMouseManager implements MouseManager {
     }
 
     public void setPosition(final int x, final int y) {
-        _control.getDisplay().setCursorLocation(x, y);
+        final Point p = new Point(x, _control.getSize().y - y);
+        _control.getDisplay().setCursorLocation(_control.toDisplay(p));
     }
 
     public void setGrabbed(final GrabbedState grabbedState) {
