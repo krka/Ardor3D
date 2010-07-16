@@ -323,13 +323,13 @@ public class Node extends Spatial {
     }
 
     @Override
-    public void propagateDirtyDown(final DirtyType dirtyType) {
-        super.propagateDirtyDown(dirtyType);
+    protected void propagateDirtyDown(final DirtyType... dirtyTypes) {
+        super.propagateDirtyDown(dirtyTypes);
 
         for (int i = getNumberOfChildren() - 1; i >= 0; i--) {
             final Spatial child = _children.get(i);
 
-            child.propagateDirtyDown(dirtyType);
+            child.propagateDirtyDown(dirtyTypes);
         }
     }
 

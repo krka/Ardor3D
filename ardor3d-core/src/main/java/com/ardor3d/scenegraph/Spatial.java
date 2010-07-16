@@ -81,7 +81,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     protected DirtyEventListener _listener;
 
     /** Field for accumulating dirty marks. */
-    protected EnumSet<DirtyType> _dirtyMark = EnumSet.allOf(DirtyType.class);
+    protected EnumSet<DirtyType> _dirtyMark = EnumSet
+            .of(DirtyType.Bounding, DirtyType.RenderState, DirtyType.Transform);
 
     /** Field for user data. Note: If this object is not explicitly of type Savable, it will be ignored during save. */
     protected Object _userData = null;
@@ -297,11 +298,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     protected void markDirty(final Spatial caller, final DirtyType dirtyType) {
         switch (dirtyType) {
             case Transform:
-                // XXX: Can we pass multiples at one time?
-                propagateDirtyUp(DirtyType.Transform);
-                propagateDirtyDown(DirtyType.Transform);
-                propagateDirtyUp(DirtyType.Bounding);
-                propagateDirtyDown(DirtyType.Bounding);
+                propagateDirtyUp(DirtyType.Transform, DirtyType.Bounding);
+                propagateDirtyDown(DirtyType.Transform, DirtyType.Bounding);
                 break;
             case RenderState:
                 propagateDirtyUp(DirtyType.RenderState);
@@ -311,10 +309,8 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
                 propagateDirtyUp(DirtyType.Bounding);
                 break;
             case Attached:
-                propagateDirtyDown(DirtyType.Transform);
-                propagateDirtyDown(DirtyType.RenderState);
+                propagateDirtyDown(DirtyType.Transform, DirtyType.RenderState, DirtyType.Bounding);
                 propagateDirtyUp(DirtyType.Bounding);
-                propagateDirtyDown(DirtyType.Bounding);
                 break;
             case Detached:
             case Destroyed:
@@ -351,25 +347,29 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     /**
      * Propagate the dirty mark up the tree hierarchy.
      * 
-     * @param dirtyType
-     *            the dirty type
+     * @param dirtyTypes
+     *            the dirty types
      */
-    protected void propagateDirtyUp(final DirtyType dirtyType) {
-        _dirtyMark.add(dirtyType);
+    protected void propagateDirtyUp(final DirtyType... dirtyTypes) {
+        for (final DirtyType type : dirtyTypes) {
+            _dirtyMark.add(type);
+        }
 
         if (_parent != null) {
-            _parent.propagateDirtyUp(dirtyType);
+            _parent.propagateDirtyUp(dirtyTypes);
         }
     }
 
     /**
      * Propagate the dirty mark down the tree hierarchy.
      * 
-     * @param dirtyType
-     *            the dirty type
+     * @param dirtyTypes
+     *            the dirty types
      */
-    protected void propagateDirtyDown(final DirtyType dirtyType) {
-        _dirtyMark.add(dirtyType);
+    protected void propagateDirtyDown(final DirtyType... dirtyTypes) {
+        for (final DirtyType type : dirtyTypes) {
+            _dirtyMark.add(type);
+        }
     }
 
     /**
@@ -788,34 +788,36 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     public void updateGeometricState(final double time, final boolean initiator) {
         updateControllers(time);
 
-        if (isDirty(DirtyType.Transform)) {
-            updateWorldTransform(false);
-        }
+        if (_dirtyMark.isEmpty()) {
+            updateChildren(time);
+        } else {
+            if (isDirty(DirtyType.Transform)) {
+                updateWorldTransform(false);
+            }
 
-        if (isDirty(DirtyType.RenderState)) {
-            updateWorldRenderStates(false);
-            clearDirty(DirtyType.RenderState);
-        }
+            if (isDirty(DirtyType.RenderState)) {
+                updateWorldRenderStates(false);
+                clearDirty(DirtyType.RenderState);
+            }
 
-        updateChildren(time);
+            updateChildren(time);
 
-        if (isDirty(DirtyType.Bounding)) {
-            updateWorldBound(false);
-            if (initiator) {
-                propagateBoundToRoot();
+            if (isDirty(DirtyType.Bounding)) {
+                updateWorldBound(false);
+                if (initiator) {
+                    propagateBoundToRoot();
+                }
             }
         }
     }
 
     /**
-     * TODO: This is a hack to allow objects like Node to traverse it's children.
+     * Override to allow objects like Node to update their children.
      * 
      * @param time
-     *            the time
+     *            the frame time
      */
-    protected void updateChildren(final double time) {
-
-    }
+    protected void updateChildren(final double time) {}
 
     /**
      * Update all controllers set on this spatial.
