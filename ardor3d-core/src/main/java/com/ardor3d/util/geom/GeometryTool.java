@@ -46,7 +46,7 @@ public abstract class GeometryTool {
     }
 
     /**
-     * Attempt to collapse duplicate vertex data in a given mesh. Vertices are consider duplicate if they occupy the
+     * Attempt to collapse duplicate vertex data in a given mesh. Vertices are considered duplicate if they occupy the
      * same place in space and match the supplied conditions. All vertices in the mesh are considered part of the same
      * vertex "group".
      * 
