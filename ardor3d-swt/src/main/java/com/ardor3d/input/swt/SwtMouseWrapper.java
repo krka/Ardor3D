@@ -128,6 +128,24 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         addNewState(e, 0, buttons, null);
     }
 
+    private int getDX(final MouseEvent e) {
+        return e.x - _lastState.getX();
+    }
+
+    private int getDY(final MouseEvent e) {
+        return getArdor3DY(e) - _lastState.getY();
+    }
+
+    /**
+     * @param e
+     *            our mouseEvent
+     * @return the Y coordinate of the event, flipped relative to the component since we expect an origin in the lower
+     *         left corner.
+     */
+    private int getArdor3DY(final MouseEvent e) {
+        return _control.getSize().y - e.y;
+    }
+
     private void setStateForButton(final MouseEvent e, final EnumMap<MouseButton, ButtonState> buttons,
             final ButtonState buttonState) {
         final MouseButton button = getButtonForEvent(e);
@@ -156,6 +174,7 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
         _clickArmed.clear();
         _clicks.clear();
 
+        // check that we have a valid _lastState
         initState(mouseEvent);
 
         addNewState(mouseEvent, 0, _lastState.getButtonStates(), null);
@@ -169,18 +188,15 @@ public class SwtMouseWrapper implements MouseWrapper, MouseListener, MouseMoveLi
 
     private void initState(final MouseEvent mouseEvent) {
         if (_lastState == null) {
-            _lastState = new MouseState(mouseEvent.x, _control.getSize().y - mouseEvent.y, 0, 0, 0, null, null);
+            _lastState = new MouseState(mouseEvent.x, getArdor3DY(mouseEvent), 0, 0, 0, null, null);
         }
     }
 
     private void addNewState(final MouseEvent mouseEvent, final int wheelDX,
             final EnumMap<MouseButton, ButtonState> buttons, final Multiset<MouseButton> clicks) {
 
-        // changing the y value, since for SWT, y = 0 at the top of the screen
-        final int fixedY = _control.getSize().y - mouseEvent.y;
-
-        final MouseState newState = new MouseState(mouseEvent.x, fixedY, mouseEvent.x - _lastState.getX(), fixedY
-                - _lastState.getY(), wheelDX, buttons, clicks);
+        final MouseState newState = new MouseState(mouseEvent.x, getArdor3DY(mouseEvent), getDX(mouseEvent),
+                getDY(mouseEvent), wheelDX, buttons, clicks);
 
         _upcomingEvents.add(newState);
         _lastState = newState;
