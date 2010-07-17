@@ -84,23 +84,17 @@ public class LwjglMouseWrapper implements MouseWrapper {
             if (Mouse.getButtonCount() > 0) {
                 final boolean down = Mouse.isButtonDown(0);
                 processButtonForClick(MouseButton.LEFT, down);
-                if (Mouse.isButtonDown(0)) {
-                    buttons.put(MouseButton.LEFT, down ? ButtonState.DOWN : ButtonState.UP);
-                }
+                buttons.put(MouseButton.LEFT, down ? ButtonState.DOWN : ButtonState.UP);
             }
             if (Mouse.getButtonCount() > 1) {
                 final boolean down = Mouse.isButtonDown(1);
                 processButtonForClick(MouseButton.RIGHT, down);
-                if (Mouse.isButtonDown(1)) {
-                    buttons.put(MouseButton.RIGHT, down ? ButtonState.DOWN : ButtonState.UP);
-                }
+                buttons.put(MouseButton.RIGHT, down ? ButtonState.DOWN : ButtonState.UP);
             }
             if (Mouse.getButtonCount() > 2) {
                 final boolean down = Mouse.isButtonDown(2);
                 processButtonForClick(MouseButton.MIDDLE, down);
-                if (Mouse.isButtonDown(2)) {
-                    buttons.put(MouseButton.MIDDLE, down ? ButtonState.DOWN : ButtonState.UP);
-                }
+                buttons.put(MouseButton.MIDDLE, down ? ButtonState.DOWN : ButtonState.UP);
             }
 
             final MouseState nextState = new MouseState(Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventDX(), Mouse
