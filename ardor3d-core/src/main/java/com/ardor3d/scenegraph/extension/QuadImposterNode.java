@@ -86,7 +86,7 @@ public class QuadImposterNode extends Node {
     protected Timer _timer;
 
     public QuadImposterNode() {
-        super();
+        this(null, 64, 64);
     }
 
     public QuadImposterNode(final String name, final int twidth, final int theight) {
@@ -113,7 +113,6 @@ public class QuadImposterNode extends Node {
         _imposterQuad = new Quad("ImposterQuad");
         _imposterQuad.resize(1, 1);
         _imposterQuad.setModelBound(new BoundingBox());
-        _imposterQuad.updateModelBound();
         _imposterQuad.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
         _imposterQuad.getSceneHints().setLightCombineMode(LightCombineMode.Off);
         super.attachChild(_imposterQuad);
