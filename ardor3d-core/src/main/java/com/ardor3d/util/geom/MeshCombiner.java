@@ -11,8 +11,13 @@
 package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 
+import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
@@ -57,27 +62,48 @@ public class MeshCombiner {
     }
 
     /**
-     * Combine the given List of Mesh objects into a single Mesh. All Mesh objects must have vertices and texcoords that
-     * have the same tuple width. It is possible to merge Mesh objects together that have mismatched normals/colors/etc.
-     * (eg. one with colors and one without.)
+     * Combine the given array of Mesh objects into a single Mesh. All Mesh objects must have vertices and texcoords
+     * that have the same tuple width. It is possible to merge Mesh objects together that have mismatched
+     * normals/colors/etc. (eg. one with colors and one without.)
      * 
      * @param sources
-     *            our list of Mesh objects to combine.
+     *            our Mesh objects to combine.
      * @return the combined Mesh.
      */
-    public final static Mesh combine(final List<Mesh> sources) {
+    public final static Mesh combine(final Mesh... sources) {
+        return combine(Lists.newArrayList(sources));
+    }
+
+    /**
+     * Combine the given collection of Mesh objects into a single Mesh. All Mesh objects must have vertices and
+     * texcoords that have the same tuple width. It is possible to merge Mesh objects together that have mismatched
+     * normals/colors/etc. (eg. one with colors and one without.)
+     * 
+     * @param sources
+     *            our collection of Mesh objects to combine.
+     * @return the combined Mesh.
+     */
+    public final static Mesh combine(final Collection<Mesh> sources) {
         if (sources == null || sources.isEmpty()) {
             return null;
         }
 
         // go through each MeshData to see what buffers we need and validate sizes.
         boolean useIndices = false, useNormals = false, useTextures = false, useColors = false;
-        int maxTextures = 0, totalVertices = 0, totalIndices = 0, texCoords = 0;
-        final int vertCoords = sources.get(0).getMeshData().getVertexCoords().getValuesPerTuple();
+        int maxTextures = 0, totalVertices = 0, totalIndices = 0, texCoords = 2, vertCoords = 3;
+        boolean first = true;
+        EnumMap<StateType, RenderState> states = null;
         MeshData md;
+        BoundingVolume volumeType = null;
         for (final Mesh mesh : sources) {
             md = mesh.getMeshData();
-            if (vertCoords != md.getVertexCoords().getValuesPerTuple()) {
+            if (first) {
+                // copy info from first mesh
+                vertCoords = md.getVertexCoords().getValuesPerTuple();
+                volumeType = mesh.getModelBound(null);
+                states = mesh.getLocalRenderStates();
+                first = false;
+            } else if (vertCoords != md.getVertexCoords().getValuesPerTuple()) {
                 throw new IllegalArgumentException("all MeshData vertex coords must use same tuple size.");
             }
 
@@ -209,8 +235,13 @@ public class MeshCombiner {
             }
         }
 
-        // set our bounding volume using the volume type of our first source.
-        result.setModelBound(sources.get(0).getModelBound(null));
+        // set our bounding volume using the volume type of our first source found above.
+        result.setModelBound(volumeType);
+
+        // set the render states from the first mesh
+        for (final RenderState state : states.values()) {
+            result.setRenderState(state);
+        }
 
         // return our mesh
         return result;
