@@ -127,13 +127,13 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
                 final MultiStatSample sample = StatCollector.getHistorical().get(i);
                 // First figure out the max value.
                 double max = 0;
-                for (final StatType type : sample._values.keySet()) {
+                for (final StatType type : sample.getStatTypes()) {
                     if (_config.containsKey(type)) {
-                        max += sample._values.get(type)._val;
+                        max = Math.max(sample.getStatValue(type).getAccumulatedValue(), max);
                     }
                 }
                 double accum = 0;
-                for (final StatType type : sample._values.keySet()) {
+                for (final StatType type : sample.getStatTypes()) {
                     if (_config.containsKey(type)) {
                         AreaEntry entry = _entries.get(type);
                         // Prepare our entry object as needed.
@@ -143,9 +143,7 @@ public class TimedAreaGrapher extends AbstractStatGrapher implements TableLinkab
                         }
 
                         // average by max and bump by accumulated total.
-                        final double value = sample._values.get(type)._val / sample._actualTime;
-                        sample._values.get(type)._average = value * 100;
-
+                        final double value = sample.getStatValue(type).getAccumulatedValue() / max;
                         final Vector3 point1 = new Vector3(i, (float) (value + accum), 0);
                         entry.verts.add(point1);
                         final Vector3 point2 = new Vector3(i, (float) (accum), 0);

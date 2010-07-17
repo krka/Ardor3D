@@ -11,29 +11,44 @@
 package com.ardor3d.util.stat;
 
 import java.util.HashMap;
+import java.util.Set;
+
+import com.google.common.collect.Maps;
 
 public class MultiStatSample {
-    public HashMap<StatType, StatValue> _values = new HashMap<StatType, StatValue>();
-    public double _actualTime = 0.0;
+    private final HashMap<StatType, StatValue> _values = Maps.newHashMap();
+    private double _elapsedTime = 0.0;
 
     public static MultiStatSample createNew(final HashMap<StatType, StatValue> current) {
         final MultiStatSample rVal = new MultiStatSample();
-        final double frames = current.containsKey(StatType.STAT_FRAMES) ? current.get(StatType.STAT_FRAMES)._val : 0;
         for (final StatType type : current.keySet()) {
             final StatValue entry = current.get(type);
-            // only count values we've seen at
-            // least 1 time from this sample set.
-            if (entry._iterations != 0) {
-                final StatValue store = new StatValue(entry._val, entry._iterations);
-                if (frames > 0) {
-                    store._average = store._val / frames;
-                } else {
-                    store._average = store._val / store._iterations;
-                }
+            // only count values we've seen at least 1 time from this sample set.
+            if (entry.getIterations() > 0) {
+                final StatValue store = new StatValue(entry);
                 rVal._values.put(type, store);
             }
         }
         return rVal;
     }
 
+    public void setTimeElapsed(final double time) {
+        _elapsedTime = time;
+    }
+
+    public boolean containsStat(final StatType type) {
+        return _values.containsKey(type);
+    }
+
+    public StatValue getStatValue(final StatType type) {
+        return _values.get(type);
+    }
+
+    public Set<StatType> getStatTypes() {
+        return _values.keySet();
+    }
+
+    public double getElapsedTime() {
+        return _elapsedTime;
+    }
 }

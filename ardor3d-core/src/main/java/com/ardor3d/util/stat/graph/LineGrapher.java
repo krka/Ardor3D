@@ -126,7 +126,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             for (int i = 0; i < StatCollector.getHistorical().size(); i++) {
                 final MultiStatSample sample = StatCollector.getHistorical().get(i);
                 for (final StatType type : _config.keySet()) {
-                    if (sample._values.containsKey(type)) {
+                    if (sample.containsStat(type)) {
                         LineEntry entry = _entries.get(type);
                         // Prepare our entry object as needed.
                         if (entry == null || entry.maxSamples != StatCollector.getMaxSamples()) {
@@ -134,9 +134,8 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
                             _entries.put(type, entry);
                         }
 
-                        final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? sample._values
-                                .get(type)._average
-                                : sample._values.get(type)._val;
+                        final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? sample
+                                .getStatValue(type).getAverageValue() : sample.getStatValue(type).getAccumulatedValue();
 
                         final Vector3 point = new Vector3(i, value, 0);
                         // Now, add

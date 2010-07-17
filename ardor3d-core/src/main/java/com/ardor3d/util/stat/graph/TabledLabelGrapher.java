@@ -104,12 +104,13 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
             final MultiStatSample sample = StatCollector.getHistorical().get(StatCollector.getHistorical().size() - 1);
             // - go through things we are configured for
             for (final StatType type : _config.keySet()) {
-                StatValue val = sample._values.get(type);
+                StatValue val = sample.getStatValue(type);
                 if (val == null) {
                     if (!StatCollector.hasHistoricalStat(type)) {
                         continue;
                     } else {
-                        val = new StatValue(0, 1);
+                        val = new StatValue();
+                        val.incrementIterations();
                     }
                 }
 
@@ -123,8 +124,8 @@ public class TabledLabelGrapher extends AbstractStatGrapher {
                 entry.visited = true;
 
                 // Update text value
-                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val._average
-                        : val._val;
+                final double value = getBooleanConfig(type, ConfigKeys.FrameAverage.name(), false) ? val
+                        .getAverageValue() : val.getAccumulatedValue();
                 entry.text.setText(getStringConfig(type, ConfigKeys.Name.name(), type.getStatName()) + " "
                         + stripVal(value, type));
 
