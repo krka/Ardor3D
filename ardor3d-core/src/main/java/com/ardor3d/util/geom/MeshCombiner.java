@@ -37,7 +37,8 @@ import com.google.common.collect.Multimap;
  * 
  * XXX: should add in a way to combine only meshes with similar renderstates<br>
  * XXX: Might be able to reduce memory usage in the singular case where all sources do not have indices defined
- * (arrays).
+ * (arrays).<br>
+ * XXX: Could be smarter about texcoords and have a tuple size per channel.<br>
  */
 public class MeshCombiner {
     public static final float[] DEFAULT_COLOR = { 1f, 1f, 1f, 1f };
@@ -142,7 +143,7 @@ public class MeshCombiner {
                 if (!useTextures) {
                     useTextures = true;
                     texCoords = md.getTextureCoords(0).getValuesPerTuple();
-                } else if (texCoords != md.getTextureCoords(0).getValuesPerTuple()) {
+                } else if (md.getTextureCoords(0) != null && texCoords != md.getTextureCoords(0).getValuesPerTuple()) {
                     throw new IllegalArgumentException("all MeshData objects with texcoords must use same tuple size.");
                 }
                 maxTextures = Math.max(maxTextures, md.getNumberOfUnits());
@@ -259,7 +260,8 @@ class IndexCombiner {
             // walk through each section
             for (int i = 0, maxI = source.getSectionCount(); i < maxI; i++) {
                 // make an int array and populate it.
-                final int size = source.getIndexLengths()[i];
+                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i] : source
+                        .getVertexCount();
                 final int[] indices = new int[size];
                 for (int j = 0; j < size; j++) {
                     indices[j] = j + vertexOffset + offset;
