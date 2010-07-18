@@ -31,7 +31,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.StripBox;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
@@ -69,11 +69,13 @@ public class CombinerExample extends ExampleBase {
         _root.attachChild(scene);
 
         // Generate many boxes and place them in a 2D grid pattern, under the origNode.
+        Mesh mesh;
         for (int i = 0, max = edge * edge; i < max; i++) {
-            final Box b = new Box("box" + i, new Vector3(i % edge, i / edge, 0), .5, .5, .5);
-            b.setModelBound(new BoundingBox());
-            b.setSolidColor(ColorRGBA.randomColor(null));
-            origNode.attachChild(b);
+            mesh = new StripBox("stripbox" + i, new Vector3(i % edge, i / edge, 0), .5, .5, .5);
+
+            mesh.setModelBound(new BoundingBox());
+            mesh.setSolidColor(ColorRGBA.randomColor(null));
+            origNode.attachChild(mesh);
         }
 
         // Create a single Mesh from the origNode and its children.

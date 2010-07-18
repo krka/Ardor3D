@@ -11,11 +11,14 @@
 package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 
 import com.ardor3d.bounding.BoundingVolume;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.FloatBufferData;
@@ -25,11 +28,17 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.visitor.Visitor;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 /**
  * Utility for combining multiple Meshes into a single Mesh. Note that you generally will want to combine Mesh objects
  * that have the same render states.
+ * 
+ * XXX: should add in a way to combine only meshes with similar renderstates<br>
+ * XXX: Might be able to reduce memory usage in the singular case where all sources do not have indices defined
+ * (arrays).
  */
 public class MeshCombiner {
     public static final float[] DEFAULT_COLOR = { 1f, 1f, 1f, 1f };
@@ -89,9 +98,8 @@ public class MeshCombiner {
         }
 
         // go through each MeshData to see what buffers we need and validate sizes.
-        boolean useIndices = false, useNormals = false, useTextures = false, useColors = false;
+        boolean useIndices = false, useNormals = false, useTextures = false, useColors = false, first = true;
         int maxTextures = 0, totalVertices = 0, totalIndices = 0, texCoords = 2, vertCoords = 3;
-        boolean first = true;
         EnumMap<StateType, RenderState> states = null;
         MeshData md;
         BoundingVolume volumeType = null;
@@ -163,9 +171,7 @@ public class MeshCombiner {
         }
         data.setTextureCoords(useTextures ? texCoordsList : null);
 
-        final IndexBufferData<?> indices = useIndices ? BufferUtils.createIndexBufferData(totalIndices,
-                totalVertices - 1) : null;
-        data.setIndices(indices);
+        final IndexCombiner iCombiner = new IndexCombiner();
 
         // Walk through our source meshes and populate return MeshData buffers.
         int vertexOffset = 0;
@@ -220,20 +226,13 @@ public class MeshCombiner {
 
             // Indices
             if (useIndices) {
-                final IndexBufferData<?> ib = md.getIndices();
-                if (ib != null) {
-                    ib.rewind();
-                    for (int i = 0, max = ib.capacity(); i < max; i++) {
-                        indices.put(ib.get(i) + vertexOffset);
-                    }
-                } else {
-                    for (int i = 0; i < md.getVertexCount(); i++) {
-                        indices.put(i + vertexOffset);
-                    }
-                }
+                iCombiner.addEntry(md, vertexOffset);
                 vertexOffset += md.getVertexCount();
             }
         }
+
+        // Apply our index combiner to the mesh
+        iCombiner.saveTo(data);
 
         // set our bounding volume using the volume type of our first source found above.
         result.setModelBound(volumeType);
@@ -245,5 +244,152 @@ public class MeshCombiner {
 
         // return our mesh
         return result;
+    }
+}
+
+class IndexCombiner {
+    Multimap<IndexMode, int[]> sectionMap = ArrayListMultimap.create();
+
+    public void addEntry(final MeshData source, final int vertexOffset) {
+        // arrays or elements?
+        if (source.getIndexBuffer() == null) {
+            // arrays...
+            int offset = 0;
+            int indexModeCounter = 0;
+            final IndexMode[] modes = source.getIndexModes();
+            // walk through each section
+            for (int i = 0, maxI = source.getSectionCount(); i < maxI; i++) {
+                // make an int array and populate it.
+                final int size = source.getIndexLengths()[i];
+                final int[] indices = new int[size];
+                for (int j = 0; j < size; j++) {
+                    indices[j] = j + vertexOffset + offset;
+                }
+
+                // add to map
+                sectionMap.put(modes[indexModeCounter], indices);
+
+                // move our offsets forward to the section
+                offset += size;
+                if (indexModeCounter < modes.length - 1) {
+                    indexModeCounter++;
+                }
+            }
+        } else {
+            // elements...
+            final IndexBufferData<?> ib = source.getIndices();
+            ib.rewind();
+            int offset = 0;
+            int indexModeCounter = 0;
+            final IndexMode[] modes = source.getIndexModes();
+            // walk through each section
+            for (int i = 0, maxI = source.getSectionCount(); i < maxI; i++) {
+                // make an int array and populate it.
+                final int size = source.getIndexLengths() != null ? source.getIndexLengths()[i] : source.getIndices()
+                        .capacity();
+                final int[] indices = new int[size];
+                for (int j = 0; j < size; j++) {
+                    indices[j] = ib.get(j + offset) + vertexOffset;
+                }
+
+                // add to map
+                sectionMap.put(modes[indexModeCounter], indices);
+
+                // move our offsets forward to the section
+                offset += size;
+                if (indexModeCounter < modes.length - 1) {
+                    indexModeCounter++;
+                }
+            }
+        }
+    }
+
+    public void saveTo(final MeshData data) {
+        final List<IntBuffer> sections = Lists.newArrayList();
+        final List<IndexMode> modes = Lists.newArrayList();
+        int max = 0;
+        // walk through index modes and combine those we can.
+        for (final IndexMode mode : sectionMap.keySet()) {
+            final Collection<int[]> sources = sectionMap.get(mode);
+            switch (mode) {
+                case Triangles:
+                case Quads:
+                case Lines:
+                case Points: {
+                    // we can combine these as-is to our heart's content.
+                    int size = 0;
+                    for (final int[] indices : sources) {
+                        size += indices.length;
+                    }
+                    max += size;
+                    final IntBuffer newSection = BufferUtils.createIntBufferOnHeap(size);
+                    for (final int[] indices : sources) {
+                        newSection.put(indices);
+                    }
+                    // save
+                    sections.add(newSection);
+                    modes.add(mode);
+                    break;
+                }
+                case TriangleFan:
+                case QuadStrip:
+                case LineLoop:
+                case LineStrip: {
+                    // these have to be kept, as is.
+                    int size;
+                    for (final int[] indices : sources) {
+                        size = indices.length;
+                        max += size;
+                        final IntBuffer newSection = BufferUtils.createIntBufferOnHeap(size);
+                        newSection.put(indices);
+
+                        sections.add(newSection);
+                        modes.add(mode);
+                    }
+                    break;
+                }
+                case TriangleStrip: {
+                    // we CAN combine these, but we have to add degenerate triangles.
+                    int size = 0;
+                    for (final int[] indices : sources) {
+                        size += indices.length + 2;
+                    }
+                    size -= 2;
+                    max += size;
+                    final IntBuffer newSection = BufferUtils.createIntBufferOnHeap(size);
+                    int i = 0;
+                    for (final int[] indices : sources) {
+                        if (i != 0) {
+                            newSection.put(indices[0]);
+                        }
+                        newSection.put(indices);
+                        if (i < sources.size() - 1) {
+                            newSection.put(indices[indices.length - 1]);
+                        }
+                        i++;
+                    }
+                    // save
+                    sections.add(newSection);
+                    modes.add(mode);
+                    break;
+                }
+            }
+        }
+
+        // compile into data
+        final IndexBufferData<?> finalIndices = BufferUtils.createIndexBufferData(max, data.getVertexCount() - 1);
+        data.setIndices(finalIndices);
+        final int[] sectionCounts = new int[sections.size()];
+        for (int i = 0; i < sectionCounts.length; i++) {
+            final IntBuffer ib = sections.get(i);
+            ib.rewind();
+            sectionCounts[i] = ib.remaining();
+            while (ib.hasRemaining()) {
+                finalIndices.put(ib.get());
+            }
+        }
+        System.err.println(Arrays.toString(sectionCounts));
+        data.setIndexLengths(sectionCounts);
+        data.setIndexModes(modes.toArray(new IndexMode[modes.size()]));
     }
 }
