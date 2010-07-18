@@ -54,7 +54,7 @@ public class AWTImageLoader implements ImageLoader {
                     formats.add(format);
                 }
             }
-            supportedFormats = formats.toArray(new String[] {});
+            supportedFormats = formats.toArray(new String[formats.size()]);
         }
         ImageLoaderUtil.registerHandler(new AWTImageLoader(), supportedFormats);
     }

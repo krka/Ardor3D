@@ -226,8 +226,8 @@ public class TransformChannel extends AbstractAnimationChannel {
             timesArray[i++] = time;
         }
         // return
-        return newChannel(name, timesArray, rotations.toArray(new ReadOnlyQuaternion[] {}), translations
-                .toArray(new ReadOnlyVector3[] {}), scales.toArray(new ReadOnlyVector3[] {}));
+        return newChannel(name, timesArray, rotations.toArray(new ReadOnlyQuaternion[rotations.size()]), translations
+                .toArray(new ReadOnlyVector3[translations.size()]), scales.toArray(new ReadOnlyVector3[scales.size()]));
     }
 
     protected TransformChannel newChannel(final String name, final float[] times, final ReadOnlyQuaternion[] rotations,
