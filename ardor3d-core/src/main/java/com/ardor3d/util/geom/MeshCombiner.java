@@ -12,7 +12,6 @@ package com.ardor3d.util.geom;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
@@ -388,7 +387,7 @@ class IndexCombiner {
                 finalIndices.put(ib.get());
             }
         }
-        System.err.println(Arrays.toString(sectionCounts));
+
         data.setIndexLengths(sectionCounts);
         data.setIndexModes(modes.toArray(new IndexMode[modes.size()]));
     }
