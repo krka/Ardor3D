@@ -117,7 +117,8 @@ public class LineExample extends ExampleBase {
         }
 
         // Create our Line object using the vertex data. We will not be providing normals, colors or texture coords.
-        final Line line = new Line("graphed line: " + grapher, vertexList.toArray(new Vector3[0]), null, null, null);
+        final Line line = new Line("graphed line: " + grapher, vertexList.toArray(new Vector3[vertexList.size()]),
+                null, null, null);
         // The type of line we are making is a LineStrip. You can experiment and try making this Lines, or a Line Loop.
         line.getMeshData().setIndexMode(IndexMode.LineStrip);
         // Update the model bound of our line to fit the data we've provided.

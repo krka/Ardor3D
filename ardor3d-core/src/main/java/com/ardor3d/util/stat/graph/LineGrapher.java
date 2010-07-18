@@ -168,7 +168,7 @@ public class LineGrapher extends AbstractStatGrapher implements TableLinkable {
             }
 
             // - Update the Point and Line params with the verts and count.
-            final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[] {}));
+            final FloatBuffer fb = BufferUtils.createFloatBuffer(entry.verts.toArray(new Vector3[entry.verts.size()]));
             entry.point.getMeshData().setVertexBuffer(fb);
             final double scaleWidth = texWidth / (StatCollector.getMaxSamples() - 1.0);
             final double scaleHeight = texHeight / (entry.max * 1.02);
