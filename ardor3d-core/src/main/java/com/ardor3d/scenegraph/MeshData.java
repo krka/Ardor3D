@@ -641,7 +641,9 @@ public class MeshData implements Cloneable, Savable {
      * Gets the index mode.
      * 
      * @return the IndexMode of the first section of this MeshData.
+     * @deprecated Please switch to {@link #getIndexMode(int)}
      */
+    @Deprecated
     public IndexMode getIndexMode() {
         return getIndexMode(0);
     }
