@@ -103,7 +103,7 @@ public class NormalGenerator {
      */
     private void generateNormals(final Mesh mesh) {
         // FIXME: only uses 1st index.
-        if (mesh.getMeshData().getIndexMode() != IndexMode.Triangles) {
+        if (mesh.getMeshData().getIndexMode(0) != IndexMode.Triangles) {
             logger.info("Invalid triangles mode in " + mesh);
             return;
         }

@@ -77,7 +77,7 @@ public class ScenegraphTree {
                 str.append("Primitives: ");
                 str.append(mesh.getMeshData().getTotalPrimitiveCount()).append("\n");
                 str.append("Index mode: ");
-                str.append(mesh.getMeshData().getIndexMode()).append("\n");
+                str.append(mesh.getMeshData().getIndexMode(0)).append("\n");
             }
 
             str.append(spatial.getTransform()).append("\n");
