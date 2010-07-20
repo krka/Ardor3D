@@ -118,7 +118,7 @@ public class LwjglMouseWrapper implements MouseWrapper {
 
         private void processButtonForClick(final MouseButton b, final boolean down) {
             boolean expired = false;
-            if (_clicks.isEmpty() && System.currentTimeMillis() - _lastClickTime.get(b) > MouseState.CLICK_TIME_MS) {
+            if (System.currentTimeMillis() - _lastClickTime.get(b) > MouseState.CLICK_TIME_MS) {
                 _clicks.setCount(b, 0);
                 expired = true;
             }
