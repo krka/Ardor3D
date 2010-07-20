@@ -62,6 +62,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     protected boolean _doSwap;
     protected GLContext _context;
     protected JoglRenderer _renderer;
+    protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
     private RenderContext _currentContext;
 
@@ -198,7 +199,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
             }
             _camera.apply(_renderer);
         }
-        _renderer.clearBuffers(Renderer.BUFFER_COLOR_AND_DEPTH);
+        _renderer.clearBuffers(_frameClear);
 
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
@@ -230,5 +231,13 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
     public RenderContext getRenderContext() {
         return _currentContext;
+    }
+
+    public int getFrameClear() {
+        return _frameClear;
+    }
+
+    public void setFrameClear(final int buffers) {
+        _frameClear = buffers;
     }
 }

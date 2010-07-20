@@ -35,6 +35,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     protected boolean _doSwap;
     protected LwjglRenderer _renderer;
     protected Object _context = new Object();
+    protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
+
     private RenderContext _currentContext;
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
@@ -123,7 +125,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             }
             _camera.apply(_renderer);
         }
-        _renderer.clearBuffers(Renderer.BUFFER_COLOR_AND_DEPTH);
+        _renderer.clearBuffers(_frameClear);
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
         return drew;
@@ -168,5 +170,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public RenderContext getRenderContext() {
         return _currentContext;
+    }
+
+    public int getFrameClear() {
+        return _frameClear;
+    }
+
+    public void setFrameClear(final int buffers) {
+        _frameClear = buffers;
     }
 }

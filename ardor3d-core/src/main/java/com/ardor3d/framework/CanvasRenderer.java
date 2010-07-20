@@ -79,4 +79,18 @@ public interface CanvasRenderer {
      * @return the Ardor3D RenderContext associated with this CanvasRenderer.
      */
     RenderContext getRenderContext();
+
+    /**
+     * @return an int representing the buffers to clear at the start of each frame. Default is
+     *         Renderer.BUFFER_COLOR_AND_DEPTH
+     */
+    int getFrameClear();
+
+    /**
+     * @param buffers
+     *            an int representing the buffers to clear at the start of each frame. Default is
+     *            Renderer.BUFFER_COLOR_AND_DEPTH
+     */
+    void setFrameClear(final int buffers);
+
 }
