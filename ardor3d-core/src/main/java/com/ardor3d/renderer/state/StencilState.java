@@ -31,15 +31,15 @@ public class StencilState extends RenderState {
         Never,
         /** A stencil function that passes if (ref & mask) < (stencil & mask). */
         LessThan,
-        /** A stencil function that passes if (ref & max) <= (stencil & mask). */
+        /** A stencil function that passes if (ref & mask) <= (stencil & mask). */
         LessThanOrEqualTo,
-        /** A stencil function that passes if (ref & max) > (stencil & mask). */
+        /** A stencil function that passes if (ref & mask) > (stencil & mask). */
         GreaterThan,
-        /** A stencil function that passes if (ref & max) >= (stencil & mask). */
+        /** A stencil function that passes if (ref & mask) >= (stencil & mask). */
         GreaterThanOrEqualTo,
-        /** A stencil function that passes if (ref & max) == (stencil & mask). */
+        /** A stencil function that passes if (ref & mask) == (stencil & mask). */
         EqualTo,
-        /** A stencil function that passes if (ref & max) != (stencil & mask). */
+        /** A stencil function that passes if (ref & mask) != (stencil & mask). */
         NotEqualTo,
         /** A stencil function that always passes. (Default) */
         Always;
