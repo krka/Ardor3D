@@ -114,4 +114,13 @@ public final class LogicalLayer {
     public Set<InputTrigger> getTriggers() {
         return _triggers;
     }
+
+    public InputTrigger findTriggerById(final String id) {
+        for (final InputTrigger trigger : _triggers) {
+            if (id.equals(trigger.getId())) {
+                return trigger;
+            }
+        }
+        return null;
+    }
 }
