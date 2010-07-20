@@ -459,6 +459,10 @@ public class MathUtils {
                 * -position.getY() + side.getZ() * -position.getZ(), up.getX() * -position.getX() + up.getY()
                 * -position.getY() + up.getZ() * -position.getZ(), -direction.getX() * -position.getX()
                 + -direction.getY() * -position.getY() + -direction.getZ() * -position.getZ(), 1.0);
+
+        Vector3.releaseTempInstance(up);
+        Vector3.releaseTempInstance(side);
+        Vector3.releaseTempInstance(direction);
     }
 
     /**
