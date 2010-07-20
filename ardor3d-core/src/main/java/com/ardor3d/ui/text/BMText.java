@@ -600,12 +600,12 @@ public class BMText extends Mesh {
                 lineIndex++;
                 cursorX = getJustificationXOffset(lineIndex);
                 cursorY += lineHeight;
-                addEmptyCharacter(i, vertices, texCrds);
+                addEmptyCharacter(vertices, texCrds);
             } else if (charVal == '\t') { // tab special case
                 final float tabStop = _tabSize * _font.getMaxCharAdvance();
                 final float stops = 1 + (float) Math.floor(cursorX / tabStop);
                 cursorX = stops * tabStop;
-                addEmptyCharacter(i, vertices, texCrds);
+                addEmptyCharacter(vertices, texCrds);
             } else { // normal character
                 chr = _font.getChar(charVal);
 
@@ -650,11 +650,15 @@ public class BMText extends Mesh {
 
     // this is inefficient yet incredibly convenient
     // used for tab and newline
-    private void addEmptyCharacter(final int i, final FloatBuffer vertices, final FloatBuffer uvs) {
+    private void addEmptyCharacter(final FloatBuffer vertices, final FloatBuffer uvs) {
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
         vertices.put(0).put(0).put(0);
+        vertices.put(0).put(0).put(0);
+        vertices.put(0).put(0).put(0);
+        uvs.put(0).put(0);
+        uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
         uvs.put(0).put(0);
