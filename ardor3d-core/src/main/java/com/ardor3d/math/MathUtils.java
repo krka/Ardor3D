@@ -480,6 +480,10 @@ public class MathUtils {
 
         store.set(side.getX(), up.getX(), -direction.getX(), side.getY(), up.getY(), -direction.getY(), side.getZ(), up
                 .getZ(), -direction.getZ());
+
+        Vector3.releaseTempInstance(up);
+        Vector3.releaseTempInstance(side);
+        Vector3.releaseTempInstance(direction);
     }
 
     /**
