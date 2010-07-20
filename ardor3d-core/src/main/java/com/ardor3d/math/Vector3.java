@@ -823,7 +823,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
      *            the vector to store the result in for return. If null, a new vector object is created and returned.
      * @return the cross product of this vector with the given vector's x, y, z values
      * @throws NullPointerException
-     *             if destination is null.
+     *             if vec is null.
      */
     public Vector3 cross(final ReadOnlyVector3 vec, final Vector3 store) {
         return cross(vec.getX(), vec.getY(), vec.getZ(), store);
