@@ -72,7 +72,7 @@ public class SimpleResourceLocator implements ResourceLocator {
     }
 
     public ResourceSource locateResource(final String resourceName) {
-        return doRecursiveLocate(resourceName);
+        return doRecursiveLocate(cleanup(resourceName));
     }
 
     protected ResourceSource doRecursiveLocate(String resourceName) {
@@ -120,7 +120,7 @@ public class SimpleResourceLocator implements ResourceLocator {
         }
     }
 
-    private String cleanup(String name) {
+    protected String cleanup(String name) {
         // Replace any %2F (or %2f) with forward slashes
         name = name.replaceAll("\\%2[F,f]", "/");
         // replace back slashes with forward

@@ -71,7 +71,9 @@ public class MultiFormatResourceLocator extends SimpleResourceLocator {
     }
 
     @Override
-    public ResourceSource locateResource(final String resourceName) {
+    public ResourceSource locateResource(String resourceName) {
+        resourceName = cleanup(resourceName);
+
         if (_trySpecifiedFormatFirst) {
             final ResourceSource src = doRecursiveLocate(resourceName);
             if (src != null) {
