@@ -456,7 +456,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                         Vector2.releaseTempInstance(pos);
                         doPick(pickRay);
                     }
-                }));
+                }, "pickTrigger"));
 
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
