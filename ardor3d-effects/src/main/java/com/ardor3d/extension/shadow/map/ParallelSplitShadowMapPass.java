@@ -392,7 +392,8 @@ public class ParallelSplitShadowMapPass extends Pass {
 
             _shadowMapRenderer.setupTexture(_shadowMapTexture[i]);
             _shadowTextureState.setTexture(_shadowMapTexture[i], i);
-
+        }
+        for (int i = 0; i < _MAX_SPLITS; i++) {
             _pssmShader.setUniform("shadowMap" + i, i);
             _pssmDebugShader.setUniform("shadowMap" + i, i);
         }

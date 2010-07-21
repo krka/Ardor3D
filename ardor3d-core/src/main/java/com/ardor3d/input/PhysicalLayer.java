@@ -47,24 +47,20 @@ public class PhysicalLayer {
     private static final long MAX_INPUT_POLL_TIME = TimeUnit.SECONDS.toNanos(2);
     private static final List<InputState> EMPTY_LIST = ImmutableList.of();
 
-    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper) {
         this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, DummyFocusWrapper.INSTANCE);
     }
 
-    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final FocusWrapper focusWrapper) {
         this(keyboardWrapper, mouseWrapper, DummyControllerWrapper.INSTANCE, focusWrapper);
     }
 
-    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final ControllerWrapper controllerWrapper) {
         this(keyboardWrapper, mouseWrapper, controllerWrapper, DummyFocusWrapper.INSTANCE);
     }
 
-    
     public PhysicalLayer(final KeyboardWrapper keyboardWrapper, final MouseWrapper mouseWrapper,
             final ControllerWrapper controllerWrapper, final FocusWrapper focusWrapper) {
         _keyboardWrapper = keyboardWrapper;
@@ -103,13 +99,13 @@ public class PhysicalLayer {
 
             // if there is no new input, exit the loop. Otherwise, add a new input state to the queue, and
             // see if there is even more input to read.
+            final ControllerState currentControllerStateSnapshot = _currentControllerState.snapshot();
             if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)
-                    && oldControllerState.equals(_currentControllerState.snapshot())) {
+                    && oldControllerState.equals(currentControllerStateSnapshot)) {
                 break;
             }
 
-            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, _currentControllerState
-                    .snapshot()));
+            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, currentControllerStateSnapshot));
 
             oldKeyState = _currentKeyboardState;
             oldMouseState = _currentMouseState;
