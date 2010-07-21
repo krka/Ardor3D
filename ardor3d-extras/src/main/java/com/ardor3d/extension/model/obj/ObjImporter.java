@@ -415,19 +415,19 @@ public class ObjImporter {
             String line;
             ObjMaterial currentMaterial = null;
             while ((line = reader.readLine()) != null) {
-                line.trim();
+                line = line.trim();
                 // handle line continuation marker \
                 while (line.endsWith("\\")) {
                     line = line.substring(0, line.length() - 1);
                     final String s = reader.readLine();
                     if (s != null) {
                         line += s;
-                        line.trim();
+                        line = line.trim();
                     }
                 }
 
                 // ignore comments. goto next line
-                if (line.startsWith("#")) {
+                if (line.startsWith("#") || line.length() == 0) {
                     continue;
                 }
 
@@ -449,6 +449,7 @@ public class ObjImporter {
                     // start new material
                     currentMaterial = new ObjMaterial();
                     store.put(tokens[1], currentMaterial);
+                    continue;
                 }
 
                 if (currentMaterial == null) {
