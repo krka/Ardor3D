@@ -23,9 +23,10 @@ varying vec3 N;
 void main(void) {
     mat4 mat = mat4(0.0);
     
-    for ( int i = 0; i < 4; i++) {
-        mat += JointPalette[int(JointIDs[i])] * Weights[i];
-    }
+    mat += JointPalette[int(JointIDs[0])] * Weights[0];
+    mat += JointPalette[int(JointIDs[1])] * Weights[1];
+    mat += JointPalette[int(JointIDs[2])] * Weights[2];
+    mat += JointPalette[int(JointIDs[3])] * Weights[3];
     
     gl_Position = gl_ModelViewProjectionMatrix * (mat * gl_Vertex);
     
