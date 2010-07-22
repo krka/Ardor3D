@@ -199,7 +199,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _jointIndices = jointIndices;
         if (_jointIndices != null && _jointIndicesBuf != null) {
             createJointBuffer();
-            updateWeightsAndJointsOnGPUShader();
         }
     }
 
@@ -221,7 +220,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _weights = weights;
         if (_weights != null && _weightsBuf != null) {
             createWeightBuffer();
-            updateWeightsAndJointsOnGPUShader();
         }
     }
 
@@ -276,8 +274,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      */
     public void setUseGPU(final boolean useGPU) {
         _useGPU = useGPU;
-
-        updateWeightsAndJointsOnGPUShader();
     }
 
     private void updateWeightsAndJointsOnGPUShader() {
@@ -462,6 +458,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         if (!_useGPU) {
             super.render(renderer);
         } else {
+            updateWeightsAndJointsOnGPUShader();
             super.render(renderer, getBindPoseData());
         }
     }
