@@ -317,6 +317,29 @@ public class AnimationDemoExample extends ExampleBase {
 
             positionCamera(upAxis);
 
+            // Uncomment to try out gpu skinning
+            // final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
+            // gpuShader.setEnabled(true);
+            // try {
+            // gpuShader.setVertexShader(PrimitiveSkeletonExample.class.getClassLoader().getResourceAsStream(
+            // "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
+            // gpuShader.setFragmentShader(PrimitiveSkeletonExample.class.getClassLoader().getResourceAsStream(
+            // "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
+            // } catch (final IOException ioe) {
+            // ioe.printStackTrace();
+            // }
+            //
+            // colladaNode.acceptVisitor(new Visitor() {
+            // @Override
+            // public void visit(final Spatial spatial) {
+            // if (spatial instanceof SkinnedMesh) {
+            // final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+            // skinnedSpatial.setGPUShader(gpuShader);
+            // skinnedSpatial.setUseGPU(true);
+            // }
+            // }
+            // }, true);
+
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             _root.setRenderState(cullState);
