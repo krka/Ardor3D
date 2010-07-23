@@ -86,9 +86,8 @@ public class PhysicalLayer {
         }
 
         KeyboardState oldKeyState = _currentKeyboardState;
-        MouseState oldMouseState = _currentMouseState = new MouseState(_currentMouseState.getX(), _currentMouseState
-                .getY(), 0, 0, 0, _currentMouseState.getButtonStates(), _currentMouseState.getClickCounts());
-        ControllerState oldControllerState = _currentControllerState.snapshot();
+        MouseState oldMouseState = _currentMouseState;
+        ControllerState oldControllerState = _currentControllerState;
 
         final long loopExitTime = System.nanoTime() + MAX_INPUT_POLL_TIME;
 
@@ -99,13 +98,12 @@ public class PhysicalLayer {
 
             // if there is no new input, exit the loop. Otherwise, add a new input state to the queue, and
             // see if there is even more input to read.
-            final ControllerState currentControllerStateSnapshot = _currentControllerState.snapshot();
             if (oldKeyState.equals(_currentKeyboardState) && oldMouseState.equals(_currentMouseState)
-                    && oldControllerState.equals(currentControllerStateSnapshot)) {
+                    && oldControllerState.equals(_currentControllerState)) {
                 break;
             }
 
-            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, currentControllerStateSnapshot));
+            _stateQueue.add(new InputState(_currentKeyboardState, _currentMouseState, _currentControllerState));
 
             oldKeyState = _currentKeyboardState;
             oldMouseState = _currentMouseState;
@@ -124,11 +122,13 @@ public class PhysicalLayer {
 
     private void readControllerState() {
         final PeekingIterator<ControllerEvent> eventIterator = _controllerWrapper.getEvents();
-        _currentControllerState.clearEvents();
 
-        while (eventIterator.hasNext()) {
-            final ControllerEvent event = eventIterator.next();
-            _currentControllerState.addEvent(event);
+        if (eventIterator.hasNext()) {
+            _currentControllerState = new ControllerState();
+            while (eventIterator.hasNext()) {
+                final ControllerEvent event = eventIterator.next();
+                _currentControllerState.addEvent(event);
+            }
         }
     }
 

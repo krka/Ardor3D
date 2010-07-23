@@ -15,8 +15,11 @@ import java.util.EnumSet;
 
 import com.ardor3d.annotation.Immutable;
 import com.google.common.collect.EnumMultiset;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.ImmutableMultiset.Builder;
 
 /**
  * Describes the mouse state at some point in time.
@@ -31,8 +34,8 @@ public class MouseState {
     private final int _dx;
     private final int _dy;
     private final int _dwheel;
-    private final EnumMap<MouseButton, ButtonState> _buttonStates = Maps.newEnumMap(MouseButton.class);
-    private final Multiset<MouseButton> _clickCounts = EnumMultiset.create(MouseButton.class);
+    private final ImmutableMap<MouseButton, ButtonState> _buttonStates;
+    private final ImmutableMultiset<MouseButton> _clickCounts;
 
     /**
      * Constructs a new MouseState instance.
@@ -60,10 +63,17 @@ public class MouseState {
         _dy = dy;
         _dwheel = dwheel;
         if (buttonStates != null) {
-            _buttonStates.putAll(buttonStates);
+            final com.google.common.collect.ImmutableMap.Builder<MouseButton, ButtonState> builder = ImmutableMap
+                    .builder();
+            _buttonStates = builder.putAll(buttonStates).build();
+        } else {
+            _buttonStates = ImmutableMap.of();
         }
         if (clicks != null) {
-            _clickCounts.addAll(clicks);
+            final Builder<MouseButton> builder = ImmutableMultiset.builder();
+            _clickCounts = builder.addAll(clicks).build();
+        } else {
+            _clickCounts = ImmutableMultiset.of();
         }
     }
 
@@ -189,6 +199,20 @@ public class MouseState {
         } else {
             return EnumMultiset.create(_clickCounts);
         }
+    }
+
+    public Multiset<MouseButton> getClickCounts(final EnumMultiset<MouseButton> store) {
+        final EnumMultiset<MouseButton> rVal = store;
+        if (store == null) {
+            if (_clickCounts.isEmpty()) {
+                return EnumMultiset.create(MouseButton.class);
+            } else {
+                return EnumMultiset.create(_clickCounts);
+            }
+        }
+        rVal.clear();
+        rVal.addAll(_clickCounts);
+        return rVal;
     }
 
     /**

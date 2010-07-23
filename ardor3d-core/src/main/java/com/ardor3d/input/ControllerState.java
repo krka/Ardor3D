@@ -26,7 +26,7 @@ public class ControllerState {
 
     public static final ControllerState NOTHING = new ControllerState();
 
-    private Map<String, Map<String, Float>> controllerStates = new LinkedHashMap<String, Map<String, Float>>();
+    private final Map<String, Map<String, Float>> controllerStates = new LinkedHashMap<String, Map<String, Float>>();
     private final List<ControllerEvent> eventsSinceLastState = new ArrayList<ControllerEvent>();
 
     /**
@@ -46,13 +46,12 @@ public class ControllerState {
 
     @Override
     public boolean equals(final Object obj) {
-        boolean retval = false;
         if (obj instanceof ControllerState) {
             final ControllerState other = (ControllerState) obj;
-            retval = other.controllerStates.equals(controllerStates);
+            return other.controllerStates.equals(controllerStates);
         }
 
-        return retval;
+        return false;
     }
 
     @Override
@@ -73,20 +72,17 @@ public class ControllerState {
 
     public ControllerState snapshot() {
         final ControllerState snapshot = new ControllerState();
-        snapshot.controllerStates = duplicateStates();
+        duplicateStates(snapshot.controllerStates);
         snapshot.eventsSinceLastState.addAll(eventsSinceLastState);
 
         return snapshot;
     }
 
-    private Map<String, Map<String, Float>> duplicateStates() {
-        final Map<String, Map<String, Float>> duplicate = Maps.newLinkedHashMap();
-
+    private void duplicateStates(final Map<String, Map<String, Float>> store) {
+        store.clear();
         for (final Entry<String, Map<String, Float>> entry : controllerStates.entrySet()) {
-            duplicate.put(entry.getKey(), Maps.newLinkedHashMap(entry.getValue()));
+            store.put(entry.getKey(), Maps.newLinkedHashMap(entry.getValue()));
         }
-
-        return duplicate;
     }
 
     public void addEvent(final ControllerEvent event) {
