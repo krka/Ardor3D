@@ -47,7 +47,7 @@ public interface ReadOnlyQuaternion {
 
     Quaternion normalize(Quaternion store);
 
-    Quaternion invert(Quaternion store);
+    Quaternion conjugate(Quaternion store);
 
     Quaternion add(ReadOnlyQuaternion quat, Quaternion store);
 

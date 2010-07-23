@@ -683,27 +683,33 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
-     * creates a new quaternion that holds the inverted values of this quaternion as if multiply(-1, store) had been
-     * called.
+     * Creates a new quaternion that is the conjugate <code>[-x, -y, -z, w]</code> of this quaternion.
      * 
      * @param store
-     *            the Quaternion to store the result in. if null, a new one is created.
-     * @return a new quaternion as described above.
+     *            the <code>Quaternion</code> to store the result in. If <code>null</code>, a new one is created.
+     * @return the conjugate to this quaternion.
      */
-    public Quaternion invert(final Quaternion store) {
-        return multiply(-1, store);
+    public Quaternion conjugate(Quaternion store) {
+        if (store == null) {
+            store = new Quaternion();
+        }
+        store.set(-getX(), -getY(), -getZ(), getW());
+        return store;
     }
 
     /**
-     * internally inverts this quaternion's values as if multiplyLocal(-1) had been called.
+     * Internally sets this quaternion to its conjugate <code>[-x, -y, -z, w]</code>.
      * 
-     * @return this quaternion for chaining
+     * @return this <code>Quaternion</code> for chaining.
      */
-    public Quaternion invertLocal() {
-        return multiplyLocal(-1);
+    public Quaternion conjugateLocal() {
+        set(-getX(), -getY(), -getZ(), getW());
+        return this;
     }
 
     /**
+     * Adds this quaternion to another and places the result in the given store.
+     * 
      * @param quat
      * @param store
      *            the Quaternion to store the result in. if null, a new one is created.
