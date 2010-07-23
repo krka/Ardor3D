@@ -15,5 +15,5 @@
 varying vec3 N;
 
 void main(void) {
-    gl_FragColor =  vec4(normalize(N)/2.0 + 0.5,1.0);
+    gl_FragColor =  vec4(abs(normalize(N)),1.0);
 }
