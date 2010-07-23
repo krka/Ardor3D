@@ -306,7 +306,8 @@ public class ObjGeometryStore {
             // set the "no smooth" smooth group to use "blend only if vertex is same". (No color data in obj, so
             // ignoring)
             groupData.setVertGroups(vertGroups);
-            groupData.setGroupConditions(0, EnumSet.of(MatchCondition.Normal, MatchCondition.UVs));
+            groupData.setGroupConditions(VertGroupData.DEFAULT_GROUP, EnumSet.of(MatchCondition.Normal,
+                    MatchCondition.UVs));
             GeometryTool.minimizeVerts(mesh, groupData);
 
             applyCurrentMaterial(mesh);
