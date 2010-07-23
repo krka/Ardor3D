@@ -31,6 +31,7 @@ public class JInputControllerWrapper implements ControllerWrapper {
     private final Event event = new Event();
     private final List<ControllerEvent> events = Collections.synchronizedList(new ArrayList<ControllerEvent>());
     private JInputControllerEventIterator eventsIt = new JInputControllerEventIterator();
+    private ControllerState blankState = null;
 
     public PeekingIterator<ControllerEvent> getEvents() {
         if (!eventsIt.hasNext()) {
@@ -75,17 +76,18 @@ public class JInputControllerWrapper implements ControllerWrapper {
         }
     }
 
-    public ControllerState getBlankState() {
-        final ControllerState state = new ControllerState();
-
-        for (final Controller controller : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
-            if (controller.getType() != Type.KEYBOARD && controller.getType() != Type.MOUSE) {
-                for (final Component component : controller.getComponents()) {
-                    state.set(controller.getName(), component.getIdentifier().getName(), 0);
+    public synchronized ControllerState getBlankState() {
+        if (blankState == null) {
+            blankState = new ControllerState();
+            for (final Controller controller : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
+                if (controller.getType() != Type.KEYBOARD && controller.getType() != Type.MOUSE) {
+                    for (final Component component : controller.getComponents()) {
+                        blankState.set(controller.getName(), component.getIdentifier().getName(), 0);
+                    }
                 }
             }
         }
 
-        return state;
+        return blankState;
     }
 }

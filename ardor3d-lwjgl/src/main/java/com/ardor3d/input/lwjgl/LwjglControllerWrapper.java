@@ -28,22 +28,25 @@ public class LwjglControllerWrapper implements ControllerWrapper {
     private static boolean inited = false;
     private final List<ControllerEvent> events = Collections.synchronizedList(new ArrayList<ControllerEvent>());
     private LwjglControllerEventIterator eventsIt = new LwjglControllerEventIterator();
+    private ControllerState blankState = null;
 
-    public ControllerState getBlankState() {
+    public synchronized ControllerState getBlankState() {
         init();
-        final ControllerState state = new ControllerState();
 
-        for (int i = 0; i < Controllers.getControllerCount(); i++) {
-            final Controller controller = Controllers.getController(i);
-            for (int j = 0; j < controller.getAxisCount(); j++) {
-                state.set(controller.getName(), controller.getAxisName(j), 0);
-            }
-            for (int j = 0; j < controller.getButtonCount(); j++) {
-                state.set(controller.getName(), controller.getButtonName(j), 0);
+        if (blankState == null) {
+            blankState = new ControllerState();
+            for (int i = 0; i < Controllers.getControllerCount(); i++) {
+                final Controller controller = Controllers.getController(i);
+                for (int j = 0; j < controller.getAxisCount(); j++) {
+                    blankState.set(controller.getName(), controller.getAxisName(j), 0);
+                }
+                for (int j = 0; j < controller.getButtonCount(); j++) {
+                    blankState.set(controller.getName(), controller.getButtonName(j), 0);
+                }
             }
         }
 
-        return state;
+        return blankState;
     }
 
     private class LwjglControllerEventIterator extends AbstractIterator<ControllerEvent> implements
