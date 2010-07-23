@@ -71,7 +71,8 @@ public class CombinerExample extends ExampleBase {
         // Generate many boxes and place them in a 2D grid pattern, under the origNode.
         Mesh mesh;
         for (int i = 0, max = edge * edge; i < max; i++) {
-            mesh = new StripBox("stripbox" + i, new Vector3(i % edge, i / edge, 0), .5, .5, .5);
+            mesh = new StripBox("stripbox" + i, new Vector3(), .5, .5, .5);
+            mesh.setTranslation(new Vector3(i % edge, i / edge, 0));
 
             mesh.setModelBound(new BoundingBox());
             mesh.setSolidColor(ColorRGBA.randomColor(null));
