@@ -104,6 +104,9 @@ public class MeshCombiner {
         MeshData md;
         BoundingVolume volumeType = null;
         for (final Mesh mesh : sources) {
+            // update world transforms
+            mesh.updateWorldTransform(false);
+
             md = mesh.getMeshData();
             if (first) {
                 // copy info from first mesh
