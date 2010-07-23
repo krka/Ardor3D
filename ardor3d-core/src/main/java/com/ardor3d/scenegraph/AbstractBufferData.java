@@ -227,31 +227,39 @@ public abstract class AbstractBufferData<T extends Buffer> {
      *            the Renderer to use. If null, execution will not occur immediately.
      */
     public static void cleanExpiredVBOs(final Renderer deleter) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
-
         // gather up expired vbos...
-        gatherGCdIds(idMap);
+        final Multimap<Object, Integer> idMap = gatherGCdIds(null);
 
-        // send to be deleted (perhaps on next render.)
-        handleVBODelete(deleter, idMap);
+        if (idMap != null) {
+            // send to be deleted (perhaps on next render.)
+            handleVBODelete(deleter, idMap);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private static void gatherGCdIds(final Multimap<Object, Integer> idMap) {
+    private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
         // Pull all expired vbos from ref queue and add to an id multimap.
         ContextIdReference<AbstractBufferData<?>> ref;
         while ((ref = (ContextIdReference<AbstractBufferData<?>>) _vboRefQueue.poll()) != null) {
             if (Constants.useMultipleContexts) {
                 final Set<Object> contextObjects = ref.getContextObjects();
                 for (final Object o : contextObjects) {
+                    if (store == null) { // lazy init
+                        store = ArrayListMultimap.create();
+                    }
                     // Add id to map
-                    idMap.put(o, ref.get(o));
+                    store.put(o, ref.get(o));
                 }
             } else {
-                idMap.put(ContextManager.getCurrentContext().getGlContextRep(), ref.get(null));
+                if (store == null) { // lazy init
+                    store = ArrayListMultimap.create();
+                }
+                store.put(ContextManager.getCurrentContext().getGlContextRep(), ref.get(null));
             }
             ref.clear();
         }
+
+        return store;
     }
 
     private static void handleVBODelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {

@@ -79,23 +79,27 @@ public class DisplayListDelegate implements RenderDelegate {
     }
 
     public static void cleanExpiredDisplayLists(final Renderer deleter) {
-        final Multimap<Object, Integer> idMap = ArrayListMultimap.create();
-
         // gather up expired display lists...
-        gatherGCdIds(idMap);
+        final Multimap<Object, Integer> idMap = gatherGCdIds(null);
 
-        // send to be deleted on next render.
-        handleDisplayListDelete(deleter, idMap);
+        if (idMap != null) {
+            // send to be deleted on next render.
+            handleDisplayListDelete(deleter, idMap);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private static void gatherGCdIds(final Multimap<Object, Integer> idMap) {
+    private static Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
         // Pull all expired display lists from ref queue and add to an id multimap.
         SimpleContextIdReference<DisplayListDelegate> ref;
         while ((ref = (SimpleContextIdReference<DisplayListDelegate>) _refQueue.poll()) != null) {
-            idMap.put(ref.getGlContext(), ref.getId());
+            if (store == null) { // lazy init
+                store = ArrayListMultimap.create();
+            }
+            store.put(ref.getGlContext(), ref.getId());
             ref.clear();
         }
+        return store;
     }
 
     private static void handleDisplayListDelete(final Renderer deleter, final Multimap<Object, Integer> idMap) {
