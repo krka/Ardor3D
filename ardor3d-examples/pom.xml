@@ -15,6 +15,7 @@
   <properties>
     <main.class>com.ardor3d.example.basic.BoxExample</main.class>
     <lwjgl.natives>${basedir}/../ardor3d-lwjgl/src/main/native</lwjgl.natives>
+    <jogl.natives>${basedir}/../ardor3d-jogl/lib/jogl/native</jogl.natives>
   </properties>
 
   <build>
@@ -141,6 +142,9 @@
       </activation>
       <properties>
         <lwjgl.native>${lwjgl.natives}/solaris</lwjgl.native>
+        <!-- the following directory and its content needs to be created -->
+        <jogl.native>${jogl.natives}/solaris</jogl.native>
+        <library.path>${lwjgl.native}:${jogl.native}</library.path>
       </properties>
     </profile>
     <profile>
@@ -153,6 +157,8 @@
       </activation>
       <properties>
         <lwjgl.native>${lwjgl.natives}/linux</lwjgl.native>
+        <jogl.native>${jogl.natives}/linux-i586</jogl.native>
+        <library.path>${lwjgl.native}:${jogl.native}</library.path>
       </properties>
     </profile>
     <profile>
@@ -165,6 +171,8 @@
       </activation>
       <properties>
         <lwjgl.native>${lwjgl.natives}/macosx</lwjgl.native>
+        <jogl.native>${jogl.natives}/macos-universal</jogl.native>
+        <library.path>${lwjgl.native}:${jogl.native}</library.path>
       </properties>
     </profile>
     <profile>
@@ -177,6 +185,8 @@
       </activation>
       <properties>
         <lwjgl.native>${lwjgl.natives}/win32</lwjgl.native>
+        <jogl.native>${jogl.natives}/windows_i586</jogl.native>
+        <library.path>${lwjgl.native};${jogl.native}</library.path>
       </properties>
     </profile>
   </profiles>
