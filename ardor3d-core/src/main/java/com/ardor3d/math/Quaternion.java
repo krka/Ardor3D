@@ -683,6 +683,42 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
     }
 
     /**
+     * Calculates the <i>multiplicative inverse</i> <code>Q<sup>-1</sup></code> of this quaternion <code>Q</code> such
+     * that <code>QQ<sup>-1</sup> = [0,0,0,1]</code> (the identity quaternion). Note that for unit quaternions, a
+     * quaternion's inverse is equal to its (far easier to calculate) conjugate.
+     * 
+     * @param store
+     *            the <code>Quaternion</code> to store the result in. If <code>null</code>, a new one is created.
+     * @see #conjugate(Quaternion)
+     * @return the multiplicative inverse of this quaternion.
+     */
+    public Quaternion invert(Quaternion store) {
+        if (store == null) {
+            store = new Quaternion();
+        }
+        conjugate(store);
+        // It is safe for store == this as a quaternion's conjugate has the same magnitude
+        store.multiplyLocal(1.0 / magnitudeSquared());
+        return store;
+    }
+
+    /**
+     * Locally sets this quaternion <code>Q</code> to its <i>multiplicative inverse</i> <code>Q<sup>-1</sup></code> such
+     * that <code>QQ<sup>-1</sup> = [0,0,0,1]</code> (the identity quaternion). Note that for unit quaternions, a
+     * quaternion's inverse is equal to its (far easier to calculate) conjugate.
+     * 
+     * @see #conjugate(Quaternion)
+     * 
+     * @return this <code>Quaternion</code> for chaining.
+     */
+    public Quaternion invertLocal() {
+        final double scale = 1.0 / magnitudeSquared();
+        conjugateLocal();
+        multiplyLocal(scale);
+        return this;
+    }
+
+    /**
      * Creates a new quaternion that is the conjugate <code>[-x, -y, -z, w]</code> of this quaternion.
      * 
      * @param store
