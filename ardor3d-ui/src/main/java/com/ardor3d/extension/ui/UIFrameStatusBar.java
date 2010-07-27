@@ -72,17 +72,23 @@ public class UIFrameStatusBar extends UIPanel {
     }
 
     private final class ResizeListener implements DragListener {
-        private int _oldX = 0;
-        private int _oldY = 0;
+        private int _initialX;
+        private int _initialY;
+        private int _initialLocalComponentWidth;
+        private int _initialLocalComponentHeight;
 
         public void startDrag(final int mouseX, final int mouseY) {
             final Vector3 vec = Vector3.fetchTempInstance();
             vec.set(mouseX, mouseY, 0);
             getWorldTransform().applyInverse(vec);
 
-            _oldX = Math.round(vec.getXf());
-            _oldY = Math.round(vec.getYf());
+            _initialX = Math.round(vec.getXf());
+            _initialY = Math.round(vec.getYf());
             Vector3.releaseTempInstance(vec);
+
+            final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
+            _initialLocalComponentWidth = frame.getLocalComponentWidth();
+            _initialLocalComponentHeight = frame.getLocalComponentHeight();
         }
 
         public void drag(final int mouseX, final int mouseY) {
@@ -103,37 +109,47 @@ public class UIFrameStatusBar extends UIPanel {
 
             final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
 
-            // Set the new width to the current width + the change in mouse x position.
-            int newWidth = frame.getLocalComponentWidth() + x - _oldX;
+            // Set the new width to the initial width + the change in mouse x position.
+            int newWidth = _initialLocalComponentWidth + (x - _initialX);
             if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
                 // don't let us get smaller than min size
                 newWidth = UIFrame.MIN_FRAME_WIDTH;
             }
+            if (newWidth < frame.getMinimumLocalComponentWidth()) {
+                // don't let us get smaller than frame min size
+                newWidth = frame.getMinimumLocalComponentWidth();
+            }
+            if (newWidth > frame.getMaximumLocalComponentWidth()) {
+                // don't let us get bigger than frame max size
+                newWidth = frame.getMaximumLocalComponentWidth();
+            }
 
-            // Set the new height to the current width + the change in mouse y position.
-            int heightDif = y - _oldY;
-            int newHeight = frame.getLocalComponentHeight() + _oldY - y;
+            // Set the new height to the initial height + the change in mouse y position.
+            int newHeight = _initialLocalComponentHeight - (y - _initialY);
             if (newHeight < UIFrame.MIN_FRAME_HEIGHT) {
                 // don't let us get smaller than absolute min size
                 newHeight = UIFrame.MIN_FRAME_HEIGHT;
-                heightDif = frame.getLocalComponentHeight() - newHeight;
-            } else if (newHeight < frame.getMinimumLocalComponentHeight()) {
+            }
+            if (newHeight < frame.getMinimumLocalComponentHeight()) {
                 // don't let us get smaller than frame min size
                 newHeight = frame.getMinimumLocalComponentHeight();
-                heightDif = frame.getLocalComponentHeight() - newHeight;
+            }
+            if (newHeight > frame.getMaximumLocalComponentHeight()) {
+                // don't let us get bigger than frame max size
+                newHeight = frame.getMaximumLocalComponentHeight();
             }
 
+            int heightDiff = newHeight - frame.getLocalComponentHeight();
+            _initialY += heightDiff;
+            
             frame.setLocalComponentSize(newWidth, newHeight);
 
-            vec.set(0, heightDif, 0);
+            vec.set(0, -heightDiff, 0);
             getWorldTransform().applyForwardVector(vec);
             frame.addTranslation(vec);
             Vector3.releaseTempInstance(vec);
 
             frame.layout();
-
-            _oldX = x;
-            _oldY = y - heightDif;
         }
 
         public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
