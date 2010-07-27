@@ -683,7 +683,9 @@ public class Camera implements Savable, Externalizable, Cloneable {
      */
     public void setFrame(final ReadOnlyVector3 location, final ReadOnlyVector3 left, final ReadOnlyVector3 up,
             final ReadOnlyVector3 direction) {
-        setAxes(left, up, direction);
+        _left.set(left);
+        _up.set(up);
+        _direction.set(direction);
         _location.set(location);
         onFrameChange();
     }
@@ -698,7 +700,9 @@ public class Camera implements Savable, Externalizable, Cloneable {
      *            the orientation of the camera.
      */
     public void setFrame(final ReadOnlyVector3 location, final ReadOnlyMatrix3 axes) {
-        setAxes(axes);
+        axes.getColumn(0, _left);
+        axes.getColumn(1, _up);
+        axes.getColumn(2, _direction);
         _location.set(location);
         onFrameChange();
     }
