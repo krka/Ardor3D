@@ -281,11 +281,16 @@ public class SkinnedMesh extends Mesh implements PoseListener {
             if (_weightsBuf == null) {
                 createWeightBuffer();
             }
-            _gpuShader.setAttributePointerMatrix("Weights", getGpuAttributeSize(), false, _weightsBuf);
             if (_jointIndicesBuf == null) {
                 createJointBuffer();
             }
-            _gpuShader.setAttributePointerMatrix("JointIDs", getGpuAttributeSize(), false, _jointIndicesBuf);
+            if (!_gpuUseMatrixAttribute) {
+                _gpuShader.setAttributePointer("Weights", getGpuAttributeSize(), false, 0, _weightsBuf);
+                _gpuShader.setAttributePointer("JointIDs", getGpuAttributeSize(), false, 0, _jointIndicesBuf);
+            } else {
+                _gpuShader.setAttributePointerMatrix("Weights", getGpuAttributeSize(), false, _weightsBuf);
+                _gpuShader.setAttributePointerMatrix("JointIDs", getGpuAttributeSize(), false, _jointIndicesBuf);
+            }
         }
     }
 
