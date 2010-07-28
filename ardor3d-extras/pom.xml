@@ -9,7 +9,7 @@
 
   <artifactId>ardor3d-extras</artifactId>
   <packaging>jar</packaging>
-  <name>Ardor3D Extras Package</name>
+  <name>Ardor 3D Extras Package</name>
 
   <dependencies>
     <dependency>

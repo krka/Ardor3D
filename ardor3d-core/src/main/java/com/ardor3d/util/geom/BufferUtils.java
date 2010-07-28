@@ -464,7 +464,7 @@ public final class BufferUtils {
 
     /**
      * Create a new FloatBuffer of an appropriate size to hold the specified number of Vector3 object data only if the
-     * given buffer if not already the right size.
+     * given buffer is not already the right size.
      * 
      * @param buf
      *            the buffer to first check and rewind

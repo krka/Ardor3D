@@ -9,7 +9,7 @@
 
   <artifactId>ardor3d-animation</artifactId>
   <packaging>jar</packaging>
-  <name>Ardor3D Skinning and Animation System</name>
+  <name>Ardor 3D Skinning and Animation System</name>
 
   <dependencies>
     <dependency>

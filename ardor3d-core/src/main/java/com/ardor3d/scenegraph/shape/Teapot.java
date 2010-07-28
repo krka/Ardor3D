@@ -52,7 +52,6 @@ public class Teapot extends Mesh {
     }
 
     private void setVertexData() {
-        _meshData.setVertexBuffer(BufferUtils.createVector3Buffer(_meshData.getVertexBuffer(), 803));
         final float[] verts = new float[] { 1.4403734f, 2.7980254f, 0.6128418f, 1.5613803f, 2.7980254f, 0.0f,
                 1.5834712f, 2.7145221f, 0.0f, 1.4607521f, 2.7145221f, 0.62151235f, 1.4640129f, 2.8258598f, 0.6228997f,
                 1.5870057f, 2.8258598f, 0.0f, 1.5121067f, 2.7980254f, 0.6433625f, 1.6391401f, 2.7980254f, 0.0f,
