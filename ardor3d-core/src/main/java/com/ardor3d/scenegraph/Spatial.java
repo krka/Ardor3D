@@ -1182,7 +1182,23 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
      * 
      * @return The spatial's last frustum intersection result.
      */
+    public Camera.FrustumIntersect getLocalLastFrustumIntersection() {
+        return _frustumIntersects;
+    }
+
+    /**
+     * Tries to find the most accurate last frustum intersection for this spatial by checking the parent for possible
+     * Outside value.
+     * 
+     * @return Outside, if this, or any ancestor was Outside, otherwise the local intersect value.
+     */
     public Camera.FrustumIntersect getLastFrustumIntersection() {
+        if (_parent != null && _frustumIntersects != Camera.FrustumIntersect.Outside) {
+            final Camera.FrustumIntersect parentIntersect = _parent.getLastFrustumIntersection();
+            if (parentIntersect == Camera.FrustumIntersect.Outside) {
+                return Camera.FrustumIntersect.Outside;
+            }
+        }
         return _frustumIntersects;
     }
 
