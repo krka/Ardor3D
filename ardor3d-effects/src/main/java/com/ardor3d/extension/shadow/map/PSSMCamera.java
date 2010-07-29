@@ -171,6 +171,12 @@ public class PSSMCamera extends Camera {
         setFrustumFar(optimalCameraFar);
     }
 
+    public void updateMaxCameraFar() {
+        double optimalCameraFar = getFrustumFar();
+        optimalCameraFar = Math.max(getFrustumNear() + 1.0, Math.min(_maxFarPlaneDistance, optimalCameraFar));
+        setFrustumFar(optimalCameraFar);
+    }
+
     /**
      * Calculate frustum corners and center.
      * 

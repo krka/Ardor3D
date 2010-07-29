@@ -12,7 +12,6 @@ package com.ardor3d.extension.shadow.map;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,6 +68,7 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
+import com.google.common.collect.Lists;
 
 /**
  * A pass providing a parallel split shadow mapping (PSSM) layer across the top of an existing scene.
@@ -95,7 +95,10 @@ public class ParallelSplitShadowMapPass extends Pass {
     private Texture2D _shadowMapTexture[];
 
     /** The list of occluding nodes. */
-    private final List<Spatial> _occluderNodes = new ArrayList<Spatial>();
+    private final List<Spatial> _occluderNodes = Lists.newArrayList();
+
+    /** Extra bounds receivers, when rendering shadows other ways than through overlay */
+    private final List<Spatial> _boundsReceiver = Lists.newArrayList();
 
     // Various optimizations for rendering shadow maps...
     /** Culling front faces when rendering shadow maps. */
@@ -174,6 +177,9 @@ public class ParallelSplitShadowMapPass extends Pass {
     /** Shader for rendering pssm shadows in one pass. */
     private GLSLShaderObjectsState _pssmShader;
 
+    /** Might need to keep main shader when doing both multitexturing shadows and overlays */
+    private GLSLShaderObjectsState _mainShader;
+
     /** Shader for debugging pssm shadows drawing splits in different colors. */
     private GLSLShaderObjectsState _pssmDebugShader;
 
@@ -185,6 +191,9 @@ public class ParallelSplitShadowMapPass extends Pass {
 
     /** Debug drawing shader. */
     private boolean _drawShaderDebug = false;
+
+    /** Do we want to keep the main shader to do both multitexturing shadows and overlays? */
+    private boolean _keepMainShader = false;
 
     /**
      * True if we want to factor in texturing to shadows; useful for casting shadows against alpha-tested textures.
@@ -203,6 +212,13 @@ public class ParallelSplitShadowMapPass extends Pass {
      * false, the shadows are generated, but not applied.
      */
     private boolean _renderShadowedScene = true;
+
+    /** Shadow filter techniques */
+    public enum Filter {
+        None, Pcf
+    }
+
+    private Filter filter = Filter.None;
 
     /**
      * Create a pssm shadow map pass casting shadows from a light with the direction given.
@@ -295,11 +311,17 @@ public class ParallelSplitShadowMapPass extends Pass {
             try {
                 _pssmShader.setVertexShader(ParallelSplitShadowMapPass.class.getClassLoader().getResourceAsStream(
                         "com/ardor3d/extension/shadow/map/pssm.vert"));
-                _pssmShader.setFragmentShader(ParallelSplitShadowMapPass.class.getClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/shadow/map/pssm.frag"));
+                if (filter == Filter.None) {
+                    _pssmShader.setFragmentShader(ParallelSplitShadowMapPass.class.getClassLoader()
+                            .getResourceAsStream("com/ardor3d/extension/shadow/map/pssm.frag"));
+                } else if (filter == Filter.Pcf) {
+                    _pssmShader.setFragmentShader(ParallelSplitShadowMapPass.class.getClassLoader()
+                            .getResourceAsStream("com/ardor3d/extension/shadow/map/pssmPCF.frag"));
+                }
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }
+            _mainShader = _pssmShader;
 
             _pssmDebugShader = new GLSLShaderObjectsState();
             try {
@@ -393,9 +415,12 @@ public class ParallelSplitShadowMapPass extends Pass {
             _shadowMapRenderer.setupTexture(_shadowMapTexture[i]);
             _shadowTextureState.setTexture(_shadowMapTexture[i], i);
         }
-        for (int i = 0; i < _MAX_SPLITS; i++) {
-            _pssmShader.setUniform("shadowMap" + i, i);
-            _pssmDebugShader.setUniform("shadowMap" + i, i);
+        if (_pssmShader != null) {
+            for (int i = 0; i < _MAX_SPLITS; i++) {
+                _pssmShader.setUniform("shadowMap" + i, i);
+                _pssmDebugShader.setUniform("shadowMap" + i, i);
+                _mainShader.setUniform("shadowMap" + i, i);
+            }
         }
     }
 
@@ -407,6 +432,15 @@ public class ParallelSplitShadowMapPass extends Pass {
      */
     @Override
     protected void doRender(final Renderer r) {
+        updateShadowMaps(r);
+
+        if (_renderShadowedScene) {
+            // Render overlay scene
+            renderShadowedScene(r);
+        }
+    }
+
+    public void updateShadowMaps(final Renderer r) {
         init(r);
         reinitTextureSize(r);
         reinitSplits();
@@ -424,6 +458,8 @@ public class ParallelSplitShadowMapPass extends Pass {
             // Calculate the closest fitting near and far planes.
             if (hasValidBounds) {
                 _pssmCam.pack(_receiverBounds);
+            } else {
+                _pssmCam.updateMaxCameraFar();
             }
         }
 
@@ -462,9 +498,39 @@ public class ParallelSplitShadowMapPass extends Pass {
             updateTextureMatrix(iSplit);
         }
 
-        if (_renderShadowedScene) {
-            // Render overlay scene
-            renderShadowedScene(r);
+        updateShaderVariables();
+    }
+
+    private void updateShaderVariables() {
+        if (_pssmShader != null && ContextManager.getCurrentContext().getCapabilities().isGLSLSupported()) {
+            final float split1 = (float) _pssmCam.getSplitDistances()[1];
+            final float split2 = (float) (_pssmCam.getSplitDistances().length > 2 ? _pssmCam.getSplitDistances()[2]
+                    : 0f);
+            final float split3 = (float) (_pssmCam.getSplitDistances().length > 3 ? _pssmCam.getSplitDistances()[3]
+                    : 0f);
+            final float split4 = (float) (_pssmCam.getSplitDistances().length > 4 ? _pssmCam.getSplitDistances()[4]
+                    : 0f);
+
+            GLSLShaderObjectsState currentShader = _drawShaderDebug ? _pssmDebugShader : _pssmShader;
+            if (_drawShaderDebug) {
+                currentShader = _pssmDebugShader;
+            }
+
+            currentShader.setUniform("sampleDist", split1, split2, split3, split4);
+            currentShader.setUniform("_shadowSize", 1f / 1024f);
+
+            if (!_drawShaderDebug) {
+                currentShader.setUniform("shadowColor", _shadowColor);
+            }
+
+            if (_keepMainShader) {
+                _mainShader.setUniform("sampleDist", split1, split2, split3, split4);
+                _mainShader.setUniform("_shadowSize", 1f / _shadowMapSize);
+
+                if (!_drawShaderDebug) {
+                    _mainShader.setUniform("shadowColor", _shadowColor);
+                }
+            }
         }
     }
 
@@ -600,25 +666,24 @@ public class ParallelSplitShadowMapPass extends Pass {
      * @param r
      *            The renderer to use
      */
-    private void renderShadowedScene(final Renderer r) {
+    public void renderShadowedScene(final Renderer r) {
+        boolean reset = false;
+        if (_context == null) {
+            _context = ContextManager.getCurrentContext();
+            reset = true;
+        }
+
         _context.pushEnforcedStates();
         _context.enforceState(_shadowTextureState);
         _context.enforceState(_discardShadowFragments);
 
         if (_pssmShader != null && _context.getCapabilities().isGLSLSupported()) {
-            final double split1 = _pssmCam.getSplitDistances()[1];
-            final double split2 = _pssmCam.getSplitDistances().length > 2 ? _pssmCam.getSplitDistances()[2] : 0;
-            final double split3 = _pssmCam.getSplitDistances().length > 3 ? _pssmCam.getSplitDistances()[3] : 0;
-            final double split4 = _pssmCam.getSplitDistances().length > 4 ? _pssmCam.getSplitDistances()[4] : 0;
-
             GLSLShaderObjectsState currentShader = _drawShaderDebug ? _pssmDebugShader : _pssmShader;
             if (_drawShaderDebug) {
                 currentShader = _pssmDebugShader;
             }
-
-            currentShader.setUniform("sampleDist", (float) split1, (float) split2, (float) split3, (float) split4);
-            if (!_drawShaderDebug) {
-                currentShader.setUniform("shadowColor", _shadowColor);
+            if (_keepMainShader) {
+                currentShader = _mainShader;
             }
             _context.enforceState(currentShader);
         }
@@ -629,6 +694,10 @@ public class ParallelSplitShadowMapPass extends Pass {
         r.renderBuckets();
 
         _context.popEnforcedStates();
+
+        if (reset) {
+            // _context = null;
+        }
     }
 
     private static RenderLogic logic = new RenderLogic() {
@@ -724,6 +793,22 @@ public class ParallelSplitShadowMapPass extends Pass {
     private void updateReceiverBounds() {
         hasValidBounds = false;
         boolean firstRun = true;
+
+        for (int i = 0, cSize = _boundsReceiver.size(); i < cSize; i++) {
+            final Spatial child = _boundsReceiver.get(i);
+            if (child != null && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
+                if (firstRun) {
+                    _receiverBounds.setCenter(child.getWorldBound().getCenter());
+                    _receiverBounds.setXExtent(0);
+                    _receiverBounds.setYExtent(0);
+                    _receiverBounds.setZExtent(0);
+                    firstRun = false;
+                }
+                _receiverBounds.mergeLocal(child.getWorldBound());
+                hasValidBounds = true;
+            }
+        }
+
         for (int i = 0, cSize = _spatials.size(); i < cSize; i++) {
             final Spatial child = _spatials.get(i);
             if (child != null && child.getWorldBound() != null && boundIsValid(child.getWorldBound())) {
@@ -1155,5 +1240,25 @@ public class ParallelSplitShadowMapPass extends Pass {
         BufferUtils.setInBuffer(testCam._corners[3], verts, 23);
 
         lineFrustum.draw(r);
+    }
+
+    public void setPssmShader(final GLSLShaderObjectsState pssmShader) {
+        _pssmShader = pssmShader;
+    }
+
+    public boolean isKeepMainShader() {
+        return _keepMainShader;
+    }
+
+    public void setKeepMainShader(final boolean keepMainShader) {
+        _keepMainShader = keepMainShader;
+    }
+
+    public void addBoundsReceiver(final Spatial spatial) {
+        _boundsReceiver.add(spatial);
+    }
+
+    public void setFiltering(final Filter filter) {
+        this.filter = filter;
     }
 }
