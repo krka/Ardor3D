@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
@@ -487,6 +488,13 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                 updateModelBound();
             }
         }
+    }
+
+    @Override
+    public void updateModelBound() {
+        super.updateModelBound();
+        // if we make our model bound accurate, also make the collision tree accurate
+        CollisionTreeManager.INSTANCE.removeCollisionTree(this);
     }
 
     private void createJointBuffer() {
