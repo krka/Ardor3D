@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.model.collada.jdom;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -64,7 +65,6 @@ public class ColladaMaterialUtils {
      * @param mesh
      *            the mesh to apply material to.
      */
-    @SuppressWarnings("unchecked")
     public void applyMaterial(final String materialName, final Mesh mesh) {
         if (materialName == null) {
             logger.warning("materialName is null");
@@ -89,6 +89,11 @@ public class ColladaMaterialUtils {
         }
 
         if ("effect".equals(effectNode.getName())) {
+            /*
+             * temp cache for textures, we do not want to add textures twice (for example, transparant map might point
+             * to diffuse texture)
+             */
+            final HashMap<String, Texture> loadedTextures = new HashMap<String, Texture>();
             final Element effect = effectNode;
             // XXX: For now, just grab the common technique:
             if (effect.getChild("profile_COMMON") != null) {
@@ -107,78 +112,113 @@ public class ColladaMaterialUtils {
                     boolean useTransparency = false;
                     String opaqueMode = "A_ONE";
 
-                    for (final Element property : (List<Element>) blinnPhong.getChildren()) {
-                        if ("diffuse".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("color".equals(propertyValue.getName())) {
-                                final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                                mState.setDiffuse(MaterialFace.FrontAndBack, color);
-                            } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
-                                TextureState tState = (TextureState) mesh
-                                        .getLocalRenderState(RenderState.StateType.Texture);
-                                if (tState == null) {
-                                    tState = new TextureState();
-                                    mesh.setRenderState(tState);
-                                }
-                                diffuseTexture = populateTextureState(tState, propertyValue, effect);
-                            }
-                        } else if ("ambient".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("color".equals(propertyValue.getName())) {
-                                final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
-                                mState.setAmbient(MaterialFace.FrontAndBack, color);
-                            }
-                        } else if ("transparent".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("color".equals(propertyValue.getName())) {
-                                transparent = _colladaDOMUtil.getColor(propertyValue.getText());
-                                // TODO: use this
-
-                                useTransparency = true;
-                            }
-                            opaqueMode = property.getAttributeValue("opaque", "A_ONE");
-                        } else if ("transparency".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("float".equals(propertyValue.getName())) {
-                                transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
-                                // TODO: use this
-
-                                if (_flipTransparency) {
-                                    transparency = 1f - transparency;
-                                }
-
-                                useTransparency = true;
-                            }
-                        } else if ("emission".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("color".equals(propertyValue.getName())) {
-                                mState.setEmissive(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
-                                        .getText()));
-                            }
-                        } else if ("specular".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("color".equals(propertyValue.getName())) {
-                                mState.setSpecular(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
-                                        .getText()));
-                            }
-                        } else if ("shininess".equals(property.getName())) {
-                            final Element propertyValue = (Element) property.getChildren().get(0);
-                            if ("float".equals(propertyValue.getName())) {
-                                float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
-                                if (shininess >= 0.0f && shininess <= 1.0f) {
-                                    final float oldShininess = shininess;
-                                    shininess *= 128;
-                                    logger.finest("Shininess - " + oldShininess
-                                            + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
-                                } else if (shininess < 0 || shininess > 128) {
-                                    final float oldShininess = shininess;
-                                    shininess = MathUtils.clamp(shininess, 0, 128);
-                                    logger.warning("Shininess must be between 0 and 128. Shininess " + oldShininess
-                                            + " was clamped to " + shininess);
-                                }
-                                mState.setShininess(MaterialFace.FrontAndBack, shininess);
-                            }
+                    /*
+                     * place holder for current property, we import material properties in fixed order (for texture
+                     * order)
+                     */
+                    Element property = null;
+                    /* Diffuse property */
+                    property = blinnPhong.getChild("diffuse");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
+                            mState.setDiffuse(MaterialFace.FrontAndBack, color);
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            diffuseTexture = populateTextureState(mesh, propertyValue, effect, loadedTextures);
                         }
+                    }
+                    /* Ambient property */
+                    property = blinnPhong.getChild("ambient");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            final ColorRGBA color = _colladaDOMUtil.getColor(propertyValue.getText());
+                            mState.setAmbient(MaterialFace.FrontAndBack, color);
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                    }
+                    /* Transparent property */
+                    property = blinnPhong.getChild("transparent");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            transparent = _colladaDOMUtil.getColor(propertyValue.getText());
+                            // TODO: use this
+                            useTransparency = true;
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                        opaqueMode = property.getAttributeValue("opaque", "A_ONE");
+                    }
+                    /* Transparency property */
+                    property = blinnPhong.getChild("transparency");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("float".equals(propertyValue.getName())) {
+                            transparency = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                            // TODO: use this
+                            if (_flipTransparency) {
+                                transparency = 1f - transparency;
+                            }
+                            useTransparency = true;
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                    }
+                    /* Emission property */
+                    property = blinnPhong.getChild("emission");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            mState.setEmissive(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
+                                    .getText()));
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                    }
+                    /* Specular property */
+                    property = blinnPhong.getChild("specular");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("color".equals(propertyValue.getName())) {
+                            mState.setSpecular(MaterialFace.FrontAndBack, _colladaDOMUtil.getColor(propertyValue
+                                    .getText()));
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                    }
+                    /* Shininess property */
+                    property = blinnPhong.getChild("shininess");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("float".equals(propertyValue.getName())) {
+                            float shininess = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                            if (shininess >= 0.0f && shininess <= 1.0f) {
+                                final float oldShininess = shininess;
+                                shininess *= 128;
+                                logger.finest("Shininess - " + oldShininess
+                                        + " - was in the [0,1] range. Scaling to [0, 128] - " + shininess);
+                            } else if (shininess < 0 || shininess > 128) {
+                                final float oldShininess = shininess;
+                                shininess = MathUtils.clamp(shininess, 0, 128);
+                                logger.warning("Shininess must be between 0 and 128. Shininess " + oldShininess
+                                        + " was clamped to " + shininess);
+                            }
+                            mState.setShininess(MaterialFace.FrontAndBack, shininess);
+                        } else if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            populateTextureState(mesh, propertyValue, effect, loadedTextures);
+                        }
+                    }
+                    /*
+                     * An extra tag defines some materials not part of the collada standard. Since we're not able to
+                     * parse we simply extract the textures from the element (such that shaders etc can at least pick up
+                     * on them)
+                     */
+                    property = technique.getChild("extra");
+                    if (property != null) {
+                        getTexturesFromElement(mesh, property, effect, loadedTextures);
                     }
 
                     // XXX: There are some issues with clarity on how to use alpha blending in OpenGL FFP.
@@ -211,23 +251,59 @@ public class ColladaMaterialUtils {
     }
 
     /**
+     * Function to searches an xml node for <texture> elements and adds them to the texture state of the mesh.
+     * 
+     * @param mesh
+     *            the Ardor3D Mesh to add the Texture to.
+     * @param element
+     *            the xml element to start the search on
+     * @param effect
+     *            our <instance_effect> element
+     */
+    private void getTexturesFromElement(final Mesh mesh, final Element element, final Element effect,
+            final HashMap<String, Texture> loadedTextures) {
+        if ("texture".equals(element.getName()) && _loadTextures) {
+            populateTextureState(mesh, element, effect, loadedTextures);
+        }
+        @SuppressWarnings("unchecked")
+        final List<Element> children = element.getChildren();
+        if (children != null) {
+            for (final Element child : children) {
+                /* recurse on children */
+                getTexturesFromElement(mesh, child, effect, loadedTextures);
+            }
+        }
+    }
+
+    /**
      * Convert a <texture> element to an Ardor3D representation and store in the given state.
      * 
-     * @param state
-     *            the Ardor3D TextureState to add of Texture to.
+     * @param mesh
+     *            the Ardor3D Mesh to add the Texture to.
      * @param daeTexture
      *            our <texture> element
      * @param effect
      *            our <instance_effect> element
      * @return the created Texture.
      */
-    private Texture populateTextureState(final TextureState state, final Element daeTexture, final Element effect) {
+    private Texture populateTextureState(final Mesh mesh, final Element daeTexture, final Element effect,
+            final HashMap<String, Texture> loadedTextures) {
         // TODO: Use vert data to determine which texcoords and set to use.
         // final String uvName = daeTexture.getAttributeValue("texcoord");
-        final int unit = 0;
+        TextureState tState = (TextureState) mesh.getLocalRenderState(RenderState.StateType.Texture);
+        if (tState == null) {
+            tState = new TextureState();
+            mesh.setRenderState(tState);
+        }
 
         // Use texture attrib to find correct sampler
         final String textureReference = daeTexture.getAttributeValue("texture");
+
+        /* only add the texture to the state once */
+        if (loadedTextures.containsKey(textureReference)) {
+            return loadedTextures.get(textureReference);
+        }
+
         Element node = _colladaDOMUtil.findTargetWithSid(textureReference);
         if (node == null) {
             // Not sure if this is quite right, but spec seems to indicate looking for global id
@@ -310,7 +386,8 @@ public class ColladaMaterialUtils {
                 applySampler(sampler, texture);
             }
             // Add to texture state.
-            state.setTexture(texture, unit);
+            tState.setTexture(texture, tState.getNumberOfSetTextures());
+            loadedTextures.put(textureReference, texture);
         } else {
             logger.warning("unable to load texture: " + daeTexture);
         }
