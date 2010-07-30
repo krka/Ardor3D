@@ -227,12 +227,6 @@ public class ObjImporter {
                     ObjImporter.logger.warning("ObjModelImporter: step not supported.  (line " + lineNo + ") " + line);
                 }
 
-                // if step size
-                else if ("step".equals(keyword)) {
-                    // TODO: Add support for step size
-                    ObjImporter.logger.warning("ObjModelImporter: step not supported.  (line " + lineNo + ") " + line);
-                }
-
                 // -------- GROUPING KEYWORDS --------
 
                 // if group name(s)
