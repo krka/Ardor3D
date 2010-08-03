@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.scenegraph.Spatial;
 
+@Deprecated
 public interface CopyLogic {
 
     Spatial copy(Spatial source, AtomicBoolean recurse);
