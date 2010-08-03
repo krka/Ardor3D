@@ -17,9 +17,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.export.Savable;
+import com.ardor3d.util.export.binary.BinaryCloner;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 
+/**
+ * @deprecated use {@link BinaryCloner} instead.
+ */
+@Deprecated
 public class ClonedCopyLogic implements CopyLogic {
     public Spatial copy(final Spatial source, final AtomicBoolean recurse) {
         try {

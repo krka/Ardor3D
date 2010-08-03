@@ -20,6 +20,10 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
+/**
+ * @deprecated use {@link Spatial#makeCopy(boolean)} instead.
+ */
+@Deprecated
 public class SharedCopyLogic implements CopyLogic {
     private static final Logger logger = Logger.getLogger(SharedCopyLogic.class.getName());
 
