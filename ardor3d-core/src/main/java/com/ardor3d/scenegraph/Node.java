@@ -451,6 +451,21 @@ public class Node extends Spatial {
         }
     }
 
+    @Override
+    public Node makeCopy(final boolean shareGeometricData) {
+        // get copy of basic spatial info
+        final Node node = (Node) super.makeCopy(shareGeometricData);
+
+        // add copy of children
+        for (final Spatial child : getChildren()) {
+            final Spatial copy = child.makeCopy(shareGeometricData);
+            node.attachChild(copy);
+        }
+
+        // return
+        return node;
+    }
+
     // /////////////////
     // Method for Cloneable
     // /////////////////

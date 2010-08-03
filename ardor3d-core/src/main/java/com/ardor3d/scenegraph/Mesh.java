@@ -51,7 +51,7 @@ import com.ardor3d.util.stat.StatType;
 import com.google.common.collect.Lists;
 
 /**
- * Mesh
+ * A Mesh is a spatial describing a renderable geometric object. Data about the mesh is stored locally using MeshData.
  */
 public class Mesh extends Spatial implements Renderable, Pickable {
 
@@ -547,6 +547,37 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             positions[i] = ray.getDirection().multiply(distances[0], new Vector3()).addLocal(ray.getOrigin());
         }
         return new IntersectionRecord(distances, positions, primitives);
+    }
+
+    @Override
+    public Mesh makeCopy(final boolean shareGeometricData) {
+        // get copy of basic spatial info
+        final Mesh mesh = (Mesh) super.makeCopy(shareGeometricData);
+
+        // if we are sharing, just reuse meshdata
+        if (shareGeometricData) {
+            mesh.setMeshData(_meshData);
+        } else {
+            // make a copy of our data
+            mesh.setMeshData(_meshData.clone());
+        }
+
+        // copy our basic properties
+        mesh.setModelBound(_modelBound.clone(null));
+        mesh.setDefaultColor(_defaultColor);
+        mesh.setVisible(_isVisible);
+
+        // return
+        return mesh;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public Class<? extends Mesh> getClassTag() {
+        return this.getClass();
     }
 
     @Override

@@ -17,6 +17,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.math.Matrix3;
@@ -54,6 +56,7 @@ import com.google.common.collect.Maps;
  * Base class for all scenegraph objects.
  */
 public abstract class Spatial implements Cloneable, Savable, Hintable {
+    private static final Logger logger = Logger.getLogger(Spatial.class.getName());
 
     /** This spatial's name. */
     protected String _name;
@@ -1236,6 +1239,48 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
     @Override
     public String toString() {
         return _name + " (" + this.getClass().getName() + ')';
+    }
+
+    /**
+     * Create a copy of this spatial.
+     * 
+     * @param shareGeometricData
+     *            if true, reuse any data fields describing the geometric shape of the spatial, as applicable.
+     * @return the copy as described.
+     */
+    public Spatial makeCopy(final boolean shareGeometricData) {
+        Spatial spat = null;
+        try {
+            spat = getClass().newInstance();
+        } catch (final InstantiationException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class " + getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        } catch (final IllegalAccessException e) {
+            logger.log(Level.SEVERE, "Could not access final constructor of class " + getClass().getCanonicalName(), e);
+            throw new RuntimeException(e);
+        }
+
+        // copy basic spatial info
+        spat.setName(getName());
+        spat.getSceneHints().set(_sceneHints);
+        spat.setTransform(_localTransform);
+
+        // copy local render states
+        for (final StateType type : _renderStateList.keySet()) {
+            final RenderState state = _renderStateList.get(type);
+            if (state != null) {
+                spat.setRenderState(state);
+            }
+        }
+
+        // copy controllers
+        if (_controllers != null) {
+            for (final SpatialController<?> sc : _controllers) {
+                spat.addController(sc);
+            }
+        }
+
+        return spat;
     }
 
     // /////////////////
