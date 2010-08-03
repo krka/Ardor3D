@@ -13,6 +13,7 @@ package com.ardor3d.extension.animation.skeletal;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Matrix4;
@@ -613,6 +614,32 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     @Override
     public Class<? extends SkinnedMesh> getClassTag() {
         return this.getClass();
+    }
+
+    @Override
+    public SkinnedMesh makeCopy(final boolean shareGeometricData) {
+        final SkinnedMesh skin = (SkinnedMesh) super.makeCopy(shareGeometricData);
+
+        // we don't want to share mesh data, just bind pose
+        if (shareGeometricData) {
+            // overriding parent
+            skin._meshData = _meshData.clone();
+            skin._bindPoseData = _bindPoseData;
+        } else {
+            skin._bindPoseData = _bindPoseData.clone();
+        }
+
+        skin._weightsPerVert = _weightsPerVert;
+        skin._useGPU = _useGPU;
+        skin._gpuShader = _gpuShader;
+        skin._autoUpdateSkinBound = _autoUpdateSkinBound;
+        skin._customApplier = _customApplier;
+
+        // bring across arrays
+        skin._weights = Arrays.copyOf(_weights, _weights.length);
+        skin._jointIndices = Arrays.copyOf(_jointIndices, _jointIndices.length);
+
+        return skin;
     }
 
     @Override
