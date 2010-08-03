@@ -12,7 +12,6 @@ package com.ardor3d.example.collision;
 
 import java.util.Random;
 
-import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
@@ -33,8 +32,6 @@ import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.SceneCopier;
-import com.ardor3d.util.geom.SharedCopyLogic;
 
 /**
  * A demonstration on how to determine if collisions exist between two nodes.
@@ -96,9 +93,6 @@ public class ManyCollisionsExample extends ExampleBase {
         t.setTranslation(new Vector3(0, 20, 0));
         _root.attachChild(t);
 
-        final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
-        sphere.setModelBound(new BoundingBox());
-
         final CullState cs = new CullState();
         cs.setCullFace(CullState.Face.Back);
         cs.setEnabled(true);
@@ -115,10 +109,11 @@ public class ManyCollisionsExample extends ExampleBase {
 
         final Random rand = new Random(1337);
 
-        final SharedCopyLogic shareLogic = new SharedCopyLogic();
+        final Sphere sphere = new Sphere("Sphere", 8, 8, 1);
+        sphere.updateModelBound();
 
         for (int i = 0; i < 200; i++) {
-            final Mesh sm = (Mesh) SceneCopier.makeCopy(sphere, shareLogic);
+            final Mesh sm = sphere.makeCopy(true);
 
             sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
                     .nextDouble() * 100.0 - 50.0));
@@ -136,7 +131,7 @@ public class ManyCollisionsExample extends ExampleBase {
         _root.attachChild(n2);
 
         for (int i = 0; i < 200; i++) {
-            final Mesh sm = (Mesh) SceneCopier.makeCopy(sphere, shareLogic);
+            final Mesh sm = sphere.makeCopy(true);
 
             sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
                     .nextDouble() * 100.0 - 50.0));

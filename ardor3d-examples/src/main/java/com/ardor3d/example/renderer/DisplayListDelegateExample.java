@@ -35,9 +35,6 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.geom.CopyLogic;
-import com.ardor3d.util.geom.SceneCopier;
-import com.ardor3d.util.geom.SharedCopyLogic;
 import com.ardor3d.util.scenegraph.CompileOptions;
 import com.ardor3d.util.scenegraph.RenderDelegate;
 import com.ardor3d.util.scenegraph.SceneCompiler;
@@ -117,7 +114,6 @@ public class DisplayListDelegateExample extends ExampleBase {
         _root.detachChild(heavyNode);
 
         final Random r = new Random();
-        final CopyLogic logic = new SharedCopyLogic();
 
         r.setSeed(1337);
         for (int i = 0; i < 50; i++) {
@@ -131,7 +127,7 @@ public class DisplayListDelegateExample extends ExampleBase {
 
         r.setSeed(1337);
         for (int i = 0; i < 50; i++) {
-            final Node node = (Node) SceneCopier.makeCopy(heavyNode, logic);
+            final Node node = heavyNode.makeCopy(true);
 
             node.setTranslation(new Vector3(-15 + r.nextFloat() * 30, r.nextFloat() * 30, -15 + r.nextFloat() * 30));
 
@@ -178,6 +174,7 @@ public class DisplayListDelegateExample extends ExampleBase {
         final Random r = new Random(1337);
         for (int i = 0; i < 150; i++) {
             final Box box = new Box("b" + i, new Vector3(0, 0, 0), new Vector3(0.1f, 0.1f, 0.1f));
+            box.updateModelBound();
             box.setRandomColors();
             final MaterialState ms = new MaterialState();
             ms.setDiffuse(MaterialFace.FrontAndBack, new ColorRGBA(r.nextFloat(), r.nextFloat(), r.nextFloat(), 1));

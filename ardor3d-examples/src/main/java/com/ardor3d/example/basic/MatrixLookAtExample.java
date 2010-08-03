@@ -28,8 +28,6 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.SceneCopier;
-import com.ardor3d.util.geom.SharedCopyLogic;
 
 /**
  * A demonstration of the MathUtils.matrixLookAt function, which constructs a rotation matrix used to orient a source
@@ -83,10 +81,9 @@ public class MatrixLookAtExample extends ExampleBase {
         _root.attachChild(targetMesh);
         targetMesh.setRandomColors();
 
-        final SharedCopyLogic sharedCopyLogic = new SharedCopyLogic();
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
-                final Mesh sm = (Mesh) SceneCopier.makeCopy(box, sharedCopyLogic);
+                final Mesh sm = box.makeCopy(true);
 
                 sm.setTranslation((x - 5.0) * 10.0, (y - 5.0) * 10.0, -10.0);
                 _root.attachChild(sm);

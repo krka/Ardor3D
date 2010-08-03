@@ -29,9 +29,6 @@ import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
-import com.ardor3d.util.geom.CopyLogic;
-import com.ardor3d.util.geom.SceneCopier;
-import com.ardor3d.util.geom.SharedCopyLogic;
 
 /**
  * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.
@@ -85,18 +82,16 @@ public class MeshDataSharingExample extends ExampleBase {
 
         _root.attachChild(n1);
 
-        final CopyLogic sharedCopyLogic = new SharedCopyLogic();
-
         final Random rand = new Random(1337);
         for (int i = 0; i < 500; i++) {
-            final Mesh sm = (Mesh) SceneCopier.makeCopy(sphere, sharedCopyLogic);
+            final Mesh sm = sphere.makeCopy(true);
 
             sm.setTranslation(new Vector3(rand.nextDouble() * 100.0 - 50.0, rand.nextDouble() * 100.0 - 50.0, rand
                     .nextDouble() * 100.0 - 50.0));
             n1.attachChild(sm);
         }
 
-        final Node n2 = (Node) SceneCopier.makeCopy(n1, sharedCopyLogic);
+        final Node n2 = n1.makeCopy(true);
         n2.setTranslation(new Vector3(50, 0, -200));
 
         final MaterialState ms = new MaterialState();
