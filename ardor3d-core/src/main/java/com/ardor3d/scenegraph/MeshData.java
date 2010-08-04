@@ -17,6 +17,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -36,7 +37,7 @@ import com.google.common.collect.MapMaker;
 /**
  * MeshData contains all the commonly used buffers for rendering a mesh.
  */
-public class MeshData implements Cloneable, Savable {
+public class MeshData implements Savable {
 
     /** The Constant logger. */
     private static final Logger logger = Logger.getLogger(MeshData.class.getName());
@@ -1155,17 +1156,38 @@ public class MeshData implements Cloneable, Savable {
         _vboIdCache.put(glContext, vboId);
     }
 
-    // /////////////////
-    // Method for Cloneable
-    // /////////////////
+    public MeshData makeCopy() {
+        final MeshData data = new MeshData();
+        data._vertexCount = _vertexCount;
+        data._primitiveCounts = Arrays.copyOf(_primitiveCounts, _primitiveCounts.length);
 
-    @Override
-    public MeshData clone() {
-        try {
-            return (MeshData) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
+        if (_vertexCoords != null) {
+            data._vertexCoords = _vertexCoords.makeCopy();
         }
+        if (_normalCoords != null) {
+            data._normalCoords = _normalCoords.makeCopy();
+        }
+        if (_fogCoords != null) {
+            data._fogCoords = _fogCoords.makeCopy();
+        }
+        if (_tangentCoords != null) {
+            data._tangentCoords = _tangentCoords.makeCopy();
+        }
+
+        for (final FloatBufferData tCoord : _textureCoords) {
+            data._textureCoords.add(tCoord.makeCopy());
+        }
+
+        if (_indexBuffer != null) {
+            data._indexBuffer = _indexBuffer.makeCopy();
+        }
+
+        if (_indexLengths != null) {
+            data._indexLengths = Arrays.copyOf(_indexLengths, _indexLengths.length);
+        }
+        data._indexModes = Arrays.copyOf(_indexModes, _indexModes.length);
+
+        return data;
     }
 
     // /////////////////
