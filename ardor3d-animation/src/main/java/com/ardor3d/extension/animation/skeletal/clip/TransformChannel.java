@@ -12,7 +12,6 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -70,9 +69,21 @@ public class TransformChannel extends AbstractAnimationChannel {
         }
 
         // Construct our data
-        _rotations = Arrays.copyOf(rotations, rotations.length);
-        _translations = Arrays.copyOf(translations, translations.length);
-        _scales = Arrays.copyOf(scales, scales.length);
+        _rotations = new ReadOnlyQuaternion[rotations.length];
+        int i = 0;
+        for (final ReadOnlyQuaternion q : rotations) {
+            _rotations[i++] = new Quaternion(q);
+        }
+        _translations = new ReadOnlyVector3[translations.length];
+        i = 0;
+        for (final ReadOnlyVector3 v : translations) {
+            _translations[i++] = new Vector3(v);
+        }
+        _scales = new ReadOnlyVector3[scales.length];
+        i = 0;
+        for (final ReadOnlyVector3 v : scales) {
+            _scales[i++] = new Vector3(v);
+        }
     }
 
     /**
