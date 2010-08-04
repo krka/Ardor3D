@@ -559,7 +559,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             mesh.setMeshData(_meshData);
         } else {
             // make a copy of our data
-            mesh.setMeshData(_meshData.clone());
+            mesh.setMeshData(_meshData.makeCopy());
         }
 
         // copy our basic properties
