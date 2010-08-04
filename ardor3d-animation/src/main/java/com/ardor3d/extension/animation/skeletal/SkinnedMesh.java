@@ -633,6 +633,11 @@ public class SkinnedMesh extends Mesh implements PoseListener {
 
         skin._currentPose = _currentPose;
 
+        // make sure pose listener added
+        if (skin._currentPose != null) {
+            skin._currentPose.addPoseListener(skin);
+        }
+
         return skin;
     }
 
