@@ -112,16 +112,29 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
         _buffer.rewind();
     }
 
+    @Override
+    public FloatBufferData makeCopy() {
+        final FloatBufferData copy = new FloatBufferData();
+        copy._buffer = BufferUtils.clone(_buffer);
+        copy._valuesPerTuple = _valuesPerTuple;
+        copy._vboAccessMode = _vboAccessMode;
+        return copy;
+    }
+
     public Class<? extends FloatBufferData> getClassTag() {
         return getClass();
     }
 
+    @Override
     public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _buffer = capsule.readFloatBuffer("buffer", null);
         _valuesPerTuple = capsule.readInt("valuesPerTuple", 0);
     }
 
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_buffer, "buffer", null);
         capsule.write(_valuesPerTuple, "valuesPerTuple", 0);
     }

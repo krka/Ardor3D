@@ -10,6 +10,7 @@
 
 package com.ardor3d.scenegraph;
 
+import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
 import java.nio.Buffer;
 import java.util.Map;
@@ -23,6 +24,8 @@ import com.ardor3d.renderer.RendererCallable;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextIdReference;
 import com.ardor3d.util.GameTaskQueueManager;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
@@ -53,10 +56,10 @@ public abstract class AbstractBufferData<T extends Buffer> {
     }
 
     /** VBO Access mode for this buffer. */
-    protected VBOAccessMode vboAccessMode = VBOAccessMode.StaticDraw;
+    protected VBOAccessMode _vboAccessMode = VBOAccessMode.StaticDraw;
 
     /** Flag for notifying the renderer that the VBO buffer needs to be updated. */
-    protected boolean needsRefresh = false;
+    protected boolean _needsRefresh = false;
 
     AbstractBufferData() {
         _identityCache.put(this, STATIC_REF);
@@ -159,19 +162,19 @@ public abstract class AbstractBufferData<T extends Buffer> {
     }
 
     public VBOAccessMode getVboAccessMode() {
-        return vboAccessMode;
+        return _vboAccessMode;
     }
 
     public void setVboAccessMode(final VBOAccessMode vboAccessMode) {
-        this.vboAccessMode = vboAccessMode;
+        this._vboAccessMode = vboAccessMode;
     }
 
     public boolean isNeedsRefresh() {
-        return needsRefresh;
+        return _needsRefresh;
     }
 
     public void setNeedsRefresh(final boolean needsRefresh) {
-        this.needsRefresh = needsRefresh;
+        this._needsRefresh = needsRefresh;
     }
 
     public static void cleanAllVBOs(final Renderer deleter) {
@@ -236,6 +239,11 @@ public abstract class AbstractBufferData<T extends Buffer> {
         }
     }
 
+    /**
+     * @return a deep copy of this buffer data object
+     */
+    public abstract AbstractBufferData<T> makeCopy();
+
     @SuppressWarnings("unchecked")
     private static final Multimap<Object, Integer> gatherGCdIds(Multimap<Object, Integer> store) {
         // Pull all expired vbos from ref queue and add to an id multimap.
@@ -285,5 +293,13 @@ public abstract class AbstractBufferData<T extends Buffer> {
                         });
             }
         }
+    }
+
+    public void read(final InputCapsule capsule) throws IOException {
+        _vboAccessMode = capsule.readEnum("vboAccessMode", VBOAccessMode.class, VBOAccessMode.StaticDraw);
+    }
+
+    public void write(final OutputCapsule capsule) throws IOException {
+        capsule.write(_vboAccessMode, "vboAccessMode", VBOAccessMode.StaticDraw);
     }
 }

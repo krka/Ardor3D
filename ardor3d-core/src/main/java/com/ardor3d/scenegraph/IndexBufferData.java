@@ -131,4 +131,7 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     public void reset() {
         getBuffer().reset();
     }
+
+    @Override
+    public abstract IndexBufferData<T> makeCopy();
 }

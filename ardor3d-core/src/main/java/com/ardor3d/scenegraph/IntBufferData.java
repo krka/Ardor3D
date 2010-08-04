@@ -53,11 +53,15 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
         return getClass();
     }
 
+    @Override
     public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _buffer = capsule.readIntBuffer("buffer", null);
     }
 
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_buffer, "buffer", null);
     }
 
@@ -118,5 +122,13 @@ public class IntBufferData extends IndexBufferData<IntBuffer> implements Savable
         buff.put(source);
         buff.flip();
         return buff;
+    }
+
+    @Override
+    public IntBufferData makeCopy() {
+        final IntBufferData copy = new IntBufferData();
+        copy._buffer = BufferUtils.clone(_buffer);
+        copy._vboAccessMode = _vboAccessMode;
+        return copy;
     }
 }

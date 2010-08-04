@@ -54,11 +54,15 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
         return getClass();
     }
 
+    @Override
     public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _buffer = capsule.readShortBuffer("buffer", null);
     }
 
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_buffer, "buffer", null);
     }
 
@@ -121,5 +125,13 @@ public class ShortBufferData extends IndexBufferData<ShortBuffer> implements Sav
         }
         buff.flip();
         return buff;
+    }
+
+    @Override
+    public ShortBufferData makeCopy() {
+        final ShortBufferData copy = new ShortBufferData();
+        copy._buffer = BufferUtils.clone(_buffer);
+        copy._vboAccessMode = _vboAccessMode;
+        return copy;
     }
 }

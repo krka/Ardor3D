@@ -54,11 +54,15 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
         return getClass();
     }
 
+    @Override
     public void read(final InputCapsule capsule) throws IOException {
+        super.read(capsule);
         _buffer = capsule.readByteBuffer("buffer", null);
     }
 
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
+        super.write(capsule);
         capsule.write(_buffer, "buffer", null);
     }
 
@@ -121,5 +125,13 @@ public class ByteBufferData extends IndexBufferData<ByteBuffer> implements Savab
         }
         buff.flip();
         return buff;
+    }
+
+    @Override
+    public ByteBufferData makeCopy() {
+        final ByteBufferData copy = new ByteBufferData();
+        copy._buffer = BufferUtils.clone(_buffer);
+        copy._vboAccessMode = _vboAccessMode;
+        return copy;
     }
 }
