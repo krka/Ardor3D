@@ -607,26 +607,18 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         return rVal;
     }
 
-    // /////////////////
-    // Methods for Savable
-    // /////////////////
-
-    @Override
-    public Class<? extends SkinnedMesh> getClassTag() {
-        return this.getClass();
-    }
-
     @Override
     public SkinnedMesh makeCopy(final boolean shareGeometricData) {
         final SkinnedMesh skin = (SkinnedMesh) super.makeCopy(shareGeometricData);
 
         // we don't want to share mesh data, just bind pose
         if (shareGeometricData) {
-            // overriding parent
-            skin._meshData = _meshData.clone();
+            // overriding parent's reuse
+            skin._meshData = _meshData.makeCopy();
+            // reuse
             skin._bindPoseData = _bindPoseData;
         } else {
-            skin._bindPoseData = _bindPoseData.clone();
+            skin._bindPoseData = _bindPoseData.makeCopy();
         }
 
         skin._weightsPerVert = _weightsPerVert;
@@ -639,7 +631,18 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         skin._weights = Arrays.copyOf(_weights, _weights.length);
         skin._jointIndices = Arrays.copyOf(_jointIndices, _jointIndices.length);
 
+        skin._currentPose = _currentPose;
+
         return skin;
+    }
+
+    // /////////////////
+    // Methods for Savable
+    // /////////////////
+
+    @Override
+    public Class<? extends SkinnedMesh> getClassTag() {
+        return this.getClass();
     }
 
     @Override

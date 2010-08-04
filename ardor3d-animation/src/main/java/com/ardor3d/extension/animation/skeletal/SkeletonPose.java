@@ -211,6 +211,25 @@ public class SkeletonPose implements Savable {
         }
     }
 
+    public SkeletonPose makeCopy() {
+        final SkeletonPose copy = new SkeletonPose(_skeleton);
+
+        int i = 0;
+        for (final Transform t : _localTransforms) {
+            copy._localTransforms[i++] = t.clone();
+        }
+        i = 0;
+        for (final Transform t : _globalTransforms) {
+            copy._globalTransforms[i++] = t.clone();
+        }
+        i = 0;
+        for (final Matrix4 m : _matrixPalette) {
+            copy._matrixPalette[i++] = m.clone();
+        }
+
+        return copy;
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
