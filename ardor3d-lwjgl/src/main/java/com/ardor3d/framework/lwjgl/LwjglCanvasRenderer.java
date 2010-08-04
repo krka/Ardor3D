@@ -12,6 +12,7 @@ package com.ardor3d.framework.lwjgl;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ARBMultisample;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
@@ -149,6 +150,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void setCurrentContext() {
         try {
+            Display.makeCurrent();
             GLContext.useContext(_context);
             ContextManager.switchContext(this);
         } catch (final LWJGLException e) {
