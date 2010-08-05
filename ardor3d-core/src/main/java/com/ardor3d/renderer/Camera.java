@@ -38,7 +38,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * This class represents a view into a 3d scene and how that view should map to a 2D rendering surface.
  */
-public class Camera implements Savable, Externalizable, Cloneable {
+public class Camera implements Savable, Externalizable {
 
     private static final long serialVersionUID = 1L;
 
@@ -211,7 +211,7 @@ public class Camera implements Savable, Externalizable, Cloneable {
     /**
      * Computation vector used in lookAt operations.
      */
-    protected Vector3 _newDirection = new Vector3();
+    protected final Vector3 _newDirection = new Vector3();
 
     /**
      * Projection mode used by the camera.
@@ -1547,15 +1547,6 @@ public class Camera implements Savable, Externalizable, Cloneable {
         _height = capsule.readInt("height", 0);
         _depthRangeNear = capsule.readDouble("depthRangeNear", 0.0);
         _depthRangeFar = capsule.readDouble("depthRangeFar", 1.0);
-    }
-
-    @Override
-    protected Camera clone() throws CloneNotSupportedException {
-        try {
-            return (Camera) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
     }
 
     public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {

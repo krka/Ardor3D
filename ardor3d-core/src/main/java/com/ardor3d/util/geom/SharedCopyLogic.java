@@ -38,7 +38,7 @@ public class SharedCopyLogic implements CopyLogic {
             result.updateModelBound();
             return result;
         }
-        return source.clone();
+        return null;
     }
 
     protected Mesh clone(final Mesh original) {

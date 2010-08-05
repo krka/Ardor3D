@@ -55,7 +55,7 @@ import com.google.common.collect.Maps;
 /**
  * Base class for all scenegraph objects.
  */
-public abstract class Spatial implements Cloneable, Savable, Hintable {
+public abstract class Spatial implements Savable, Hintable {
     private static final Logger logger = Logger.getLogger(Spatial.class.getName());
 
     /** This spatial's name. */
@@ -1281,22 +1281,6 @@ public abstract class Spatial implements Cloneable, Savable, Hintable {
         }
 
         return spat;
-    }
-
-    // /////////////////
-    // Method for Cloneable
-    // /////////////////
-
-    /**
-     * @see Object#clone()
-     */
-    @Override
-    public Spatial clone() {
-        try {
-            return (Spatial) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
     }
 
     // /////////////////

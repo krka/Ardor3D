@@ -467,15 +467,6 @@ public class Node extends Spatial {
     }
 
     // /////////////////
-    // Method for Cloneable
-    // /////////////////
-
-    @Override
-    public Node clone() {
-        return (Node) super.clone();
-    }
-
-    // /////////////////
     // Methods for Savable
     // /////////////////
 
