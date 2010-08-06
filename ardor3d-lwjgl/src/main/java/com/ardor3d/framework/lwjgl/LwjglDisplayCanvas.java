@@ -47,6 +47,12 @@ public class LwjglDisplayCanvas implements Canvas, FocusWrapper {
         _settings = settings;
         _canvasRenderer = canvasRenderer;
         _canvas = canvas;
+        _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
+            @Override
+            public void makeCurrent() throws LWJGLException {
+                Display.makeCurrent();
+            }
+        });
     }
 
     public void draw(final CountDownLatch latch) {

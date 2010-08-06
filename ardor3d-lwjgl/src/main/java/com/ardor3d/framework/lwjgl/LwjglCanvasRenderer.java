@@ -28,6 +28,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
+import com.ardor3d.util.Ardor3dException;
 
 public class LwjglCanvasRenderer implements CanvasRenderer {
     protected Scene _scene;
@@ -38,6 +39,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     protected int _frameClear = Renderer.BUFFER_COLOR_AND_DEPTH;
 
     private RenderContext _currentContext;
+    private LwjglCanvasCallback _canvasCallback;
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
     // and since it is at the moment more work than it is worth to get it ready. Later on, when
@@ -126,8 +128,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             _camera.apply(_renderer);
         }
         _renderer.clearBuffers(_frameClear);
+
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
+
+        // release the context
+        releaseCurrentContext();
+
         return drew;
     }
 
@@ -143,16 +150,25 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         _scene = scene;
     }
 
+    public LwjglCanvasCallback getCanvasCallback() {
+        return _canvasCallback;
+    }
+
+    public void setCanvasCallback(final LwjglCanvasCallback canvasCallback) {
+        _canvasCallback = canvasCallback;
+    }
+
     public Renderer getRenderer() {
         return _renderer;
     }
 
-    public void setCurrentContext() {
+    public void setCurrentContext() throws Ardor3dException {
         try {
+            _canvasCallback.makeCurrent();
             GLContext.useContext(_context);
             ContextManager.switchContext(this);
         } catch (final LWJGLException e) {
-            throw new RuntimeException(e);
+            throw new Ardor3dException("Failed to claim OpenGL context.", e);
         }
     }
 

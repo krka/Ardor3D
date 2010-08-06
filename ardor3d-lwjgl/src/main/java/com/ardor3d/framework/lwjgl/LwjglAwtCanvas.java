@@ -39,6 +39,12 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
                 .getStencilBits(), settings.getSamples()).withStereo(settings.isStereo()));
         _settings = settings;
         _canvasRenderer = canvasRenderer;
+        _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
+            @Override
+            public void makeCurrent() throws LWJGLException {
+                LwjglAwtCanvas.this.makeCurrent();
+            }
+        });
     }
 
     public void draw(final CountDownLatch latch) {

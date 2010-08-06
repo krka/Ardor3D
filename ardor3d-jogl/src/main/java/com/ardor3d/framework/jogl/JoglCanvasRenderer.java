@@ -31,15 +31,11 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.jogl.JoglContextCapabilities;
 import com.ardor3d.renderer.jogl.JoglRenderer;
+import com.ardor3d.util.Ardor3dException;
 
 public class JoglCanvasRenderer implements CanvasRenderer {
 
     private static final Logger LOGGER = Logger.getLogger(JoglCanvasRenderer.class.getName());
-
-    /**
-     * Set to true to be safe when rendering in multiple canvases. Set to false for a faster, single canvas mode.
-     */
-    public static boolean MULTI_CANVAS_MODE = true;
 
     // NOTE: This code commented out by Petter 090224, since it isn't really ready to be used,
     // and since it is at the moment more work than it is worth to get it ready. Later on, when
@@ -85,8 +81,29 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _useDebug = useDebug;
     }
 
-    public void setCurrentContext() {
-        _context.makeCurrent();
+    public void setCurrentContext() throws Ardor3dException {
+        int value;
+        int attempt = 1;
+        while ((value = _context.makeCurrent()) == GLContext.CONTEXT_NOT_CURRENT) {
+            if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
+                // failed, throw exception
+                throw new Ardor3dException("Failed to claim OpenGL context.");
+            }
+            attempt++;
+            try {
+                Thread.sleep(5);
+            } catch (final InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if (value == GLContext.CONTEXT_CURRENT_NEW) {
+            ContextManager.getCurrentContext().contextLost();
+
+            // Whenever the context is created or replaced, the GL chain
+            // is lost. Debug will have to be added if desired.
+            _debugEnabled = false;
+        }
+
         ContextManager.switchContext(_context);
     }
 
@@ -159,30 +176,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        ContextManager.switchContext(_context);
-        if (MULTI_CANVAS_MODE && !_context.equals(GLContext.getCurrent())) {
-            int value;
-            int attempt = 1;
-            while ((value = _context.makeCurrent()) == GLContext.CONTEXT_NOT_CURRENT) {
-                if (attempt == MAX_CONTEXT_GRAB_ATTEMPTS) {
-                    // failed, return false to avoid back buffer swap.
-                    return false;
-                }
-                attempt++;
-                try {
-                    Thread.sleep(5);
-                } catch (final InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            if (value == GLContext.CONTEXT_CURRENT_NEW) {
-                ContextManager.getCurrentContext().contextLost();
-
-                // Whenever the context is created or replaced, the GL chain
-                // is lost. Debug will have to be added if desired.
-                _debugEnabled = false;
-            }
-        }
+        setCurrentContext();
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
@@ -203,9 +197,10 @@ public class JoglCanvasRenderer implements CanvasRenderer {
 
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
-        if (MULTI_CANVAS_MODE) {
-            _context.release();
-        }
+
+        // release the context
+        releaseCurrentContext();
+
         return drew;
     }
 

@@ -46,6 +46,12 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
 
     public LwjglCanvas(final LwjglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
         _canvasRenderer = canvasRenderer;
+        _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
+            @Override
+            public void makeCurrent() throws LWJGLException {
+                Display.makeCurrent();
+            }
+        });
         _settings = settings;
     }
 

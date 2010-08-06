@@ -14,6 +14,7 @@ import com.ardor3d.annotation.MainThread;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.util.Ardor3dException;
 
 /**
  * Represents a class that knows how to render a scene using a specific Open GL implementation.
@@ -67,8 +68,11 @@ public interface CanvasRenderer {
 
     /**
      * Have the CanvasRenderer claim the graphics context.
+     * 
+     * @throws Ardor3dException
+     *             if we can not claim the context.
      */
-    void setCurrentContext();
+    void setCurrentContext() throws Ardor3dException;
 
     /**
      * Have the CanvasRenderer release the graphics context.
