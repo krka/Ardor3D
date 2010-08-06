@@ -75,9 +75,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         }
 
         try {
+            _canvasCallback.makeCurrent();
             GLContext.useContext(_context);
         } catch (final LWJGLException e) {
-            throw new RuntimeException(e);
+            throw new Ardor3dException("Unable to init CanvasRenderer.", e);
         }
 
         final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
