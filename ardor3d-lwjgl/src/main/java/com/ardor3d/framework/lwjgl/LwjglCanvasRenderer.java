@@ -118,7 +118,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        setCurrentContext();
+        makeCurrentContext();
 
         // render stuff, first apply our camera if we have one
         if (_camera != null) {
@@ -162,7 +162,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         return _renderer;
     }
 
-    public void setCurrentContext() throws Ardor3dException {
+    public void makeCurrentContext() throws Ardor3dException {
         try {
             _canvasCallback.makeCurrent();
             GLContext.useContext(_context);

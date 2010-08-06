@@ -72,7 +72,7 @@ public interface CanvasRenderer {
      * @throws Ardor3dException
      *             if we can not claim the context.
      */
-    void setCurrentContext() throws Ardor3dException;
+    void makeCurrentContext() throws Ardor3dException;
 
     /**
      * Have the CanvasRenderer release the graphics context.

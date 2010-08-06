@@ -142,8 +142,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                 Thread.yield();
             }
             // grab the graphics context so cleanup will work out.
-            _canvas.getCanvasRenderer().setCurrentContext();
+            _canvas.getCanvasRenderer().makeCurrentContext();
             quit(_canvas.getCanvasRenderer().getRenderer());
+            _canvas.getCanvasRenderer().releaseCurrentContext();
         } catch (final Throwable t) {
             System.err.println("Throwable caught in MainThread - exiting");
             t.printStackTrace(System.err);

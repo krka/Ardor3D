@@ -92,11 +92,13 @@ public class JoglBasicExample implements Scene {
             _canvas.draw(null);
             Thread.yield();
         }
-        _canvas.getCanvasRenderer().setCurrentContext();
+        _canvas.getCanvasRenderer().makeCurrentContext();
 
         // Done, do cleanup
         ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
         _canvas.close();
+
+        _canvas.getCanvasRenderer().releaseCurrentContext();
     }
 
     /**

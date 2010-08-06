@@ -81,7 +81,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         _useDebug = useDebug;
     }
 
-    public void setCurrentContext() throws Ardor3dException {
+    public void makeCurrentContext() throws Ardor3dException {
         int value;
         int attempt = 1;
         while ((value = _context.makeCurrent()) == GLContext.CONTEXT_NOT_CURRENT) {
@@ -176,7 +176,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     public boolean draw() {
 
         // set up context for rendering this canvas
-        setCurrentContext();
+        makeCurrentContext();
 
         // Enable Debugging if requested.
         if (_useDebug != _debugEnabled) {
