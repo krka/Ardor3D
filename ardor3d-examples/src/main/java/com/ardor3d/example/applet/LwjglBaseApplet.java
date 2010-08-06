@@ -200,6 +200,9 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
         final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(this);
         _glCanvas = new LwjglDisplayCanvas(_displayCanvas, _settings, canvasRenderer);
         _glCanvas.init();
+
+        // by default, we'll keep it vsync'd
+        _glCanvas.setVSyncEnabled(true);
     }
 
     protected void initInput() {
