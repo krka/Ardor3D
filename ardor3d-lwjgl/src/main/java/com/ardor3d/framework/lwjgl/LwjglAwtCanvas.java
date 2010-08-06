@@ -62,7 +62,9 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     @MainThread
     protected void paintGL() {
         if (!_inited) {
-            init();
+            _canvasRenderer.init(_settings, false); // false - do not do back buffer swap, awt will do that.
+            _canvasRenderer.getCamera().resize(getWidth(), getHeight());
+            _inited = true;
         }
 
         if (!_updated) {
@@ -82,9 +84,7 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     public void init() {
-        _canvasRenderer.init(_settings, false); // false - do not do back buffer swap, awt will do that.
-        _canvasRenderer.getCamera().resize(getWidth(), getHeight());
-        _inited = true;
+        ; // ignore - can only be inited inside our paintGL
     }
 
     public LwjglCanvasRenderer getCanvasRenderer() {
