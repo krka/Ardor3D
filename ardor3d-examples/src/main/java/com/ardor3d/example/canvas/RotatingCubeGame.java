@@ -64,6 +64,7 @@ public class RotatingCubeGame implements Updater {
     private final Matrix3 _incr = new Matrix3();
     private static final double MOUSE_TURN_SPEED = 1;
     private int rotationSign = 1;
+    private boolean inited;
 
     public RotatingCubeGame(final ExampleScene scene, final Exit exit, final LogicalLayer logicalLayer,
             final Key toggleRotationKey) {
@@ -75,6 +76,9 @@ public class RotatingCubeGame implements Updater {
 
     @MainThread
     public void init() {
+        if (inited) {
+            return;
+        }
         // add a cube to the scene
         // add a rotating controller to the cube
         // add a light
@@ -113,6 +117,7 @@ public class RotatingCubeGame implements Updater {
         scene.getRoot().attachChild(box);
 
         registerInputTriggers();
+        inited = true;
     }
 
     private void registerInputTriggers() {
