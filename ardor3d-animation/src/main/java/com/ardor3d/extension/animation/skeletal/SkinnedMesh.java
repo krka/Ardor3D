@@ -279,7 +279,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     private void updateWeightsAndJointsOnGPUShader() {
-        if (isUseGPU() && _gpuShader != null) {
+        if (_gpuShader != null) {
             if (_weightsBuf == null) {
                 createWeightBuffer();
             }
@@ -293,6 +293,12 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                 _gpuShader.setAttributePointerMatrix("Weights", getGpuAttributeSize(), false, _weightsBuf);
                 _gpuShader.setAttributePointerMatrix("JointIDs", getGpuAttributeSize(), false, _jointIndicesBuf);
             }
+        }
+    }
+
+    private void updateJointPaletteOnGPUShader() {
+        if (_gpuShader != null) {
+            _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
         }
     }
 
@@ -335,14 +341,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     /**
-     * Apply skinning values for GPU or CPU skinning.
+     * Apply skinning values for CPU skinning.
      */
     public void applyPose() {
-        if (isUseGPU()) {
-            if (_gpuShader != null) {
-                _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
-            }
-        } else {
+        if (!isUseGPU()) {
             // Get a handle to the source and dest vertices buffers
             final FloatBuffer bindVerts = _bindPoseData.getVertexBuffer();
             FloatBuffer storeVerts = _meshData.getVertexBuffer();
@@ -463,9 +465,14 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     @Override
     public void render(final Renderer renderer) {
         if (!_useGPU) {
+            // render as normal
             super.render(renderer);
         } else {
+            // update shader attributes / uniforms.
             updateWeightsAndJointsOnGPUShader();
+            updateJointPaletteOnGPUShader();
+
+            // render using the bind pose.
             super.render(renderer, getBindPoseData());
         }
     }
