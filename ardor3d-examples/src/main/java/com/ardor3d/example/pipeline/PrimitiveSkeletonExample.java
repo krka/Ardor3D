@@ -50,8 +50,8 @@ public class PrimitiveSkeletonExample extends ExampleBase {
     private boolean showSkeleton = false;
     private boolean useGPU = false;
 
-    private SkeletonPose pose;
-    private SkinnedMesh arm;
+    private SkeletonPose pose1, pose2;
+    private SkinnedMesh arm, arm1, arm2;
     private BasicText t1, t2, t3;
 
     public static void main(final String[] args) {
@@ -76,8 +76,10 @@ public class PrimitiveSkeletonExample extends ExampleBase {
 
         final Skeleton sk = new Skeleton("arm sk", new Joint[] { j1, j2 });
 
-        pose = new SkeletonPose(sk);
-        pose.updateTransforms();
+        pose1 = new SkeletonPose(sk);
+        pose1.updateTransforms();
+        pose2 = new SkeletonPose(sk);
+        pose2.updateTransforms();
 
         arm = new SkinnedMesh("arm");
         final Cylinder cy = new Cylinder("cylinder", 3, 8, 1, 10);
@@ -86,7 +88,6 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.getMeshData().setNormalBuffer(BufferUtils.createFloatBuffer(cy.getMeshData().getNormalBuffer().capacity()));
         arm.getMeshData().setIndices(BufferUtils.clone(cy.getMeshData().getIndices()));
         arm.getMeshData().setTextureBuffer(BufferUtils.clone(cy.getMeshData().getTextureBuffer(0)), 0);
-        arm.setCurrentPose(pose);
         arm.setTranslation(0, 0, -10);
         arm.getSceneHints().setCullHint(CullHint.Dynamic);
 
@@ -147,7 +148,17 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         arm.setGPUShader(gpuShader);
         arm.setUseGPU(useGPU);
 
-        _root.attachChild(arm);
+        arm1 = arm.makeCopy(true);
+        arm2 = arm.makeCopy(true);
+
+        arm1.setCurrentPose(pose1);
+        arm2.setCurrentPose(pose2);
+
+        arm1.addTranslation(1, 0, 0);
+        arm2.addTranslation(-1, 0, 0);
+
+        _root.attachChild(arm1);
+        _root.attachChild(arm2);
 
         t1 = BasicText.createDefaultTextLabel("Text1", "[SPACE] Pause joint animation.");
         t1.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
@@ -182,8 +193,10 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.G), new TriggerAction() {
             public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
                 useGPU = !useGPU;
-                arm.getGPUShader().setEnabled(useGPU);
-                arm.setUseGPU(useGPU);
+                arm1.getGPUShader().setEnabled(useGPU);
+                arm1.setUseGPU(useGPU);
+                arm2.getGPUShader().setEnabled(useGPU);
+                arm2.setUseGPU(useGPU);
                 if (useGPU) {
                     t2.setText("[G] GPU Skinning is ON.");
                 } else {
@@ -209,7 +222,7 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         super.renderDebug(renderer);
 
         if (showSkeleton) {
-            SkeletalDebugger.drawSkeletons(_root, renderer);
+            SkeletalDebugger.drawSkeletons(_root, renderer, true, false);
         }
     }
 
@@ -234,15 +247,21 @@ public class PrimitiveSkeletonExample extends ExampleBase {
             angle %= 360;
 
             // move the end of the arm up and down.
-            final Transform t = pose.getLocalJointTransforms()[1];
-            t.setTranslation(t.getTranslation().getX(), Math.sin(angle * MathUtils.DEG_TO_RAD) * 2, t.getTranslation()
-                    .getZ());
+            final Transform t1 = pose1.getLocalJointTransforms()[1];
+            t1.setTranslation(t1.getTranslation().getX(), Math.sin(angle * MathUtils.DEG_TO_RAD) * 2, t1
+                    .getTranslation().getZ());
 
-            pose.updateTransforms();
+            final Transform t2 = pose2.getLocalJointTransforms()[1];
+            t2.setTranslation(t2.getTranslation().getX(), Math.cos(angle * MathUtils.DEG_TO_RAD) * 2, t2
+                    .getTranslation().getZ());
+
+            pose1.updateTransforms();
+            pose2.updateTransforms();
 
             if (!useGPU) {
                 // no point to updating the model bound in gpu mode
-                arm.updateModelBound();
+                arm1.updateModelBound();
+                arm2.updateModelBound();
             }
         }
     }
