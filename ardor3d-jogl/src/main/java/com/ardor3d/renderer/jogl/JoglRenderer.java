@@ -884,7 +884,8 @@ public class JoglRenderer extends AbstractRenderer {
                 final Buffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
                 JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-                gl.glBufferSubDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer.limit() * 4, dataBuffer);
+                gl.glBufferSubDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, 0, dataBuffer.limit() * data.getByteCount(),
+                        dataBuffer);
                 data.setNeedsRefresh(false);
             }
 
@@ -900,10 +901,10 @@ public class JoglRenderer extends AbstractRenderer {
 
             rendRecord.invalidateVBO();
             JoglRendererUtil.setBoundElementVBO(rendRecord, vboID);
-            gl.glBufferDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, dataBuffer.limit() * 4, dataBuffer,
+            gl.glBufferDataARB(GL.GL_ELEMENT_ARRAY_BUFFER_ARB, dataBuffer.limit() * data.getByteCount(), dataBuffer,
                     getGLVBOAccessMode(data.getVboAccessMode()));
         } else {
-            throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
+            throw new Ardor3dException("Attempting to create a vbo id for a IndexBufferData with no Buffer value.");
         }
         return vboID;
     }

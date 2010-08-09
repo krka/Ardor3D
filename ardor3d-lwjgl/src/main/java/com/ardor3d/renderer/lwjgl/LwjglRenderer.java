@@ -872,7 +872,7 @@ public class LwjglRenderer extends AbstractRenderer {
                         (ByteBuffer) dataBuffer, getGLVBOAccessMode(data.getVboAccessMode()));
             }
         } else {
-            throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
+            throw new Ardor3dException("Attempting to create a vbo id for a IndexBufferData with no Buffer value.");
         }
         return vboID;
     }
