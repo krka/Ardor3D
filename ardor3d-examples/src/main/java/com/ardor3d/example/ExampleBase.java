@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.NativeCanvas;
@@ -142,9 +143,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
                 Thread.yield();
             }
             // grab the graphics context so cleanup will work out.
-            _canvas.getCanvasRenderer().makeCurrentContext();
+            final CanvasRenderer cr = _canvas.getCanvasRenderer();
+            cr.makeCurrentContext();
             quit(_canvas.getCanvasRenderer().getRenderer());
-            _canvas.getCanvasRenderer().releaseCurrentContext();
+            cr.releaseCurrentContext();
         } catch (final Throwable t) {
             System.err.println("Throwable caught in MainThread - exiting");
             t.printStackTrace(System.err);
