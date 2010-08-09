@@ -108,7 +108,9 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     }
 
     public void releaseCurrentContext() {
-        _context.release();
+        if (_context.equals(GLContext.getCurrent())) {
+            _context.release();
+        }
     }
 
     @MainThread
