@@ -18,6 +18,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.Camera.FrustumIntersect;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.controller.ComplexSpatialController;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -228,6 +229,12 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
                         listener.onDead(particles);
                     }
                 }
+            } else {
+                // if not dead make sure our particles refresh their vbos, etc.
+                final MeshData md = particles.getParticleGeometry().getMeshData();
+                md.getVertexCoords().setNeedsRefresh(true);
+                md.getColorCoords().setNeedsRefresh(true);
+                md.getTextureCoords(0).setNeedsRefresh(true);
             }
 
             // If we have a bound and any live particles, update it

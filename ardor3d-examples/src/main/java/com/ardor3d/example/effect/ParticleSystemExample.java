@@ -45,8 +45,20 @@ public class ParticleSystemExample extends ExampleBase {
 
     int ignore = 10;
 
+    private double counter = 0;
+    private int frames = 0;
+
     @Override
     protected void updateExample(final ReadOnlyTimer timer) {
+        counter += timer.getTimePerFrame();
+        frames++;
+        if (counter > 1) {
+            final double fps = (frames / counter);
+            counter = 0;
+            frames = 0;
+            System.out.printf("%7.1f FPS\n", fps);
+        }
+
         // We'll ignore the first 10 iterations because our timer is going to be unstable.
         if (ignore > 0) {
             ignore--;
@@ -70,13 +82,16 @@ public class ParticleSystemExample extends ExampleBase {
         _canvas.setTitle("Particle System - Example");
         _lightState.setEnabled(false);
 
+        // test particles + VBO
+        // _root.getSceneHints().setDataMode(DataMode.VBO);
+
         particles = ParticleFactory.buildParticles("particles", 300);
         particles.setEmissionDirection(new Vector3(0, 1, 0));
         particles.setInitialVelocity(.006);
         particles.setStartSize(2.5);
         particles.setEndSize(.5);
-        particles.setMinimumLifeTime(1200);
-        particles.setMaximumLifeTime(1400);
+        particles.setMinimumLifeTime(100);
+        particles.setMaximumLifeTime(1500);
         particles.setStartColor(new ColorRGBA(1, 0, 0, 1));
         particles.setEndColor(new ColorRGBA(0, 1, 0, 0));
         particles.setMaximumAngle(360 * MathUtils.DEG_TO_RAD);
