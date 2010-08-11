@@ -13,6 +13,7 @@ package com.ardor3d.example.benchmark.ball;
 import java.net.URISyntaxException;
 
 import com.ardor3d.example.Purpose;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.framework.Scene;
@@ -120,8 +121,11 @@ public class BubbleMarkExample implements Scene {
         }
 
         // Done, do cleanup
+        final CanvasRenderer cr = canvas.getCanvasRenderer();
+        cr.makeCurrentContext();
         ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
         canvas.close();
+        cr.releaseCurrentContext();
     }
 
     /**
