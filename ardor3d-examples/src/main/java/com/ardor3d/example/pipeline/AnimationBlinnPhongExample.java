@@ -53,7 +53,7 @@ import com.ardor3d.util.resource.URLResourceSource;
  * Illustrates gpu skinning with normal map, specular map and diffuse coloring.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationBlinnPhongExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationBlinnPhongExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationBlinnPhongExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationBlinnPhongExample extends ExampleBase {
     private ColladaImporter colladaImporter;
@@ -245,10 +245,10 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
     private void importDogDae() {
 
-        final ResourceSource rts = new URLResourceSource(AnimationBlinnPhongExample.class.getClassLoader().getResource(
+        final ResourceSource rts = new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
                 "com/ardor3d/example/media/models/collada/juanita/dog_Apr18_normals.dds"));
         final Texture t = TextureManager.load(rts, Texture.MinificationFilter.NearestNeighborNearestMipMap, true);
-        final ResourceSource specularRS = new URLResourceSource(AnimationBlinnPhongExample.class.getClassLoader()
+        final ResourceSource specularRS = new URLResourceSource(Thread.currentThread().getContextClassLoader()
                 .getResource("com/ardor3d/example/media/models/collada/juanita/dog_Apr18_specular.dds"));
         final Texture specular = TextureManager.load(specularRS,
                 Texture.MinificationFilter.NearestNeighborNearestMipMap, false);
@@ -264,9 +264,9 @@ public class AnimationBlinnPhongExample extends ExampleBase {
         gpuShader = new GLSLShaderObjectsState();
         gpuShader.setEnabled(true);
         try {
-            gpuShader.setVertexShader(AnimationBlinnPhongExample.class.getClassLoader().getResourceAsStream(
+            gpuShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.vert"));
-            gpuShader.setFragmentShader(AnimationBlinnPhongExample.class.getClassLoader().getResourceAsStream(
+            gpuShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.frag"));
 
             gpuShader.setUniform("quantizationFactor", 1f / quantizationFactor);

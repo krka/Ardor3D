@@ -44,7 +44,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * stream.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ExportImportExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ExportImportExample.jpg", //
 maxHeapMemory = 64)
 public class ExportImportExample extends ExampleBase {
     private static final Logger logger = Logger.getLogger(ExportImportExample.class.getName());

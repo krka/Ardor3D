@@ -25,7 +25,7 @@ import com.ardor3d.scenegraph.shape.Quad;
  * A demonstration using MaterialState to set lighting equation parameters.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MaterialFaceExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MaterialFaceExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MaterialFaceExample.jpg", //
 maxHeapMemory = 64)
 public class MaterialFaceExample extends ExampleBase {
 

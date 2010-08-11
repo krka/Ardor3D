@@ -19,7 +19,7 @@ import com.ardor3d.scenegraph.controller.interpolation.QuaternionInterpolationCo
  * between the given quaternions.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.QuaternionInterpolationControllerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_QuaternionInterpolationControllerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/interpolation_QuaternionInterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class QuaternionInterpolationControllerExample extends
         InterpolationControllerBase<QuaternionInterpolationController> {

@@ -13,7 +13,6 @@ package com.ardor3d.example.basic;
 import java.net.URISyntaxException;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
@@ -50,7 +49,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.JoglBasicExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_JoglBasicExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_JoglBasicExample.jpg", //
 maxHeapMemory = 64)
 public class JoglBasicExample implements Scene {
 
@@ -157,8 +156,8 @@ public class JoglBasicExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

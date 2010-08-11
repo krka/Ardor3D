@@ -20,7 +20,7 @@ import com.ardor3d.scenegraph.controller.interpolation.DefaultColorInterpolation
  * interpolating between the given colors.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.DefaultColorInterpolationControllerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_DefaultColorInterpolationControllerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/interpolation_DefaultColorInterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class DefaultColorInterpolationControllerExample extends
         InterpolationControllerBase<DefaultColorInterpolationController> {

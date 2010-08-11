@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
@@ -65,7 +64,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * This examples demonstrates how to render OpenGL (via LWJGL) on a SWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.LwjglSwtExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_LwjglSwtExample.jpg", //
 maxHeapMemory = 64)
 public class LwjglSwtExample {
     static MouseCursor _cursor1;
@@ -122,8 +121,8 @@ public class LwjglSwtExample {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -260,8 +259,8 @@ public class LwjglSwtExample {
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
         try {
-            _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
-            _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
+            _cursor1 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
+            _cursor2 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/movedata.gif");
         } catch (final IOException ioe) {
             ioe.printStackTrace();
         }
@@ -271,7 +270,7 @@ public class LwjglSwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(LwjglAwtExample.class
+        final com.ardor3d.image.Image image = awtImageLoader.load(Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream(resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);

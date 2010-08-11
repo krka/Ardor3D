@@ -45,7 +45,7 @@ import com.ardor3d.util.TextureManager;
  * A simple example showing bloom.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.BloomExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_BloomExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_BloomExample.jpg", //
 maxHeapMemory = 64)
 public class BloomExample extends ExampleBase {
     /** The Constant logger. */

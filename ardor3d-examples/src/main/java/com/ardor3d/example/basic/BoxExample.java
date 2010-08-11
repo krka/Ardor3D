@@ -29,7 +29,7 @@ import com.ardor3d.util.TextureManager;
  * A simple example showing a textured and lit box spinning.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.BoxExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
 maxHeapMemory = 64)
 public class BoxExample extends ExampleBase {
 

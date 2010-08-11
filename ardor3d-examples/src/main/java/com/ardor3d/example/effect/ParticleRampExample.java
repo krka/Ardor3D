@@ -31,7 +31,7 @@ import com.ardor3d.util.TextureManager;
  * color) change over time.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleRampExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleRampExample.jpg", //
 maxHeapMemory = 64)
 public class ParticleRampExample extends ExampleBase {
 

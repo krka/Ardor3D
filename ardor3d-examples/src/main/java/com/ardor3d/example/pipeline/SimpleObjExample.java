@@ -23,7 +23,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * Simplest example of loading a Wavefront OBJ model.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleObjExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_SimpleObjExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleObjExample.jpg", //
 maxHeapMemory = 64)
 public class SimpleObjExample extends ExampleBase {
     public static void main(final String[] args) {
@@ -39,8 +39,8 @@ public class SimpleObjExample extends ExampleBase {
         final long time = System.currentTimeMillis();
         final ObjImporter importer = new ObjImporter();
         try {
-            importer.setTextureLocator(new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/models/obj/")));
+            importer.setTextureLocator(new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/models/obj/")));
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
         }

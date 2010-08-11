@@ -26,7 +26,7 @@ import com.ardor3d.scenegraph.Line;
  * A demonstration of antialising on a Line object.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LineExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LineExample.jpg", //
 maxHeapMemory = 64)
 public class LineExample extends ExampleBase {
 

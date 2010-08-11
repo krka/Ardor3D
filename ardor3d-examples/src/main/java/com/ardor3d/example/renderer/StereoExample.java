@@ -36,7 +36,7 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the StereoCamera class, which allows for your stereo viewing pleasures.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.StereoExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_StereoExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_StereoExample.jpg", //
 maxHeapMemory = 64)
 public class StereoExample extends ExampleBase {
 

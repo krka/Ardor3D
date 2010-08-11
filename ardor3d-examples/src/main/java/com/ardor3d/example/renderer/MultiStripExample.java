@@ -27,7 +27,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * Illustrates mesh with several primitives (i.e. strip, quad, triangle).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MultiStripExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MultiStripExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MultiStripExample.jpg", //
 maxHeapMemory = 64)
 public class MultiStripExample extends ExampleBase {
 

@@ -22,7 +22,6 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
@@ -279,8 +278,8 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

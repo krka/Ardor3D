@@ -733,7 +733,7 @@ public class PropertiesGameSettings {
         }
         InputStream istream = null;
         if (propFileName != null) {
-            istream = PropertiesGameSettings.class.getClassLoader().getResourceAsStream(propFileName);
+            istream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propFileName);
         }
         if (istream == null) {
             logger.fine("No customization properties file found");

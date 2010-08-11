@@ -66,7 +66,7 @@ import com.ardor3d.util.scenegraph.SceneCompiler;
  * Illustrates creating a display list of intrinsic shapes (e.g. Box, Cone, Torus).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.DisplayListExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_DisplayListExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_DisplayListExample.jpg", //
 maxHeapMemory = 64)
 public class DisplayListExample extends ExampleBase {
     private int wrapCount;

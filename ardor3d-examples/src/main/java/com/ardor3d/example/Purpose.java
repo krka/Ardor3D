@@ -37,7 +37,7 @@ public @interface Purpose {
     /**
      * @return the resource path to a screenshot thumbnail, e.g. /com/ardor3d/example/thumbnails/boxexample.png
      */
-    String thumbnailPath() default "/com/ardor3d/example/media/images/ardor3d_white_256.jpg";
+    String thumbnailPath() default "com/ardor3d/example/media/images/ardor3d_white_256.jpg";
 
     /**
      * Default value is 64.

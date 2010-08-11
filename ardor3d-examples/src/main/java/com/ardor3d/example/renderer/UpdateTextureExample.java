@@ -53,7 +53,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  * A demonstration of procedurally updating a texture.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.UpdateTextureExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_UpdateTextureExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_UpdateTextureExample.jpg", //
 maxHeapMemory = 64)
 public class UpdateTextureExample extends ExampleBase {
     private Mesh t;

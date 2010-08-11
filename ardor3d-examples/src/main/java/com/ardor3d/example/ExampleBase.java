@@ -169,10 +169,10 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         AWTImageLoader.registerLoader();
 
         try {
-            SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-            srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
+            srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader().getResource(
                     "com/ardor3d/example/media/models/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, srl);
         } catch (final URISyntaxException ex) {
@@ -386,7 +386,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         final String dflt = settings.getDefaultSettingsWidgetImage();
         if (dflt != null) {
             try {
-                dialogImage = ExampleBase.class.getResource(dflt);
+                dialogImage = Thread.currentThread().getContextClassLoader().getResource(dflt);
             } catch (final Exception e) {
                 logger.log(Level.SEVERE, "Resource lookup of '" + dflt + "' failed.  Proceeding.");
             }

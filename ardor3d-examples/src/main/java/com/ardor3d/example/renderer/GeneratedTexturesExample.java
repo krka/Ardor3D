@@ -54,7 +54,7 @@ import com.ardor3d.util.TextureKey;
  * textures.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.GeneratedTexturesExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_GeneratedTexturesExample.jpg", //
 maxHeapMemory = 64)
 public class GeneratedTexturesExample extends ExampleBase {
     private final static int COUNT = 10;

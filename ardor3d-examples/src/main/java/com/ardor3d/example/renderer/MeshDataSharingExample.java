@@ -34,7 +34,7 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the CopyLogic and SceneCopier classes, which allow for the efficient copying and sharing of mesh data.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MeshDataSharingExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MeshDataSharingExample.jpg", //
 maxHeapMemory = 64)
 public class MeshDataSharingExample extends ExampleBase {
 

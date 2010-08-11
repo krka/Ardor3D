@@ -34,7 +34,7 @@ import com.ardor3d.ui.text.BMText.AutoScale;
  * Illustrates how to modify text properties (e.g. font, color, alignment) and display on a canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.BMTextExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_BMTextExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_BMTextExample.jpg", //
 maxHeapMemory = 64)
 public class BMTextExample extends ExampleBase {
 

@@ -64,7 +64,7 @@ import com.ardor3d.util.resource.URLResourceSource;
  * Illustrates loading a model from Collada. If the model also contains an animation, the animation is played as well.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaExample.jpg", //
 maxHeapMemory = 128)
 public class ColladaExample extends ExampleBase {
 

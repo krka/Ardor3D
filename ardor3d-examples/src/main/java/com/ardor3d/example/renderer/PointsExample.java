@@ -23,7 +23,7 @@ import com.ardor3d.util.geom.BufferUtils;
  * A demonstration of displaying numerous Point in three-dimensions.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.PointsExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_PointsExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_PointsExample.jpg", //
 maxHeapMemory = 64)
 public class PointsExample extends ExampleBase {
 

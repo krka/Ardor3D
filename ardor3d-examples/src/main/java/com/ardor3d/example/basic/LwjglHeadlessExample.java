@@ -21,7 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
@@ -59,7 +58,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.LwjglHeadlessExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_LwjglHeadlessExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_LwjglHeadlessExample.jpg", //
 maxHeapMemory = 64)
 public class LwjglHeadlessExample implements Scene {
 
@@ -186,8 +185,8 @@ public class LwjglHeadlessExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

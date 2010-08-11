@@ -23,7 +23,7 @@ import com.ardor3d.scenegraph.controller.interpolation.LinearVector3Interpolatio
  * coordinates (via linear interpolation).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.LinearVector3InterpolationControllerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_LinearVector3InterpolationControllerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/interpolation_LinearVector3InterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class LinearVector3InterpolationControllerExample extends
         InterpolationControllerBase<LinearVector3InterpolationController> {

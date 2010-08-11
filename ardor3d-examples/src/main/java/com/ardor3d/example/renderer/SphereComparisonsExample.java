@@ -31,7 +31,7 @@ import com.ardor3d.util.TextureManager;
  * Simple example showing differences between GeoSphere and Sphere and their various texture mappings.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.SphereComparisonsExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_SphereComparisonsExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_SphereComparisonsExample.jpg", //
 maxHeapMemory = 64)
 public class SphereComparisonsExample extends ExampleBase {
 

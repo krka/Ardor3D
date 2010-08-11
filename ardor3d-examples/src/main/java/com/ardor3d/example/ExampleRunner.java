@@ -108,8 +108,8 @@ public class ExampleRunner extends JFrame {
     private final static String HEADER = "<html><body><h2 align=\"center\">Ardor3d Examples</h2>"
             + "<p>Choose an example in the tree and select Run. Movement keys are: W, A, S, and D. Control view with left/right buttons.</p>"
             + "<p align=\"center\"><img src=\""
-            + ExampleRunner.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
-            + "\"></p></body></html>";
+            + Thread.currentThread().getContextClassLoader().getResource(
+                    "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"></p></body></html>";
     private static Comparator<Class<?>> classComparator = new Comparator<Class<?>>() {
 
         public int compare(final Class<?> o1, final Class<?> o2) {
@@ -372,7 +372,8 @@ public class ExampleRunner extends JFrame {
             if (purpose != null) {
                 try {
                     // Look for the example's thumbnail.
-                    final URL imageURL = ExampleRunner.class.getResource(purpose.thumbnailPath());
+                    final URL imageURL = Thread.currentThread().getContextClassLoader().getResource(
+                            purpose.thumbnailPath());
                     if (imageURL != null) {
                         imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
@@ -386,8 +387,8 @@ public class ExampleRunner extends JFrame {
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
                 imgURL = "<img src=\""
-                        + ExampleRunner.class.getResource("/com/ardor3d/example/media/images/ardor3d_white_256.jpg")
-                        + "\"/>";
+                        + Thread.currentThread().getContextClassLoader().getResource(
+                                "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"/>";
             }
 
             // Set the description HTML
@@ -407,7 +408,7 @@ public class ExampleRunner extends JFrame {
         }
         try {
             final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale.getDefault(),
-                    getClass().getClassLoader());
+                    Thread.currentThread().getContextClassLoader());
 
             return bundle.getString(purpose.htmlDescriptionKey());
 
@@ -472,7 +473,8 @@ public class ExampleRunner extends JFrame {
      */}
 
     private static ImageIcon getIcon(final String name) {
-        return new ImageIcon(ExampleRunner.class.getResource("/com/ardor3d/example/media/icons/" + name));
+        return new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(
+                "com/ardor3d/example/media/icons/" + name));
     }
 
     interface SearchFilter {
@@ -756,14 +758,11 @@ public class ExampleRunner extends JFrame {
 
             // Translate the package name into an absolute path
             String name = pckgname;
-            if (!name.startsWith("/")) {
-                name = "/" + name;
-            }
             name = name.replace('.', '/');
 
             // Get a File object for the package
             // URL url = UPBClassLoader.get().getResource(name);
-            url = this.getClass().getResource(name);
+            url = Thread.currentThread().getContextClassLoader().getResource(name);
             // URL url = ClassLoader.getSystemClassLoader().getResource(name);
             // pckgname = pckgname + ".";
 

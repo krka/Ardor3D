@@ -38,7 +38,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * surface.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.ViewportExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_ViewportExample.jpg", //
 maxHeapMemory = 64)
 public class ViewportExample extends ExampleBase {
 

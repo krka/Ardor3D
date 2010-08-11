@@ -33,7 +33,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * Illustrates how to display and move GUI primitatives (e.g. RadioButton, Lable, TabbedPane) on a canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.ui.RotatingUIExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/ui_RotatingUIExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_RotatingUIExample.jpg", //
 maxHeapMemory = 64)
 public class RotatingUIExample extends ExampleBase {
     UIHud hud;

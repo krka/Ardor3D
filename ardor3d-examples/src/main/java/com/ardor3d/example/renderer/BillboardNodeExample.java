@@ -34,7 +34,7 @@ import com.ardor3d.util.TextureManager;
  * Illustrates the BillboardNode class; which defines a node that always orients towards the camera.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.BillboardNodeExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_BillboardNodeExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_BillboardNodeExample.jpg", //
 maxHeapMemory = 64)
 public class BillboardNodeExample extends ExampleBase {
     private BasicText t;

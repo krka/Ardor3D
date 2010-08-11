@@ -86,7 +86,7 @@ import com.ardor3d.util.resource.URLResourceSource;
  * Illustrates loading several animations from Collada and arranging them in an animation state machine.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.AnimationDemoExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationDemoExample extends ExampleBase {
 
@@ -371,8 +371,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Load our layer and states from script
         try {
-            final ResourceSource layersFile = new URLResourceSource(JSLayerImporter.class.getClassLoader().getResource(
-                    "com/ardor3d/example/pipeline/AnimationDemoExample.js"));
+            final ResourceSource layersFile = new URLResourceSource(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/pipeline/AnimationDemoExample.js"));
             layerOutput = JSLayerImporter.addLayers(layersFile, manager, input);
         } catch (final Exception e) {
             e.printStackTrace();

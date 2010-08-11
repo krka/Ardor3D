@@ -12,7 +12,6 @@ package com.ardor3d.example.benchmark.ball;
 
 import java.net.URISyntaxException;
 
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.NativeCanvas;
@@ -58,7 +57,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * </p>
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.benchmark.ball.BubbleMarkExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/benchmark_ball_BubbleMarkExample.jpg", //
 maxHeapMemory = 64)
 public class BubbleMarkExample implements Scene {
 
@@ -153,8 +152,8 @@ public class BubbleMarkExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

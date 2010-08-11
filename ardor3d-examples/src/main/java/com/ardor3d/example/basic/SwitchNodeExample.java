@@ -36,7 +36,7 @@ import com.ardor3d.util.TextureManager;
  * A demonstration of the SwitchNode class; used to control which Node to actively display from a set of Nodes.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.SwitchNodeExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_SwitchNodeExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_SwitchNodeExample.jpg", //
 maxHeapMemory = 64)
 public class SwitchNodeExample extends ExampleBase {
     public static void main(final String[] args) {

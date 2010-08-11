@@ -23,7 +23,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
@@ -53,7 +52,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
  * This examples demonstrates how to render OpenGL (via JOGL) on a AWT canvas.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.canvas.JoglAwtExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/canvas_JoglAwtExample.jpg", //
 maxHeapMemory = 64)
 public class JoglAwtExample {
     static MouseCursor _cursor1;
@@ -92,16 +91,16 @@ public class JoglAwtExample {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(ExampleBase.class.getClassLoader().getResource(
-                    "com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
+                    .getResource("com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
         }
 
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
-        _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
-        _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
+        _cursor1 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
+        _cursor2 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/movedata.gif");
 
         addCanvas(frame, scene1, logicalLayer, frameWork);
         frame
@@ -142,7 +141,7 @@ public class JoglAwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(JoglAwtExample.class
+        final com.ardor3d.image.Image image = awtImageLoader.load(Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream(resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);

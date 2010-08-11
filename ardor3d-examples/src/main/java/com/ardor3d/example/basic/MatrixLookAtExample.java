@@ -34,7 +34,7 @@ import com.ardor3d.util.TextureManager;
  * position to a given target position.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.MatrixLookAtExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_MatrixLookAtExample.jpg", //
 maxHeapMemory = 64)
 public class MatrixLookAtExample extends ExampleBase {
 

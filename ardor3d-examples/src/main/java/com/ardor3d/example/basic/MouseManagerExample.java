@@ -45,7 +45,7 @@ import com.ardor3d.util.TextureManager;
  * mouse.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.MouseManagerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_MouseManagerExample.jpg", //
 maxHeapMemory = 64)
 public class MouseManagerExample extends ExampleBase {
 
@@ -102,8 +102,8 @@ public class MouseManagerExample extends ExampleBase {
         final AWTImageLoader awtImageLoader = new AWTImageLoader();
 
         try {
-            _cursor1 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/wait_cursor.png");
-            _cursor2 = createMouseCursor(awtImageLoader, "/com/ardor3d/example/media/input/movedata.gif");
+            _cursor1 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/wait_cursor.png");
+            _cursor2 = createMouseCursor(awtImageLoader, "com/ardor3d/example/media/input/movedata.gif");
 
             _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.H), new TriggerAction() {
                 public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
@@ -154,7 +154,8 @@ public class MouseManagerExample extends ExampleBase {
 
     private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final Image image = awtImageLoader.load(getClass().getResourceAsStream(resourceName), true);
+        final Image image = awtImageLoader.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                resourceName), true);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

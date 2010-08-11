@@ -32,7 +32,7 @@ import com.ardor3d.util.TextureManager;
  * color) change over time.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.ParticleSystemExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_ParticleSystemExample.jpg", //
 maxHeapMemory = 64)
 public class ParticleSystemExample extends ExampleBase {
 

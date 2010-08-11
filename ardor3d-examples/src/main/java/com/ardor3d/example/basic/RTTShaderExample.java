@@ -34,7 +34,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * A simple example showing use of shaders inside of RTT.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.basic.RTTShaderExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/basic_RTTShaderExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_RTTShaderExample.jpg", //
 maxHeapMemory = 64)
 public class RTTShaderExample extends ExampleBase {
     private final Quaternion rotQuat = new Quaternion();

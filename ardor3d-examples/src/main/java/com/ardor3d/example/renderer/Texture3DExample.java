@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  * Very simple example showing use of a Texture3D texture.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.Texture3DExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_Texture3DExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_Texture3DExample.jpg", //
 maxHeapMemory = 64)
 public class Texture3DExample extends ExampleBase {
 

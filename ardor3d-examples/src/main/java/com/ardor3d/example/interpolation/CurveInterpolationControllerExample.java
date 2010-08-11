@@ -28,7 +28,7 @@ import com.ardor3d.spline.Curve;
  * of 3D coordinates (via spline).
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.interpolation.CurveInterpolationControllerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/interpolation_CurveInterpolationControllerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/interpolation_CurveInterpolationControllerExample.jpg", //
 maxHeapMemory = 64)
 public class CurveInterpolationControllerExample extends InterpolationControllerBase<CurveInterpolationController> {
 

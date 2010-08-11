@@ -30,7 +30,7 @@ import com.ardor3d.util.TextureManager;
  * Borrows from the BoxExample to illustrate using PassNode to do simple multi-texturing.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.MultiPassTextureExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_MultiPassTextureExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_MultiPassTextureExample.jpg", //
 maxHeapMemory = 64)
 public class MultiPassTextureExample extends ExampleBase {
 

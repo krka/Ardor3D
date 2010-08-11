@@ -44,7 +44,7 @@ import com.ardor3d.util.stat.StatType;
  * An example showing use of MeshCombiner to weld together a bunch of boxes into a single mesh.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.CombinerExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_CombinerExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_CombinerExample.jpg", //
 maxHeapMemory = 64)
 public class CombinerExample extends ExampleBase {
 

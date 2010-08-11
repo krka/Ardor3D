@@ -50,7 +50,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * Illustrates loading a model from Collada and procedurally animating its joints.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.ColladaManualAnimationExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_ColladaManualAnimationExample.jpg", //
 maxHeapMemory = 64)
 public class ColladaManualAnimationExample extends ExampleBase {
 

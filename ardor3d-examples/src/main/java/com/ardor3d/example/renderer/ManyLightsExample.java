@@ -30,7 +30,7 @@ import com.ardor3d.util.ReadOnlyTimer;
  * A demonstration of randomly placed spheres being illuminated by numerious PointLight sources.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.ManyLightsExample", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/renderer_ManyLightsExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_ManyLightsExample.jpg", //
 maxHeapMemory = 64)
 public class ManyLightsExample extends ExampleBase {
     private final Random rand = new Random();
