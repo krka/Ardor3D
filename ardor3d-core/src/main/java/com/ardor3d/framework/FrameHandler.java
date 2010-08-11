@@ -41,7 +41,11 @@ public final class FrameHandler {
     private final CopyOnWriteArrayList<Canvas> _canvases;
     private final Timer _timer;
 
-    
+    /**
+     * Number of seconds we'll wait for a latch to count down to 0. Default is 5.
+     */
+    private long _timeoutSeconds = 5;
+
     public FrameHandler(final Timer timer) {
         _timer = timer;
         _updaters = new CopyOnWriteArrayList<Updater>();
@@ -93,7 +97,7 @@ public final class FrameHandler {
             // When the actual OpenGL rendering has been done, the OpenGL thread will countdown
             // on the latch, and once all the canvases have finished rendering, this method
             // will return.
-            final boolean success = latch.await(5, TimeUnit.SECONDS);
+            final boolean success = latch.await(_timeoutSeconds, TimeUnit.SECONDS);
 
             if (!success) {
                 logger.logp(Level.SEVERE, FrameHandler.class.toString(), "updateFrame",
@@ -175,4 +179,11 @@ public final class FrameHandler {
         }
     }
 
+    public long getTimeoutSeconds() {
+        return _timeoutSeconds;
+    }
+
+    public void setTimeoutSeconds(final long timeoutSeconds) {
+        _timeoutSeconds = timeoutSeconds;
+    }
 }
