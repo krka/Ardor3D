@@ -278,9 +278,9 @@ public class BloomRenderPass extends Pass {
 
         extractionShader = new GLSLShaderObjectsState();
         try {
-            extractionShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            extractionShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_extract.vert"));
-            extractionShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            extractionShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_extract.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -290,9 +290,9 @@ public class BloomRenderPass extends Pass {
         // Create blur shader
         blurShader = new GLSLShaderObjectsState();
         try {
-            blurShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur.vert"));
-            blurShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -302,9 +302,9 @@ public class BloomRenderPass extends Pass {
         // Create blur shader horizontal
         blurShaderHorizontal = new GLSLShaderObjectsState();
         try {
-            blurShaderHorizontal.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderHorizontal.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur.vert"));
-            blurShaderHorizontal.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderHorizontal.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur_horizontal7.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -314,9 +314,9 @@ public class BloomRenderPass extends Pass {
         // Create blur shader vertical
         blurShaderVertical = new GLSLShaderObjectsState();
         try {
-            blurShaderVertical.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_blur_vertical7.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -326,9 +326,9 @@ public class BloomRenderPass extends Pass {
         // Create final shader(basic texturing)
         finalShader = new GLSLShaderObjectsState();
         try {
-            finalShader.setVertexShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            finalShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_final.vert"));
-            finalShader.setFragmentShader(BloomRenderPass.class.getClassLoader().getResourceAsStream(
+            finalShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     shaderDirectory + "bloom_final.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);

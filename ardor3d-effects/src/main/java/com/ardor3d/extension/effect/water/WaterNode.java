@@ -422,9 +422,9 @@ public class WaterNode extends Node {
 
         try {
             logger.info("loading " + currentShaderStr);
-            waterShader.setVertexShader(WaterNode.class.getClassLoader()
-                    .getResourceAsStream(currentShaderStr + ".vert"));
-            waterShader.setFragmentShader(WaterNode.class.getClassLoader().getResourceAsStream(
+            waterShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+                    currentShaderStr + ".vert"));
+            waterShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     currentShaderStr + ".frag"));
         } catch (final IOException e) {
             logger.log(Level.WARNING, "Error loading shader", e);
@@ -449,9 +449,9 @@ public class WaterNode extends Node {
         waterShader._needSendShader = true;
 
         try {
-            blurShaderVertical.setVertexShader(WaterNode.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(WaterNode.class.getClassLoader().getResourceAsStream(
+            blurShaderVertical.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);

@@ -181,10 +181,10 @@ public class GeometryClipmapTerrain extends Node {
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
             try {
-                _geometryClipmapShader.setVertexShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/terrain/geometryClipmapShader.vert"));
-                _geometryClipmapShader.setFragmentShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/terrain/geometryClipmapShader.frag"));
+                _geometryClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("com/ardor3d/extension/terrain/geometryClipmapShader.vert"));
+                _geometryClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("com/ardor3d/extension/terrain/geometryClipmapShader.frag"));
                 // _geometryClipmapShader.setVertexShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
                 // "com/ardor3d/extension/terrain/geometryClipmapShaderSpecular.vert"));
                 // _geometryClipmapShader.setFragmentShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(

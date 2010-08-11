@@ -192,10 +192,10 @@ public class TexturedGeometryClipmapTerrain extends Node {
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
             try {
-                _geometryClipmapShader.setVertexShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
-                _geometryClipmapShader.setFragmentShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
+                _geometryClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
+                _geometryClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream("com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }

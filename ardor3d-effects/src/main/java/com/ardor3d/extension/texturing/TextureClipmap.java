@@ -385,9 +385,9 @@ public class TextureClipmap {
     public void reloadShader() {
         textureClipmapShader = new GLSLShaderObjectsState();
         try {
-            textureClipmapShader.setVertexShader(TextureClipmap.class.getClassLoader().getResourceAsStream(
+            textureClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/texture/textureClipmapShader.vert"));
-            textureClipmapShader.setFragmentShader(TextureClipmap.class.getClassLoader().getResourceAsStream(
+            textureClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
                     "com/ardor3d/extension/effect/texture/textureClipmapShader.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);

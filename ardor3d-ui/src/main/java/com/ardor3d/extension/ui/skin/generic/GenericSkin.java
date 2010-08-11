@@ -49,7 +49,7 @@ public class GenericSkin extends Skin {
     protected Texture _sharedTex;
 
     public GenericSkin() {
-        loadTexture("/com/ardor3d/extension/ui/skin/generic/genericSkin.png");
+        loadTexture("com/ardor3d/extension/ui/skin/generic/genericSkin.png");
     }
 
     public GenericSkin(final String skinTexture) {
