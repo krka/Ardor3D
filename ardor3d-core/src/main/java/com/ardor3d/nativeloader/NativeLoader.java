@@ -47,7 +47,7 @@ public class NativeLoader {
     private static void makeLibraryAvailable(final String libraryPath) throws IOException {
         // logger.info("Making library: " + libraryPath + " available");
 
-        final URL resourceURL = NativeLoader.class.getResource(libraryPath);
+        final URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(libraryPath);
 
         if (resourceURL == null) {
             throw new IOException("Unable to locate library resource '" + libraryPath + "' in classpath");

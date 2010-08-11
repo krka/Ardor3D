@@ -73,7 +73,8 @@ public class TextureState extends RenderState {
     public static ResourceSource DEFAULT_TEXTURE_SOURCE;
     static {
         try {
-            DEFAULT_TEXTURE_SOURCE = new URLResourceSource(TextureState.class.getResource("notloaded.tga"));
+            DEFAULT_TEXTURE_SOURCE = new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
+                    "notloaded.tga"));
         } catch (final Exception e) {
             // ignore.
             DEFAULT_TEXTURE_SOURCE = null;

@@ -58,7 +58,7 @@ public class ResourceLocatorTool {
             }
             // last resort...
             try {
-                final URL u = ResourceLocatorTool.class.getResource(resourceName);
+                final URL u = Thread.currentThread().getContextClassLoader().getResource(resourceName);
                 if (u != null) {
                     return new URLResourceSource(u);
                 }
