@@ -317,7 +317,7 @@ final public class TextureManager {
         }
 
         // delete the ids
-        if (!idMap.isEmpty()) {
+        if (idMap != null && !idMap.isEmpty()) {
             handleTextureDelete(deleter, idMap, futureStore);
         }
     }
