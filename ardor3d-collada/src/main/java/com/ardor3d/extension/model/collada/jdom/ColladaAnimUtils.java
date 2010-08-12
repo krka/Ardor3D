@@ -397,6 +397,9 @@ public class ColladaAnimUtils {
                     // copy mesh render states across.
                     copyRenderStates(sourceMesh, skMesh);
 
+                    // copy hints across
+                    skMesh.getSceneHints().set(sourceMesh.getSceneHints());
+
                     try {
                         // Use source mesh as bind pose data in the new SkinnedMesh
                         final MeshData bindPose = copyMeshData(sourceMesh.getMeshData());
