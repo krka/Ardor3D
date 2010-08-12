@@ -74,7 +74,7 @@ public class TextureState extends RenderState {
     static {
         try {
             DEFAULT_TEXTURE_SOURCE = new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
-                    "notloaded.tga"));
+                    "com/ardor3d/renderer/state/notloaded.tga"));
         } catch (final Exception e) {
             // ignore.
             DEFAULT_TEXTURE_SOURCE = null;
