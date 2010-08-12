@@ -45,18 +45,24 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
     private volatile boolean _focusLost = false;
 
     /**
-     * If true, we will call makeCurrent at the start of the frame, even if lwjgl thinks it has the current context
-     * already.
+     * If true, we will not try to drop and reclaim the context on each frame.
      */
-    public static boolean ALWAYS_MAKE_CURRENT = false;
+    public static boolean SINGLE_THREADED_MODE = true;
 
     public LwjglCanvas(final LwjglCanvasRenderer canvasRenderer, final DisplaySettings settings) {
         _canvasRenderer = canvasRenderer;
         _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
             @Override
             public void makeCurrent() throws LWJGLException {
-                if (ALWAYS_MAKE_CURRENT || !Display.isCurrent()) {
+                if (!SINGLE_THREADED_MODE) {
                     Display.makeCurrent();
+                }
+            }
+
+            @Override
+            public void releaseContext() throws LWJGLException {
+                if (!SINGLE_THREADED_MODE) {
+                    Display.releaseContext();
                 }
             }
         });

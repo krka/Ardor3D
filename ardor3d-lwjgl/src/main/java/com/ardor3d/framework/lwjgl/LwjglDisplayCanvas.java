@@ -50,8 +50,15 @@ public class LwjglDisplayCanvas implements Canvas, FocusWrapper {
         _canvasRenderer.setCanvasCallback(new LwjglCanvasCallback() {
             @Override
             public void makeCurrent() throws LWJGLException {
-                if (LwjglCanvas.ALWAYS_MAKE_CURRENT || !Display.isCurrent()) {
+                if (!LwjglCanvas.SINGLE_THREADED_MODE) {
                     Display.makeCurrent();
+                }
+            }
+
+            @Override
+            public void releaseContext() throws LWJGLException {
+                if (!LwjglCanvas.SINGLE_THREADED_MODE) {
+                    Display.releaseContext();
                 }
             }
         });

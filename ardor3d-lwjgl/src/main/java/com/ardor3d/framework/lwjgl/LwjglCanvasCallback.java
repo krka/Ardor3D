@@ -21,4 +21,11 @@ public interface LwjglCanvasCallback {
      */
     void makeCurrent() throws LWJGLException;
 
+    /**
+     * Release this canvas as the current opengl owner.
+     * 
+     * @throws LWJGLException
+     */
+    void releaseContext() throws LWJGLException;
+
 }

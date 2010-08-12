@@ -200,8 +200,10 @@ public class JoglCanvasRenderer implements CanvasRenderer {
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
 
-        // release the context
-        releaseCurrentContext();
+        // release the context if we're done (swapped and all)
+        if (_doSwap) {
+            releaseCurrentContext();
+        }
 
         return drew;
     }

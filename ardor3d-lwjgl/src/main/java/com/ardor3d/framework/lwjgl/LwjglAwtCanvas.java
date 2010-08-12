@@ -44,6 +44,11 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
             public void makeCurrent() throws LWJGLException {
                 LwjglAwtCanvas.this.makeCurrent();
             }
+
+            @Override
+            public void releaseContext() throws LWJGLException {
+                LwjglAwtCanvas.this.releaseContext();
+            }
         });
     }
 
@@ -71,12 +76,15 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
             return;
         }
 
-        if (_canvasRenderer.draw()) {
-            try {
+        try {
+            if (_canvasRenderer.draw()) {
                 swapBuffers();
-            } catch (final LWJGLException e) {
-                throw new RuntimeException(e);
             }
+        } catch (final LWJGLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            // release our context - because swap is external, we release here instead.
+            _canvasRenderer.releaseCurrentContext();
         }
 
         _updated = false;

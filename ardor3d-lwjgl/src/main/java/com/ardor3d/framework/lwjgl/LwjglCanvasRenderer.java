@@ -133,8 +133,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         final boolean drew = _scene.renderUnto(_renderer);
         _renderer.flushFrame(drew && _doSwap);
 
-        // release the context
-        releaseCurrentContext();
+        // release the context if we're done (swapped and all)
+        if (_doSwap) {
+            releaseCurrentContext();
+        }
 
         return drew;
     }
@@ -176,6 +178,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public void releaseCurrentContext() {
         try {
             GLContext.useContext(null);
+            _canvasCallback.releaseContext();
         } catch (final LWJGLException e) {
             throw new RuntimeException(e);
         }
