@@ -89,6 +89,8 @@ public class ScenegraphTree {
             final SceneHints sceneHints = spatial.getSceneHints();
             str.append("Cull hint: ");
             str.append(sceneHints.getCullHint()).append("\n");
+            str.append("Bucket: ");
+            str.append(sceneHints.getRenderBucketType()).append("\n");
 
             textArea.setText(str.toString());
         }
