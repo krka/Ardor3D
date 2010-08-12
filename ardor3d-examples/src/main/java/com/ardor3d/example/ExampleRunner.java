@@ -440,8 +440,8 @@ public class ExampleRunner extends JFrame {
                     args.add(isWindows ? "javaw" : "java");
                     args.add("-Xmx" + maxHeapMemory + "M");
                     args.add("-cp");
-                    args.add(System.getProperty("java.class.path"));
-                    args.add("-Djava.library.path=" + System.getProperty("java.library.path"));
+                    args.add("\"" + System.getProperty("java.class.path") + "\"");
+                    args.add("-Djava.library.path=\"" + System.getProperty("java.library.path") + "\"");
                     args.add(clazz.getCanonicalName());
                     logger.info("start " + args.toString());
                     final ProcessBuilder pb = new ProcessBuilder(args);
