@@ -37,10 +37,10 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
 /**
- * A simple example showing a textured and lit box spinning.
+ * An example of using TrailMesh.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.TrailExample", //
-thumbnailPath = "com/ardor3d/example/media/thumbnails/basic_BoxExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_TrailExample.jpg", //
 maxHeapMemory = 64)
 public class TrailExample extends ExampleBase {
 
