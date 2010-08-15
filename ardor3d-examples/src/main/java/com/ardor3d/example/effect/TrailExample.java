@@ -16,6 +16,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.useful.TrailMesh;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
+import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.logical.InputTrigger;
 import com.ardor3d.input.logical.KeyPressedCondition;
@@ -117,7 +118,9 @@ public class TrailExample extends ExampleBase {
 
         // Add a texture to the box.
         TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/trail.png", Texture.MinificationFilter.Trilinear, true));
+        final Texture texture = TextureManager.load("images/trail.png", Texture.MinificationFilter.Trilinear, false);
+        texture.setWrap(WrapMode.EdgeClamp);
+        ts.setTexture(texture);
         trailMesh.setRenderState(ts);
 
         final BlendState bs = new BlendState();
