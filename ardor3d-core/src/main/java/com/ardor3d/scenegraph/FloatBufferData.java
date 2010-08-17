@@ -89,7 +89,7 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
      */
     public void scaleData(final float... scales) {
         _buffer.rewind();
-        for (int i = 0; i < _buffer.remaining();) {
+        for (int i = 0; i < _buffer.limit();) {
             _buffer.put(_buffer.get(i) * scales[i % scales.length]);
             i++;
         }
@@ -105,7 +105,7 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
      */
     public void translateData(final float... translates) {
         _buffer.rewind();
-        for (int i = 0; i < _buffer.remaining();) {
+        for (int i = 0; i < _buffer.limit();) {
             _buffer.put(_buffer.get(i) + translates[i % translates.length]);
             i++;
         }
