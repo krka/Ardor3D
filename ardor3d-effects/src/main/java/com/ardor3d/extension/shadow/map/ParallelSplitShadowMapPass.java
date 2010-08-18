@@ -517,7 +517,9 @@ public class ParallelSplitShadowMapPass extends Pass {
             }
 
             currentShader.setUniform("sampleDist", split1, split2, split3, split4);
-            currentShader.setUniform("_shadowSize", 1f / 1024f);
+            if (filter == Filter.Pcf) {
+                currentShader.setUniform("_shadowSize", 1f / _shadowMapSize);
+            }
 
             if (!_drawShaderDebug) {
                 currentShader.setUniform("shadowColor", _shadowColor);
@@ -525,7 +527,9 @@ public class ParallelSplitShadowMapPass extends Pass {
 
             if (_keepMainShader) {
                 _mainShader.setUniform("sampleDist", split1, split2, split3, split4);
-                _mainShader.setUniform("_shadowSize", 1f / _shadowMapSize);
+                if (filter == Filter.Pcf) {
+                    _mainShader.setUniform("_shadowSize", 1f / _shadowMapSize);
+                }
 
                 if (!_drawShaderDebug) {
                     _mainShader.setUniform("shadowColor", _shadowColor);
