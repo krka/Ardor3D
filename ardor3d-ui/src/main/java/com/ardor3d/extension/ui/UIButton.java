@@ -81,6 +81,7 @@ public class UIButton extends AbstractLabelUIComponent {
      * @param icon
      */
     public UIButton(final String text, final SubTex icon) {
+        setConsumeMouseEvents(true);
         setText(text);
         setIcon(icon);
 

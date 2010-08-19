@@ -98,6 +98,10 @@ public abstract class UIComponent extends Node {
     private boolean _visible = true;
     /** If false, this component may optionally disable input to it and its children (as applicable). */
     private boolean _enabled = true;
+    /** If true, we will consume any mouse events that are sent to this component. (default is false) */
+    private boolean _consumeMouseEvents = false;
+    /** If true, we will consume any key events that are sent to this component. (default is false) */
+    private boolean _consumeKeyEvents = false;
 
     /** The opacity of this component. 0 is fully transparent and 1 is fully opaque. The default is 1. */
     private float _opacity = 1.0f;
@@ -496,6 +500,22 @@ public abstract class UIComponent extends Node {
     public void setMinimumContentHeight(final int height) {
         _minimumContentsSize.setHeight(height);
         validateContentSize();
+    }
+
+    public boolean isConsumeKeyEvents() {
+        return _consumeKeyEvents;
+    }
+
+    public void setConsumeKeyEvents(final boolean consume) {
+        _consumeKeyEvents = consume;
+    }
+
+    public boolean isConsumeMouseEvents() {
+        return _consumeMouseEvents;
+    }
+
+    public void setConsumeMouseEvents(final boolean consume) {
+        _consumeMouseEvents = consume;
     }
 
     /**
@@ -1326,10 +1346,10 @@ public abstract class UIComponent extends Node {
      */
     public boolean mousePressed(final MouseButton button, final InputState state) {
         // default is to offer event to parent, if it is a UIComponent
-        if (getParent() instanceof UIComponent) {
+        if (!_consumeMouseEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).mousePressed(button, state);
         } else {
-            return false;
+            return _consumeMouseEvents;
         }
     }
 
@@ -1347,7 +1367,7 @@ public abstract class UIComponent extends Node {
         if (getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).mouseReleased(button, state);
         } else {
-            return false;
+            return _consumeMouseEvents;
         }
     }
 
@@ -1366,10 +1386,10 @@ public abstract class UIComponent extends Node {
         resetToolTipTime();
 
         // default is to offer event to parent, if it is a UIComponent
-        if (getParent() instanceof UIComponent) {
+        if (!_consumeMouseEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).mouseMoved(mouseX, mouseY, state);
         } else {
-            return false;
+            return _consumeMouseEvents;
         }
     }
 
@@ -1388,10 +1408,10 @@ public abstract class UIComponent extends Node {
      */
     public boolean mouseWheel(final int wheelDx, final InputState state) {
         // default is to offer event to parent, if it is a UIComponent
-        if (getParent() instanceof UIComponent) {
+        if (!_consumeMouseEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).mouseWheel(wheelDx, state);
         } else {
-            return false;
+            return _consumeMouseEvents;
         }
     }
 
@@ -1405,10 +1425,10 @@ public abstract class UIComponent extends Node {
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean keyPressed(final Key key, final InputState state) {
-        if (getParent() instanceof UIComponent) {
+        if (!_consumeKeyEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).keyPressed(key, state);
         } else {
-            return false;
+            return _consumeKeyEvents;
         }
     }
 
@@ -1422,10 +1442,10 @@ public abstract class UIComponent extends Node {
      * @return true if we want to consider the event "consumed" by the UI system.
      */
     public boolean keyReleased(final Key key, final InputState state) {
-        if (getParent() instanceof UIComponent) {
+        if (!_consumeKeyEvents && getParent() instanceof UIComponent) {
             return ((UIComponent) getParent()).keyReleased(key, state);
         } else {
-            return false;
+            return _consumeKeyEvents;
         }
     }
 

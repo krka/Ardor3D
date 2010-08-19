@@ -82,6 +82,7 @@ public class UIFrame extends UIContainer {
         _basePanel = new UIPanel(new BorderLayout());
         _basePanel.setBackdrop(new SolidBackdrop(ColorRGBA.LIGHT_GRAY));
         _basePanel.setLayoutData(BorderLayoutData.CENTER);
+        _basePanel.setConsumeMouseEvents(true);
         add(_basePanel);
 
         _contentPanel = new UIPanel();

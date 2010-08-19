@@ -602,9 +602,11 @@ public class UIHud extends Node {
         // grab the component the mouse is over, if any
         final UIComponent over = getUIComponent(mouseX, mouseY);
 
+        boolean consumed = false;
+
         // Are we over a component? let it know we moved inside it.
         if (over != null) {
-            over.mouseMoved(mouseX, mouseY, currentIS);
+            consumed |= over.mouseMoved(mouseX, mouseY, currentIS);
         }
 
         // component points to a different UIComponent than before, so mark departed
@@ -618,7 +620,7 @@ public class UIHud extends Node {
         }
         _lastMouseOverComponent = over;
 
-        return false;
+        return consumed;
     }
 
     /**
