@@ -95,6 +95,9 @@ import com.google.common.base.Predicates;
 public abstract class ExampleBase implements Runnable, Updater, Scene {
     private static final Logger logger = Logger.getLogger(ExampleBase.class.getName());
 
+    /** If true (the default) we will call System.exit on end of demo. */
+    public static boolean QUIT_VM_ON_EXIT = true;
+
     protected final LogicalLayer _logicalLayer = new LogicalLayer();
 
     protected PhysicalLayer _physicalLayer;
@@ -147,6 +150,9 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             cr.makeCurrentContext();
             quit(_canvas.getCanvasRenderer().getRenderer());
             cr.releaseCurrentContext();
+            if (QUIT_VM_ON_EXIT) {
+                System.exit(0);
+            }
         } catch (final Throwable t) {
             System.err.println("Throwable caught in MainThread - exiting");
             t.printStackTrace(System.err);
