@@ -255,8 +255,8 @@ public class ObjGeometryStore {
             boolean hasNormals = false, hasUVs = false;
 
             int j = 0;
-            final int[] vertGroups = new int[_meshManager.getStore().size()];
-            final List<Integer> groups = Lists.newArrayList();
+            final long[] vertGroups = new long[_meshManager.getStore().size()];
+            final List<Long> groups = Lists.newArrayList();
             Vector3 vector;
             for (final ObjIndexSet set : _meshManager.getStore().keySet()) {
                 vertGroups[j] = set.getSmoothGroup();
@@ -300,7 +300,7 @@ public class ObjGeometryStore {
 
             final VertGroupData groupData = new VertGroupData();
             // set all smooth groups to use "blend as long as UVs and SmoothGroup are same".
-            for (final int group : groups) {
+            for (final long group : groups) {
                 groupData.setGroupConditions(group, EnumSet.of(MatchCondition.UVs));
             }
             // set the "no smooth" smooth group to use "blend only if vertex is same". (No color data in obj, so

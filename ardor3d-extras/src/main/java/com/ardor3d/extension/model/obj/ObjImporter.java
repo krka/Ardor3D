@@ -134,7 +134,7 @@ public class ObjImporter {
         try {
             final Map<String, ObjMaterial> materialLibrary = Maps.newHashMap();
             final ObjGeometryStore store = new ObjGeometryStore();
-            int currentSmoothGroup = -1;
+            long currentSmoothGroup = -1;
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()));
             String line;
@@ -232,8 +232,10 @@ public class ObjImporter {
                 // if group name(s)
                 else if ("g".equals(keyword)) {
                     if (tokens.length < 2) {
-                        throw new Error("wrong number of args.  g must have at least 1 argument.  (line " + lineNo
-                                + ") " + line);
+                        store.setCurrentGroupNames(null);
+                        continue;
+                        // throw new Error("wrong number of args.  g must have at least 1 argument.  (line " + lineNo
+                        // + ") " + line);
                     }
 
                     // Each token is a name
@@ -251,7 +253,7 @@ public class ObjImporter {
                     if ("off".equalsIgnoreCase(tokens[1])) {
                         currentSmoothGroup = 0;
                     } else {
-                        currentSmoothGroup = Integer.parseInt(tokens[1]);
+                        currentSmoothGroup = Long.parseLong(tokens[1]);
                     }
                 }
 
