@@ -20,27 +20,27 @@ public class VertGroupData {
 
     public static final int DEFAULT_GROUP = 0;
 
-    private final Map<Integer, EnumSet<MatchCondition>> _groupConditions = Maps.newHashMap();
-    private int[] _vertGroups = null;
+    private final Map<Long, EnumSet<MatchCondition>> _groupConditions = Maps.newHashMap();
+    private long[] _vertGroups = null;
 
     public VertGroupData() {}
 
-    public void setGroupConditions(final int groupNumber, final EnumSet<MatchCondition> conditions) {
+    public void setGroupConditions(final long groupNumber, final EnumSet<MatchCondition> conditions) {
         _groupConditions.put(groupNumber, conditions);
     }
 
-    public EnumSet<MatchCondition> getGroupConditions(final int groupNumber) {
+    public EnumSet<MatchCondition> getGroupConditions(final long groupNumber) {
         return _groupConditions.get(groupNumber);
     }
 
-    public int getGroupForVertex(final int index) {
+    public long getGroupForVertex(final int index) {
         if (_vertGroups != null) {
             return _vertGroups[index];
         }
         return DEFAULT_GROUP;
     }
 
-    public void setVertGroups(final int[] vertGroupMap) {
+    public void setVertGroups(final long[] vertGroupMap) {
         _vertGroups = vertGroupMap;
     }
 }
