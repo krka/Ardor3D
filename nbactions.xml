@@ -6,7 +6,7 @@
             <packaging>*</packaging>
         </packagings>
         <goals>
-            <goal>-o</goal>
+            <goal>-e</goal>
             <goal>install</goal>
         </goals>
     </action>
@@ -16,7 +16,6 @@
             <packaging>jar</packaging>
         </packagings>
         <goals>
-            <goal>-o</goal>
             <goal>exec:java</goal>
         </goals>
     </action>
