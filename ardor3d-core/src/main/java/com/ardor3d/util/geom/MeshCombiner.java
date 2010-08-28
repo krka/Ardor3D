@@ -100,6 +100,7 @@ public class MeshCombiner {
         // go through each MeshData to see what buffers we need and validate sizes.
         boolean useIndices = false, useNormals = false, useTextures = false, useColors = false, first = true;
         int maxTextures = 0, totalVertices = 0, totalIndices = 0, texCoords = 2, vertCoords = 3;
+        IndexMode mode = null;
         EnumMap<StateType, RenderState> states = null;
         MeshData md;
         BoundingVolume volumeType = null;
@@ -129,6 +130,8 @@ public class MeshCombiner {
                 } else {
                     totalIndices += md.getVertexCount();
                 }
+            } else {
+                mode = md.getIndexMode(0);
             }
 
             // check for normals
@@ -235,7 +238,12 @@ public class MeshCombiner {
         }
 
         // Apply our index combiner to the mesh
-        iCombiner.saveTo(data);
+        if (useIndices) {
+            iCombiner.saveTo(data);
+        } else {
+            data.setIndexLengths(null);
+            data.setIndexMode(mode);
+        }
 
         // set our bounding volume using the volume type of our first source found above.
         result.setModelBound(volumeType);
