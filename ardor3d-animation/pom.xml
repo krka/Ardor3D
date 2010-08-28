@@ -10,19 +10,8 @@
   <artifactId>ardor3d-animation</artifactId>
   <packaging>jar</packaging>
   <name>Ardor 3D Skinning and Animation System</name>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
+
+  <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ardor3d-core</artifactId>
