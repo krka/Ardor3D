@@ -105,9 +105,9 @@
 
   <!-- these properties help simplify specifying some commonly occurring variables -->
     <properties>
-        <lwjgl.version>2.4.2</lwjgl.version>
+        <lwjgl.version>ardor3d-2.5.0</lwjgl.version>
         <jdom.version>ardor3d-1.1.1</jdom.version>
-        <swt.version>3650</swt.version>
+        <swt.version>ardor3d-3448</swt.version>
     </properties>
 
   <!-- The dependencyManagement section should specify all versions of artifacts used in sub -->
