@@ -14,215 +14,159 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Quick and merge sort implementations that create no garbage, unlike {@link Arrays#sort}. The merge sort is stable,
- * the quick sort is not.
+ * Shell and merge sort implementations with the goal of reducing garbage and allowing tuning.
  */
 public abstract class SortUtil {
-    /**
-     * Quick sorts the supplied array using the specified comparator.
-     */
-    public static <T> void qsort(final T[] a, final Comparator<? super T> comp) {
-        qsort(a, 0, a.length - 1, comp);
-    }
 
     /**
-     * Quick sorts the supplied array using the specified comparator.
+     * The size at or below which we will use shell sort instead of the system sort.
+     */
+    public static int SHELL_SORT_THRESHOLD = 17;
+
+    /**
+     * <p>
+     * Merge sorts the supplied data, in the given range, using the given comparator.
+     * </p>
+     * <p>
+     * <b>Note: this internally creates a temporary copy of the array to use as work space during sort.</b>
+     * </p>
      * 
-     * @param lo0
-     *            the index of the lowest element to include in the sort.
-     * @param hi0
-     *            the index of the highest element to include in the sort.
+     * @param source
+     *            the array to sort. Will hold the sorted array on completion.
+     * @param left
+     *            the left-most index of our sort range.
+     * @param right
+     *            the right-most index of our sort range.
+     * @param comp
+     *            our object Comparator
      */
-    public static <T> void qsort(final T[] a, final int lo0, final int hi0, final Comparator<? super T> comp) {
-        // bail out if we're already done
-        if (hi0 <= lo0) {
-            return;
-        }
-
-        // if this is a two element list, do a simple sort on it
-        T t;
-        if (hi0 - lo0 == 1) {
-            // if they're not already sorted, swap them
-            if (comp.compare(a[hi0], a[lo0]) < 0) {
-                t = a[lo0];
-                a[lo0] = a[hi0];
-                a[hi0] = t;
-            }
-            return;
-        }
-
-        // the middle element in the array is our partitioning element
-        final T mid = a[(lo0 + hi0) / 2];
-
-        // set up our partitioning boundaries
-        int lo = lo0 - 1, hi = hi0 + 1;
-
-        // loop through the array until indices cross
-        for (;;) {
-            // find the first element that is greater than or equal to
-            // the partition element starting from the left Index.
-            while (comp.compare(a[++lo], mid) < 0) {
-                ;
-            }
-
-            // find an element that is smaller than or equal to
-            // the partition element starting from the right Index.
-            while (comp.compare(mid, a[--hi]) < 0) {
-                ;
-            }
-
-            // swap the two elements or bail out of the loop
-            if (hi > lo) {
-                t = a[lo];
-                a[lo] = a[hi];
-                a[hi] = t;
-            } else {
-                break;
-            }
-        }
-
-        // if the right index has not reached the left side of array
-        // must now sort the left partition
-        if (lo0 < lo - 1) {
-            qsort(a, lo0, lo - 1, comp);
-        }
-
-        // if the left index has not reached the right side of array
-        // must now sort the right partition
-        if (hi + 1 < hi0) {
-            qsort(a, hi + 1, hi0, comp);
-        }
-    }
-
-    public static void qsort(final int[] a, final int lo0, final int hi0, final Comparator<Integer> comp) {
-        // bail out if we're already done
-        if (hi0 <= lo0) {
-            return;
-        }
-
-        // if this is a two element list, do a simple sort on it
-        int t;
-        if (hi0 - lo0 == 1) {
-            // if they're not already sorted, swap them
-            if (comp.compare(a[hi0], a[lo0]) < 0) {
-                t = a[lo0];
-                a[lo0] = a[hi0];
-                a[hi0] = t;
-            }
-            return;
-        }
-
-        // the middle element in the array is our partitioning element
-        final int mid = a[(lo0 + hi0) / 2];
-
-        // set up our partitioning boundaries
-        int lo = lo0 - 1, hi = hi0 + 1;
-
-        // loop through the array until indices cross
-        for (;;) {
-            // find the first element that is greater than or equal to
-            // the partition element starting from the left Index.
-            while (comp.compare(a[++lo], mid) < 0) {
-                ;
-            }
-
-            // find an element that is smaller than or equal to
-            // the partition element starting from the right Index.
-            while (comp.compare(mid, a[--hi]) < 0) {
-                ;
-            }
-
-            // swap the two elements or bail out of the loop
-            if (hi > lo) {
-                t = a[lo];
-                a[lo] = a[hi];
-                a[hi] = t;
-            } else {
-                break;
-            }
-        }
-
-        // if the right index has not reached the left side of array
-        // must now sort the left partition
-        if (lo0 < lo - 1) {
-            qsort(a, lo0, lo - 1, comp);
-        }
-
-        // if the left index has not reached the right side of array
-        // must now sort the right partition
-        if (hi + 1 < hi0) {
-            qsort(a, hi + 1, hi0, comp);
-        }
+    public static <T> void msort(final T[] source, final int left, final int right, final Comparator<? super T> comp) {
+        final T[] copy = Arrays.copyOf(source, source.length);
+        msort(copy, source, left, right, comp);
     }
 
     /**
-     * Merge sorts the supplied array using the specified comparator.
+     * <p>
+     * Merge sorts the supplied data, in the given range, using the given comparator.
+     * </p>
      * 
-     * @param src
-     *            contains the elements to be sorted.
-     * @param dest
-     *            must contain the same values as the src array.
+     * @param sourceCopy
+     *            contains the elements to be sorted and acts as a work space for the sort.
+     * @param destinationCopy
+     *            contains the elements to be sorted and will hold the fully sorted array when complete.
+     * @param left
+     *            the left-most index of our sort range.
+     * @param right
+     *            the right-most index of our sort range.
+     * @param comp
+     *            our object Comparator
      */
-    public static <T> void msort(final T[] src, final T[] dest, final Comparator<? super T> comp) {
-        msort(src, dest, 0, src.length, 0, comp);
-    }
-
-    /**
-     * Merge sorts the supplied array using the specified comparator.
-     * 
-     * @param src
-     *            contains the elements to be sorted.
-     * @param dest
-     *            must contain the same values as the src array.
-     */
-    public static <T> void msort(final T[] src, final T[] dest, final int low, final int high,
+    public static <T> void msort(final T[] source, final T[] copy, final int left, final int right,
             final Comparator<? super T> comp) {
-        msort(src, dest, low, high, 0, comp);
+        // use an insertion sort on small arrays to avoid recursion down to 1:1
+        final int length = right - left + 1;
+        if (length <= SHELL_SORT_THRESHOLD) {
+            // insertion sort in place
+            shellSort(copy, left, right, comp);
+            // copy into destination
+            return;
+        }
+
+        // recursively sort each half of array
+        final int mid = (left + right) >> 1;
+        msort(copy, source, left, mid, comp);
+        msort(copy, source, mid + 1, right, comp);
+
+        // merge the sorted halves
+        merge(source, copy, left, mid, right, comp);
     }
 
-    /** Implements the actual merge sort. */
-    protected static <T> void msort(final T[] src, final T[] dest, int low, int high, final int offset,
-            final Comparator<? super T> comp) {
-        // use an insertion sort on small arrays
-        final int length = high - low;
-        if (length < INSERTION_SORT_THRESHOLD) {
-            for (int ii = low; ii < high; ii++) {
-                for (int jj = ii; jj > low && comp.compare(dest[jj - 1], dest[jj]) > 0; jj--) {
-                    final T temp = dest[jj];
-                    dest[jj] = dest[jj - 1];
-                    dest[jj - 1] = temp;
+    /**
+     * Performs a merge on two sets of data stored in source, represented by the ranges formed by [left, mid] and
+     * [mid+1, right]. Stores the result in destination.
+     * 
+     * @param source
+     *            our source data
+     * @param destination
+     *            the array to store our result in
+     * @param left
+     * @param mid
+     * @param right
+     * @param comp
+     *            our object Comparator
+     */
+    protected static <T> void merge(final T[] source, final T[] destination, final int left, final int mid,
+            final int right, final Comparator<? super T> comp) {
+        int i = left, j = mid + 1;
+
+        for (int k = left; k <= right; k++) {
+            if (i == mid + 1) {
+                destination[k] = source[j++];
+                continue;
+            } else if (j == right + 1) {
+                destination[k] = source[i++];
+                continue;
+            } else {
+                destination[k] = comp.compare(source[i], source[j]) <= 0 ? source[i++] : source[j++];
+            }
+        }
+    }
+
+    /**
+     * Performs an in-place shell sort (extension of insertion sort) of the provided data.
+     * 
+     * @param array
+     *            our source data
+     * @param left
+     *            the left index of the range to sort
+     * @param right
+     *            the right index (inclusive) of the range to sort
+     * @param comp
+     *            our object Comparator
+     */
+    public static <T> void shellSort(final T[] array, final int left, final int right, final Comparator<? super T> comp) {
+        int h;
+        for (h = 1; h <= (right - 1) / 9; h = 3 * h + 1) {
+            ;
+        }
+        for (; h > 0; h /= 3) {
+            for (int i = left + h; i <= right; i++) {
+                int j = i;
+                final T val = array[i];
+                while (j >= left + h && comp.compare(val, array[j - h]) < 0) {
+                    array[j] = array[j - h];
+                    j -= h;
                 }
-            }
-            return;
-        }
-
-        // recursively sort each half of dest into src
-        final int destLow = low, destHigh = high;
-        low += offset;
-        high += offset;
-        final int mid = (low + high) >> 1;
-        msort(dest, src, low, mid, -offset, comp);
-        msort(dest, src, mid, high, -offset, comp);
-
-        // if the list is already sorted, just copy from src to dest; this
-        // optimization results in faster sorts for nearly ordered lists
-        if (comp.compare(src[mid - 1], src[mid]) <= 0) {
-            System.arraycopy(src, low, dest, destLow, length);
-            return;
-        }
-
-        // merge the sorted halves (now in src) into dest
-        for (int ii = destLow, pp = low, qq = mid; ii < destHigh; ii++) {
-            if (qq >= high || pp < mid && comp.compare(src[pp], src[qq]) <= 0) {
-                dest[ii] = src[pp++];
-            } else {
-                dest[ii] = src[qq++];
+                array[j] = val;
             }
         }
     }
 
     /**
-     * The size at or below which we will use insertion sort because it's probably faster.
+     * Performs an in-place shell sort (extension of insertion sort) of the provided data.
+     * 
+     * @param array
+     *            our source data
+     * @param left
+     *            the left index of the range to sort
+     * @param right
+     *            the right index (inclusive) of the range to sort
      */
-    private static final int INSERTION_SORT_THRESHOLD = 7;
+    public static <T extends Comparable<T>> void shellSort(final T[] array, final int left, final int right) {
+        int h;
+        for (h = 1; h <= (right - 1) / 9; h = 3 * h + 1) {
+            ;
+        }
+        for (; h > 0; h /= 3) {
+            for (int i = left + h; i <= right; i++) {
+                int j = i;
+                final T val = array[i];
+                while (j >= left + h && val.compareTo(array[j - 1]) < 0) {
+                    array[j] = array[j - h];
+                    j -= h;
+                }
+                array[j] = val;
+            }
+        }
+    }
 }

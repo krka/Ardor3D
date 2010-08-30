@@ -38,6 +38,7 @@ public class AbstractRenderBucket implements RenderBucket {
 
     public void add(final Spatial spatial) {
         if (_currentListSize == _currentList.length) {
+            // grow if necessary
             final Spatial[] temp = new Spatial[_currentListSize * 2];
             System.arraycopy(_currentList, 0, temp, 0, _currentListSize);
             _currentList = temp;
@@ -61,13 +62,10 @@ public class AbstractRenderBucket implements RenderBucket {
     }
 
     public void clear() {
-        for (int i = 0; i < _currentListSize; i++) {
-            _currentList[i] = null;
+        if (_currentListSize > 0) {
+            Arrays.fill(_currentList, 0, _currentListSize - 1, null);
+            _currentListSize = 0;
         }
-        if (_tempList != null) {
-            Arrays.fill(_tempList, null);
-        }
-        _currentListSize = 0;
     }
 
     public void render(final Renderer renderer) {
@@ -77,15 +75,26 @@ public class AbstractRenderBucket implements RenderBucket {
     }
 
     public void sort() {
+        // only sort if we have more than one item in our bucket.
         if (_currentListSize > 1) {
-            // resize or populate our temporary array as necessary
-            if (_tempList == null || _tempList.length != _currentList.length) {
-                _tempList = _currentList.clone();
+            if (_currentListSize <= SortUtil.SHELL_SORT_THRESHOLD) {
+                // shell sort
+                SortUtil.shellSort(_currentList, 0, _currentListSize - 1, _comparator);
             } else {
-                System.arraycopy(_currentList, 0, _tempList, 0, _currentList.length);
+                // verify our temp array is large enough to hold the list
+                if (_tempList == null || _tempList.length < _currentListSize) {
+                    _tempList = _currentList.clone();
+                } else {
+                    // copy in our list for use in the merge sort.
+                    System.arraycopy(_currentList, 0, _tempList, 0, _currentListSize);
+                }
+
+                // merge sort
+                SortUtil.msort(_tempList, _currentList, 0, _currentListSize - 1, _comparator);
+
+                // null fill to remove references
+                Arrays.fill(_tempList, 0, _currentListSize - 1, null);
             }
-            // now merge sort tlist into list
-            SortUtil.msort(_tempList, _currentList, 0, _currentListSize, _comparator);
         }
     }
 
