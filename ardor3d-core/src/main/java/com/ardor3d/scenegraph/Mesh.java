@@ -183,6 +183,7 @@ public class Mesh extends Spatial implements Renderable, Pickable {
             _worldTransform.applyForward(compVect);
             BufferUtils.setInBuffer(compVect, store, v);
         }
+        Vector3.releaseTempInstance(compVect);
         return store;
     }
 
