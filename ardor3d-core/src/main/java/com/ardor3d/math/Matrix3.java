@@ -364,6 +364,9 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
     }
 
     /**
+     * XXX: Need to redo this again... or at least correct the terms. YRP are arbitrary terms, based on a specific frame
+     * of axis.
+     * 
      * Updates this matrix from the given Euler rotation angles (y,r,p). Note that we are applying in order: roll,
      * pitch, yaw but we've ordered them in x, y, and z for convenience. See:
      * http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
@@ -605,9 +608,9 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
             bank = Math.atan2(-_data[1][2], _data[1][1]);
             attitude = Math.asin(_data[1][0]);
         }
-        result[0] = heading;
-        result[1] = attitude;
-        result[2] = bank;
+        result[0] = bank;
+        result[1] = heading;
+        result[2] = attitude;
 
         return result;
     }
