@@ -86,6 +86,13 @@ public class PhysicalLayer {
         }
 
         KeyboardState oldKeyState = _currentKeyboardState;
+        if (_currentMouseState.getDwheel() == 0 && _currentMouseState.getDx() == 0 && _currentMouseState.getDy() == 0) {
+            // we can reuse - do nothing
+        } else {
+            // we can't reuse
+            _currentMouseState = new MouseState(_currentMouseState.getX(), _currentMouseState.getY(), 0, 0, 0,
+                    _currentMouseState.getButtonStates(), _currentMouseState.getClickCounts());
+        }
         MouseState oldMouseState = _currentMouseState;
         ControllerState oldControllerState = _currentControllerState;
 
