@@ -10,7 +10,6 @@
 
 package com.ardor3d.util;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 /**
@@ -40,8 +39,10 @@ public abstract class SortUtil {
      * @param comp
      *            our object Comparator
      */
+    @SuppressWarnings("unchecked")
     public static <T> void msort(final T[] source, final int left, final int right, final Comparator<? super T> comp) {
-        final T[] copy = Arrays.copyOf(source, source.length);
+        final T[] copy = (T[]) new Object[source.length];
+        System.arraycopy(source, 0, copy, 0, source.length);
         msort(copy, source, left, right, comp);
     }
 

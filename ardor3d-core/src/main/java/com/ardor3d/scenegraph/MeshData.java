@@ -17,7 +17,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -1159,7 +1158,8 @@ public class MeshData implements Savable {
     public MeshData makeCopy() {
         final MeshData data = new MeshData();
         data._vertexCount = _vertexCount;
-        data._primitiveCounts = Arrays.copyOf(_primitiveCounts, _primitiveCounts.length);
+        data._primitiveCounts = new int[_primitiveCounts.length];
+        System.arraycopy(_primitiveCounts, 0, data._primitiveCounts, 0, _primitiveCounts.length);
 
         if (_vertexCoords != null) {
             data._vertexCoords = _vertexCoords.makeCopy();
@@ -1183,9 +1183,11 @@ public class MeshData implements Savable {
         }
 
         if (_indexLengths != null) {
-            data._indexLengths = Arrays.copyOf(_indexLengths, _indexLengths.length);
+            data._indexLengths = new int[_indexLengths.length];
+            System.arraycopy(_indexLengths, 0, data._indexLengths, 0, _indexLengths.length);
         }
-        data._indexModes = Arrays.copyOf(_indexModes, _indexModes.length);
+        data._indexModes = new IndexMode[_indexModes.length];
+        System.arraycopy(_indexModes, 0, data._indexModes, 0, _indexModes.length);
 
         return data;
     }

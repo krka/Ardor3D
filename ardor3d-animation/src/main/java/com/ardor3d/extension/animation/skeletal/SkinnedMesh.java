@@ -13,7 +13,6 @@ package com.ardor3d.extension.animation.skeletal;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
-import java.util.Arrays;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Matrix4;
@@ -635,8 +634,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         skin._customApplier = _customApplier;
 
         // bring across arrays
-        skin._weights = Arrays.copyOf(_weights, _weights.length);
-        skin._jointIndices = Arrays.copyOf(_jointIndices, _jointIndices.length);
+        skin._weights = new float[_weights.length];
+        System.arraycopy(_weights, 0, skin._weights, 0, _weights.length);
+        skin._jointIndices = new short[_jointIndices.length];
+        System.arraycopy(_jointIndices, 0, skin._jointIndices, 0, _jointIndices.length);
 
         skin._currentPose = _currentPose;
 

@@ -12,7 +12,6 @@ package com.ardor3d.extension.animation.skeletal.clip;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 import com.ardor3d.util.export.InputCapsule;
@@ -41,7 +40,8 @@ public class TriggerChannel extends AbstractAnimationChannel {
     public TriggerChannel(final String channelName, final float[] times, final String[] keys) {
         super(channelName, times);
 
-        _keys = Arrays.copyOf(keys, keys.length);
+        _keys = new String[keys.length];
+        System.arraycopy(keys, 0, _keys, 0, keys.length);
     }
 
     @Override
