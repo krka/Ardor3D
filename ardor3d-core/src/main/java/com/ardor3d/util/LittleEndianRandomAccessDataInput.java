@@ -137,7 +137,7 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
     }
 
     /**
-     * Seeks to the position of the last mark.
+     * Seeks to the position of the last mark. The mark is not changed or discarded.
      * 
      * @return this object
      * @throws InvalidMarkException
