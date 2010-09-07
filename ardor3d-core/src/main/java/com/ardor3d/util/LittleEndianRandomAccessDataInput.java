@@ -15,6 +15,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.InvalidMarkException;
 
 import com.ardor3d.util.export.ByteUtils;
 
@@ -123,6 +124,28 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
         final int skipped = _contents.remaining();
         _contents.position(_contents.limit());
         return skipped;
+    }
+
+    /**
+     * Sets a mark at the current position in the underlying buffer. This position can be returned to by calling reset.
+     * 
+     * @return this object
+     */
+    public final LittleEndianRandomAccessDataInput mark() {
+        _contents.mark();
+        return this;
+    }
+
+    /**
+     * Seeks to the position of the last mark.
+     * 
+     * @return this object
+     * @throws InvalidMarkException
+     *             if mark was not previously called.
+     */
+    public final LittleEndianRandomAccessDataInput reset() {
+        _contents.reset();
+        return this;
     }
 
     /**
