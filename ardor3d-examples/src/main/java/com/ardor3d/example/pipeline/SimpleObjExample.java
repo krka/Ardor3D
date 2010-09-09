@@ -17,6 +17,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.model.obj.ObjGeometryStore;
 import com.ardor3d.extension.model.obj.ObjImporter;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 /**
@@ -39,8 +40,8 @@ public class SimpleObjExample extends ExampleBase {
         final long time = System.currentTimeMillis();
         final ObjImporter importer = new ObjImporter();
         try {
-            importer.setTextureLocator(new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
-                    .getResource("com/ardor3d/example/media/models/obj/")));
+            importer.setTextureLocator(new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    SimpleObjExample.class, "com/ardor3d/example/media/models/obj/")));
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
         }
