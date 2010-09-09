@@ -18,6 +18,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 
 /**
@@ -52,7 +53,7 @@ public final class JSLayerImporter {
         jsEngine.put("OUTPUTSTORE", output);
 
         // load our helper functions first...
-        jsEngine.eval(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+        jsEngine.eval(new InputStreamReader(ResourceLocatorTool.getClassPathResourceAsStream(JSLayerImporter.class,
                 "com/ardor3d/extension/animation/skeletal/state/loader/functions.js")));
 
         // Add our user data...

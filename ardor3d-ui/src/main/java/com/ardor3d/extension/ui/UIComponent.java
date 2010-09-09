@@ -46,6 +46,7 @@ import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMFont;
 import com.ardor3d.ui.text.BasicText;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.URLResourceSource;
 
 /**
@@ -1090,9 +1091,8 @@ public abstract class UIComponent extends Node {
     public static BMFont getDefaultFont() {
         if (UIComponent._defaultFont == null) {
             try {
-                UIComponent._defaultFont = new BMFont(
-                        new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
-                                "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), true);
+                UIComponent._defaultFont = new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(
+                        UIComponent.class, "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), true);
             } catch (final Exception ex) {
                 UIComponent.logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
             }

@@ -82,6 +82,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 
 /**
@@ -108,7 +109,7 @@ public class ExampleRunner extends JFrame {
     private final static String HEADER = "<html><body><h2 align=\"center\">Ardor3d Examples</h2>"
             + "<p>Choose an example in the tree and select Run. Movement keys are: W, A, S, and D. Control view with left/right buttons.</p>"
             + "<p align=\"center\"><img src=\""
-            + Thread.currentThread().getContextClassLoader().getResource(
+            + ResourceLocatorTool.getClassPathResource(ExampleRunner.class,
                     "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"></p></body></html>";
     private static Comparator<Class<?>> classComparator = new Comparator<Class<?>>() {
 
@@ -372,8 +373,8 @@ public class ExampleRunner extends JFrame {
             if (purpose != null) {
                 try {
                     // Look for the example's thumbnail.
-                    final URL imageURL = Thread.currentThread().getContextClassLoader().getResource(
-                            purpose.thumbnailPath());
+                    final URL imageURL = ResourceLocatorTool.getClassPathResource(ExampleRunner.class, purpose
+                            .thumbnailPath());
                     if (imageURL != null) {
                         imgURL = "<br><img src=\"" + imageURL + "\">";
                     }
@@ -387,7 +388,7 @@ public class ExampleRunner extends JFrame {
             // default to Ardor3D logo if no image available.
             if ("".equals(imgURL)) {
                 imgURL = "<img src=\""
-                        + Thread.currentThread().getContextClassLoader().getResource(
+                        + ResourceLocatorTool.getClassPathResource(ExampleRunner.class,
                                 "com/ardor3d/example/media/images/ardor3d_white_256.jpg") + "\"/>";
             }
 
@@ -408,7 +409,7 @@ public class ExampleRunner extends JFrame {
         }
         try {
             final ResourceBundle bundle = ResourceBundle.getBundle(purpose.localisationBaseFile(), Locale.getDefault(),
-                    Thread.currentThread().getContextClassLoader());
+                    ClassLoader.getSystemClassLoader());
 
             return bundle.getString(purpose.htmlDescriptionKey());
 
@@ -473,7 +474,7 @@ public class ExampleRunner extends JFrame {
      */}
 
     private static ImageIcon getIcon(final String name) {
-        return new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(
+        return new ImageIcon(ResourceLocatorTool.getClassPathResource(ExampleRunner.class,
                 "com/ardor3d/example/media/icons/" + name));
     }
 
@@ -762,7 +763,7 @@ public class ExampleRunner extends JFrame {
 
             // Get a File object for the package
             // URL url = UPBClassLoader.get().getResource(name);
-            url = Thread.currentThread().getContextClassLoader().getResource(name);
+            url = ResourceLocatorTool.getClassPathResource(ExampleRunner.class, name);
             // URL url = ClassLoader.getSystemClassLoader().getResource(name);
             // pckgname = pckgname + ".";
 

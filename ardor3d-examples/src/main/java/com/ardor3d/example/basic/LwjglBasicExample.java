@@ -158,8 +158,8 @@ public class LwjglBasicExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
-                    .getResource("com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    LwjglBasicExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

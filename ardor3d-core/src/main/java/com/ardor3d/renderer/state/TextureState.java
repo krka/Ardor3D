@@ -28,6 +28,7 @@ import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 
@@ -73,7 +74,7 @@ public class TextureState extends RenderState {
     public static ResourceSource DEFAULT_TEXTURE_SOURCE;
     static {
         try {
-            DEFAULT_TEXTURE_SOURCE = new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
+            DEFAULT_TEXTURE_SOURCE = new URLResourceSource(ResourceLocatorTool.getClassPathResource(TextureState.class,
                     "com/ardor3d/renderer/state/notloaded.tga"));
         } catch (final Exception e) {
             // ignore.

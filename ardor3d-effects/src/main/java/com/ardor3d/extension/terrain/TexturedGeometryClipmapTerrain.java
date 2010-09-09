@@ -33,6 +33,7 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.DataMode;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * First iteration of a Geometry Clipmap terrain, without streaming support.
@@ -192,10 +193,12 @@ public class TexturedGeometryClipmapTerrain extends Node {
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
             try {
-                _geometryClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
-                _geometryClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
+                _geometryClipmapShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        TexturedGeometryClipmapTerrain.class,
+                        "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
+                _geometryClipmapShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        TexturedGeometryClipmapTerrain.class,
+                        "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }

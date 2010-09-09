@@ -33,6 +33,7 @@ import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 
 public class TextureClipmap {
@@ -385,10 +386,10 @@ public class TextureClipmap {
     public void reloadShader() {
         textureClipmapShader = new GLSLShaderObjectsState();
         try {
-            textureClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            textureClipmapShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(TextureClipmap.class,
                     "com/ardor3d/extension/effect/texture/textureClipmapShader.vert"));
-            textureClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                    "com/ardor3d/extension/effect/texture/textureClipmapShader.frag"));
+            textureClipmapShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    TextureClipmap.class, "com/ardor3d/extension/effect/texture/textureClipmapShader.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }

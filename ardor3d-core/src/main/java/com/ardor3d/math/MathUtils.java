@@ -565,6 +565,6 @@ public class MathUtils {
         if (x <= 0) {
             return 1;
         }
-        return 2 << x - 1;
+        return 2 << (x - 1);
     }
 }

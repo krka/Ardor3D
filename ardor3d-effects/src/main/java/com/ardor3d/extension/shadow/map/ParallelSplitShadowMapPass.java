@@ -68,6 +68,7 @@ import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
 
 /**
@@ -309,14 +310,14 @@ public class ParallelSplitShadowMapPass extends Pass {
         if (caps.isGLSLSupported()) {
             _pssmShader = new GLSLShaderObjectsState();
             try {
-                _pssmShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/shadow/map/pssm.vert"));
+                _pssmShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.vert"));
                 if (filter == Filter.None) {
-                    _pssmShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                            "com/ardor3d/extension/shadow/map/pssm.frag"));
+                    _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                            ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssm.frag"));
                 } else if (filter == Filter.Pcf) {
-                    _pssmShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                            "com/ardor3d/extension/shadow/map/pssmPCF.frag"));
+                    _pssmShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                            ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmPCF.frag"));
                 }
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -325,10 +326,10 @@ public class ParallelSplitShadowMapPass extends Pass {
 
             _pssmDebugShader = new GLSLShaderObjectsState();
             try {
-                _pssmDebugShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/shadow/map/pssmDebug.vert"));
-                _pssmDebugShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                        "com/ardor3d/extension/shadow/map/pssmDebug.frag"));
+                _pssmDebugShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.vert"));
+                _pssmDebugShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        ParallelSplitShadowMapPass.class, "com/ardor3d/extension/shadow/map/pssmDebug.frag"));
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }

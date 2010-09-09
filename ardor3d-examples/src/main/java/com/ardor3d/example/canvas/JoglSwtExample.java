@@ -121,8 +121,8 @@ public class JoglSwtExample {
         AWTImageLoader.registerLoader();
 
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
-                    .getResource("com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    JoglSwtExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();
@@ -260,8 +260,8 @@ public class JoglSwtExample {
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final com.ardor3d.image.Image image = awtImageLoader.load(Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream(resourceName), false);
+        final com.ardor3d.image.Image image = awtImageLoader.load(ResourceLocatorTool.getClassPathResourceAsStream(
+                JoglSwtExample.class, resourceName), false);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }

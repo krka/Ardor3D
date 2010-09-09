@@ -46,6 +46,7 @@ import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
 import com.ardor3d.scenegraph.shape.Quad;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * The WaterNode handles rendering of a water effect on all of it's children. What is reflected in the water is
@@ -422,9 +423,9 @@ public class WaterNode extends Node {
 
         try {
             logger.info("loading " + currentShaderStr);
-            waterShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            waterShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
                     currentShaderStr + ".vert"));
-            waterShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            waterShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
                     currentShaderStr + ".frag"));
         } catch (final IOException e) {
             logger.log(Level.WARNING, "Error loading shader", e);
@@ -449,9 +450,9 @@ public class WaterNode extends Node {
         waterShader._needSendShader = true;
 
         try {
-            blurShaderVertical.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            blurShaderVertical.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
                     "com/ardor3d/extension/effect/bloom/bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            blurShaderVertical.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(WaterNode.class,
                     "com/ardor3d/extension/effect/bloom/bloom_blur_vertical5_down.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);

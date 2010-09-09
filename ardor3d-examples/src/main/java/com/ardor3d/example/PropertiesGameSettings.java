@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ardor3d.util.Ardor3dException;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * <code>PropertiesGameSettings</code> handles loading and saving a properties file that defines the display settings. A
@@ -733,7 +734,7 @@ public class PropertiesGameSettings {
         }
         InputStream istream = null;
         if (propFileName != null) {
-            istream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propFileName);
+            istream = ResourceLocatorTool.getClassPathResourceAsStream(PropertiesGameSettings.class, propFileName);
         }
         if (istream == null) {
             logger.fine("No customization properties file found");

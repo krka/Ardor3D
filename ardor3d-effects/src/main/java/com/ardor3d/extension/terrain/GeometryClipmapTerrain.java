@@ -31,6 +31,7 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.DataMode;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * First iteration of a Geometry Clipmap terrain, without streaming support.
@@ -181,14 +182,10 @@ public class GeometryClipmapTerrain extends Node {
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
             try {
-                _geometryClipmapShader.setVertexShader(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/terrain/geometryClipmapShader.vert"));
-                _geometryClipmapShader.setFragmentShader(Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("com/ardor3d/extension/terrain/geometryClipmapShader.frag"));
-                // _geometryClipmapShader.setVertexShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                // "com/ardor3d/extension/terrain/geometryClipmapShaderSpecular.vert"));
-                // _geometryClipmapShader.setFragmentShader(ClipmapLevel.class.getClassLoader().getResourceAsStream(
-                // "com/ardor3d/extension/terrain/geometryClipmapShaderSpecular.frag"));
+                _geometryClipmapShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        GeometryClipmapTerrain.class, "com/ardor3d/extension/terrain/geometryClipmapShader.vert"));
+                _geometryClipmapShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        GeometryClipmapTerrain.class, "com/ardor3d/extension/terrain/geometryClipmapShader.frag"));
             } catch (final IOException ex) {
                 logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
             }

@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import com.ardor3d.util.resource.ResourceLocatorTool;
+
 /**
  * TODO: document this class!
  * 
@@ -47,7 +49,7 @@ public class NativeLoader {
     private static void makeLibraryAvailable(final String libraryPath) throws IOException {
         // logger.info("Making library: " + libraryPath + " available");
 
-        final URL resourceURL = Thread.currentThread().getContextClassLoader().getResource(libraryPath);
+        final URL resourceURL = ResourceLocatorTool.getClassPathResource(NativeLoader.class, libraryPath);
 
         if (resourceURL == null) {
             throw new IOException("Unable to locate library resource '" + libraryPath + "' in classpath");

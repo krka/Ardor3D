@@ -185,8 +185,8 @@ public class LwjglHeadlessExample implements Scene {
 
         // Set the location of our example resources.
         try {
-            final SimpleResourceLocator srl = new SimpleResourceLocator(Thread.currentThread().getContextClassLoader()
-                    .getResource("com/ardor3d/example/media/"));
+            final SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(
+                    LwjglHeadlessExample.class, "com/ardor3d/example/media/"));
             ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
         } catch (final URISyntaxException ex) {
             ex.printStackTrace();

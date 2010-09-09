@@ -39,6 +39,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * A demonstration of the MouseManager class, which is used to control properties (e.g. cursor, location) of the native
@@ -154,8 +155,8 @@ public class MouseManagerExample extends ExampleBase {
 
     private MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
             throws IOException {
-        final Image image = awtImageLoader.load(Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                resourceName), true);
+        final Image image = awtImageLoader.load(ResourceLocatorTool.getClassPathResourceAsStream(
+                MouseManagerExample.class, resourceName), true);
 
         return new MouseCursor("cursor1", image, 0, image.getHeight() - 1);
     }
