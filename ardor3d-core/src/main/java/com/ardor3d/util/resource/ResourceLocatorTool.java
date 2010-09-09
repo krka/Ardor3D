@@ -10,15 +10,21 @@
 
 package com.ardor3d.util.resource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.common.collect.Sets;
 
 /**
  * Manager class for locator utility classes used to find various assets. (XXX: Needs more documentation)
@@ -58,7 +64,7 @@ public class ResourceLocatorTool {
             }
             // last resort...
             try {
-                final URL u = Thread.currentThread().getContextClassLoader().getResource(resourceName);
+                final URL u = ResourceLocatorTool.getClassPathResource(ResourceLocatorTool.class, resourceName);
                 if (u != null) {
                     return new URLResourceSource(u);
                 }
@@ -97,5 +103,91 @@ public class ResourceLocatorTool {
             }
             return bases.remove(locator);
         }
+    }
+
+    /**
+     * Locate a resource using various classloaders.
+     * 
+     * <ul>
+     * <li>First it tries the Thread.currentThread().getContextClassLoader().</li>
+     * <li>Then it tries the ClassLoader.getSystemClassLoader() (if not same as context class loader).</li>
+     * <li>Finally it tries the clazz.getClassLoader()</li>
+     * </ul>
+     * 
+     * @param clazz
+     *            a class to use as a local reference.
+     * @param name
+     *            the name and path of the resource.
+     * @return the URL of the resource, or null if none found.
+     */
+    public static URL getClassPathResource(final Class<?> clazz, final String name) {
+        URL result = Thread.currentThread().getContextClassLoader().getResource(name);
+        if (result == null
+                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+            result = ClassLoader.getSystemResource(name);
+        }
+        if (result == null) {
+            result = clazz.getClassLoader().getResource(name);
+        }
+        return result;
+    }
+
+    /**
+     * Locate a resource using various classloaders and open a stream to it.
+     * 
+     * @param clazz
+     *            a class to use as a local reference.
+     * @param name
+     *            the name and path of the resource.
+     * @return the input stream if resource is found, or null if not.
+     */
+    public static InputStream getClassPathResourceAsStream(final Class<?> clazz, final String name) {
+        InputStream result = Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+        if (result == null
+                && !Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+            result = ClassLoader.getSystemResourceAsStream(name);
+        }
+        if (result == null) {
+            result = clazz.getClassLoader().getResourceAsStream(name);
+        }
+        return result;
+    }
+
+    /**
+     * Locate all instances of a resource using various classloaders.
+     * 
+     * @param clazz
+     *            a class to use as a local reference.
+     * @param name
+     *            the name and path of the resource.
+     * @return a set containing the located URLs of the named resource.
+     */
+    public static Set<URL> getClassPathResources(final Class<?> clazz, final String name) {
+        final Set<URL> results = Sets.newHashSet();
+        Enumeration<URL> urls = null;
+        try {
+            urls = Thread.currentThread().getContextClassLoader().getResources(name);
+            for (; urls.hasMoreElements();) {
+                results.add(urls.nextElement());
+            }
+        } catch (final IOException ioe) {
+        }
+        if (!Thread.currentThread().getContextClassLoader().equals(ClassLoader.getSystemClassLoader())) {
+            try {
+                urls = ClassLoader.getSystemResources(name);
+                for (; urls.hasMoreElements();) {
+                    results.add(urls.nextElement());
+                }
+            } catch (final IOException ioe) {
+            }
+        }
+        try {
+            urls = clazz.getClassLoader().getResources(name);
+            for (; urls.hasMoreElements();) {
+                results.add(urls.nextElement());
+            }
+        } catch (final IOException ioe) {
+        }
+        return results;
     }
 }
