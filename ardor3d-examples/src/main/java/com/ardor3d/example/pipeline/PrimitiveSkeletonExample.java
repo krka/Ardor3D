@@ -37,6 +37,7 @@ import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 
 /**
  * A demonstration of combining the skeletal animation classes with OpenGL Shading Language.
@@ -138,9 +139,9 @@ public class PrimitiveSkeletonExample extends ExampleBase {
         final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
         gpuShader.setEnabled(useGPU);
         try {
-            gpuShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(PrimitiveSkeletonExample.class,
                     "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
-            gpuShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(PrimitiveSkeletonExample.class,
                     "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
         } catch (final IOException ioe) {
             ioe.printStackTrace();

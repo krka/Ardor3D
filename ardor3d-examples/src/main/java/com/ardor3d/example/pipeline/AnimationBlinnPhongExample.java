@@ -245,11 +245,13 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
     private void importDogDae() {
 
-        final ResourceSource rts = new URLResourceSource(Thread.currentThread().getContextClassLoader().getResource(
+        final ResourceSource rts = new URLResourceSource(ResourceLocatorTool.getClassPathResource(
+                AnimationBlinnPhongExample.class,
                 "com/ardor3d/example/media/models/collada/juanita/dog_Apr18_normals.dds"));
         final Texture t = TextureManager.load(rts, Texture.MinificationFilter.NearestNeighborNearestMipMap, true);
-        final ResourceSource specularRS = new URLResourceSource(Thread.currentThread().getContextClassLoader()
-                .getResource("com/ardor3d/example/media/models/collada/juanita/dog_Apr18_specular.dds"));
+        final ResourceSource specularRS = new URLResourceSource(ResourceLocatorTool.getClassPathResource(
+                AnimationBlinnPhongExample.class,
+                "com/ardor3d/example/media/models/collada/juanita/dog_Apr18_specular.dds"));
         final Texture specular = TextureManager.load(specularRS,
                 Texture.MinificationFilter.NearestNeighborNearestMipMap, false);
 
@@ -264,9 +266,10 @@ public class AnimationBlinnPhongExample extends ExampleBase {
         gpuShader = new GLSLShaderObjectsState();
         gpuShader.setEnabled(true);
         try {
-            gpuShader.setVertexShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationBlinnPhongExample.class,
                     "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.vert"));
-            gpuShader.setFragmentShader(Thread.currentThread().getContextClassLoader().getResourceAsStream(
+            gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    AnimationBlinnPhongExample.class,
                     "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.frag"));
 
             gpuShader.setUniform("quantizationFactor", 1f / quantizationFactor);

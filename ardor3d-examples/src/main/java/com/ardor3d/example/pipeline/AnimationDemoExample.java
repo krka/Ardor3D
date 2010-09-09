@@ -79,6 +79,7 @@ import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
 
@@ -321,10 +322,10 @@ public class AnimationDemoExample extends ExampleBase {
             // final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
             // gpuShader.setEnabled(true);
             // try {
-            // gpuShader.setVertexShader(PrimitiveSkeletonExample.class.getClassLoader().getResourceAsStream(
+            // gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationDemoExample.class,
             // "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
-            // gpuShader.setFragmentShader(PrimitiveSkeletonExample.class.getClassLoader().getResourceAsStream(
-            // "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
+            // gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+            // AnimationDemoExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
             // } catch (final IOException ioe) {
             // ioe.printStackTrace();
             // }
@@ -371,8 +372,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Load our layer and states from script
         try {
-            final ResourceSource layersFile = new URLResourceSource(Thread.currentThread().getContextClassLoader()
-                    .getResource("com/ardor3d/example/pipeline/AnimationDemoExample.js"));
+            final ResourceSource layersFile = new URLResourceSource(ResourceLocatorTool.getClassPathResource(
+                    AnimationDemoExample.class, "com/ardor3d/example/pipeline/AnimationDemoExample.js"));
             layerOutput = JSLayerImporter.addLayers(layersFile, manager, input);
         } catch (final Exception e) {
             e.printStackTrace();
