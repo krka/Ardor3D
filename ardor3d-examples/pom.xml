@@ -11,7 +11,6 @@
     <packaging>jar</packaging>
     <name>Ardor 3D Examples</name>
 
-  <!-- TODO: decide if this is needed and if so, make this into a more final solution -->
     <properties>
         <main.class>com.ardor3d.example.basic.BoxExample</main.class>
         <jogl.native>${basedir}${file.separator}..${file.separator}ardor3d-jogl${file.separator}lib${file.separator}jogl${file.separator}native${file.separator}windows_i586</jogl.native>
@@ -26,7 +25,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-            <!-- TODO: find a good way of handling native libraries, preferably packaging them in jar files for storage in repo -->
+			            <!-- TODO: find a good way of handling native libraries -->
                         <manifest>
                             <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>
