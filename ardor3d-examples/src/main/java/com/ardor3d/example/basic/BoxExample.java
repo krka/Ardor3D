@@ -46,7 +46,6 @@ public class BoxExample extends ExampleBase {
     private final Vector3 axis = new Vector3(1, 1, 0.5f).normalizeLocal();
 
     public static void main(final String[] args) {
-        System.out.println(System.getProperty("java.library.path"));
         start(BoxExample.class);
     }
 
