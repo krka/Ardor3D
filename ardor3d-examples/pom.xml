@@ -140,46 +140,106 @@
     </dependencies>
     <profiles>
         <profile>
-            <id>linux</id>
+            <id>linux-x86</id>
             <activation>
                 <os>
-                    <name>Linux</name>
+                    <arch>i386</arch>
+                    <name>linux</name>
                 </os>
             </activation>
             <properties>
+                <swt.classifier>linux-x86</swt.classifier>
                 <lwjgl.classifier>linux</lwjgl.classifier>
             </properties>
         </profile>
         <profile>
-            <id>solaris</id>
+            <id>linux-x86_64</id>
             <activation>
                 <os>
+                    <arch>amd64</arch>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.classifier>linux-x86_64</swt.classifier>
+                <lwjgl.classifier>linux</lwjgl.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>solaris-sparc</id>
+            <activation>
+                <os>
+                    <arch>sparc</arch>
                     <name>SunOS</name>
                 </os>
             </activation>
             <properties>
+                <swt.classifier>solaris-sparc</swt.classifier>
                 <lwjgl.classifier>solaris</lwjgl.classifier>
             </properties>
         </profile>
         <profile>
-            <id>mac</id>
+            <id>solaris-x86</id>
             <activation>
                 <os>
+                    <arch>x86</arch>
+                    <name>SunOS</name>
+                </os>
+            </activation>
+            <properties>
+                <swt.classifier>solaris-x86</swt.classifier>
+                <lwjgl.classifier>solaris</lwjgl.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>macosx-cocoa-64</id>
+            <activation>
+                <os>
+                    <arch>x86_64</arch>
                     <family>mac</family>
                 </os>
             </activation>
             <properties>
+                <swt.classifier>mac-x86_64</swt.classifier>
                 <lwjgl.classifier>mac</lwjgl.classifier>
             </properties>
         </profile>
         <profile>
-            <id>windows</id>
+            <id>macosx-cocoa</id>
             <activation>
                 <os>
+                    <arch>x86</arch>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.classifier>mac-x86</swt.classifier>
+                <lwjgl.classifier>mac</lwjgl.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>win32</id>
+            <activation>
+                <os>
+                    <arch>x86</arch>
                     <family>Windows</family>
                 </os>
             </activation>
             <properties>
+                <swt.classifier>win32-x86</swt.classifier>
+                <lwjgl.classifier>windows</lwjgl.classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>win64</id>
+            <activation>
+                <os>
+                    <arch>amd64</arch>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <swt.classifier>win32-x86_64</swt.classifier>
                 <lwjgl.classifier>windows</lwjgl.classifier>
             </properties>
         </profile>
