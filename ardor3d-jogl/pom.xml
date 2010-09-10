@@ -10,8 +10,19 @@
   <artifactId>ardor3d-jogl</artifactId>
   <packaging>jar</packaging>
   <name>Ardor 3D JOGL</name>
-
-  <dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ardor3d-core</artifactId>
@@ -26,7 +37,7 @@
      and since it is at the moment more work than it is worth to get it ready. Later on, when
      we have solved some more fundamental problems, it is probably time to revisit this.
     -->
-      
+
     <!-- dependency>
       <groupId>net.java.dev.jogl</groupId>
       <artifactId>jogl-natives</artifactId>
@@ -37,3 +48,4 @@
     </dependency>
   </dependencies>
 </project>
+
