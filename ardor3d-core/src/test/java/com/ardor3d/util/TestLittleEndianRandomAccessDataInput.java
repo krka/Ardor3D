@@ -17,9 +17,7 @@ import java.io.ByteArrayInputStream;
 import org.junit.Test;
 
 /**
- * These tests are fairly brittle, since they rely on the implementation of BufferedInputStream. It is necessary for the
- * bytes available to always be larger than the buffer size of the buffered input stream for the tests to work. This
- * size is currently 8192, but if it changes, or if the implementation changes, these tests can break.
+ * Some tests for our random access little endian data input
  */
 public class TestLittleEndianRandomAccessDataInput {
 
