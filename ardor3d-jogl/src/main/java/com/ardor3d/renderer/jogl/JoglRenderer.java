@@ -410,7 +410,7 @@ public class JoglRenderer extends AbstractRenderer {
         final IntBuffer idBuffer = BufferUtils.createIntBuffer(ids.size());
         idBuffer.clear();
         for (final Integer i : ids) {
-            if (i != null && i > 0) {
+            if (i != null && i != 0) {
                 idBuffer.put(i);
             }
         }
