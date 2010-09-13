@@ -170,16 +170,16 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
     }
 
     /**
-     * 
      * Reads a specified number of bytes to form a string. The length of the string (number of characters) is required
      * to notify when reading should stop. The index is increased the number of characters read.
      * 
      * @param size
      *            the length of the string to read.
      * @param charset
-     *            the charset
+     *            the charset used to convert the bytes to a string.
      * @return the string read.
      * @throws IOException
+     *             if EOS/EOF is reached before "size" number of bytes are read.
      */
     public String readString(final int size, final Charset charset) throws IOException {
         final int start = position();
@@ -198,6 +198,17 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
         return s;
     }
 
+    /**
+     * Reads a specified number of bytes to form a string. The length of the string (number of characters) is required
+     * to notify when reading should stop. The index is increased the number of characters read. Will use the platform's
+     * default Charset to convert the bytes to string.
+     * 
+     * @param size
+     *            the length of the string to read.
+     * @return the string read.
+     * @throws IOException
+     *             if EOS/EOF is reached before "size" number of bytes are read.
+     */
     public String readString(final int size) throws IOException {
         return readString(size, Charset.defaultCharset());
     }
