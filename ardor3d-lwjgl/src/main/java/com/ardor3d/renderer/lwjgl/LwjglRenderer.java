@@ -405,7 +405,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void deleteDisplayLists(final Collection<Integer> ids) {
         for (final Integer i : ids) {
-            if (i != null && i > 0) {
+            if (i != null && i != 0) {
                 System.err.println("deleted DL: " + i);
                 GL11.glDeleteLists(i, 1);
             }
@@ -786,11 +786,11 @@ public class LwjglRenderer extends AbstractRenderer {
 
     private int setupVBO(final FloatBufferData data, final RenderContext context, final RendererRecord rendRecord) {
         if (data == null) {
-            return -1;
+            return 0;
         }
 
         int vboID = data.getVBOID(context.getGlContextRep());
-        if (vboID > 0) {
+        if (vboID != 0) {
             updateVBO(data, rendRecord, vboID, 0);
 
             return vboID;
@@ -827,11 +827,11 @@ public class LwjglRenderer extends AbstractRenderer {
     private int setupIndicesVBO(final IndexBufferData<?> data, final RenderContext context,
             final RendererRecord rendRecord) {
         if (data == null) {
-            return -1;
+            return 0;
         }
 
         int vboID = data.getVBOID(context.getGlContextRep());
-        if (vboID > 0) {
+        if (vboID != 0) {
             if (data.isNeedsRefresh()) {
                 final Buffer dataBuffer = data.getBuffer();
                 dataBuffer.rewind();
@@ -883,7 +883,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         final int vboID = setupVBO(data, context, rendRecord);
 
-        if (vboID > 0) {
+        if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
             GL11.glVertexPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
@@ -899,7 +899,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         final int vboID = setupVBO(data, context, rendRecord);
 
-        if (vboID > 0) {
+        if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
             GL11.glNormalPointer(GL11.GL_FLOAT, 0, 0);
@@ -915,7 +915,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
         final int vboID = setupVBO(data, context, rendRecord);
 
-        if (vboID > 0) {
+        if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
             GL11.glColorPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
@@ -936,7 +936,7 @@ public class LwjglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final int vboID = setupVBO(data, context, rendRecord);
 
-        if (vboID > 0) {
+        if (vboID != 0) {
             GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
             EXTFogCoord.glFogCoordPointerEXT(GL11.GL_FLOAT, 0, 0);
@@ -984,7 +984,7 @@ public class LwjglRenderer extends AbstractRenderer {
                     final int vboID = setupVBO(data, context, rendRecord);
 
                     // Found good vbo
-                    if (vboID > 0) {
+                    if (vboID != 0) {
                         if (!valid || !wasOn) {
                             // enable bit in tracking int
                             enabledTextures |= (2 << i);
