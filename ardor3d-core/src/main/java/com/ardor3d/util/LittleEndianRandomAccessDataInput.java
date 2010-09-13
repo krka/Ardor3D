@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.InvalidMarkException;
+import java.nio.charset.Charset;
 
 import com.ardor3d.util.export.ByteUtils;
 
@@ -166,6 +167,39 @@ public class LittleEndianRandomAccessDataInput implements DataInput {
      */
     public final String readUTF() throws IOException {
         throw new IOException("operation unsupported.");
+    }
+
+    /**
+     * 
+     * Reads a specified number of bytes to form a string. The length of the string (number of characters) is required
+     * to notify when reading should stop. The index is increased the number of characters read.
+     * 
+     * @param size
+     *            the length of the string to read.
+     * @param charset
+     *            the charset
+     * @return the string read.
+     * @throws IOException
+     */
+    public String readString(final int size, final Charset charset) throws IOException {
+        final int start = position();
+        final byte[] content = new byte[size];
+        readFully(content);
+        seek(start + size);
+        int indexOfNullByte = size;
+        // Look for zero terminated string from byte array
+        for (int i = 0; i < size; i++) {
+            if (content[i] == 0) {
+                indexOfNullByte = i;
+                break;
+            }
+        }
+        final String s = new String(content, 0, indexOfNullByte, charset);
+        return s;
+    }
+
+    public String readString(final int size) throws IOException {
+        return readString(size, Charset.defaultCharset());
     }
 
     public final void seek(final int pos) throws IOException {
