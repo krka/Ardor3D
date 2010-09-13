@@ -784,7 +784,7 @@ public class JoglRenderer extends AbstractRenderer {
         if (indexLengths == null) {
             final int glIndexMode = getGLIndexMode(indexModes[0]);
 
-            indices.getBuffer().position(0);
+            indices.position(0);
             if (indices.getBuffer() instanceof IntBuffer) {
                 gl.glDrawElements(glIndexMode, indices.getBufferLimit(), type, indices.getBuffer());
             } else if (indices.getBuffer() instanceof ShortBuffer) {
@@ -1117,7 +1117,8 @@ public class JoglRenderer extends AbstractRenderer {
                         TextureState.MAX_TEXTURES) : 1;
                 for (int i = 0; i < max; i++) {
                     wasOn = (enabledTextures & (2 << i)) != 0;
-                    exists = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null;
+                    exists = textureCoords != null && i < textureCoords.size() && textureCoords.get(i) != null
+                            && i <= ts.getMaxTextureIndexUsed();
 
                     if (!exists) {
                         if (valid && !wasOn) {
