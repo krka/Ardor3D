@@ -171,7 +171,7 @@ public abstract class AbstractRenderer implements Renderer {
         final RenderContext context = ContextManager.getCurrentContext();
 
         // first look up in enforced states
-        final RenderState state = context.getEnforcedState(type);
+        final RenderState state = context.hasEnforcedStates() ? context.getEnforcedState(type) : null;
 
         // Not there? Use the state we received
         if (state == null) {

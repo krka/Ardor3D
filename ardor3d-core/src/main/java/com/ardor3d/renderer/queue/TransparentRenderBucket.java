@@ -72,7 +72,8 @@ public class TransparentRenderBucket extends AbstractRenderBucket {
 
                     // check if we have a Cull state set or enforced. If one is explicitly set and is not Face.None,
                     // we'll not do two-pass transparency.
-                    RenderState setState = context.getEnforcedState(StateType.Cull);
+                    RenderState setState = context.hasEnforcedStates() ? context.getEnforcedState(StateType.Cull)
+                            : null;
                     if (setState == null) {
                         setState = mesh.getWorldRenderState(RenderState.StateType.Cull);
                     }

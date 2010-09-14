@@ -147,6 +147,10 @@ public class RenderContext {
         _currentStates.remove(type);
     }
 
+    public boolean hasEnforcedStates() {
+        return !_enforcedStates.isEmpty();
+    }
+
     public RenderState getEnforcedState(final RenderState.StateType type) {
         return _enforcedStates.get(type);
     }
