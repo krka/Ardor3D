@@ -230,11 +230,9 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         }
 
         // Apply fixed function states before mesh transforms for proper function
-        StateType type;
-        for (final RenderState state : _states.values()) {
-            type = state.getType();
+        for (final StateType type : StateType.values) {
             if (type != StateType.GLSLShader && type != StateType.FragmentProgram && type != StateType.VertexProgram) {
-                renderer.applyState(type, state);
+                renderer.applyState(type, _states.get(type));
             }
         }
 
