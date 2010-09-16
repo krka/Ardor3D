@@ -31,6 +31,13 @@ public class BlendStateRecord extends StateRecord {
 
     public ColorRGBA blendColor = new ColorRGBA(-1, -1, -1, -1);
 
+    // sample coverage
+    public boolean sampleAlphaToCoverageEnabled = false;
+    public boolean sampleAlphaToOneEnabled = false;
+    public boolean sampleCoverageEnabled = false;
+    public boolean sampleCoverageInverted = false;
+    public float sampleCoverage = 1f;
+
     @Override
     public void invalidate() {
         super.invalidate();
@@ -50,5 +57,11 @@ public class BlendStateRecord extends StateRecord {
         alphaRef = -1;
 
         blendColor.set(-1, -1, -1, -1);
+
+        sampleAlphaToCoverageEnabled = false;
+        sampleAlphaToOneEnabled = false;
+        sampleCoverageEnabled = false;
+        sampleCoverageInverted = false;
+        sampleCoverage = -1;
     }
 }

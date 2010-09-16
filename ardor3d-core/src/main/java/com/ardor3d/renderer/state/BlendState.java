@@ -257,6 +257,17 @@ public class BlendState extends RenderState {
     /** The reference value to which incoming alpha values are compared. */
     private float _reference = 0;
 
+    /** Enables conversion of alpha values to masks - a form of dithering. */
+    private boolean _sampleAlphaToCoverageEnabled = false;
+    /** Replaces alpha sample with max value. */
+    private boolean _sampleAlphaToOneEnabled = false;
+    /** Enables fragment mask modification. */
+    private boolean _sampleCoverageEnabled = false;
+    /** a mask that modifies the coverage of multi-sampled pixel fragments. Must be [0, 1] */
+    private float _sampleCoverage = 1.0f;
+    /** If enabled, sample coverage mask is inverted. */
+    private boolean _sampleCoverageInverted = false;
+
     /**
      * Constructor instantiates a new <code>BlendState</code> object with default values.
      */
@@ -528,6 +539,55 @@ public class BlendState extends RenderState {
         _constantColor.set(constantColor);
     }
 
+    public boolean isSampleAlphaToCoverageEnabled() {
+        return _sampleAlphaToCoverageEnabled;
+    }
+
+    public void setSampleAlphaToCoverageEnabled(final boolean sampleAlphaToCoverageEnabled) {
+        _sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+    }
+
+    public boolean isSampleAlphaToOneEnabled() {
+        return _sampleAlphaToOneEnabled;
+    }
+
+    public void setSampleAlphaToOneEnabled(final boolean sampleAlphaToOneEnabled) {
+        _sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+    }
+
+    public boolean isSampleCoverageEnabled() {
+        return _sampleCoverageEnabled;
+    }
+
+    public void setSampleCoverageEnabled(final boolean sampleCoverageEnabled) {
+        _sampleCoverageEnabled = sampleCoverageEnabled;
+    }
+
+    public float getSampleCoverage() {
+        return _sampleCoverage;
+    }
+
+    /**
+     * @param value
+     *            new sample coverage value - must be in range [0f, 1f]
+     * @throws IllegalArgumentException
+     *             if value is not in correct range.
+     */
+    public void setSampleCoverage(final float value) {
+        if (value > 1.0f || value < 0.0f) {
+            throw new IllegalArgumentException("value must be in range [0f, 1f]");
+        }
+        _sampleCoverage = value;
+    }
+
+    public boolean isSampleCoverageInverted() {
+        return _sampleCoverageInverted;
+    }
+
+    public void setSampleCoverageInverted(final boolean sampleCoverageInverted) {
+        _sampleCoverageInverted = sampleCoverageInverted;
+    }
+
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
@@ -542,6 +602,11 @@ public class BlendState extends RenderState {
         capsule.write(_testFunction, "test", TestFunction.GreaterThan);
         capsule.write(_reference, "reference", 0);
         capsule.write(_constantColor, "constantColor", null);
+        capsule.write(_sampleAlphaToCoverageEnabled, "sampleAlphaToCoverageEnabled", false);
+        capsule.write(_sampleAlphaToOneEnabled, "sampleAlphaToOneEnabled", false);
+        capsule.write(_sampleCoverageEnabled, "sampleCoverageEnabled", false);
+        capsule.write(_sampleCoverageInverted, "sampleCoverageInverted", false);
+        capsule.write(_sampleCoverage, "sampleCoverage", 1.0f);
     }
 
     @Override

@@ -11,6 +11,7 @@
 package com.ardor3d.scene.state.lwjgl;
 
 import org.lwjgl.opengl.ARBImaging;
+import org.lwjgl.opengl.ARBMultisample;
 import org.lwjgl.opengl.EXTBlendColor;
 import org.lwjgl.opengl.EXTBlendEquationSeparate;
 import org.lwjgl.opengl.EXTBlendFuncSeparate;
@@ -46,12 +47,24 @@ public abstract class LwjglBlendStateUtil {
             applyBlendFunctions(state.isBlendEnabled(), state, record, caps);
 
             applyTest(state.isTestEnabled(), state, record);
+
+            if (caps.isMultisampleSupported()) {
+                applyAlphaCoverage(state.isSampleAlphaToCoverageEnabled(), state.isSampleAlphaToOneEnabled(), record,
+                        caps);
+                applySampleCoverage(state.isSampleCoverageEnabled(), state, record, caps);
+            }
         } else {
             // disable blend
             applyBlendEquations(false, state, record, caps);
 
             // disable alpha test
             applyTest(false, state, record);
+
+            // disable sample coverage
+            if (caps.isMultisampleSupported()) {
+                applyAlphaCoverage(false, false, record, caps);
+                applySampleCoverage(false, state, record, caps);
+            }
         }
 
         if (!record.isValid()) {
@@ -165,6 +178,78 @@ public abstract class LwjglBlendStateUtil {
                     record.srcFactorRGB = glSrcRGB;
                     record.dstFactorRGB = glDstRGB;
                 }
+            }
+        }
+    }
+
+    protected static void applyAlphaCoverage(final boolean sampleAlphaToCoverageEnabled,
+            final boolean sampleAlphaToOneEnabled, final BlendStateRecord record, final ContextCapabilities caps) {
+        if (record.isValid()) {
+            if (sampleAlphaToCoverageEnabled != record.sampleAlphaToCoverageEnabled) {
+                if (sampleAlphaToCoverageEnabled) {
+                    GL11.glEnable(ARBMultisample.GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+                } else {
+                    GL11.glDisable(ARBMultisample.GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+                }
+                record.sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+            }
+            if (sampleAlphaToOneEnabled != record.sampleAlphaToOneEnabled) {
+                if (sampleAlphaToOneEnabled) {
+                    GL11.glEnable(ARBMultisample.GL_SAMPLE_ALPHA_TO_ONE_ARB);
+                } else {
+                    GL11.glDisable(ARBMultisample.GL_SAMPLE_ALPHA_TO_ONE_ARB);
+                }
+                record.sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+            }
+        } else {
+            if (sampleAlphaToCoverageEnabled) {
+                GL11.glEnable(ARBMultisample.GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+            } else {
+                GL11.glDisable(ARBMultisample.GL_SAMPLE_ALPHA_TO_COVERAGE_ARB);
+            }
+            record.sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+            if (sampleAlphaToOneEnabled) {
+                GL11.glEnable(ARBMultisample.GL_SAMPLE_ALPHA_TO_ONE_ARB);
+            } else {
+                GL11.glDisable(ARBMultisample.GL_SAMPLE_ALPHA_TO_ONE_ARB);
+            }
+            record.sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+        }
+    }
+
+    protected static void applySampleCoverage(final boolean enabled, final BlendState state,
+            final BlendStateRecord record, final ContextCapabilities caps) {
+
+        final boolean coverageInverted = state.isSampleCoverageInverted();
+        final float coverageValue = state.getSampleCoverage();
+
+        if (record.isValid()) {
+            if (enabled) {
+                if (!record.sampleCoverageEnabled) {
+                    GL11.glEnable(ARBMultisample.GL_SAMPLE_COVERAGE_ARB);
+                    record.sampleCoverageEnabled = true;
+                }
+                if (record.sampleCoverageInverted != coverageInverted || record.sampleCoverage != coverageValue) {
+                    ARBMultisample.glSampleCoverageARB(coverageValue, coverageInverted);
+                    record.sampleCoverageInverted = coverageInverted;
+                    record.sampleCoverage = coverageValue;
+                }
+            } else {
+                if (record.sampleCoverageEnabled) {
+                    GL11.glDisable(ARBMultisample.GL_SAMPLE_COVERAGE_ARB);
+                    record.sampleCoverageEnabled = false;
+                }
+            }
+        } else {
+            if (enabled) {
+                GL11.glEnable(ARBMultisample.GL_SAMPLE_COVERAGE_ARB);
+                record.sampleCoverageEnabled = true;
+                ARBMultisample.glSampleCoverageARB(coverageValue, coverageInverted);
+                record.sampleCoverageInverted = coverageInverted;
+                record.sampleCoverage = coverageValue;
+            } else {
+                GL11.glDisable(ARBMultisample.GL_SAMPLE_COVERAGE_ARB);
+                record.sampleCoverageEnabled = false;
             }
         }
     }

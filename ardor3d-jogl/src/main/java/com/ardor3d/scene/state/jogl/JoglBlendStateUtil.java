@@ -34,18 +34,32 @@ public abstract class JoglBlendStateUtil {
         final ContextCapabilities caps = context.getCapabilities();
         context.setCurrentState(StateType.Blend, state);
 
-        if (state.isEnabled()) {
-            applyBlendEquations(state.isBlendEnabled(), state, record, caps);
-            applyBlendColor(state.isBlendEnabled(), state, record, caps);
-            applyBlendFunctions(state.isBlendEnabled(), state, record, caps);
+        final GL gl = GLU.getCurrentGL();
 
-            applyTest(state.isTestEnabled(), state, record);
+        if (state.isEnabled()) {
+            applyBlendEquations(gl, state.isBlendEnabled(), state, record, caps);
+            applyBlendColor(gl, state.isBlendEnabled(), state, record, caps);
+            applyBlendFunctions(gl, state.isBlendEnabled(), state, record, caps);
+
+            applyTest(gl, state.isTestEnabled(), state, record);
+
+            if (caps.isMultisampleSupported()) {
+                applyAlphaCoverage(gl, state.isSampleAlphaToCoverageEnabled(), state.isSampleAlphaToOneEnabled(),
+                        record, caps);
+                applySampleCoverage(gl, state.isSampleCoverageEnabled(), state, record, caps);
+            }
         } else {
             // disable blend
-            applyBlendEquations(false, state, record, caps);
+            applyBlendEquations(gl, false, state, record, caps);
 
             // disable alpha test
-            applyTest(false, state, record);
+            applyTest(gl, false, state, record);
+
+            // disable sample coverage
+            if (caps.isMultisampleSupported()) {
+                applyAlphaCoverage(gl, false, false, record, caps);
+                applySampleCoverage(gl, false, state, record, caps);
+            }
         }
 
         if (!record.isValid()) {
@@ -53,10 +67,8 @@ public abstract class JoglBlendStateUtil {
         }
     }
 
-    private static void applyBlendEquations(final boolean enabled, final BlendState state,
+    private static void applyBlendEquations(final GL gl, final boolean enabled, final BlendState state,
             final BlendStateRecord record, final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
-
         if (record.isValid()) {
             if (enabled) {
                 if (!record.blendEnabled) {
@@ -103,10 +115,8 @@ public abstract class JoglBlendStateUtil {
         }
     }
 
-    private static void applyBlendColor(final boolean enabled, final BlendState state, final BlendStateRecord record,
-            final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
-
+    private static void applyBlendColor(final GL gl, final boolean enabled, final BlendState state,
+            final BlendStateRecord record, final ContextCapabilities caps) {
         if (enabled) {
             final boolean applyConstant = state.getDestinationFunctionRGB().usesConstantColor()
                     || state.getSourceFunctionRGB().usesConstantColor()
@@ -122,10 +132,8 @@ public abstract class JoglBlendStateUtil {
         }
     }
 
-    private static void applyBlendFunctions(final boolean enabled, final BlendState state,
+    private static void applyBlendFunctions(final GL gl, final boolean enabled, final BlendState state,
             final BlendStateRecord record, final ContextCapabilities caps) {
-        final GL gl = GLU.getCurrentGL();
-
         if (record.isValid()) {
             if (enabled) {
                 final int glSrcRGB = getGLSrcValue(state.getSourceFunctionRGB(), caps);
@@ -164,6 +172,78 @@ public abstract class JoglBlendStateUtil {
                     record.srcFactorRGB = glSrcRGB;
                     record.dstFactorRGB = glDstRGB;
                 }
+            }
+        }
+    }
+
+    protected static void applyAlphaCoverage(final GL gl, final boolean sampleAlphaToCoverageEnabled,
+            final boolean sampleAlphaToOneEnabled, final BlendStateRecord record, final ContextCapabilities caps) {
+        if (record.isValid()) {
+            if (sampleAlphaToCoverageEnabled != record.sampleAlphaToCoverageEnabled) {
+                if (sampleAlphaToCoverageEnabled) {
+                    gl.glEnable(GL.GL_SAMPLE_ALPHA_TO_COVERAGE);
+                } else {
+                    gl.glDisable(GL.GL_SAMPLE_ALPHA_TO_COVERAGE);
+                }
+                record.sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+            }
+            if (sampleAlphaToOneEnabled != record.sampleAlphaToOneEnabled) {
+                if (sampleAlphaToOneEnabled) {
+                    gl.glEnable(GL.GL_SAMPLE_ALPHA_TO_ONE);
+                } else {
+                    gl.glDisable(GL.GL_SAMPLE_ALPHA_TO_ONE);
+                }
+                record.sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+            }
+        } else {
+            if (sampleAlphaToCoverageEnabled) {
+                gl.glEnable(GL.GL_SAMPLE_ALPHA_TO_COVERAGE);
+            } else {
+                gl.glDisable(GL.GL_SAMPLE_ALPHA_TO_COVERAGE);
+            }
+            record.sampleAlphaToCoverageEnabled = sampleAlphaToCoverageEnabled;
+            if (sampleAlphaToOneEnabled) {
+                gl.glEnable(GL.GL_SAMPLE_ALPHA_TO_ONE);
+            } else {
+                gl.glDisable(GL.GL_SAMPLE_ALPHA_TO_ONE);
+            }
+            record.sampleAlphaToOneEnabled = sampleAlphaToOneEnabled;
+        }
+    }
+
+    protected static void applySampleCoverage(final GL gl, final boolean enabled, final BlendState state,
+            final BlendStateRecord record, final ContextCapabilities caps) {
+
+        final boolean coverageInverted = state.isSampleCoverageInverted();
+        final float coverageValue = state.getSampleCoverage();
+
+        if (record.isValid()) {
+            if (enabled) {
+                if (!record.sampleCoverageEnabled) {
+                    gl.glEnable(GL.GL_SAMPLE_COVERAGE);
+                    record.sampleCoverageEnabled = true;
+                }
+                if (record.sampleCoverageInverted != coverageInverted || record.sampleCoverage != coverageValue) {
+                    gl.glSampleCoverage(coverageValue, coverageInverted);
+                    record.sampleCoverageInverted = coverageInverted;
+                    record.sampleCoverage = coverageValue;
+                }
+            } else {
+                if (record.sampleCoverageEnabled) {
+                    gl.glDisable(GL.GL_SAMPLE_COVERAGE);
+                    record.sampleCoverageEnabled = false;
+                }
+            }
+        } else {
+            if (enabled) {
+                gl.glEnable(GL.GL_SAMPLE_COVERAGE);
+                record.sampleCoverageEnabled = true;
+                gl.glSampleCoverage(coverageValue, coverageInverted);
+                record.sampleCoverageInverted = coverageInverted;
+                record.sampleCoverage = coverageValue;
+            } else {
+                gl.glDisable(GL.GL_SAMPLE_COVERAGE);
+                record.sampleCoverageEnabled = false;
             }
         }
     }
@@ -283,9 +363,8 @@ public abstract class JoglBlendStateUtil {
         throw new IllegalArgumentException("Invalid blend equation: " + eq);
     }
 
-    private static void applyTest(final boolean enabled, final BlendState state, final BlendStateRecord record) {
-        final GL gl = GLU.getCurrentGL();
-
+    private static void applyTest(final GL gl, final boolean enabled, final BlendState state,
+            final BlendStateRecord record) {
         if (record.isValid()) {
             if (enabled) {
                 if (!record.testEnabled) {
