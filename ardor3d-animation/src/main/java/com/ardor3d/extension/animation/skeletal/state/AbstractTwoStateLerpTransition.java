@@ -82,6 +82,9 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
      *            sets the start state. Updates the state's owner to point to this transition.
      */
     public void setStateA(final AbstractFiniteState stateA) {
+        if (stateA == this) {
+            throw new IllegalArgumentException("Can not set state A to self.");
+        }
         _stateA = stateA;
         if (_stateA != null) {
             _stateA.setLastStateOwner(this);
@@ -97,6 +100,9 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
      *            sets the end state. Updates the state's owner to point to this transition.
      */
     public void setStateB(final AbstractFiniteState stateB) {
+        if (stateB == this) {
+            throw new IllegalArgumentException("Can not set state B to self.");
+        }
         _stateB = stateB;
         if (_stateB != null) {
             _stateB.setLastStateOwner(this);

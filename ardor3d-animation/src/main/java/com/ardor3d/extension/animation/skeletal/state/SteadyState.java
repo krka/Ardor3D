@@ -114,16 +114,17 @@ public class SteadyState extends AbstractFiniteState {
     @Override
     public void update(final double globalTime, final AnimationLayer layer) {
         if (!getSourceTree().setTime(globalTime, layer.getManager())) {
+            final StateOwner lastOwner = getLastStateOwner();
             if (_endTransition != null) {
                 // time to move to end transition
                 final AbstractFiniteState newState = _endTransition.doTransition(null, layer);
                 newState.resetClips(layer.getManager());
                 if (this != newState) {
-                    getLastStateOwner().replaceState(this, newState);
+                    lastOwner.replaceState(this, newState);
                 }
             } else {
                 // we're done. end.
-                getLastStateOwner().replaceState(this, null);
+                lastOwner.replaceState(this, null);
             }
         }
     }
