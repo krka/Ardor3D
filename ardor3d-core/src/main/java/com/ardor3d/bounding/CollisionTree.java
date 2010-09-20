@@ -333,13 +333,13 @@ public class CollisionTree implements Serializable {
             storeA = dataA.getPrimitive(_primitiveIndices[i], _section, storeA);
             // to world space
             for (int t = 0; t < storeA.length; t++) {
-                transformA.applyForward(storeA[i]);
+                transformA.applyForward(storeA[t]);
             }
             for (int j = collisionTree._start; j < collisionTree._end; j++) {
                 storeB = dataB.getPrimitive(collisionTree._primitiveIndices[j], collisionTree._section, storeB);
                 // to world space
                 for (int t = 0; t < storeB.length; t++) {
-                    transformB.applyForward(storeB[i]);
+                    transformB.applyForward(storeB[t]);
                 }
                 if (Intersection.intersection(storeA, storeB)) {
                     return true;
