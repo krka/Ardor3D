@@ -33,11 +33,11 @@ public class SyncFadeTransitionState extends FadeTransitionState {
     }
 
     @Override
-    public AbstractFiniteState getTransitionState(final String key, final AnimationLayer layer) {
+    public AbstractFiniteState getTransitionState(final SteadyState callingState, final AnimationLayer layer) {
         // grab current time as our start
         setStart(layer.getManager().getCurrentGlobalTime());
         // set "current" start state
-        setStateA(layer.getCurrentState());
+        setStateA(callingState);
         // set "target" end state
         setStateB(layer.getSteadyState(getTargetState()));
         // grab current state's start time and set on end state

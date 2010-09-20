@@ -119,8 +119,10 @@ public class AnimationLayer implements StateOwner {
      * @return true if there is a current state and we were able to do the given transition.
      */
     public boolean doTransition(final String key) {
-        if (getCurrentState() instanceof SteadyState) {
-            final AbstractFiniteState nextState = getCurrentState().doTransition(key, this);
+        final AbstractFiniteState state = getCurrentState();
+        if (state instanceof SteadyState) {
+            final SteadyState steadyState = (SteadyState) state;
+            final AbstractFiniteState nextState = steadyState.doTransition(key, this);
             if (nextState != null) {
                 setCurrentState(nextState, false);
                 return true;

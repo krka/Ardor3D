@@ -85,11 +85,20 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
         return _endWindow;
     }
 
-    @Override
-    public final AbstractFiniteState doTransition(final String key, final AnimationLayer layer) {
+    /**
+     * Request that this state perform a transition to another.
+     * 
+     * @param callingState
+     *            the state calling for this transition.
+     * @param layer
+     *            the layer our state belongs to.
+     * @return the new state to transition to. May be null if the transition was not possible or was ignored for some
+     *         reason.
+     */
+    public final AbstractFiniteState doTransition(final SteadyState callingState, final AnimationLayer layer) {
         final double time = layer.getManager().getCurrentGlobalTime() - layer.getCurrentState().getGlobalStartTime();
         if (isInTimeWindow(time)) {
-            return getTransitionState(key, layer);
+            return getTransitionState(callingState, layer);
         } else {
             return null;
         }
@@ -126,11 +135,11 @@ public abstract class AbstractTransitionState extends AbstractFiniteState {
     /**
      * Do the transition logic for this transition state.
      * 
-     * @param key
-     *            the key used to transition. Generally ignored.
+     * @param callingState
+     *            the state calling for this transition.
      * @param layer
      *            the layer our state belongs to.
      * @return the state to transition to. Often ourselves.
      */
-    abstract AbstractFiniteState getTransitionState(String key, AnimationLayer layer);
+    abstract AbstractFiniteState getTransitionState(SteadyState callingState, AnimationLayer layer);
 }

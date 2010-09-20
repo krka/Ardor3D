@@ -32,7 +32,7 @@ public class ImmediateTransitionState extends AbstractTransitionState {
     }
 
     @Override
-    public AbstractFiniteState getTransitionState(final String key, final AnimationLayer layer) {
+    public AbstractFiniteState getTransitionState(final SteadyState callingState, final AnimationLayer layer) {
         // Pull our state from the layer
         final AbstractFiniteState state = layer.getSteadyState(getTargetState());
         // Reset to start

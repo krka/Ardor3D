@@ -37,11 +37,11 @@ public class FrozenTransitionState extends AbstractTwoStateLerpTransition {
     }
 
     @Override
-    public AbstractFiniteState getTransitionState(final String key, final AnimationLayer layer) {
+    public AbstractFiniteState getTransitionState(final SteadyState callingState, final AnimationLayer layer) {
         // grab current time as our start
         setStart(layer.getManager().getCurrentGlobalTime());
         // set "frozen" start state
-        setStateA(layer.getCurrentState());
+        setStateA(callingState);
         // set "target" end state
         setStateB(layer.getSteadyState(getTargetState()));
         // restart end state.

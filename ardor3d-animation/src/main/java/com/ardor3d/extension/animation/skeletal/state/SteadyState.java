@@ -102,11 +102,20 @@ public class SteadyState extends AbstractFiniteState {
         _transitions.put(keyword, state);
     }
 
-    @Override
+    /**
+     * Request that this state transition to another.
+     * 
+     * @param key
+     *            a key to match against a map of possible transitions.
+     * @param layer
+     *            the layer our state belongs to.
+     * @return the new state to transition to. May be null if the transition was not possible or was ignored for some
+     *         reason.
+     */
     public AbstractFiniteState doTransition(final String key, final AnimationLayer layer) {
         if (_transitions.containsKey(key)) {
             final AbstractTransitionState state = _transitions.get(key);
-            return state.doTransition(key, layer);
+            return state.doTransition(this, layer);
         }
         return null;
     }
@@ -117,7 +126,7 @@ public class SteadyState extends AbstractFiniteState {
             final StateOwner lastOwner = getLastStateOwner();
             if (_endTransition != null) {
                 // time to move to end transition
-                final AbstractFiniteState newState = _endTransition.doTransition(null, layer);
+                final AbstractFiniteState newState = _endTransition.doTransition(this, layer);
                 newState.resetClips(layer.getManager());
                 if (this != newState) {
                     lastOwner.replaceState(this, newState);

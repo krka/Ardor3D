@@ -54,19 +54,6 @@ public abstract class AbstractFiniteState {
     }
 
     /**
-     * Request that this state transition to another.
-     * 
-     * @param key
-     *            a key to match against a map of possible transitions. For states that are themselves transitions, this
-     *            may be null or ignored.
-     * @param layer
-     *            the layer our state belongs to.
-     * @return the new state to transition to. May be null if the transition was not possible or was ignored for some
-     *         reason.
-     */
-    public abstract AbstractFiniteState doTransition(String key, AnimationLayer layer);
-
-    /**
      * Update this state using the current global time.
      * 
      * @param globalTime
