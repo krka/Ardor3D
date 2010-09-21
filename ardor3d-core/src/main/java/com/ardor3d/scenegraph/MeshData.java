@@ -1140,13 +1140,13 @@ public class MeshData implements Savable {
      *            the object representing the OpenGL context a vbo belongs to. See
      *            {@link RenderContext#getGlContextRep()}
      * @param vboId
-     *            the vbo id of a vbo. To be valid, this must be greater than 0.
+     *            the vbo id of a vbo. To be valid, this must be != 0.
      * @throws IllegalArgumentException
-     *             if vboId is less than or equal to 0.
+     *             if vboId is equal to 0.
      */
     public void setVBOInterleavedID(final Object glContext, final int vboId) {
-        if (vboId <= 0) {
-            throw new IllegalArgumentException("vboId must be > 0");
+        if (vboId == 0) {
+            throw new IllegalArgumentException("vboId must != 0");
         }
 
         if (_vboIdCache == null) {

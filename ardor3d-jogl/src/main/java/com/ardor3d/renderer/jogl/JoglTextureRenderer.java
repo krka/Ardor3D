@@ -387,7 +387,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
         final GL gl = GLU.getCurrentGL();
 
         // Lazy init
-        if (_fboID <= 0) {
+        if (_fboID == 0) {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
 
             // Create our texture binding FBO
@@ -500,14 +500,14 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     public void cleanup() {
         final GL gl = GLU.getCurrentGL();
 
-        if (_fboID > 0) {
+        if (_fboID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_fboID);
             id.rewind();
             gl.glDeleteFramebuffersEXT(id.limit(), id);
         }
 
-        if (_depthRBID > 0) {
+        if (_depthRBID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_depthRBID);
             id.rewind();

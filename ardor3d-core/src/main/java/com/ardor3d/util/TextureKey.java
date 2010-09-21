@@ -282,13 +282,13 @@ final public class TextureKey implements Savable {
      *            the object representing the OpenGL context a texture belongs to. See
      *            {@link RenderContext#getGlContextRep()}
      * @param textureId
-     *            the texture id of a texture. To be valid, this must be greater than 0.
+     *            the texture id of a texture. To be valid, this must not be 0.
      * @throws IllegalArgumentException
-     *             if textureId is less than or equal to 0.
+     *             if textureId is equal to 0.
      */
     public void setTextureIdForContext(final Object glContext, final int textureId) {
-        if (textureId <= 0) {
-            throw new IllegalArgumentException("textureId must be > 0");
+        if (textureId == 0) {
+            throw new IllegalArgumentException("textureId must != 0");
         }
 
         _idCache.put(glContext, textureId);

@@ -372,7 +372,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     @Override
     protected void activate() {
         // Lazy init
-        if (_fboID <= 0) {
+        if (_fboID == 0) {
             final IntBuffer buffer = BufferUtils.createIntBuffer(1);
 
             // Create our texture binding FBO
@@ -487,14 +487,14 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     public void cleanup() {
-        if (_fboID > 0) {
+        if (_fboID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_fboID);
             id.rewind();
             EXTFramebufferObject.glDeleteFramebuffersEXT(id);
         }
 
-        if (_depthRBID > 0) {
+        if (_depthRBID != 0) {
             final IntBuffer id = BufferUtils.createIntBuffer(1);
             id.put(_depthRBID);
             id.rewind();

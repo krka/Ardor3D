@@ -1034,7 +1034,7 @@ public class LwjglRenderer extends AbstractRenderer {
             currLengthBytes = Math.round(interleaved.getBuffer().get());
         }
 
-        if (lengthBytes != currLengthBytes || interleaved.getVBOID(context.getGlContextRep()) <= 0
+        if (lengthBytes != currLengthBytes || interleaved.getVBOID(context.getGlContextRep()) == 0
                 || interleaved.isNeedsRefresh()) {
             initializeInterleavedVBO(context, interleaved, vertexCoords, normalCoords, colorCoords, textureCoords,
                     lengthBytes);
