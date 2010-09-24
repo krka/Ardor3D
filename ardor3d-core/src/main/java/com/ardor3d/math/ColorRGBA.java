@@ -937,4 +937,69 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
             COLOR_POOL.release(color);
         }
     }
+
+    /**
+     * Parses the given string for a color value. Currently we support hex notation - # followed by 1, 2, 3, 4, 6, or 8
+     * chars 0-9A-F.
+     * <ul>
+     * <li>chars: pattern - notes</li>
+     * <li>1: V - RGB is parsed as val/15, A=1</li>
+     * <li>2: VA - RGB is parsed as V/15, A as A/15</li>
+     * <li>3: RGB - RGB is parsed as R/15, G/15, B/15, A=1</li>
+     * <li>4: RGB - RGBA are parsed as R/15, G/15, B/15, A/15</li>
+     * <li>6: RRGGBB - RGB is parsed as RR/255, GG/255, BB/255, A=1</li>
+     * <li>8: RRGGBBAA - RGBA is parsed as RR/255, GG/255, BB/255, AA/255</li>
+     * </ul>
+     * 
+     * @param colorString
+     * @param store
+     * @return
+     */
+    public static ColorRGBA parseColor(final String colorString, final ColorRGBA store) {
+        System.err.println(colorString);
+        ColorRGBA rVal = store;
+        if (rVal == null) {
+            rVal = new ColorRGBA();
+        }
+
+        // XXX: should we parse words too? eg 'red'...
+        if (!colorString.startsWith("#")) {
+            throw new IllegalArgumentException("must start with #.");
+        }
+
+        float r = 1, g = 1, b = 1, a = 1;
+        final int length = colorString.length();
+        if (length == 2) {
+            r = Integer.parseInt(colorString.substring(1, 2), 16) / 15f;
+            g = b = r;
+            a = 1;
+        } else if (length == 3) {
+            r = Integer.parseInt(colorString.substring(1, 2), 16) / 15f;
+            g = b = r;
+            a = Integer.parseInt(colorString.substring(2, 3), 16) / 15f;
+        } else if (length == 4) {
+            r = Integer.parseInt(colorString.substring(1, 2), 16) / 15f;
+            g = Integer.parseInt(colorString.substring(2, 3), 16) / 15f;
+            b = Integer.parseInt(colorString.substring(3, 4), 16) / 15f;
+            a = 1;
+        } else if (length == 5) {
+            r = Integer.parseInt(colorString.substring(1, 2), 16) / 15f;
+            g = Integer.parseInt(colorString.substring(2, 3), 16) / 15f;
+            b = Integer.parseInt(colorString.substring(3, 4), 16) / 15f;
+            a = Integer.parseInt(colorString.substring(4, 5), 16) / 15f;
+        } else if (length == 7) {
+            r = Integer.parseInt(colorString.substring(1, 3), 16) / 255f;
+            g = Integer.parseInt(colorString.substring(3, 5), 16) / 255f;
+            b = Integer.parseInt(colorString.substring(5, 7), 16) / 255f;
+            a = 1;
+        } else if (length == 9) {
+            r = Integer.parseInt(colorString.substring(1, 3), 16) / 255f;
+            g = Integer.parseInt(colorString.substring(3, 5), 16) / 255f;
+            b = Integer.parseInt(colorString.substring(5, 7), 16) / 255f;
+            a = Integer.parseInt(colorString.substring(7, 9), 16) / 255f;
+        }
+        rVal.set(r, g, b, a);
+
+        return rVal;
+    }
 }
