@@ -17,8 +17,8 @@ import java.util.Set;
 import com.ardor3d.annotation.Immutable;
 
 /**
- * A keyboard state at some point in time. Contains an EnumSet of the keys that are down, as well
- * as a KeyEvent that describes the latest event (a key being pressed or released).
+ * A keyboard state at some point in time. Contains an EnumSet of the keys that are down, as well as a KeyEvent that
+ * describes the latest event (a key being pressed or released).
  */
 @Immutable
 public class KeyboardState {
@@ -28,7 +28,7 @@ public class KeyboardState {
     private final Set<Key> _keysDownView;
     private final KeyEvent _keyEvent;
 
-    public KeyboardState(final EnumSet<Key> keysDown, KeyEvent keyEvent) {
+    public KeyboardState(final EnumSet<Key> keysDown, final KeyEvent keyEvent) {
         // keeping the keysDown as an EnumSet rather than as an unmodifiableSet in order to get
         // the performance benefit of working with the fast implementations of contains(),
         // removeAll(), etc., in EnumSet. The intention is that the keysDown set should never change.
@@ -43,6 +43,24 @@ public class KeyboardState {
 
     public boolean isDown(final Key key) {
         return _keysDown.contains(key);
+    }
+
+    public boolean isAllDown(final Key... keys) {
+        for (final Key key : keys) {
+            if (!_keysDown.contains(key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isAtLeastOneDown(final Key... keys) {
+        for (final Key key : keys) {
+            if (_keysDown.contains(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Set<Key> getKeysDown() {
@@ -81,10 +99,7 @@ public class KeyboardState {
 
     @Override
     public String toString() {
-        return "KeyboardState{" +
-                "_keysDown=" + _keysDown +
-                ", _keyEvent=" + _keyEvent +
-                '}';
+        return "KeyboardState{_keysDown=" + _keysDown + ", _keyEvent=" + _keyEvent + '}';
     }
 
 }
