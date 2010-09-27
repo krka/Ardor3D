@@ -32,11 +32,13 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.lwjgl.LWJGLException;
 
 import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.FrameHandler;
+import com.ardor3d.framework.lwjgl.LwjglCanvasCallback;
 import com.ardor3d.framework.lwjgl.LwjglCanvasRenderer;
 import com.ardor3d.framework.swt.SwtCanvas;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -189,6 +191,7 @@ public class LwjglSwtExample {
 
         final SwtCanvas canvas1 = new SwtCanvas(topLeft, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer1 = new LwjglCanvasRenderer(scene);
+        addCallback(canvas1, lwjglCanvasRenderer1);
         canvas1.setCanvasRenderer(lwjglCanvasRenderer1);
         frameWork.addCanvas(canvas1);
         canvas1.addControlListener(newResizeHandler(canvas1, lwjglCanvasRenderer1));
@@ -196,18 +199,21 @@ public class LwjglSwtExample {
 
         final SwtCanvas canvas2 = new SwtCanvas(bottomLeft, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer2 = new LwjglCanvasRenderer(scene);
+        addCallback(canvas2, lwjglCanvasRenderer2);
         canvas2.setCanvasRenderer(lwjglCanvasRenderer2);
         frameWork.addCanvas(canvas2);
         canvas2.addControlListener(newResizeHandler(canvas2, lwjglCanvasRenderer2));
 
         final SwtCanvas canvas3 = new SwtCanvas(topRight, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer3 = new LwjglCanvasRenderer(scene);
+        addCallback(canvas3, lwjglCanvasRenderer3);
         canvas3.setCanvasRenderer(lwjglCanvasRenderer3);
         frameWork.addCanvas(canvas3);
         canvas3.addControlListener(newResizeHandler(canvas3, lwjglCanvasRenderer3));
 
         final SwtCanvas canvas4 = new SwtCanvas(bottomRight, SWT.NONE, data);
         final LwjglCanvasRenderer lwjglCanvasRenderer4 = new LwjglCanvasRenderer(scene);
+        addCallback(canvas4, lwjglCanvasRenderer4);
         canvas4.setCanvasRenderer(lwjglCanvasRenderer4);
         frameWork.addCanvas(canvas4);
         canvas4.addControlListener(newResizeHandler(canvas4, lwjglCanvasRenderer4));
@@ -266,6 +272,20 @@ public class LwjglSwtExample {
         }
 
         _showCursor1.put(canvas1, true);
+    }
+
+    private static void addCallback(final SwtCanvas canvas, final LwjglCanvasRenderer renderer) {
+        renderer.setCanvasCallback(new LwjglCanvasCallback() {
+            @Override
+            public void makeCurrent() throws LWJGLException {
+                canvas.setCurrent();
+            }
+
+            @Override
+            public void releaseContext() throws LWJGLException {
+                ; // do nothing?
+            }
+        });
     }
 
     private static MouseCursor createMouseCursor(final AWTImageLoader awtImageLoader, final String resourceName)
