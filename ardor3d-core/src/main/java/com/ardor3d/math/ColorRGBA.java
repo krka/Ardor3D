@@ -439,6 +439,34 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
     }
 
     /**
+     * @return this string as a hex value (#RRGGBBAA). e.g. opaque blue is #0000ffff
+     */
+    public String asHexRRGGBBAA() {
+        final StringBuilder sb = new StringBuilder("#");
+        final String red = Integer.toHexString(Math.round(MathUtils.clamp(getRed(), 0f, 1f) * 255));
+        final String green = Integer.toHexString(Math.round(MathUtils.clamp(getGreen(), 0f, 1f) * 255));
+        final String blue = Integer.toHexString(Math.round(MathUtils.clamp(getBlue(), 0f, 1f) * 255));
+        final String alpha = Integer.toHexString(Math.round(MathUtils.clamp(getAlpha(), 0f, 1f) * 255));
+        if (red.length() < 2) {
+            sb.append("0");
+        }
+        sb.append(red);
+        if (green.length() < 2) {
+            sb.append("0");
+        }
+        sb.append(green);
+        if (blue.length() < 2) {
+            sb.append("0");
+        }
+        sb.append(blue);
+        if (alpha.length() < 2) {
+            sb.append("0");
+        }
+        sb.append(alpha);
+        return sb.toString();
+    }
+
+    /**
      * Adds the given values to those of this color and returns them in store.
      * 
      * @param r
@@ -956,7 +984,6 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
      * @return
      */
     public static ColorRGBA parseColor(final String colorString, final ColorRGBA store) {
-        System.err.println(colorString);
         ColorRGBA rVal = store;
         if (rVal == null) {
             rVal = new ColorRGBA();

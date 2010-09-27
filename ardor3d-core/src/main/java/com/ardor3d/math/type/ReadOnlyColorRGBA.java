@@ -50,4 +50,6 @@ public interface ReadOnlyColorRGBA {
 
     ColorRGBA lerp(ReadOnlyColorRGBA endColor, float scalar, ColorRGBA store);
 
+    String asHexRRGGBBAA();
+
 }
