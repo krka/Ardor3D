@@ -19,4 +19,8 @@ public interface Textable {
 
     public String getText();
 
+    public boolean isStyledText();
+
+    public void setStyledText(boolean value);
+
 }

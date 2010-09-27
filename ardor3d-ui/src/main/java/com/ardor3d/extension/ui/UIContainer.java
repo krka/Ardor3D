@@ -517,6 +517,20 @@ public abstract class UIContainer extends UIComponent {
         setDirty(true);
     }
 
+    @Override
+    public void fireStyleChanged() {
+        super.fireStyleChanged();
+        Spatial child;
+        for (int i = 0, cSize = getNumberOfChildren(); i < cSize; i++) {
+            child = getChild(i);
+            if (child != null) {
+                if (child instanceof UIComponent) {
+                    ((UIComponent) child).fireStyleChanged();
+                }
+            }
+        }
+    }
+
     /**
      * Release our standin and cached texture for gc. If needed again, they will be created from scratch.
      */

@@ -101,7 +101,7 @@ public enum Alignment {
      *            the height of the component or area we are setting position on.
      * @return the new Y position to use.
      */
-    public int alignY(final int availableHeight, final int height) {
-        return (int) (fromBottom() * availableHeight - fromBottom() * height);
+    public double alignY(final double availableHeight, final double height) {
+        return fromBottom() * availableHeight - fromBottom() * height;
     }
 }

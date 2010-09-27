@@ -303,13 +303,30 @@ public class UIButton extends AbstractLabelUIComponent {
      */
     public void setButtonText(final String text) {
         super.setText(text);
-        getDefaultState().setText(text);
-        getDisabledState().setText(text);
-        getDisabledSelectedState().setText(text);
-        getMouseOverState().setText(text);
-        getMouseOverSelectedState().setText(text);
-        getPressedState().setText(text);
-        getSelectedState().setText(text);
+        for (final UIState state : getStates()) {
+            if (state instanceof LabelState) {
+                ((LabelState) state).setText(text);
+            }
+        }
+    }
+
+    /**
+     * Sets the text on this button and all contained states.
+     * 
+     * @param text
+     *            the new text
+     * @param isStyled
+     *            if true, the text may contain style markup.
+     */
+    public void setButtonText(final String text, final boolean isStyled) {
+        super.setStyledText(isStyled);
+        super.setText(text);
+        for (final UIState state : getStates()) {
+            if (state instanceof LabelState) {
+                ((LabelState) state).setText(text);
+                ((LabelState) state).setStyledText(isStyled);
+            }
+        }
     }
 
     /**

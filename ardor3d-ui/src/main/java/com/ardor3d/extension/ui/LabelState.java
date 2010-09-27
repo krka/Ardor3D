@@ -17,18 +17,20 @@ import com.ardor3d.extension.ui.util.SubTex;
 /**
  * A state useful for maintaining and setting label properties such as text, icon, gap, and alignment.
  */
-public class LabelState extends UIState implements Textable {
+public class LabelState extends UIState {
 
     /** Text to set on component, or null if to leave unchanged. */
-    private String _text = null;
+    protected String _text = null;
     /** Icon to set on component, or null if to leave unchanged. */
-    private SubTex _icon = null;
+    protected SubTex _icon = null;
     /** Icon size to set on component, or null if to leave unchanged. */
-    private Dimension _iconDimensions = null;
+    protected Dimension _iconDimensions = null;
     /** Alignment to set on component, or null if to leave unchanged. */
-    private Alignment _alignment = null;
+    protected Alignment _alignment = null;
     /** Gap to set on component, or null if to leave unchanged. */
-    private int _gap = -1;
+    protected Integer _gap = null;
+    /** If true, our text could be marked up with style information - null to leave unchanged. */
+    protected Boolean _styled = null;
 
     @Override
     public void setupAppearance(final UIComponent component) {
@@ -46,7 +48,7 @@ public class LabelState extends UIState implements Textable {
             if (_iconDimensions != null) {
                 labelComponent.setIconDimensions(_iconDimensions);
             }
-            if (_gap != -1) {
+            if (_gap != null) {
                 labelComponent.setGap(_gap);
             }
             if (_alignment != null) {
@@ -63,7 +65,7 @@ public class LabelState extends UIState implements Textable {
         _alignment = align;
     }
 
-    public int getGap() {
+    public Integer getGap() {
         return _gap;
     }
 
@@ -93,5 +95,13 @@ public class LabelState extends UIState implements Textable {
 
     public void setText(final String text) {
         _text = text;
+    }
+
+    public Boolean isStyledText() {
+        return _styled;
+    }
+
+    public void setStyledText(final Boolean value) {
+        _styled = value;
     }
 }

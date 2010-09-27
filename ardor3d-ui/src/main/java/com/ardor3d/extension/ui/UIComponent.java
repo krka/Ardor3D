@@ -10,9 +10,9 @@
 
 package com.ardor3d.extension.ui;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Logger;
 
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
 import com.ardor3d.extension.ui.backdrop.UIBackdrop;
@@ -20,6 +20,8 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
 import com.ardor3d.extension.ui.layout.UILayoutData;
 import com.ardor3d.extension.ui.skin.SkinManager;
+import com.ardor3d.extension.ui.text.StyleConstants;
+import com.ardor3d.extension.ui.text.UIKeyHandler;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.input.InputState;
@@ -44,17 +46,14 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.scenegraph.hint.PickingHint;
-import com.ardor3d.ui.text.BMFont;
-import com.ardor3d.ui.text.BasicText;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.URLResourceSource;
+import com.google.common.collect.Maps;
 
 /**
  * Base UI class. All UI components/widgets/controls extend this class.
+ * 
+ * TODO: alert/dirty needed for font style changes.
  */
-public abstract class UIComponent extends Node {
-    private static Logger logger = Logger.getLogger(UIComponent.class.getName());
-
+public abstract class UIComponent extends Node implements UIKeyHandler {
     /** If true, use opacity settings to blend the components. Default is false. */
     private static boolean _useTransparency = false;
 
@@ -87,10 +86,16 @@ public abstract class UIComponent extends Node {
     /** The amount of time (in ms) before we should show the tooltip on this component. */
     private int _tooltipPopTime = 1000;
 
-    /** A default font used when font field and all parents font fields are null. */
-    private static BMFont _defaultFont = null;
-    /** The font to use for text on this component, if needed. Inherited from parent if null. */
-    private BMFont _font = null;
+    /** The default font family (Vera) used when font family field and all parents font fields are null. */
+    private static String _defaultFontFamily = "Vera";
+
+    /** The default font size (18) used when font size field and all parents font size fields are 0. */
+    private static int _defaultFontSize = 18;
+
+    /** The default font styles to use. */
+    private static Map<String, Object> _defaultFontStyles = Maps.newHashMap();
+    /** The font styles to use for text on this component, if needed. */
+    private Map<String, Object> _fontStyles = Maps.newHashMap();
 
     /** Optional information used by a parent container's layout. */
     private UILayoutData _layoutData = null;
@@ -187,30 +192,70 @@ public abstract class UIComponent extends Node {
     }
 
     /**
+     * Add a new font style to this component. Will be inherited by children if they do not have the same key.
      * 
-     * @return our font if one is set. Otherwise we will continue up the scenegraph until we find a font. If no font is
-     *         found, the default font is used.
-     * @see #getDefaultFont()
+     * @param styleKey
+     *            style key
+     * @param styleValue
+     *            the value to associate with the key.
      */
-    public BMFont getFont() {
-        BMFont font = _font;
-        if (font == null) {
-            if (getParent() != null && getParent() instanceof UIComponent) {
-                font = ((UIComponent) getParent()).getFont();
-            } else {
-                font = UIComponent.getDefaultFont();
-            }
-        }
-        return font;
+    public void addFontStyle(final String styleKey, final Object styleValue) {
+        _fontStyles.put(styleKey, styleValue);
+        fireStyleChanged();
     }
 
     /**
-     * @param font
-     *            the font to use (as needed) for this component. Note that this can be inherited by child components if
-     *            this is a container class.
+     * Removes a font style locally from this component, if present.
+     * 
+     * @param styleKey
+     *            style key
+     * @return the style value we were mapped to, or null if none (or was mapped to null).
      */
-    public void setFont(final BMFont font) {
-        _font = font;
+    public Object clearFontStyle(final String styleKey) {
+        final Object removedValue = _fontStyles.remove(styleKey);
+        fireStyleChanged();
+        return removedValue;
+    }
+
+    /**
+     * @return the locally set font styles.
+     */
+    public Map<String, Object> getLocalFontStyles() {
+        return _fontStyles;
+    }
+
+    /**
+     * @return our combined font styles, merged downward from root, including defaults.
+     */
+    public Map<String, Object> getFontStyles() {
+        final Map<String, Object> styles;
+        if (getParent() != null && getParent() instanceof UIComponent) {
+            styles = ((UIComponent) getParent()).getFontStyles();
+        } else {
+            styles = Maps.newHashMap(UIComponent._defaultFontStyles);
+            styles.put(StyleConstants.KEY_COLOR, UIComponent.DEFAULT_FOREGROUND_COLOR);
+        }
+        styles.putAll(_fontStyles);
+
+        if (_foregroundColor != null) {
+            styles.put(StyleConstants.KEY_COLOR, _foregroundColor);
+        }
+        return styles;
+    }
+
+    /**
+     * @param styles
+     *            the font styles to use (as needed) for this component. Note that this can be inherited by child
+     *            components if this is a container class and styles is null.
+     */
+    public void setFontStyles(final Map<String, Object> styles) {
+        if (styles == null) {
+            _fontStyles = null;
+        } else {
+            _fontStyles.clear();
+            _fontStyles.putAll(styles);
+        }
+        fireStyleChanged();
     }
 
     /**
@@ -892,6 +937,7 @@ public abstract class UIComponent extends Node {
         } else {
             _foregroundColor.set(color);
         }
+        fireStyleChanged();
         fireComponentDirty();
     }
 
@@ -1079,25 +1125,51 @@ public abstract class UIComponent extends Node {
 
     /**
      * @param defaultFont
-     *            the BMFont to use as "default" across all UI components that do not have one set.
+     *            the Font to use as "default" across all UI components that do not have one set.
      */
-    public static void setDefaultFont(final BMFont defaultFont) {
-        UIComponent._defaultFont = defaultFont;
+    public static void setDefaultFontFamily(final String family) {
+        UIComponent._defaultFontFamily = family;
     }
 
     /**
-     * @return the defaultFont. Uses Ardor's default font (arial-24-bold-regular.fnt) if none is set.
+     * @return the default Font family. Defaults to "Vera".
      */
-    public static BMFont getDefaultFont() {
-        if (UIComponent._defaultFont == null) {
-            try {
-                UIComponent._defaultFont = new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(
-                        UIComponent.class, "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), true);
-            } catch (final Exception ex) {
-                UIComponent.logger.throwing(BasicText.class.getCanonicalName(), "static font init", ex);
-            }
+    public static String getDefaultFontFamily() {
+        return UIComponent._defaultFontFamily;
+    }
+
+    /**
+     * @param size
+     *            the Font size to use as "default" across all UI components that do not have one set.
+     */
+    public static void setDefaultFontSize(final int size) {
+        UIComponent._defaultFontSize = size;
+    }
+
+    /**
+     * @return the default Font size (height). Defaults to 18.
+     */
+    public static int getDefaultFontSize() {
+        return UIComponent._defaultFontSize;
+    }
+
+    /**
+     * @param defaultStyles
+     *            the Font styles to use as "default" across all UI components that do not have one set.
+     */
+    public static void setDefaultFontStyles(final Map<String, Object> defaultStyles) {
+        if (defaultStyles == null) {
+            UIComponent._defaultFontStyles = Maps.newHashMap();
+        } else {
+            UIComponent._defaultFontStyles = Maps.newHashMap(defaultStyles);
         }
-        return UIComponent._defaultFont;
+    }
+
+    /**
+     * @return the default Font styles.
+     */
+    public static Map<String, Object> getDefaultFontStyles() {
+        return UIComponent._defaultFontStyles;
     }
 
     /**
@@ -1173,6 +1245,11 @@ public abstract class UIComponent extends Node {
             ((UIComponent) getParent()).fireComponentDirty();
         }
     }
+
+    /**
+     * Let subcomponents know that style has been changed.
+     */
+    public void fireStyleChanged() {}
 
     /**
      * @return true if all components should use their opacity value to blend against other components (and/or the 3d

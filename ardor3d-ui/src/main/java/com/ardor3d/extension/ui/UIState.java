@@ -37,9 +37,6 @@ public class UIState extends UIComponent {
         if (getBorder() != null) {
             component.setBorder(getBorder());
         }
-        if (getFont() != null) {
-            component.setFont(getFont());
-        }
         if (getLocalForegroundColor() != null) {
             component.setForegroundColor(getLocalForegroundColor());
         }

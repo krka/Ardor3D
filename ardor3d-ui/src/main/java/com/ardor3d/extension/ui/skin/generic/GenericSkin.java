@@ -18,12 +18,15 @@ import com.ardor3d.extension.ui.UIFrameBar;
 import com.ardor3d.extension.ui.UIFrameStatusBar;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UISliderKnob;
 import com.ardor3d.extension.ui.UIState;
 import com.ardor3d.extension.ui.UITab;
+import com.ardor3d.extension.ui.UITextArea;
+import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.UITooltip;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.EmptyBackdrop;
@@ -559,6 +562,61 @@ public class GenericSkin extends Skin {
     protected void applyToLabel(final UILabel component) {
         component.getDefaultState().setForegroundColor(ColorRGBA.BLACK);
         component.getDisabledState().setForegroundColor(ColorRGBA.GRAY);
+    }
+
+    @Override
+    protected void applyToTextField(final UITextField component) {
+
+        final SolidBorder border = new SolidBorder(1, 1, 1, 1);
+        border.setLeftColor(ColorRGBA.GRAY);
+        border.setTopColor(ColorRGBA.GRAY);
+        border.setRightColor(ColorRGBA.LIGHT_GRAY);
+        border.setBottomColor(ColorRGBA.LIGHT_GRAY);
+
+        final SolidBackdrop backdrop = new SolidBackdrop(ColorRGBA.WHITE);
+
+        component.setPadding(new Insets(1, 1, 1, 1));
+
+        for (final UIState state : component.getStates()) {
+            state.setBorder(border);
+            state.setBackdrop(backdrop);
+            if (state.equals(component.getDisabledState())) {
+                state.setForegroundColor(ColorRGBA.GRAY);
+            } else {
+                state.setForegroundColor(ColorRGBA.BLACK);
+            }
+        }
+
+    }
+
+    @Override
+    protected void applyToPasswordField(final UIPasswordField component) {
+        applyToTextField(component);
+    }
+
+    @Override
+    protected void applyToTextArea(final UITextArea component) {
+
+        final SolidBorder border = new SolidBorder(1, 1, 1, 1);
+        border.setLeftColor(ColorRGBA.GRAY);
+        border.setTopColor(ColorRGBA.GRAY);
+        border.setRightColor(ColorRGBA.LIGHT_GRAY);
+        border.setBottomColor(ColorRGBA.LIGHT_GRAY);
+
+        final SolidBackdrop backdrop = new SolidBackdrop(ColorRGBA.WHITE);
+
+        component.setPadding(new Insets(1, 1, 1, 1));
+
+        for (final UIState state : component.getStates()) {
+            state.setBorder(border);
+            state.setBackdrop(backdrop);
+            if (state.equals(component.getDisabledState())) {
+                state.setForegroundColor(ColorRGBA.GRAY);
+            } else {
+                state.setForegroundColor(ColorRGBA.BLACK);
+            }
+        }
+
     }
 
     @Override

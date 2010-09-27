@@ -10,29 +10,15 @@
 
 package com.ardor3d.extension.ui;
 
+import com.ardor3d.extension.ui.text.RenderedText;
+import com.ardor3d.extension.ui.text.TextFactory;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.Dimension;
 import com.ardor3d.extension.ui.util.SubTex;
 import com.ardor3d.extension.ui.util.SubTexUtil;
-import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.MathUtils;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.queue.RenderBucketType;
-import com.ardor3d.renderer.state.BlendState;
-import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.renderer.state.BlendState.DestinationFunction;
-import com.ardor3d.renderer.state.BlendState.SourceFunction;
-import com.ardor3d.renderer.state.BlendState.TestFunction;
-import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.TextureCombineMode;
-import com.ardor3d.ui.text.BMFont;
-import com.ardor3d.ui.text.BMText;
-import com.ardor3d.ui.text.BMText.AutoFade;
-import com.ardor3d.ui.text.BMText.AutoScale;
 
 /**
  * A state component containing a text label and an icon. These are separated by an optional gap and can also be given a
@@ -53,7 +39,10 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
     private final Dimension _iconDimensions = new Dimension();
 
     /** The text object to use for drawing label text. */
-    private BMText _text;
+    private RenderedText _uiText;
+
+    /** If true, our text could be marked up with style information. */
+    protected boolean _styled = false;
 
     @Override
     public void updateMinimumSizeFromContents() {
@@ -62,8 +51,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         final String textVal = getText();
         if (textVal != null && textVal.length() > 0) {
-            width += Math.round(_text.getWidth());
-            height += Math.round(_text.getHeight());
+            width += Math.round(_uiText.getWidth());
+            height += Math.round(_uiText.getHeight());
         }
 
         if (_iconDimensions != null) {
@@ -89,7 +78,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
      * @return the currently set text value of this label.
      */
     public String getText() {
-        return _text != null ? _text.getText() : null;
+        return _uiText != null ? _uiText.getText() : null;
     }
 
     /**
@@ -104,39 +93,28 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
 
         if (text != null) {
-            if (text.equals(getText())) {
-                return;
-            }
-            if (_text != null) {
-                _text.setText(text);
-            } else {
-                _text = AbstractLabelUIComponent.createText(text, getFont());
-                _text.getSceneHints().setRenderBucketType(RenderBucketType.Skip);
-                _text.updateGeometricState(0);
-            }
+            _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, -1);
         } else {
-            _text = null;
+            _uiText = null;
         }
 
         updateMinimumSizeFromContents();
     }
 
-    @Override
-    protected void updateChildren(final double time) {
-        super.updateChildren(time);
-        if (_text != null) {
-            _text.updateGeometricState(time);
-        }
+    public boolean isStyledText() {
+        return _styled;
+    }
+
+    public void setStyledText(final boolean value) {
+        _styled = value;
     }
 
     @Override
-    public void setFont(final BMFont font) {
-        super.setFont(font);
-
-        // Reset our BMText object, using the new font.
-        final String text = getText();
-        _text = null;
-        setText(text);
+    protected void updateChildren(final double time) {
+        super.updateChildren(time);
+        if (_uiText != null) {
+            _uiText.updateGeometricState(time);
+        }
     }
 
     public Alignment getAlignment() {
@@ -209,6 +187,12 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
     }
 
     @Override
+    public void fireStyleChanged() {
+        super.fireStyleChanged();
+        setText(getText());
+    }
+
+    @Override
     protected void drawComponent(final Renderer renderer) {
 
         double x = 0;
@@ -228,7 +212,7 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
         }
 
         if (hasTextObject) {
-            width += Math.round(_text.getWidth());
+            width += Math.round(_uiText.getWidth());
         }
 
         // find left most x location of content (icon+text) based on alignment.
@@ -236,12 +220,13 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         if (_icon != null) {
             // find bottom most y location of icon based on alignment.
-            if (hasTextObject && _text.getHeight() > _iconDimensions.getHeight()) {
-                final int trailing = _text.getFont().getLineHeight() - _text.getFont().getBaseHeight();
-                y = _alignment.alignY(getContentHeight() - trailing, _iconDimensions.getHeight()) + trailing - 1;
-            } else {
-                y = _alignment.alignY(getContentHeight(), _iconDimensions.getHeight());
-            }
+            // TODO: recheck for proper vertical alignment with new text impl
+            // if (hasTextObject && _uiText.getHeight() > _iconDimensions.getHeight()) {
+            // final int trailing = _uiText.getFont().getLineHeight() - _uiText.getFont().getBaseHeight();
+            // y = _alignment.alignY(getContentHeight() - trailing, _iconDimensions.getHeight()) + trailing - 1;
+            // } else {
+            y = _alignment.alignY(getContentHeight(), _iconDimensions.getHeight());
+            // }
 
             final double dix = getTotalLeft();
             final double diy = getTotalBottom();
@@ -254,76 +239,27 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
         if (hasTextObject) {
             // find bottom most y location of text based on alignment.
-            y = _alignment.alignY(getContentHeight(), Math.round(_text.getHeight()));
+            y = _alignment.alignY(getContentHeight(), Math.round(_uiText.getHeight()));
 
             // set our text location
             final Vector3 v = Vector3.fetchTempInstance();
             v.set(x + getTotalLeft(), y + getTotalBottom(), 0);
 
             final Transform t = Transform.fetchTempInstance();
-            final Matrix3 m = Matrix3.fetchTempInstance();
             t.set(getWorldTransform());
             t.applyForwardVector(v);
-
-            // Add correction matrix to put text into XY plane.
-            t.getMatrix().multiply(AbstractLabelUIComponent.textCorrectionMat, m);
-            if (t.isRotationMatrix()) {
-                t.setRotation(m);
-            } else {
-                t.setMatrix(m);
-            }
             t.translate(v);
             Vector3.releaseTempInstance(v);
 
-            _text.setWorldTransform(t);
+            _uiText.setWorldTransform(t);
             Transform.releaseTempInstance(t);
 
-            // draw text using current foreground color and alpha.
-            final ColorRGBA color = ColorRGBA.fetchTempInstance();
-            color.set(getForegroundColor());
-            color.setAlpha(color.getAlpha() * UIComponent.getCurrentOpacity());
-            _text.setTextColor(color);
-            _text.render(renderer);
-            ColorRGBA.releaseTempInstance(color);
+            // TODO: alpha of text...
+            _uiText.render(renderer);
         }
     }
 
-    public BMText getTextObject() {
-        return _text;
-    }
-
-    static Matrix3 textCorrectionMat = new Matrix3().fromAngles(MathUtils.HALF_PI, 0, 0);
-
-    // Create an instance of BMText for text rendering.
-    private static BMText createText(final String text, final BMFont font) {
-        final BMText tComp = new BMText("", text, font);
-        tComp.setAutoFade(AutoFade.Off);
-        tComp.setAutoScale(AutoScale.Off);
-        tComp.setAutoRotate(false);
-        tComp.setFontScale(font.getSize());
-        tComp.setRotation(AbstractLabelUIComponent.textCorrectionMat);
-
-        final ZBufferState zState = new ZBufferState();
-        zState.setEnabled(false);
-        zState.setWritable(false);
-        tComp.setRenderState(zState);
-
-        final CullState cState = new CullState();
-        cState.setEnabled(false);
-        tComp.setRenderState(cState);
-
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        blend.setSourceFunction(SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(DestinationFunction.OneMinusSourceAlpha);
-        blend.setTestEnabled(true);
-        blend.setReference(0f);
-        blend.setTestFunction(TestFunction.GreaterThan);
-        tComp.setRenderState(blend);
-
-        tComp.getSceneHints().setLightCombineMode(LightCombineMode.Off);
-        tComp.getSceneHints().setTextureCombineMode(TextureCombineMode.Replace);
-        tComp.updateModelBound();
-        return tComp;
+    public RenderedText getTextObject() {
+        return _uiText;
     }
 }
