@@ -91,6 +91,7 @@ public class SwtCanvas extends GLCanvas implements Canvas {
 
             if (_canvasRenderer.draw()) {
                 swapBuffers();
+                _canvasRenderer.releaseCurrentContext();
             }
         }
 
