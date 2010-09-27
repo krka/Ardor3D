@@ -21,11 +21,14 @@ import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UIScrollPanel;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UITabbedPane;
+import com.ardor3d.extension.ui.UITextArea;
+import com.ardor3d.extension.ui.UITextField;
 import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
 import com.ardor3d.extension.ui.event.ActionEvent;
@@ -63,8 +66,7 @@ thumbnailPath = "com/ardor3d/example/media/thumbnails/ui_SimpleUIExample.jpg", /
 maxHeapMemory = 64)
 public class SimpleUIExample extends ExampleBase {
     UIHud hud;
-    UILabel fpslabel;
-    UIProgressBar bar;
+    private UIFrame frame;
 
     public static void main(final String[] args) {
         start(SimpleUIExample.class);
@@ -105,17 +107,20 @@ public class SimpleUIExample extends ExampleBase {
 
         final UIPanel panel2 = makeLoginPanel();
 
-        final UIPanel panel3 = makeClockPanel();
+        final UIPanel panel3 = makeChatPanel();
 
-        final UIPanel panel4 = makeScrollPanel();
+        final UIPanel panel4 = makeClockPanel();
+
+        final UIPanel panel5 = makeScrollPanel();
 
         final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
         pane.add(panel, "widgets");
         pane.add(panel2, "grid");
-        pane.add(panel3, "clock");
-        pane.add(panel4, "picture");
+        pane.add(panel3, "chat");
+        pane.add(panel4, "clock");
+        pane.add(panel5, "picture");
 
-        final UIFrame frame = new UIFrame("Sample");
+        frame = new UIFrame("UI Sample");
         frame.setContentPanel(pane);
         frame.updateMinimumSizeFromContents();
         frame.layout();
@@ -154,17 +159,16 @@ public class SimpleUIExample extends ExampleBase {
         final UILabel lHeader = new UILabel("Welcome! Log in to server xyz");
         lHeader.setLayoutData(new GridLayoutData(2, true, true));
         final UILabel lName = new UILabel("Name");
-        // will be replaced by a text field
-        final UILabel tfName = new UILabel("player1");
+        final UITextField tfName = new UITextField();
+        tfName.setText("player1");
         tfName.setLayoutData(GridLayoutData.WrapAndGrow);
         final UILabel lPassword = new UILabel("Password");
-        // will be replaced by a password field
-        final UILabel tfPassword = new UILabel("*********");
+        final UIPasswordField tfPassword = new UIPasswordField();
         tfPassword.setLayoutData(GridLayoutData.WrapAndGrow);
         final UIButton btLogin = new UIButton("login");
         btLogin.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                System.out.println("login pressed!");
+                System.out.println("login as user: " + tfName.getText() + " password: " + tfPassword.getText());
             }
         });
         pLogin.add(lHeader);
@@ -174,6 +178,48 @@ public class SimpleUIExample extends ExampleBase {
         pLogin.add(tfPassword);
         pLogin.add(btLogin);
         return pLogin;
+    }
+
+    private UIPanel makeChatPanel() {
+        final UIPanel chatPanel = new UIPanel(new BorderLayout());
+        final UIPanel bottomPanel = new UIPanel(new BorderLayout());
+        bottomPanel.setLayoutData(BorderLayoutData.SOUTH);
+        final UILabel dirLabel = new UILabel("Sample chat.  Try using markup like [b]text[/b]:");
+        dirLabel.setLayoutData(BorderLayoutData.NORTH);
+        final UITextArea historyArea = new UITextArea();
+        historyArea.setStyledText(true);
+        historyArea.setAlignment(Alignment.BOTTOM_LEFT);
+        historyArea.setEditable(false);
+        final UIScrollPanel scrollArea = new UIScrollPanel(historyArea);
+        scrollArea.setLayoutData(BorderLayoutData.CENTER);
+        final UITextField chatField = new UITextField();
+        chatField.setLayoutData(BorderLayoutData.CENTER);
+        final UIButton chatButton = new UIButton("SAY");
+        chatButton.setLayoutData(BorderLayoutData.EAST);
+
+        final ActionListener actionListener = new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                applyChat(historyArea, chatField);
+            }
+        };
+        chatButton.addActionListener(actionListener);
+        chatField.addActionListener(actionListener);
+
+        bottomPanel.add(chatField);
+        bottomPanel.add(chatButton);
+
+        chatPanel.add(dirLabel);
+        chatPanel.add(scrollArea);
+        chatPanel.add(bottomPanel);
+        return chatPanel;
+    }
+
+    private void applyChat(final UITextArea historyArea, final UITextField chatField) {
+        final String text = chatField.getText();
+        if (text.length() > 0) {
+            historyArea.setText(historyArea.getText() + "\n" + text);
+            chatField.setText("");
+        }
     }
 
     private UIPanel makeWidgetPanel() {
@@ -190,6 +236,7 @@ public class SimpleUIExample extends ExampleBase {
         button.setGap(10);
         button.setLayoutData(BorderLayoutData.NORTH);
         button.setTooltipText("This is a tooltip!");
+        button.setStyledText(true);
         panel.add(button);
 
         final RowLayout rowLay = new RowLayout(false, false, false);
@@ -197,7 +244,7 @@ public class SimpleUIExample extends ExampleBase {
         centerPanel.setLayoutData(BorderLayoutData.CENTER);
         panel.add(centerPanel);
 
-        final UICheckBox check1 = new UICheckBox("Hello");
+        final UICheckBox check1 = new UICheckBox("Hello\nthere");
         check1.setSelected(true);
         check1.setEnabled(false);
         centerPanel.add(check1);
@@ -205,7 +252,8 @@ public class SimpleUIExample extends ExampleBase {
         centerPanel.add(check2);
 
         final ButtonGroup group = new ButtonGroup();
-        final UIRadioButton radio1 = new UIRadioButton("option A");
+        final UIRadioButton radio1 = new UIRadioButton();
+        radio1.setButtonText("[b]option [i]A[/i][/b]", true);
         radio1.setGroup(group);
         centerPanel.add(radio1);
         final UIRadioButton radio2 = new UIRadioButton("option B");
@@ -226,15 +274,17 @@ public class SimpleUIExample extends ExampleBase {
         centerPanel.add(slider);
         centerPanel.add(lSliderValue);
 
-        bar = new UIProgressBar("Loading: ", true);
+        final UIProgressBar bar = new UIProgressBar("Loading: ", true);
         bar.setPercentFilled(0);
         bar.setLocalComponentWidth(250);
         bar.setMaximumContentWidth(bar.getContentWidth());
+        bar.addController(new SpatialController<UIProgressBar>() {
+            @Override
+            public void update(final double time, final UIProgressBar caller) {
+                caller.setPercentFilled(_timer.getTimeInSeconds() / 15);
+            }
+        });
         centerPanel.add(bar);
-
-        fpslabel = new UILabel("FPS");
-        fpslabel.setLayoutData(BorderLayoutData.SOUTH);
-        panel.add(fpslabel);
         return panel;
     }
 
@@ -314,9 +364,7 @@ public class SimpleUIExample extends ExampleBase {
             final double fps = (frames / counter);
             counter = 0;
             frames = 0;
-            fpslabel.setText(Math.round(fps) + " FPS");
-            bar.setPercentFilled(timer.getTimeInSeconds() / 15);
-            bar.updateMinimumSizeFromContents();
+            frame.setTitle("UI Sample: " + Math.round(fps) + " FPS");
         }
         hud.updateGeometricState(timer.getTimePerFrame());
     }
