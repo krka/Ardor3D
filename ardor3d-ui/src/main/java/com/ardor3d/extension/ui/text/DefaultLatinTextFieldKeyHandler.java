@@ -241,7 +241,7 @@ public class DefaultLatinTextFieldKeyHandler implements UIKeyHandler {
 
         if (_textField.isEditable()) {
             final char c = state.getKeyboardState().getKeyEvent().getKeyChar();
-            if (c >= 32) {
+            if (c >= 32 && c != (char) -1) {
                 if (selection.getSelectionLength() > 0) {
                     _textField.deleteSelectedText();
                     text = _textField.getText();

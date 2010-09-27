@@ -213,6 +213,9 @@ public class UIHud extends Node {
             final Spatial s = getChild(i);
             if (s instanceof UIComponent) {
                 final UIComponent comp = (UIComponent) s;
+                if (!comp.isVisible()) {
+                    continue;
+                }
 
                 ret = comp.getUIComponent(x, y);
 

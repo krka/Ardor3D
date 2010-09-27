@@ -242,7 +242,7 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
 
         if (_textArea.isEditable()) {
             final char c = state.getKeyboardState().getKeyEvent().getKeyChar();
-            if (c >= 32) {
+            if (c >= 32 && c != (char) -1) {
                 if (selection.getSelectionLength() > 0) {
                     _textArea.deleteSelectedText();
                     text = _textArea.getText();
