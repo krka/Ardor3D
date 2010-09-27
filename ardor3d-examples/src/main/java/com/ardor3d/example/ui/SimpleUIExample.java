@@ -253,10 +253,11 @@ public class SimpleUIExample extends ExampleBase {
 
         final ButtonGroup group = new ButtonGroup();
         final UIRadioButton radio1 = new UIRadioButton();
-        radio1.setButtonText("[b]option [i]A[/i][/b]", true);
+        radio1.setButtonText("option [i]A[/i]", true);
         radio1.setGroup(group);
         centerPanel.add(radio1);
-        final UIRadioButton radio2 = new UIRadioButton("option B");
+        final UIRadioButton radio2 = new UIRadioButton();
+        radio2.setButtonText("option [c=#f00]B[/c]", true);
         radio2.setGroup(group);
         centerPanel.add(radio2);
 
