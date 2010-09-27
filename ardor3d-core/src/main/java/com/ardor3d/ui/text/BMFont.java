@@ -167,6 +167,10 @@ public class BMFont {
         return _info.outline;
     }
 
+    public Info getInfo() {
+        return _info;
+    }
+
     /**
      * Writes the XML for this font out to the OutputStream provided.
      * 
