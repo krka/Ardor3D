@@ -51,17 +51,17 @@ public enum TextFactory {
         final List<BMFont> fonts = Lists.newArrayList();
         try {
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-12-regular.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-12-regular.fnt")), false));
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), false));
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-regular.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-18-regular.fnt")), false));
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-bold.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-18-bold.fnt")), false));
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-bold-italic.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-18-bold-italic.fnt")), false));
             fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-24-bold.fnt")), true));
+                    "com/ardor3d/extension/ui/font/arial-24-bold.fnt")), false));
         } catch (final IOException e) {
             e.printStackTrace();
         }

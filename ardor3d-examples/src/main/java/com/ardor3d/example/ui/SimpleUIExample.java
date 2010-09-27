@@ -244,7 +244,7 @@ public class SimpleUIExample extends ExampleBase {
         centerPanel.setLayoutData(BorderLayoutData.CENTER);
         panel.add(centerPanel);
 
-        final UICheckBox check1 = new UICheckBox("Hello\nthere");
+        final UICheckBox check1 = new UICheckBox("Hello\n(disabled)");
         check1.setSelected(true);
         check1.setEnabled(false);
         centerPanel.add(check1);
