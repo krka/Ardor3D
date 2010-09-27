@@ -243,7 +243,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
             // set our text location
             final Vector3 v = Vector3.fetchTempInstance();
-            v.set(x + getTotalLeft(), y + getTotalBottom(), 0);
+            // note: we round to get the text pixel aligned... otherwise it can get blurry
+            v.set(Math.round(x + getTotalLeft()), Math.round(y + getTotalBottom()), 0);
 
             final Transform t = Transform.fetchTempInstance();
             t.set(getWorldTransform());

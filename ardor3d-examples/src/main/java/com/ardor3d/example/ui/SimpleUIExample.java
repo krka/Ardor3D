@@ -236,7 +236,6 @@ public class SimpleUIExample extends ExampleBase {
         button.setGap(10);
         button.setLayoutData(BorderLayoutData.NORTH);
         button.setTooltipText("This is a tooltip!");
-        button.setStyledText(true);
         panel.add(button);
 
         final RowLayout rowLay = new RowLayout(false, false, false);

@@ -82,10 +82,10 @@ public class UIButton extends AbstractLabelUIComponent {
      */
     public UIButton(final String text, final SubTex icon) {
         setConsumeMouseEvents(true);
-        setText(text);
         setIcon(icon);
 
         applySkin();
+        setButtonText(text);
 
         switchState(getDefaultState());
     }
@@ -337,13 +337,11 @@ public class UIButton extends AbstractLabelUIComponent {
      */
     public void setButtonIcon(final SubTex icon) {
         super.setIcon(icon);
-        getDefaultState().setIcon(icon);
-        getDisabledState().setIcon(icon);
-        getDisabledSelectedState().setIcon(icon);
-        getMouseOverState().setIcon(icon);
-        getMouseOverSelectedState().setIcon(icon);
-        getPressedState().setIcon(icon);
-        getSelectedState().setIcon(icon);
+        for (final UIState state : getStates()) {
+            if (state instanceof LabelState) {
+                ((LabelState) state).setIcon(icon);
+            }
+        }
     }
 
     public String getActionCommand() {

@@ -146,7 +146,8 @@ public class UITextField extends AbstractUITextEntryComponent {
             if (text.length() > 0) {
                 // set our text location
                 final Vector3 v = Vector3.fetchTempInstance();
-                v.set(x, y, 0);
+                // note: we round to get the text pixel aligned... otherwise it can get blurry
+                v.set(Math.round(x), Math.round(y), 0);
                 final Transform t = Transform.fetchTempInstance();
                 t.set(getWorldTransform());
                 t.applyForwardVector(v);

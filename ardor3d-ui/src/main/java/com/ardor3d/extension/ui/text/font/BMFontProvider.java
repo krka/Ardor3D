@@ -73,20 +73,27 @@ public class BMFontProvider implements FontProvider {
             if (family.equalsIgnoreCase(info.face)) {
                 score += 200;
             }
+
             if (info.bold) {
                 if (isBold) {
                     score += 50;
                 } else {
-                    score -= 10;
+                    score -= 25;
                 }
+            } else if (isBold) {
+                score -= 25;
             }
+
             if (info.italic) {
                 if (isItalic) {
                     score += 50;
                 } else {
-                    score -= 10;
+                    score -= 25;
                 }
+            } else if (isItalic) {
+                score -= 25;
             }
+
             score -= Math.abs(size - info.size);
 
             if (score > bestScore) {
