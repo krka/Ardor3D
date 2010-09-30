@@ -25,7 +25,7 @@ import com.ardor3d.extension.ui.text.font.BMFontProvider;
 import com.ardor3d.extension.ui.text.font.FontProvider;
 import com.ardor3d.extension.ui.text.font.UIFont;
 import com.ardor3d.extension.ui.text.parser.StyleParser;
-import com.ardor3d.extension.ui.text.parser.WikiMarkupParser;
+import com.ardor3d.extension.ui.text.parser.ForumLikeMarkupParser;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.BlendState;
@@ -67,7 +67,7 @@ public enum TextFactory {
         }
         setFontProvider(new BMFontProvider(fonts));
 
-        setStyleParser(new WikiMarkupParser());
+        setStyleParser(new ForumLikeMarkupParser());
     }
 
     public void setFontProvider(final FontProvider provider) {

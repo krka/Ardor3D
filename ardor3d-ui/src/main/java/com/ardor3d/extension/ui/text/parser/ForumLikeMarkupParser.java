@@ -23,7 +23,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.google.common.collect.Lists;
 
-public class WikiMarkupParser implements StyleParser {
+public class ForumLikeMarkupParser implements StyleParser {
 
     Comparator<StyleSpan> endSorter = new Comparator<StyleSpan>() {
         public int compare(final StyleSpan o1, final StyleSpan o2) {
