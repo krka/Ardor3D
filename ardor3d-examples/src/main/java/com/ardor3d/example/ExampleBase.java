@@ -169,6 +169,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
         logger.info("Display Vendor: " + caps.getDisplayVendor());
         logger.info("Display Renderer: " + caps.getDisplayRenderer());
         logger.info("Display Version: " + caps.getDisplayVersion());
+        logger.info("Shading Language Version: " + caps.getShadingLanguageVersion());
 
         registerInputTriggers();
 

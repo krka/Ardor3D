@@ -21,6 +21,7 @@ import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
 import org.lwjgl.opengl.EXTTextureLODBias;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.util.geom.BufferUtils;
@@ -206,6 +207,12 @@ public class LwjglContextCapabilities extends ContextCapabilities {
             _displayVersion = GL11.glGetString(GL11.GL_VERSION);
         } catch (final Exception e) {
             _displayVersion = "Unable to retrieve API version.";
+        }
+
+        try {
+            _shadingLanguageVersion = GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION);
+        } catch (final Exception e) {
+            _shadingLanguageVersion = "Unable to retrieve shading language version.";
         }
     }
 }

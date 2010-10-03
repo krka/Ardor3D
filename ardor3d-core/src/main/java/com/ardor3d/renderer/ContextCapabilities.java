@@ -120,6 +120,7 @@ public class ContextCapabilities {
     protected String _displayVendor;
     protected String _displayRenderer;
     protected String _displayVersion;
+    protected String _shadingLanguageVersion;
 
     /**
      * @return true if we support Vertex Buffer Objects.
@@ -506,5 +507,14 @@ public class ContextCapabilities {
      */
     public String getDisplayVersion() {
         return _displayVersion;
+    }
+
+    /**
+     * Returns the supported shading language version. Needs OpenGL 2.0 support to query.
+     * 
+     * @return The shading language version supported
+     */
+    public String getShadingLanguageVersion() {
+        return _shadingLanguageVersion;
     }
 }

@@ -19,6 +19,7 @@ public class IntersectionRecord {
 
     private final double[] _distances;
     private final Vector3[] _points;
+    private final Vector3[] _normals;
     private final List<PrimitiveKey> _primitives;
 
     /**
@@ -49,11 +50,32 @@ public class IntersectionRecord {
      *             null)
      */
     public IntersectionRecord(final double[] distances, final Vector3[] points, final List<PrimitiveKey> primitives) {
+        this(distances, points, null, primitives);
+    }
+
+    /**
+     * Instantiates a new IntersectionRecord defining the distances and points.
+     * 
+     * @param distances
+     *            the distances of this intersection.
+     * @param points
+     *            the points of this intersection.
+     * @param points
+     *            the normals of this intersection.
+     * @param primitives
+     *            the primitives at each index. May be null.
+     * @throws Ardor3dException
+     *             if distances.length != points.length or points.length != primitives.size() (if primitives is not
+     *             null)
+     */
+    public IntersectionRecord(final double[] distances, final Vector3[] points, final Vector3[] normals,
+            final List<PrimitiveKey> primitives) {
         if (distances.length != points.length || (primitives != null && points.length != primitives.size())) {
             throw new Ardor3dException("All arguments must have an equal number of elements.");
         }
         _distances = distances;
         _points = points;
+        _normals = normals;
         _primitives = primitives;
     }
 
@@ -76,6 +98,17 @@ public class IntersectionRecord {
      */
     public Vector3 getIntersectionPoint(final int index) {
         return _points[index];
+    }
+
+    /**
+     * Returns an intersection normal at a provided index.
+     * 
+     * @param index
+     *            the index of the point to obtain.
+     * @return the normal at the index of the array.
+     */
+    public Vector3 getIntersectionNormal(final int index) {
+        return _normals[index];
     }
 
     /**
