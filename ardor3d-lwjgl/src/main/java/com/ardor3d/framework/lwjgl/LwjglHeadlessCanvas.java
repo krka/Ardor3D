@@ -35,6 +35,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.lwjgl.LwjglContextCapabilities;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRenderer;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
@@ -91,6 +92,14 @@ public class LwjglHeadlessCanvas {
             }
         }
 
+        // Set up our Ardor3D context and capabilities objects
+        final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
+        final RenderContext currentContext = new RenderContext(this, caps, null);
+
+        if (!caps.isFBOSupported()) {
+            throw new Ardor3dException("Headless requires FBO support.");
+        }
+
         // Init our FBO.
         final IntBuffer buffer = BufferUtils.createIntBuffer(1);
         EXTFramebufferObject.glGenFramebuffersEXT(buffer); // generate id
@@ -124,10 +133,6 @@ public class LwjglHeadlessCanvas {
 
         // Setup our data buffer for storing rendered image data.
         _data = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
-
-        // Set up our Ardor3D context and capabilities objects
-        final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
-        final RenderContext currentContext = new RenderContext(this, caps, null);
 
         // Add context to manager and set as active.
         ContextManager.addContext(this, currentContext);
