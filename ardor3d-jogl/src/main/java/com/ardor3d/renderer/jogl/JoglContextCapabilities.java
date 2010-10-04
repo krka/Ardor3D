@@ -61,6 +61,8 @@ public final class JoglContextCapabilities extends ContextCapabilities {
                 && gl.isExtensionAvailable("GL_ARB_fragment_shader") && gl.isExtensionAvailable("GL_ARB_vertex_shader")
                 && gl.isExtensionAvailable("GL_ARB_shading_language_100");
 
+        _geometryShader4Supported = gl.isExtensionAvailable("GL_ARB_geometry_shader4") && _glslSupported;
+
         if (_glslSupported) {
             gl.glGetIntegerv(GL.GL_MAX_VERTEX_ATTRIBS_ARB, buf);
             _maxGLSLVertexAttribs = buf.get(0);

@@ -32,6 +32,7 @@ public class ContextCapabilities {
     protected boolean _supportsVertexProgram = false;
 
     protected boolean _glslSupported = false;
+    protected boolean _geometryShader4Supported = false;
     protected int _maxGLSLVertexAttribs;
 
     protected boolean _pbufferSupported = false;
@@ -211,6 +212,14 @@ public class ContextCapabilities {
      */
     public boolean isGLSLSupported() {
         return _glslSupported;
+    }
+
+    /**
+     * @return true if the GLSL is supported and ARB_geometry_shader4 extension is supported by current graphics
+     *         configuration.
+     */
+    public boolean isGeometryShader4Supported() {
+        return _geometryShader4Supported;
     }
 
     /**

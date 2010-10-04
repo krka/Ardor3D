@@ -59,6 +59,8 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _glslSupported = caps.GL_ARB_shader_objects && caps.GL_ARB_fragment_shader && caps.GL_ARB_vertex_shader
                 && caps.GL_ARB_shading_language_100;
 
+        _geometryShader4Supported = caps.GL_ARB_geometry_shader4 && _glslSupported;
+
         if (_glslSupported) {
             GL11.glGetInteger(ARBVertexShader.GL_MAX_VERTEX_ATTRIBS_ARB, buf);
             _maxGLSLVertexAttribs = buf.get(0);

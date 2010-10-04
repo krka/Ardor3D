@@ -15,12 +15,14 @@ import java.nio.IntBuffer;
 import java.util.logging.Logger;
 
 import org.lwjgl.opengl.ARBFragmentShader;
+import org.lwjgl.opengl.ARBGeometryShader4;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.ARBVertexProgram;
 import org.lwjgl.opengl.ARBVertexShader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
@@ -35,7 +37,7 @@ import com.ardor3d.util.shader.ShaderVariable;
 public abstract class LwjglShaderObjectsStateUtil {
     private static final Logger logger = Logger.getLogger(LwjglShaderObjectsStateUtil.class.getName());
 
-    protected static void sendToGL(final GLSLShaderObjectsState state) {
+    protected static void sendToGL(final GLSLShaderObjectsState state, final ContextCapabilities caps) {
         if (state.getVertexShader() == null && state.getFragmentShader() == null) {
             logger.warning("Could not find shader resources!" + "(both inputbuffers are null)");
             state._needSendShader = false;
@@ -95,6 +97,33 @@ public abstract class LwjglShaderObjectsStateUtil {
             state._fragmentShaderID = -1;
         }
 
+        if (caps.isGeometryShader4Supported()) {
+            if (state.getGeometryShader() != null) {
+                if (state._geometryShaderID != -1) {
+                    removeFragShader(state);
+                }
+
+                state._geometryShaderID = ARBShaderObjects
+                        .glCreateShaderObjectARB(ARBGeometryShader4.GL_GEOMETRY_SHADER_ARB);
+
+                // Create the sources
+                ARBShaderObjects.glShaderSourceARB(state._geometryShaderID, state.getGeometryShader());
+
+                // Compile the fragment shader
+                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                ARBShaderObjects.glCompileShaderARB(state._geometryShaderID);
+                ARBShaderObjects.glGetObjectParameterARB(state._geometryShaderID,
+                        ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                checkProgramError(compiled, state._geometryShaderID);
+
+                // Attach the program
+                ARBShaderObjects.glAttachObjectARB(state._programID, state._geometryShaderID);
+            } else if (state._geometryShaderID != -1) {
+                removeGeomShader(state);
+                state._geometryShaderID = -1;
+            }
+        }
+
         ARBShaderObjects.glLinkProgramARB(state._programID);
         checkLinkError(state._programID);
         state.setNeedsRefresh(true);
@@ -121,6 +150,14 @@ public abstract class LwjglShaderObjectsStateUtil {
             logger.severe(out);
 
             throw new Ardor3dException("Error linking GLSL shader: " + out);
+        }
+    }
+
+    /** Removes the geometry shader */
+    private static void removeGeomShader(final GLSLShaderObjectsState state) {
+        if (state._geometryShaderID != -1) {
+            ARBShaderObjects.glDetachObjectARB(state._programID, state._geometryShaderID);
+            ARBShaderObjects.glDeleteObjectARB(state._geometryShaderID);
         }
     }
 
@@ -175,7 +212,9 @@ public abstract class LwjglShaderObjectsStateUtil {
 
     public static void apply(final LwjglRenderer renderer, final GLSLShaderObjectsState state) {
         final RenderContext context = ContextManager.getCurrentContext();
-        if (context.getCapabilities().isGLSLSupported()) {
+        final ContextCapabilities caps = context.getCapabilities();
+
+        if (caps.isGLSLSupported()) {
             // Ask for the current state record
             final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context
                     .getStateRecord(StateType.GLSLShader);
@@ -183,7 +222,7 @@ public abstract class LwjglShaderObjectsStateUtil {
 
             if (state.isEnabled()) {
                 if (state._needSendShader) {
-                    sendToGL(state);
+                    sendToGL(state, caps);
                 }
 
                 if (state._shaderDataLogic != null) {

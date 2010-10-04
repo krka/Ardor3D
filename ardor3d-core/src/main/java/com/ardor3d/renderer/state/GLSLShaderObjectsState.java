@@ -71,7 +71,7 @@ public class GLSLShaderObjectsState extends RenderState {
     /** Storage for shader attribute values */
     protected List<ShaderVariable> shaderAttributes = new ArrayList<ShaderVariable>();
 
-    protected ByteBuffer vertShader, fragShader;
+    protected ByteBuffer vertShader, fragShader, geomShader;
 
     // XXX: The below fields are public for brevity mostly as a way to remember that this class needs revisiting.
 
@@ -95,8 +95,8 @@ public class GLSLShaderObjectsState extends RenderState {
     /** OpenGL id for the attached fragment shader. */
     public int _fragmentShaderID = -1;
 
-    private int _numWarnings;
-    private static final int MAX_NUM_WARNINGS = 10;
+    /** OpenGL id for the attached geometry shader. */
+    public int _geometryShaderID = -1;
 
     /**
      * Gets the currently loaded vertex shader.
@@ -116,12 +116,25 @@ public class GLSLShaderObjectsState extends RenderState {
         return fragShader;
     }
 
+    /**
+     * Gets the currently loaded geometry shader.
+     * 
+     * @return
+     */
+    public ByteBuffer getGeometryShader() {
+        return geomShader;
+    }
+
     public void setVertexShader(final InputStream stream) throws IOException {
         setVertexShader(load(stream));
     }
 
     public void setFragmentShader(final InputStream stream) throws IOException {
         setFragmentShader(load(stream));
+    }
+
+    public void setGeometryShader(final InputStream stream) throws IOException {
+        setGeometryShader(load(stream));
     }
 
     protected ByteBuffer load(final InputStream in) throws IOException {
@@ -158,12 +171,20 @@ public class GLSLShaderObjectsState extends RenderState {
         fragShader = shader;
     }
 
+    public void setGeometryShader(final ByteBuffer shader) {
+        geomShader = shader;
+    }
+
     public void setVertexShader(final String shader) {
         vertShader = stringToByteBuffer(shader);
     }
 
     public void setFragmentShader(final String shader) {
         fragShader = stringToByteBuffer(shader);
+    }
+
+    public void setGeometryShader(final String shader) {
+        geomShader = stringToByteBuffer(shader);
     }
 
     private ByteBuffer stringToByteBuffer(final String str) {
@@ -974,6 +995,7 @@ public class GLSLShaderObjectsState extends RenderState {
         capsule.writeSavableList(shaderAttributes, "shaderAttributes", new ArrayList<ShaderVariable>());
         capsule.write(vertShader, "vertShader", null);
         capsule.write(fragShader, "fragShader", null);
+        capsule.write(geomShader, "geomShader", null);
 
         if (_shaderDataLogic instanceof Savable) {
             capsule.write((Savable) _shaderDataLogic, "shaderDataLogic", null);
@@ -987,6 +1009,7 @@ public class GLSLShaderObjectsState extends RenderState {
         shaderAttributes = capsule.readSavableList("shaderAttributes", new ArrayList<ShaderVariable>());
         vertShader = capsule.readByteBuffer("vertShader", null);
         fragShader = capsule.readByteBuffer("fragShader", null);
+        geomShader = capsule.readByteBuffer("geomShader", null);
 
         final Savable shaderDataLogic = capsule.readSavable("shaderDataLogic", null);
         // only override set _shaderDataLogic if we have something in the capsule.

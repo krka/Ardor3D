@@ -33,7 +33,7 @@ import com.ardor3d.util.shader.ShaderVariable;
 public abstract class JoglShaderObjectsStateUtil {
     private static final Logger logger = Logger.getLogger(JoglShaderObjectsStateUtil.class.getName());
 
-    protected static void sendToGL(final GLSLShaderObjectsState state) {
+    protected static void sendToGL(final GLSLShaderObjectsState state, final ContextCapabilities caps) {
         final GL gl = GLU.getCurrentGL();
 
         if (state.getVertexShader() == null && state.getFragmentShader() == null) {
@@ -100,6 +100,35 @@ public abstract class JoglShaderObjectsStateUtil {
             state._fragmentShaderID = -1;
         }
 
+        if (caps.isGeometryShader4Supported()) {
+            if (state.getGeometryShader() != null) {
+                if (state._geometryShaderID != -1) {
+                    removeGeomShader(state);
+                }
+
+                state._geometryShaderID = gl.glCreateShaderObjectARB(GL.GL_GEOMETRY_SHADER_EXT);
+
+                // Create the sources
+                final byte array[] = new byte[state.getGeometryShader().limit()];
+                state.getGeometryShader().rewind();
+                state.getGeometryShader().get(array);
+                gl.glShaderSourceARB(state._geometryShaderID, 1, new String[] { new String(array) },
+                        new int[] { array.length }, 0);
+
+                // Compile the fragment shader
+                final IntBuffer compiled = BufferUtils.createIntBuffer(1);
+                gl.glCompileShaderARB(state._geometryShaderID);
+                gl.glGetObjectParameterivARB(state._geometryShaderID, GL.GL_OBJECT_COMPILE_STATUS_ARB, compiled);
+                checkProgramError(compiled, state._geometryShaderID);
+
+                // Attach the program
+                gl.glAttachObjectARB(state._programID, state._geometryShaderID);
+            } else if (state._geometryShaderID != -1) {
+                removeGeomShader(state);
+                state._geometryShaderID = -1;
+            }
+        }
+
         gl.glLinkProgramARB(state._programID);
         checkLinkError(state._programID);
         state.setNeedsRefresh(true);
@@ -151,6 +180,16 @@ public abstract class JoglShaderObjectsStateUtil {
         }
     }
 
+    /** Removes the geometry shader */
+    private static void removeGeomShader(final GLSLShaderObjectsState state) {
+        final GL gl = GLU.getCurrentGL();
+
+        if (state._geometryShaderID != -1) {
+            gl.glDetachObjectARB(state._programID, state._geometryShaderID);
+            gl.glDeleteObjectARB(state._geometryShaderID);
+        }
+    }
+
     /**
      * Check for program errors. If an error is detected, program exits.
      * 
@@ -197,7 +236,7 @@ public abstract class JoglShaderObjectsStateUtil {
 
             if (state.isEnabled()) {
                 if (state._needSendShader) {
-                    sendToGL(state);
+                    sendToGL(state, caps);
                 }
 
                 if (state._shaderDataLogic != null) {
