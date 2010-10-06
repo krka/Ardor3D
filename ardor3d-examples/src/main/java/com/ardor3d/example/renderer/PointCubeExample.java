@@ -13,6 +13,7 @@ package com.ardor3d.example.renderer;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.image.Texture;
@@ -51,6 +52,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * A more complex example of using geometry shaders. Requires support for geometry shaders (obviously).
+ */
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.renderer.PointCubeExample", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/renderer_PointCubeExample.jpg", //
+maxHeapMemory = 64)
 public class PointCubeExample extends ExampleBase {
     protected Node _textNode = new Node();
     protected BasicText _exampleInfo[] = new BasicText[4];
