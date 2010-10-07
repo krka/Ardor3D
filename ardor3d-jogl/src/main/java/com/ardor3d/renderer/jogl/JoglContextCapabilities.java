@@ -214,10 +214,14 @@ public final class JoglContextCapabilities extends ContextCapabilities {
             _displayVersion = "Unable to retrieve API version.";
         }
 
-        try {
-            _shadingLanguageVersion = gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION);
-        } catch (final Exception e) {
-            _shadingLanguageVersion = "Unable to retrieve shading language version.";
+        if (_glslSupported) {
+            try {
+                _shadingLanguageVersion = gl.glGetString(GL.GL_SHADING_LANGUAGE_VERSION);
+            } catch (final Exception e) {
+                _shadingLanguageVersion = "Unable to retrieve shading language version.";
+            }
+        } else {
+            _shadingLanguageVersion = "Not supported.";
         }
     }
 }
