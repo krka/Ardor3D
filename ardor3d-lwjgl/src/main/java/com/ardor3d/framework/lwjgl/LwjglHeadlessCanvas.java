@@ -52,8 +52,8 @@ public class LwjglHeadlessCanvas {
 
     private final Scene _scene;
     private final Renderer _renderer = new LwjglRenderer();
-    private final DisplaySettings _settings;
-    private final Camera _camera;
+    protected final DisplaySettings _settings;
+    protected final Camera _camera;
 
     private final int _fboID, _depthRBID, _colorRBID;
     private final IntBuffer _data;
