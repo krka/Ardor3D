@@ -216,7 +216,7 @@ public class ColladaMeshUtils {
         if (polys == null || polys.getChild("input") == null) {
             return null;
         }
-        final Mesh polyMesh = new Mesh(extractName(polys));
+        final Mesh polyMesh = new Mesh(extractName(colladaGeometry, polys));
         polyMesh.getMeshData().setIndexMode(IndexMode.Triangles);
 
         // Build and set RenderStates for our material
@@ -306,7 +306,7 @@ public class ColladaMeshUtils {
         if (polys == null || polys.getChild("input") == null) {
             return null;
         }
-        final Mesh polyMesh = new Mesh(extractName(polys));
+        final Mesh polyMesh = new Mesh(extractName(colladaGeometry, polys));
         polyMesh.getMeshData().setIndexMode(IndexMode.Triangles);
 
         // Build and set RenderStates for our material
@@ -393,7 +393,7 @@ public class ColladaMeshUtils {
         if (tris == null || tris.getChild("input") == null || tris.getChild("p") == null) {
             return null;
         }
-        final Mesh triMesh = new Mesh(extractName(tris));
+        final Mesh triMesh = new Mesh(extractName(colladaGeometry, tris));
         triMesh.getMeshData().setIndexMode(IndexMode.Triangles);
 
         // Build and set RenderStates for our material
@@ -440,7 +440,7 @@ public class ColladaMeshUtils {
         if (lines == null || lines.getChild("input") == null || lines.getChild("p") == null) {
             return null;
         }
-        final Line lineMesh = new Line(extractName(lines));
+        final Line lineMesh = new Line(extractName(colladaGeometry, lines));
 
         // Build and set RenderStates for our material
         _colladaMaterialUtils.applyMaterial(lines.getAttributeValue("material"), lineMesh);
@@ -540,17 +540,31 @@ public class ColladaMeshUtils {
         }
         return rVal;
     }
-    
+
     /**
-     * Extract name from xml element, some exporters don't support 'name' attribute,
-     * so we better use the material instead of a generic name. 
+     * Extract name from xml element, some exporters don't support 'name' attribute, so we better use the material
+     * instead of a generic name.
+     * 
      * @param element
      * @return value from 'name' or 'material' attribute
      */
-    private String extractName(Element element) {
+    private String extractName(final Element colladaGeometry, final Element element) {
         String name = element.getAttributeValue("name");
-        if (name == null || "".equals(name))
-            name = element.getAttributeValue("material");
+        if (name == null || name.isEmpty()) {
+            name = colladaGeometry.getAttributeValue("name");
+        }
+        if (name == null || name.isEmpty()) {
+            name = colladaGeometry.getAttributeValue("id");
+        }
+        if (name == null) {
+            name = "";
+        }
+
+        final String materialName = element.getAttributeValue("material");
+        if (materialName != null && !materialName.isEmpty()) {
+            name += "[" + materialName + "]";
+        }
+
         return name;
     }
 }
