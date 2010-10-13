@@ -736,7 +736,7 @@ public class GLSLShaderObjectsState extends RenderState {
             shaderUniform.matrixBuffer = matrixBuffer;
         }
 
-        matrixBuffer.rewind();
+        matrixBuffer.clear();
         for (final ReadOnlyMatrix4 value : values) {
             value.toFloatBuffer(matrixBuffer);
         }
