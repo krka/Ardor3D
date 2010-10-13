@@ -164,7 +164,11 @@ public class UISlider extends UIContainer {
      * Update our knob's position.
      */
     private void updateKnob() {
-        _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
+        if ((float) (_model.getMaxValue() - _model.getMinValue()) != 0) {
+            _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
+        } else {
+            _knob.setPosition(0);
+        }
     }
 
     /**
