@@ -20,10 +20,7 @@ import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.CullState.Face;
-import com.ardor3d.renderer.state.CullState.PolygonWind;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -218,10 +215,12 @@ public class Md2Importer {
                     extra = vertCount % 2 == 1 ? 3 : 2;
                     triCounts += vertCount + extra;
                 }
-                counts[0] = triCounts - extra;
+                counts[0] = triCounts - extra + 1;
                 modes[0] = IndexMode.TriangleStrip;
                 vertexCount += counts[0];
             }
+
+            vertexCount++;
 
             // Create each frame as a Mesh using glcommands if given
             final Mesh[] meshes = new Mesh[header.numFrames];
@@ -250,12 +249,9 @@ public class Md2Importer {
                             continue;
                         }
 
-                        // if we're not the first strip, add a vert for degenerate triangle connector
-                        if (j != 0) {
-                            addVert(cmd, frame, 0, verts);
-                            norms.getBuffer().put(0).put(0).put(0);
-                            texs.getBuffer().put(0).put(0);
-                        }
+                        addVert(cmd, frame, 0, verts);
+                        norms.getBuffer().put(0).put(0).put(0);
+                        texs.getBuffer().put(0).put(0);
 
                         // add strip verts / normals
                         for (int k = 0; k < cmd.vertIndices.length; k++) {
@@ -278,15 +274,17 @@ public class Md2Importer {
                                 texs.getBuffer().put(0).put(0);
                             }
                         }
-
                     }
                 }
                 // Now the fans
                 // XXX: could add these to the strip instead
                 for (final int j : fanIndices) {
                     cmd = commands[j];
-                    texs.getBuffer().put(cmd.texCoords);
-                    for (int k = 0; k < cmd.vertIndices.length; k++) {
+                    texs.getBuffer().put(cmd.texCoords[0]).put(cmd.texCoords[1]);
+                    addNormal(cmd, frame, 0, norms);
+                    addVert(cmd, frame, 0, verts);
+                    for (int k = cmd.vertIndices.length; --k >= 1;) {
+                        texs.getBuffer().put(cmd.texCoords[k * 2]).put(cmd.texCoords[k * 2 + 1]);
                         addNormal(cmd, frame, k, norms);
                         addVert(cmd, frame, k, verts);
                     }
@@ -299,12 +297,6 @@ public class Md2Importer {
 
             // Use resource name for mesh
             mesh.setName(resource.getName());
-
-            // XXX: wind order seems inverted in md2. Maybe swap out with our own stripifier
-            final CullState cs = new CullState();
-            cs.setCullFace(Face.Back);
-            cs.setPolygonWind(PolygonWind.ClockWise);
-            mesh.setRenderState(cs);
 
             // Add controller
             final KeyframeController<Mesh> controller = new KeyframeController<Mesh>();
