@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
  */
 public class RowLayout extends UILayout {
 
-    private static final int MAX_ADDITIONS = 50;
+    private static final int MAX_RELAX = 50;
     private final boolean _horizontal;
     private final boolean _expandsHorizontally;
     private final boolean _expandsVertically;
@@ -90,11 +90,12 @@ public class RowLayout extends UILayout {
             return;
         }
 
-        final Rectangle2 storeA = new Rectangle2();
-        final Rectangle2 storeB = new Rectangle2();
+        final Rectangle2 storeA = Rectangle2.fetchTempInstance();
+        final Rectangle2 storeB = Rectangle2.fetchTempInstance();
 
-        // list of components
-        final List<UIComponent> comps = Lists.newArrayList();
+        // Grab a list of components, squeezing them down to their min size on the flow axis
+        List<UIComponent> comps = Lists.newArrayList();
+        List<UIComponent> compsBack = Lists.newArrayList();
         for (int i = 0; i < content.size(); i++) {
             final Spatial spat = content.get(i);
             if (spat instanceof UIComponent) {
@@ -110,53 +111,59 @@ public class RowLayout extends UILayout {
             }
         }
 
-        if (comps.size() > 0) {
+        // if we have components to layout...
+        if (!comps.isEmpty()) {
 
             // Determine how much space we feel we need.
             final int reqSpace = _horizontal ? getSumOfAllWidths(content) : getSumOfAllHeights(content);
 
-            // How much space do we actually have?
+            // How much extra space do we have?
             int freeSpace = (_horizontal ? container.getContentWidth() : container.getContentHeight()) - reqSpace;
 
-            int additions = 0;
-            do {
-                final UIComponent comp = comps.remove(0);
-                Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
-                final Rectangle2 origRect = storeB.set(rect);
-                if (freeSpace < 0) {
-                    freeSpace = 0;
-                }
-                final int extraSize = freeSpace / (comps.size() + 1);
-                if (_horizontal) {
-                    final int height = _expandsVertically ? container.getContentHeight() : rect.getHeight();
-                    final int width = (_expandsHorizontally ? extraSize : 0) + rect.getWidth();
-                    if (height == rect.getHeight() && width == rect.getWidth()) {
-                        continue;
+            int relaxIndex = 0;
+            // cycle through until we've given away all of the space
+            while (freeSpace > 0 && !comps.isEmpty() && relaxIndex < RowLayout.MAX_RELAX) {
+                final int extraPerComp = freeSpace / comps.size();
+                while (!comps.isEmpty()) {
+                    final UIComponent comp = comps.remove(0);
+                    Rectangle2 rect = comp.getRelativeComponentBounds(storeA);
+                    final Rectangle2 origRect = storeB.set(rect);
+                    if (freeSpace < 0) {
+                        freeSpace = 0;
                     }
+                    if (_horizontal) {
+                        final int height = _expandsVertically ? container.getContentHeight() : rect.getHeight();
+                        final int width = (_expandsHorizontally ? extraPerComp : 0) + rect.getWidth();
+                        if (height == rect.getHeight() && width == rect.getWidth()) {
+                            continue;
+                        }
 
-                    comp.fitComponentIn(width, height);
-                    rect = comp.getRelativeComponentBounds(storeA);
-                    if (Math.abs(rect.getWidth() - width) <= 1) {
-                        comps.add(comp);
-                        additions++;
-                    }
-                    freeSpace -= rect.getWidth() - origRect.getWidth();
-                } else {
-                    final int width = _expandsHorizontally ? container.getContentWidth() : rect.getWidth();
-                    final int height = (_expandsVertically ? extraSize : 0) + rect.getHeight();
-                    if (height == rect.getHeight() && width == rect.getWidth()) {
-                        continue;
-                    }
+                        comp.fitComponentIn(width, height);
+                        rect = comp.getRelativeComponentBounds(storeA);
+                        if (Math.abs(rect.getWidth() - width) <= 1) {
+                            compsBack.add(comp);
+                        }
+                        freeSpace -= rect.getWidth() - origRect.getWidth();
+                    } else {
+                        final int width = _expandsHorizontally ? container.getContentWidth() : rect.getWidth();
+                        final int height = (_expandsVertically ? extraPerComp : 0) + rect.getHeight();
+                        if (height == rect.getHeight() && width == rect.getWidth()) {
+                            continue;
+                        }
 
-                    comp.fitComponentIn(width, height);
-                    rect = comp.getRelativeComponentBounds(storeA);
-                    if (Math.abs(rect.getHeight() - height) <= 1) {
-                        comps.add(comp);
-                        additions++;
+                        comp.fitComponentIn(width, height);
+                        rect = comp.getRelativeComponentBounds(storeA);
+                        if (Math.abs(rect.getHeight() - height) <= 1) {
+                            compsBack.add(comp);
+                        }
+                        freeSpace -= rect.getHeight() - origRect.getHeight();
                     }
-                    freeSpace -= rect.getHeight() - origRect.getHeight();
                 }
-            } while (comps.size() > 0 && additions <= RowLayout.MAX_ADDITIONS);
+                final List<UIComponent> compsTemp = comps;
+                comps = compsBack;
+                compsBack = compsTemp;
+                relaxIndex++;
+            }
 
             int x = 0;
             int y = !_expandsVertically && !_horizontal ? container.getContentHeight() - reqSpace : 0;
@@ -183,6 +190,8 @@ public class RowLayout extends UILayout {
             }
         }
 
+        Rectangle2.releaseTempInstance(storeA);
+        Rectangle2.releaseTempInstance(storeB);
     }
 
     @Override

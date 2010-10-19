@@ -584,6 +584,7 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     }
 
     /**
+     * Attempt to force this component to fit in the given rectangle.
      * 
      * @param width
      * @param height
