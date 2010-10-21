@@ -148,7 +148,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
             // grab the graphics context so cleanup will work out.
             final CanvasRenderer cr = _canvas.getCanvasRenderer();
             cr.makeCurrentContext();
-            quit(_canvas.getCanvasRenderer().getRenderer());
+            quit(cr.getRenderer());
             cr.releaseCurrentContext();
             if (QUIT_VM_ON_EXIT) {
                 System.exit(0);
