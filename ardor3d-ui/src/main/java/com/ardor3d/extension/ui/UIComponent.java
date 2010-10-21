@@ -1511,6 +1511,23 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     }
 
     /**
+     * Called when this component has focus and a key is held down over more than 1 input cycle.
+     * 
+     * @param key
+     *            the key held.
+     * @param the
+     *            current tracked state of the input system.
+     * @return true if we want to consider the event "consumed" by the UI system.
+     */
+    public boolean keyHeld(final Key key, final InputState state) {
+        if (!_consumeKeyEvents && getParent() instanceof UIComponent) {
+            return ((UIComponent) getParent()).keyHeld(key, state);
+        } else {
+            return _consumeKeyEvents;
+        }
+    }
+
+    /**
      * Called when this component has focus and a key is released.
      * 
      * @param key

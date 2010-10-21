@@ -17,4 +17,6 @@ public interface UIKeyHandler {
     boolean keyPressed(Key key, InputState state);
 
     boolean keyReleased(Key key, InputState state);
+
+    boolean keyHeld(Key key, InputState state);
 }

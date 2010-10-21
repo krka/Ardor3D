@@ -107,6 +107,8 @@ public abstract class AbstractLabelUIComponent extends StateBasedUIComponent imp
 
     public void setStyledText(final boolean value) {
         _styled = value;
+        fireStyleChanged();
+        fireComponentDirty();
     }
 
     @Override

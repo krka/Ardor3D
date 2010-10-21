@@ -487,8 +487,9 @@ public class UIHud extends Node {
                 // repeats
                 final EnumSet<Key> repeats = currentKState.getKeysHeldSince(previousKState);
                 if (!repeats.isEmpty() && _focusedComponent != null) {
-                    // TODO: handle repeats better once we have text fields.
-                    consumed = true;
+                    for (final Key key : repeats) {
+                        consumed |= fireKeyHeldEvent(key, current);
+                    }
                 }
             }
 
@@ -657,6 +658,23 @@ public class UIHud extends Node {
     public boolean fireKeyPressedEvent(final Key key, final InputState currentIS) {
         if (_focusedComponent != null) {
             return _focusedComponent.keyPressed(key, currentIS);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Handle key held (pressed down over more than one input update cycle.)
+     * 
+     * @param key
+     *            the held key
+     * @param currentIS
+     *            the current input state.
+     * @return if this event is consumed.
+     */
+    public boolean fireKeyHeldEvent(final Key key, final InputState currentIS) {
+        if (_focusedComponent != null) {
+            return _focusedComponent.keyHeld(key, currentIS);
         } else {
             return false;
         }

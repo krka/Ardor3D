@@ -122,7 +122,7 @@ public class RowLayout extends UILayout {
 
             int relaxIndex = 0;
             // cycle through until we've given away all of the space
-            while (freeSpace > 0 && !comps.isEmpty() && relaxIndex < RowLayout.MAX_RELAX) {
+            while ((freeSpace > 0 || relaxIndex == 0) && !comps.isEmpty() && relaxIndex < RowLayout.MAX_RELAX) {
                 final int extraPerComp = freeSpace / comps.size();
                 while (!comps.isEmpty()) {
                     final UIComponent comp = comps.remove(0);

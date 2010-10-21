@@ -28,6 +28,11 @@ public class DefaultLatinTextAreaKeyHandler implements UIKeyHandler {
     }
 
     @Override
+    public boolean keyHeld(final Key key, final InputState state) {
+        return true;
+    }
+
+    @Override
     public boolean keyPressed(final Key key, final InputState state) {
         // grab our text
         String text = _textArea.getText();

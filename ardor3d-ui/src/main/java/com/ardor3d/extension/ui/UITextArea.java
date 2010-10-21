@@ -124,6 +124,11 @@ public class UITextArea extends AbstractUITextEntryComponent {
         }
 
         @Override
+        public boolean keyHeld(final Key key, final InputState state) {
+            return getKeyHandler().keyHeld(key, state);
+        }
+
+        @Override
         public void mouseEntered(final int mouseX, final int mouseY, final InputState state) {
         // TODO: set cursor to text entry
         }

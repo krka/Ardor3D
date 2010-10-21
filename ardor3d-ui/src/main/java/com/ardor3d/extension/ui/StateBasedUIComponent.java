@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -88,6 +89,23 @@ public abstract class StateBasedUIComponent extends UIComponent {
         switchState(_currentState);
     }
 
+    /**
+     * Sets the text color on this component and (optionally) all contained states.
+     * 
+     * @param color
+     *            the new foreground color
+     * @param allStates
+     *            if true, set across all contained states as well as self.
+     */
+    public void setForegroundColor(final ReadOnlyColorRGBA color, final boolean allStates) {
+        super.setForegroundColor(color);
+        if (allStates) {
+            for (final UIState state : getStates()) {
+                state.setForegroundColor(color);
+            }
+        }
+    }
+
     // Redirect input / event methods to current state.
 
     @Override
@@ -130,6 +148,11 @@ public abstract class StateBasedUIComponent extends UIComponent {
     @Override
     public boolean keyReleased(final Key key, final InputState state) {
         return getCurrentState().keyReleased(key, state) || super.keyReleased(key, state);
+    }
+
+    @Override
+    public boolean keyHeld(final Key key, final InputState state) {
+        return getCurrentState().keyHeld(key, state) || super.keyHeld(key, state);
     }
 
     @Override
