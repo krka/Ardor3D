@@ -123,6 +123,16 @@ public class Mesh extends Spatial implements Renderable, Pickable {
      * @param store
      *            the bounding volume
      */
+    public BoundingVolume getModelBound() {
+        return _modelBound;
+    }
+
+    /**
+     * Retrieves a copy of the local bounding volume for this mesh.
+     * 
+     * @param store
+     *            the bounding volume
+     */
     public BoundingVolume getModelBound(final BoundingVolume store) {
         if (_modelBound == null) {
             return null;
