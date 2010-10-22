@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -139,6 +140,32 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
         }
     }
 
+    public void render(final Scene toDraw, final Texture tex, final int clear) {
+        try {
+            ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
+
+            setupForSingleTexDraw(tex);
+
+            if (_samples > 0 && _supportsMultisample) {
+                setMSFBO();
+            }
+
+            switchCameraIn(clear);
+            doDraw(toDraw);
+            switchCameraOut();
+
+            if (_samples > 0 && _supportsMultisample) {
+                blitTo(tex);
+            }
+
+            takedownForSingleTexDraw(tex);
+
+            ContextManager.getCurrentContext().popFBOTextureRenderer();
+        } catch (final Exception e) {
+            logger.logp(Level.SEVERE, this.getClass().toString(), "render(Spatial, Texture, boolean)", "Exception", e);
+        }
+    }
+
     public void render(final List<? extends Spatial> toDraw, final Texture tex, final int clear) {
         try {
             ContextManager.getCurrentContext().pushFBOTextureRenderer(this);
@@ -224,6 +251,10 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
             final Spatial spat = toDraw.get(x);
             doDraw(spat);
         }
+    }
+
+    protected void doDraw(final Scene toDraw) {
+        toDraw.renderUnto(_parentRenderer);
     }
 
     public int getWidth() {

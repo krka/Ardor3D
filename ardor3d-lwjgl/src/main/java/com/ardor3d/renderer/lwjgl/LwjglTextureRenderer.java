@@ -24,6 +24,7 @@ import org.lwjgl.opengl.EXTFramebufferMultisample;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 
+import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -112,15 +113,20 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     public void render(final Spatial spat, final List<Texture> texs, final int clear) {
-        render(null, spat, texs, clear);
+        render(null, spat, null, texs, clear);
     }
 
     public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
-        render(spat, null, texs, clear);
+        render(spat, null, null, texs, clear);
     }
 
-    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
-            final int clear) {
+    @Override
+    public void render(final Scene scene, final List<Texture> texs, final int clear) {
+        render(null, null, scene, texs, clear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
+            final List<Texture> texs, final int clear) {
 
         final int maxDrawBuffers = ContextManager.getCurrentContext().getCapabilities().getMaxFBOColorAttachments();
 
@@ -141,8 +147,10 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     switchCameraIn(clear);
                     if (toDrawA != null) {
                         doDraw(toDrawA);
-                    } else {
+                    } else if (toDrawB != null) {
                         doDraw(toDrawB);
+                    } else {
+                        doDraw(toDrawC);
                     }
                     switchCameraOut();
 

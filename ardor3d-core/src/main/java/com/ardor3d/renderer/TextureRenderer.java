@@ -12,6 +12,7 @@ package com.ardor3d.renderer;
 
 import java.util.List;
 
+import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -33,8 +34,32 @@ public interface TextureRenderer {
     Camera getCamera();
 
     /**
+     * 
+     * @param scene
+     *            the scene to render.
+     * @param tex
+     *            the Texture to render to.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
+     */
+    void render(Scene scene, Texture tex, int clear);
+
+    /**
      * NOTE: If more than one texture is given, copy-texture is used regardless of card capabilities to decrease render
      * time.
+     * 
+     * @param scene
+     *            the scene to render.
+     * @param tex
+     *            a list of Textures to render to.
+     * @param clear
+     *            which buffers to clear before rendering, if any.
+     * @see Renderer#BUFFER_COLOR et al
+     */
+    void render(Scene scene, List<Texture> texs, int clear);
+
+    /**
      * 
      * @param spat
      *            the scene to render.

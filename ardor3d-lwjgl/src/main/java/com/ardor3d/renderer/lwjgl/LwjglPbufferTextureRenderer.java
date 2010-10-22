@@ -26,6 +26,7 @@ import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.opengl.RenderTexture;
 
 import com.ardor3d.framework.DisplaySettings;
+import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.MathUtils;
@@ -116,16 +117,19 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     }
 
     public void render(final Spatial spat, final Texture tex, final int clear) {
-        render(null, spat, tex, clear);
+        render(null, spat, null, tex, clear);
     }
 
     public void render(final List<? extends Spatial> spat, final Texture tex, final int clear) {
-        render(spat, null, tex, clear);
+        render(spat, null, null, tex, clear);
     }
 
-    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Texture tex, final int clear) {
-        // clear the current states since we are rendering into a new location
-        // and can not rely on states still being set.
+    public void render(final Scene scene, final Texture tex, final int clear) {
+        render(null, null, scene, tex, clear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
+            final Texture tex, final int clear) {
         try {
             if (_pbuffer == null || _pbuffer.isBufferLost()) {
                 if (_pbuffer != null && _pbuffer.isBufferLost()) {
@@ -144,8 +148,10 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
 
                 if (toDrawA != null) {
                     doDraw(toDrawA);
-                } else {
+                } else if (toDrawB != null) {
                     doDraw(toDrawB);
+                } else {
+                    doDraw(toDrawC);
                 }
 
                 deactivate();
@@ -176,17 +182,19 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
     }
 
     public void render(final Spatial spat, final List<Texture> texs, final int clear) {
-        render(null, spat, texs, clear);
+        render(null, spat, null, texs, clear);
     }
 
     public void render(final List<? extends Spatial> spat, final List<Texture> texs, final int clear) {
-        render(spat, null, texs, clear);
+        render(spat, null, null, texs, clear);
     }
 
-    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final List<Texture> texs,
-            final int clear) {
-        // clear the current states since we are rendering into a new location
-        // and can not rely on states still being set.
+    public void render(final Scene scene, final List<Texture> texs, final int clear) {
+        render(null, null, scene, texs, clear);
+    }
+
+    private void render(final List<? extends Spatial> toDrawA, final Spatial toDrawB, final Scene toDrawC,
+            final List<Texture> texs, final int clear) {
         try {
             if (_pbuffer == null || _pbuffer.isBufferLost()) {
                 if (_pbuffer != null && _pbuffer.isBufferLost()) {
