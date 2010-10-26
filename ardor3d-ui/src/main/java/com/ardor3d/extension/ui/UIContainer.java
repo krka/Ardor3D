@@ -122,11 +122,12 @@ public abstract class UIContainer extends UIComponent {
      */
     public void add(final UIComponent component) {
         attachChild(component);
-        fireStyleChanged();
         // send relation event if we already have a hud
         if (getHud() != null) {
             component.attachedToHud();
         }
+        fireStyleChanged();
+        fireComponentDirty();
     }
 
     /**
