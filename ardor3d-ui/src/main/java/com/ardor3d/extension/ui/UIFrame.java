@@ -50,6 +50,9 @@ public class UIFrame extends UIContainer {
     /** If true, show a resize handle on this frame and allow its use. */
     private boolean _resizeable = true;
 
+    /** If true (the default) then allow dragging of this frame using the frame bar. */
+    private boolean _draggable = true;
+
     /** if true, the frame is maximized and can be restored */
     private boolean _maximized = false;
 
@@ -178,6 +181,21 @@ public class UIFrame extends UIContainer {
      */
     public boolean isResizeable() {
         return _resizeable;
+    }
+
+    /**
+     * @param draggable
+     *            true if we should allow dragging of this frame via a frame bar.
+     */
+    public void setDraggable(final boolean draggable) {
+        _draggable = draggable;
+    }
+
+    /**
+     * @return true if this frame allows dragging.
+     */
+    public boolean isDraggable() {
+        return _draggable;
     }
 
     /**
@@ -417,6 +435,9 @@ public class UIFrame extends UIContainer {
         }
 
         public void drag(final int mouseX, final int mouseY) {
+            if (!isDraggable()) {
+                return;
+            }
             // check if we are off the edge... if so, flag for redraw (part of the frame may have been hidden)
             if (!smallerThanWindow()) {
                 fireComponentDirty();
