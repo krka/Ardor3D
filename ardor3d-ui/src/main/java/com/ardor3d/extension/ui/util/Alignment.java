@@ -91,6 +91,10 @@ public enum Alignment {
         return fromLeft() * availableWidth - fromLeft() * width;
     }
 
+    public int alignX(final int availableWidth, final int width) {
+        return (int) Math.round(fromLeft() * availableWidth - fromLeft() * width);
+    }
+
     /**
      * Determine the correct relative Y position for a component being aligned, using this alignment, to another
      * component (or a box to another box, or area... etc. - anything with a "height").
@@ -103,5 +107,9 @@ public enum Alignment {
      */
     public double alignY(final double availableHeight, final double height) {
         return fromBottom() * availableHeight - fromBottom() * height;
+    }
+
+    public int alignY(final int availableHeight, final int height) {
+        return (int) Math.round(fromBottom() * availableHeight - fromBottom() * height);
     }
 }
