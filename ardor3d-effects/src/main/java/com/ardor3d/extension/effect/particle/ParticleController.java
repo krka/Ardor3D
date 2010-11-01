@@ -462,8 +462,8 @@ public class ParticleController extends ComplexSpatialController<ParticleSystem>
     }
 
     /**
-     * Runs the update method of this particle manager for iteration seconds with an update every .1 seconds (IE
-     * <code>iterations</code> 10 update(.1) calls). This is used to "warm up" and get the particle manager going.
+     * Runs the update method of this particle manager X number of times passing .1 seconds for each call. This is used
+     * to "warm up" and get the particle manager going.
      * 
      * @param iterations
      *            The number of iterations to warm up.
