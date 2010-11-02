@@ -11,6 +11,7 @@
 package com.ardor3d.extension.animation.skeletal.state;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.BlendTreeSource;
@@ -100,6 +101,28 @@ public class SteadyState extends AbstractFiniteState {
             throw new IllegalArgumentException("keyword must not be null.");
         }
         _transitions.put(keyword, state);
+    }
+
+    /**
+     * 
+     * @param keyword
+     *            the reference key for the transition state we wish to pull from this steady state.
+     * @return the transition related to the given keyword, or null if none are found.
+     * @throws IllegalArgumentException
+     *             if keyword is null.
+     */
+    public AbstractTransitionState getTransition(final String keyword) {
+        if (keyword == null) {
+            throw new IllegalArgumentException("keyword must not be null.");
+        }
+        return _transitions.get(keyword);
+    }
+
+    /**
+     * @return a Set of the transition state keywords used by this steady state.
+     */
+    public Set<String> getTransitionKeywords() {
+        return _transitions.keySet();
     }
 
     /**
