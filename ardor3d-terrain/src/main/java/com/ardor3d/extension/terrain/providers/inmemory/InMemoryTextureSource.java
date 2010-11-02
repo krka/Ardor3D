@@ -109,7 +109,7 @@ public class InMemoryTextureSource implements TextureSource {
         final int tileX = tile.getX();
         final int tileY = tile.getY();
 
-        final int levelSize = 1 << availableClipmapLevels - clipmapLevel;
+        final int levelSize = 1 << availableClipmapLevels - clipmapLevel - 1;
 
         final int size = inMemoryTerrainData.getSide();
         final byte[] colorData = inMemoryTerrainData.getColorData();
