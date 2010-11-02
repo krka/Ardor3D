@@ -11,6 +11,7 @@
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-jogl,ardor3d-jogl"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-lwjgl,ardor3d-lwjgl"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-swt,ardor3d-swt"/>
+<project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-terrain,ardor3d-terrain"/>
 <project reference="1.0.1,http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk/ardor3d-ui,ardor3d-ui"/>
 </provider>
 </psf>
