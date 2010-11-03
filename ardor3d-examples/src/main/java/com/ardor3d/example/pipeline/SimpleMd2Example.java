@@ -29,7 +29,7 @@ import com.ardor3d.util.resource.ResourceLocatorTool;
  * Simplest example of loading a model in MD2 format.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleMd2Example", //
-thumbnailPath = "/com/ardor3d/example/media/thumbnails/pipeline_SimpleObjExample.jpg", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleMd2Example.jpg", //
 maxHeapMemory = 64)
 public class SimpleMd2Example extends ExampleBase {
     public static void main(final String[] args) {
