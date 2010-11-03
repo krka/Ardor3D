@@ -1552,7 +1552,11 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public void setupPointParameters(final float pointSize, final boolean antialiased) {
+    @Override
+    public void setupPointParameters(final float pointSize, final boolean antialiased, final boolean isSprite,
+            final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
+            final float maxPointSize) {
+        final RenderContext context = ContextManager.getCurrentContext();
         final GL gl = GLU.getCurrentGL();
 
         // TODO: make this into a pointrecord call
@@ -1560,6 +1564,17 @@ public class JoglRenderer extends AbstractRenderer {
         if (antialiased) {
             gl.glEnable(GL.GL_POINT_SMOOTH);
             gl.glHint(GL.GL_POINT_SMOOTH_HINT, GL.GL_NICEST);
+        }
+
+        if (isSprite && context.getCapabilities().isPointSpritesSupported()) {
+            gl.glEnable(GL.GL_POINT_SPRITE_ARB);
+            gl.glTexEnvi(GL.GL_POINT_SPRITE_ARB, GL.GL_COORD_REPLACE_ARB, GL.GL_TRUE);
+        }
+
+        if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
+            gl.glPointParameterfvARB(GL.GL_POINT_DISTANCE_ATTENUATION_ARB, attenuationCoefficients);
+            gl.glPointParameterfARB(GL.GL_POINT_SIZE_MIN_ARB, minPointSize);
+            gl.glPointParameterfARB(GL.GL_POINT_SIZE_MAX_ARB, maxPointSize);
         }
     }
 

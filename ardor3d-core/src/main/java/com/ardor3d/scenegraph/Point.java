@@ -23,17 +23,40 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * <code>Point</code> defines a collection of vertices that are rendered as single points.
+ * <code>Point</code> defines a collection of vertices that are rendered as single points or textured sprites depending
+ * on PointType.
  */
 public class Point extends Mesh {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+
+    public enum PointType {
+        Point, PointSprite;
+    };
+
+    private PointType _pointType;
 
     private float _pointSize = 1.0f;
     private boolean _antialiased = false;
 
+    /**
+     * Distance Attenuation fields.
+     */
+    // XXX: LWJGL requires 4 floats, but only 3 coefficients are mentioned in the specification?
+    // JOGL works fine with 3.
+    private final FloatBuffer _attenuationCoefficients = BufferUtils.createFloatBuffer(new float[] { 0.0f, 0f,
+            0.000004f, 0f });
+    private float _minPointSize = 1.0f;
+    private float _maxPointSize = 64.0f;
+    private boolean _useDistanceAttenuation = false;
+
     public Point() {
         this("point", null, null, null, (FloatBufferData) null);
+    }
+
+    public Point(final PointType type) {
+        this();
+        _pointType = type;
     }
 
     /**
@@ -97,6 +120,47 @@ public class Point extends Mesh {
         _meshData.setTextureCoords(coords, 0);
     }
 
+    public boolean isPointSprite() {
+        return _pointType == PointType.PointSprite;
+    }
+
+    /**
+     * Default attenuation coefficient is calculated to work best with pointSize = 1.
+     * 
+     * @param bool
+     */
+    public void enableDistanceAttenuation(final boolean bool) {
+        _useDistanceAttenuation = bool;
+    }
+
+    /**
+     * Distance Attenuation Equation:<br>
+     * x = distance from the eye<br>
+     * Derived Size = clamp( pointSize * sqrt( attenuation(x) ) )<br>
+     * attenuation(x) = 1 / (a + b*x + c*x^2)
+     * <p>
+     * Default coefficients used are(they should work best with pointSize=1):<br>
+     * a = 0, b = 0, c = 0.000004f<br>
+     * This should give(without taking regards to the max,min pointSize clamping):<br>
+     * 1. A size of 1 pixel at distance of 500 units.<br>
+     * Derived Size = 1/(0.000004*500^2) = 1<br>
+     * 2. A size of 25 pixel at distance of 100 units.<br>
+     * 3. A size of 2500 at a distance of 10 units.<br>
+     * 
+     * @see <a href="http://www.opengl.org/registry/specs/ARB/point_parameters.txt">OpenGL specification</a>
+     * @param a
+     *            constant term in the attenuation equation
+     * @param b
+     *            linear term in the attenuation equation
+     * @param c
+     *            quadratic term in the attenuation equation
+     */
+    public void setDistanceAttenuationCoefficients(final float a, final float b, final float c) {
+        _attenuationCoefficients.put(0, a);
+        _attenuationCoefficients.put(1, b);
+        _attenuationCoefficients.put(2, c);
+    }
+
     /**
      * @return true if points are to be drawn antialiased
      */
@@ -116,6 +180,14 @@ public class Point extends Mesh {
         _antialiased = antialiased;
     }
 
+    public PointType getPointType() {
+        return _pointType;
+    }
+
+    public void setPointType(final PointType pointType) {
+        _pointType = pointType;
+    }
+
     /**
      * @return the pixel size of each point.
      */
@@ -132,6 +204,42 @@ public class Point extends Mesh {
      */
     public void setPointSize(final float size) {
         _pointSize = size;
+    }
+
+    /**
+     * When DistanceAttenuation is enabled, the points maximum size will get clamped to this value.
+     * 
+     * @param maxSize
+     */
+    public void setMaxPointSize(final float maxSize) {
+        _maxPointSize = maxSize;
+    }
+
+    /**
+     * When DistanceAttenuation is enabled, the points maximum size will get clamped to this value.
+     * 
+     * @param maxSize
+     */
+    public float getMaxPointSize() {
+        return _maxPointSize;
+    }
+
+    /**
+     * When DistanceAttenuation is enabled, the points minimum size will get clamped to this value.
+     * 
+     * @param maxSize
+     */
+    public void setMinPointSize(final float minSize) {
+        _minPointSize = minSize;
+    }
+
+    /**
+     * When DistanceAttenuation is enabled, the points minimum size will get clamped to this value.
+     * 
+     * @param maxSize
+     */
+    public float getMinPointSize() {
+        return _minPointSize;
     }
 
     /**
@@ -162,6 +270,12 @@ public class Point extends Mesh {
         super.write(capsule);
         capsule.write(_pointSize, "pointSize", 1);
         capsule.write(_antialiased, "antialiased", false);
+        capsule.write(_pointType, "pointType", PointType.Point);
+        capsule.write(_useDistanceAttenuation, "useDistanceAttenuation", false);
+        capsule.write(_attenuationCoefficients, "attenuationCoefficients", null);
+        capsule.write(_minPointSize, "minPointSize", 1);
+        capsule.write(_maxPointSize, "maxPointSize", 64);
+
     }
 
     @Override
@@ -169,11 +283,25 @@ public class Point extends Mesh {
         super.read(capsule);
         _pointSize = capsule.readFloat("pointSize", 1);
         _antialiased = capsule.readBoolean("antialiased", false);
+        _pointType = capsule.readEnum("pointType", PointType.class, PointType.Point);
+        _useDistanceAttenuation = capsule.readBoolean("useDistanceAttenuation", false);
+        final FloatBuffer coef = capsule.readFloatBuffer("attenuationCoefficients", null);
+        if (coef == null) {
+            _attenuationCoefficients.clear();
+            _attenuationCoefficients.put(new float[] { 0.0f, 0f, 0.000004f, 0f });
+        } else {
+            _attenuationCoefficients.clear();
+            _attenuationCoefficients.put(coef);
+        }
+        _minPointSize = capsule.readFloat("minPointSize", 1);
+        _maxPointSize = capsule.readFloat("maxPointSize", 64);
+
     }
 
     @Override
     public void render(final Renderer renderer) {
-        renderer.setupPointParameters(getPointSize(), isAntialiased());
+        renderer.setupPointParameters(_pointSize, isAntialiased(), isPointSprite(), _useDistanceAttenuation,
+                _attenuationCoefficients, _minPointSize, _maxPointSize);
 
         super.render(renderer);
     }

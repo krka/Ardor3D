@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 
 import org.lwjgl.opengl.ARBBufferObject;
 import org.lwjgl.opengl.ARBMultitexture;
+import org.lwjgl.opengl.ARBPointParameters;
+import org.lwjgl.opengl.ARBPointSprite;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.EXTFogCoord;
@@ -1494,9 +1496,27 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public void setupPointParameters(final float pointSize, final boolean antialiased) {
+    @Override
+    public void setupPointParameters(final float pointSize, final boolean antialiased, final boolean isSprite,
+            final boolean useDistanceAttenuation, final FloatBuffer attenuationCoefficients, final float minPointSize,
+            final float maxPointSize) {
+        final RenderContext context = ContextManager.getCurrentContext();
+
         // TODO: make a record for point states
         GL11.glPointSize(pointSize);
+
+        if (isSprite && context.getCapabilities().isPointSpritesSupported()) {
+            GL11.glEnable(ARBPointSprite.GL_POINT_SPRITE_ARB);
+            GL11.glTexEnvi(ARBPointSprite.GL_POINT_SPRITE_ARB, ARBPointSprite.GL_COORD_REPLACE_ARB, GL11.GL_TRUE);
+        }
+
+        if (useDistanceAttenuation && context.getCapabilities().isPointParametersSupported()) {
+            ARBPointParameters.glPointParameterARB(ARBPointParameters.GL_POINT_DISTANCE_ATTENUATION_ARB,
+                    attenuationCoefficients);
+            ARBPointParameters.glPointParameterfARB(ARBPointParameters.GL_POINT_SIZE_MIN_ARB, minPointSize);
+            ARBPointParameters.glPointParameterfARB(ARBPointParameters.GL_POINT_SIZE_MAX_ARB, maxPointSize);
+        }
+
         if (antialiased) {
             GL11.glEnable(GL11.GL_POINT_SMOOTH);
             GL11.glHint(GL11.GL_POINT_SMOOTH_HINT, GL11.GL_NICEST);

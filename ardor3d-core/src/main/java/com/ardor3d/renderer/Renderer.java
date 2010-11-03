@@ -466,8 +466,14 @@ public interface Renderer {
      * 
      * @param pointSize
      * @param antialiased
+     * @param isSprite
+     * @param useDistanceAttenuation
+     * @param attenuationCoefficients
+     * @param minPointSize
+     * @param maxPointSize
      */
-    void setupPointParameters(float pointSize, boolean antialiased);
+    void setupPointParameters(float pointSize, boolean antialiased, boolean isSprite, boolean useDistanceAttenuation,
+            FloatBuffer attenuationCoefficients, float minPointSize, float maxPointSize);
 
     /**
      * Apply the given state to the current RenderContext using this Renderer.

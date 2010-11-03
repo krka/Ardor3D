@@ -25,6 +25,9 @@ public class ContextCapabilities {
 
     protected boolean _supportsFogCoords = false;
 
+    protected boolean _supportsPointSprites = false;
+    protected boolean _supportsPointParameters = false;
+
     protected boolean _supportsTextureLodBias = false;
     protected float _maxTextureLodBias = 0f;
 
@@ -191,6 +194,20 @@ public class ContextCapabilities {
      */
     public boolean isFogCoordinatesSupported() {
         return _supportsFogCoords;
+    }
+
+    /**
+     * @return true if point sprites are supported
+     */
+    public boolean isPointSpritesSupported() {
+        return _supportsPointSprites;
+    }
+
+    /**
+     * @return true if point parameters are supported
+     */
+    public boolean isPointParametersSupported() {
+        return _supportsPointParameters;
     }
 
     /**

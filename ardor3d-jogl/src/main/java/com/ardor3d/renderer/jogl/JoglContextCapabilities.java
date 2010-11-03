@@ -46,6 +46,9 @@ public final class JoglContextCapabilities extends ContextCapabilities {
         _supportsFragmentProgram = gl.isExtensionAvailable("GL_ARB_fragment_program");
         _supportsVertexProgram = gl.isExtensionAvailable("GL_ARB_vertex_program");
 
+        _supportsPointSprites = gl.isExtensionAvailable("GL_ARB_point_sprite");
+        _supportsPointParameters = gl.isExtensionAvailable("GL_ARB_point_parameters");
+
         _supportsTextureLodBias = gl.isExtensionAvailable("GL_EXT_texture_lod_bias");
         if (_supportsTextureLodBias) {
             gl.glGetIntegerv(GL.GL_MAX_TEXTURE_LOD_BIAS_EXT, buf);

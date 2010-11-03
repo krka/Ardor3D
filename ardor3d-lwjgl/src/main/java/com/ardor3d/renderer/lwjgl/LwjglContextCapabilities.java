@@ -45,6 +45,9 @@ public class LwjglContextCapabilities extends ContextCapabilities {
         _supportsFragmentProgram = caps.GL_ARB_fragment_program;
         _supportsVertexProgram = caps.GL_ARB_vertex_program;
 
+        _supportsPointSprites = caps.GL_ARB_point_sprite;
+        _supportsPointParameters = caps.GL_ARB_point_parameters;
+
         _supportsTextureLodBias = caps.GL_EXT_texture_lod_bias;
         if (_supportsTextureLodBias) {
             GL11.glGetInteger(EXTTextureLODBias.GL_MAX_TEXTURE_LOD_BIAS_EXT, buf);
