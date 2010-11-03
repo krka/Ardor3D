@@ -133,6 +133,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ardor3d-terrain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ardor3d-ui</artifactId>
             <version>${project.version}</version>
         </dependency>
