@@ -17,7 +17,7 @@ import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.Vector3;
 
 /**
- * Simplest example of loading a collada model.
+ * Simplest example of loading a Collada model.
  */
 @Purpose(htmlDescriptionKey = "com.ardor3d.example.pipeline.SimpleColladaExample", //
 thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_SimpleColladaExample.jpg", //
