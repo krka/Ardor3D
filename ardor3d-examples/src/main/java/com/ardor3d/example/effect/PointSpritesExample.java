@@ -4,6 +4,7 @@ package com.ardor3d.example.effect;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.example.ExampleBase;
+import com.ardor3d.example.Purpose;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.WrapMode;
@@ -22,6 +23,12 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * A demonstration of using PointType.PointSprite. (Example requires GLSL shader support.)
+ */
+@Purpose(htmlDescriptionKey = "com.ardor3d.example.effect.PointSpritesExample", //
+thumbnailPath = "com/ardor3d/example/media/thumbnails/effect_PointSpritesExample.jpg", //
+maxHeapMemory = 64)
 public class PointSpritesExample extends ExampleBase {
     private final int _spriteCount = 60000;
     private Point _pointSprites;

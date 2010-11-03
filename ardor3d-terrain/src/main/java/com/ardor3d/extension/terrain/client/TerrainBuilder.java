@@ -31,12 +31,12 @@ public class TerrainBuilder {
 
     private boolean showDebugPanels = false;
 
+    private final List<TextureSource> extraTextureSources = Lists.newArrayList();
+
     public TerrainBuilder(final TerrainDataProvider terrainDataProvider, final Camera camera) {
         this.terrainDataProvider = terrainDataProvider;
         this.camera = camera;
     }
-
-    private final List<TextureSource> extraTextureSources = Lists.newArrayList();
 
     public void addTextureConnection(final TextureSource textureSource) {
         extraTextureSources.add(textureSource);
