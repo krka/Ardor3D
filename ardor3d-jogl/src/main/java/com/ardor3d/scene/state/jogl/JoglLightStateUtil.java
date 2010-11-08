@@ -84,12 +84,12 @@ public abstract class JoglLightStateUtil {
             } else {
                 setModelAmbient(record, ColorRGBA.BLACK_NO_ALPHA);
             }
-
-            if (!record.isValid()) {
-                record.validate();
-            }
         } else {
             setLightEnabled(false, record);
+        }
+
+        if (!record.isValid()) {
+            record.validate();
         }
     }
 
