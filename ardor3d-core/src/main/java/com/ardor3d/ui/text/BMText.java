@@ -589,6 +589,8 @@ public class BMText extends Mesh {
 
         float alignX = _size.getXf() * _align.horizontal;
         float alignY = _size.getYf() * _align.vertical;
+        alignX = Math.round(alignX);
+        alignY = Math.round(alignY);
         alignX += _fixedOffset.getX();
         alignY += _fixedOffset.getY();
 
