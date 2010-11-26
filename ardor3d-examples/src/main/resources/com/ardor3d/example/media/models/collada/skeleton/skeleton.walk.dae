@@ -105,20 +105,6 @@
             <shininess>
               <float sid="shininess">1.071773</float>
             </shininess>
-            <reflective>
-              <texture texture="Map__0-image" texcoord="CHANNEL0">
-                <extra>
-                  <technique profile="MAYA">
-                    <wrapU sid="wrapU0">TRUE</wrapU>
-                    <wrapV sid="wrapV0">TRUE</wrapV>
-                    <blend_mode>ADD</blend_mode>
-                  </technique>
-                </extra>
-              </texture>
-            </reflective>
-            <reflectivity>
-              <float sid="reflectivity">1.000000</float>
-            </reflectivity>
             <transparent>
               <color sid="transparent">1.000000  1.000000 1.000000 1.000000</color>
             </transparent>

@@ -790,6 +790,10 @@ public class ColladaAnimUtils {
             final String source = channel.getAttributeValue("source");
 
             final String targetString = channel.getAttributeValue("target");
+            if (targetString == null || targetString.isEmpty()) {
+                return;
+            }
+
             final Target target = processTargetString(targetString);
             logger.fine(target.toString());
             final Element targetNode = findTargetNode(target);

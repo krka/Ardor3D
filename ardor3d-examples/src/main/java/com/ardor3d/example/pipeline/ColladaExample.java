@@ -93,8 +93,8 @@ public class ColladaExample extends ExampleBase {
 
         _lightState.detachAll();
         final DirectionalLight light = new DirectionalLight();
-        light.setDiffuse(new ColorRGBA(0.75f, 0.75f, 0.75f, 0.75f));
-        light.setAmbient(new ColorRGBA(0.25f, 0.25f, 0.25f, 1.0f));
+        light.setDiffuse(new ColorRGBA(1, 1, 1, 1));
+        light.setAmbient(new ColorRGBA(0.9f, 0.9f, 0.9f, 1));
         light.setDirection(new Vector3(-1, -1, -1).normalizeLocal());
         light.setEnabled(true);
         _lightState.attach(light);

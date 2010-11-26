@@ -20,6 +20,10 @@ import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.extension.model.collada.jdom.data.SamplerTypes;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.image.Texture.ApplyMode;
+import com.ardor3d.image.Texture.CombinerFunctionRGB;
+import com.ardor3d.image.Texture.CombinerOperandRGB;
+import com.ardor3d.image.Texture.CombinerSource;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -211,6 +215,41 @@ public class ColladaMaterialUtils {
                             populateTextureState(mesh, propertyValue, effect, loadedTextures);
                         }
                     }
+                    /* Reflectivity property */
+                    float reflectivity = 1.0f;
+                    property = blinnPhong.getChild("reflectivity");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("float".equals(propertyValue.getName())) {
+                            reflectivity = Float.parseFloat(propertyValue.getText().replace(",", "."));
+                        }
+                    }
+                    /* Reflective property. Texture only */
+                    property = blinnPhong.getChild("reflective");
+                    if (property != null) {
+                        final Element propertyValue = (Element) property.getChildren().get(0);
+                        if ("texture".equals(propertyValue.getName()) && _loadTextures) {
+                            final Texture reflectiveTexture = populateTextureState(mesh, propertyValue, effect,
+                                    loadedTextures);
+
+                            reflectiveTexture.setEnvironmentalMapMode(Texture.EnvironmentalMapMode.SphereMap);
+                            reflectiveTexture.setApply(ApplyMode.Combine);
+
+                            reflectiveTexture.setCombineFuncRGB(CombinerFunctionRGB.Interpolate);
+                            // color 1
+                            reflectiveTexture.setCombineSrc0RGB(CombinerSource.CurrentTexture);
+                            reflectiveTexture.setCombineOp0RGB(CombinerOperandRGB.SourceColor);
+                            // color 2
+                            reflectiveTexture.setCombineSrc1RGB(CombinerSource.Previous);
+                            reflectiveTexture.setCombineOp1RGB(CombinerOperandRGB.SourceColor);
+                            // interpolate param will come from alpha of constant color
+                            reflectiveTexture.setCombineSrc2RGB(CombinerSource.Constant);
+                            reflectiveTexture.setCombineOp2RGB(CombinerOperandRGB.SourceAlpha);
+
+                            reflectiveTexture.setConstantColor(new ColorRGBA(1, 1, 1, reflectivity));
+                        }
+                    }
+
                     /*
                      * An extra tag defines some materials not part of the collada standard. Since we're not able to
                      * parse we simply extract the textures from the element (such that shaders etc can at least pick up
@@ -385,6 +424,7 @@ public class ColladaMaterialUtils {
                 // Apply params from our sampler.
                 applySampler(sampler, texture);
             }
+
             // Add to texture state.
             tState.setTexture(texture, tState.getNumberOfSetTextures());
             loadedTextures.put(textureReference, texture);
