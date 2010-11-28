@@ -265,17 +265,31 @@ public class ColladaMaterialUtils {
                     // Turn on alpha blending and use diffuse alpha.
 
                     // check to make sure we actually need this.
-                    if ("A_ONE".equals(opaqueMode) && ColorRGBA.WHITE.equals(transparent) && transparency == 1.0) {
+                    // testing separately for a transparency of 0.0 is to hack around erroneous exports, since usually
+                    // there is no use in exporting something with 100% transparency.
+                    if ("A_ONE".equals(opaqueMode) && ColorRGBA.WHITE.equals(transparent) && transparency == 1.0
+                            || transparency == 0.0) {
                         useTransparency = false;
                     }
 
-                    if (diffuseTexture != null && useTransparency) {
-                        final BlendState blend = new BlendState();
-                        blend.setBlendEnabled(true);
-                        blend.setTestEnabled(true);
-                        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-                        blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
-                        mesh.setRenderState(blend);
+                    if (useTransparency) {
+                        if (diffuseTexture != null) {
+                            final BlendState blend = new BlendState();
+                            blend.setBlendEnabled(true);
+                            blend.setTestEnabled(true);
+                            blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+                            blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusSourceAlpha);
+                            mesh.setRenderState(blend);
+                        } else {
+                            final BlendState blend = new BlendState();
+                            blend.setBlendEnabled(true);
+                            blend.setTestEnabled(true);
+                            transparent.setAlpha(transparent.getAlpha() * transparency);
+                            blend.setConstantColor(transparent);
+                            blend.setSourceFunction(BlendState.SourceFunction.ConstantAlpha);
+                            blend.setDestinationFunction(BlendState.DestinationFunction.OneMinusConstantAlpha);
+                            mesh.setRenderState(blend);
+                        }
 
                         mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
                     }
