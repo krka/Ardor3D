@@ -59,7 +59,7 @@ public class ObjGeometryStore {
         return _dataStore;
     }
 
-    public Spatial getScenegraph() {
+    public Node getScenegraph() {
         return _root;
     }
 
