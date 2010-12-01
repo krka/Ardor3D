@@ -25,15 +25,19 @@ import com.ardor3d.intersection.BoundingPickResults;
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.controller.SpatialController;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TextureCombineMode;
@@ -76,6 +80,8 @@ public class ShapesExample extends ExampleBase {
     private int index;
     private BasicText _text;
     private PickResults _pickResults;
+    private Spatial _picked = null;
+    private SpatialController<Spatial> _pickedControl;
 
     public static void main(final String[] args) {
         start(ShapesExample.class);
@@ -129,6 +135,30 @@ public class ShapesExample extends ExampleBase {
         _text.setTranslation(10, 10, 0);
         _text.getSceneHints().setCullHint(CullHint.Always);
         _root.attachChild(_text);
+
+        // Set up picked pulse
+        _pickedControl = new SpatialController<Spatial>() {
+            ColorRGBA curr = new ColorRGBA();
+            float val = 0;
+            boolean add = true;
+
+            @Override
+            public void update(final double time, final Spatial caller) {
+                val += time * (add ? 1 : -1);
+                if (val < 0) {
+                    val = -val;
+                    add = true;
+                } else if (val > 1) {
+                    val = 1 - (val - (int) val);
+                    add = false;
+                }
+
+                curr.set(val, val, val, 1.0f);
+
+                final MaterialState ms = (MaterialState) caller.getLocalRenderState(StateType.Material);
+                ms.setAmbient(curr);
+            }
+        };
     }
 
     @Override
@@ -159,13 +189,29 @@ public class ShapesExample extends ExampleBase {
                     final PickData pick = _pickResults.getPickData(0);
                     if (pick.getTarget() instanceof Spatial) {
                         final Spatial topLevel = getTopLevel((Spatial) pick.getTarget());
+                        if (!topLevel.equals(_picked)) {
+                            clearPicked();
+                            _picked = topLevel;
+                            _picked.addController(_pickedControl);
+                        }
                         _text.setText(topLevel.getName());
                     }
                 } else {
                     // No pick, clear label.
                     _text.getSceneHints().setCullHint(CullHint.Always);
                     _text.setText("");
+
+                    clearPicked();
                 }
+            }
+
+            private void clearPicked() {
+                if (_picked != null) {
+                    final MaterialState ms = (MaterialState) _picked.getLocalRenderState(StateType.Material);
+                    ms.setAmbient(ColorRGBA.DARK_GRAY);
+                    _picked.removeController(_pickedControl);
+                }
+                _picked = null;
             }
 
             private Spatial getTopLevel(final Spatial target) {
@@ -200,6 +246,9 @@ public class ShapesExample extends ExampleBase {
         if (spatial instanceof Mesh) {
             ((Mesh) spatial).updateModelBound();
         }
+        final MaterialState ms = new MaterialState();
+        ms.setAmbient(ColorRGBA.DARK_GRAY);
+        spatial.setRenderState(ms);
         _root.attachChild(spatial);
         index++;
     }
