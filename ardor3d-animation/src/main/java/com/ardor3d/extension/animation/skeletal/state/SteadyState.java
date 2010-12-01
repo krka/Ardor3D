@@ -126,6 +126,44 @@ public class SteadyState extends AbstractFiniteState {
     }
 
     /**
+     * Remove a transition state by keyword.
+     * 
+     * @param keyword
+     *            the reference key for the transition state we wish to remove from this steady state.
+     * @return the removed transition, or null if none was found by the given keyword.
+     * @throws IllegalArgumentException
+     *             if keyword is null.
+     */
+    public AbstractTransitionState removeTransition(final String keyword) {
+        if (keyword == null) {
+            throw new IllegalArgumentException("keyword must not be null.");
+        }
+        return _transitions.remove(keyword);
+    }
+
+    /**
+     * Remove the first instance of a specific transition state from this steady state.
+     * 
+     * @param transition
+     *            the transition state we wish to remove from this steady state.
+     * @return true if we found and removed the given transition.
+     * @throws IllegalArgumentException
+     *             if transition is null.
+     */
+    public boolean removeTransition(final AbstractTransitionState transition) {
+        if (transition == null) {
+            throw new IllegalArgumentException("transition must not be null.");
+        }
+        for (final String keyword : _transitions.keySet()) {
+            if (_transitions.get(keyword).equals(transition)) {
+                _transitions.remove(keyword);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Request that this state transition to another.
      * 
      * @param key
