@@ -226,8 +226,11 @@ public class AnimationLayer implements StateOwner {
      *            the layer before this layer in the animation manager.
      */
     public void updateLayerBlending(final AnimationLayer previousLayer) {
-        getLayerBlender().setLayerA(previousLayer);
-        getLayerBlender().setLayerB(this);
+        final LayerBlender blender = getLayerBlender();
+        if (blender != null) {
+            blender.setLayerA(previousLayer);
+            blender.setLayerB(this);
+        }
     }
 
     /**
