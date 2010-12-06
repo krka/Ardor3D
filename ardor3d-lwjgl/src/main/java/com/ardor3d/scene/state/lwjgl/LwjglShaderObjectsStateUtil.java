@@ -100,7 +100,7 @@ public abstract class LwjglShaderObjectsStateUtil {
         if (caps.isGeometryShader4Supported()) {
             if (state.getGeometryShader() != null) {
                 if (state._geometryShaderID != -1) {
-                    removeFragShader(state);
+                    removeGeomShader(state);
                 }
 
                 state._geometryShaderID = ARBShaderObjects
