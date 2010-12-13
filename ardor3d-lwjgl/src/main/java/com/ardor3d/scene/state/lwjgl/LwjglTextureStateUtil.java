@@ -589,7 +589,7 @@ public abstract class LwjglTextureStateUtil {
                 texture = state.getTexture(i);
 
                 // pull our texture id for this texture, for this context.
-                int textureId = texture != null ? texture.getTextureIdForContext(context.getGlContextRep()) : -1;
+                int textureId = texture != null ? texture.getTextureIdForContext(context.getGlContextRep()) : 0;
 
                 // check for invalid textures - ones that have no opengl id and
                 // no image data
