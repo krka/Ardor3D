@@ -90,6 +90,7 @@ public class ContextIdReference<T> extends PhantomReference<T> {
     @Override
     public void clear() {
         super.clear();
+        _singleContextId = 0;
         REFS.remove(this);
     }
 }
