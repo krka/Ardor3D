@@ -31,6 +31,9 @@ public class ManagedTransformSource implements BlendTreeSource {
     /** Our local source data. */
     private final Map<String, TransformData> data = Maps.newHashMap();
 
+    /** optional: name of source we were initialized from, if given. */
+    private String sourceName;
+
     /**
      * Set the local source transform data for a given joint index.
      * 
@@ -160,5 +163,13 @@ public class ManagedTransformSource implements BlendTreeSource {
             setJointTransformData(jointIndex, ((JointChannel) clip.findChannelByName(JointChannel.JOINT_CHANNEL_NAME
                     + jointIndex)).getTransformData(0, new TransformData()));
         }
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(final String name) {
+        sourceName = name;
     }
 }

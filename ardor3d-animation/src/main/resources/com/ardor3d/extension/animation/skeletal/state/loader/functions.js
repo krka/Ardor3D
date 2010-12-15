@@ -171,6 +171,9 @@ function _treeSource(json) {
 		// if we are asked to, init joint positions from initial position of a
 		// clip
 		if (root.initFromClip) {
+			// store name fore future use.
+			source.setSourceName(root.initFromClip.clip);
+			
 			// get clip
 			var clip = INPUTSTORE.clips.get(root.initFromClip.clip);
 			if (root.initFromClip.jointNames) {
