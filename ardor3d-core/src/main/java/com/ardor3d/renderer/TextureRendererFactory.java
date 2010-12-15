@@ -36,9 +36,14 @@ public enum TextureRendererFactory {
      * @param caps
      *            the context capabilities, used for testing.
      * @return a TextureRenderer
+     * @throws IllegalStateException
+     *             if provider has not been set prior to calling this method.
      */
     public TextureRenderer createTextureRenderer(final int width, final int height, final Renderer renderer,
             final ContextCapabilities caps) {
+        if (_provider == null) {
+            throw new IllegalStateException("No provider has been set on TextureRendererFactory.");
+        }
         return _provider.createTextureRenderer(width, height, renderer, caps);
     }
 
@@ -60,9 +65,14 @@ public enum TextureRendererFactory {
      * @param caps
      *            the context capabilities, used for testing.
      * @return a TextureRenderer
+     * @throws IllegalStateException
+     *             if provider has not been set prior to calling this method.
      */
     public TextureRenderer createTextureRenderer(final int width, final int height, final int depthBits,
             final int samples, final Renderer renderer, final ContextCapabilities caps) {
+        if (_provider == null) {
+            throw new IllegalStateException("No provider has been set on TextureRendererFactory.");
+        }
         return _provider.createTextureRenderer(width, height, depthBits, samples, renderer, caps);
     }
 
@@ -80,10 +90,14 @@ public enum TextureRendererFactory {
      * @param caps
      *            the context capabilities, used for testing.
      * @return a TextureRenderer
+     * @throws IllegalStateException
+     *             if provider has not been set prior to calling this method.
      */
     public TextureRenderer createTextureRenderer(final DisplaySettings settings, final boolean forcePbuffer,
             final Renderer renderer, final ContextCapabilities caps) {
+        if (_provider == null) {
+            throw new IllegalStateException("No provider has been set on TextureRendererFactory.");
+        }
         return _provider.createTextureRenderer(settings, forcePbuffer, renderer, caps);
     }
-
 }
