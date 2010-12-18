@@ -82,10 +82,9 @@ public class RawHeightMap {
     }
 
     /**
-     * <code>load</code> fills the height data array with the appropriate data from the set RAW image. If the RAW image
-     * has not been set a JmeException will be thrown.
+     * <code>load</code> fills the height data array with the appropriate data from the set RAW image stream or file.
      * 
-     * @return true if the load is successfull, false otherwise.
+     * @return true if the load is successful, false otherwise.
      */
     public boolean loadHeightmap() {
         // initialize the height data attributes
