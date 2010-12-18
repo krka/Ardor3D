@@ -14,6 +14,7 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.input.InputState;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 
 /**
@@ -76,11 +77,12 @@ public class UIFrameStatusBar extends UIPanel {
         private int _initialY;
         private int _initialLocalComponentWidth;
         private int _initialLocalComponentHeight;
+        private final Transform _initFrameTransform = new Transform();
 
         public void startDrag(final int mouseX, final int mouseY) {
             final Vector3 vec = Vector3.fetchTempInstance();
             vec.set(mouseX, mouseY, 0);
-            getWorldTransform().applyInverse(vec);
+            getWorldTransform().applyInverseVector(vec);
 
             _initialX = Math.round(vec.getXf());
             _initialY = Math.round(vec.getYf());
@@ -89,6 +91,8 @@ public class UIFrameStatusBar extends UIPanel {
             final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
             _initialLocalComponentWidth = frame.getLocalComponentWidth();
             _initialLocalComponentHeight = frame.getLocalComponentHeight();
+
+            _initFrameTransform.set(frame.getWorldTransform());
         }
 
         public void drag(final int mouseX, final int mouseY) {
@@ -100,9 +104,10 @@ public class UIFrameStatusBar extends UIPanel {
         }
 
         private void resizeFrameByPosition(final int mouseX, final int mouseY) {
+
             final Vector3 vec = Vector3.fetchTempInstance();
             vec.set(mouseX, mouseY, 0);
-            getWorldTransform().applyInverse(vec);
+            getWorldTransform().applyInverseVector(vec);
 
             final int x = Math.round(vec.getXf());
             final int y = Math.round(vec.getYf());
@@ -110,7 +115,7 @@ public class UIFrameStatusBar extends UIPanel {
             final UIFrame frame = UIFrame.findParentFrame(UIFrameStatusBar.this);
 
             // Set the new width to the initial width + the change in mouse x position.
-            int newWidth = _initialLocalComponentWidth + (x - _initialX);
+            int newWidth = _initialLocalComponentWidth + x - _initialX;
             if (newWidth < UIFrame.MIN_FRAME_WIDTH) {
                 // don't let us get smaller than min size
                 newWidth = UIFrame.MIN_FRAME_WIDTH;
@@ -139,13 +144,12 @@ public class UIFrameStatusBar extends UIPanel {
                 newHeight = frame.getMaximumLocalComponentHeight();
             }
 
-            int heightDiff = newHeight - frame.getLocalComponentHeight();
-            _initialY += heightDiff;
-            
             frame.setLocalComponentSize(newWidth, newHeight);
 
-            vec.set(0, -heightDiff, 0);
-            getWorldTransform().applyForwardVector(vec);
+
+            vec.set(0, _initialLocalComponentHeight - newHeight, 0);
+            _initFrameTransform.applyForwardVector(vec);
+            frame.setTransform(_initFrameTransform);
             frame.addTranslation(vec);
             Vector3.releaseTempInstance(vec);
 
