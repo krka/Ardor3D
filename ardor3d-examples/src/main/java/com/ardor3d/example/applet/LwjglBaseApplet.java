@@ -52,6 +52,7 @@ import com.ardor3d.renderer.TextureRendererFactory;
 import com.ardor3d.renderer.lwjgl.LwjglTextureRendererProvider;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
 import com.ardor3d.util.GameTaskQueueManager;
@@ -59,6 +60,7 @@ import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.SimpleResourceLocator;
+import com.ardor3d.util.stat.StatCollector;
 
 /**
  * An example base class for ardor3d/lwjgl applets. This is not meant to be a "best-practices" applet, just a rough demo
@@ -180,9 +182,12 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
     protected void update() {
         _timer.update();
 
-        if (_logicalLayer != null) {
-            _logicalLayer.checkTriggers(_timer.getTimePerFrame());
+        /** update stats, if enabled. */
+        if (Constants.stats) {
+            StatCollector.update();
         }
+
+        updateLogicalLayer(_timer);
 
         // Execute updateQueue item
         GameTaskQueueManager.getManager(_glCanvas.getCanvasRenderer().getRenderContext())
@@ -192,6 +197,13 @@ public abstract class LwjglBaseApplet extends Applet implements Scene {
 
         // Update controllers/render states/transforms/bounds for rootNode.
         _root.updateGeometricState(_timer.getTimePerFrame(), true);
+    }
+
+    protected void updateLogicalLayer(final ReadOnlyTimer timer) {
+        // check and execute any input triggers, if we are concerned with input
+        if (_logicalLayer != null) {
+            _logicalLayer.checkTriggers(timer.getTimePerFrame());
+        }
     }
 
     protected void initGL() throws LWJGLException {
