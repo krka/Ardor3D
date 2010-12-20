@@ -27,10 +27,12 @@ import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
@@ -582,6 +584,71 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         return mesh;
     }
 
+    /**
+     * Let this mesh know we want to change its indices to the provided new order. Override this to provide extra
+     * functionality for sub types as needed.
+     * 
+     * @param newIndices
+     *            the IntBufferData to switch to.
+     * @param modes
+     *            the new segment modes to use.
+     * @param lengths
+     *            the new lengths to use.
+     */
+    public void reorderIndices(final IndexBufferData<?> newIndices, final IndexMode[] modes, final int[] lengths) {
+        _meshData.setIndices(newIndices);
+        _meshData.setIndexModes(modes);
+        _meshData.setIndexLengths(lengths);
+    }
+
+    /**
+     * Swap around the order of the vertex data in this Mesh. This is usually called by a tool that has attempted to
+     * determine a more optimal order for vertex data.
+     * 
+     * @param newVertexOrder
+     *            a mapping to the desired new order, where the current location of a vertex is the index into this
+     *            array and the value at that location in the array is the new location to store the vertex data.
+     */
+    public void reorderVertexData(final int[] newVertexOrder) {
+        reorderVertexData(newVertexOrder, _meshData);
+    }
+
+    protected void reorderVertexData(final int[] newVertexOrder, final MeshData meshData) {
+        final FloatBufferData verts = new FloatBufferData(BufferUtils.clone(meshData.getVertexBuffer()), 3);
+        final FloatBufferData norms = meshData.getNormalBuffer() != null ? new FloatBufferData(BufferUtils
+                .clone(meshData.getNormalBuffer()), 3) : null;
+        final FloatBufferData[] uvs = new FloatBufferData[meshData.getNumberOfUnits()];
+        for (int k = 0; k < uvs.length; k++) {
+            if (meshData.getTextureBuffer(k) != null) {
+                uvs[k] = new FloatBufferData(BufferUtils.clone(meshData.getTextureBuffer(k)), 2);
+            }
+        }
+
+        final Vector3 temp3 = new Vector3();
+        final Vector2 temp2 = new Vector2();
+        for (int i = 0; i < meshData.getVertexCount(); i++) {
+            BufferUtils.populateFromBuffer(temp3, meshData.getVertexBuffer(), i);
+            BufferUtils.setInBuffer(temp3, verts.getBuffer(), newVertexOrder[i]);
+            if (norms != null) {
+                BufferUtils.populateFromBuffer(temp3, meshData.getNormalBuffer(), i);
+                BufferUtils.setInBuffer(temp3, norms.getBuffer(), newVertexOrder[i]);
+            }
+            for (int k = 0; k < uvs.length; k++) {
+                if (uvs[k] != null) {
+                    BufferUtils.populateFromBuffer(temp2, meshData.getTextureBuffer(0), i);
+                    BufferUtils.setInBuffer(temp2, uvs[k].getBuffer(), newVertexOrder[i]);
+                }
+            }
+        }
+        meshData.setVertexCoords(verts);
+        meshData.setNormalCoords(norms);
+        for (int k = 0; k < uvs.length; k++) {
+            if (uvs[k] != null) {
+                meshData.setTextureCoords(uvs[k], k);
+            }
+        }
+    }
+
     // /////////////////
     // Methods for Savable
     // /////////////////
@@ -608,5 +675,4 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         _defaultColor = (ColorRGBA) capsule.readSavable("defaultColor", new ColorRGBA(ColorRGBA.WHITE));
         _isVisible = capsule.readBoolean("visible", true);
     }
-
 }

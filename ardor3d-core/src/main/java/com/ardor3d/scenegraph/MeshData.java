@@ -1175,7 +1175,11 @@ public class MeshData implements Savable {
         }
 
         for (final FloatBufferData tCoord : _textureCoords) {
-            data._textureCoords.add(tCoord.makeCopy());
+            if (tCoord != null) {
+                data._textureCoords.add(tCoord.makeCopy());
+            } else {
+                data._textureCoords.add(null);
+            }
         }
 
         if (_indexBuffer != null) {

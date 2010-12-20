@@ -16,8 +16,10 @@ import java.nio.ShortBuffer;
 
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.math.Matrix4;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.util.export.InputCapsule;
@@ -75,12 +77,12 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     /**
      * Flag for switching between GPU and CPU skinning.
      */
-    private boolean _useGPU;
+    protected boolean _useGPU;
 
     /**
      * The shader state to update with GLSL attributes/uniforms related to GPU skinning. See class doc for more.
      */
-    private GLSLShaderObjectsState _gpuShader;
+    protected GLSLShaderObjectsState _gpuShader;
 
     /**
      * <p>
@@ -91,12 +93,12 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      * XXX: If we can find a better way to update the bounds, maybe we should make this default to true or remove this
      * altogether.
      */
-    private boolean _autoUpdateSkinBound = false;
+    protected boolean _autoUpdateSkinBound = false;
 
     /**
      * Custom update apply logic.
      */
-    private SkinPoseApplyLogic _customApplier = null;
+    protected SkinPoseApplyLogic _customApplier = null;
 
     /**
      * Constructs a new SkinnedMesh.
@@ -277,7 +279,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _useGPU = useGPU;
     }
 
-    private void updateWeightsAndJointsOnGPUShader() {
+    protected void updateWeightsAndJointsOnGPUShader() {
         if (_gpuShader != null) {
             if (_weightsBuf == null) {
                 createWeightBuffer();
@@ -295,7 +297,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         }
     }
 
-    private void updateJointPaletteOnGPUShader() {
+    protected void updateJointPaletteOnGPUShader() {
         if (_gpuShader != null) {
             _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
         }
@@ -504,22 +506,23 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         CollisionTreeManager.INSTANCE.removeCollisionTree(this);
     }
 
-    private void createJointBuffer() {
+    protected void createJointBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
-            data = reorderAndPad(convert(_jointIndices), getWeightsPerVert(), getGpuAttributeSize());
+            data = SkinnedMesh.reorderAndPad(SkinnedMesh.convert(_jointIndices), getWeightsPerVert(),
+                    getGpuAttributeSize());
         } else {
-            data = pad(convert(_jointIndices), getWeightsPerVert(), getGpuAttributeSize());
+            data = SkinnedMesh.pad(SkinnedMesh.convert(_jointIndices), getWeightsPerVert(), getGpuAttributeSize());
         }
         _jointIndicesBuf = BufferUtils.createFloatBuffer(_jointIndicesBuf, data);
     }
 
-    private void createWeightBuffer() {
+    protected void createWeightBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
-            data = reorderAndPad(_weights, getWeightsPerVert(), getGpuAttributeSize());
+            data = SkinnedMesh.reorderAndPad(_weights, getWeightsPerVert(), getGpuAttributeSize());
         } else {
-            data = pad(_weights, getWeightsPerVert(), getGpuAttributeSize());
+            data = SkinnedMesh.pad(_weights, getWeightsPerVert(), getGpuAttributeSize());
         }
         _weightsBuf = BufferUtils.createFloatBuffer(_weightsBuf, data);
     }
@@ -531,7 +534,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      *            the short values
      * @return our new float array
      */
-    private float[] convert(final short... shorts) {
+    protected static float[] convert(final short... shorts) {
         final float[] rval = new float[shorts.length];
         for (int i = 0; i < rval.length; i++) {
             rval[i] = shorts[i];
@@ -556,7 +559,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      *            the size of the matrix edge... eg. 4 would mean a 4x4 matrix.
      * @return our new data array.
      */
-    private float[] reorderAndPad(final float[] src, final int srcElementSize, final int matSide) {
+    protected static float[] reorderAndPad(final float[] src, final int srcElementSize, final int matSide) {
         final int elements = src.length / srcElementSize;
         final float[] rVal = new float[elements * matSide * matSide];
 
@@ -594,7 +597,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      *            the desired size of each element in the return array.
      * @return the padded array.
      */
-    private float[] pad(final float[] src, final int srcElementSize, final int attribSize) {
+    protected static float[] pad(final float[] src, final int srcElementSize, final int attribSize) {
         if (srcElementSize == attribSize) {
             return src;
         }
@@ -647,6 +650,38 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         }
 
         return skin;
+    }
+
+    @Override
+    public void reorderIndices(final IndexBufferData<?> newIndices, final IndexMode[] modes, final int[] lengths) {
+        super.reorderIndices(newIndices, modes, lengths);
+        _bindPoseData.setIndices(newIndices);
+        _bindPoseData.setIndexModes(modes);
+        _bindPoseData.setIndexLengths(lengths);
+    }
+
+    @Override
+    public void reorderVertexData(final int[] newVertexOrder) {
+        if (_meshData != null) {
+            reorderVertexData(newVertexOrder, _meshData);
+        }
+        reorderVertexData(newVertexOrder, _bindPoseData);
+
+        // reorder weight/joint information
+        final float[] weights = new float[_weights.length];
+        final short[] jointIndices = new short[_jointIndices.length];
+
+        for (int i = 0; i < _bindPoseData.getVertexCount(); i++) {
+            for (int j = 0; j < _weightsPerVert; j++) {
+                final int oldIndex = i * _weightsPerVert + j;
+                final int newIndex = newVertexOrder[i] * _weightsPerVert + j;
+                weights[newIndex] = _weights[oldIndex];
+                jointIndices[newIndex] = _jointIndices[oldIndex];
+            }
+        }
+
+        setWeights(weights);
+        setJointIndices(jointIndices);
     }
 
     // /////////////////
