@@ -40,7 +40,6 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
 
     private final EnumSet<Key> _pressedList = EnumSet.noneOf(Key.class);
 
-    
     public AwtKeyboardWrapper(final Component component) {
         _component = Preconditions.checkNotNull(component, "component");
     }
@@ -69,7 +68,7 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final java.awt.event.KeyEvent e) {
-        final Key pressed = AwtKey.findByCode(e.getKeyCode());
+        final Key pressed = fromKeyEventToKey(e);
         if (!_pressedList.contains(pressed)) {
             _upcomingEvents.add(new KeyEvent(pressed, KeyState.DOWN, e.getKeyChar()));
             _pressedList.add(pressed);
@@ -77,9 +76,20 @@ public class AwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyReleased(final java.awt.event.KeyEvent e) {
-        final Key released = AwtKey.findByCode(e.getKeyCode());
+        final Key released = fromKeyEventToKey(e);
         _upcomingEvents.add(new KeyEvent(released, KeyState.UP, e.getKeyChar()));
         _pressedList.remove(released);
+    }
+
+    /**
+     * Convert from AWT key event to Ardor3D Key. Override to provide additional or custom behavior.
+     * 
+     * @param e
+     *            the AWT KeyEvent received by the input system.
+     * @return an Ardor3D Key, to be forwarded to the Predicate/Trigger system.
+     */
+    public synchronized Key fromKeyEventToKey(final java.awt.event.KeyEvent e) {
+        return AwtKey.findByCode(e.getKeyCode());
     }
 
     private class AwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {

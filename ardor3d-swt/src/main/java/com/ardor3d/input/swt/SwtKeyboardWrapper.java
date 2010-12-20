@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Control;
 
 import com.ardor3d.annotation.GuardedBy;
 import com.ardor3d.annotation.ThreadSafe;
+import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyEvent;
 import com.ardor3d.input.KeyState;
 import com.ardor3d.input.KeyboardWrapper;
@@ -38,7 +39,7 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     @GuardedBy("this")
     private SwtKeyboardIterator _currentIterator = null;
     @GuardedBy("this")
-    private int _lastKeyPressedCode = -1;
+    private Key _lastKeyPressed = null;
 
     public SwtKeyboardWrapper(final Control control) {
         _upcomingEvents = new LinkedList<KeyEvent>();
@@ -58,32 +59,42 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
     }
 
     public synchronized void keyPressed(final org.eclipse.swt.events.KeyEvent event) {
-        // System.out.println("keyPressed(" + SwtKey.findByCode(event.keyCode) + ")");
-        if (event.keyCode == _lastKeyPressedCode) {
+        final Key key = fromKeyEventToKey(event);
+        if (key == _lastKeyPressed) {
             // ignore if this is a repeat event
             return;
         }
 
         final char keyChar = event.character;
 
-        if (_lastKeyPressedCode != -1) {
+        if (_lastKeyPressed != null) {
             // if this is a different key to the last key that was pressed, then
             // add an 'up' even for the previous one - SWT doesn't send an 'up' event for the
             // first key in the below scenario:
             // 1. key 1 down
             // 2. key 2 down
             // 3. key 1 up
-            _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(_lastKeyPressedCode), KeyState.UP, keyChar));
+            _upcomingEvents.add(new KeyEvent(key, KeyState.UP, keyChar));
         }
 
-        _lastKeyPressedCode = event.keyCode;
-        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.DOWN, keyChar));
+        _lastKeyPressed = key;
+        _upcomingEvents.add(new KeyEvent(key, KeyState.DOWN, keyChar));
     }
 
     public synchronized void keyReleased(final org.eclipse.swt.events.KeyEvent event) {
-        // System.out.println("keyReleased(" + SwtKey.findByCode(event.keyCode) + ")");
-        _upcomingEvents.add(new KeyEvent(SwtKey.findByCode(event.keyCode), KeyState.UP, event.character));
-        _lastKeyPressedCode = -1;
+        _upcomingEvents.add(new KeyEvent(fromKeyEventToKey(event), KeyState.UP, event.character));
+        _lastKeyPressed = null;
+    }
+
+    /**
+     * Convert from SWT key event to Ardor3D Key. Override to provide additional or custom behavior.
+     * 
+     * @param e
+     *            the SWT KeyEvent received by the input system.
+     * @return an Ardor3D Key, to be forwarded to the Predicate/Trigger system.
+     */
+    public synchronized Key fromKeyEventToKey(final org.eclipse.swt.events.KeyEvent e) {
+        return SwtKey.findByCode(e.keyCode);
     }
 
     private class SwtKeyboardIterator extends AbstractIterator<KeyEvent> implements PeekingIterator<KeyEvent> {
