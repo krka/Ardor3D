@@ -34,7 +34,7 @@ public class NvTriangleStripper implements Visitor {
     /** GeForce3 cache size */
     public static final int CACHESIZE_GEFORCE3 = 24;
 
-    private int _cacheSize = NvTriangleStripper.CACHESIZE_GEFORCE1_2;
+    private int _cacheSize = NvTriangleStripper.CACHESIZE_GEFORCE3;
     private int _minStripSize = 0;
     private int _restartVal = 0;
     private boolean _stitchStrips = true;
