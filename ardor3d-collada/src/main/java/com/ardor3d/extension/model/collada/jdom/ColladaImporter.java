@@ -11,8 +11,10 @@
 package com.ardor3d.extension.model.collada.jdom;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.jdom.Attribute;
@@ -30,10 +32,12 @@ import com.ardor3d.extension.model.collada.jdom.data.AssetData;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.DataCache;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 import com.ardor3d.util.resource.RelativeResourceLocator;
 import com.ardor3d.util.resource.ResourceLocator;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Main class for importing Collada files.
@@ -50,10 +54,21 @@ public class ColladaImporter {
     private ResourceLocator _textureLocator;
     private ResourceLocator _modelLocator;
     private boolean _compressTextures = false;
+    private boolean _optimizeMeshes = false;
+    private final EnumSet<MatchCondition> _optimizeSettings = EnumSet.of(MatchCondition.UVs, MatchCondition.Normal,
+            MatchCondition.Color);
+
+    public boolean isLoadTextures() {
+        return _loadTextures;
+    }
 
     public ColladaImporter setLoadTextures(final boolean loadTextures) {
         _loadTextures = loadTextures;
         return this;
+    }
+
+    public boolean isCompressTextures() {
+        return _compressTextures;
     }
 
     public ColladaImporter setCompressTextures(final boolean compressTextures) {
@@ -61,9 +76,17 @@ public class ColladaImporter {
         return this;
     }
 
+    public boolean isLoadAnimations() {
+        return _loadAnimations;
+    }
+
     public ColladaImporter setLoadAnimations(final boolean loadAnimations) {
         _loadAnimations = loadAnimations;
         return this;
+    }
+
+    public boolean isFlipTransparency() {
+        return _flipTransparency;
     }
 
     /**
@@ -76,14 +99,41 @@ public class ColladaImporter {
         return this;
     }
 
+    public ResourceLocator getTextureLocator() {
+        return _textureLocator;
+    }
+
     public ColladaImporter setTextureLocator(final ResourceLocator textureLocator) {
         _textureLocator = textureLocator;
         return this;
     }
 
+    public ResourceLocator getModelLocator() {
+        return _modelLocator;
+    }
+
     public ColladaImporter setModelLocator(final ResourceLocator modelLocator) {
         _modelLocator = modelLocator;
         return this;
+    }
+
+    public boolean isOptimizeMeshes() {
+        return _optimizeMeshes;
+    }
+
+    public void setOptimizeMeshes(final boolean optimizeMeshes) {
+        _optimizeMeshes = optimizeMeshes;
+    }
+
+    public Set<MatchCondition> getOptimizeSettings() {
+        return ImmutableSet.copyOf(_optimizeSettings);
+    }
+
+    public void setOptimizeSettings(final MatchCondition... optimizeSettings) {
+        _optimizeSettings.clear();
+        for (final MatchCondition cond : optimizeSettings) {
+            _optimizeSettings.add(cond);
+        }
     }
 
     /**
@@ -123,7 +173,8 @@ public class ColladaImporter {
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
         final ColladaMaterialUtils colladaMaterialUtils = new ColladaMaterialUtils(_loadTextures, dataCache,
                 colladaDOMUtil, _textureLocator, _compressTextures, _flipTransparency);
-        final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils);
+        final ColladaMeshUtils colladaMeshUtils = new ColladaMeshUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,
+                _optimizeMeshes, _optimizeSettings);
         final ColladaAnimUtils colladaAnimUtils = new ColladaAnimUtils(colladaStorage, dataCache, colladaDOMUtil,
                 colladaMeshUtils);
         final ColladaNodeUtils colladaNodeUtils = new ColladaNodeUtils(dataCache, colladaDOMUtil, colladaMaterialUtils,

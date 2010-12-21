@@ -61,6 +61,7 @@ import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.export.binary.BinaryExporter;
 import com.ardor3d.util.export.binary.BinaryImporter;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.geom.VertMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -433,6 +434,7 @@ public class ColladaAnimUtils {
                         for (final MeshVertPairs pairs : vertPairsList) {
                             if (pairs.getMesh() == sourceMesh) {
                                 pairsMap = pairs;
+                                break;
                             }
                         }
                     }
@@ -440,6 +442,9 @@ public class ColladaAnimUtils {
                     if (pairsMap == null) {
                         throw new ColladaException("Unable to locate pair map for geometry.", geometry);
                     }
+
+                    // Check for a remapping, if we optimized geometry
+                    final VertMap vertMap = _dataCache.getMeshVertMap().get(sourceMesh);
 
                     // Use pairs map and vertWeightMap to build our weights and joint indices.
                     {
@@ -462,15 +467,20 @@ public class ColladaAnimUtils {
                             }
                         }
 
-                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(pairsMap.getIndices().length
-                                * maxWeightsPerVert);
-                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(pairsMap.getIndices().length
-                                * maxWeightsPerVert);
+                        final int verts = skMesh.getMeshData().getVertexCount();
+                        final FloatBuffer weightBuffer = BufferUtils.createFloatBuffer(verts * maxWeightsPerVert);
+                        final ShortBuffer jointIndexBuffer = BufferUtils.createShortBuffer(verts * maxWeightsPerVert);
                         int j;
                         float sum = 0;
                         final float[] weights = new float[maxWeightsPerVert];
                         final short[] indices = new short[maxWeightsPerVert];
-                        for (final int originalIndex : pairsMap.getIndices()) {
+                        int originalIndex;
+                        for (int x = 0; x < verts; x++) {
+                            originalIndex = pairsMap.getIndices()[x];
+                            if (vertMap != null) {
+                                originalIndex = pairsMap.getIndices()[vertMap.getFirstOldIndex(x)];
+                            }
+
                             j = 0;
                             sum = 0;
 

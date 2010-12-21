@@ -22,6 +22,8 @@ import com.ardor3d.extension.animation.skeletal.Joint;
 import com.ardor3d.extension.animation.skeletal.Skeleton;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.image.Texture;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.util.geom.VertMap;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -46,6 +48,7 @@ public class DataCache {
     private final Map<Element, String[]> _stringArrays;
 
     private final Multimap<Element, MeshVertPairs> _vertMappings;
+    private final Map<Mesh, VertMap> _meshVertMap;
 
     private final Map<Element, Joint> _elementJointMapping;
     private JointNode _rootJointNode;
@@ -71,6 +74,7 @@ public class DataCache {
         _intArrays = Maps.newHashMap();
         _stringArrays = Maps.newHashMap();
         _vertMappings = ArrayListMultimap.create();
+        _meshVertMap = Maps.newHashMap();
 
         _elementJointMapping = Maps.newHashMap();
         _skeletons = Lists.newArrayList();
@@ -149,6 +153,10 @@ public class DataCache {
         return _vertMappings;
     }
 
+    public Map<Mesh, VertMap> getMeshVertMap() {
+        return _meshVertMap;
+    }
+
     public Map<Element, Joint> getElementJointMapping() {
         return _elementJointMapping;
     }
@@ -179,5 +187,9 @@ public class DataCache {
 
     public void addSkeleton(final Skeleton skeleton) {
         _skeletons.add(skeleton);
+    }
+
+    public void setMeshVertMap(final Mesh geometry, final VertMap map) {
+        _meshVertMap.put(geometry, map);
     }
 }

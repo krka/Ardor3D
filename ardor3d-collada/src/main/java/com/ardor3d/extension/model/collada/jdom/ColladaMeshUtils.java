@@ -11,6 +11,7 @@
 package com.ardor3d.extension.model.collada.jdom;
 
 import java.nio.FloatBuffer;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,6 +29,9 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Point;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.geom.GeometryTool;
+import com.ardor3d.util.geom.VertMap;
+import com.ardor3d.util.geom.GeometryTool.MatchCondition;
 
 /**
  * Methods for parsing Collada data related to meshes.
@@ -38,12 +42,17 @@ public class ColladaMeshUtils {
     private final DataCache _dataCache;
     private final ColladaDOMUtil _colladaDOMUtil;
     private final ColladaMaterialUtils _colladaMaterialUtils;
+    private final boolean _optimizeMeshes;
+    private final EnumSet<MatchCondition> _optimizeSettings;
 
     public ColladaMeshUtils(final DataCache dataCache, final ColladaDOMUtil colladaDOMUtil,
-            final ColladaMaterialUtils colladaMaterialUtils) {
+            final ColladaMaterialUtils colladaMaterialUtils, final boolean optimizeMeshes,
+            final EnumSet<MatchCondition> optimizeSettings) {
         _dataCache = dataCache;
         _colladaDOMUtil = colladaDOMUtil;
         _colladaMaterialUtils = colladaMaterialUtils;
+        _optimizeMeshes = optimizeMeshes;
+        _optimizeSettings = EnumSet.copyOf(optimizeSettings);
     }
 
     /**
@@ -202,7 +211,12 @@ public class ColladaMeshUtils {
             indices[i] = i;
         }
         final MeshVertPairs mvp = new MeshVertPairs(points, indices);
-        _dataCache.getVertMappings().put(mesh, mvp);
+        _dataCache.getVertMappings().put(colladaGeometry, mvp);
+
+        if (_optimizeMeshes) {
+            final VertMap map = GeometryTool.minimizeVerts(points, _optimizeSettings);
+            _dataCache.setMeshVertMap(points, map);
+        }
 
         // Update bound
         points.updateModelBound();
@@ -295,6 +309,11 @@ public class ColladaMeshUtils {
             firstIndex += vals.length / interval;
         }
 
+        if (_optimizeMeshes) {
+            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            _dataCache.setMeshVertMap(polyMesh, map);
+        }
+
         // update bounds
         polyMesh.updateModelBound();
 
@@ -382,6 +401,11 @@ public class ColladaMeshUtils {
             firstIndex += length;
         }
 
+        if (_optimizeMeshes) {
+            final VertMap map = GeometryTool.minimizeVerts(polyMesh, _optimizeSettings);
+            _dataCache.setMeshVertMap(polyMesh, map);
+        }
+
         // update bounds
         polyMesh.updateModelBound();
 
@@ -431,6 +455,11 @@ public class ColladaMeshUtils {
             }
         }
 
+        if (_optimizeMeshes) {
+            final VertMap map = GeometryTool.minimizeVerts(triMesh, _optimizeSettings);
+            _dataCache.setMeshVertMap(triMesh, map);
+        }
+
         triMesh.updateModelBound();
 
         return triMesh;
@@ -475,6 +504,11 @@ public class ColladaMeshUtils {
             if (rVal != Integer.MIN_VALUE) {
                 indices[j] = rVal;
             }
+        }
+
+        if (_optimizeMeshes) {
+            final VertMap map = GeometryTool.minimizeVerts(lineMesh, _optimizeSettings);
+            _dataCache.setMeshVertMap(lineMesh, map);
         }
 
         lineMesh.updateModelBound();
