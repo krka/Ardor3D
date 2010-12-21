@@ -26,7 +26,6 @@ import com.google.common.collect.Maps;
  * 
  * Note: Does not work with geometry using texcoords other than 2d coords. <br>
  * TODO: Consider adding an option for "close enough" vertex matches... ie, smaller than X distance apart.<br>
- * TODO: Does not yet work with models that do not have indices.
  */
 public abstract class GeometryTool {
     private static final Logger logger = Logger.getLogger(GeometryTool.class.getName());
@@ -106,9 +105,6 @@ public abstract class GeometryTool {
                 }
             }
 
-            // grab indices
-            final int[] inds = BufferUtils.getIntArray(mesh.getMeshData().getIndices());
-
             final Map<VertKey, Integer> store = Maps.newHashMap();
             final Map<Integer, Integer> indexRemap = Maps.newHashMap();
             int good = 0;
@@ -175,13 +171,26 @@ public abstract class GeometryTool {
                 }
             }
 
-            final IndexBufferData<?> indexBuffer = mesh.getMeshData().getIndices();
-            indexBuffer.rewind();
-            for (final int i : inds) {
-                if (indexRemap.containsKey(i)) {
-                    indexBuffer.put(indexRemap.get(i));
-                } else {
-                    indexBuffer.put(i);
+            if (mesh.getMeshData().getIndices() == null) {
+                final IndexBufferData<?> indexBuffer = BufferUtils.createIndexBufferData(oldCount, oldCount);
+                mesh.getMeshData().setIndices(indexBuffer);
+                for (int i = 0; i < oldCount; i++) {
+                    if (indexRemap.containsKey(i)) {
+                        indexBuffer.put(indexRemap.get(i));
+                    } else {
+                        indexBuffer.put(i);
+                    }
+                }
+            } else {
+                final IndexBufferData<?> indexBuffer = mesh.getMeshData().getIndices();
+                final int[] inds = BufferUtils.getIntArray(mesh.getMeshData().getIndices());
+                indexBuffer.rewind();
+                for (final int i : inds) {
+                    if (indexRemap.containsKey(i)) {
+                        indexBuffer.put(indexRemap.get(i));
+                    } else {
+                        indexBuffer.put(i);
+                    }
                 }
             }
             result.applyRemapping(indexRemap);

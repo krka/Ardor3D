@@ -626,17 +626,22 @@ public class Mesh extends Spatial implements Renderable, Pickable {
 
         final Vector3 temp3 = new Vector3();
         final Vector2 temp2 = new Vector2();
+        int vert;
         for (int i = 0; i < meshData.getVertexCount(); i++) {
+            vert = newVertexOrder[i];
+            if (vert == -1) {
+                vert = i;
+            }
             BufferUtils.populateFromBuffer(temp3, meshData.getVertexBuffer(), i);
-            BufferUtils.setInBuffer(temp3, verts.getBuffer(), newVertexOrder[i]);
+            BufferUtils.setInBuffer(temp3, verts.getBuffer(), vert);
             if (norms != null) {
                 BufferUtils.populateFromBuffer(temp3, meshData.getNormalBuffer(), i);
-                BufferUtils.setInBuffer(temp3, norms.getBuffer(), newVertexOrder[i]);
+                BufferUtils.setInBuffer(temp3, norms.getBuffer(), vert);
             }
             for (int k = 0; k < uvs.length; k++) {
                 if (uvs[k] != null) {
                     BufferUtils.populateFromBuffer(temp2, meshData.getTextureBuffer(0), i);
-                    BufferUtils.setInBuffer(temp2, uvs[k].getBuffer(), newVertexOrder[i]);
+                    BufferUtils.setInBuffer(temp2, uvs[k].getBuffer(), vert);
                 }
             }
         }

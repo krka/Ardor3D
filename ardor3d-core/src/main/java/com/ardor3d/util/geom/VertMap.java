@@ -33,11 +33,24 @@ public class VertMap {
         return _lookupTable[oldIndex];
     }
 
+    public int getFirstOldIndex(final int newIndex) {
+        for (int i = 0; i < _lookupTable.length; i++) {
+            if (_lookupTable[i] == newIndex) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void applyRemapping(final Map<Integer, Integer> indexRemap) {
         for (int i = 0; i < _lookupTable.length; i++) {
             if (indexRemap.containsKey(_lookupTable[i])) {
                 _lookupTable[i] = indexRemap.get(_lookupTable[i]);
             }
         }
+    }
+
+    public int[] getLookupTable() {
+        return _lookupTable;
     }
 }
