@@ -74,7 +74,7 @@ public class SwtKeyboardWrapper implements KeyboardWrapper, KeyListener {
             // 1. key 1 down
             // 2. key 2 down
             // 3. key 1 up
-            _upcomingEvents.add(new KeyEvent(key, KeyState.UP, keyChar));
+            _upcomingEvents.add(new KeyEvent(_lastKeyPressed, KeyState.UP, keyChar));
         }
 
         _lastKeyPressed = key;
