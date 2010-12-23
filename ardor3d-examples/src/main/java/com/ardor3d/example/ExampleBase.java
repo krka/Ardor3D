@@ -284,7 +284,7 @@ public abstract class ExampleBase implements Runnable, Updater, Scene {
     }
 
     protected void renderExample(final Renderer renderer) {
-        renderer.draw(_root);
+        _root.onDraw(renderer);
     }
 
     protected void renderDebug(final Renderer renderer) {

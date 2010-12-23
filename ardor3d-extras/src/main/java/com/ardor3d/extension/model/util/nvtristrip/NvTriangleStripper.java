@@ -72,7 +72,7 @@ public class NvTriangleStripper implements Visitor {
      * around with this number to tweak performance.
      * 
      * @param cacheSize
-     *            (Default value: 16)
+     *            (Default value: 24)
      */
     public void setCacheSize(final int cacheSize) {
         _cacheSize = cacheSize;
@@ -129,8 +129,11 @@ public class NvTriangleStripper implements Visitor {
     }
 
     /**
+     * If set to true, will call remapIndices after generateStrips.
      * 
-     * @param vertices
+     * @param reorder
+     *            (Default value: false)
+     * @see #remapIndices(PrimitiveGroup[], AtomicReference, int)
      */
     public void setReorderVertices(final boolean reorder) {
         _reorderVertices = reorder;
