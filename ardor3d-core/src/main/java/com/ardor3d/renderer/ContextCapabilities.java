@@ -485,7 +485,7 @@ public class ContextCapabilities {
     }
 
     public boolean isTextureMirrorEdgeClampSupported() {
-        return _supportsMirrorClamp;
+        return _supportsMirrorEdgeClamp;
     }
 
     public boolean isTextureMirrorBorderClampSupported() {
