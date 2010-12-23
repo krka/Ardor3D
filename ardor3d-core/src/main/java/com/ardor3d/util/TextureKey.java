@@ -77,7 +77,7 @@ final public class TextureKey implements Savable {
     private static AtomicInteger _uniqueTK = new AtomicInteger(Integer.MIN_VALUE);
 
     /** DO NOT USE. FOR INTERNAL USE ONLY */
-    public TextureKey() {
+    protected TextureKey() {
         if (Constants.useMultipleContexts) {
             _dirtyContexts = Lists.newArrayList();
         } else {
