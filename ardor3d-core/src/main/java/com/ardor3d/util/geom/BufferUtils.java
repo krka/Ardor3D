@@ -1066,11 +1066,12 @@ public final class BufferUtils {
      */
     public static void copy(final FloatBuffer source, final int fromPos, final FloatBuffer destination,
             final int toPos, final int length) {
-        final float[] data = new float[length];
+        final int oldLimit = source.limit();
         source.position(fromPos);
-        source.get(data);
+        source.limit(fromPos + length);
         destination.position(toPos);
-        destination.put(data);
+        destination.put(source);
+        source.limit(oldLimit);
     }
 
     /**
