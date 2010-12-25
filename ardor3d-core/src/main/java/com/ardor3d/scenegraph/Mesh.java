@@ -27,7 +27,6 @@ import com.ardor3d.intersection.PrimitiveKey;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
-import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -613,40 +612,69 @@ public class Mesh extends Spatial implements Renderable, Pickable {
         reorderVertexData(newVertexOrder, _meshData);
     }
 
+    /**
+     * Swap around the order of the vertex data in the given MeshData. Override to provide specific behavior to the Mesh
+     * object.
+     * 
+     * @param newVertexOrder
+     *            a mapping to the desired new order, where the current location of a vertex is the index into this
+     *            array and the value at that location in the array is the new location to store the vertex data.
+     * @param meshData
+     *            the meshData object to work against.
+     */
     protected void reorderVertexData(final int[] newVertexOrder, final MeshData meshData) {
-        final FloatBufferData verts = new FloatBufferData(BufferUtils.clone(meshData.getVertexBuffer()), 3);
-        final FloatBufferData norms = meshData.getNormalBuffer() != null ? new FloatBufferData(BufferUtils
-                .clone(meshData.getNormalBuffer()), 3) : null;
+        // must be non-null
+        final FloatBufferData verts = meshData.getVertexCoords().makeCopy();
+
+        final FloatBufferData norms = meshData.getNormalBuffer() != null ? meshData.getVertexCoords().makeCopy() : null;
+        final FloatBufferData colors = meshData.getColorBuffer() != null ? meshData.getColorCoords().makeCopy() : null;
+        final FloatBufferData fogs = meshData.getFogBuffer() != null ? meshData.getFogCoords().makeCopy() : null;
+        final FloatBufferData tangents = meshData.getTangentBuffer() != null ? meshData.getTangentCoords().makeCopy()
+                : null;
         final FloatBufferData[] uvs = new FloatBufferData[meshData.getNumberOfUnits()];
         for (int k = 0; k < uvs.length; k++) {
-            if (meshData.getTextureBuffer(k) != null) {
-                uvs[k] = new FloatBufferData(BufferUtils.clone(meshData.getTextureBuffer(k)), 2);
+            final FloatBufferData tex = meshData.getTextureCoords(k);
+            if (tex != null) {
+                uvs[k] = tex.makeCopy();
             }
         }
 
-        final Vector3 temp3 = new Vector3();
-        final Vector2 temp2 = new Vector2();
         int vert;
         for (int i = 0; i < meshData.getVertexCount(); i++) {
             vert = newVertexOrder[i];
             if (vert == -1) {
                 vert = i;
             }
-            BufferUtils.populateFromBuffer(temp3, meshData.getVertexBuffer(), i);
-            BufferUtils.setInBuffer(temp3, verts.getBuffer(), vert);
+            BufferUtils.copy(meshData.getVertexBuffer(), i * verts.getValuesPerTuple(), verts.getBuffer(), vert
+                    * verts.getValuesPerTuple(), verts.getValuesPerTuple());
             if (norms != null) {
-                BufferUtils.populateFromBuffer(temp3, meshData.getNormalBuffer(), i);
-                BufferUtils.setInBuffer(temp3, norms.getBuffer(), vert);
+                BufferUtils.copy(meshData.getNormalBuffer(), i * norms.getValuesPerTuple(), norms.getBuffer(), vert
+                        * norms.getValuesPerTuple(), norms.getValuesPerTuple());
+            }
+            if (colors != null) {
+                BufferUtils.copy(meshData.getColorBuffer(), i * colors.getValuesPerTuple(), colors.getBuffer(), vert
+                        * colors.getValuesPerTuple(), colors.getValuesPerTuple());
+            }
+            if (fogs != null) {
+                BufferUtils.copy(meshData.getFogBuffer(), i * fogs.getValuesPerTuple(), fogs.getBuffer(), vert
+                        * fogs.getValuesPerTuple(), fogs.getValuesPerTuple());
+            }
+            if (tangents != null) {
+                BufferUtils.copy(meshData.getTangentBuffer(), i * tangents.getValuesPerTuple(), tangents.getBuffer(),
+                        vert * tangents.getValuesPerTuple(), tangents.getValuesPerTuple());
             }
             for (int k = 0; k < uvs.length; k++) {
                 if (uvs[k] != null) {
-                    BufferUtils.populateFromBuffer(temp2, meshData.getTextureBuffer(0), i);
-                    BufferUtils.setInBuffer(temp2, uvs[k].getBuffer(), vert);
+                    BufferUtils.copy(meshData.getTextureBuffer(k), i * uvs[k].getValuesPerTuple(), uvs[k].getBuffer(),
+                            vert * uvs[k].getValuesPerTuple(), uvs[k].getValuesPerTuple());
                 }
             }
         }
         meshData.setVertexCoords(verts);
         meshData.setNormalCoords(norms);
+        meshData.setColorCoords(colors);
+        meshData.setFogCoords(fogs);
+        meshData.setTangentCoords(tangents);
         for (int k = 0; k < uvs.length; k++) {
             if (uvs[k] != null) {
                 meshData.setTextureCoords(uvs[k], k);

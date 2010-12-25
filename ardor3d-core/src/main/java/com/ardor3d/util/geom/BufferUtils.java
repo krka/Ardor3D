@@ -1051,6 +1051,29 @@ public final class BufferUtils {
     }
 
     /**
+     * Copies floats from one buffer to another.
+     * 
+     * @param source
+     *            the buffer to copy from
+     * @param fromPos
+     *            the starting point to copy from
+     * @param destination
+     *            the buffer to copy to
+     * @param toPos
+     *            the starting point to copy to
+     * @param length
+     *            the number of floats to copy
+     */
+    public static void copy(final FloatBuffer source, final int fromPos, final FloatBuffer destination,
+            final int toPos, final int length) {
+        final float[] data = new float[length];
+        source.position(fromPos);
+        source.get(data);
+        destination.position(toPos);
+        destination.put(data);
+    }
+
+    /**
      * Copies floats from one position in the buffer to another.
      * 
      * @param buf
@@ -1521,5 +1544,4 @@ public final class BufferUtils {
             System.out.println(store.toString());
         }
     }
-
 }
