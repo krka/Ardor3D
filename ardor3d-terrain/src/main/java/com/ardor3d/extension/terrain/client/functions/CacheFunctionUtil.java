@@ -15,6 +15,9 @@ public class CacheFunctionUtil {
                     Luminance8ToRGBFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize,
                             tileSize);
                     return;
+                case Luminance8Alpha8:
+                    Luminance8Alpha8ToRGBAFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize, tileSize);
+                    return;
                 case Luminance12:
                     Luminance12ToRGBFunction.getInstance().doConversion(sourceData, store, destX, destY, dataSize,
                             tileSize);
