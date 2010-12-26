@@ -58,10 +58,12 @@ maxHeapMemory = 64)
 public class AtlasExample extends ExampleBase {
 
     /** Text fields used to present info about the example. */
-    private final BasicText _exampleInfo[] = new BasicText[2];
+    private final BasicText _exampleInfo[] = new BasicText[3];
 
     private double counter = 0;
     private int frames = 0;
+
+    private Node boxNode;
 
     public static void main(final String[] args) {
         start(AtlasExample.class);
@@ -81,26 +83,15 @@ public class AtlasExample extends ExampleBase {
 
     @Override
     protected void initExample() {
-        _canvas.setTitle("Box Example");
+        _canvas.setTitle("Atlas Example");
 
         // Use a separate node for packing/combining, otherwise we will get the text packed as well
-        final Node boxNode = new Node("boxes");
+        boxNode = new Node("boxes");
         _root.attachChild(boxNode);
 
-        // Setup lots of boxes with different textures and wrap modes
-        for (int i = 0; i < 40; i++) {
-            createBox(boxNode, "images/ball.png", WrapMode.BorderClamp);
-            createBox(boxNode, "images/trail.png", WrapMode.Clamp);
-            createBox(boxNode, "images/flare.png", WrapMode.EdgeClamp);
-            createBox(boxNode, "images/flaresmall.jpg", WrapMode.MirrorBorderClamp);
-            createBox(boxNode, "icons/ardor3d_white_24.png", WrapMode.MirrorClamp);
-            createBox(boxNode, "icons/console.png", WrapMode.MirrorEdgeClamp);
-            createBox(boxNode, "icons/declaration.png", WrapMode.MirroredRepeat);
-            createBox(boxNode, "icons/list-add.png", WrapMode.Repeat);
-            createBox(boxNode, "icons/world.png", WrapMode.Repeat);
-        }
+        resetBoxes();
 
-        // Setyp textfields for presenting example info.
+        // Setup text labels for presenting example info.
         final Node textNodes = new Node("Text");
         _root.attachChild(textNodes);
         textNodes.getSceneHints().setRenderBucketType(RenderBucketType.Ortho);
@@ -130,9 +121,32 @@ public class AtlasExample extends ExampleBase {
                 boxNode.detachAllChildren();
                 boxNode.attachChild(merged);
             }
-
         }));
 
+        // Combine into one mesh
+        _logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.R), new TriggerAction() {
+            public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+                resetBoxes();
+            }
+        }));
+
+    }
+
+    private void resetBoxes() {
+        boxNode.detachAllChildren();
+
+        // Setup lots of boxes with different textures and wrap modes
+        for (int i = 0; i < 40; i++) {
+            createBox(boxNode, "images/ball.png", WrapMode.BorderClamp);
+            createBox(boxNode, "images/trail.png", WrapMode.Clamp);
+            createBox(boxNode, "images/flare.png", WrapMode.EdgeClamp);
+            createBox(boxNode, "images/flaresmall.jpg", WrapMode.MirrorBorderClamp);
+            createBox(boxNode, "icons/ardor3d_white_24.png", WrapMode.MirrorClamp);
+            createBox(boxNode, "icons/console.png", WrapMode.MirrorEdgeClamp);
+            createBox(boxNode, "icons/declaration.png", WrapMode.MirroredRepeat);
+            createBox(boxNode, "icons/list-add.png", WrapMode.Repeat);
+            createBox(boxNode, "icons/world.png", WrapMode.Repeat);
+        }
     }
 
     private void packIntoAtlas(final Spatial spatial) {
@@ -212,5 +226,6 @@ public class AtlasExample extends ExampleBase {
     private void updateText() {
         _exampleInfo[0].setText("1. Press [F] to create texture atlas and apply");
         _exampleInfo[1].setText("2. Press [G] to combine all into one mesh");
+        _exampleInfo[2].setText("Press [R] to start over");
     }
 }
