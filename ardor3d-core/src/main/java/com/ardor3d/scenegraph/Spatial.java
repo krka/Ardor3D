@@ -724,7 +724,8 @@ public abstract class Spatial implements Savable, Hintable {
         final int state = camera.getPlaneState();
 
         // check to see if we can cull this node
-        _frustumIntersects = (_parent != null ? _parent._frustumIntersects : Camera.FrustumIntersect.Intersects);
+        _frustumIntersects = ((_parent != null && _parent.getWorldBound() != null) ? _parent._frustumIntersects
+                : Camera.FrustumIntersect.Intersects);
 
         if (cm == CullHint.Dynamic && _frustumIntersects == Camera.FrustumIntersect.Intersects) {
             _frustumIntersects = camera.contains(_worldBound);
