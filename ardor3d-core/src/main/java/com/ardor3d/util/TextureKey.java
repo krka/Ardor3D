@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.MinificationFilter;
@@ -30,6 +31,7 @@ import com.google.common.collect.Lists;
 /**
  * <code>TextureKey</code> provides a way for the TextureManager to cache and retrieve <code>Texture</code> objects.
  */
+@SavableFactory(factoryMethod = "initSavable")
 final public class TextureKey implements Savable {
 
     /** The source of the image used in this Texture. */
@@ -83,6 +85,11 @@ final public class TextureKey implements Savable {
         } else {
             _dirtyContexts = null;
         }
+    }
+
+    /** DO NOT USE. FOR INTERNAL USE ONLY */
+    public static TextureKey initSavable() {
+        return new TextureKey();
     }
 
     public void setDirty() {
