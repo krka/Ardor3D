@@ -26,6 +26,11 @@ public class TextureParameter {
     private final TextureKey textureKey;
     private int atlasIndex;
 
+    private float diffX;
+    private float diffY;
+    private float offsetX;
+    private float offsetY;
+
     public TextureParameter(final Mesh mesh, final int textureIndex, final int targetTextureIndex) {
         this.mesh = mesh;
         this.textureIndex = textureIndex;
@@ -94,5 +99,37 @@ public class TextureParameter {
 
     public int getTargetTextureIndex() {
         return targetTextureIndex;
+    }
+
+    public float getDiffX() {
+        return diffX;
+    }
+
+    public void setDiffX(final float diffX) {
+        this.diffX = diffX;
+    }
+
+    public float getDiffY() {
+        return diffY;
+    }
+
+    public void setDiffY(final float diffY) {
+        this.diffY = diffY;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(final float offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(final float offsetY) {
+        this.offsetY = offsetY;
     }
 }

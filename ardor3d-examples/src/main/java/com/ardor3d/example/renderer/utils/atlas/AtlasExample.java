@@ -42,6 +42,7 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.ui.text.BasicText;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -138,6 +139,7 @@ public class AtlasExample extends ExampleBase {
         // Setup lots of boxes with different textures and wrap modes
         for (int i = 0; i < 40; i++) {
             createBox(boxNode, "images/ball.png", WrapMode.BorderClamp);
+            createSphere(boxNode, "images/ball.png", WrapMode.BorderClamp);
             createBox(boxNode, "images/trail.png", WrapMode.Clamp);
             createBox(boxNode, "images/flare.png", WrapMode.EdgeClamp);
             createBox(boxNode, "images/flaresmall.jpg", WrapMode.MirrorBorderClamp);
@@ -146,6 +148,7 @@ public class AtlasExample extends ExampleBase {
             createBox(boxNode, "icons/declaration.png", WrapMode.MirroredRepeat);
             createBox(boxNode, "icons/list-add.png", WrapMode.Repeat);
             createBox(boxNode, "icons/world.png", WrapMode.Repeat);
+            createSphere(boxNode, "icons/world.png", WrapMode.Repeat);
         }
     }
 
@@ -178,6 +181,19 @@ public class AtlasExample extends ExampleBase {
         debugDumpAtlases(packer);
     }
 
+    private Mesh createSphere(final Node parentNode, final String textureName, final WrapMode mode) {
+        // Create sphere
+        final Sphere sphere = new Sphere("Sphere", 10, 10, 1);
+        sphere.setModelBound(new BoundingBox());
+        sphere.setTranslation(new Vector3(MathUtils.rand.nextInt(40) - 20, MathUtils.rand.nextInt(40) - 20,
+                MathUtils.rand.nextInt(40) - 100));
+        parentNode.attachChild(sphere);
+
+        setupStates(sphere, textureName, mode);
+
+        return sphere;
+    }
+
     private Mesh createBox(final Node parentNode, final String textureName, final WrapMode mode) {
         // Create box
         final Box box = new Box("Box", new Vector3(0, 0, 0), 1, 1, 1);
@@ -186,20 +202,24 @@ public class AtlasExample extends ExampleBase {
                 .nextInt(40) - 100));
         parentNode.attachChild(box);
 
-        // Add a texture to the box.
+        setupStates(box, textureName, mode);
+
+        return box;
+    }
+
+    private void setupStates(final Mesh mesh, final String textureName, final WrapMode mode) {
+        // Add a texture to the mesh.
         final TextureState ts = new TextureState();
         final Texture texture = TextureManager.load(textureName, Texture.MinificationFilter.Trilinear, true);
         texture.setWrap(mode);
         texture.setBorderColor(ColorRGBA.RED);
         ts.setTexture(texture);
-        box.setRenderState(ts);
+        mesh.setRenderState(ts);
 
-        // Add a material to the box, to show both vertex color and lighting/shading.
+        // Add a material to the mesh, to show both vertex color and lighting/shading.
         final MaterialState ms = new MaterialState();
         ms.setColorMaterial(ColorMaterial.Diffuse);
-        box.setRenderState(ms);
-
-        return box;
+        mesh.setRenderState(ms);
     }
 
     public void debugDumpAtlases(final TexturePacker packer) {

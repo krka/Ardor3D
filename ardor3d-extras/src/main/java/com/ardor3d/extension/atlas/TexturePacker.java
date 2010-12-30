@@ -74,10 +74,15 @@ public class TexturePacker {
         if (list != null) {
             final TextureParameter cachedParameter = list.get(0);
 
-            final FloatBuffer source = cachedParameter.getTextureCoords();
+            final float diffX = cachedParameter.getDiffX();
+            final float diffY = cachedParameter.getDiffY();
+            final float offsetX = cachedParameter.getOffsetX();
+            final float offsetY = cachedParameter.getOffsetY();
+
             final FloatBuffer destination = parameterObject.getTextureCoords();
-            for (int i = 0; i < source.limit(); i++) {
-                destination.put(i, source.get(i));
+            for (int i = 0; i < destination.limit(); i += 2) {
+                destination.put(i, destination.get(i) * diffX + offsetX);
+                destination.put(i + 1, destination.get(i + 1) * diffY + offsetY);
             }
 
             parameterObject.setAtlasIndex(cachedParameter.getAtlasIndex());
@@ -177,6 +182,11 @@ public class TexturePacker {
 
         final float offsetX = (rectangle.getX() + 1) * invAtlasWidth;
         final float offsetY = (rectangle.getY() + 1) * invAtlasHeight;
+
+        parameterObject.setDiffX(diffX);
+        parameterObject.setDiffY(diffY);
+        parameterObject.setOffsetX(offsetX);
+        parameterObject.setOffsetY(offsetY);
 
         final FloatBuffer destination = parameterObject.getTextureCoords();
         for (int i = 0; i < destination.limit(); i += 2) {
