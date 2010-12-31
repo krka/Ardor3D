@@ -13,9 +13,12 @@ package com.ardor3d.extension.atlas;
 import java.nio.FloatBuffer;
 
 import com.ardor3d.image.Texture;
+import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
 
 public class TextureParameter {
@@ -24,8 +27,8 @@ public class TextureParameter {
     private final int textureIndex;
     private final int targetTextureIndex;
     private final TextureKey textureKey;
-    private int atlasIndex;
 
+    private int atlasIndex;
     private float diffX;
     private float diffY;
     private float offsetX;
@@ -35,7 +38,18 @@ public class TextureParameter {
         this.mesh = mesh;
         this.textureIndex = textureIndex;
         this.targetTextureIndex = targetTextureIndex;
-        texture = ((TextureState) mesh.getWorldRenderState(StateType.Texture)).getTexture(textureIndex);
+
+        if (mesh.isDirty(DirtyType.RenderState)) {
+            mesh.updateWorldRenderStates(false);
+            mesh.clearDirty(DirtyType.RenderState);
+        }
+
+        final RenderState textureState = mesh.getWorldRenderState(StateType.Texture);
+        if (textureState == null) {
+            throw new Ardor3dException("No texture found for mesh: " + mesh);
+        }
+
+        texture = ((TextureState) textureState).getTexture(textureIndex);
         textureKey = texture.getTextureKey();
     }
 
