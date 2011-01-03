@@ -23,6 +23,21 @@ public class DisplaySettings {
     private final boolean _stereo;
     private final CanvasRenderer _shareContext;
 
+    /**
+     * Convenience method equivalent to <code>DisplaySettings(width, height, 0, 0, 0, 8, 0, 0, 
+     * false, false, null)</code>
+     * 
+     * @param width
+     *            the canvas width
+     * @param height
+     *            the canvas height
+     * @param depthBits
+     *            the number of bits making up the z-buffer
+     * @param samples
+     *            the number of samples used to anti-alias
+     * @see http://en.wikipedia.org/wiki/Z-buffering
+     * @see http://en.wikipedia.org/wiki/Multisample_anti-aliasing
+     */
     public DisplaySettings(final int width, final int height, final int depthBits, final int samples) {
         _width = width;
         _height = height;
@@ -37,6 +52,22 @@ public class DisplaySettings {
         _shareContext = null;
     }
 
+    /**
+     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency, 
+     * 0, 8, 0, 0, fullScreen, false, null)</code>
+     * 
+     * @param width
+     *            the canvas width
+     * @param height
+     *            the canvas height
+     * @param colorDepth
+     *            the number of color bits used to represent the color of a single pixel
+     * @param frequency
+     *            the number of times per second to repaint the canvas
+     * @param fullScreen
+     *            true if the canvas should assume exclusive access to the screen
+     * @see http://en.wikipedia.org/wiki/Refresh_rate
+     */
     public DisplaySettings(final int width, final int height, final int colorDepth, final int frequency,
             final boolean fullScreen) {
         _width = width;
@@ -52,6 +83,35 @@ public class DisplaySettings {
         _shareContext = null;
     }
 
+    /**
+     * Convenience method equivalent to <code>DisplaySettings(width, height, colorDepth, frequency, 
+     * alphaBits, depthBits, stencilBits, samples, fullScreen, stereo, null)</code>
+     * 
+     * @param width
+     *            the canvas width
+     * @param height
+     *            the canvas height
+     * @param colorDepth
+     *            the number of color bits used to represent the color of a single pixel
+     * @param frequency
+     *            the number of times per second to repaint the canvas
+     * @param alphaBits
+     *            the numner of bits used to represent the translucency of a single pixel
+     * @param depthBits
+     *            the number of bits making up the z-buffer
+     * @param stencilBits
+     *            the number of bits making up the stencil buffer
+     * @param samples
+     *            the number of samples used to anti-alias
+     * @param fullScreen
+     *            true if the canvas should assume exclusive access to the screen
+     * @param stereo
+     *            true if the canvas should be rendered stereoscopically (for 3D glasses)
+     * @see http://en.wikipedia.org/wiki/Refresh_rate
+     * @see http://en.wikipedia.org/wiki/Alpha_compositing
+     * @see http://en.wikipedia.org/wiki/Stencil_buffer
+     * @see http://en.wikipedia.org/wiki/Stereoscopy
+     */
     public DisplaySettings(final int width, final int height, final int colorDepth, final int frequency,
             final int alphaBits, final int depthBits, final int stencilBits, final int samples,
             final boolean fullScreen, final boolean stereo) {
@@ -68,6 +128,39 @@ public class DisplaySettings {
         _shareContext = null;
     }
 
+    /**
+     * Creates a new <code>DisplaySettings</code> object.
+     * 
+     * @param width
+     *            the canvas width
+     * @param height
+     *            the canvas height
+     * @param colorDepth
+     *            the number of color bits used to represent the color of a single pixel
+     * @param frequency
+     *            the number of times per second to repaint the canvas
+     * @param alphaBits
+     *            the numner of bits used to represent the translucency of a single pixel
+     * @param depthBits
+     *            the number of bits making up the z-buffer
+     * @param stencilBits
+     *            the number of bits making up the stencil buffer
+     * @param samples
+     *            the number of samples used to anti-alias
+     * @param fullScreen
+     *            true if the canvas should assume exclusive access to the screen
+     * @param stereo
+     *            true if the canvas should be rendered stereoscopically (for 3D glasses)
+     * @param shareContext
+     *            the renderer used to render the canvas (see "ardor3d.useMultipleContexts" property)
+     * @see http://en.wikipedia.org/wiki/Z-buffering
+     * @see http://en.wikipedia.org/wiki/Multisample_anti-aliasing
+     * @see http://en.wikipedia.org/wiki/Refresh_rate
+     * @see http://en.wikipedia.org/wiki/Alpha_compositing
+     * @see http://en.wikipedia.org/wiki/Stencil_buffer
+     * @see http://en.wikipedia.org/wiki/Stereoscopy
+     * @see http://www.ardor3d.com/forums/viewtopic.php?f=13&t=318&p=2311&hilit=ardor3d.useMultipleContexts#p2311
+     */
     public DisplaySettings(final int width, final int height, final int colorDepth, final int frequency,
             final int alphaBits, final int depthBits, final int stencilBits, final int samples,
             final boolean fullScreen, final boolean stereo, final CanvasRenderer shareContext) {
@@ -139,38 +232,18 @@ public class DisplaySettings {
 
         final DisplaySettings that = (DisplaySettings) o;
 
-        if (_colorDepth != that._colorDepth) {
-            return false;
-        }
-        if (_frequency != that._frequency) {
-            return false;
-        }
-        if (_fullScreen != that._fullScreen) {
-            return false;
-        }
-        if (_height != that._height) {
-            return false;
-        }
-        if (_width != that._width) {
-            return false;
-        }
-        if (_alphaBits != that._alphaBits) {
-            return false;
-        }
-        if (_depthBits != that._depthBits) {
-            return false;
-        }
-        if (_stencilBits != that._stencilBits) {
-            return false;
-        }
-        if (_samples != that._samples) {
-            return false;
-        }
-        if (_stereo != that._stereo) {
-            return false;
-        }
-
-        return true;
+        return _colorDepth == that._colorDepth
+                && _frequency == that._frequency
+                && _fullScreen != that._fullScreen
+                && _height != that._height
+                && _width != that._width
+                && _alphaBits != that._alphaBits
+                && _depthBits != that._depthBits
+                && _stencilBits != that._stencilBits
+                && _samples != that._samples
+                && _stereo != that._stereo
+                && ((_shareContext == that._shareContext) || (_shareContext != null && _shareContext
+                        .equals(that._shareContext)));
     }
 
     @Override
@@ -187,6 +260,7 @@ public class DisplaySettings {
         result = 31 * result + _samples;
         result = 31 * result + (_fullScreen ? 1 : 0);
         result = 31 * result + (_stereo ? 1 : 0);
+        result = 31 * result + (_shareContext != null ? _shareContext.hashCode() : 0);
         return result;
     }
 }
