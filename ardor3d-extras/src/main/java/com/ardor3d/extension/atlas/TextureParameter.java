@@ -11,6 +11,7 @@
 package com.ardor3d.extension.atlas;
 
 import java.nio.FloatBuffer;
+import java.util.logging.Logger;
 
 import com.ardor3d.image.Texture;
 import com.ardor3d.renderer.state.RenderState;
@@ -22,6 +23,8 @@ import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.TextureKey;
 
 public class TextureParameter {
+    private static final Logger logger = Logger.getLogger(TextureParameter.class.getName());
+
     private final Mesh mesh;
     private final Texture texture;
     private final int textureIndex;
@@ -35,6 +38,10 @@ public class TextureParameter {
     private float offsetY;
 
     public TextureParameter(final Mesh mesh, final int textureIndex, final int targetTextureIndex) {
+        if (mesh == null) {
+            throw new IllegalArgumentException("Mesh is null");
+        }
+
         this.mesh = mesh;
         this.textureIndex = textureIndex;
         this.targetTextureIndex = targetTextureIndex;
@@ -46,11 +53,11 @@ public class TextureParameter {
 
         final RenderState textureState = mesh.getWorldRenderState(StateType.Texture);
         if (textureState == null) {
-            throw new Ardor3dException("No texture found for mesh: " + mesh);
+            throw new Ardor3dException("No texture state found for mesh: " + mesh);
         }
 
         texture = ((TextureState) textureState).getTexture(textureIndex);
-        textureKey = texture.getTextureKey();
+        textureKey = texture != null ? texture.getTextureKey() : null;
     }
 
     public Mesh getMesh() {
@@ -145,5 +152,14 @@ public class TextureParameter {
 
     public void setOffsetY(final float offsetY) {
         this.offsetY = offsetY;
+    }
+
+    public int getTextureIndex() {
+        return textureIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "TextureParameter [mesh=" + mesh + ", textureIndex=" + textureIndex + "]";
     }
 }

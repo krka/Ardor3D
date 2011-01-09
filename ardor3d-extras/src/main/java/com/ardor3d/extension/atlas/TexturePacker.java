@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
@@ -34,6 +35,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class TexturePacker {
+    private static final Logger logger = Logger.getLogger(TexturePacker.class.getName());
+
     private final int atlasWidth;
     private final int atlasHeight;
     private int nrTextures = 0;
@@ -70,6 +73,23 @@ public class TexturePacker {
     }
 
     public void insert(final TextureParameter parameterObject) {
+        if (parameterObject.getTextureCoords() == null) {
+            TexturePacker.logger.warning("Skipping mesh! - No texture coords found at index "
+                    + parameterObject.getTextureIndex() + " for mesh: " + parameterObject);
+            return;
+        }
+        if (parameterObject.getTexture() == null) {
+            TexturePacker.logger.warning("Skipping mesh! - No texture found at index "
+                    + parameterObject.getTextureIndex() + " for mesh: " + parameterObject);
+            return;
+        }
+        final ImageDataFormat format = parameterObject.getTexture().getImage().getDataFormat();
+        if (format != ImageDataFormat.RGB && format != ImageDataFormat.RGBA) {
+            TexturePacker.logger.warning("Skipping mesh! - Only RGB and RGBA texture formats supported currently: "
+                    + parameterObject);
+            return;
+        }
+
         List<TextureParameter> list = cachedAtlases.get(parameterObject);
         if (list != null) {
             final TextureParameter cachedParameter = list.get(0);
@@ -138,7 +158,6 @@ public class TexturePacker {
         final ByteBuffer lightData = parameterObject.getTexture().getImage().getData(0);
 
         boolean hasAlpha = false;
-        final ImageDataFormat format = parameterObject.getTexture().getImage().getDataFormat();
         if (format == ImageDataFormat.RGBA) {
             hasAlpha = true;
         }
@@ -260,11 +279,12 @@ public class TexturePacker {
     }
 
     public void createAtlases() {
-        createAtlases(Texture.MinificationFilter.Trilinear, MagnificationFilter.Bilinear);
+        createAtlases(Texture.MinificationFilter.Trilinear, MagnificationFilter.Bilinear, WrapMode.EdgeClamp,
+                ApplyMode.Modulate);
     }
 
     public void createAtlases(final Texture.MinificationFilter minificationFilter,
-            final Texture.MagnificationFilter magnificationFilter) {
+            final Texture.MagnificationFilter magnificationFilter, final WrapMode wrapMode, final ApplyMode applyMode) {
         for (final ByteBuffer data : dataBuffers) {
             data.rewind();
 
@@ -274,8 +294,8 @@ public class TexturePacker {
             final Texture texture = TextureManager.loadFromImage(image, minificationFilter);
             texture.setMagnificationFilter(magnificationFilter);
 
-            texture.setWrap(WrapMode.EdgeClamp);
-            texture.setApply(ApplyMode.Modulate);
+            texture.setWrap(wrapMode);
+            texture.setApply(applyMode);
 
             textures.add(texture);
         }
