@@ -20,8 +20,7 @@ import com.ardor3d.image.Image;
 import com.ardor3d.image.ImageDataFormat;
 import com.ardor3d.image.ImageDataType;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture.ApplyMode;
-import com.ardor3d.image.Texture.MagnificationFilter;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.WrapAxis;
 import com.ardor3d.image.Texture.WrapMode;
 import com.ardor3d.math.ColorRGBA;
@@ -279,23 +278,24 @@ public class TexturePacker {
     }
 
     public void createAtlases() {
-        createAtlases(Texture.MinificationFilter.Trilinear, MagnificationFilter.Bilinear, WrapMode.EdgeClamp,
-                ApplyMode.Modulate);
+        createAtlases(new AtlasTextureParameter());
     }
 
-    public void createAtlases(final Texture.MinificationFilter minificationFilter,
-            final Texture.MagnificationFilter magnificationFilter, final WrapMode wrapMode, final ApplyMode applyMode) {
+    public void createAtlases(final AtlasTextureParameter atlasTextureParameter) {
         for (final ByteBuffer data : dataBuffers) {
             data.rewind();
 
             final ImageDataFormat fmt = useAlpha ? ImageDataFormat.RGBA : ImageDataFormat.RGB;
             final Image image = new Image(fmt, ImageDataType.UnsignedByte, atlasWidth, atlasHeight, data, null);
 
-            final Texture texture = TextureManager.loadFromImage(image, minificationFilter);
-            texture.setMagnificationFilter(magnificationFilter);
+            final TextureStoreFormat format = atlasTextureParameter.compress ? TextureStoreFormat.GuessCompressedFormat
+                    : TextureStoreFormat.GuessNoCompressedFormat;
+            final Texture texture = TextureManager.loadFromImage(image, atlasTextureParameter.minificationFilter,
+                    format);
+            texture.setMagnificationFilter(atlasTextureParameter.magnificationFilter);
 
-            texture.setWrap(wrapMode);
-            texture.setApply(applyMode);
+            texture.setWrap(atlasTextureParameter.wrapMode);
+            texture.setApply(atlasTextureParameter.applyMode);
 
             textures.add(texture);
         }
