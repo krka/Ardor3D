@@ -202,11 +202,13 @@ public abstract class InterpolationController<C, T extends Spatial> extends Comp
 
             case CYCLE:
                 if (isCycleForward()) {
-                    if (getIndex() == getMaximumIndex()) {
+                    if (getIndex() >= getMaximumIndex()) {
+                        setIndex(getMaximumIndex());
                         setCycleForward(false);
                     }
                 } else {
-                    if (getIndex() == getMinimumIndex()) {
+                    if (getIndex() <= getMinimumIndex()) {
+                        setIndex(getMinimumIndex());
                         setCycleForward(true);
                     }
                 }
