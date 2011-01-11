@@ -152,10 +152,9 @@ public class UISlider extends UIContainer {
      * Set the value on this slider
      * 
      * @param value
-     *            the new value. Must be between min and max values.
+     *            the new value. Clamps between min and max values.
      */
     public void setValue(final int value) {
-        assert _model.getMinValue() <= value && value <= _model.getMaxValue() : "value must be between the model's minValue and maxValue.";
         _model.setCurrentValue(value, this);
         updateKnob();
     }
@@ -167,7 +166,7 @@ public class UISlider extends UIContainer {
         if ((float) (_model.getMaxValue() - _model.getMinValue()) != 0) {
             _knob.setPosition(_model.getCurrentValue() / (float) (_model.getMaxValue() - _model.getMinValue()));
         } else {
-            _knob.setPosition(0);
+            _knob.setPosition(_model.getMinValue());
         }
     }
 
