@@ -347,7 +347,7 @@ public class PointCubeExample extends ExampleBase {
             + "  gl_Position = mvp[0]*(scale*cube[5] + position); EmitVertex();" + "  uv = coord[13];"
             + "  gl_Position = mvp[0]*(scale*cube[4] + position); EmitVertex();" + "  uv = coord[14];"
             + "  gl_Position = mvp[0]*(scale*cube[1] + position); EmitVertex();" + "  uv = coord[15];"
-            + "  gl_Position = mvp[0]*(scale*cube[0] + position); EmitVertex();" + "  EndPrimitive();" + "};";
+            + "  gl_Position = mvp[0]*(scale*cube[0] + position); EmitVertex();" + "  EndPrimitive();" + "}";
 
     private static final String s_frag = "uniform sampler2D texture;" + "" + "in vec2 uv;" + "" + "void main()" + "{"
             + "  gl_FragColor = vec4(texture2D(texture,uv));" + "}";

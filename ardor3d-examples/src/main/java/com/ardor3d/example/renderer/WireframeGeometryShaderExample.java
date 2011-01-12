@@ -65,7 +65,7 @@ public class WireframeGeometryShaderExample extends ExampleBase {
             "  dist = vec3(0,0,area/length(v2));" + //
             "  gl_Position = gl_in[2].gl_Position; EmitVertex();" + //
             "  EndPrimitive();" + //
-            "};";
+            "}";
 
     private static final String s_frag_wireframe_120 = "#version 120\n" + //
             "in vec3 dist;" + //
