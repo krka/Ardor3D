@@ -61,6 +61,7 @@ public class Terrain extends Node implements Pickable {
 
     private List<ClipmapLevel> _clips;
     private int _visibleLevels = 0;
+    private int _minVisibleLevel = 0;
     private final Camera _terrainCamera;
     private final int _clipSideSize;
 
@@ -166,7 +167,7 @@ public class Terrain extends Node implements Pickable {
     protected void updateChildren(final double time) {
         super.updateChildren(time);
 
-        for (int i = 0; i < _clips.size(); i++) {
+        for (int i = _minVisibleLevel; i < _clips.size(); i++) {
             if (_clips.get(i).isReady()) {
                 _visibleLevels = i;
                 break;
@@ -590,5 +591,42 @@ public class Terrain extends Node implements Pickable {
 
     public void addTextureClipmap(final TextureClipmap textureClipmap) {
         _textureClipmaps.add(textureClipmap);
+    }
+
+    /**
+     * set the minimum (highest resolution) clipmap level visible
+     * 
+     * @param level
+     *            clamped to valid range
+     */
+    public void setMinVisibleLevel(final int level) {
+        if (level < 0) {
+            _minVisibleLevel = 0;
+        } else if (level >= _clips.size()) {
+            _minVisibleLevel = _clips.size() - 1;
+        } else {
+            _minVisibleLevel = level;
+        }
+    }
+
+    public int getMinVisibleLevel() {
+        return _minVisibleLevel;
+    }
+
+    /**
+     * convenience function to set minimum (highest resolution) texture clipmap level on all TextureClipmaps held by
+     * this terrain
+     */
+    public void setTextureMinVisibleLevel(final int level) {
+        for (final TextureClipmap tc : _textureClipmaps) {
+            tc.setMinVisibleLevel(level);
+        }
+    }
+
+    public int getTextureMinVisibleLevel() {
+        if (!_textureClipmaps.isEmpty()) {
+            return _textureClipmaps.get(0).getMinVisibleLevel();
+        }
+        return 0;
     }
 }

@@ -54,6 +54,7 @@ public class TextureClipmap {
     private final int textureLevels;
     private final int validLevels;
     private int currentShownLevels;
+    private int minVisibleLevel = 0;
 
     private float scale = 1f;
 
@@ -124,7 +125,7 @@ public class TextureClipmap {
         textureClipmapShader.setUniform("eyePosition", eyePosition);
         eyePosition.multiplyLocal(textureSize / (scale * 4f * 32f));
 
-        for (int unit = 0; unit < validLevels; unit++) {
+        for (int unit = minVisibleLevel; unit < validLevels; unit++) {
             if (cacheList.get(unit).isValid()) {
                 currentShownLevels = unit;
                 break;
@@ -626,5 +627,25 @@ public class TextureClipmap {
 
     public int getValidLevels() {
         return validLevels;
+    }
+
+    /**
+     * set the minimum (highest resolution) clipmap level visible
+     * 
+     * @param level
+     *            clamped to valid range
+     */
+    public void setMinVisibleLevel(final int level) {
+        if (level < 0) {
+            minVisibleLevel = 0;
+        } else if (level >= validLevels) {
+            minVisibleLevel = validLevels - 1;
+        } else {
+            minVisibleLevel = level;
+        }
+    }
+
+    public int getMinVisibleLevel() {
+        return minVisibleLevel;
     }
 }
