@@ -159,12 +159,12 @@ public class AnimationDemoExample extends ExampleBase {
             public void actionPerformed(final ActionEvent event) {
                 if (!walk) {
                     if (manager.getBaseAnimationLayer().doTransition("walk")) {
-                        runWalkButton.setText("Start running...");
+                        runWalkButton.setButtonText("Start running...");
                         walk = true;
                     }
                 } else {
                     if (manager.getBaseAnimationLayer().doTransition("run")) {
-                        runWalkButton.setText("Start walking...");
+                        runWalkButton.setButtonText("Start walking...");
                         walk = false;
                     }
                 }

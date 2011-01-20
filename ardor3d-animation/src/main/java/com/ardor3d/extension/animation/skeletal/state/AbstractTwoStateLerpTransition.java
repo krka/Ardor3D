@@ -148,7 +148,7 @@ public abstract class AbstractTwoStateLerpTransition extends AbstractTransitionS
         // if we're outside the fade time...
         if (currentTime > getFadeTime()) {
             // transition over to end state
-            layer.setCurrentState(getTargetState(), false);
+            getLastStateOwner().replaceState(this, getStateB());
             return;
         }
 
