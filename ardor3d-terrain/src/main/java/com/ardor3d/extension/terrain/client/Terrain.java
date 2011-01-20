@@ -629,4 +629,13 @@ public class Terrain extends Node implements Pickable {
         }
         return 0;
     }
+
+    public float getHeightAt(final double x, final double z) {
+        final Vector3 heightCalc = new Vector3(x, 0, z);
+        worldToLocal(heightCalc, heightCalc);
+        final float height = getClipmaps().get(0).getCache().getSubHeight(heightCalc.getXf(), heightCalc.getZf());
+        heightCalc.set(x, height, z);
+        localToWorld(heightCalc, heightCalc);
+        return heightCalc.getYf();
+    }
 }
