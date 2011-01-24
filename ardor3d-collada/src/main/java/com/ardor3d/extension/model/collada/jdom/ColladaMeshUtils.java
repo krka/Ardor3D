@@ -583,20 +583,32 @@ public class ColladaMeshUtils {
      * @return value from 'name' or 'material' attribute
      */
     private String extractName(final Element colladaGeometry, final Element element) {
+        // Try to get mesh name
         String name = element.getAttributeValue("name");
         if (name == null || name.isEmpty()) {
-            name = colladaGeometry.getAttributeValue("name");
+            // No mesh name found, try to get mesh id
+            name = element.getAttributeValue("id");
         }
         if (name == null || name.isEmpty()) {
-            name = colladaGeometry.getAttributeValue("id");
+            // No mesh name or id found, try to get parent geometry name
+            name = colladaGeometry.getAttributeValue("name");
+            if (name == null || name.isEmpty()) {
+                // No parent geometry name found, try to get geometry id (mandatory according to spec)
+                name = colladaGeometry.getAttributeValue("id");
+            }
+            if (name == null) {
+                name = "";
+            }
+
+            // Since we have retrieved the parent geometry name/id, we append the material(if any),
+            // to make identification unique.
+            final String materialName = element.getAttributeValue("material");
+            if (materialName != null && !materialName.isEmpty()) {
+                name += "[" + materialName + "]";
+            }
         }
         if (name == null) {
             name = "";
-        }
-
-        final String materialName = element.getAttributeValue("material");
-        if (materialName != null && !materialName.isEmpty()) {
-            name += "[" + materialName + "]";
         }
 
         return name;
