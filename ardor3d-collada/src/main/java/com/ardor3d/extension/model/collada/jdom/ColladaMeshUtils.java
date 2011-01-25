@@ -607,9 +607,6 @@ public class ColladaMeshUtils {
                 name += "[" + materialName + "]";
             }
         }
-        if (name == null) {
-            name = "";
-        }
 
         return name;
     }
