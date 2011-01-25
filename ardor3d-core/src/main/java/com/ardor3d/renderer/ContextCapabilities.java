@@ -126,6 +126,69 @@ public class ContextCapabilities {
     protected String _displayVersion;
     protected String _shadingLanguageVersion;
 
+    public ContextCapabilities() {}
+
+    public ContextCapabilities(final ContextCapabilities source) {
+        _automaticMipMaps = source._automaticMipMaps;
+        _displayRenderer = source._displayRenderer;
+        _displayVendor = source._displayVendor;
+        _displayVersion = source._displayVersion;
+        _fboSupported = source._fboSupported;
+        _geometryShader4Supported = source._geometryShader4Supported;
+        _glslSupported = source._glslSupported;
+        _maxAnisotropic = source._maxAnisotropic;
+        _maxFBOColorAttachments = source._maxFBOColorAttachments;
+        _maxFBOSamples = source._maxFBOSamples;
+        _maxGLSLVertexAttribs = source._maxGLSLVertexAttribs;
+        _maxTextureLodBias = source._maxTextureLodBias;
+        _maxTextureSize = source._maxTextureSize;
+        _maxUserClipPlanes = source._maxUserClipPlanes;
+        _numAuxDrawBuffers = source._numAuxDrawBuffers;
+        _numFixedTexUnits = source._numFixedTexUnits;
+        _numFragmentTexCoordUnits = source._numFragmentTexCoordUnits;
+        _numFragmentTexUnits = source._numFragmentTexUnits;
+        _numTotalTexUnits = source._numTotalTexUnits;
+        _numVertexTexUnits = source._numVertexTexUnits;
+        _pbufferSupported = source._pbufferSupported;
+        _shadingLanguageVersion = source._shadingLanguageVersion;
+        _stencilWrapSupport = source._stencilWrapSupport;
+        _supportsAniso = source._supportsAniso;
+        _supportsBorderClamp = source._supportsBorderClamp;
+        _supportsConstantColor = source._supportsConstantColor;
+        _supportsDepthTexture = source._supportsDepthTexture;
+        _supportsEdgeClamp = source._supportsEdgeClamp;
+        _supportsEnvCombine = source._supportsEnvCombine;
+        _supportsEnvDot3 = source._supportsEnvDot3;
+        _supportsEq = source._supportsEq;
+        _supportsFogCoords = source._supportsFogCoords;
+        _supportsFragmentProgram = source._supportsFragmentProgram;
+        _supportsGenericCompression = source._supportsGenericCompression;
+        _supportsGL1_2 = source._supportsGL1_2;
+        _supportsLATCCompression = source._supportsLATCCompression;
+        _supportsMinMax = source._supportsMinMax;
+        _supportsMirrorBorderClamp = source._supportsMirrorBorderClamp;
+        _supportsMirrorClamp = source._supportsMirrorClamp;
+        _supportsMirrorEdgeClamp = source._supportsMirrorEdgeClamp;
+        _supportsMirroredRepeat = source._supportsMirroredRepeat;
+        _supportsMultisample = source._supportsMultisample;
+        _supportsMultiTexture = source._supportsMultiTexture;
+        _supportsNonPowerTwo = source._supportsNonPowerTwo;
+        _supportsPointParameters = source._supportsPointParameters;
+        _supportsPointSprites = source._supportsPointSprites;
+        _supportsRectangular = source._supportsRectangular;
+        _supportsS3TCCompression = source._supportsS3TCCompression;
+        _supportsSeparateEq = source._supportsSeparateEq;
+        _supportsSeparateFunc = source._supportsSeparateFunc;
+        _supportsShadow = source._supportsShadow;
+        _supportsSubtract = source._supportsSubtract;
+        _supportsTexture3D = source._supportsTexture3D;
+        _supportsTextureCubeMap = source._supportsTextureCubeMap;
+        _supportsTextureLodBias = source._supportsTextureLodBias;
+        _supportsVBO = source._supportsVBO;
+        _supportsVertexProgram = source._supportsVertexProgram;
+        _twoSidedStencilSupport = source._twoSidedStencilSupport;
+    }
+
     /**
      * @return true if we support Vertex Buffer Objects.
      */
