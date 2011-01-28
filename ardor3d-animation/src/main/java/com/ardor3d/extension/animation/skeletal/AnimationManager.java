@@ -19,6 +19,7 @@ import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.extension.animation.skeletal.state.AbstractFiniteState;
 import com.ardor3d.extension.animation.skeletal.util.LoggingMap;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
@@ -44,7 +45,7 @@ public class AnimationManager {
      * A timer to use as our "global" time keeper. All animation sources under this manager will use this timer as their
      * time reference.
      */
-    private Timer _globalTimer;
+    private ReadOnlyTimer _globalTimer;
 
     /** The pose this manager manipulates on update. */
     private List<SkeletonPose> _applyToPoses;
@@ -80,7 +81,7 @@ public class AnimationManager {
      * @param globalTimer
      *            the timer to use for global time keeping.
      */
-    public AnimationManager(final Timer globalTimer) {
+    public AnimationManager(final ReadOnlyTimer globalTimer) {
         this(globalTimer, null);
     }
 
@@ -92,7 +93,7 @@ public class AnimationManager {
      * @param pose
      *            a pose to update.
      */
-    public AnimationManager(final Timer globalTimer, final SkeletonPose pose) {
+    public AnimationManager(final ReadOnlyTimer globalTimer, final SkeletonPose pose) {
         _globalTimer = globalTimer;
 
         // add our base layer
@@ -120,7 +121,7 @@ public class AnimationManager {
     /**
      * @return the timer used by this manager for global time keeping.
      */
-    public Timer getGlobalTimer() {
+    public ReadOnlyTimer getGlobalTimer() {
         return _globalTimer;
     }
 
