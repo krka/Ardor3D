@@ -28,6 +28,10 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class LwjglContextCapabilities extends ContextCapabilities {
 
+    public LwjglContextCapabilities(final ContextCapabilities caps) {
+        super(caps);
+    }
+
     public LwjglContextCapabilities(final org.lwjgl.opengl.ContextCapabilities caps) {
         final IntBuffer buf = BufferUtils.createIntBuffer(16);
 

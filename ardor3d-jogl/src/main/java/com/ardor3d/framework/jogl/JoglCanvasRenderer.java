@@ -25,6 +25,7 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -114,6 +115,11 @@ public class JoglCanvasRenderer implements CanvasRenderer {
     }
 
     @MainThread
+    protected ContextCapabilities createContextCapabilities() {
+        return new JoglContextCapabilities(_context.getGL());
+    }
+
+    @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
         if (_context == null) {
@@ -129,7 +135,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
                     .getContextKey());
         }
 
-        final JoglContextCapabilities caps = new JoglContextCapabilities(_context.getGL());
+        final ContextCapabilities caps = new JoglContextCapabilities(_context.getGL());
         _currentContext = new RenderContext(_context, caps, sharedContext);
 
         ContextManager.addContext(_context, _currentContext);

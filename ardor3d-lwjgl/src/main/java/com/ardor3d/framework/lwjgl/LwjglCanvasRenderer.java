@@ -22,6 +22,7 @@ import com.ardor3d.framework.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
@@ -62,6 +63,11 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     }
 
     @MainThread
+    protected ContextCapabilities createContextCapabilities() {
+        return new LwjglContextCapabilities(GLContext.getCapabilities());
+    }
+
+    @MainThread
     public void init(final DisplaySettings settings, final boolean doSwap) {
         _doSwap = doSwap;
 
@@ -81,7 +87,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             throw new Ardor3dException("Unable to init CanvasRenderer.", e);
         }
 
-        final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
+        final ContextCapabilities caps = createContextCapabilities();
         _currentContext = new RenderContext(this, caps, sharedContext);
 
         ContextManager.addContext(this, _currentContext);

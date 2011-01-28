@@ -19,7 +19,7 @@ import javax.media.opengl.GLAutoDrawable;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.util.geom.BufferUtils;
 
-public final class JoglContextCapabilities extends ContextCapabilities {
+public class JoglContextCapabilities extends ContextCapabilities {
 
     public JoglContextCapabilities(final GLAutoDrawable autodrawable) {
         init(autodrawable.getGL());
@@ -27,6 +27,10 @@ public final class JoglContextCapabilities extends ContextCapabilities {
 
     public JoglContextCapabilities(final GL gl) {
         init(gl);
+    }
+
+    public JoglContextCapabilities(final ContextCapabilities caps) {
+        super(caps);
     }
 
     public void init(final GL gl) {
