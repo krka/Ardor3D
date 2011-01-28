@@ -24,10 +24,10 @@ public interface TriggerAction {
      * @param source
      *            the Canvas that was the source of the current input
      * @param inputState
-     *            the current state of the input systems when the action was triggered
+     *            the current and previous states of the input system when the action was triggered
      * @param tpf
      *            the time per frame in seconds
      */
     @MainThread
-    public void perform(Canvas source, TwoInputStates inputState, double tpf);
+    public void perform(Canvas source, TwoInputStates inputStates, double tpf);
 }
