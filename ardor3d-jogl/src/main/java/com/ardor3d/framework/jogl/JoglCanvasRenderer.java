@@ -135,7 +135,7 @@ public class JoglCanvasRenderer implements CanvasRenderer {
                     .getContextKey());
         }
 
-        final ContextCapabilities caps = new JoglContextCapabilities(_context.getGL());
+        final ContextCapabilities caps = createContextCapabilities();
         _currentContext = new RenderContext(_context, caps, sharedContext);
 
         ContextManager.addContext(_context, _currentContext);
