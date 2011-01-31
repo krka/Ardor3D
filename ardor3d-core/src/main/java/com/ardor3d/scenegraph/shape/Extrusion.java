@@ -16,6 +16,8 @@ import java.util.List;
 
 import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -66,7 +68,7 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public Extrusion(final Line shape, final List<Vector3> path, final Vector3 up) {
+    public Extrusion(final Line shape, final List<ReadOnlyVector3> path, final ReadOnlyVector3 up) {
         updateGeometry(shape, path, up);
     }
 
@@ -82,7 +84,7 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public Extrusion(final String name, final Line shape, final List<Vector3> path, final Vector3 up) {
+    public Extrusion(final String name, final Line shape, final List<ReadOnlyVector3> path, final ReadOnlyVector3 up) {
         super(name);
         updateGeometry(shape, path, up);
     }
@@ -97,7 +99,7 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public void updateGeometry(final Line shape, final List<Vector3> path, final Vector3 up) {
+    public void updateGeometry(final Line shape, final List<ReadOnlyVector3> path, final ReadOnlyVector3 up) {
         updateGeometry(shape, path, false, up);
     }
 
@@ -113,22 +115,31 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public void updateGeometry(final Line shape, final List<Vector3> path, final boolean closed, final Vector3 up) {
+    public void updateGeometry(final Line shape, final List<ReadOnlyVector3> path, final boolean closed,
+            final ReadOnlyVector3 up) {
         final FloatBuffer shapeBuffer = shape.getMeshData().getVertexBuffer();
         final FloatBuffer shapeNormalBuffer = shape.getMeshData().getNormalBuffer();
 
-        FloatBuffer vertices;
-        FloatBuffer normals;
         final int numVertices = path.size() * shapeBuffer.limit();
+
+        FloatBuffer vertices;
         if (_meshData.getVertexBuffer() != null && _meshData.getVertexBuffer().limit() == numVertices) {
             vertices = _meshData.getVertexBuffer();
-            normals = _meshData.getNormalBuffer();
             vertices.rewind();
-            normals.rewind();
         } else {
             vertices = BufferUtils.createFloatBuffer(numVertices);
-            normals = BufferUtils.createFloatBuffer(numVertices);
         }
+
+        FloatBuffer normals = null;
+        if (shapeNormalBuffer != null) {
+            if (_meshData.getNormalBuffer() != null && _meshData.getNormalBuffer().limit() == numVertices) {
+                normals = _meshData.getNormalBuffer();
+                normals.rewind();
+            } else {
+                normals = BufferUtils.createFloatBuffer(numVertices);
+            }
+        }
+
         final int numIndices = (path.size() - 1) * 2 * shapeBuffer.limit();
         IndexBufferData<?> indices;
         if (_meshData.getIndexBuffer() != null && _meshData.getIndexBuffer().limit() == numIndices) {
@@ -138,19 +149,23 @@ public class Extrusion extends Mesh {
             indices = BufferUtils.createIndexBufferData(numIndices, numVertices - 1);
         }
 
+        final IndexMode indexMode = shape.getMeshData().getIndexMode(0);
+
         final int shapeVertices = shapeBuffer.limit() / 3;
         final Vector3 vector = new Vector3();
         final Vector3 direction = new Vector3();
         final Quaternion rotation = new Quaternion();
+
         for (int i = 0; i < path.size(); i++) {
-            final Vector3 point = path.get(i);
+            final ReadOnlyVector3 point = path.get(i);
             shapeBuffer.rewind();
-            shapeNormalBuffer.rewind();
+            if (shapeNormalBuffer != null) {
+                shapeNormalBuffer.rewind();
+            }
             int shapeVertice = 0;
             do {
-
-                final Vector3 nextPoint = i < path.size() - 1 ? path.get(i + 1) : closed ? path.get(0) : null;
-                final Vector3 lastPoint = i > 0 ? path.get(i - 1) : null;
+                final ReadOnlyVector3 nextPoint = i < path.size() - 1 ? path.get(i + 1) : closed ? path.get(0) : null;
+                final ReadOnlyVector3 lastPoint = i > 0 ? path.get(i - 1) : null;
                 if (nextPoint != null) {
                     direction.set(nextPoint).subtractLocal(point);
                 } else {
@@ -158,28 +173,40 @@ public class Extrusion extends Mesh {
                 }
                 rotation.lookAt(direction, up);
 
-                vector.set(shapeNormalBuffer.get(), shapeNormalBuffer.get(), shapeNormalBuffer.get());
-                rotation.apply(vector, vector);
-                normals.put((float) vector.getX());
-                normals.put((float) vector.getY());
-                normals.put((float) vector.getZ());
+                if (shapeNormalBuffer != null && normals != null) {
+                    vector.set(shapeNormalBuffer.get(), shapeNormalBuffer.get(), shapeNormalBuffer.get());
+                    rotation.apply(vector, vector);
+                    normals.put(vector.getXf());
+                    normals.put(vector.getYf());
+                    normals.put(vector.getZf());
+                }
 
                 vector.set(shapeBuffer.get(), shapeBuffer.get(), shapeBuffer.get());
                 rotation.apply(vector, vector);
                 vector.addLocal(point);
-                vertices.put((float) vector.getX());
-                vertices.put((float) vector.getY());
-                vertices.put((float) vector.getZ());
+                vertices.put(vector.getXf());
+                vertices.put(vector.getYf());
+                vertices.put(vector.getZf());
 
-                if ((shapeVertice & 1) == 0) {
+                if (indexMode != IndexMode.Lines || (shapeVertice & 1) == 0) {
                     if (i < path.size() - 1) {
-                        indices.put(i * shapeVertices + shapeVertice);
-                        indices.put(i * shapeVertices + shapeVertice + 1);
-                        indices.put((i + 1) * shapeVertices + shapeVertice);
+                        if (shapeBuffer.hasRemaining()) {
+                            indices.put(i * shapeVertices + shapeVertice);
+                            indices.put(i * shapeVertices + shapeVertice + 1);
+                            indices.put((i + 1) * shapeVertices + shapeVertice);
 
-                        indices.put((i + 1) * shapeVertices + shapeVertice + 1);
-                        indices.put((i + 1) * shapeVertices + shapeVertice);
-                        indices.put(i * shapeVertices + shapeVertice + 1);
+                            indices.put((i + 1) * shapeVertices + shapeVertice + 1);
+                            indices.put((i + 1) * shapeVertices + shapeVertice);
+                            indices.put(i * shapeVertices + shapeVertice + 1);
+                        } else if (indexMode == IndexMode.LineLoop) {
+                            indices.put(i * shapeVertices + shapeVertice);
+                            indices.put(i * shapeVertices + shapeVertice + 1);
+                            indices.put((i + 1) * shapeVertices + shapeVertice);
+
+                            indices.put(i * shapeVertices + shapeVertice);
+                            indices.put((i - 1) * shapeVertices + shapeVertice + 1);
+                            indices.put(i * shapeVertices + shapeVertice + 1);
+                        }
                     } else if (closed) {
                         indices.put(i * shapeVertices + shapeVertice);
                         indices.put(i * shapeVertices + shapeVertice + 1);
@@ -195,7 +222,9 @@ public class Extrusion extends Mesh {
         }
 
         _meshData.setVertexBuffer(vertices);
-        _meshData.setNormalBuffer(normals);
+        if (normals != null) {
+            _meshData.setNormalBuffer(normals);
+        }
         _meshData.setIndices(indices);
     }
 
@@ -212,7 +241,8 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public void updateGeometry(final Line shape, final List<Vector3> points, final int segments, final Vector3 up) {
+    public void updateGeometry(final Line shape, final List<ReadOnlyVector3> points, final int segments,
+            final ReadOnlyVector3 up) {
         updateGeometry(shape, points, segments, false, up);
     }
 
@@ -231,8 +261,8 @@ public class Extrusion extends Mesh {
      * @param up
      *            up vector
      */
-    public void updateGeometry(final Line shape, final List<Vector3> points, final int segments, final boolean closed,
-            final Vector3 up) {
+    public void updateGeometry(final Line shape, final List<ReadOnlyVector3> points, final int segments,
+            final boolean closed, final ReadOnlyVector3 up) {
         int np = points.size(); // number of points
         if (closed) {
             np = np + 3;
@@ -240,10 +270,10 @@ public class Extrusion extends Mesh {
         final double d[][] = new double[3][np]; // Newton form coefficients
         final double x[] = new double[np]; // x-coordinates of nodes
 
-        final List<Vector3> path = new ArrayList<Vector3>();
+        final List<ReadOnlyVector3> path = new ArrayList<ReadOnlyVector3>();
 
         for (int i = 0; i < np; i++) {
-            Vector3 p;
+            ReadOnlyVector3 p;
             if (!closed) {
                 p = points.get(i);
             } else {
