@@ -145,10 +145,10 @@ public final class Debugger {
         }
     }
 
-    public static void setBoundsColor(final ColorRGBA color) {
-        boundingBox.setSolidColor(color);
-        boundingOB.setSolidColor(color);
-        boundingSphere.setSolidColor(color);
+    public static void setBoundsColor(final ReadOnlyColorRGBA color) {
+        boundingBox.setDefaultColor(color);
+        boundingOB.setDefaultColor(color);
+        boundingSphere.setDefaultColor(color);
     }
 
     public static void drawBoundingSphere(final BoundingSphere sphere, final Renderer r) {
