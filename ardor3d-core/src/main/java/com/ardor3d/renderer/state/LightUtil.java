@@ -54,7 +54,7 @@ public abstract class LightUtil {
     }
 
     protected static double getValueFor(final Light l, final BoundingVolume val) {
-        if (!l.isEnabled()) {
+        if (l == null || !l.isEnabled()) {
             return 0;
         } else if (l.getType() == Light.Type.Directional) {
             return getColorValue(l);
