@@ -45,6 +45,16 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
     public Rectangle3() {}
 
     /**
+     * Constructor creates a new <code>Rectangle3</code> using the values of the provided source rectangle.
+     * 
+     * @param source
+     *            the rectangle to copy from
+     */
+    public Rectangle3(final ReadOnlyRectangle3 source) {
+        this(source.getA(), source.getB(), source.getC());
+    }
+
+    /**
      * Constructor creates a new <code>Rectangle3</code> with defined A, B, and C points that define the area of the
      * rectangle.
      * 
@@ -190,15 +200,7 @@ public class Rectangle3 implements Cloneable, Savable, Externalizable, ReadOnlyR
 
     @Override
     public Rectangle3 clone() {
-        try {
-            final Rectangle3 p = (Rectangle3) super.clone();
-            p._a.set(_a);
-            p._b.set(_b);
-            p._c.set(_c);
-            return p;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Rectangle3(this);
     }
 
     // /////////////////

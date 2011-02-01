@@ -1216,11 +1216,7 @@ public class Matrix3 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     @Override
     public Matrix3 clone() {
-        try {
-            return (Matrix3) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Matrix3(this);
     }
 
     // /////////////////

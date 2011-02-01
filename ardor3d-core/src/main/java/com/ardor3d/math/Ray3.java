@@ -29,6 +29,16 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param source
+     *            the ray to copy from.
+     */
+    public Ray3(final ReadOnlyRay3 source) {
+        this(source.getOrigin(), source.getDirection());
+    }
+
+    /**
      * Constructs a new ray using the supplied origin point and unit length direction vector
      * 
      * @param origin
@@ -294,7 +304,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
 
     @Override
     public Ray3 clone() {
-        return (Ray3) super.clone();
+        return new Ray3(this);
     }
 
     // /////////////////

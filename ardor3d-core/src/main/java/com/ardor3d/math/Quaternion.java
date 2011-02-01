@@ -1332,11 +1332,7 @@ public class Quaternion implements Cloneable, Savable, Externalizable, ReadOnlyQ
 
     @Override
     public Quaternion clone() {
-        try {
-            return (Quaternion) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Quaternion(this);
     }
 
     // /////////////////

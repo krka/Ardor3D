@@ -671,15 +671,15 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
     }
 
     /**
-     * @return the distance between the origin (0, 0) and the point described by this vector (x, y). Effectively the
-     *         square root of the value returned by {@link #lengthSquared()}.
+     * @return the magnitude of this vector, or the distance between the origin (0, 0) and the point described by (x,
+     *         y). Basically sqrt(x^2 + y^2)
      */
     public double length() {
         return MathUtils.sqrt(lengthSquared());
     }
 
     /**
-     * @return the squared distance between the origin (0, 0) and the point described by this vector (x, y)
+     * @return the squared magnitude of this vector. (x^2 + y^2)
      */
     public double lengthSquared() {
         return getX() * getX() + getY() * getY();
@@ -851,11 +851,7 @@ public class Vector2 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     @Override
     public Vector2 clone() {
-        try {
-            return (Vector2) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Vector2(this);
     }
 
     // /////////////////

@@ -46,6 +46,16 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param source
+     *            the ring to copy from.
+     */
+    public Ring(final ReadOnlyRing source) {
+        this(source.getCenter(), source.getUp(), source.getInnerRadius(), source.getOuterRadius());
+    }
+
+    /**
      * Constructor creates a new <code>Ring</code> with defined center point, up vector, and inner and outer radii.
      * 
      * @param center
@@ -255,14 +265,7 @@ public class Ring implements Cloneable, Savable, Externalizable, ReadOnlyRing, P
 
     @Override
     public Ring clone() {
-        try {
-            final Ring p = (Ring) super.clone();
-            p._center.set(_center);
-            p._up.set(_up);
-            return p;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Ring(this);
     }
 
     // /////////////////

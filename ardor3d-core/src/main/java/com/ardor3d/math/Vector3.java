@@ -973,11 +973,7 @@ public class Vector3 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     @Override
     public Vector3 clone() {
-        try {
-            return (Vector3) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Vector3(this);
     }
 
     // /////////////////

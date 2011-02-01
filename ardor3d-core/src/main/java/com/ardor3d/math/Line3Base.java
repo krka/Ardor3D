@@ -20,7 +20,7 @@ import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
 
-public abstract class Line3Base implements Cloneable, Savable, Externalizable {
+public abstract class Line3Base implements Savable, Externalizable {
 
     protected final Vector3 _origin = new Vector3();
     protected final Vector3 _direction = new Vector3();
@@ -78,22 +78,6 @@ public abstract class Line3Base implements Cloneable, Savable, Externalizable {
         result += 31 * result + _direction.hashCode();
 
         return result;
-    }
-
-    // /////////////////
-    // Method for Cloneable
-    // /////////////////
-
-    @Override
-    public Line3Base clone() {
-        try {
-            final Line3Base l = (Line3Base) super.clone();
-            l._direction.set(_direction);
-            l._origin.set(_origin);
-            return l;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
     }
 
     // /////////////////

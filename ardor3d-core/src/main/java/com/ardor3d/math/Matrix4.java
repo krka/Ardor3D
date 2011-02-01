@@ -1247,11 +1247,7 @@ public class Matrix4 implements Cloneable, Savable, Externalizable, ReadOnlyMatr
 
     @Override
     public Matrix4 clone() {
-        try {
-            return (Matrix4) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Matrix4(this);
     }
 
     // /////////////////

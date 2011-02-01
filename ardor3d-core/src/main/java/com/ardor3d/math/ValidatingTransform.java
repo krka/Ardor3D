@@ -21,6 +21,17 @@ import com.ardor3d.util.Ardor3dException;
  * A Transform that checks if any of it's member values are null, NaN or Infinity, and throws an Ardor3dException if so.
  */
 public class ValidatingTransform extends Transform {
+    public ValidatingTransform() {}
+
+    /**
+     * Copy constructor
+     * 
+     * @param source
+     */
+    public ValidatingTransform(final ReadOnlyTransform source) {
+        super(source);
+    }
+
     private void validate() {
         if (!Transform.isValid(this)) {
             throw new Ardor3dException("Transform is invalid");
@@ -120,4 +131,14 @@ public class ValidatingTransform extends Transform {
         validate();
         return this;
     }
+
+    // /////////////////
+    // Method for Cloneable
+    // /////////////////
+
+    @Override
+    public ValidatingTransform clone() {
+        return new ValidatingTransform(this);
+    }
+
 }

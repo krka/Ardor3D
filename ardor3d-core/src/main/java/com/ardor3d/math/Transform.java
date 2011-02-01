@@ -908,15 +908,7 @@ public class Transform implements Cloneable, Savable, Externalizable, ReadOnlyTr
 
     @Override
     public Transform clone() {
-        try {
-            final Transform t = (Transform) super.clone();
-            t._matrix.set(_matrix);
-            t._scale.set(_scale);
-            t._translation.set(_translation);
-            return t;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Transform(this);
     }
 
     // /////////////////

@@ -875,11 +875,7 @@ public class ColorRGBA implements Cloneable, Savable, Externalizable, ReadOnlyCo
 
     @Override
     public ColorRGBA clone() {
-        try {
-            return (ColorRGBA) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new ColorRGBA(this);
     }
 
     // /////////////////

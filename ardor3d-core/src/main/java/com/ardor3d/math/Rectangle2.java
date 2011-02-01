@@ -62,7 +62,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
      * @param source
      *            the rectangle to copy from
      */
-    public Rectangle2(final Rectangle2 source) {
+    public Rectangle2(final ReadOnlyRectangle2 source) {
         set(source);
     }
 
@@ -122,8 +122,8 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
         return this;
     }
 
-    public Rectangle2 set(final Rectangle2 rect) {
-        return set(rect._x, rect._y, rect._width, rect._height);
+    public Rectangle2 set(final ReadOnlyRectangle2 rect) {
+        return set(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     }
 
     public Rectangle2 intersect(final Rectangle2 other, final Rectangle2 store) {
@@ -201,16 +201,7 @@ public class Rectangle2 implements Cloneable, Savable, Externalizable, ReadOnlyR
 
     @Override
     public Rectangle2 clone() {
-        try {
-            final Rectangle2 r = (Rectangle2) super.clone();
-            r._x = _x;
-            r._y = _y;
-            r._width = _width;
-            r._height = _height;
-            return r;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Rectangle2(this);
     }
 
     // /////////////////

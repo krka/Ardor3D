@@ -137,7 +137,7 @@ public class Line3 extends Line3Base implements ReadOnlyLine3, Poolable {
 
     @Override
     public Line3 clone() {
-        return (Line3) super.clone();
+        return new Line3(this);
     }
 
     // /////////////////

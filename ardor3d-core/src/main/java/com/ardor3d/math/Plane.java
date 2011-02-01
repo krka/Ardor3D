@@ -48,6 +48,16 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param source
+     *            the plane to copy from.
+     */
+    public Plane(final ReadOnlyPlane source) {
+        this(source.getNormal(), source.getConstant());
+    }
+
+    /**
      * Constructs a new plane using the supplied normal vector and plane constant
      * 
      * @param normal
@@ -217,13 +227,7 @@ public class Plane implements Cloneable, Savable, Externalizable, ReadOnlyPlane,
 
     @Override
     public Plane clone() {
-        try {
-            final Plane p = (Plane) super.clone();
-            p._normal.set(_normal);
-            return p;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Plane(this);
     }
 
     // /////////////////

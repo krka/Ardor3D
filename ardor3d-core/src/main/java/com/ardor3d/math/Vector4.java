@@ -922,11 +922,7 @@ public class Vector4 implements Cloneable, Savable, Externalizable, ReadOnlyVect
 
     @Override
     public Vector4 clone() {
-        try {
-            return (Vector4) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Vector4(this);
     }
 
     // /////////////////

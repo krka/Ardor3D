@@ -37,6 +37,16 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
     }
 
     /**
+     * Copy constructor.
+     * 
+     * @param source
+     *            the line segment to copy from.
+     */
+    public LineSegment3(final ReadOnlyLineSegment3 source) {
+        this(source.getOrigin(), source.getDirection(), source.getExtent());
+    }
+
+    /**
      * Constructs a new segment segment using the supplied origin point, unit length direction vector and extent
      * 
      * @param origin
@@ -222,7 +232,7 @@ public class LineSegment3 extends Line3Base implements ReadOnlyLineSegment3, Poo
 
     @Override
     public LineSegment3 clone() {
-        return (LineSegment3) super.clone();
+        return new LineSegment3(this);
     }
 
     // /////////////////

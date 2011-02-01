@@ -50,13 +50,23 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
     public Triangle() {}
 
     /**
+     * Copy constructor.
+     * 
+     * @param source
+     *            the triangle to copy from.
+     */
+    public Triangle(final ReadOnlyTriangle source) {
+        this(source.getA(), source.getB(), source.getC(), source.getIndex());
+    }
+
+    /**
      * Construct a new, mutable triangle using the given points and an index of 0.
      * 
      * @param pointA
      * @param pointB
      * @param pointC
      */
-    public Triangle(final Vector3 pointA, final Vector3 pointB, final Vector3 pointC) {
+    public Triangle(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC) {
         this(pointA, pointB, pointC, 0);
     }
 
@@ -68,7 +78,8 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
      * @param pointC
      * @param index
      */
-    public Triangle(final Vector3 pointA, final Vector3 pointB, final Vector3 pointC, final int index) {
+    public Triangle(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC,
+            final int index) {
         _pointA.set(pointA);
         _pointB.set(pointB);
         _pointC.set(pointC);
@@ -289,17 +300,7 @@ public class Triangle implements Cloneable, Savable, Externalizable, ReadOnlyTri
 
     @Override
     public Triangle clone() {
-        try {
-            final Triangle t = (Triangle) super.clone();
-            t._pointA.set(_pointA);
-            t._pointB.set(_pointB);
-            t._pointC.set(_pointC);
-            t._center = _center != null ? _center.clone() : null;
-            t._normal = _normal != null ? _normal.clone() : null;
-            return t;
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // can not happen
-        }
+        return new Triangle(this);
     }
 
     // /////////////////
