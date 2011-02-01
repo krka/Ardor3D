@@ -454,16 +454,19 @@ public class ColladaAnimUtils {
                         for (final int originalIndex : pairsMap.getIndices()) {
                             weightCount = 0;
 
-                            // get first 4 weights and joints at original index and add weights up to get divisor sum
-                            final int[] data = vertWeightMap[originalIndex];
-                            for (int i = 0; i < data.length; i += maxOffset + 1) {
-                                final float weight = jointWeights.get(data[i + weightOff]);
-                                if (weight != 0) {
-                                    weightCount++;
+                            // get weights and joints at original index and add weights up to get divisor sum
+                            // we'll assume 0's for vertices with no matching weight.
+                            if (vertWeightMap.length > originalIndex) {
+                                final int[] data = vertWeightMap[originalIndex];
+                                for (int i = 0; i < data.length; i += maxOffset + 1) {
+                                    final float weight = jointWeights.get(data[i + weightOff]);
+                                    if (weight != 0) {
+                                        weightCount++;
+                                    }
                                 }
-                            }
-                            if (weightCount > maxWeightsPerVert) {
-                                maxWeightsPerVert = weightCount;
+                                if (weightCount > maxWeightsPerVert) {
+                                    maxWeightsPerVert = weightCount;
+                                }
                             }
                         }
 
@@ -484,14 +487,17 @@ public class ColladaAnimUtils {
                             j = 0;
                             sum = 0;
 
-                            // get first 4 weights and joints at original index and add weights up to get divisor sum
-                            final int[] data = vertWeightMap[originalIndex];
-                            for (int i = 0; i < data.length; i += maxOffset + 1) {
-                                final float weight = jointWeights.get(data[i + weightOff]);
-                                if (weight != 0) {
-                                    weights[j] = jointWeights.get(data[i + weightOff]);
-                                    indices[j] = (short) order[jointIndices.get(data[i + indOff])];
-                                    sum += weights[j++];
+                            // get weights and joints at original index and add weights up to get divisor sum
+                            // we'll assume 0's for vertices with no matching weight.
+                            if (vertWeightMap.length > originalIndex) {
+                                final int[] data = vertWeightMap[originalIndex];
+                                for (int i = 0; i < data.length; i += maxOffset + 1) {
+                                    final float weight = jointWeights.get(data[i + weightOff]);
+                                    if (weight != 0) {
+                                        weights[j] = jointWeights.get(data[i + weightOff]);
+                                        indices[j] = (short) order[jointIndices.get(data[i + indOff])];
+                                        sum += weights[j++];
+                                    }
                                 }
                             }
                             // add extra padding as needed
@@ -501,7 +507,7 @@ public class ColladaAnimUtils {
                             }
                             // add weights to weightBuffer / sum
                             for (final float w : weights) {
-                                weightBuffer.put(w / sum);
+                                weightBuffer.put(sum != 0 ? w / sum : 0);
                             }
                             // add joint indices to jointIndexBuffer
                             jointIndexBuffer.put(indices);
