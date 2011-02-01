@@ -10,6 +10,7 @@
 
 package com.ardor3d.example.pipeline;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -362,8 +363,13 @@ public class AnimationDemoExample extends ExampleBase {
         final InputStore input = new InputStore();
         input.getClips().setMissCallback(new MissingCallback<String, AnimationClip>() {
             public AnimationClip getValue(final String key) {
-                final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/" + key + ".dae");
-                return storage1.extractChannelsAsClip(key);
+                try {
+                    final ColladaStorage storage1 = colladaImporter.load("collada/skeleton/" + key + ".dae");
+                    return storage1.extractChannelsAsClip(key);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
         });
 

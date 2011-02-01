@@ -73,8 +73,10 @@ public class LoggingMap<KEY, VALUE> {
         // value is null? ask callback.
         if (value == null && getMissCallback() != null) {
             value = getMissCallback().getValue(key);
-            // save for next time.
-            _wrappedMap.put(key, value);
+            if (value != null) {
+                // save for next time.
+                _wrappedMap.put(key, value);
+            }
         }
         // value still null...
         if (value == null) {

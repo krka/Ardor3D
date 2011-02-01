@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.model.collada.jdom;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -143,8 +144,10 @@ public class ColladaImporter {
      *            the name of the resource to find. ResourceLocatorTool will be used with TYPE_MODEL to find the
      *            resource.
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
+     * @throws IOException
+     *             if the resource can not be located or loaded for some reason.
      */
-    public ColladaStorage load(final String resource) {
+    public ColladaStorage load(final String resource) throws IOException {
         final ResourceSource source;
         if (_modelLocator == null) {
             source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, resource);
@@ -153,11 +156,10 @@ public class ColladaImporter {
         }
 
         if (source == null) {
-            throw new Error("Unable to locate '" + resource + "'");
+            throw new IOException("Unable to locate '" + resource + "'");
         }
 
         return load(source);
-
     }
 
     /**
@@ -166,8 +168,10 @@ public class ColladaImporter {
      * @param resource
      *            the name of the resource to find.
      * @return a ColladaStorage data object containing the Collada scene and other useful elements.
+     * @throws IOException
+     *             if the resource can not be loaded for some reason.
      */
-    public ColladaStorage load(final ResourceSource resource) {
+    public ColladaStorage load(final ResourceSource resource) throws IOException {
         final ColladaStorage colladaStorage = new ColladaStorage();
         final DataCache dataCache = new DataCache();
         final ColladaDOMUtil colladaDOMUtil = new ColladaDOMUtil(dataCache);
@@ -181,7 +185,6 @@ public class ColladaImporter {
                 colladaMeshUtils, colladaAnimUtils);
 
         try {
-
             // Pull in the DOM tree of the Collada resource.
             final Element collada = readCollada(resource, dataCache);
 
@@ -220,7 +223,7 @@ public class ColladaImporter {
             // return storage
             return colladaStorage;
         } catch (final Exception e) {
-            throw new Error("Unable to load collada resource from URL: " + resource, e);
+            throw new IOException("Unable to load collada resource from URL: " + resource, e);
         }
     }
 

@@ -259,14 +259,19 @@ public class AnimationBlinnPhongExample extends ExampleBase {
 
         final ResourceSource rs = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL,
                 "com/ardor3d/example/media/models/collada/juanita/dog_Apr18_smooth.dae");
-        colladaStorage = colladaImporter.load(rs);
+        try {
+            colladaStorage = colladaImporter.load(rs);
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
 
         colladaNode = colladaStorage.getScene();
 
         gpuShader = new GLSLShaderObjectsState();
         gpuShader.setEnabled(true);
         try {
-            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationBlinnPhongExample.class,
+            gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    AnimationBlinnPhongExample.class,
                     "com/ardor3d/example/media/models/collada/juanita/skinning_gpu2.vert"));
             gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
                     AnimationBlinnPhongExample.class,

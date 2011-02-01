@@ -10,6 +10,8 @@
 
 package com.ardor3d.example.pipeline;
 
+import java.io.IOException;
+
 import com.ardor3d.example.ExampleBase;
 import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
@@ -33,7 +35,11 @@ public class SimpleColladaExample extends ExampleBase {
         _canvas.getCanvasRenderer().getCamera().setLocation(new Vector3(0, 5, 20));
 
         // Load the collada scene
-        final ColladaStorage storage = new ColladaImporter().load("collada/sony/Seymour.dae");
-        _root.attachChild(storage.getScene());
+        try {
+            final ColladaStorage storage = new ColladaImporter().load("collada/sony/Seymour.dae");
+            _root.attachChild(storage.getScene());
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }
