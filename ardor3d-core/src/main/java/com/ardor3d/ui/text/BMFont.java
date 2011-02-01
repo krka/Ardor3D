@@ -28,6 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.ardor3d.annotation.SavableFactory;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -37,6 +38,9 @@ import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.TextureManager;
+import com.ardor3d.util.export.InputCapsule;
+import com.ardor3d.util.export.OutputCapsule;
+import com.ardor3d.util.export.Savable;
 import com.ardor3d.util.resource.ResourceSource;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -49,7 +53,7 @@ import com.google.common.collect.Maps;
  * <li>This class only supports a single page (see BMFont documentation for details on pages)
  * </ul>
  */
-public class BMFont {
+public class BMFont implements Savable {
     private static Logger logger = Logger.getLogger(BMFont.class.getName());
 
     private final Map<Integer, Char> _charMap = Maps.newHashMap();
@@ -60,10 +64,15 @@ public class BMFont {
     private Texture _pageTexture;
     private RenderStateSetter _blendStateSetter = null;
     private RenderStateSetter _alphaStateSetter = null;
-    private final boolean _useMipMaps;
+    private boolean _useMipMaps;
     private int _maxCharAdv;
     private Common _common = null;
     private Info _info = null;
+
+    /**
+     * This constructor should be used when loading as Savable
+     */
+    public BMFont() {}
 
     /**
      * Reads an XML BMFont description file and loads corresponding texture. Note that the TGA written by BMFont does
@@ -583,7 +592,8 @@ public class BMFont {
     }
 
     // == support structs ==================================
-    public class Info {
+    @SavableFactory(factoryMethod = "create")
+    public static class Info implements Savable {
         public String face;
         public int size;
         public boolean bold;
@@ -596,9 +606,51 @@ public class BMFont {
         public int[] padding;
         public int[] spacing;
         public int outline;
+
+        public static Info create() {
+            return new Info();
+        }
+
+        @Override
+        public void write(final OutputCapsule capsule) throws IOException {
+            capsule.write(face, "face", null);
+            capsule.write(size, "size", 0);
+            capsule.write(bold, "bold", false);
+            capsule.write(italic, "italic", false);
+            capsule.write(charset, "charset", null);
+            capsule.write(unicode, "unicode", false);
+            capsule.write(stretchH, "stretchH", 0);
+            capsule.write(smooth, "smooth", false);
+            capsule.write(aa, "aa", false);
+            capsule.write(padding, "padding", null);
+            capsule.write(spacing, "spacing", null);
+            capsule.write(outline, "outline", 0);
+        }
+
+        @Override
+        public void read(final InputCapsule capsule) throws IOException {
+            face = capsule.readString("face", null);
+            size = capsule.readInt("size", 0);
+            bold = capsule.readBoolean("bold", false);
+            italic = capsule.readBoolean("italic", false);
+            charset = capsule.readString("charset", null);
+            unicode = capsule.readBoolean("unicode", false);
+            stretchH = capsule.readInt("stretchH", 0);
+            smooth = capsule.readBoolean("smooth", false);
+            aa = capsule.readBoolean("aa", false);
+            padding = capsule.readIntArray("padding", null);
+            spacing = capsule.readIntArray("spacing", null);
+            outline = capsule.readInt("outline", 0);
+        }
+
+        @Override
+        public Class<?> getClassTag() {
+            return getClass();
+        }
     }
 
-    public class Common {
+    @SavableFactory(factoryMethod = "create")
+    public static class Common implements Savable {
         public int lineHeight;
         public int base;
         public int scaleW;
@@ -609,14 +661,75 @@ public class BMFont {
         public int redChnl;
         public int greenChnl;
         public int blueChnl;
+
+        public static Common create() {
+            return new Common();
+        }
+
+        @Override
+        public void write(final OutputCapsule capsule) throws IOException {
+            capsule.write(lineHeight, "lineHeight", 0);
+            capsule.write(base, "base", 0);
+            capsule.write(scaleW, "scaleW", 1);
+            capsule.write(scaleH, "scaleH", 1);
+            capsule.write(pages, "pages", 0);
+            capsule.write(packed, "packed", false);
+            capsule.write(alphaChnl, "alphaChnl", 0);
+            capsule.write(redChnl, "redChnl", 0);
+            capsule.write(greenChnl, "greenChnl", 0);
+            capsule.write(blueChnl, "blueChnl", 0);
+        }
+
+        @Override
+        public void read(final InputCapsule capsule) throws IOException {
+            lineHeight = capsule.readInt("lineHeight", 0);
+            base = capsule.readInt("base", 0);
+            scaleW = capsule.readInt("scaleW", 0);
+            scaleH = capsule.readInt("scaleH", 0);
+            pages = capsule.readInt("pages", 0);
+            packed = capsule.readBoolean("packed", false);
+            alphaChnl = capsule.readInt("alphaChnl", 0);
+            redChnl = capsule.readInt("redChnl", 0);
+            greenChnl = capsule.readInt("greenChnl", 0);
+            blueChnl = capsule.readInt("blueChnl", 0);
+        }
+
+        @Override
+        public Class<?> getClassTag() {
+            return getClass();
+        }
     }
 
-    public class Page {
+    @SavableFactory(factoryMethod = "create")
+    public static class Page implements Savable {
         public int id;
         public String file;
+
+        public static Page create() {
+            return new Page();
+        }
+
+        @Override
+        public void write(final OutputCapsule capsule) throws IOException {
+            capsule.write(id, "id", 0);
+            capsule.write(file, "file", null);
+        }
+
+        @Override
+        public void read(final InputCapsule capsule) throws IOException {
+            id = capsule.readInt("id", 0);
+            file = capsule.readString("file", null);
+
+        }
+
+        @Override
+        public Class<?> getClassTag() {
+            return this.getClass();
+        }
     }
 
-    public class Char {
+    @SavableFactory(factoryMethod = "create")
+    public static class Char implements Savable {
         public int id;
         public int x;
         public int y;
@@ -627,6 +740,81 @@ public class BMFont {
         public int xadvance;
         public int page;
         public int chnl;
+
+        public static Char create() {
+            return new Char();
+        }
+
+        @Override
+        public void write(final OutputCapsule capsule) throws IOException {
+            capsule.write(id, "id", 0);
+            capsule.write(x, "x", 0);
+            capsule.write(y, "y", 0);
+            capsule.write(width, "width", 0);
+            capsule.write(height, "height", 0);
+            capsule.write(xoffset, "xoffset", 0);
+            capsule.write(yoffset, "yoffset", 0);
+            capsule.write(xadvance, "xadvance", 0);
+            capsule.write(page, "page", 0);
+            capsule.write(chnl, "chnl", 0);
+        }
+
+        @Override
+        public void read(final InputCapsule capsule) throws IOException {
+            id = capsule.readInt("id", 0);
+            x = capsule.readInt("x", 0);
+            y = capsule.readInt("y", 0);
+            width = capsule.readInt("width", 0);
+            height = capsule.readInt("height", 0);
+            xoffset = capsule.readInt("xoffset", 0);
+            yoffset = capsule.readInt("yoffset", 0);
+            xadvance = capsule.readInt("xadvance", 0);
+            page = capsule.readInt("page", 0);
+            chnl = capsule.readInt("chnl", 0);
+        }
+
+        @Override
+        public Class<?> getClassTag() {
+            return getClass();
+        }
+    }
+
+    @SavableFactory(factoryMethod = "create")
+    public static class Kerning implements Savable {
+        public int first;
+        public int second;
+        public int amount;
+
+        public Kerning() {}
+
+        public Kerning(final int first, final int second, final int amount) {
+            this.first = first;
+            this.second = second;
+            this.amount = amount;
+        }
+
+        public static Kerning create() {
+            return new BMFont.Kerning();
+        }
+
+        @Override
+        public void write(final OutputCapsule capsule) throws IOException {
+            capsule.write(first, "fist", 0);
+            capsule.write(second, "second", 0);
+            capsule.write(amount, "amount", 0);
+        }
+
+        @Override
+        public void read(final InputCapsule capsule) throws IOException {
+            first = capsule.readInt("first", 0);
+            second = capsule.readInt("second", 0);
+            amount = capsule.readInt("amount", 0);
+        }
+
+        @Override
+        public Class<?> getClassTag() {
+            return getClass();
+        }
     }
 
     /**
@@ -681,5 +869,86 @@ public class BMFont {
                 zBuffState.setWritable(false);
             }
         }
+    }
+
+    @Override
+    public void write(final OutputCapsule capsule) throws IOException {
+        _pageTexture.setStoreImage(true);
+        capsule.write(_useMipMaps, "useMipMaps", false);
+        capsule.write(_styleName, "styleName", null);
+        capsule.write(_pageTexture, "pageTexture", null);
+
+        // Info
+        capsule.write(_info, "info", null);
+        // Common
+        capsule.write(_common, "common", null);
+        // Pages
+        capsule.writeSavableList(_pages, "pages", _pages);
+        // Chars
+        capsule.writeSavableList(new ArrayList<Char>(_charMap.values()), "charMap", null);
+
+        // Kernings
+        final List<Kerning> kernings = new ArrayList<Kerning>();
+        for (final Iterator<Integer> iterator = _kernMap.keySet().iterator(); iterator.hasNext();) {
+            final Integer first = iterator.next();
+            final Map<Integer, Integer> amtHash = _kernMap.get(first);
+            for (final Iterator<Integer> iterator2 = amtHash.keySet().iterator(); iterator2.hasNext();) {
+                final Integer second = iterator2.next();
+                final Integer amount = amtHash.get(second);
+                kernings.add(new Kerning(first, second, amount));
+            }
+        }
+        capsule.writeSavableList(kernings, "kernings", kernings);
+    }
+
+    @Override
+    public void read(final InputCapsule capsule) throws IOException {
+        _useMipMaps = capsule.readBoolean("useMipMaps", false);
+        _styleName = capsule.readString("styleName", null);
+        _pageTexture = (Texture) capsule.readSavable("pageTexture", null);
+        _pageTexture = TextureManager.loadFromImage(_pageTexture.getImage(), _pageTexture.getMinificationFilter());
+
+        // Info
+        _info = (Info) capsule.readSavable("info", _info);
+        // Common
+        _common = (Common) capsule.readSavable("common", _common);
+        // Pages
+        _pages.clear();
+        final List<Savable> pages = capsule.readSavableList("pages", new ArrayList<Savable>());
+        for (final Savable savable : pages) {
+            _pages.add((Page) savable);
+            if (_pages.size() > 1) {
+                logger.warning("multiple pages defined in font description file, but only a single page is supported.");
+            }
+        }
+        // Chars
+        _charMap.clear();
+        final List<Savable> chars = capsule.readSavableList("charMap", new ArrayList<Savable>());
+        for (final Savable savable : chars) {
+            final Char c = (Char) savable;
+            _charMap.put(c.id, c);
+            if (c.xadvance > _maxCharAdv) {
+                _maxCharAdv = c.xadvance;
+            }
+        }
+        // Kernings
+        _kernMap.clear();
+        final List<Savable> kernings = capsule.readSavableList("kernings", new ArrayList<Savable>());
+        for (final Savable savable : kernings) {
+            final Kerning k = (Kerning) savable;
+            Map<Integer, Integer> amtHash;
+            amtHash = _kernMap.get(k.first);
+            if (amtHash == null) {
+                amtHash = Maps.newHashMap();
+                _kernMap.put(k.first, amtHash);
+            }
+            amtHash.put(k.second, k.amount);
+            _kernMap.put(k.first, amtHash);
+        }
+    }
+
+    @Override
+    public Class<?> getClassTag() {
+        return getClass();
     }
 }
