@@ -58,9 +58,9 @@ public class UIHud extends Node {
     private final LogicalLayer _logicalLayer = new LogicalLayer();
 
     /**
-     * The single tooltip used by this hud.
+     * The single tooltip used by this hud - lazy inited
      */
-    private final UITooltip _ttip = new UITooltip();
+    private UITooltip _ttip;
 
     /**
      * Internal flag indicating whether the last input event was consumed by the UI. This is used to decide if we will
@@ -131,6 +131,9 @@ public class UIHud extends Node {
      * @return this hud's associated tooltip object.
      */
     public UITooltip getTooltip() {
+        if (_ttip == null) {
+            _ttip = new UITooltip();
+        }
         return _ttip;
     }
 
