@@ -10,6 +10,8 @@
 
 package com.ardor3d.extension.ui.backdrop;
 
+import java.util.Arrays;
+
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.SubTex;
@@ -36,11 +38,14 @@ public class ImageBackdrop extends SolidBackdrop {
     }
 
     /** The image to draw. */
-    private SubTex _image = null;
+    protected SubTex _image = null;
     /** The axis to stretch the image on. */
-    private StretchAxis _axis = StretchAxis.Both;
+    protected StretchAxis _axis = StretchAxis.Both;
     /** The alignment (to the component) to align the image to. */
-    private Alignment _alignment = Alignment.MIDDLE;
+    protected Alignment _alignment = Alignment.MIDDLE;
+
+    /** used internally to hold component measurements prior to drawing backdrop */
+    protected final double[] _dims = new double[4];
 
     /**
      * Construct this back drop, using the given image.
@@ -69,12 +74,11 @@ public class ImageBackdrop extends SolidBackdrop {
     public void draw(final Renderer renderer, final UIComponent comp) {
         super.draw(renderer, comp);
 
-        final double[] vals = new double[4];
-        getDimensions(comp, vals);
-        double x = vals[0];
-        double y = vals[1];
-        final double width = vals[2];
-        final double height = vals[3];
+        getDimensions(comp, _dims);
+        double x = _dims[0];
+        double y = _dims[1];
+        final double width = _dims[2];
+        final double height = _dims[3];
 
         x += comp.getMargin().getLeft() + comp.getBorder().getLeft();
         y += comp.getMargin().getBottom() + comp.getBorder().getBottom();
@@ -87,6 +91,7 @@ public class ImageBackdrop extends SolidBackdrop {
         final double bgwidth = UIBackdrop.getBackdropWidth(comp);
         final double bgheight = UIBackdrop.getBackdropHeight(comp);
 
+        Arrays.fill(vals, 0);
         switch (_axis) {
             case Both:
                 vals[2] = bgwidth;
