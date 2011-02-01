@@ -10,7 +10,6 @@
 
 package com.ardor3d.extension.ui.text;
 
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,17 +23,14 @@ import com.ardor3d.extension.ui.text.RenderedText.RenderedTextData;
 import com.ardor3d.extension.ui.text.font.BMFontProvider;
 import com.ardor3d.extension.ui.text.font.FontProvider;
 import com.ardor3d.extension.ui.text.font.UIFont;
-import com.ardor3d.extension.ui.text.parser.StyleParser;
 import com.ardor3d.extension.ui.text.parser.ForumLikeMarkupParser;
+import com.ardor3d.extension.ui.text.parser.StyleParser;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.MeshData;
-import com.ardor3d.ui.text.BMFont;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.URLResourceSource;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -48,25 +44,14 @@ public enum TextFactory {
     private final static float[] WHITE = new float[] { 1, 1, 1, 1 };
 
     TextFactory() {
-        final List<BMFont> fonts = Lists.newArrayList();
-        try {
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-12-regular.fnt")), false));
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-16-bold-regular.fnt")), false));
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-regular.fnt")), false));
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-bold.fnt")), false));
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-18-bold-italic.fnt")), false));
-            fonts.add(new BMFont(new URLResourceSource(ResourceLocatorTool.getClassPathResource(BMFontProvider.class,
-                    "com/ardor3d/extension/ui/font/arial-24-bold.fnt")), false));
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        setFontProvider(new BMFontProvider(fonts));
-
+        final BMFontProvider fontProvider = new BMFontProvider();
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-12-regular", "Arial", 12, false, false);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-16-bold-regular", "Arial", 16, true, false);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-regular", "Arial", 18, false, false);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-bold", "Arial", 18, true, false);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-18-bold-italic", "Arial", 18, true, true);
+        fontProvider.addFont("com/ardor3d/extension/ui/font/arial-24-bold", "Arial", 24, false, false);
+        setFontProvider(fontProvider);
         setStyleParser(new ForumLikeMarkupParser());
     }
 
@@ -88,7 +73,6 @@ public enum TextFactory {
 
     public RenderedText generateText(final String text, final boolean styled, final Map<String, Object> defaultStyles,
             final RenderedText store, final int maxWidth) {
-
         RenderedText rVal = store;
         if (rVal == null) {
             rVal = new RenderedText();
@@ -224,7 +208,7 @@ public enum TextFactory {
             // check to see if we're past the edge of our allowed width
             if (maxWidth > 0 && xOffset + (int) Math.round(scale * (desc.getXOffset() + desc.getWidth())) > maxWidth) {
                 // add current index to lineEnds
-                lineEnds.add(descs.size() - 1);
+                lineEnds.add(descs.size() - 2);
 
                 // add current max height to heights
                 lineHeights.add(maxLineHeight);
