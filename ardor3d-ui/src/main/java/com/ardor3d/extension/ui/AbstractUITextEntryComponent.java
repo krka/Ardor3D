@@ -97,7 +97,11 @@ public abstract class AbstractUITextEntryComponent extends StateBasedUIComponent
             if (text.equals(getText())) {
                 return;
             }
-            _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, -1);
+            int maxWidth = getMaximumLocalComponentWidth() - getTotalLeft() - getTotalRight();
+            if (maxWidth <= 0) {
+                maxWidth = -1;
+            }
+            _uiText = TextFactory.INSTANCE.generateText(text, isStyledText(), getFontStyles(), _uiText, maxWidth);
         } else {
             _uiText = null;
             // reset caret position
