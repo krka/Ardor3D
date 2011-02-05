@@ -235,7 +235,9 @@ public class TextureGridCache implements TextureCache, Runnable {
         }
 
         if (!started) {
-            new Thread(this, "TextureCache-" + clipmapLevel).start();
+            final Thread textureCacheThread = new Thread(this, "TextureGridCache-" + clipmapLevel);
+            textureCacheThread.setDaemon(true);
+            textureCacheThread.start();
             started = true;
         }
     }

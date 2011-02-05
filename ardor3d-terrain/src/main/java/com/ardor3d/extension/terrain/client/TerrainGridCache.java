@@ -225,7 +225,9 @@ public class TerrainGridCache implements TerrainCache, Runnable {
         }
 
         if (!started) {
-            new Thread(this, "TextureCache-" + clipmapLevel).start();
+            final Thread textureCacheThread = new Thread(this, "TerrainGridCache-" + clipmapLevel);
+            textureCacheThread.setDaemon(true);
+            textureCacheThread.start();
             started = true;
         }
     }
