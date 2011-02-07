@@ -10,6 +10,9 @@
 
 package com.ardor3d.util;
 
+/**
+ * <code>Timer</code> is a ReadOnlyTimer implementation with nanosecond resolution.
+ */
 public class Timer implements ReadOnlyTimer {
 
     private static final long TIMER_RESOLUTION = 1000000000L;
@@ -44,6 +47,9 @@ public class Timer implements ReadOnlyTimer {
         return _tpf;
     }
 
+    /**
+     * Update should be called once per frame to correctly update "time per frame" and "frame rate (fps)"
+     */
     public void update() {
         final long time = getTime();
         _tpf = (time - _previousTime) * INVERSE_TIMER_RESOLUTION;
@@ -51,6 +57,10 @@ public class Timer implements ReadOnlyTimer {
         _previousTime = time;
     }
 
+    /**
+     * Reset this timer, so that {@link #getTime()} and {@link #getTimeInSeconds()} reflects the time spend from this
+     * call.
+     */
     public void reset() {
         _startTime = System.nanoTime();
         _previousTime = getTime();
