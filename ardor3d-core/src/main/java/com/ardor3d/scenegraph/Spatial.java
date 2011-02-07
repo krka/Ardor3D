@@ -44,6 +44,7 @@ import com.ardor3d.scenegraph.hint.Hintable;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.Constants;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.export.CapsuleUtils;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
@@ -774,7 +775,8 @@ public abstract class Spatial implements Savable, Hintable {
      * Update geometric state.
      * 
      * @param time
-     *            the time
+     *            The time in seconds between the last two consecutive frames (time per frame). See
+     *            {@link ReadOnlyTimer#getTimePerFrame()}
      * @see #updateGeometricState(double, boolean)
      */
     public void updateGeometricState(final double time) {
@@ -785,7 +787,8 @@ public abstract class Spatial implements Savable, Hintable {
      * <code>updateGeometricState</code> updates all the geometry information for the node.
      * 
      * @param time
-     *            the frame time.
+     *            The time in seconds between the last two consecutive frames (time per frame). See
+     *            {@link ReadOnlyTimer#getTimePerFrame()}
      * @param initiator
      *            true if this node started the update process.
      */
@@ -819,7 +822,8 @@ public abstract class Spatial implements Savable, Hintable {
      * Override to allow objects like Node to update their children.
      * 
      * @param time
-     *            the frame time
+     *            The time in seconds between the last two consecutive frames (time per frame). See
+     *            {@link ReadOnlyTimer#getTimePerFrame()}
      */
     protected void updateChildren(final double time) {}
 
@@ -827,7 +831,8 @@ public abstract class Spatial implements Savable, Hintable {
      * Update all controllers set on this spatial.
      * 
      * @param time
-     *            the time
+     *            The time in seconds between the last two consecutive frames (time per frame). See
+     *            {@link ReadOnlyTimer#getTimePerFrame()}
      */
     @SuppressWarnings("unchecked")
     public void updateControllers(final double time) {
