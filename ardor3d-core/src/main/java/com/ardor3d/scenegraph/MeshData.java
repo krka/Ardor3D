@@ -478,8 +478,8 @@ public class MeshData implements Savable {
         FloatBufferData dest = _textureCoords.get(toIndex);
         final FloatBufferData src = _textureCoords.get(fromIndex);
         if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
-            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()), src
-                    .getValuesPerTuple());
+            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()),
+                    src.getValuesPerTuple());
             _textureCoords.set(toIndex, dest);
         }
         dest.getBuffer().clear();
@@ -526,8 +526,8 @@ public class MeshData implements Savable {
         FloatBufferData dest = _textureCoords.get(toIndex);
         final FloatBufferData src = _textureCoords.get(fromIndex);
         if (dest == null || dest.getBuffer().capacity() != src.getBuffer().limit()) {
-            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()), src
-                    .getValuesPerTuple());
+            dest = new FloatBufferData(BufferUtils.createFloatBuffer(src.getBuffer().capacity()),
+                    src.getValuesPerTuple());
             _textureCoords.set(toIndex, dest);
         }
         dest.getBuffer().clear();
@@ -826,8 +826,8 @@ public class MeshData implements Savable {
             }
             if (getIndexBuffer() != null) {
                 // indexed geometry
-                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(), getIndices().get(
-                        getVertexIndex(primitiveIndex, i, section)));
+                BufferUtils.populateFromBuffer(result[i], getVertexBuffer(),
+                        getIndices().get(getVertexIndex(primitiveIndex, i, section)));
             } else {
                 // non-indexed geometry
                 BufferUtils
@@ -1166,6 +1166,9 @@ public class MeshData implements Savable {
         }
         if (_normalCoords != null) {
             data._normalCoords = _normalCoords.makeCopy();
+        }
+        if (_colorCoords != null) {
+            data._colorCoords = _colorCoords.makeCopy();
         }
         if (_fogCoords != null) {
             data._fogCoords = _fogCoords.makeCopy();
