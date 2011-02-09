@@ -262,7 +262,6 @@ public enum TextFactory {
             inverseTextureWidth = 1f / tex.getImage().getWidth();
 
             final TextMesh tMesh = new TextMesh();
-            rVal.attachChild(tMesh);
 
             // apply render states
             applyStates(tMesh, tex);
@@ -336,6 +335,8 @@ public enum TextFactory {
                 texs.put(l).put(b); // left bottom
                 texs.put(r).put(b); // right bottom
             }
+
+            rVal.attachChild(tMesh);
         }
 
         // set maxWidth and maxHeight on rVal
