@@ -1020,9 +1020,8 @@ public class Camera implements Savable, Externalizable {
         planeNormal.setX(_up.getX() * _coeffBottom[0]);
         planeNormal.setY(_up.getY() * _coeffBottom[0]);
         planeNormal.setZ(_up.getZ() * _coeffBottom[0]);
-        planeNormal.addLocal(_direction.getX() * _coeffBottom[1], _direction.getY() * _coeffBottom[1], _direction
-                .getZ()
-                * _coeffBottom[1]);
+        planeNormal.addLocal(_direction.getX() * _coeffBottom[1], _direction.getY() * _coeffBottom[1],
+                _direction.getZ() * _coeffBottom[1]);
         _worldPlane[BOTTOM_PLANE].setNormal(planeNormal);
         _worldPlane[BOTTOM_PLANE].setConstant(_location.dot(planeNormal));
 
@@ -1191,8 +1190,8 @@ public class Camera implements Savable, Externalizable {
         }
         final Vector3 origin = Vector3.fetchTempInstance();
         final Vector3 direction = Vector3.fetchTempInstance();
-        getWorldCoordinates(screenPosition, 0, origin);
-        getWorldCoordinates(screenPosition, 0.3, direction).subtractLocal(origin).normalizeLocal();
+        getWorldCoordinates(pos, 0, origin);
+        getWorldCoordinates(pos, 0.3, direction).subtractLocal(origin).normalizeLocal();
         result.setOrigin(origin);
         result.setDirection(direction);
         Vector3.releaseTempInstance(origin);
