@@ -10,6 +10,9 @@
 
 package com.ardor3d.extension.animation.skeletal.clip;
 
+import com.ardor3d.extension.animation.skeletal.AnimationManager;
+import com.ardor3d.extension.animation.skeletal.SkeletonPose;
+
 /**
  * Callback interface for logic to execute when a Trigger from a TriggerChannel is encountered.
  */
@@ -18,7 +21,10 @@ public interface TriggerCallback {
     /**
      * Called once per encounter of a TriggerParam. Not guaranteed to be called if, for example, the window defined in
      * the TriggerParam is very small and/or the frame rate is really bad.
+     * 
+     * @param applyToPose
+     * @param manager
      */
-    void doTrigger();
+    void doTrigger(SkeletonPose applyToPose, AnimationManager manager);
 
 }

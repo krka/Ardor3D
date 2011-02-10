@@ -1,3 +1,5 @@
+importPackage(Packages.com.ardor3d.example.pipeline);
+
 // set up walk/run as our base layer as separate states.
 var walkState = {
 	"name" : "walk_anim",
@@ -106,3 +108,19 @@ _steadyState(headState);
 // create attachment points
 _addAttachment("right_weapon", "Bip01_R_Finger0", 0, null);
 _addAttachment("left_weapon", "Bip01_L_Finger0", 0, null);
+
+// set up trigger info
+var triggerChannelInfo = {
+	"clip" : "skeleton.punch", // clip to add trigger channel to
+	"triggerChannel" : {  // information about the channel
+		"name" : "punch_fire", // name of channel
+		"times" : [0.0, 0.5, 0.75],
+		"keys" : [null, "fist_fire", null]
+	}
+};
+
+// add our punch trigger channel
+_addTriggerChannel(triggerChannelInfo);
+
+// add our callbacks
+_addTriggerCallback("fist_fire", new FireballTrigger());

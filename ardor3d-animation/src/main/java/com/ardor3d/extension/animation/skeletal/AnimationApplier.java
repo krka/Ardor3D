@@ -10,6 +10,7 @@
 
 package com.ardor3d.extension.animation.skeletal;
 
+import com.ardor3d.extension.animation.skeletal.clip.TriggerCallback;
 
 /**
  * Describes a class that can take information from a manager and its current layers and state and apply it to a given
@@ -27,5 +28,26 @@ public interface AnimationApplier {
      *            the animation manager to pull state from.
      */
     void applyTo(SkeletonPose applyToPose, AnimationManager manager);
+
+    /**
+     * Add a trigger callback to our callback list.
+     * 
+     * @param key
+     *            the key to add a callback to
+     * @param callback
+     *            the callback logic to add.
+     */
+    void addTriggerCallback(final String key, final TriggerCallback callback);
+
+    /**
+     * Remove a trigger callback from our callback list for a specific key.
+     * 
+     * @param key
+     *            the key to remove from
+     * @param callback
+     *            the callback logic to remove.
+     * @return true if the callback was found to remove
+     */
+    boolean removeTriggerCallback(final String key, final TriggerCallback callback);
 
 }

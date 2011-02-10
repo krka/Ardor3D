@@ -29,6 +29,7 @@ public class SimpleAnimationApplier implements AnimationApplier {
 
     private final Multimap<String, TriggerCallback> _triggerCallbacks = ArrayListMultimap.create();
 
+    @Override
     public void applyTo(final SkeletonPose applyToPose, final AnimationManager manager) {
         final Map<String, ? extends Object> data = manager.getCurrentSourceData();
 
@@ -45,7 +46,7 @@ public class SimpleAnimationApplier implements AnimationApplier {
                         try {
                             // pull callback(s) for the current trigger key, if exists, and call.
                             for (final TriggerCallback cb : _triggerCallbacks.get(trigger.getCurrentTrigger())) {
-                                cb.doTrigger();
+                                cb.doTrigger(applyToPose, manager);
                             }
                         } finally {
                             trigger.setArmed(false);
@@ -58,27 +59,12 @@ public class SimpleAnimationApplier implements AnimationApplier {
         }
     }
 
-    /**
-     * Add a trigger callback to our callback list.
-     * 
-     * @param key
-     *            the key to add a callback to
-     * @param callback
-     *            the callback logic to add.
-     */
+    @Override
     public void addTriggerCallback(final String key, final TriggerCallback callback) {
         _triggerCallbacks.put(key, callback);
     }
 
-    /**
-     * Remove a trigger callback from our callback list for a specific key.
-     * 
-     * @param key
-     *            the key to remove from
-     * @param callback
-     *            the callback logic to remove.
-     * @return true if the callback was found to remove
-     */
+    @Override
     public boolean removeTriggerCallback(final String key, final TriggerCallback callback) {
         return _triggerCallbacks.remove(key, callback);
     }

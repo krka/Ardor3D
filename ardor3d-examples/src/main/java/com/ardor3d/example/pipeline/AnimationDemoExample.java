@@ -13,7 +13,6 @@ package com.ardor3d.example.pipeline;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
@@ -27,16 +26,11 @@ import com.ardor3d.extension.animation.skeletal.SkeletonPose;
 import com.ardor3d.extension.animation.skeletal.blendtree.ManagedTransformSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
-import com.ardor3d.extension.animation.skeletal.clip.TriggerCallback;
-import com.ardor3d.extension.animation.skeletal.clip.TriggerChannel;
 import com.ardor3d.extension.animation.skeletal.state.loader.InputStore;
 import com.ardor3d.extension.animation.skeletal.state.loader.JSLayerImporter;
 import com.ardor3d.extension.animation.skeletal.state.loader.OutputStore;
 import com.ardor3d.extension.animation.skeletal.util.MissingCallback;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
-import com.ardor3d.extension.effect.particle.ParticleControllerListener;
-import com.ardor3d.extension.effect.particle.ParticleFactory;
-import com.ardor3d.extension.effect.particle.ParticleSystem;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
@@ -44,42 +38,33 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIRadioButton;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
 import com.ardor3d.extension.ui.layout.AnchorLayoutData;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
-import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
-import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.framework.NativeCanvas;
 import com.ardor3d.light.DirectionalLight;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Quaternion;
-import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
-import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.controller.ComplexSpatialController.RepeatType;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
-import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
-import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.URLResourceSource;
@@ -91,6 +76,8 @@ import com.ardor3d.util.resource.URLResourceSource;
 thumbnailPath = "com/ardor3d/example/media/thumbnails/pipeline_AnimationDemoExample.jpg", //
 maxHeapMemory = 64)
 public class AnimationDemoExample extends ExampleBase {
+
+    static AnimationDemoExample instance;
 
     private Node colladaNode;
     private boolean showSkeleton = false, showJointLabels = false;
@@ -111,6 +98,10 @@ public class AnimationDemoExample extends ExampleBase {
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
+    }
+
+    public AnimationDemoExample() {
+        instance = this;
     }
 
     @Override
@@ -142,8 +133,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5,
+                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -373,9 +364,6 @@ public class AnimationDemoExample extends ExampleBase {
             }
         });
 
-        // Add a special trigger channel to the punch clip.
-        addFireballTrigger(applier, input.getClips().get("skeleton.punch"));
-
         // Load our layer and states from script
         try {
             final ResourceSource layersFile = new URLResourceSource(ResourceLocatorTool.getClassPathResource(
@@ -423,77 +411,6 @@ public class AnimationDemoExample extends ExampleBase {
         });
     }
 
-    private void addFireballTrigger(final SimpleAnimationApplier applier, final AnimationClip punchClip) {
-        final float max = punchClip.getMaxTimeIndex();
-        final TriggerChannel triggerChannel = new TriggerChannel("punch_fire", new float[] { 0, max / 2,
-                max / 2 + 0.25f }, new String[] { null, "fist_fire", null });
-        punchClip.addChannel(triggerChannel);
-        applier.addTriggerCallback("fist_fire", new TriggerCallback() {
-            public void doTrigger() {
-                GameTaskQueueManager.getManager(_canvas.getCanvasRenderer().getRenderContext()).update(
-                        new Callable<Void>() {
-                            @Override
-                            public Void call() throws Exception {
-                                addParticles();
-                                return null;
-                            }
-                        });
-            }
-        });
-    }
-
-    private void addParticles() {
-        // find location of fist
-        final Transform loc = pose.getGlobalJointTransforms()[15];
-
-        // Spawn a short lived explosion
-        final ParticleSystem explosion = ParticleFactory.buildParticles("big", 80);
-        explosion.setEmissionDirection(new Vector3(0.0f, 1.0f, 0.0f));
-        explosion.setMaximumAngle(MathUtils.PI);
-        explosion.setSpeed(0.9f);
-        explosion.setMinimumLifeTime(300.0f);
-        explosion.setMaximumLifeTime(500.0f);
-        explosion.setStartSize(2.0f);
-        explosion.setEndSize(5.0f);
-        explosion.setStartColor(new ColorRGBA(1.0f, 0.312f, 0.121f, 1.0f));
-        explosion.setEndColor(new ColorRGBA(1.0f, 0.24313726f, 0.03137255f, 0.0f));
-        explosion.setControlFlow(false);
-        explosion.setInitialVelocity(0.04f);
-        explosion.setParticleSpinSpeed(0.0f);
-        explosion.setRepeatType(RepeatType.CLAMP);
-
-        // attach to root, at fist location
-        explosion.setTransform(loc);
-        explosion.warmUp(1);
-        _root.attachChild(explosion);
-        _root.updateWorldTransform(true);
-
-        explosion.getParticleController().addListener(new ParticleControllerListener() {
-            @Override
-            public void onDead(final ParticleSystem particles) {
-                explosion.removeFromParent();
-            }
-        });
-        explosion.forceRespawn();
-
-        final BlendState blend = new BlendState();
-        blend.setBlendEnabled(true);
-        blend.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
-        blend.setDestinationFunction(BlendState.DestinationFunction.One);
-        explosion.setRenderState(blend);
-
-        final TextureState ts = new TextureState();
-        ts.setTexture(TextureManager.load("images/flaresmall.jpg", Texture.MinificationFilter.Trilinear,
-                TextureStoreFormat.GuessCompressedFormat, true));
-        ts.getTexture().setWrap(WrapMode.BorderClamp);
-        ts.setEnabled(true);
-        explosion.setRenderState(ts);
-
-        final ZBufferState zstate = new ZBufferState();
-        zstate.setWritable(false);
-        explosion.setRenderState(zstate);
-    }
-
     private void positionCamera(final ReadOnlyVector3 upAxis) {
         colladaNode.updateGeometricState(0.0);
         final BoundingVolume bounding = colladaNode.getWorldBound();
@@ -504,8 +421,8 @@ public class AnimationDemoExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
-                        .getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
+                        boundingBox.getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);
@@ -566,5 +483,13 @@ public class AnimationDemoExample extends ExampleBase {
         if (showSkeleton) {
             SkeletalDebugger.drawSkeletons(_root, renderer, false, showJointLabels);
         }
+    }
+
+    public NativeCanvas getCanvas() {
+        return _canvas;
+    }
+
+    public Node getRoot() {
+        return _root;
     }
 }

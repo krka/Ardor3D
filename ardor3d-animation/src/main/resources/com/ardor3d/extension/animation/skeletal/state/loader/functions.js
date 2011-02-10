@@ -289,3 +289,31 @@ function _addAttachment(attachName, jointName, poseIndex, transform) {
 
 	return;
 }
+
+/**
+ * Create a trigger channel and add it to a clip.  The channel data and 
+ * clip name are specified in the json data structure.
+ * 
+ * @param json
+ *            the json data structure
+ */
+function _addTriggerChannel(json) {
+	var triggerChannel = new TriggerChannel(json.triggerChannel.name, 
+				json.triggerChannel.times, json.triggerChannel.keys);
+
+	var clip = INPUTSTORE.clips.get(json.clip);
+	clip.addChannel(triggerChannel);
+}
+
+/**
+ * Add a trigger callback to the current manager's Animation applier.
+ * 
+ * @param key
+ *            a String indicating the key to look for in order to trigger 
+ *			  the given callback. 
+ * @param callback
+ *            the callback object - must be an instance of TriggerCallback
+ */
+function _addTriggerCallback(key, callback) {
+	MANAGER.getApplier().addTriggerCallback(key, callback);
+}
