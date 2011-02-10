@@ -19,6 +19,7 @@ import com.ardor3d.input.logical.LogicalLayer;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -28,14 +29,18 @@ import com.google.common.base.Predicates;
 
 public class FirstPersonControl {
 
-    private final Vector3 _upAxis = new Vector3();
-    private double _mouseRotateSpeed = .005;
-    private double _moveSpeed = 50;
-    private double _keyRotateSpeed = 2.25;
-    private final Matrix3 _workerMatrix = new Matrix3();
-    private final Vector3 _workerStoreA = new Vector3();
-    private InputTrigger _mouseTrigger;
-    private InputTrigger _keyTrigger;
+    protected final Vector3 _upAxis = new Vector3();
+    protected double _mouseRotateSpeed = .005;
+    protected double _moveSpeed = 50;
+    protected double _keyRotateSpeed = 2.25;
+    protected final Matrix3 _workerMatrix = new Matrix3();
+    protected final Vector3 _workerStoreA = new Vector3();
+    protected InputTrigger _mouseTrigger;
+    protected InputTrigger _keyTrigger;
+
+    protected boolean _clampVerticalAngle = false;
+    protected double _minVerticalAngle = -60 * MathUtils.DEG_TO_RAD;
+    protected double _maxVerticalAngle = 60 * MathUtils.DEG_TO_RAD;
 
     public FirstPersonControl(final ReadOnlyVector3 upAxis) {
         _upAxis.set(upAxis);
@@ -126,28 +131,56 @@ public class FirstPersonControl {
     }
 
     protected void rotate(final Camera camera, final double dx, final double dy) {
-
         if (dx != 0) {
-            _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
-            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
-            camera.setLeft(_workerStoreA);
-            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
-            camera.setDirection(_workerStoreA);
-            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
-            camera.setUp(_workerStoreA);
+            applyDx(dx, camera);
         }
 
         if (dy != 0) {
-            _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
-            _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
-            camera.setLeft(_workerStoreA);
-            _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
-            camera.setDirection(_workerStoreA);
-            _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
-            camera.setUp(_workerStoreA);
+            applyDY(dy, camera);
         }
 
-        camera.normalize();
+        if (dx != 0 || dy != 0) {
+            camera.normalize();
+        }
+    }
+
+    private void applyDx(final double dx, final Camera camera) {
+        _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis);
+        _workerMatrix.applyPost(camera.getLeft(), _workerStoreA);
+        camera.setLeft(_workerStoreA);
+        _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
+        camera.setDirection(_workerStoreA);
+        _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
+        camera.setUp(_workerStoreA);
+    }
+
+    private void applyDY(final double dy, final Camera camera) {
+        // apply dy angle change to direction vector
+        _workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
+        _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
+        camera.setDirection(_workerStoreA);
+
+        // do we want to constrain our vertical angle?
+        if (isClampVerticalAngle()) {
+            // check if we went out of bounds and back up
+            final double angleV = MathUtils.HALF_PI - _workerStoreA.smallestAngleBetween(_upAxis);
+            if (angleV > getMaxVerticalAngle() || angleV < getMinVerticalAngle()) {
+                // clamp the angle to our range
+                final double newAngle = MathUtils.clamp(angleV, getMinVerticalAngle(), getMaxVerticalAngle());
+                // take the difference in angles and back up the direction vector
+                _workerMatrix.fromAngleNormalAxis(-(newAngle - angleV), camera.getLeft());
+                _workerMatrix.applyPost(camera.getDirection(), _workerStoreA);
+                camera.setDirection(_workerStoreA);
+                // figure out new up vector by crossing direction and left.
+                camera.getDirection().cross(camera.getLeft(), _workerStoreA);
+                camera.setUp(_workerStoreA);
+                return;
+            }
+        }
+
+        // just apply to up vector
+        _workerMatrix.applyPost(camera.getUp(), _workerStoreA);
+        camera.setUp(_workerStoreA);
     }
 
     /**
@@ -245,5 +278,47 @@ public class FirstPersonControl {
 
     public InputTrigger getMouseTrigger() {
         return _mouseTrigger;
+    }
+
+    public boolean isClampVerticalAngle() {
+        return _clampVerticalAngle;
+    }
+
+    /**
+     * @param clampVerticalAngle
+     *            if true, the vertical angle of the camera is locked between the minimum and maximum angles (default is
+     *            [-60, 60])
+     */
+    public void setClampVerticalAngle(final boolean clampVerticalAngle) {
+        _clampVerticalAngle = clampVerticalAngle;
+    }
+
+    public double getMinVerticalAngle() {
+        return _minVerticalAngle;
+    }
+
+    /**
+     * @param minVerticalAngle
+     *            the new minimum angle, in radians, to clamp our vertical angle to. Defaults to -60 degrees (in
+     *            radians). Must be less than the max angle. Has no effect unless clampVerticalAngle is true.
+     * @see #setClampVerticalAngle(boolean)
+     */
+    public void setMinVerticalAngle(final double minVerticalAngle) {
+        _minVerticalAngle = minVerticalAngle;
+    }
+
+    public double getMaxVerticalAngle() {
+        return _maxVerticalAngle;
+    }
+
+    /**
+     * 
+     * @param maxVerticalAngle
+     *            the new maximum angle, in radians, to clamp our vertical angle to. Defaults to +60 degrees (in
+     *            radians). Must be less than the max angle. Has no effect unless clampVerticalAngle is true.
+     * @see #setClampVerticalAngle(boolean)
+     */
+    public void setMaxVerticalAngle(final double maxVerticalAngle) {
+        _maxVerticalAngle = maxVerticalAngle;
     }
 }
