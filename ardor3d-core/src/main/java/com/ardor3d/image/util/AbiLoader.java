@@ -34,6 +34,6 @@ public final class AbiLoader implements ImageLoader {
      *             if an error occurs during read.
      */
     public Image load(final InputStream is, final boolean flip) throws IOException {
-        return (Image) BinaryImporter.getInstance().load(is);
+        return (Image) new BinaryImporter().load(is);
     }
 }

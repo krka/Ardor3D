@@ -59,8 +59,4 @@ public class XMLImporter implements Ardor3dImporter {
     public Savable load(final byte[] data) throws IOException {
         return load(new ByteArrayInputStream(data));
     }
-
-    public static XMLImporter getInstance() {
-        return new XMLImporter();
-    }
 }

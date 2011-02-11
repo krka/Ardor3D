@@ -117,7 +117,7 @@ public class ExportImportExample extends ExampleBase {
 
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            BinaryExporter.getInstance().save(originalNode, bos);
+            new BinaryExporter().save(originalNode, bos);
         } catch (final IOException e) {
             logger.log(Level.SEVERE, "BinaryExporter failed to save file", e);
         }
@@ -126,7 +126,7 @@ public class ExportImportExample extends ExampleBase {
         _root.attachChild(originalNode);
 
         try {
-            binaryImportedNode = (Node) BinaryImporter.getInstance().load(bos.toByteArray());
+            binaryImportedNode = (Node) new BinaryImporter().load(bos.toByteArray());
             binaryImportedNode.setTranslation(new Vector3(80, 80, -400));
             _root.attachChild(binaryImportedNode);
         } catch (final IOException e) {
@@ -135,13 +135,13 @@ public class ExportImportExample extends ExampleBase {
 
         bos.reset();
         try {
-            XMLExporter.getInstance().save(originalNode, bos);
+            new XMLExporter().save(originalNode, bos);
         } catch (final IOException e) {
             logger.log(Level.SEVERE, "XMLExporter failed to save file", e);
         }
 
         try {
-            xmlImportedNode = (Node) XMLImporter.getInstance().load(bos.toByteArray());
+            xmlImportedNode = (Node) new XMLImporter().load(bos.toByteArray());
             xmlImportedNode.setTranslation(new Vector3(80, -80, -400));
             _root.attachChild(xmlImportedNode);
         } catch (final IOException e) {

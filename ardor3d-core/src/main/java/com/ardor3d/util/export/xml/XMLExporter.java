@@ -52,9 +52,4 @@ public class XMLExporter implements Ardor3dExporter {
     public void save(final Savable object, final File f) throws IOException {
         save(object, new FileOutputStream(f));
     }
-
-    public static XMLExporter getInstance() {
-        return new XMLExporter();
-    }
-
 }

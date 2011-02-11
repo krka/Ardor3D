@@ -45,26 +45,10 @@ public class BinaryImporter implements Ardor3dImporter {
     // Key - id, opject - location in the file
     protected final Map<Integer, Integer> _locationTable = Maps.newHashMap();
 
-    protected final boolean _debug;
-
     protected byte[] _dataArray = null;
     protected int _aliasWidth = 0;
 
-    public BinaryImporter() {
-        this(false);
-    }
-
-    public BinaryImporter(final boolean debug) {
-        _debug = debug;
-    }
-
-    public static BinaryImporter getInstance() {
-        return new BinaryImporter();
-    }
-
-    public static BinaryImporter getInstance(final boolean debug) {
-        return new BinaryImporter(debug);
-    }
+    public BinaryImporter() {}
 
     public Savable load(final InputStream is) throws IOException {
         return load(is, null, null);
@@ -151,11 +135,12 @@ public class BinaryImporter implements Ardor3dImporter {
             baos = null;
 
             final Savable rVal = readObject(id);
-            if (_debug) {
-                logger.info("Importer Stats: ");
-                logger.info("Tags: " + numClasses);
-                logger.info("Objects: " + numLocs);
-                logger.info("Data Size: " + _dataArray.length);
+
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Importer Stats: ");
+                logger.fine("Tags: " + numClasses);
+                logger.fine("Objects: " + numLocs);
+                logger.fine("Data Size: " + _dataArray.length);
             }
             return rVal;
 
@@ -258,15 +243,14 @@ public class BinaryImporter implements Ardor3dImporter {
                                 + "Some types may require the annotation SavableFactory.  Please double check.", e);
                 throw new Ardor3dException(e);
             } catch (final NoSuchMethodException e) {
-                logger
-                        .logp(
-                                Level.SEVERE,
-                                this.getClass().toString(),
-                                "readObject(int)",
-                                e.getMessage()
-                                        + " \n"
-                                        + "Method specified in annotation does not appear to exist or has an invalid method signature.",
-                                e);
+                logger.logp(
+                        Level.SEVERE,
+                        this.getClass().toString(),
+                        "readObject(int)",
+                        e.getMessage()
+                                + " \n"
+                                + "Method specified in annotation does not appear to exist or has an invalid method signature.",
+                        e);
                 throw new Ardor3dException(e);
             }
 

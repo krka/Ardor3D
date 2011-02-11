@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -132,31 +133,18 @@ public class BinaryExporter implements Ardor3dExporter {
 
     protected final List<Savable> _contentKeys = Lists.newArrayList();
 
-    protected final boolean _debug;
-
     public BinaryExporter() {
-        this(false, DEFAULT_COMPRESSION);
+        this(DEFAULT_COMPRESSION);
     }
 
     /**
      * Construct a new exporter, specifying some options.
      * 
-     * @param debug
-     *            if true, information about the out will be logged.
      * @param compression
      *            the compression type to use. One of the constants from {@link java.util.zip.Deflater}
      */
-    public BinaryExporter(final boolean debug, final int compression) {
-        _debug = debug;
+    public BinaryExporter(final int compression) {
         _compression = compression;
-    }
-
-    public static BinaryExporter getInstance() {
-        return new BinaryExporter();
-    }
-
-    public static BinaryExporter getInstance(final boolean debug, final int compression) {
-        return new BinaryExporter(debug, compression);
     }
 
     public void save(final Savable object, final OutputStream os) throws IOException {
@@ -262,13 +250,13 @@ public class BinaryExporter implements Ardor3dExporter {
             out = null;
             zos = null;
 
-            if (_debug) {
-                logger.info("Stats:");
-                logger.info("classes: " + classNum);
-                logger.info("class table: " + ttbytes + " bytes");
-                logger.info("objects: " + locNum);
-                logger.info("location table: " + locbytes + " bytes");
-                logger.info("data: " + location + " bytes");
+            if (logger.isLoggable(Level.FINE)) {
+                logger.fine("Stats:");
+                logger.fine("classes: " + classNum);
+                logger.fine("class table: " + ttbytes + " bytes");
+                logger.fine("objects: " + locNum);
+                logger.fine("location table: " + locbytes + " bytes");
+                logger.fine("data: " + location + " bytes");
             }
         } finally {
             _aliasCount = 1;
