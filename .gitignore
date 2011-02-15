@@ -1,2 +1,15 @@
-ardor3d-core/target/
 ardor3d.iws
+ardor3d-core/target/
+ardor3d-animation/target/
+ardor3d-archetype/target/
+ardor3d-awt/target/
+ardor3d-collada/target/
+ardor3d-effects/target/
+ardor3d-examples/target/
+ardor3d-extras/target/
+ardor3d-jogl/target/
+ardor3d-lwjgl/target/
+ardor3d-swt/target/
+ardor3d-terrain/target/
+ardor3d-ui/target/
+
