@@ -5,7 +5,11 @@ Add this to .git/config
     fetch = trunk:refs/remotes/trunk
 
 
-Run:
-git svn fetch to sync with ardor
+To sync with ardor:
+git svn fetch
+git svn rebase
+git pull
+git push
+
 
 
