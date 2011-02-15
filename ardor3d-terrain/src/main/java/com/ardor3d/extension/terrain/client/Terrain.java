@@ -11,6 +11,7 @@
 package com.ardor3d.extension.terrain.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -46,8 +47,10 @@ import com.ardor3d.renderer.state.MaterialState.MaterialFace;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.DataMode;
+import com.ardor3d.util.URLInputSupplier;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.google.common.collect.Lists;
+import com.google.common.io.InputSupplier;
 
 /**
  * An implementation of geometry clipmapping
@@ -79,8 +82,8 @@ public class Terrain extends Node implements Pickable {
 
     private final DoubleBufferedList<Region> mailBox = new DoubleBufferedList<Region>();
 
-    private URL vertexShader;
-    private URL pixelShader;
+    private InputSupplier<? extends InputStream> vertexShader;
+    private InputSupplier<? extends InputStream> pixelShader;
 
     /** Timers for mailbox updates */
     private long oldTime = 0;
@@ -150,10 +153,10 @@ public class Terrain extends Node implements Pickable {
             ex.printStackTrace();
         }
 
-        vertexShader = ResourceLocatorTool.getClassPathResource(Terrain.class,
-                "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert");
-        pixelShader = ResourceLocatorTool.getClassPathResource(Terrain.class,
-                "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag");
+        vertexShader = new URLInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
+                "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
+        pixelShader = new URLInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
+                "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
 
         // setScale(terrainConfiguration.getScale());
         // TODO: hack. unify scale handling over cache etc
@@ -405,8 +408,8 @@ public class Terrain extends Node implements Pickable {
         if (caps.isGLSLSupported()) {
             _geometryClipmapShader = new GLSLShaderObjectsState();
             try {
-                _geometryClipmapShader.setVertexShader(vertexShader.openStream());
-                _geometryClipmapShader.setFragmentShader(pixelShader.openStream());
+                _geometryClipmapShader.setVertexShader(vertexShader.getInput());
+                _geometryClipmapShader.setFragmentShader(pixelShader.getInput());
             } catch (final IOException ex) {
                 Terrain.logger
                         .logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
@@ -582,10 +585,18 @@ public class Terrain extends Node implements Pickable {
     }
 
     public void setVertexShader(final URL vertexShader) {
-        this.vertexShader = vertexShader;
+        setVertexShader(new URLInputSupplier(vertexShader));
     }
 
     public void setPixelShader(final URL pixelShader) {
+        setPixelShader(new URLInputSupplier(pixelShader));
+    }
+
+    public void setVertexShader(InputSupplier<? extends InputStream> vertexShader) {
+        this.vertexShader = vertexShader;
+    }
+
+    public void setPixelShader(InputSupplier<? extends InputStream> pixelShader) {
         this.pixelShader = pixelShader;
     }
 
