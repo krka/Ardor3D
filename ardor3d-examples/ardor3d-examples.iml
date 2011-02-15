@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <exclude-output />
@@ -11,6 +11,29 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="ardor3d-core" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:r08" level="project" />
+    <orderEntry type="module" module-name="ardor3d-lwjgl" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_util:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: net.java.games.input:jinput:ardor3d-20100503" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_natives:linux:2.6.0" level="project" />
+    <orderEntry type="module" module-name="ardor3d-awt" />
+    <orderEntry type="module" module-name="ardor3d-swt" />
+    <orderEntry type="library" name="Maven: org.eclipse.swt:swt:linux-x86_64:3650" level="project" />
+    <orderEntry type="module" module-name="ardor3d-jogl" />
+    <orderEntry type="library" name="Maven: net.java.dev.jogl:jogl:ardor3d-1.1.2-pre-20080523" level="project" />
+    <orderEntry type="library" name="Maven: com.projectdarkstar.ext.net.java.dev.gluegen:gluegen-rt:1.0b06" level="project" />
+    <orderEntry type="module" module-name="ardor3d-effects" />
+    <orderEntry type="module" module-name="ardor3d-extras" />
+    <orderEntry type="module" module-name="ardor3d-collada" />
+    <orderEntry type="module" module-name="ardor3d-animation" />
+    <orderEntry type="library" name="Maven: org.jdom:jdom:ardor3d-1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jdom:jaxen:ardor3d-1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jdom:saxpath:ardor3d-1.1.1" level="project" />
+    <orderEntry type="module" module-name="ardor3d-terrain" />
+    <orderEntry type="module" module-name="ardor3d-ui" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
   </component>
 </module>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <exclude-output />
@@ -11,6 +11,13 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="ardor3d-core" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:r08" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_util:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: net.java.games.input:jinput:ardor3d-20100503" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_natives:linux:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
   </component>
 </module>
 
