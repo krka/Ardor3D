@@ -51,6 +51,7 @@ import com.google.common.collect.Lists;
  */
 public class UIHud extends Node {
     private static final Logger _logger = Logger.getLogger(UIHud.class.getName());
+    private static final int MOUSE_CLICK_SENSITIVITY = 5;
 
     /**
      * The logical layer used by this UI to receive input events.
@@ -94,6 +95,8 @@ public class UIHud extends Node {
      */
     private final List<HudListener> _hudListeners = Lists.newArrayList();
     private UIComponent mousePressedComponent;
+    private int mousePressedX;
+    private int mousePressedY;
 
     /**
      * Construct a new UIHud
@@ -528,6 +531,9 @@ public class UIHud extends Node {
         setFocusedComponent(over);
 
         mousePressedComponent = over;
+        mousePressedX = mouseX;
+        mousePressedY = mouseY;
+
         if (over == null) {
             return false;
         } else {
@@ -576,6 +582,11 @@ public class UIHud extends Node {
 
         if (component != null) {
             consumed |= component.mouseReleased(button, currentIS);
+
+            int distance = Math.abs(mouseX - mousePressedX) + Math.abs(mouseY - mousePressedY);
+            if (distance < MOUSE_CLICK_SENSITIVITY) {
+                component.mouseClicked(button, currentIS);
+            }
         }
 
         if (button == _dragButton && _dragListener != null) {

@@ -1449,6 +1449,15 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
         }
     }
 
+    public boolean mouseClicked(final MouseButton button, final InputState state) {
+        // default is to offer event to parent, if it is a UIComponent
+        if (getParent() instanceof UIComponent) {
+            return ((UIComponent) getParent()).mouseClicked(button, state);
+        } else {
+            return _consumeMouseEvents;
+        }
+    }
+
     /**
      * Called when a mouse button is moved while the cursor is over this component.
      * 
