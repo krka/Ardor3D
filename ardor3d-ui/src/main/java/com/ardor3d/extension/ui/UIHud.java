@@ -93,6 +93,7 @@ public class UIHud extends Node {
      * List of hud listeners.
      */
     private final List<HudListener> _hudListeners = Lists.newArrayList();
+    private UIComponent mousePressedComponent;
 
     /**
      * Construct a new UIHud
@@ -526,6 +527,7 @@ public class UIHud extends Node {
 
         setFocusedComponent(over);
 
+        mousePressedComponent = over;
         if (over == null) {
             return false;
         } else {
@@ -567,15 +569,17 @@ public class UIHud extends Node {
     public boolean fireMouseButtonReleased(final MouseButton button, final InputState currentIS) {
         boolean consumed = false;
         final int mouseX = currentIS.getMouseState().getX(), mouseY = currentIS.getMouseState().getY();
-        final UIComponent over = getUIComponent(mouseX, mouseY);
 
         // if we're over a pickable component, send it the mouse release
-        if (over != null) {
-            consumed |= over.mouseReleased(button, currentIS);
+        UIComponent component = mousePressedComponent;
+        mousePressedComponent = null;
+
+        if (component != null) {
+            consumed |= component.mouseReleased(button, currentIS);
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(over, mouseX, mouseY);
+            _dragListener.endDrag(component, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }
