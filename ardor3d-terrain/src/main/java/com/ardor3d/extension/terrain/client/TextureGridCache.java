@@ -160,7 +160,8 @@ public class TextureGridCache implements TextureCache, Runnable {
             final int destX = MathUtils.moduloPositive(tile.getX(), cacheSize);
             final int destY = MathUtils.moduloPositive(tile.getY(), cacheSize);
 
-            final TextureStoreFormat format = textureConfiguration.getTextureDataType(0);
+            final TextureStoreFormat format = textureConfiguration.getTextureDataType(source.getContributorId(
+                    requestedLevel, tile));
             CacheFunctionUtil.applyFunction(useAlpha, function, sourceData, data, destX, destY, format, tileSize,
                     dataSize);
         }
