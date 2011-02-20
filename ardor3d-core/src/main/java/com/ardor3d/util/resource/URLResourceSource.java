@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -28,6 +28,9 @@ public class URLResourceSource implements ResourceSource {
     private URL _url;
     private String _type;
 
+    // used to make equals more efficient
+    private transient String _urlToString = null;
+
     /**
      * Construct a new URLResourceSource. Must set URL separately.
      */
@@ -43,7 +46,7 @@ public class URLResourceSource implements ResourceSource {
      */
     public URLResourceSource(final URL sourceUrl) {
         assert (sourceUrl != null) : "sourceUrl must not be null";
-        _url = sourceUrl;
+        setURL(sourceUrl);
 
         // add type, if present
         final String fileName = _url.getFile();
@@ -68,7 +71,7 @@ public class URLResourceSource implements ResourceSource {
      */
     public URLResourceSource(final URL sourceUrl, final String type) {
         assert (sourceUrl != null) : "sourceUrl must not be null";
-        _url = sourceUrl;
+        setURL(sourceUrl);
 
         _type = type;
     }
@@ -96,6 +99,7 @@ public class URLResourceSource implements ResourceSource {
 
     public void setURL(final URL url) {
         _url = url;
+        _urlToString = url != null ? url.toString() : null;
     }
 
     public URL getURL() {
@@ -103,7 +107,7 @@ public class URLResourceSource implements ResourceSource {
     }
 
     public String getName() {
-        return _url.toString();
+        return _urlToString;
     }
 
     public String getType() {
@@ -123,7 +127,7 @@ public class URLResourceSource implements ResourceSource {
      */
     @Override
     public String toString() {
-        return "URLResourceSource [url=" + _url + ", type=" + _type + "]";
+        return "URLResourceSource [url=" + _urlToString + ", type=" + _type + "]";
     }
 
     @Override
@@ -131,7 +135,7 @@ public class URLResourceSource implements ResourceSource {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((_type == null) ? 0 : _type.hashCode());
-        result = prime * result + ((_url == null) ? 0 : _url.toString().hashCode());
+        result = prime * result + ((_urlToString == null) ? 0 : _urlToString.hashCode());
         return result;
     }
 
@@ -158,7 +162,7 @@ public class URLResourceSource implements ResourceSource {
             if (other._url != null) {
                 return false;
             }
-        } else if (!_url.toString().equals(other._url.toString())) {
+        } else if (!_urlToString.equals(other._urlToString)) {
             return false;
         }
         return true;
