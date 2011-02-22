@@ -83,12 +83,12 @@ import com.ardor3d.scene.state.jogl.JoglZBufferStateUtil;
 import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.scene.state.jogl.util.JoglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -296,7 +296,7 @@ public class JoglRenderer extends AbstractRenderer {
      * re-initializes the GL context for rendering of another piece of geometry.
      */
     protected void postdrawGeometry(final Mesh g) {
-    // Nothing to do here yet
+        // Nothing to do here yet
     }
 
     public void flushGraphics() {
@@ -398,8 +398,8 @@ public class JoglRenderer extends AbstractRenderer {
     public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
         final GL gl = GLU.getCurrentGL();
         if (defaultColor != null) {
-            gl.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
-                    .getAlpha());
+            gl.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
+                    defaultColor.getAlpha());
         } else {
             gl.glColor4f(1, 1, 1, 1);
         }
@@ -845,13 +845,13 @@ public class JoglRenderer extends AbstractRenderer {
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
-            vboID = makeVBOId(rendRecord);
+            vboID = makeVBOId();
             data.setVBOID(context.getGlContextRep(), vboID);
 
             rendRecord.invalidateVBO();
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, dataBuffer.limit() * 4, dataBuffer, getGLVBOAccessMode(data
-                    .getVboAccessMode()));
+            gl.glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, dataBuffer.limit() * 4, dataBuffer,
+                    getGLVBOAccessMode(data.getVboAccessMode()));
         } else {
             throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
         }
@@ -896,7 +896,7 @@ public class JoglRenderer extends AbstractRenderer {
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
-            vboID = makeVBOId(rendRecord);
+            vboID = makeVBOId();
             data.setVBOID(context.getGlContextRep(), vboID);
 
             rendRecord.invalidateVBO();
@@ -1189,26 +1189,24 @@ public class JoglRenderer extends AbstractRenderer {
         final RendererRecord rendRecord = context.getRendererRecord();
         final ContextCapabilities caps = context.getCapabilities();
 
-        final int vboID = makeVBOId(rendRecord);
+        final int vboID = makeVBOId();
         interleaved.setVBOID(context.getGlContextRep(), vboID);
 
         rendRecord.invalidateVBO();
         JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-        gl
-                .glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, bufferSize, null, getGLVBOAccessMode(interleaved
-                        .getVboAccessMode()));
+        gl.glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, bufferSize, null, getGLVBOAccessMode(interleaved.getVboAccessMode()));
 
         int offset = 0;
         if (normalCoords != null) {
             normalCoords.getBuffer().rewind();
-            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, normalCoords.getBufferLimit() * 4, normalCoords
-                    .getBuffer());
+            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, normalCoords.getBufferLimit() * 4,
+                    normalCoords.getBuffer());
             offset += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
             colorCoords.getBuffer().rewind();
-            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, colorCoords.getBufferLimit() * 4, colorCoords
-                    .getBuffer());
+            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, colorCoords.getBufferLimit() * 4,
+                    colorCoords.getBuffer());
             offset += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
@@ -1232,8 +1230,8 @@ public class JoglRenderer extends AbstractRenderer {
         }
         if (vertexCoords != null) {
             vertexCoords.getBuffer().rewind();
-            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, vertexCoords.getBufferLimit() * 4, vertexCoords
-                    .getBuffer());
+            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offset, vertexCoords.getBufferLimit() * 4,
+                    vertexCoords.getBuffer());
         }
 
         interleaved.setNeedsRefresh(false);
@@ -1317,7 +1315,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public int makeVBOId(final RendererRecord rendRecord) {
+    public int makeVBOId() {
         final GL gl = GLU.getCurrentGL();
 
         final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
