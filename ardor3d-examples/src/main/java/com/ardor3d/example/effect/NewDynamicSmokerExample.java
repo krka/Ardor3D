@@ -20,19 +20,19 @@ import com.ardor3d.extension.effect.particle.emitter.MeshEmitter;
 import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UISlider;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.Texture.WrapMode;
+import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.control.FirstPersonControl;
 import com.ardor3d.input.logical.InputTrigger;
@@ -148,7 +148,7 @@ public class NewDynamicSmokerExample extends ExampleBase {
         }
         // find mouse location in world coords
         _canvas.getCanvasRenderer().getCamera().getPickRay(mouseLoc, false, ray);
-        ray.intersects(rocketPlane, worldStore);
+        ray.intersectsPlane(rocketPlane, worldStore);
 
         // get rocket's current orientation as quat
         final Quaternion currentOrient = new Quaternion().fromRotationMatrix(rocketEntityNode.getWorldRotation());
@@ -293,8 +293,8 @@ public class NewDynamicSmokerExample extends ExampleBase {
         frame.setContentPanel(panel);
         frame.pack();
         final Camera cam = _canvas.getCanvasRenderer().getCamera();
-        frame.setLocalXY(cam.getWidth() - frame.getLocalComponentWidth(), cam.getHeight()
-                - frame.getLocalComponentHeight());
+        frame.setLocalXY(cam.getWidth() - frame.getLocalComponentWidth(),
+                cam.getHeight() - frame.getLocalComponentHeight());
         hud.add(frame);
     }
 }
