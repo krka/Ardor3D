@@ -365,7 +365,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
 
                 if (storeNorms == null || storeNorms.capacity() < bindNorms.capacity()) {
                     storeNorms = BufferUtils.createFloatBuffer(bindNorms.capacity());
-                    _meshData.setVertexBuffer(storeNorms);
+                    _meshData.setNormalBuffer(storeNorms);
                 } else {
                     storeNorms.rewind();
                 }
