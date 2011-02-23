@@ -66,10 +66,11 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
     public boolean intersects(final Vector3[] polygonVertices, final Vector3 locationStore) {
         if (polygonVertices.length == 3) {
             // TRIANGLE
-            return intersects(polygonVertices[0], polygonVertices[1], polygonVertices[2], locationStore, true);
+            return intersectsTriangle(polygonVertices[0], polygonVertices[1], polygonVertices[2], locationStore);
         } else if (polygonVertices.length == 4) {
             // QUAD
-            return intersects(polygonVertices[0], polygonVertices[1], polygonVertices[3], locationStore, false);
+            return intersectsQuad(polygonVertices[0], polygonVertices[1], polygonVertices[2], polygonVertices[3],
+                    locationStore);
         }
         // TODO: Add support for line and point
         return false;
@@ -82,16 +83,13 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      * @param locationStore
      *            if not null, and this ray intersects, the point of intersection is calculated and stored in this
      *            Vector3
-     * @param triangle
-     *            if true, the 3 points are interpreted as a triangle. If false, the points are interpreted as the union
-     *            of triangles [pointA, pointB, pointC] and [-pointA + pointB + pointC, pointB, pointC]
-     * @return true if this ray intersects a triangle (or quad) formed by the given three points.
+     * @return true if this ray intersects a triangle formed by the given three points.
      * @throws NullPointerException
      *             if any of the points are null.
      */
-    public boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC,
-            final Vector3 locationStore, final boolean triangle) {
-        return intersects(pointA, pointB, pointC, locationStore, false, triangle);
+    public boolean intersectsTriangle(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
+            final ReadOnlyVector3 pointC, final Vector3 locationStore) {
+        return intersects(pointA, pointB, pointC, locationStore, false);
     }
 
     /**
@@ -102,16 +100,52 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      *            if not null, and this ray intersects, the point of intersection is calculated and stored in this
      *            Vector3 as (t, u, v) where t is the distance from the _origin to the point of intersection and (u, v)
      *            is the intersection point on the triangle plane.
-     * @param triangle
-     *            if true, the 3 points are interpreted as a triangle. If false, the points are interpreted as the union
-     *            of triangles [pointA, pointB, pointC] and [-pointA + pointB + pointC, pointB, pointC]
-     * @return true if this ray intersects a triangle (or quad) formed by the given three points.
+     * @return true if this ray intersects a triangle formed by the given three points.
      * @throws NullPointerException
      *             if any of the points are null.
      */
-    public boolean intersectsPlanar(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
-            final ReadOnlyVector3 pointC, final Vector3 locationStore, final boolean triangle) {
-        return intersects(pointA, pointB, pointC, locationStore, true, triangle);
+    public boolean intersectsTrianglePlanar(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
+            final ReadOnlyVector3 pointC, final Vector3 locationStore) {
+        return intersects(pointA, pointB, pointC, locationStore, true);
+    }
+
+    /**
+     * @param pointA
+     * @param pointB
+     * @param pointC
+     * @param pointD
+     * @param locationStore
+     *            if not null, and this ray intersects, the point of intersection is calculated and stored in this
+     *            Vector3
+     * @return true if this ray intersects a triangle formed by the given three points. The points are assumed to be
+     *         coplanar.
+     * @throws NullPointerException
+     *             if any of the points are null.
+     */
+    public boolean intersectsQuad(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
+            final ReadOnlyVector3 pointC, final ReadOnlyVector3 pointD, final Vector3 locationStore) {
+        return intersects(pointA, pointB, pointC, locationStore, false)
+                || intersects(pointA, pointD, pointC, locationStore, false);
+    }
+
+    /**
+     * @param pointA
+     * @param pointB
+     * @param pointC
+     * @param pointD
+     * @param locationStore
+     *            if not null, and this ray intersects, the point of intersection is calculated and stored in this
+     *            Vector3 as (t, u, v) where t is the distance from the _origin to the point of intersection and (u, v)
+     *            is the intersection point on the triangle plane.
+     * @return true if this ray intersects a quad formed by the given four points. The points are assumed to be
+     *         coplanar.
+     * @throws NullPointerException
+     *             if any of the points are null.
+     */
+    public boolean intersectsQuadPlanar(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
+            final ReadOnlyVector3 pointC, final ReadOnlyVector3 pointD, final Vector3 locationStore) {
+        return intersects(pointA, pointB, pointC, locationStore, true)
+                || intersects(pointA, pointD, pointC, locationStore, true);
     }
 
     /**
@@ -126,15 +160,12 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      * @param doPlanar
      *            see {@link #intersects(Vector3, Vector3, Vector3, Vector3, boolean)} and
      *            {@link #intersectsPlanar(Vector3, Vector3, Vector3, Vector3, boolean)}
-     * @param triangle
-     *            if true, the 3 points are interpreted as a triangle. If false, the points are interpreted as the union
-     *            of triangles [pointA, pointB, pointC] and [-pointA + pointB + pointC, pointB, pointC]
      * @return true if this ray intersects a triangle (or quad) formed by the given three points.
      * @throws NullPointerException
      *             if any of the points are null.
      */
-    private boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
-            final ReadOnlyVector3 pointC, final Vector3 locationStore, final boolean doPlanar, final boolean triangle) {
+    public boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC,
+            final Vector3 locationStore, final boolean doPlanar) {
         final Vector3 diff = Vector3.fetchTempInstance().set(_origin).subtractLocal(pointA);
         final Vector3 edge1 = Vector3.fetchTempInstance().set(pointB).subtractLocal(pointA);
         final Vector3 edge2 = Vector3.fetchTempInstance().set(pointC).subtractLocal(pointA);
@@ -143,9 +174,9 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
         double dirDotNorm = _direction.dot(norm);
         double sign;
         if (dirDotNorm > MathUtils.EPSILON) {
-            sign = 1;
+            sign = 1.0;
         } else if (dirDotNorm < -MathUtils.EPSILON) {
-            sign = -1f;
+            sign = -1.0;
             dirDotNorm = -dirDotNorm;
         } else {
             // ray and triangle/quad are parallel
@@ -157,7 +188,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
         if (dirDotDiffxEdge2 >= 0.0) {
             final double dirDotEdge1xDiff = sign * _direction.dot(edge1.crossLocal(diff));
             if (dirDotEdge1xDiff >= 0.0) {
-                if (triangle ? dirDotDiffxEdge2 + dirDotEdge1xDiff <= dirDotNorm : dirDotEdge1xDiff <= dirDotNorm) {
+                if (dirDotDiffxEdge2 + dirDotEdge1xDiff <= dirDotNorm) {
                     final double diffDotNorm = -sign * diff.dot(norm);
                     if (diffDotNorm >= 0.0) {
                         // ray intersects triangle
@@ -203,7 +234,7 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
      * @throws NullPointerException
      *             if the plane is null.
      */
-    public boolean intersects(final ReadOnlyPlane plane, final Vector3 locationStore) {
+    public boolean intersectsPlane(final ReadOnlyPlane plane, final Vector3 locationStore) {
         final ReadOnlyVector3 normal = plane.getNormal();
         final double denominator = normal.dot(_direction);
 
