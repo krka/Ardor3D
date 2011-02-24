@@ -178,17 +178,17 @@ public class URLResourceSource implements ResourceSource {
         final String file = capsule.readString("file", null);
         if (file != null) {
             // see if we would like to divert this to a new location.
-            final ResourceSource src = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE, URLDecoder
-                    .decode(file, "UTF-8"));
+            final ResourceSource src = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_TEXTURE,
+                    URLDecoder.decode(file, "UTF-8"));
             if (src instanceof URLResourceSource) {
-                _url = ((URLResourceSource) src)._url;
+                setURL(((URLResourceSource) src)._url);
                 _type = ((URLResourceSource) src)._type;
                 return;
             }
         }
 
-        if (_url == null && protocol != null && host != null && file != null) {
-            _url = new URL(protocol, host, file);
+        if (protocol != null && host != null && file != null) {
+            setURL(new URL(protocol, host, file));
         }
 
         _type = capsule.readString("type", null);
