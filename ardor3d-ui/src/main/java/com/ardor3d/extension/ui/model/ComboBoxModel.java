@@ -30,12 +30,12 @@ public interface ComboBoxModel {
      * Add a new item to at the specified index in our model. Should pad with null entries if index > current max model
      * index.
      * 
-     * @param value
-     *            the value to add
      * @param index
      *            the index to add at
+     * @param value
+     *            the value to add
      */
-    void addItem(Object value, int index);
+    void addItem(int index, Object value);
 
     /**
      * Get the item value at the specified index.
@@ -70,10 +70,10 @@ public interface ComboBoxModel {
      * 
      * @param index
      *            the index to add at.
-     * @param name
+     * @param view
      *            the view String to set
      */
-    void setViewAt(int index, String name);
+    void setViewAt(int index, String view);
 
     /**
      * @param index
