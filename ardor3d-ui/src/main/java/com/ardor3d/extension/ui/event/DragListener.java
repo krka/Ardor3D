@@ -11,6 +11,7 @@
 package com.ardor3d.extension.ui.event;
 
 import com.ardor3d.extension.ui.UIComponent;
+import com.ardor3d.input.MouseButton;
 
 /**
  * Classes interested in processing drag events should implement this interface.
@@ -40,7 +41,7 @@ public interface DragListener {
      * @param mouseY
      *            the y mouse coordinate
      */
-    public void startDrag(int mouseX, int mouseY);
+    public void startDrag(MouseButton button, int mouseX, int mouseY);
 
     /**
      * Method called when the button is still held after startDrag and the mouse has moved again.
@@ -50,7 +51,7 @@ public interface DragListener {
      * @param mouseY
      *            the new y mouse coordinate
      */
-    public void drag(int mouseX, int mouseY);
+    public void drag(MouseButton button, int mouseX, int mouseY);
 
     /**
      * End our drag. This is called when the button is released after initDrag.
@@ -62,6 +63,6 @@ public interface DragListener {
      * @param mouseY
      *            the y mouse coordinate
      */
-    public void endDrag(UIComponent component, int mouseX, int mouseY);
+    public void endDrag(MouseButton button, UIComponent component, int mouseX, int mouseY);
 
 }

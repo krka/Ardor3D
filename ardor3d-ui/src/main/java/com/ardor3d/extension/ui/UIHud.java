@@ -548,7 +548,8 @@ public class UIHud extends Node {
             }
 
             if (listener.isDragHandle(over, mouseX, mouseY)) {
-                listener.startDrag(mouseX, mouseY);
+					_dragButton = button;
+                listener.startDrag(button, mouseX, mouseY);
                 _dragListener = listener;
                 consumed = true;
                 break;
@@ -590,7 +591,7 @@ public class UIHud extends Node {
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(component, mouseX, mouseY);
+            _dragListener.endDrag(button, component, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }
@@ -616,7 +617,7 @@ public class UIHud extends Node {
         // Check for drag movements.
         if (currentIS.getMouseState().getButtonState(_dragButton) == ButtonState.DOWN) {
             if (_dragListener != null) {
-                _dragListener.drag(mouseX, mouseY);
+                _dragListener.drag(_dragButton, mouseX, mouseY);
                 return true;
             }
         }

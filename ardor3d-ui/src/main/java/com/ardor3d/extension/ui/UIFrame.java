@@ -17,6 +17,7 @@ import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Rectangle2;
 import com.ardor3d.renderer.Camera;
@@ -429,12 +430,12 @@ public class UIFrame extends UIContainer {
         int oldX = 0;
         int oldY = 0;
 
-        public void startDrag(final int mouseX, final int mouseY) {
+        public void startDrag(MouseButton button, final int mouseX, final int mouseY) {
             oldX = mouseX;
             oldY = mouseY;
         }
 
-        public void drag(final int mouseX, final int mouseY) {
+        public void drag(MouseButton button, final int mouseX, final int mouseY) {
             if (!isDraggable()) {
                 return;
             }
@@ -463,7 +464,7 @@ public class UIFrame extends UIContainer {
             return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
         }
 
-        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
+        public void endDrag(MouseButton button, final UIComponent component, final int mouseX, final int mouseY) {}
 
         public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
             return component == _titleBar.getTitleLabel();

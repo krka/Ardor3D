@@ -14,6 +14,7 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.input.InputState;
+import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 
@@ -79,7 +80,7 @@ public class UIFrameStatusBar extends UIPanel {
         private int _initialLocalComponentHeight;
         private final Transform _initFrameTransform = new Transform();
 
-        public void startDrag(final int mouseX, final int mouseY) {
+        public void startDrag(MouseButton button, final int mouseX, final int mouseY) {
             final Vector3 vec = Vector3.fetchTempInstance();
             vec.set(mouseX, mouseY, 0);
             getWorldTransform().applyInverseVector(vec);
@@ -95,11 +96,11 @@ public class UIFrameStatusBar extends UIPanel {
             _initFrameTransform.set(frame.getWorldTransform());
         }
 
-        public void drag(final int mouseX, final int mouseY) {
+        public void drag(MouseButton button, final int mouseX, final int mouseY) {
             resizeFrameByPosition(mouseX, mouseY);
         }
 
-        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {
+        public void endDrag(MouseButton button, final UIComponent component, final int mouseX, final int mouseY) {
             resizeFrameByPosition(mouseX, mouseY);
         }
 
