@@ -74,11 +74,10 @@ public class AnchorLayout extends UILayout {
 
         // go through all children of a container
         for (int x = container.getNumberOfChildren(); --x >= 0;) {
-            // set them all to relative position 0,0
+
             final Spatial child = container.getChild(x);
             if (child instanceof UIComponent) {
                 final UIComponent childComp = (UIComponent) child;
-                childComp.setTranslation(0, 0, childComp.getTranslation().getZ());
 
                 // add an anchor for the component.
                 if (_records.get(childComp) == null) {
@@ -87,6 +86,8 @@ public class AnchorLayout extends UILayout {
 
                 // add them to the records container by their dependencies, if any.
                 if (childComp.getLayoutData() instanceof AnchorLayoutData) {
+						 // set them all to relative position 0,0
+						 childComp.setTranslation(0, 0, childComp.getTranslation().getZ());
                     final AnchorLayoutData layData = (AnchorLayoutData) childComp.getLayoutData();
                     AnchorRecord aRecord = _records.get(layData.getParent());
                     if (aRecord == null) {
