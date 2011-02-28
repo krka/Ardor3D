@@ -10,7 +10,7 @@ import com.ardor3d.math.Rectangle2;
 public class FrameDragListener implements DragListener {
 	 int oldX = 0;
 	 int oldY = 0;
-	private UIFrame uiFrame;
+	protected UIFrame uiFrame;
 
 	public FrameDragListener(UIFrame uiFrame) {
 		this.uiFrame = uiFrame;
