@@ -7,7 +7,7 @@ import com.ardor3d.math.Rectangle2;
 /**
  * The drag listener responsible for allowing a frame to be moved around the screen with the mouse.
  */
-public final class FrameDragListener implements DragListener {
+public class FrameDragListener implements DragListener {
 	 int oldX = 0;
 	 int oldY = 0;
 	private UIFrame uiFrame;
