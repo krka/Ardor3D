@@ -153,15 +153,9 @@ public class Terrain extends Node implements Pickable {
             ex.printStackTrace();
         }
 
-<<<<<<< HEAD
         vertexShader = new URLInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
                 "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
         pixelShader = new URLInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
-=======
-        vertexShader = new UrlInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
-                "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.vert"));
-        pixelShader = new UrlInputSupplier(ResourceLocatorTool.getClassPathResource(Terrain.class,
->>>>>>> master
                 "com/ardor3d/extension/terrain/texturedGeometryClipmapShader.frag"));
 
         // setScale(terrainConfiguration.getScale());
