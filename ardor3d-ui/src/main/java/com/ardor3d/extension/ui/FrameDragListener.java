@@ -1,7 +1,6 @@
 package com.ardor3d.extension.ui;
 
 import com.ardor3d.extension.ui.event.DragListener;
-import com.ardor3d.input.MouseButton;
 import com.ardor3d.math.Rectangle2;
 
 /**
@@ -16,12 +15,12 @@ public class FrameDragListener implements DragListener {
 		this.uiFrame = uiFrame;
 	}
 
-	public void startDrag(MouseButton button, final int mouseX, final int mouseY) {
+	public void startDrag(final int mouseX, final int mouseY) {
 		  oldX = mouseX;
 		  oldY = mouseY;
 	 }
 
-	 public void drag(MouseButton button, final int mouseX, final int mouseY) {
+	 public void drag(final int mouseX, final int mouseY) {
 		  if (!uiFrame.isDraggable()) {
 				return;
 		  }
@@ -50,7 +49,7 @@ public class FrameDragListener implements DragListener {
 		  return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
 	 }
 
-	 public void endDrag(MouseButton button, final UIComponent component, final int mouseX, final int mouseY) {}
+	 public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
 
 	 public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
 		  return component == uiFrame.getTitleBar().getTitleLabel();

@@ -35,34 +35,31 @@ public interface DragListener {
     /**
      * Let the implementor know that we've accepted this as our current drag target. This is called by the hud if a drag
      * action is detected and isDragHandle has returned true.
-     * 
-     * @param mouseX
-     *            the x mouse coordinate
-     * @param mouseY
-     *            the y mouse coordinate
-     */
-    public void startDrag(MouseButton button, int mouseX, int mouseY);
+     *
+	  * @param mouseX
+	  *            the x mouse coordinate
+	  * @param mouseY
+	  */
+    public void startDrag(int mouseX, int mouseY);
 
     /**
      * Method called when the button is still held after startDrag and the mouse has moved again.
-     * 
-     * @param mouseX
-     *            the new x mouse coordinate
-     * @param mouseY
-     *            the new y mouse coordinate
-     */
-    public void drag(MouseButton button, int mouseX, int mouseY);
+     *
+	  * @param mouseX
+	  *            the new x mouse coordinate
+	  * @param mouseY
+	  */
+    public void drag(int mouseX, int mouseY);
 
     /**
      * End our drag. This is called when the button is released after initDrag.
-     * 
-     * @param component
-     *            the UIComponent our drag ended over.
-     * @param mouseX
-     *            the x mouse coordinate
-     * @param mouseY
-     *            the y mouse coordinate
-     */
-    public void endDrag(MouseButton button, UIComponent component, int mouseX, int mouseY);
+     *
+	  * @param component
+	  *            the UIComponent our drag ended over.
+	  * @param mouseX
+	  *            the x mouse coordinate
+	  * @param mouseY
+	  */
+    public void endDrag(UIComponent component, int mouseX, int mouseY);
 
 }

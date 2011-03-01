@@ -58,6 +58,8 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.TextureManager;
 
+import javax.swing.text.NumberFormatter;
+
 /**
  * Illustrates how to display GUI primitives (e.g. RadioButton, Label, TabbedPane) on a canvas.
  */
@@ -282,7 +284,9 @@ public class SimpleUIExample extends ExampleBase {
         bar.addController(new SpatialController<UIProgressBar>() {
             @Override
             public void update(final double time, final UIProgressBar caller) {
-                caller.setPercentFilled(_timer.getTimeInSeconds() / 15);
+					double percentFilled = _timer.getTimeInSeconds() / 15;
+					caller.setPercentFilled(percentFilled);
+					caller.setBarText(String.format("%.2f", percentFilled));
             }
         });
         centerPanel.add(bar);
