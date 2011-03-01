@@ -100,8 +100,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      */
     protected SkinPoseApplyLogic _customApplier = null;
 
-    private final float[] vecStore = new float[3];
-
     /**
      * Constructs a new SkinnedMesh.
      */
@@ -374,26 +372,25 @@ public class SkinnedMesh extends Mesh implements PoseListener {
             }
 
             Matrix4 jntMat;
-            float bindVX, bindVY, bindVZ;
-            float bindNX = 0, bindNY = 0, bindNZ = 0;
-            float vSumX, vSumY, vSumZ;
-            float nSumX = 0, nSumY = 0, nSumZ = 0;
+            double bindVX, bindVY, bindVZ;
+            double bindNX = 0, bindNY = 0, bindNZ = 0;
+            double vSumX, vSumY, vSumZ;
+            double nSumX = 0, nSumY = 0, nSumZ = 0;
             double tempX, tempY, tempZ;
             float weight;
             int jointIndex;
 
             // Cycle through each vertex
-            for (int i = 0, count = _bindPoseData.getVertexCount(); i < count; i++) {
+            for (int i = 0; i < _bindPoseData.getVertexCount(); i++) {
                 // zero out our sum var
                 vSumX = 0;
                 vSumY = 0;
                 vSumZ = 0;
 
                 // Grab the bind pose vertex Vbp from _bindPoseData
-                bindVerts.get(vecStore, 0, 3);
-                bindVX = vecStore[0];
-                bindVY = vecStore[1];
-                bindVZ = vecStore[2];
+                bindVX = bindVerts.get();
+                bindVY = bindVerts.get();
+                bindVZ = bindVerts.get();
 
                 // See if we should do the corresponding normal as well
                 if (bindNorms != null) {
@@ -403,10 +400,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                     nSumZ = 0;
 
                     // Grab the bind pose norm Nbp from _bindPoseData
-                    bindNorms.get(vecStore, 0, 3);
-                    bindNX = vecStore[0];
-                    bindNY = vecStore[1];
-                    bindNZ = vecStore[2];
+                    bindNX = bindNorms.get();
+                    bindNY = bindNorms.get();
+                    bindNZ = bindNorms.get();
                 }
 
                 // for each joint where the weight != 0
@@ -450,16 +446,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                 }
 
                 // Store sum into _meshData
-                vecStore[0] = vSumX;
-                vecStore[1] = vSumY;
-                vecStore[2] = vSumZ;
-                storeVerts.put(vecStore);
+                storeVerts.put((float) vSumX).put((float) vSumY).put((float) vSumZ);
 
                 if (bindNorms != null) {
-                    vecStore[0] = nSumX;
-                    vecStore[1] = nSumY;
-                    vecStore[2] = nSumZ;
-                    storeNorms.put(vecStore);
+                    storeNorms.put((float) nSumX).put((float) nSumY).put((float) nSumZ);
                 }
             }
 
