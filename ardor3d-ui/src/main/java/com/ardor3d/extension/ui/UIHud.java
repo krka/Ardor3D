@@ -53,6 +53,7 @@ import com.google.common.collect.Lists;
  */
 public class UIHud extends Node {
     private static final Logger _logger = Logger.getLogger(UIHud.class.getName());
+    private static final int MOUSE_CLICK_SENSITIVITY = 5;
 
     /**
      * The logical layer used by this UI to receive input events.
@@ -100,6 +101,9 @@ public class UIHud extends Node {
      * List of hud listeners.
      */
     private final List<HudListener> _hudListeners = Lists.newArrayList();
+    private UIComponent mousePressedComponent;
+    private int mousePressedX;
+    private int mousePressedY;
 
     /**
      * An optional mouseManager, required in order to test mouse is grabbed.
@@ -572,6 +576,10 @@ public class UIHud extends Node {
 
         setFocusedComponent(over);
 
+        mousePressedComponent = over;
+        mousePressedX = mouseX;
+        mousePressedY = mouseY;
+
         if (over == null) {
             return false;
         } else {
@@ -613,15 +621,22 @@ public class UIHud extends Node {
     public boolean fireMouseButtonReleased(final MouseButton button, final InputState currentIS) {
         boolean consumed = false;
         final int mouseX = currentIS.getMouseState().getX(), mouseY = currentIS.getMouseState().getY();
-        final UIComponent over = getUIComponent(mouseX, mouseY);
 
         // if we're over a pickable component, send it the mouse release
-        if (over != null) {
-            consumed |= over.mouseReleased(button, currentIS);
+        UIComponent component = mousePressedComponent;
+        mousePressedComponent = null;
+
+        if (component != null) {
+            consumed |= component.mouseReleased(button, currentIS);
+
+            int distance = Math.abs(mouseX - mousePressedX) + Math.abs(mouseY - mousePressedY);
+            if (distance < MOUSE_CLICK_SENSITIVITY) {
+                component.mouseClicked(button, currentIS);
+            }
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(over, mouseX, mouseY);
+            _dragListener.endDrag(component, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }
