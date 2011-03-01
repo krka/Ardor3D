@@ -22,10 +22,12 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.logical.BasicTriggersApplier;
@@ -68,6 +70,11 @@ public class UIHud extends Node {
      */
     private boolean _inputConsumed;
 
+    /**
+     * Flag used to determine if we should use mouse input when mouse is grabbed. Defaults to true.
+     */
+    private boolean _ignoreMouseInputOnGrabbed = true;
+
     /** Which button is used for drag operations. Defaults to LEFT. */
     private MouseButton _dragButton = MouseButton.LEFT;
 
@@ -93,6 +100,11 @@ public class UIHud extends Node {
      * List of hud listeners.
      */
     private final List<HudListener> _hudListeners = Lists.newArrayList();
+
+    /**
+     * An optional mouseManager, required in order to test mouse is grabbed.
+     */
+    private MouseManager _mouseManager;
 
     /**
      * Construct a new UIHud
@@ -377,6 +389,39 @@ public class UIHud extends Node {
     }
 
     /**
+     * @return true if we should ignore (only forward) mouse input when the mouse is set to grabbed. If true, requires
+     *         mouse manager to be set or this param is ignored.
+     */
+    public boolean isIgnoreMouseInputOnGrabbed() {
+        return _ignoreMouseInputOnGrabbed;
+    }
+
+    /**
+     * @param mouseInputOnGrabbed
+     *            true if we should ignore (only forward) mouse input when the mouse is set to grabbed. If true,
+     *            requires mouse manager to be set or this param is ignored.
+     * @see #setMouseManager(MouseManager)
+     */
+    public void setIgnoreMouseInputOnGrabbed(final boolean mouseInputOnGrabbed) {
+        _ignoreMouseInputOnGrabbed = mouseInputOnGrabbed;
+    }
+
+    /**
+     * @return a MouseManager used to test if mouse is grabbed, or null if none was set.
+     */
+    public MouseManager getMouseManager() {
+        return _mouseManager;
+    }
+
+    /**
+     * @param manager
+     *            a MouseManager used to test if mouse is grabbed.
+     */
+    public void setMouseManager(final MouseManager manager) {
+        _mouseManager = manager;
+    }
+
+    /**
      * Convenience method for setting up the UI's connection to the Ardor3D input system, along with a forwarding
      * address for input events that the UI does not care about.
      * 
@@ -437,7 +482,8 @@ public class UIHud extends Node {
         final InputState current = inputStates.getCurrent();
 
         // Mouse checks.
-        {
+        if (!isIgnoreMouseInputOnGrabbed() || _mouseManager == null
+                || _mouseManager.getGrabbed() != GrabbedState.GRABBED) {
             final MouseState previousMState = inputStates.getPrevious().getMouseState();
             final MouseState currentMState = current.getMouseState();
             if (previousMState != currentMState) {

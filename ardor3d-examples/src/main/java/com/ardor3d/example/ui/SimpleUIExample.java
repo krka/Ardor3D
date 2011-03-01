@@ -152,6 +152,7 @@ public class SimpleUIExample extends ExampleBase {
         hud = new UIHud();
         hud.add(frame);
         hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setMouseManager(_mouseManager);
     }
 
     private UIPanel makeLoginPanel() {

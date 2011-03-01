@@ -224,6 +224,7 @@ public class NewDynamicSmokerExample extends ExampleBase {
         // setup hud
         hud = new UIHud();
         hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setMouseManager(_mouseManager);
 
         final UIFrame frame = new UIFrame("Controls", EnumSet.noneOf(FrameButtons.class));
         frame.setResizeable(false);
