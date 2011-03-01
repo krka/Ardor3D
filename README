@@ -6,10 +6,14 @@ Add this to .git/config
 
 
 To sync with ardor:
+
+git checkout master
 git svn fetch
 git svn rebase
 git pull
 git push
-
-
+git checkout fearless
+git pull
+git merge master # resolve any conflicts
+git push
 
