@@ -22,10 +22,12 @@ import com.ardor3d.extension.ui.event.DragListener;
 import com.ardor3d.extension.ui.util.HudListener;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.ButtonState;
+import com.ardor3d.input.GrabbedState;
 import com.ardor3d.input.InputState;
 import com.ardor3d.input.Key;
 import com.ardor3d.input.KeyboardState;
 import com.ardor3d.input.MouseButton;
+import com.ardor3d.input.MouseManager;
 import com.ardor3d.input.MouseState;
 import com.ardor3d.input.PhysicalLayer;
 import com.ardor3d.input.logical.BasicTriggersApplier;
@@ -51,7 +53,6 @@ import com.google.common.collect.Lists;
  */
 public class UIHud extends Node {
     private static final Logger _logger = Logger.getLogger(UIHud.class.getName());
-    private static final int MOUSE_CLICK_SENSITIVITY = 5;
 
     /**
      * The logical layer used by this UI to receive input events.
@@ -68,6 +69,11 @@ public class UIHud extends Node {
      * forward the event to the next LogicalLayer.
      */
     private boolean _inputConsumed;
+
+    /**
+     * Flag used to determine if we should use mouse input when mouse is grabbed. Defaults to true.
+     */
+    private boolean _ignoreMouseInputOnGrabbed = true;
 
     /** Which button is used for drag operations. Defaults to LEFT. */
     private MouseButton _dragButton = MouseButton.LEFT;
@@ -94,9 +100,11 @@ public class UIHud extends Node {
      * List of hud listeners.
      */
     private final List<HudListener> _hudListeners = Lists.newArrayList();
-    private UIComponent mousePressedComponent;
-    private int mousePressedX;
-    private int mousePressedY;
+
+    /**
+     * An optional mouseManager, required in order to test mouse is grabbed.
+     */
+    private MouseManager _mouseManager;
 
     /**
      * Construct a new UIHud
@@ -381,6 +389,39 @@ public class UIHud extends Node {
     }
 
     /**
+     * @return true if we should ignore (only forward) mouse input when the mouse is set to grabbed. If true, requires
+     *         mouse manager to be set or this param is ignored.
+     */
+    public boolean isIgnoreMouseInputOnGrabbed() {
+        return _ignoreMouseInputOnGrabbed;
+    }
+
+    /**
+     * @param mouseInputOnGrabbed
+     *            true if we should ignore (only forward) mouse input when the mouse is set to grabbed. If true,
+     *            requires mouse manager to be set or this param is ignored.
+     * @see #setMouseManager(MouseManager)
+     */
+    public void setIgnoreMouseInputOnGrabbed(final boolean mouseInputOnGrabbed) {
+        _ignoreMouseInputOnGrabbed = mouseInputOnGrabbed;
+    }
+
+    /**
+     * @return a MouseManager used to test if mouse is grabbed, or null if none was set.
+     */
+    public MouseManager getMouseManager() {
+        return _mouseManager;
+    }
+
+    /**
+     * @param manager
+     *            a MouseManager used to test if mouse is grabbed.
+     */
+    public void setMouseManager(final MouseManager manager) {
+        _mouseManager = manager;
+    }
+
+    /**
      * Convenience method for setting up the UI's connection to the Ardor3D input system, along with a forwarding
      * address for input events that the UI does not care about.
      * 
@@ -441,7 +482,8 @@ public class UIHud extends Node {
         final InputState current = inputStates.getCurrent();
 
         // Mouse checks.
-        {
+        if (!isIgnoreMouseInputOnGrabbed() || _mouseManager == null
+                || _mouseManager.getGrabbed() != GrabbedState.GRABBED) {
             final MouseState previousMState = inputStates.getPrevious().getMouseState();
             final MouseState currentMState = current.getMouseState();
             if (previousMState != currentMState) {
@@ -530,10 +572,6 @@ public class UIHud extends Node {
 
         setFocusedComponent(over);
 
-        mousePressedComponent = over;
-        mousePressedX = mouseX;
-        mousePressedY = mouseY;
-
         if (over == null) {
             return false;
         } else {
@@ -548,8 +586,7 @@ public class UIHud extends Node {
             }
 
             if (listener.isDragHandle(over, mouseX, mouseY)) {
-					_dragButton = button;
-                listener.startDrag(button, mouseX, mouseY);
+                listener.startDrag(mouseX, mouseY);
                 _dragListener = listener;
                 consumed = true;
                 break;
@@ -576,22 +613,15 @@ public class UIHud extends Node {
     public boolean fireMouseButtonReleased(final MouseButton button, final InputState currentIS) {
         boolean consumed = false;
         final int mouseX = currentIS.getMouseState().getX(), mouseY = currentIS.getMouseState().getY();
+        final UIComponent over = getUIComponent(mouseX, mouseY);
 
         // if we're over a pickable component, send it the mouse release
-        UIComponent component = mousePressedComponent;
-        mousePressedComponent = null;
-
-        if (component != null) {
-            consumed |= component.mouseReleased(button, currentIS);
-
-            int distance = Math.abs(mouseX - mousePressedX) + Math.abs(mouseY - mousePressedY);
-            if (distance < MOUSE_CLICK_SENSITIVITY) {
-                component.mouseClicked(button, currentIS);
-            }
+        if (over != null) {
+            consumed |= over.mouseReleased(button, currentIS);
         }
 
         if (button == _dragButton && _dragListener != null) {
-            _dragListener.endDrag(button, component, mouseX, mouseY);
+            _dragListener.endDrag(over, mouseX, mouseY);
             _dragListener = null;
             consumed = true;
         }
@@ -617,7 +647,7 @@ public class UIHud extends Node {
         // Check for drag movements.
         if (currentIS.getMouseState().getButtonState(_dragButton) == ButtonState.DOWN) {
             if (_dragListener != null) {
-                _dragListener.drag(_dragButton, mouseX, mouseY);
+                _dragListener.drag(mouseX, mouseY);
                 return true;
             }
         }
@@ -734,3 +764,4 @@ public class UIHud extends Node {
         }
     }
 }
+

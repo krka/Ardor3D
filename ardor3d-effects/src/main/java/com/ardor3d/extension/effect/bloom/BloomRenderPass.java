@@ -95,7 +95,8 @@ public class BloomRenderPass extends Pass {
     /**
      * Release pbuffers in TextureRenderer's. Preferably called from user cleanup method.
      */
-    public void cleanup() {
+    @Override
+    public void cleanUp() {
         super.cleanUp();
         if (tRenderer != null) {
             tRenderer.cleanup();
@@ -245,6 +246,8 @@ public class BloomRenderPass extends Pass {
     private void doInit(final Renderer r) {
         initialized = true;
 
+        cleanUp();
+
         // Test for glsl support
         final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
         if (!caps.isGLSLSupported() || !(caps.isPbufferSupported() || caps.isFBOSupported())) {
@@ -303,8 +306,8 @@ public class BloomRenderPass extends Pass {
         // Create blur shader horizontal
         blurShaderHorizontal = new GLSLShaderObjectsState();
         try {
-            blurShaderHorizontal.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_blur.vert"));
+            blurShaderHorizontal.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    BloomRenderPass.class, shaderDirectory + "bloom_blur.vert"));
             blurShaderHorizontal.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
                     BloomRenderPass.class, shaderDirectory + "bloom_blur_horizontal7.frag"));
         } catch (final IOException ex) {
@@ -317,8 +320,8 @@ public class BloomRenderPass extends Pass {
         try {
             blurShaderVertical.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
                     shaderDirectory + "bloom_blur.vert"));
-            blurShaderVertical.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(BloomRenderPass.class,
-                    shaderDirectory + "bloom_blur_vertical7.frag"));
+            blurShaderVertical.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                    BloomRenderPass.class, shaderDirectory + "bloom_blur_vertical7.frag"));
         } catch (final IOException ex) {
             logger.logp(Level.SEVERE, getClass().getName(), "init(Renderer)", "Could not load shaders.", ex);
         }
@@ -429,5 +432,9 @@ public class BloomRenderPass extends Pass {
 
     public boolean isUseSeparateConvolution() {
         return useSeparateConvolution;
+    }
+
+    public void markNeedsRefresh() {
+        initialized = false;
     }
 }

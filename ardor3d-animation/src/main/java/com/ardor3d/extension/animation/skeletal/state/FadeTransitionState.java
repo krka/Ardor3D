@@ -50,7 +50,11 @@ public class FadeTransitionState extends AbstractTwoStateLerpTransition {
         super.update(globalTime, layer);
 
         // update both of our states
-        getStateA().update(globalTime, layer);
-        getStateB().update(globalTime, layer);
+        if (getStateA() != null) {
+            getStateA().update(globalTime, layer);
+        }
+        if (getStateB() != null) {
+            getStateB().update(globalTime, layer);
+        }
     }
 }

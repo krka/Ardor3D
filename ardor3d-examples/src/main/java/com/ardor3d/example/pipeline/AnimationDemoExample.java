@@ -38,11 +38,11 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
@@ -130,11 +130,12 @@ public class AnimationDemoExample extends ExampleBase {
     private void createHUD() {
         hud = new UIHud();
         hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setMouseManager(_mouseManager);
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5,
-                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
+                - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -421,8 +422,8 @@ public class AnimationDemoExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
-                        boundingBox.getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
+                        .getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);

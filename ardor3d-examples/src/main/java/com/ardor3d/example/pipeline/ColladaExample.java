@@ -121,6 +121,7 @@ public class ColladaExample extends ExampleBase {
 
         hud = new UIHud();
         hud.setupInput(_canvas, _physicalLayer, _logicalLayer);
+        hud.setMouseManager(_mouseManager);
 
         // Add fps display
         frameRateLabel = new UILabel("X");

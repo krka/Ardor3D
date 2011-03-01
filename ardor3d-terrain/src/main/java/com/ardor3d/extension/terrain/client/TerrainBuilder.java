@@ -29,6 +29,8 @@ public class TerrainBuilder {
     private int clipmapTextureCount = 20;
     private int clipmapTextureSize = 128;
 
+    private int mapId = -1;
+
     private boolean showDebugPanels = false;
 
     private final List<TextureSource> extraTextureSources = Lists.newArrayList();
@@ -44,12 +46,24 @@ public class TerrainBuilder {
 
     public Terrain build() throws Exception {
         final Map<Integer, String> availableMaps = terrainDataProvider.getAvailableMaps();
-        final int mapId = availableMaps.keySet().iterator().next();
+        if (availableMaps.isEmpty()) {
+            throw new Exception("No available maps found on this terrain provider.");
+        }
 
-        final TerrainSource terrainSource = terrainDataProvider.getTerrainSource(mapId);
+        int selectedMapId = 0;
+        if (mapId < 0) {
+            selectedMapId = availableMaps.keySet().iterator().next();
+        } else {
+            if (!availableMaps.containsKey(mapId)) {
+                throw new IllegalArgumentException(mapId + " is not a valid terrain ID on this terrain provider.");
+            }
+            selectedMapId = mapId;
+        }
+
+        final TerrainSource terrainSource = terrainDataProvider.getTerrainSource(selectedMapId);
         final Terrain terrain = buildTerrainSystem(terrainSource);
 
-        final TextureSource textureSource = terrainDataProvider.getTextureSource(mapId);
+        final TextureSource textureSource = terrainDataProvider.getTextureSource(selectedMapId);
         if (textureSource != null) {
             terrain.addTextureClipmap(buildTextureSystem(textureSource));
 
@@ -180,6 +194,11 @@ public class TerrainBuilder {
 
     public TerrainBuilder setShowDebugPanels(final boolean showDebugPanels) {
         this.showDebugPanels = showDebugPanels;
+        return this;
+    }
+
+    public TerrainBuilder setMapId(final int mapId) {
+        this.mapId = mapId;
         return this;
     }
 }
