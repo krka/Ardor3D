@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -12,11 +12,13 @@ package com.ardor3d.extension.ui.skin;
 
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
+import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPasswordField;
+import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
 import com.ardor3d.extension.ui.UISlider;
@@ -58,6 +60,8 @@ public abstract class Skin {
         // 4. PANEL TYPES
         else if (component instanceof UIProgressBar) {
             applyToProgressBar((UIProgressBar) component);
+        } else if (component instanceof UIComboBox) {
+            applyToComboBox((UIComboBox) component);
         } else if (component instanceof UIPanel) {
             applyToPanel((UIPanel) component);
         }
@@ -65,6 +69,8 @@ public abstract class Skin {
         // 5. FRAME TYPES
         else if (component instanceof UITooltip) {
             applyToTooltip((UITooltip) component);
+        } else if (component instanceof UIPopupMenu) {
+            applyToPopupMenu((UIPopupMenu) component);
         } else if (component instanceof UIFrame) {
             applyToFrame((UIFrame) component);
         }
@@ -100,4 +106,8 @@ public abstract class Skin {
     protected abstract void applyToProgressBar(UIProgressBar component);
 
     protected abstract void applyToSlider(UISlider component);
+
+    protected abstract void applyToPopupMenu(UIPopupMenu component);
+
+    protected abstract void applyToComboBox(UIComboBox component);
 }
