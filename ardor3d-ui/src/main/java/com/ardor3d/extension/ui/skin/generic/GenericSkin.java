@@ -25,6 +25,7 @@ import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIScrollBar;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UISliderKnob;
 import com.ardor3d.extension.ui.UIState;
@@ -41,6 +42,7 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.ImageBorder;
 import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
+import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.skin.Skin;
 import com.ardor3d.extension.ui.skin.SkinningTask;
 import com.ardor3d.extension.ui.util.Alignment;
@@ -852,6 +854,70 @@ public class GenericSkin extends Skin {
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    protected void applyToScrollBar(final UIScrollBar component) {
+        final SolidBorder border = new SolidBorder(1, 1, 1, 1);
+        border.setColor(new ColorRGBA(165 / 255f, 165 / 255f, 165 / 255f, 1f));
+        component.setMargin(new Insets());
+        component.setPadding(new Insets());
+        component.setBorder(border);
+        {
+            final UIButton button = component.getBtTopLeft();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            if (component.getOrientation() == Orientation.Horizontal) {
+                button.setButtonIcon(new SubTex(_sharedTex, 130, 121, 16, 15));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 130, 137, 16, 15));
+            } else {
+                button.setButtonIcon(new SubTex(_sharedTex, 97, 120, 15, 16));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 120, 15, 16));
+            }
+        }
+        {
+            final UIButton button = component.getBtBottomRight();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            if (component.getOrientation() == Orientation.Horizontal) {
+                button.setButtonIcon(new SubTex(_sharedTex, 147, 121, 16, 15));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 147, 137, 16, 15));
+            } else {
+                button.setButtonIcon(new SubTex(_sharedTex, 97, 137, 15, 16));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 137, 15, 16));
+            }
+        }
+        {
+            final UISlider slider = component.getSlider();
+            slider.getBackPanel().setBorder(new EmptyBorder());
+            slider.setMargin(new Insets());
+            slider.setPadding(new Insets());
+            slider.getBackPanel().setLayout(new RowLayout(false));
+
+            final UISliderKnob knob = slider.getKnob();
+            knob.getKnobLabel().setIcon(null);
+            knob.setPadding(new Insets(0, 0, 0, 0));
+            knob.setMargin(new Insets());
+            final ColorRGBA colorTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
+            final ColorRGBA colorBtm = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
+            final GradientBackdrop knobColor = new GradientBackdrop(colorTop, colorTop, colorBtm, colorBtm);
+            knob.getKnobLabel().setBackdrop(knobColor);
+            knob.getKnobLabel().setBorder(border);
         }
     }
 }
