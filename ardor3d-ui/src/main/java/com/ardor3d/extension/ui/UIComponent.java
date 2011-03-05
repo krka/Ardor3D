@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -82,9 +82,9 @@ public abstract class UIComponent extends Node implements UIKeyHandler {
     private ColorRGBA _foregroundColor = null;
 
     /** Text to display using UITooltip when hovered over. Inherited from parent if null. */
-    private String _tooltipText = null;
+    protected String _tooltipText = null;
     /** The amount of time (in ms) before we should show the tooltip on this component. */
-    private int _tooltipPopTime = 1000;
+    protected int _tooltipPopTime = 1000;
 
     /** The default font family (Vera) used when font family field and all parents font fields are null. */
     private static String _defaultFontFamily = "Vera";

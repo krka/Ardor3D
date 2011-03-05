@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -13,6 +13,7 @@ package com.ardor3d.extension.ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -105,6 +106,11 @@ public class UIHud extends Node {
      * An optional mouseManager, required in order to test mouse is grabbed.
      */
     private MouseManager _mouseManager;
+
+    /**
+     * The list of currently displayed popup menus, with each entry being a submenu of the one previous.
+     */
+    private final List<UIPopupMenu> _popupMenus = Lists.newArrayList();
 
     /**
      * Construct a new UIHud
@@ -221,8 +227,14 @@ public class UIHud extends Node {
      * @return the picked component or null if nothing pickable was found at the given coordinates.
      */
     public UIComponent getUIComponent(final int x, final int y) {
-        UIComponent ret = null;
         UIComponent found = null;
+        for (int i = _popupMenus.size(); --i >= 0;) {
+            final UIPopupMenu menu = _popupMenus.get(i);
+            found = menu.getUIComponent(x, y);
+            if (found != null) {
+                return found;
+            }
+        }
 
         for (int i = getNumberOfChildren(); --i >= 0;) {
             final Spatial s = getChild(i);
@@ -232,10 +244,9 @@ public class UIHud extends Node {
                     continue;
                 }
 
-                ret = comp.getUIComponent(x, y);
+                found = comp.getUIComponent(x, y);
 
-                if (ret != null) {
-                    found = ret;
+                if (found != null) {
                     break;
                 }
             }
@@ -302,10 +313,16 @@ public class UIHud extends Node {
         r.setOrtho();
         try {
             Spatial child;
-            for (int i = 0, max = getNumberOfChildren(); i < max; i++) {
+            int i, max;
+            for (i = 0, max = getNumberOfChildren(); i < max; i++) {
                 child = getChild(i);
                 if (child != null) {
                     child.onDraw(r);
+                }
+            }
+            if (!_popupMenus.isEmpty()) {
+                for (i = 0, max = _popupMenus.size(); i < max; i++) {
+                    _popupMenus.get(i).onDraw(r);
                 }
             }
             if (_ttip != null && _ttip.isVisible()) {
@@ -318,6 +335,19 @@ public class UIHud extends Node {
                 r.unsetOrtho();
             }
             r.clearClips();
+        }
+    }
+
+    @Override
+    public void updateGeometricState(final double time, final boolean initiator) {
+        super.updateGeometricState(time, initiator);
+        if (!_popupMenus.isEmpty()) {
+            for (int i = 0, max = _popupMenus.size(); i < max; i++) {
+                _popupMenus.get(i).updateGeometricState(time, true);
+            }
+        }
+        if (_ttip != null && _ttip.isVisible()) {
+            _ttip.updateGeometricState(time, true);
         }
     }
 
@@ -573,6 +603,7 @@ public class UIHud extends Node {
         setFocusedComponent(over);
 
         if (over == null) {
+            closePopupMenus();
             return false;
         } else {
             consumed |= over.mousePressed(button, currentIS);
@@ -595,8 +626,9 @@ public class UIHud extends Node {
 
         // bring any clicked components to front
         final UIComponent component = over.getTopLevelComponent();
-        if (component != null) {
+        if (component != null && !(component instanceof UIPopupMenu)) {
             bringToFront(component);
+            closePopupMenus();
         }
         return consumed;
     }
@@ -762,5 +794,41 @@ public class UIHud extends Node {
         } else {
             return 1;
         }
+    }
+
+    public void closePopupMenus() {
+        for (final UIPopupMenu menu : _popupMenus) {
+            menu.close();
+        }
+        _popupMenus.clear();
+    }
+
+    public void closePopupMenusAfter(final Object parent) {
+        if (parent == this) {
+            closePopupMenus();
+            return;
+        }
+
+        boolean found = false;
+        for (final Iterator<UIPopupMenu> it = _popupMenus.iterator(); it.hasNext();) {
+            final UIPopupMenu pMenu = it.next();
+            if (found) {
+                pMenu.close();
+                it.remove();
+            } else if (pMenu == parent) {
+                found = true;
+            }
+        }
+    }
+
+    public void showPopupMenu(final UIPopupMenu menu) {
+        closePopupMenus();
+        _popupMenus.add(menu);
+        menu.setHud(this);
+    }
+
+    public void showSubPopupMenu(final UIPopupMenu menu) {
+        _popupMenus.add(menu);
+        menu.setHud(this);
     }
 }
