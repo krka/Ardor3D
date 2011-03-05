@@ -16,6 +16,7 @@ import com.ardor3d.example.Purpose;
 import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
+import com.ardor3d.extension.ui.UIComboBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIHud;
@@ -33,11 +34,13 @@ import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
 import com.ardor3d.extension.ui.backdrop.MultiImageBackdrop;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
+import com.ardor3d.extension.ui.event.SelectionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.extension.ui.layout.GridLayout;
 import com.ardor3d.extension.ui.layout.GridLayoutData;
 import com.ardor3d.extension.ui.layout.RowLayout;
+import com.ardor3d.extension.ui.model.DefaultComboBoxModel;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.ButtonGroup;
 import com.ardor3d.extension.ui.util.Dimension;
@@ -274,6 +277,16 @@ public class SimpleUIExample extends ExampleBase {
         });
         centerPanel.add(slider);
         centerPanel.add(lSliderValue);
+
+        final UIComboBox combo = new UIComboBox(new DefaultComboBoxModel("alpha", "beta", "gamma", "delta"));
+        combo.setLocalComponentWidth(120);
+        combo.addSelectionListener(new SelectionListener<UIComboBox>() {
+            @Override
+            public void selectionChanged(final UIComboBox component, final Object newValue) {
+                System.out.println("New combo value: " + newValue);
+            }
+        });
+        centerPanel.add(combo);
 
         final UIProgressBar bar = new UIProgressBar("Loading: ", true);
         bar.setPercentFilled(0);

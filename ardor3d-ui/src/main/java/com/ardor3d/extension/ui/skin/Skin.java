@@ -21,6 +21,7 @@ import com.ardor3d.extension.ui.UIPasswordField;
 import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIScrollBar;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UITab;
 import com.ardor3d.extension.ui.UITextArea;
@@ -62,6 +63,8 @@ public abstract class Skin {
             applyToProgressBar((UIProgressBar) component);
         } else if (component instanceof UIComboBox) {
             applyToComboBox((UIComboBox) component);
+        } else if (component instanceof UIScrollBar) {
+            applyToScrollBar((UIScrollBar) component);
         } else if (component instanceof UIPanel) {
             applyToPanel((UIPanel) component);
         }
@@ -110,4 +113,6 @@ public abstract class Skin {
     protected abstract void applyToPopupMenu(UIPopupMenu component);
 
     protected abstract void applyToComboBox(UIComboBox component);
+
+    protected abstract void applyToScrollBar(UIScrollBar component);
 }
