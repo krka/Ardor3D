@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
+import com.ardor3d.extension.ui.event.FrameDragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
@@ -45,7 +46,7 @@ public class UIFrame extends UIContainer {
     private boolean _decorated = true;
 
     /** The drag listener responsible for allowing repositioning of the frame by dragging the title label. */
-    private FrameDragListener _dragListener = new FrameDragListener();
+    private DragListener _dragListener = new FrameDragListener(this);
 
     /** If true, show a resize handle on this frame and allow its use. */
     private boolean _resizeable = true;
@@ -411,7 +412,7 @@ public class UIFrame extends UIContainer {
      * @param listener
      *            the drag listener. Must not be null.
      */
-    public void setDragListener(final FrameDragListener listener) {
+    public void setDragListener(final DragListener listener) {
         assert listener != null : "listener must not be null";
         if (isAttachedToHUD()) {
             getHud().removeDragListener(_dragListener);
@@ -419,54 +420,6 @@ public class UIFrame extends UIContainer {
         _dragListener = listener;
         if (isAttachedToHUD()) {
             getHud().addDragListener(_dragListener);
-        }
-    }
-
-    /**
-     * The drag listener responsible for allowing a frame to be moved around the screen with the mouse.
-     */
-    private final class FrameDragListener implements DragListener {
-        int oldX = 0;
-        int oldY = 0;
-
-        public void startDrag(final int mouseX, final int mouseY) {
-            oldX = mouseX;
-            oldY = mouseY;
-        }
-
-        public void drag(final int mouseX, final int mouseY) {
-            if (!isDraggable()) {
-                return;
-            }
-            // check if we are off the edge... if so, flag for redraw (part of the frame may have been hidden)
-            if (!smallerThanWindow()) {
-                fireComponentDirty();
-            }
-
-            addTranslation(mouseX - oldX, mouseY - oldY, 0);
-            oldX = mouseX;
-            oldY = mouseY;
-
-            // check if we are off the edge now... if so, flag for redraw (part of the frame may have been hidden)
-            if (!smallerThanWindow()) {
-                fireComponentDirty();
-            }
-        }
-
-        /**
-         * @return true if this frame can be fully contained by the hud.
-         */
-        public boolean smallerThanWindow() {
-            final int dispWidth = getHud().getWidth();
-            final int dispHeight = getHud().getHeight();
-            final Rectangle2 rect = getRelativeComponentBounds(null);
-            return rect.getWidth() <= dispWidth && rect.getHeight() <= dispHeight;
-        }
-
-        public void endDrag(final UIComponent component, final int mouseX, final int mouseY) {}
-
-        public boolean isDragHandle(final UIComponent component, final int mouseX, final int mouseY) {
-            return component == _titleBar.getTitleLabel();
         }
     }
 
