@@ -39,9 +39,9 @@ public abstract class JoglOffsetStateUtil {
             setOffset(state.getFactor(), state.getUnits(), record);
         } else {
             // disable all offset types
-            setOffsetEnabled(OffsetType.Fill, state.isTypeEnabled(OffsetType.Fill), record);
-            setOffsetEnabled(OffsetType.Line, state.isTypeEnabled(OffsetType.Line), record);
-            setOffsetEnabled(OffsetType.Point, state.isTypeEnabled(OffsetType.Point), record);
+            setOffsetEnabled(OffsetType.Fill, false, record);
+            setOffsetEnabled(OffsetType.Line, false, record);
+            setOffsetEnabled(OffsetType.Point, false, record);
 
             // set factor and units to default 0, 0.
             setOffset(0, 0, record);
