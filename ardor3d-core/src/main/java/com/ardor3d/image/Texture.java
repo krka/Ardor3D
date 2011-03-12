@@ -1336,7 +1336,7 @@ public abstract class Texture implements Savable {
         rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
         rVal.setApply(_apply);
         rVal.setConstantColor(_constantColor);
-        rVal.setBorderColor(_constantColor);
+        rVal.setBorderColor(_borderColor);
         rVal.setCombineFuncAlpha(_combineFuncAlpha);
         rVal.setCombineFuncRGB(_combineFuncRGB);
         rVal.setCombineOp0Alpha(_combineOp0Alpha);
