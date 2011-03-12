@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.FragmentProgramState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.FragmentProgramStateRecord;
@@ -58,7 +57,7 @@ public final class LwjglFragmentProgramStateUtil {
         return buf.get(0);
     }
 
-    public static void apply(final LwjglRenderer renderer, final FragmentProgramState state) {
+    public static void apply(final FragmentProgramState state) {
         final RenderContext context = ContextManager.getCurrentContext();
         if (context.getCapabilities().isFragmentProgramSupported()) {
             final FragmentProgramStateRecord record = (FragmentProgramStateRecord) context
@@ -95,8 +94,8 @@ public final class LwjglFragmentProgramStateUtil {
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
                                 ARBProgram.glProgramLocalParameter4fARB(ARBFragmentProgram.GL_FRAGMENT_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1], state
-                                                ._getParameters()[i][2], state._getParameters()[i][3]);
+                                        state._getParameters()[i][0], state._getParameters()[i][1],
+                                        state._getParameters()[i][2], state._getParameters()[i][3]);
                             }
                         }
                     }

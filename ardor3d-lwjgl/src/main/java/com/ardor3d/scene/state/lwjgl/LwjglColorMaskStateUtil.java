@@ -14,14 +14,13 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.ColorMaskState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ColorMaskStateRecord;
 
 public abstract class LwjglColorMaskStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final ColorMaskState state) {
+    public static void apply(final ColorMaskState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final ColorMaskStateRecord record = (ColorMaskStateRecord) context.getStateRecord(StateType.ColorMask);
