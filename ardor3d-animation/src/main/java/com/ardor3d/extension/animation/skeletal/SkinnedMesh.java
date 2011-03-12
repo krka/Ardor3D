@@ -242,7 +242,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
             _currentPose.removePoseListener(this);
         }
         _currentPose = currentPose;
-        _currentPose.addPoseListener(this);
+        if (_currentPose != null) {
+            _currentPose.addPoseListener(this);
+        }
     }
 
     /**
@@ -298,7 +300,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     protected void updateJointPaletteOnGPUShader() {
-        if (_gpuShader != null) {
+        if (_gpuShader != null && _currentPose != null) {
             _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
         }
     }
@@ -345,7 +347,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      * Apply skinning values for CPU skinning.
      */
     public void applyPose() {
-        if (!isUseGPU()) {
+        if (!isUseGPU() && _currentPose != null) {
             // Get a handle to the source and dest vertices buffers
             final FloatBuffer bindVerts = _bindPoseData.getVertexBuffer();
             FloatBuffer storeVerts = _meshData.getVertexBuffer();
