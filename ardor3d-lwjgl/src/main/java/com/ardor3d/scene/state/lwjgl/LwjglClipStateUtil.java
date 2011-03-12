@@ -15,14 +15,13 @@ import org.lwjgl.opengl.GL11;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.ClipState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ClipStateRecord;
 
 public abstract class LwjglClipStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final ClipState state) {
+    public static void apply(final ClipState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final ClipStateRecord record = (ClipStateRecord) context.getStateRecord(StateType.Clip);

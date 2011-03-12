@@ -14,15 +14,14 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ShadingState;
 import com.ardor3d.renderer.state.ShadingState.ShadingMode;
 import com.ardor3d.renderer.state.record.ShadingStateRecord;
 
 public abstract class LwjglShadingStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final ShadingState state) {
+    public static void apply(final ShadingState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final ShadingStateRecord record = (ShadingStateRecord) context.getStateRecord(StateType.Shading);

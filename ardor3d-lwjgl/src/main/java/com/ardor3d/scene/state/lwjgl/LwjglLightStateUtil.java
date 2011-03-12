@@ -24,7 +24,6 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.LightRecord;
@@ -32,7 +31,7 @@ import com.ardor3d.renderer.state.record.LightStateRecord;
 
 public abstract class LwjglLightStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final LightState state) {
+    public static void apply(final LightState state) {
         final RenderContext context = ContextManager.getCurrentContext();
         final LightStateRecord record = (LightStateRecord) context.getStateRecord(StateType.Light);
         context.setCurrentState(StateType.Light, state);

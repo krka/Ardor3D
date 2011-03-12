@@ -15,8 +15,8 @@ import org.lwjgl.opengl.GL11;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.record.WireframeStateRecord;
 
 public abstract class LwjglWireframeStateUtil {

@@ -17,16 +17,15 @@ import org.lwjgl.opengl.GL11;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.StencilState;
 import com.ardor3d.renderer.state.StencilState.StencilFunction;
 import com.ardor3d.renderer.state.StencilState.StencilOperation;
 import com.ardor3d.renderer.state.record.StencilStateRecord;
 
 public abstract class LwjglStencilStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final StencilState state) {
+    public static void apply(final StencilState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
@@ -38,25 +37,26 @@ public abstract class LwjglStencilStateUtil {
             if (state.isUseTwoSided() && caps.isTwoSidedStencilSupported()) {
                 EXTStencilTwoSide.glActiveStencilFaceEXT(GL11.GL_BACK);
                 applyMask(state.getStencilWriteMaskBack(), record, 2);
-                applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(), state
-                        .getStencilFuncMaskBack(), record, 2);
-                applyOp(getGLStencilOp(state.getStencilOpFailBack(), caps), getGLStencilOp(state
-                        .getStencilOpZFailBack(), caps), getGLStencilOp(state.getStencilOpZPassBack(), caps), record, 2);
+                applyFunc(getGLStencilFunction(state.getStencilFunctionBack()), state.getStencilReferenceBack(),
+                        state.getStencilFuncMaskBack(), record, 2);
+                applyOp(getGLStencilOp(state.getStencilOpFailBack(), caps),
+                        getGLStencilOp(state.getStencilOpZFailBack(), caps),
+                        getGLStencilOp(state.getStencilOpZPassBack(), caps), record, 2);
 
                 EXTStencilTwoSide.glActiveStencilFaceEXT(GL11.GL_FRONT);
                 applyMask(state.getStencilWriteMaskFront(), record, 1);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionFront()), state.getStencilReferenceFront(),
                         state.getStencilFuncMaskFront(), record, 1);
-                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps), getGLStencilOp(state
-                        .getStencilOpZFailFront(), caps), getGLStencilOp(state.getStencilOpZPassFront(), caps), record,
-                        1);
+                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZPassFront(), caps), record, 1);
             } else {
                 applyMask(state.getStencilWriteMaskFront(), record, 0);
                 applyFunc(getGLStencilFunction(state.getStencilFunctionFront()), state.getStencilReferenceFront(),
                         state.getStencilFuncMaskFront(), record, 0);
-                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps), getGLStencilOp(state
-                        .getStencilOpZFailFront(), caps), getGLStencilOp(state.getStencilOpZPassFront(), caps), record,
-                        0);
+                applyOp(getGLStencilOp(state.getStencilOpFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZFailFront(), caps),
+                        getGLStencilOp(state.getStencilOpZPassFront(), caps), record, 0);
             }
         }
 
