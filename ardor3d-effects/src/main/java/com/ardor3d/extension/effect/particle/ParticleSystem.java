@@ -920,11 +920,12 @@ public abstract class ParticleSystem extends Node {
             _originCenter.set(getWorldTranslation()).addLocal(_originOffset);
 
             setWorldTranslation(Vector3.ZERO);
-            setWorldRotation(Matrix3.IDENTITY);
-            markDirty(DirtyType.Transform);
         } else {
             _originCenter.set(_originOffset);
         }
+
+        setWorldRotation(Matrix3.IDENTITY);
+        markDirty(DirtyType.Transform);
     }
 
     @Override
