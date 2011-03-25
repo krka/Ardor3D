@@ -218,6 +218,7 @@ public class LwjglCanvas implements NativeCanvas, FocusWrapper {
         return Display.isCreated() && Display.isActive();
     }
 
+    @MainThread
     public boolean isClosing() {
         return Display.isCreated() && Display.isCloseRequested();
     }
