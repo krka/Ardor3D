@@ -53,7 +53,7 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     public void draw(final CountDownLatch latch) {
-        if (latch != null && _updated) {
+        if (!shouldDraw(latch)) {
             latch.countDown();
             return;
         }
@@ -62,6 +62,12 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
         _latch = latch;
         _updated = true;
         repaint();
+    }
+
+    private boolean shouldDraw(final CountDownLatch latch) {
+        final boolean showing = isShowing();
+        final boolean lastUpdateComplete = latch == null || !_updated;
+        return showing && lastUpdateComplete;
     }
 
     @Override
