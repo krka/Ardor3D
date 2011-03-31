@@ -49,4 +49,9 @@ public class FrozenTreeSource implements BlendTreeSource {
         _source.setTime(_time, manager);
         return true;
     }
+
+    @Override
+    public boolean isActive(final AnimationManager manager) {
+        return true;
+    }
 }

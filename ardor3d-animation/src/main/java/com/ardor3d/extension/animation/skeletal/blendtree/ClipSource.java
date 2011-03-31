@@ -102,4 +102,10 @@ public class ClipSource implements BlendTreeSource {
     public void resetClips(final AnimationManager manager, final double globalStartTime) {
         manager.resetClipInstance(_clip, globalStartTime);
     }
+
+    @Override
+    public boolean isActive(final AnimationManager manager) {
+        final AnimationClipInstance instance = manager.getClipInstance(_clip);
+        return instance.isActive() && _clip.getMaxTimeIndex() > 0;
+    }
 }

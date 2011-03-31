@@ -64,6 +64,14 @@ public abstract class AbstractFiniteState {
     public abstract void update(final double globalTime, final AnimationLayer layer);
 
     /**
+     * Post update. If the state has no more clips and no end transition, this will clear this state from the layer.
+     * 
+     * @param layer
+     *            the layer this state belongs to.
+     */
+    public abstract void postUpdate(final AnimationLayer layer);
+
+    /**
      * @return the current map of source channel data for this layer.
      */
     public abstract Map<String, ? extends Object> getCurrentSourceData(AnimationManager manager);
