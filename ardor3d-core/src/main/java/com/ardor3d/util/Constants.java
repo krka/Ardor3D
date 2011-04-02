@@ -36,7 +36,9 @@ public class Constants {
     static {
         boolean hasPropertyAccess = true;
         try {
-            System.getSecurityManager().checkPropertiesAccess();
+            if (System.getSecurityManager() != null) {
+                System.getSecurityManager().checkPropertiesAccess();
+            }
         } catch (final SecurityException e) {
             hasPropertyAccess = false;
         }
