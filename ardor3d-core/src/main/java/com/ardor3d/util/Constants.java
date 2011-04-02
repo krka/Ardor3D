@@ -17,20 +17,50 @@ public class Constants {
 
     public static boolean updateGraphs = false;
 
-    public static final boolean stats = (System.getProperty("ardor3d.stats") != null);
+    public static final boolean stats;
 
-    public static final boolean trackDirectMemory = (System.getProperty("ardor3d.trackDirect") != null);
+    public static final boolean trackDirectMemory;
 
-    public static final boolean useMultipleContexts = (System.getProperty("ardor3d.useMultipleContexts") != null);
+    public static final boolean useMultipleContexts;
 
-    public static final boolean useMathPools = (System.getProperty("ardor3d.noMathPools") == null);
+    public static final boolean useMathPools;
 
-    public static final boolean useFastMath = (System.getProperty("ardor3d.useFastMath") != null);
+    public static final boolean useFastMath;
 
-    public static final boolean storeSavableImages = (System.getProperty("ardor3d.storeSavableImages") != null);
+    public static final boolean storeSavableImages;
 
-    public static final int maxPoolSize = (System.getProperty("ardor3d.maxPoolSize") != null ? Integer.parseInt(System
-            .getProperty("ardor3d.maxPoolSize")) : 11);
+    public static final int maxPoolSize;
 
-    public static boolean useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
+    public static final boolean useValidatingTransform;
+
+    static {
+        boolean hasPropertyAccess = true;
+        try {
+            System.getSecurityManager().checkPropertiesAccess();
+        } catch (final SecurityException e) {
+            hasPropertyAccess = false;
+        }
+
+        if (hasPropertyAccess) {
+            stats = (System.getProperty("ardor3d.stats") != null);
+            trackDirectMemory = (System.getProperty("ardor3d.trackDirect") != null);
+            useMultipleContexts = (System.getProperty("ardor3d.useMultipleContexts") != null);
+            useMathPools = (System.getProperty("ardor3d.noMathPools") == null);
+            useFastMath = (System.getProperty("ardor3d.useFastMath") != null);
+            storeSavableImages = (System.getProperty("ardor3d.storeSavableImages") != null);
+            maxPoolSize = (System.getProperty("ardor3d.maxPoolSize") != null ? Integer.parseInt(System
+                    .getProperty("ardor3d.maxPoolSize")) : 11);
+
+            useValidatingTransform = (System.getProperty("ardor3d.disableValidatingTransform") == null);
+        } else {
+            stats = false;
+            trackDirectMemory = false;
+            useMultipleContexts = false;
+            useMathPools = true;
+            useFastMath = false;
+            storeSavableImages = false;
+            maxPoolSize = 11;
+            useValidatingTransform = true;
+        }
+    }
 }
