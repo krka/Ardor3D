@@ -21,19 +21,19 @@ public class ObjDataStore {
     private final List<Vector3> _generatedNormals = Lists.newArrayList();
     private final List<Vector3> _uvs = Lists.newArrayList();
 
-    List<Vector3> getVertices() {
+    public List<Vector3> getVertices() {
         return _vertices;
     }
 
-    List<Vector3> getNormals() {
+    public List<Vector3> getNormals() {
         return _normals;
     }
 
-    List<Vector3> getGeneratedNormals() {
+    public List<Vector3> getGeneratedNormals() {
         return _generatedNormals;
     }
 
-    List<Vector3> getUvs() {
+    public List<Vector3> getUvs() {
         return _uvs;
     }
 }
