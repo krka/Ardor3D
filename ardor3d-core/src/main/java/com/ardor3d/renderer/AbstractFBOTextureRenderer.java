@@ -270,7 +270,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
     }
 
     public void setMultipleTargets(final boolean multi) {
-    // ignore. Does not matter to FBO.
+        // ignore. Does not matter to FBO.
     }
 
     public void enforceState(final RenderState state) {

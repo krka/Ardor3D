@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -138,7 +137,7 @@ public interface TextureRenderer {
      * @param tex
      *            The texture to setup for use in Texture Rendering.
      */
-    void setupTexture(Texture2D tex);
+    void setupTexture(Texture tex);
 
     /**
      * <code>copyToTexture</code> copies the current frame buffer contents to the given Texture. What is copied is based
