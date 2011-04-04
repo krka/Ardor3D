@@ -235,6 +235,9 @@ public abstract class Texture implements Savable {
         Add;
     }
 
+    /**
+     * Formula to use for texture coordinate generation
+     */
     public enum EnvironmentalMapMode {
         /**
          * Use texture coordinates as they are. (Do not do texture coordinate generation.)

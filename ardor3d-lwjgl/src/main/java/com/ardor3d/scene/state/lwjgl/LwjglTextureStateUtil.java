@@ -1613,7 +1613,7 @@ public abstract class LwjglTextureStateUtil {
         }
     }
 
-    private static int getGLType(final Type type) {
+    public static int getGLType(final Type type) {
         switch (type) {
             case TwoDimensional:
                 return GL11.GL_TEXTURE_2D;
