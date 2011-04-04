@@ -21,7 +21,7 @@ public class TextureCubeMap extends Texture {
     private WrapMode _wrapT = WrapMode.Repeat;
     private WrapMode _wrapR = WrapMode.Repeat;
 
-    private Face _currentRTTFace = Face.PositiveX;
+    private transient Face _currentRTTFace = Face.PositiveX;
 
     /**
      * Face of the Cubemap as described by its directional offset from the origin.
@@ -116,10 +116,20 @@ public class TextureCubeMap extends Texture {
         throw new IllegalArgumentException("invalid WrapAxis: " + axis);
     }
 
+    /**
+     * Set the cubemap Face to use for the next Render To Texture operation (when used with TextureRenderer.) NB: This
+     * field is transient - not saved by Savable.
+     * 
+     * @param currentRTTFace
+     *            the face to use
+     */
     public void setCurrentRTTFace(final Face currentRTTFace) {
         _currentRTTFace = currentRTTFace;
     }
 
+    /**
+     * @return the cubemap Face to use for the next Render To Texture operation (when used with TextureRenderer.)
+     */
     public Face getCurrentRTTFace() {
         return _currentRTTFace;
     }
