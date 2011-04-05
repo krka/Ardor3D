@@ -62,6 +62,7 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
@@ -99,6 +100,8 @@ public class AnimationDemoExample extends ExampleBase {
     private UIButton runWalkButton, punchButton;
     private OutputStore layerOutput;
     private Cylinder staff;
+
+    private GLSLShaderObjectsState gpuShader;
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
@@ -203,9 +206,36 @@ public class AnimationDemoExample extends ExampleBase {
         });
         basePanel.add(skinCheck);
 
+        final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
+        gpuSkinningCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        gpuSkinningCheck.setSelected(false);
+        gpuSkinningCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                _root.acceptVisitor(new Visitor() {
+                    @Override
+                    public void visit(final Spatial spatial) {
+                        if (spatial instanceof SkinnedMesh) {
+                            final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                            if (gpuSkinningCheck.isSelected()) {
+                                skinnedSpatial.setGPUShader(gpuShader);
+                                skinnedSpatial.setUseGPU(true);
+                            } else {
+                                skinnedSpatial.setGPUShader(null);
+                                skinnedSpatial.clearRenderState(StateType.GLSLShader);
+                                skinnedSpatial.setUseGPU(false);
+                            }
+                        }
+                    }
+                }, true);
+            }
+        });
+        basePanel.add(gpuSkinningCheck);
+
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT,
+                0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 
@@ -312,8 +342,7 @@ public class AnimationDemoExample extends ExampleBase {
 
             positionCamera(upAxis);
 
-            // Uncomment below in visitor to try out gpu skinning
-            final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
+            gpuShader = new GLSLShaderObjectsState();
             gpuShader.setEnabled(true);
             try {
                 gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationDemoExample.class,
@@ -323,17 +352,6 @@ public class AnimationDemoExample extends ExampleBase {
             } catch (final IOException ioe) {
                 ioe.printStackTrace();
             }
-
-            colladaNode.acceptVisitor(new Visitor() {
-                @Override
-                public void visit(final Spatial spatial) {
-                    if (spatial instanceof SkinnedMesh) {
-                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
-                        // skinnedSpatial.setGPUShader(gpuShader);
-                        // skinnedSpatial.setUseGPU(true);
-                    }
-                }
-            }, true);
 
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
