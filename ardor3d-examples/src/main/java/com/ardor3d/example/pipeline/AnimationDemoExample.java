@@ -357,11 +357,13 @@ public class AnimationDemoExample extends ExampleBase {
             cullState.setCullFace(Face.Back);
             colladaNode.setRenderState(cullState);
 
-            for (int i = 0; i < 6; i++) {
-                // Add colladaNode to root
-                final Node copy = colladaNode.makeCopy(false);
-                copy.setTranslation(0, 0, -50 - (i * 50));
-                _root.attachChild(copy);
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    // Add colladaNode to root
+                    final Node copy = colladaNode.makeCopy(false);
+                    copy.setTranslation(-i * 50, 0, -50 - (j * 50));
+                    _root.attachChild(copy);
+                }
             }
 
         } catch (final Exception ex) {
