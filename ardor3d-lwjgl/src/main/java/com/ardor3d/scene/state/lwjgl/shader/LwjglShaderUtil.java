@@ -259,63 +259,79 @@ public abstract class LwjglShaderUtil {
         final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context.getStateRecord(StateType.GLSLShader);
 
         if (shaderVariable instanceof ShaderVariablePointerFloat) {
-            updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable, record);
         } else if (shaderVariable instanceof ShaderVariablePointerFloatMatrix) {
-            updateShaderAttribute((ShaderVariablePointerFloatMatrix) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerFloatMatrix) shaderVariable, record);
         } else if (shaderVariable instanceof ShaderVariablePointerByte) {
-            updateShaderAttribute((ShaderVariablePointerByte) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerByte) shaderVariable, record);
         } else if (shaderVariable instanceof ShaderVariablePointerInt) {
-            updateShaderAttribute((ShaderVariablePointerInt) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerInt) shaderVariable, record);
         } else if (shaderVariable instanceof ShaderVariablePointerShort) {
-            updateShaderAttribute((ShaderVariablePointerShort) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerShort) shaderVariable, record);
         } else {
             logger.warning("updateShaderAttribute: Unknown shaderVariable type!");
             return;
         }
-
-        record.enabledAttributes.add(shaderVariable.variableID);
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerFloat shaderUniform) {
-        shaderUniform.data.rewind();
-        ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    public static void useShaderProgram(final int id, final ShaderObjectsStateRecord record) {
+        if (record.shaderId != id) {
+            ARBShaderObjects.glUseProgramObjectARB(id);
+            record.shaderId = id;
+        }
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerFloatMatrix shaderUniform) {
-        final FloatBuffer data = shaderUniform.data.duplicate();
-        final int size = shaderUniform.size;
+    private static void enableVertexAttribute(final int id, final ShaderObjectsStateRecord record) {
+        if (!record.enabledAttributes.contains(id)) {
+            ARBVertexProgram.glEnableVertexAttribArrayARB(id);
+            record.enabledAttributes.add(id);
+        }
+    }
+
+    private static void updateShaderAttribute(final ShaderVariablePointerFloat variable,
+            final ShaderObjectsStateRecord record) {
+        enableVertexAttribute(variable.variableID, record);
+        variable.data.rewind();
+        ARBVertexProgram.glVertexAttribPointerARB(variable.variableID, variable.size, variable.normalized,
+                variable.stride, variable.data);
+    }
+
+    private static void updateShaderAttribute(final ShaderVariablePointerFloatMatrix variable,
+            final ShaderObjectsStateRecord record) {
+        final FloatBuffer data = variable.data.duplicate();
+        final int size = variable.size;
         final int length = data.capacity() / size;
         int pos = 0;
         for (int i = 0; i < size; i++) {
             pos = (i * length);
             data.limit(pos + length - 1);
             data.position(pos);
-            ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID + i);
-            ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID + i, size, shaderUniform.normalized, 0,
-                    data);
+            enableVertexAttribute(variable.variableID + i, record);
+            ARBVertexProgram.glVertexAttribPointerARB(variable.variableID + i, size, variable.normalized, 0, data);
         }
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerByte shaderUniform) {
-        shaderUniform.data.rewind();
-        ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, shaderUniform.unsigned,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void updateShaderAttribute(final ShaderVariablePointerByte variable,
+            final ShaderObjectsStateRecord record) {
+        enableVertexAttribute(variable.variableID, record);
+        variable.data.rewind();
+        ARBVertexProgram.glVertexAttribPointerARB(variable.variableID, variable.size, variable.unsigned,
+                variable.normalized, variable.stride, variable.data);
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerInt shaderUniform) {
-        shaderUniform.data.rewind();
-        ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, shaderUniform.unsigned,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void updateShaderAttribute(final ShaderVariablePointerInt variable,
+            final ShaderObjectsStateRecord record) {
+        enableVertexAttribute(variable.variableID, record);
+        variable.data.rewind();
+        ARBVertexProgram.glVertexAttribPointerARB(variable.variableID, variable.size, variable.unsigned,
+                variable.normalized, variable.stride, variable.data);
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerShort shaderUniform) {
-        shaderUniform.data.rewind();
-        ARBVertexProgram.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        ARBVertexProgram.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, shaderUniform.unsigned,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void updateShaderAttribute(final ShaderVariablePointerShort variable,
+            final ShaderObjectsStateRecord record) {
+        enableVertexAttribute(variable.variableID, record);
+        variable.data.rewind();
+        ARBVertexProgram.glVertexAttribPointerARB(variable.variableID, variable.size, variable.unsigned,
+                variable.normalized, variable.stride, variable.data);
     }
 }
