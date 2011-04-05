@@ -23,6 +23,8 @@ public class ShaderObjectsStateRecord extends StateRecord {
 
     public Set<Integer> enabledAttributes = Sets.newHashSet();
 
+    public int shaderId = -1;
+
     public GLSLShaderObjectsState getReference() {
         return reference;
     }
@@ -36,6 +38,7 @@ public class ShaderObjectsStateRecord extends StateRecord {
         super.invalidate();
 
         reference = null;
+        shaderId = -1;
         enabledAttributes.clear();
     }
 }
