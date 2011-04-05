@@ -129,7 +129,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
             switchCameraOut();
 
             if (_samples > 0 && _supportsMultisample) {
-                blitTo(tex);
+                blitMSFBO();
             }
 
             takedownForSingleTexDraw(tex);
@@ -155,7 +155,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
             switchCameraOut();
 
             if (_samples > 0 && _supportsMultisample) {
-                blitTo(tex);
+                blitMSFBO();
             }
 
             takedownForSingleTexDraw(tex);
@@ -181,7 +181,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
             switchCameraOut();
 
             if (_samples > 0 && _supportsMultisample) {
-                blitTo(tex);
+                blitMSFBO();
             }
 
             takedownForSingleTexDraw(tex);
@@ -201,7 +201,7 @@ public abstract class AbstractFBOTextureRenderer implements TextureRenderer {
 
     protected abstract void setMSFBO();
 
-    protected abstract void blitTo(Texture tex);
+    protected abstract void blitMSFBO();
 
     protected abstract void deactivate();
 

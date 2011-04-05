@@ -163,7 +163,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
                     switchCameraOut();
 
                     if (_samples > 0 && _supportsMultisample) {
-                        blitTo(tex);
+                        blitMSFBO();
                     }
 
                     takedownForSingleTexDraw(tex);
@@ -361,7 +361,7 @@ public class JoglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
-    protected void blitTo(final Texture tex) {
+    protected void blitMSFBO() {
         final GL gl = GLU.getCurrentGL();
 
         gl.glBindFramebufferEXT(GL.GL_READ_FRAMEBUFFER_EXT, _msfboID);

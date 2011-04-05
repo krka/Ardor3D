@@ -167,7 +167,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
                     switchCameraOut();
 
                     if (_samples > 0 && _supportsMultisample) {
-                        blitTo(tex);
+                        blitMSFBO();
                     }
 
                     takedownForSingleTexDraw(tex);
@@ -364,7 +364,7 @@ public class LwjglTextureRenderer extends AbstractFBOTextureRenderer {
     }
 
     @Override
-    protected void blitTo(final Texture tex) {
+    protected void blitMSFBO() {
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_READ_FRAMEBUFFER_EXT, _msfboID);
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferBlit.GL_DRAW_FRAMEBUFFER_EXT, _fboID);
         EXTFramebufferBlit.glBlitFramebufferEXT(0, 0, _width, _height, 0, 0, _width, _height, GL11.GL_COLOR_BUFFER_BIT
