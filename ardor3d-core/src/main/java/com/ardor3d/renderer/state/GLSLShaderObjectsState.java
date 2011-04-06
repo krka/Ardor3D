@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,7 +34,11 @@ import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
 import com.ardor3d.renderer.state.record.StateRecord;
+import com.ardor3d.scenegraph.ByteBufferData;
+import com.ardor3d.scenegraph.FloatBufferData;
+import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.ShortBufferData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.export.Savable;
@@ -97,6 +100,8 @@ public class GLSLShaderObjectsState extends RenderState {
 
     /** OpenGL id for the attached geometry shader. */
     public int _geometryShaderID = -1;
+
+    private boolean _useAttributeVBO;
 
     /**
      * Gets the currently loaded vertex shader.
@@ -264,6 +269,18 @@ public class GLSLShaderObjectsState extends RenderState {
 
     public GLSLShaderDataLogic getShaderDataLogic() {
         return _shaderDataLogic;
+    }
+
+    public boolean isUseAttributeVBO() {
+        return _useAttributeVBO;
+    }
+
+    /**
+     * @param useAttributeVBO
+     *            if true, and we support VBO, we'll use VBO for shader attributes.
+     */
+    public void setUseAttributeVBO(final boolean useAttributeVBO) {
+        _useAttributeVBO = useAttributeVBO;
     }
 
     /**
@@ -771,7 +788,7 @@ public class GLSLShaderObjectsState extends RenderState {
      *            The actual data to use as attribute pointer
      */
     public void setAttributePointer(final String name, final int size, final boolean normalized, final int stride,
-            final FloatBuffer data) {
+            final FloatBufferData data) {
         final ShaderVariablePointerFloat shaderUniform = getShaderAttribute(name, ShaderVariablePointerFloat.class);
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
@@ -795,7 +812,7 @@ public class GLSLShaderObjectsState extends RenderState {
      *            The actual data to use as attribute pointer
      */
     public void setAttributePointerMatrix(final String name, final int size, final boolean normalized,
-            final FloatBuffer data) {
+            final FloatBufferData data) {
         final ShaderVariablePointerFloatMatrix shaderUniform = getShaderAttribute(name,
                 ShaderVariablePointerFloatMatrix.class);
         shaderUniform.size = size;
@@ -825,7 +842,7 @@ public class GLSLShaderObjectsState extends RenderState {
      *            The actual data to use as attribute pointer
      */
     public void setAttributePointer(final String name, final int size, final boolean normalized,
-            final boolean unsigned, final int stride, final ByteBuffer data) {
+            final boolean unsigned, final int stride, final ByteBufferData data) {
         final ShaderVariablePointerByte shaderUniform = getShaderAttribute(name, ShaderVariablePointerByte.class);
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
@@ -856,7 +873,7 @@ public class GLSLShaderObjectsState extends RenderState {
      *            The actual data to use as attribute pointer
      */
     public void setAttributePointer(final String name, final int size, final boolean normalized,
-            final boolean unsigned, final int stride, final IntBuffer data) {
+            final boolean unsigned, final int stride, final IntBufferData data) {
         final ShaderVariablePointerInt shaderUniform = getShaderAttribute(name, ShaderVariablePointerInt.class);
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
@@ -887,7 +904,7 @@ public class GLSLShaderObjectsState extends RenderState {
      *            The actual data to use as attribute pointer
      */
     public void setAttributePointer(final String name, final int size, final boolean normalized,
-            final boolean unsigned, final int stride, final ShortBuffer data) {
+            final boolean unsigned, final int stride, final ShortBufferData data) {
         final ShaderVariablePointerShort shaderUniform = getShaderAttribute(name, ShaderVariablePointerShort.class);
         shaderUniform.size = size;
         shaderUniform.normalized = normalized;
@@ -996,6 +1013,7 @@ public class GLSLShaderObjectsState extends RenderState {
         capsule.write(vertShader, "vertShader", null);
         capsule.write(fragShader, "fragShader", null);
         capsule.write(geomShader, "geomShader", null);
+        capsule.write(_useAttributeVBO, "useAttributeVBO", false);
 
         if (_shaderDataLogic instanceof Savable) {
             capsule.write((Savable) _shaderDataLogic, "shaderDataLogic", null);
@@ -1010,6 +1028,7 @@ public class GLSLShaderObjectsState extends RenderState {
         vertShader = capsule.readByteBuffer("vertShader", null);
         fragShader = capsule.readByteBuffer("fragShader", null);
         geomShader = capsule.readByteBuffer("geomShader", null);
+        _useAttributeVBO = capsule.readBoolean("useAttributeVBO", false);
 
         final Savable shaderDataLogic = capsule.readSavable("shaderDataLogic", null);
         // only override set _shaderDataLogic if we have something in the capsule.

@@ -13,6 +13,7 @@ package com.ardor3d.util.shader.uniformtypes;
 import java.io.IOException;
 import java.nio.IntBuffer;
 
+import com.ardor3d.scenegraph.IntBufferData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.shader.ShaderVariable;
@@ -36,7 +37,7 @@ public class ShaderVariablePointerInt extends ShaderVariable {
     /** Specifies if the data is in signed or unsigned format */
     public boolean unsigned;
     /** The data for the attribute value */
-    public IntBuffer data;
+    public IntBufferData data;
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
@@ -55,6 +56,13 @@ public class ShaderVariablePointerInt extends ShaderVariable {
         stride = capsule.readInt("stride", 0);
         normalized = capsule.readBoolean("normalized", false);
         unsigned = capsule.readBoolean("unsigned", false);
-        data = capsule.readIntBuffer("data", null);
+        data = (IntBufferData) capsule.readSavable("data", null);
+        // XXX: transitional
+        if (data == null) {
+            final IntBuffer buff = capsule.readIntBuffer("data", null);
+            if (buff != null) {
+                data = new IntBufferData(buff);
+            }
+        }
     }
 }

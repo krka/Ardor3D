@@ -66,11 +66,6 @@ public abstract class IndexBufferData<T extends Buffer> extends AbstractBufferDa
     public abstract void put(IndexBufferData<?> buf);
 
     /**
-     * @return the number of bytes per entry in the buffer. For example, an IntBuffer would return 4.
-     */
-    public abstract int getByteCount();
-
-    /**
      * Get the underlying nio buffer.
      */
     @Override
