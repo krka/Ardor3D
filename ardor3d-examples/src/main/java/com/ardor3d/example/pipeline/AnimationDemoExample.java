@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -39,11 +39,11 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
@@ -60,13 +60,13 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.ReadOnlyTimer;
@@ -102,6 +102,8 @@ public class AnimationDemoExample extends ExampleBase {
     private Cylinder staff;
 
     private GLSLShaderObjectsState gpuShader;
+
+    private final Node skNode = new Node("skeletons");
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
@@ -141,8 +143,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5,
-                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
+                - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -176,7 +178,6 @@ public class AnimationDemoExample extends ExampleBase {
         punchButton
                 .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
         punchButton.addActionListener(new ActionListener() {
-
             public void actionPerformed(final ActionEvent event) {
                 manager.findAnimationLayer("punch").setCurrentState("punch_right", true);
                 punchButton.setEnabled(false);
@@ -195,20 +196,9 @@ public class AnimationDemoExample extends ExampleBase {
         });
         basePanel.add(headCheck);
 
-        final UICheckBox skinCheck = new UICheckBox("Show skin mesh");
-        skinCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
-        skinCheck.setSelected(true);
-        skinCheck.addActionListener(new ActionListener() {
-
-            public void actionPerformed(final ActionEvent event) {
-                colladaNode.getSceneHints().setCullHint(skinCheck.isSelected() ? CullHint.Dynamic : CullHint.Always);
-            }
-        });
-        basePanel.add(skinCheck);
-
         final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
         gpuSkinningCheck
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
         gpuSkinningCheck.setSelected(false);
         gpuSkinningCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -232,10 +222,21 @@ public class AnimationDemoExample extends ExampleBase {
         });
         basePanel.add(gpuSkinningCheck);
 
+        final UICheckBox vboCheck = new UICheckBox("Use VBO");
+        vboCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        vboCheck.setSelected(false);
+        vboCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                skNode.getSceneHints().setDataMode(vboCheck.isSelected() ? DataMode.VBO : DataMode.Arrays);
+                gpuShader.setUseAttributeVBO(vboCheck.isSelected());
+            }
+        });
+        basePanel.add(vboCheck);
+
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT,
-                0, -5));
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vboCheck, Alignment.BOTTOM_LEFT, 0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 
@@ -316,8 +317,8 @@ public class AnimationDemoExample extends ExampleBase {
 
     private void createCharacter() {
         try {
-            // detach the old colladaNode, if present.
-            _root.detachChild(colladaNode);
+            skNode.detachAllChildren();
+            _root.attachChild(skNode);
 
             final long time = System.currentTimeMillis();
             final ColladaImporter colladaImporter = new ColladaImporter();
@@ -360,9 +361,9 @@ public class AnimationDemoExample extends ExampleBase {
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     // Add colladaNode to root
-                    final Node copy = colladaNode.makeCopy(false);
+                    final Node copy = colladaNode.makeCopy(true);
                     copy.setTranslation(-i * 50, 0, -50 - (j * 50));
-                    _root.attachChild(copy);
+                    skNode.attachChild(copy);
                 }
             }
 
@@ -451,8 +452,8 @@ public class AnimationDemoExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
-                        boundingBox.getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
+                        .getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);

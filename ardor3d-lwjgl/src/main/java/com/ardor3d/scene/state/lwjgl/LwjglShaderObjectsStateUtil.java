@@ -241,7 +241,7 @@ public abstract class LwjglShaderObjectsStateUtil {
                             LwjglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
                             shaderVariable.needsRefresh = false;
                         }
-                        LwjglShaderUtil.updateShaderAttribute(renderer, shaderVariable);
+                        LwjglShaderUtil.updateShaderAttribute(renderer, shaderVariable, state.isUseAttributeVBO());
                     }
 
                     for (int i = state.getShaderUniforms().size(); --i >= 0;) {

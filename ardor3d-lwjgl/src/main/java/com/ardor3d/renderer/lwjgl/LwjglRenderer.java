@@ -89,12 +89,12 @@ import com.ardor3d.scene.state.lwjgl.LwjglZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -288,7 +288,7 @@ public class LwjglRenderer extends AbstractRenderer {
      * re-initializes the GL context for rendering of another piece of geometry.
      */
     protected void postdrawGeometry(final Mesh g) {
-        // Nothing to do here yet
+    // Nothing to do here yet
     }
 
     public void flushGraphics() {
@@ -384,8 +384,8 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
         if (defaultColor != null) {
-            GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
-                    defaultColor.getAlpha());
+            GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
+                    .getAlpha());
         } else {
             GL11.glColor4f(1, 1, 1, 1);
         }
@@ -786,10 +786,12 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    private int setupVBO(final FloatBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+    public static int setupVBO(final AbstractBufferData<? extends Buffer> data, final RenderContext context) {
         if (data == null) {
             return 0;
         }
+
+        final RendererRecord rendRecord = context.getRendererRecord();
 
         int vboID = data.getVBOID(context.getGlContextRep());
         if (vboID != 0) {
@@ -798,7 +800,7 @@ public class LwjglRenderer extends AbstractRenderer {
             return vboID;
         }
 
-        final FloatBuffer dataBuffer = data.getBuffer();
+        final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
@@ -807,21 +809,44 @@ public class LwjglRenderer extends AbstractRenderer {
 
             rendRecord.invalidateVBO();
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
-            ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, dataBuffer,
-                    getGLVBOAccessMode(data.getVboAccessMode()));
+            if (dataBuffer instanceof FloatBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, (FloatBuffer) dataBuffer,
+                        getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ByteBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, (ByteBuffer) dataBuffer,
+                        getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof IntBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, (IntBuffer) dataBuffer,
+                        getGLVBOAccessMode(data.getVboAccessMode()));
+            } else if (dataBuffer instanceof ShortBuffer) {
+                ARBBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, (ShortBuffer) dataBuffer,
+                        getGLVBOAccessMode(data.getVboAccessMode()));
+            }
         } else {
             throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
         }
         return vboID;
     }
 
-    private void updateVBO(final FloatBufferData data, final RendererRecord rendRecord, final int vboID,
-            final int offsetBytes) {
+    public static void updateVBO(final AbstractBufferData<? extends Buffer> data, final RendererRecord rendRecord,
+            final int vboID, final int offsetBytes) {
         if (data.isNeedsRefresh()) {
-            final FloatBuffer dataBuffer = data.getBuffer();
+            final Buffer dataBuffer = data.getBuffer();
             dataBuffer.rewind();
             LwjglRendererUtil.setBoundVBO(rendRecord, vboID);
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, dataBuffer);
+            if (dataBuffer instanceof FloatBuffer) {
+                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                        (FloatBuffer) dataBuffer);
+            } else if (dataBuffer instanceof ByteBuffer) {
+                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                        (ByteBuffer) dataBuffer);
+            } else if (dataBuffer instanceof IntBuffer) {
+                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                        (IntBuffer) dataBuffer);
+            } else if (dataBuffer instanceof ShortBuffer) {
+                ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                        (ShortBuffer) dataBuffer);
+            }
             data.setNeedsRefresh(false);
         }
     }
@@ -883,7 +908,7 @@ public class LwjglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
@@ -899,7 +924,7 @@ public class LwjglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
@@ -915,7 +940,7 @@ public class LwjglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
@@ -936,7 +961,7 @@ public class LwjglRenderer extends AbstractRenderer {
         }
 
         final RendererRecord rendRecord = context.getRendererRecord();
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             GL11.glEnableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
@@ -983,7 +1008,7 @@ public class LwjglRenderer extends AbstractRenderer {
 
                     // grab a vboID and make sure it exists and is up to date.
                     final FloatBufferData data = textureCoords.get(i);
-                    final int vboID = setupVBO(data, context, rendRecord);
+                    final int vboID = setupVBO(data, context);
 
                     // Found good vbo
                     if (vboID != 0) {
@@ -1156,14 +1181,14 @@ public class LwjglRenderer extends AbstractRenderer {
         int offsetBytes = 0;
         if (normalCoords != null) {
             normalCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
-                    normalCoords.getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, normalCoords
+                    .getBuffer());
             offsetBytes += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
             colorCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
-                    colorCoords.getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, colorCoords
+                    .getBuffer());
             offsetBytes += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
@@ -1187,8 +1212,8 @@ public class LwjglRenderer extends AbstractRenderer {
         }
         if (vertexCoords != null) {
             vertexCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
-                    vertexCoords.getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, vertexCoords
+                    .getBuffer());
         }
 
         interleaved.setNeedsRefresh(false);
@@ -1267,7 +1292,7 @@ public class LwjglRenderer extends AbstractRenderer {
         }
     }
 
-    public int makeVBOId() {
+    public static int makeVBOId() {
         final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
         ARBBufferObject.glGenBuffersARB(idBuff);
         return idBuff.get(0);
@@ -1280,7 +1305,7 @@ public class LwjglRenderer extends AbstractRenderer {
         LwjglRendererUtil.setBoundElementVBO(rendRecord, 0);
     }
 
-    private int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
+    private static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
         int glMode = ARBBufferObject.GL_STATIC_DRAW_ARB;
         switch (vboAccessMode) {
             case StaticDraw:
