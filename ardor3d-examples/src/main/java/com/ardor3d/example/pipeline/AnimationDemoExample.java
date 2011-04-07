@@ -39,11 +39,11 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIRadioButton;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
@@ -60,8 +60,8 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
-import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.GLSLShaderObjectsState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -143,8 +143,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5,
+                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -223,8 +223,7 @@ public class AnimationDemoExample extends ExampleBase {
         basePanel.add(gpuSkinningCheck);
 
         final UICheckBox vboCheck = new UICheckBox("Use VBO");
-        vboCheck
-                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        vboCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
         vboCheck.setSelected(false);
         vboCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -354,12 +353,24 @@ public class AnimationDemoExample extends ExampleBase {
                 ioe.printStackTrace();
             }
 
+            // turn on the buffers in our skeleton so they can be shared.
+            colladaNode.acceptVisitor(new Visitor() {
+                @Override
+                public void visit(final Spatial spatial) {
+                    if (spatial instanceof SkinnedMesh) {
+                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                        skinnedSpatial.recreateWeightAttributeBuffer();
+                        skinnedSpatial.recreateJointAttributeBuffer();
+                    }
+                }
+            }, true);
+
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
             colladaNode.setRenderState(cullState);
 
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
                     // Add colladaNode to root
                     final Node copy = colladaNode.makeCopy(true);
                     copy.setTranslation(-i * 50, 0, -50 - (j * 50));
@@ -452,8 +463,8 @@ public class AnimationDemoExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
-                        .getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
+                        boundingBox.getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);

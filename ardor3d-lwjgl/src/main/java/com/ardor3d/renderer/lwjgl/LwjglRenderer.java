@@ -89,12 +89,12 @@ import com.ardor3d.scene.state.lwjgl.LwjglZBufferStateUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglRendererUtil;
 import com.ardor3d.scene.state.lwjgl.util.LwjglTextureUtil;
 import com.ardor3d.scenegraph.AbstractBufferData;
+import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Renderable;
 import com.ardor3d.scenegraph.Spatial;
-import com.ardor3d.scenegraph.AbstractBufferData.VBOAccessMode;
 import com.ardor3d.scenegraph.hint.NormalsMode;
 import com.ardor3d.util.Ardor3dException;
 import com.ardor3d.util.Constants;
@@ -288,7 +288,7 @@ public class LwjglRenderer extends AbstractRenderer {
      * re-initializes the GL context for rendering of another piece of geometry.
      */
     protected void postdrawGeometry(final Mesh g) {
-    // Nothing to do here yet
+        // Nothing to do here yet
     }
 
     public void flushGraphics() {
@@ -384,8 +384,8 @@ public class LwjglRenderer extends AbstractRenderer {
 
     public void applyDefaultColor(final ReadOnlyColorRGBA defaultColor) {
         if (defaultColor != null) {
-            GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(), defaultColor
-                    .getAlpha());
+            GL11.glColor4f(defaultColor.getRed(), defaultColor.getGreen(), defaultColor.getBlue(),
+                    defaultColor.getAlpha());
         } else {
             GL11.glColor4f(1, 1, 1, 1);
         }
@@ -916,7 +916,6 @@ public class LwjglRenderer extends AbstractRenderer {
             GL11.glVertexPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
         } else {
             GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -932,7 +931,6 @@ public class LwjglRenderer extends AbstractRenderer {
             GL11.glNormalPointer(GL11.GL_FLOAT, 0, 0);
         } else {
             GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
-            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -948,7 +946,6 @@ public class LwjglRenderer extends AbstractRenderer {
             GL11.glColorPointer(data.getValuesPerTuple(), GL11.GL_FLOAT, 0, 0);
         } else {
             GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
-            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -969,7 +966,6 @@ public class LwjglRenderer extends AbstractRenderer {
             EXTFogCoord.glFogCoordPointerEXT(GL11.GL_FLOAT, 0, 0);
         } else {
             GL11.glDisableClientState(EXTFogCoord.GL_FOG_COORDINATE_ARRAY_EXT);
-            LwjglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -1035,9 +1031,6 @@ public class LwjglRenderer extends AbstractRenderer {
                             // disable state
                             GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                         }
-
-                        // set our active vbo to 0
-                        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
                 }
             }
@@ -1151,8 +1144,6 @@ public class LwjglRenderer extends AbstractRenderer {
         } else {
             GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
         }
-
-        LwjglRendererUtil.setBoundVBO(rendRecord, 0);
     }
 
     private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
@@ -1181,14 +1172,14 @@ public class LwjglRenderer extends AbstractRenderer {
         int offsetBytes = 0;
         if (normalCoords != null) {
             normalCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, normalCoords
-                    .getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                    normalCoords.getBuffer());
             offsetBytes += normalCoords.getBufferLimit() * 4;
         }
         if (colorCoords != null) {
             colorCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, colorCoords
-                    .getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                    colorCoords.getBuffer());
             offsetBytes += colorCoords.getBufferLimit() * 4;
         }
         if (textureCoords != null) {
@@ -1212,8 +1203,8 @@ public class LwjglRenderer extends AbstractRenderer {
         }
         if (vertexCoords != null) {
             vertexCoords.getBuffer().rewind();
-            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes, vertexCoords
-                    .getBuffer());
+            ARBBufferObject.glBufferSubDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, offsetBytes,
+                    vertexCoords.getBuffer());
         }
 
         interleaved.setNeedsRefresh(false);

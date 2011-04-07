@@ -202,7 +202,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setJointIndices(final short[] jointIndices) {
         _jointIndices = jointIndices;
         if (_jointIndices != null && _jointIndicesBuf != null) {
-            createJointBuffer();
+            recreateJointAttributeBuffer();
         }
     }
 
@@ -223,7 +223,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setWeights(final float[] weights) {
         _weights = weights;
         if (_weights != null && _weightsBuf != null) {
-            createWeightBuffer();
+            recreateWeightAttributeBuffer();
         }
     }
 
@@ -285,10 +285,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     protected void updateWeightsAndJointsOnGPUShader() {
         if (_gpuShader != null) {
             if (_weightsBuf == null) {
-                createWeightBuffer();
+                recreateWeightAttributeBuffer();
             }
             if (_jointIndicesBuf == null) {
-                createJointBuffer();
+                recreateWeightAttributeBuffer();
             }
             if (!_gpuUseMatrixAttribute) {
                 _gpuShader.setAttributePointer("Weights", getGpuAttributeSize(), false, 0, _weightsBuf);
@@ -509,7 +509,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         CollisionTreeManager.INSTANCE.removeCollisionTree(this);
     }
 
-    protected void createJointBuffer() {
+    public void recreateJointAttributeBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
             data = SkinnedMesh.reorderAndPad(SkinnedMesh.convert(_jointIndices), getWeightsPerVert(),
@@ -520,7 +520,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         _jointIndicesBuf = new FloatBufferData(BufferUtils.createFloatBuffer(data), getGpuAttributeSize());
     }
 
-    protected void createWeightBuffer() {
+    public void recreateWeightAttributeBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
             data = SkinnedMesh.reorderAndPad(_weights, getWeightsPerVert(), getGpuAttributeSize());

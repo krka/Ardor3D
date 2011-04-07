@@ -253,12 +253,14 @@ public abstract class JoglShaderUtil {
     }
 
     /**
-     * Updates an attribute shadervariable.
+     * Updates an vertex attribute pointer.
      * 
      * @param renderer
      *            the current renderer
      * @param shaderVariable
      *            variable to update
+     * @param useVBO
+     *            if true, we'll use VBO for the attributes, if false we'll use arrays.
      */
     public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable,
             final boolean useVBO) {
@@ -269,7 +271,7 @@ public abstract class JoglShaderUtil {
 
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
-        if (caps.isVBOSupported()) {
+        if (caps.isVBOSupported() && !useVBO) {
             renderer.unbindVBO();
         }
 
