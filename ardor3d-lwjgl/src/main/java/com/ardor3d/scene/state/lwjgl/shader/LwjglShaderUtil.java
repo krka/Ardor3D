@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -59,6 +59,11 @@ public abstract class LwjglShaderUtil {
      *            variable to update
      */
     public static void updateShaderUniform(final ShaderVariable shaderVariable) {
+        if (!shaderVariable.hasData()) {
+            throw new IllegalArgumentException("shaderVariable has no data: " + shaderVariable.name + " type: "
+                    + shaderVariable.getClass().getName());
+        }
+
         if (shaderVariable instanceof ShaderVariableInt) {
             updateShaderUniform((ShaderVariableInt) shaderVariable);
         } else if (shaderVariable instanceof ShaderVariableInt2) {
@@ -253,6 +258,11 @@ public abstract class LwjglShaderUtil {
         if (shaderVariable.variableID == -1) {
             // attribute is not bound, or was not found in shader.
             return;
+        }
+
+        if (!shaderVariable.hasData()) {
+            throw new IllegalArgumentException("shaderVariable has no data: " + shaderVariable.name + " type: "
+                    + shaderVariable.getClass().getName());
         }
 
         final RenderContext context = ContextManager.getCurrentContext();

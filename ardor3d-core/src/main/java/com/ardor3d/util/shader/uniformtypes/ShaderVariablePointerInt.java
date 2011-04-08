@@ -40,6 +40,11 @@ public class ShaderVariablePointerInt extends ShaderVariable {
     public IntBufferData data;
 
     @Override
+    public boolean hasData() {
+        return data != null && data.getBuffer() != null;
+    }
+
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
         super.write(capsule);
         capsule.write(size, "size", 0);
