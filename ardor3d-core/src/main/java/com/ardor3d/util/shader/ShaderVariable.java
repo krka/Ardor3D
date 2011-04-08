@@ -31,6 +31,10 @@ public class ShaderVariable implements Savable {
 
     public boolean errorLogged = false;
 
+    public boolean hasData() {
+        return true;
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof ShaderVariable) {
