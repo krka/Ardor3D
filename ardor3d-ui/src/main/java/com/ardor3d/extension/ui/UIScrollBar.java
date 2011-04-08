@@ -13,7 +13,6 @@ package com.ardor3d.extension.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
@@ -33,15 +32,12 @@ public class UIScrollBar extends UIPanel {
     private final List<ActionListener> _listeners = new ArrayList<ActionListener>();
 
     public UIScrollBar(final Orientation orientation) {
+        setLayout(new BorderLayout());
         this.orientation = orientation;
         slider = new UISlider(orientation);
         slider.setLayoutData(BorderLayoutData.CENTER);
-        slider.setBackdrop(new SolidBackdrop(getForegroundColor()));
         btTopLeft = new UIButton(orientation == Orientation.Vertical ? "^" : "<");
-        btTopLeft.setPadding(null);
         btBottomRight = new UIButton(orientation == Orientation.Vertical ? "v" : ">");
-        btBottomRight.setPadding(null);
-        setLayout(new BorderLayout());
         add(btTopLeft);
         add(btBottomRight);
         add(slider);
@@ -127,5 +123,17 @@ public class UIScrollBar extends UIPanel {
 
     public void setMaxValue(final int maxOffset) {
         slider.getModel().setMaxValue(maxOffset);
+    }
+
+    public UISlider getSlider() {
+        return slider;
+    }
+
+    public UIButton getBtTopLeft() {
+        return btTopLeft;
+    }
+
+    public UIButton getBtBottomRight() {
+        return btBottomRight;
     }
 }

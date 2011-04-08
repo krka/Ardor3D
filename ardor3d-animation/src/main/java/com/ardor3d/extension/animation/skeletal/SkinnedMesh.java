@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -19,6 +19,7 @@ import com.ardor3d.math.Matrix4;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.IndexBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -53,14 +54,14 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      * Storage for per vertex joint indices. There should be "weightsPerVert" entries per vertex.
      */
     protected short[] _jointIndices;
-    protected FloatBuffer _jointIndicesBuf;
+    protected FloatBufferData _jointIndicesBuf;
 
     /**
      * Storage for per vertex joint indices. These should already be normalized (all joints affecting the vertex add to
      * 1.) There should be "weightsPerVert" entries per vertex.
      */
     protected float[] _weights;
-    protected FloatBuffer _weightsBuf;
+    protected FloatBufferData _weightsBuf;
 
     /**
      * The original bind pose form of this SkinnedMesh. When doing CPU skinning, this will be used as a source and the
@@ -99,8 +100,6 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      * Custom update apply logic.
      */
     protected SkinPoseApplyLogic _customApplier = null;
-
-    private final float[] vecStore = new float[3];
 
     /**
      * Constructs a new SkinnedMesh.
@@ -203,7 +202,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setJointIndices(final short[] jointIndices) {
         _jointIndices = jointIndices;
         if (_jointIndices != null && _jointIndicesBuf != null) {
-            createJointBuffer();
+            recreateJointAttributeBuffer();
         }
     }
 
@@ -224,7 +223,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     public void setWeights(final float[] weights) {
         _weights = weights;
         if (_weights != null && _weightsBuf != null) {
-            createWeightBuffer();
+            recreateWeightAttributeBuffer();
         }
     }
 
@@ -244,7 +243,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
             _currentPose.removePoseListener(this);
         }
         _currentPose = currentPose;
-        _currentPose.addPoseListener(this);
+        if (_currentPose != null) {
+            _currentPose.addPoseListener(this);
+        }
     }
 
     /**
@@ -284,10 +285,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     protected void updateWeightsAndJointsOnGPUShader() {
         if (_gpuShader != null) {
             if (_weightsBuf == null) {
-                createWeightBuffer();
+                recreateWeightAttributeBuffer();
             }
             if (_jointIndicesBuf == null) {
-                createJointBuffer();
+                recreateWeightAttributeBuffer();
             }
             if (!_gpuUseMatrixAttribute) {
                 _gpuShader.setAttributePointer("Weights", getGpuAttributeSize(), false, 0, _weightsBuf);
@@ -300,7 +301,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
     }
 
     protected void updateJointPaletteOnGPUShader() {
-        if (_gpuShader != null) {
+        if (_gpuShader != null && _currentPose != null) {
             _gpuShader.setUniform("JointPalette", _currentPose.getMatrixPalette(), true);
         }
     }
@@ -347,7 +348,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
      * Apply skinning values for CPU skinning.
      */
     public void applyPose() {
-        if (!isUseGPU()) {
+        if (!isUseGPU() && _currentPose != null) {
             // Get a handle to the source and dest vertices buffers
             final FloatBuffer bindVerts = _bindPoseData.getVertexBuffer();
             FloatBuffer storeVerts = _meshData.getVertexBuffer();
@@ -374,26 +375,25 @@ public class SkinnedMesh extends Mesh implements PoseListener {
             }
 
             Matrix4 jntMat;
-            float bindVX, bindVY, bindVZ;
-            float bindNX = 0, bindNY = 0, bindNZ = 0;
-            float vSumX, vSumY, vSumZ;
-            float nSumX = 0, nSumY = 0, nSumZ = 0;
+            double bindVX, bindVY, bindVZ;
+            double bindNX = 0, bindNY = 0, bindNZ = 0;
+            double vSumX, vSumY, vSumZ;
+            double nSumX = 0, nSumY = 0, nSumZ = 0;
             double tempX, tempY, tempZ;
             float weight;
             int jointIndex;
 
             // Cycle through each vertex
-            for (int i = 0, count = _bindPoseData.getVertexCount(); i < count; i++) {
+            for (int i = 0; i < _bindPoseData.getVertexCount(); i++) {
                 // zero out our sum var
                 vSumX = 0;
                 vSumY = 0;
                 vSumZ = 0;
 
                 // Grab the bind pose vertex Vbp from _bindPoseData
-                bindVerts.get(vecStore, 0, 3);
-                bindVX = vecStore[0];
-                bindVY = vecStore[1];
-                bindVZ = vecStore[2];
+                bindVX = bindVerts.get();
+                bindVY = bindVerts.get();
+                bindVZ = bindVerts.get();
 
                 // See if we should do the corresponding normal as well
                 if (bindNorms != null) {
@@ -403,10 +403,9 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                     nSumZ = 0;
 
                     // Grab the bind pose norm Nbp from _bindPoseData
-                    bindNorms.get(vecStore, 0, 3);
-                    bindNX = vecStore[0];
-                    bindNY = vecStore[1];
-                    bindNZ = vecStore[2];
+                    bindNX = bindNorms.get();
+                    bindNY = bindNorms.get();
+                    bindNZ = bindNorms.get();
                 }
 
                 // for each joint where the weight != 0
@@ -450,16 +449,10 @@ public class SkinnedMesh extends Mesh implements PoseListener {
                 }
 
                 // Store sum into _meshData
-                vecStore[0] = vSumX;
-                vecStore[1] = vSumY;
-                vecStore[2] = vSumZ;
-                storeVerts.put(vecStore);
+                storeVerts.put((float) vSumX).put((float) vSumY).put((float) vSumZ);
 
                 if (bindNorms != null) {
-                    vecStore[0] = nSumX;
-                    vecStore[1] = nSumY;
-                    vecStore[2] = nSumZ;
-                    storeNorms.put(vecStore);
+                    storeNorms.put((float) nSumX).put((float) nSumY).put((float) nSumZ);
                 }
             }
 
@@ -516,7 +509,7 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         CollisionTreeManager.INSTANCE.removeCollisionTree(this);
     }
 
-    protected void createJointBuffer() {
+    public void recreateJointAttributeBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
             data = SkinnedMesh.reorderAndPad(SkinnedMesh.convert(_jointIndices), getWeightsPerVert(),
@@ -524,17 +517,17 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         } else {
             data = SkinnedMesh.pad(SkinnedMesh.convert(_jointIndices), getWeightsPerVert(), getGpuAttributeSize());
         }
-        _jointIndicesBuf = BufferUtils.createFloatBuffer(_jointIndicesBuf, data);
+        _jointIndicesBuf = new FloatBufferData(BufferUtils.createFloatBuffer(data), getGpuAttributeSize());
     }
 
-    protected void createWeightBuffer() {
+    public void recreateWeightAttributeBuffer() {
         final float[] data;
         if (isGpuUseMatrixAttribute()) {
             data = SkinnedMesh.reorderAndPad(_weights, getWeightsPerVert(), getGpuAttributeSize());
         } else {
             data = SkinnedMesh.pad(_weights, getWeightsPerVert(), getGpuAttributeSize());
         }
-        _weightsBuf = BufferUtils.createFloatBuffer(_weightsBuf, data);
+        _weightsBuf = new FloatBufferData(BufferUtils.createFloatBuffer(data), getGpuAttributeSize());
     }
 
     /**
@@ -647,10 +640,17 @@ public class SkinnedMesh extends Mesh implements PoseListener {
         skin._customApplier = _customApplier;
 
         // bring across arrays
-        skin._weights = new float[_weights.length];
-        System.arraycopy(_weights, 0, skin._weights, 0, _weights.length);
-        skin._jointIndices = new short[_jointIndices.length];
-        System.arraycopy(_jointIndices, 0, skin._jointIndices, 0, _jointIndices.length);
+        if (shareGeometricData) {
+            skin._weights = _weights;
+            skin._weightsBuf = _weightsBuf;
+            skin._jointIndices = _jointIndices;
+            skin._jointIndicesBuf = _jointIndicesBuf;
+        } else {
+            skin._weights = new float[_weights.length];
+            System.arraycopy(_weights, 0, skin._weights, 0, _weights.length);
+            skin._jointIndices = new short[_jointIndices.length];
+            System.arraycopy(_jointIndices, 0, skin._jointIndices, 0, _jointIndices.length);
+        }
 
         skin._currentPose = _currentPose;
 

@@ -232,30 +232,28 @@ public abstract class LwjglShaderObjectsStateUtil {
 
             if (!record.isValid() || record.getReference() != state || state.needsRefresh()) {
                 record.setReference(state);
-                if (state.isEnabled()) {
-                    if (state._programID != -1) {
-                        ARBShaderObjects.glUseProgramObjectARB(state._programID);
+                if (state.isEnabled() && state._programID != -1) {
+                    LwjglShaderUtil.useShaderProgram(state._programID, record);
 
-                        for (int i = state.getShaderAttributes().size(); --i >= 0;) {
-                            final ShaderVariable shaderVariable = state.getShaderAttributes().get(i);
-                            if (shaderVariable.needsRefresh) {
-                                LwjglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
-                                shaderVariable.needsRefresh = false;
-                            }
-                            LwjglShaderUtil.updateShaderAttribute(renderer, shaderVariable);
+                    for (int i = state.getShaderAttributes().size(); --i >= 0;) {
+                        final ShaderVariable shaderVariable = state.getShaderAttributes().get(i);
+                        if (shaderVariable.needsRefresh) {
+                            LwjglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
+                            shaderVariable.needsRefresh = false;
                         }
+                        LwjglShaderUtil.updateShaderAttribute(renderer, shaderVariable, state.isUseAttributeVBO());
+                    }
 
-                        for (int i = state.getShaderUniforms().size(); --i >= 0;) {
-                            final ShaderVariable shaderVariable = state.getShaderUniforms().get(i);
-                            if (shaderVariable.needsRefresh) {
-                                LwjglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
-                                LwjglShaderUtil.updateShaderUniform(shaderVariable);
-                                shaderVariable.needsRefresh = false;
-                            }
+                    for (int i = state.getShaderUniforms().size(); --i >= 0;) {
+                        final ShaderVariable shaderVariable = state.getShaderUniforms().get(i);
+                        if (shaderVariable.needsRefresh) {
+                            LwjglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
+                            LwjglShaderUtil.updateShaderUniform(shaderVariable);
+                            shaderVariable.needsRefresh = false;
                         }
                     }
                 } else {
-                    ARBShaderObjects.glUseProgramObjectARB(0);
+                    LwjglShaderUtil.useShaderProgram(0, record);
 
                     // go through and disable any enabled attributes
                     if (!record.enabledAttributes.isEmpty()) {

@@ -14,7 +14,6 @@ import java.util.List;
 
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.state.RenderState;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -22,7 +21,8 @@ import com.ardor3d.scenegraph.Spatial;
 
 /**
  * <code>TextureRenderer</code> defines an abstract class that handles rendering a scene to a buffer and copying it to a
- * texture. Creation of this object is usually handled via a TextureRendererFactory.
+ * texture. Creation of this object is usually handled via a TextureRendererFactory. Note that currently, only Texture2D
+ * is supported by Pbuffer versions of this class. Texture2D and TextureCubeMap are supported in FBO mode.
  */
 public interface TextureRenderer {
 
@@ -38,7 +38,8 @@ public interface TextureRenderer {
      * @param scene
      *            the scene to render.
      * @param tex
-     *            the Texture to render to.
+     *            the Texture to render to. This should be a Texture2D or TextureCubeMap. If the latter, its
+     *            currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -51,8 +52,9 @@ public interface TextureRenderer {
      * 
      * @param scene
      *            the scene to render.
-     * @param tex
-     *            a list of Textures to render to.
+     * @param texs
+     *            a list of Textures to render to. These should be of type Texture2D or TextureCubeMap. If the latter,
+     *            its currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -64,7 +66,8 @@ public interface TextureRenderer {
      * @param spat
      *            the scene to render.
      * @param tex
-     *            the Texture to render to.
+     *            the Texture to render to. This should be a Texture2D or TextureCubeMap. If the latter, its
+     *            currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -77,8 +80,9 @@ public interface TextureRenderer {
      * 
      * @param spat
      *            the scene to render.
-     * @param tex
-     *            a list of Textures to render to.
+     * @param texs
+     *            a list of Textures to render to. These should be of type Texture2D or TextureCubeMap. If the latter,
+     *            its currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -92,7 +96,8 @@ public interface TextureRenderer {
      * @param spats
      *            an array of Spatials to render.
      * @param tex
-     *            the Texture to render to.
+     *            the Texture to render to. This should be a Texture2D or TextureCubeMap. If the latter, its
+     *            currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -105,8 +110,9 @@ public interface TextureRenderer {
      * 
      * @param spats
      *            an array of Spatials to render.
-     * @param tex
-     *            a list of Textures to render to.
+     * @param texs
+     *            a list of Textures to render to. These should be of type Texture2D or TextureCubeMap. If the latter,
+     *            its currentRTTFace will determine which cube face is drawn to.
      * @param clear
      *            which buffers to clear before rendering, if any.
      * @see Renderer#BUFFER_COLOR et al
@@ -136,9 +142,9 @@ public interface TextureRenderer {
      * Note that the texture renderer's size is not necessarily what is specified in the constructor.
      * 
      * @param tex
-     *            The texture to setup for use in Texture Rendering.
+     *            The texture to setup for use in Texture Rendering. This should be of type Texture2D or TextureCubeMap.
      */
-    void setupTexture(Texture2D tex);
+    void setupTexture(Texture tex);
 
     /**
      * <code>copyToTexture</code> copies the current frame buffer contents to the given Texture. What is copied is based
@@ -147,7 +153,8 @@ public interface TextureRenderer {
      * texture's height.
      * 
      * @param tex
-     *            The Texture to copy into.
+     *            The Texture to copy into. This should be a Texture2D or TextureCubeMap. If the latter, its
+     *            currentRTTFace will determine which cube face is drawn to.
      * @param x
      *            the x offset into the framebuffer
      * @param y

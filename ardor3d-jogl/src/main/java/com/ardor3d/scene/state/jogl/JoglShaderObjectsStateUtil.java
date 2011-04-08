@@ -246,32 +246,30 @@ public abstract class JoglShaderObjectsStateUtil {
 
             if (!record.isValid() || record.getReference() != state || state.needsRefresh()) {
                 record.setReference(state);
-                if (state.isEnabled()) {
-                    if (state._programID != -1) {
-                        gl.glUseProgramObjectARB(state._programID);
+                if (state.isEnabled() && state._programID != -1) {
+                    JoglShaderUtil.useShaderProgram(state._programID, record);
 
-                        final List<ShaderVariable> attribs = state.getShaderAttributes();
-                        for (int i = attribs.size(); --i >= 0;) {
-                            final ShaderVariable shaderVariable = attribs.get(i);
-                            if (shaderVariable.needsRefresh) {
-                                JoglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
-                                shaderVariable.needsRefresh = false;
-                            }
-                            JoglShaderUtil.updateShaderAttribute(renderer, shaderVariable);
+                    final List<ShaderVariable> attribs = state.getShaderAttributes();
+                    for (int i = attribs.size(); --i >= 0;) {
+                        final ShaderVariable shaderVariable = attribs.get(i);
+                        if (shaderVariable.needsRefresh) {
+                            JoglShaderUtil.updateAttributeLocation(shaderVariable, state._programID);
+                            shaderVariable.needsRefresh = false;
                         }
+                        JoglShaderUtil.updateShaderAttribute(renderer, shaderVariable, state.isUseAttributeVBO());
+                    }
 
-                        final List<ShaderVariable> uniforms = state.getShaderUniforms();
-                        for (int i = uniforms.size(); --i >= 0;) {
-                            final ShaderVariable shaderVariable = uniforms.get(i);
-                            if (shaderVariable.needsRefresh) {
-                                JoglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
-                                JoglShaderUtil.updateShaderUniform(shaderVariable);
-                                shaderVariable.needsRefresh = false;
-                            }
+                    final List<ShaderVariable> uniforms = state.getShaderUniforms();
+                    for (int i = uniforms.size(); --i >= 0;) {
+                        final ShaderVariable shaderVariable = uniforms.get(i);
+                        if (shaderVariable.needsRefresh) {
+                            JoglShaderUtil.updateUniformLocation(shaderVariable, state._programID);
+                            JoglShaderUtil.updateShaderUniform(shaderVariable);
+                            shaderVariable.needsRefresh = false;
                         }
                     }
                 } else {
-                    gl.glUseProgramObjectARB(0);
+                    JoglShaderUtil.useShaderProgram(0, record);
 
                     // go through and disable any enabled attributes
                     if (!record.enabledAttributes.isEmpty()) {

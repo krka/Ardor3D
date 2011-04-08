@@ -54,4 +54,7 @@ public class ImmediateTransitionState extends AbstractTransitionState {
      */
     @Override
     public void update(final double globalTime, final AnimationLayer layer) {}
+
+    @Override
+    public void postUpdate(final AnimationLayer layer) {}
 }

@@ -10,7 +10,6 @@
 
 package com.ardor3d.scene.state.jogl.shader;
 
-import java.nio.FloatBuffer;
 import java.util.logging.Logger;
 
 import javax.media.opengl.GL;
@@ -20,8 +19,10 @@ import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
 import com.ardor3d.renderer.Renderer;
+import com.ardor3d.renderer.jogl.JoglRenderer;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.record.ShaderObjectsStateRecord;
+import com.ardor3d.scene.state.jogl.util.JoglRendererUtil;
 import com.ardor3d.util.shader.ShaderVariable;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat;
 import com.ardor3d.util.shader.uniformtypes.ShaderVariableFloat2;
@@ -252,14 +253,17 @@ public abstract class JoglShaderUtil {
     }
 
     /**
-     * Updates an attribute shadervariable.
+     * Updates an vertex attribute pointer.
      * 
      * @param renderer
      *            the current renderer
      * @param shaderVariable
      *            variable to update
+     * @param useVBO
+     *            if true, we'll use VBO for the attributes, if false we'll use arrays.
      */
-    public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable) {
+    public static void updateShaderAttribute(final Renderer renderer, final ShaderVariable shaderVariable,
+            final boolean useVBO) {
         if (shaderVariable.variableID == -1) {
             // attribute is not bound, or was not found in shader.
             return;
@@ -267,79 +271,129 @@ public abstract class JoglShaderUtil {
 
         final RenderContext context = ContextManager.getCurrentContext();
         final ContextCapabilities caps = context.getCapabilities();
-        if (caps.isVBOSupported()) {
+        if (caps.isVBOSupported() && !useVBO) {
             renderer.unbindVBO();
         }
 
         final ShaderObjectsStateRecord record = (ShaderObjectsStateRecord) context.getStateRecord(StateType.GLSLShader);
 
         if (shaderVariable instanceof ShaderVariablePointerFloat) {
-            updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerFloat) shaderVariable, record, useVBO);
         } else if (shaderVariable instanceof ShaderVariablePointerFloatMatrix) {
-            updateShaderAttribute((ShaderVariablePointerFloatMatrix) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerFloatMatrix) shaderVariable, record, useVBO);
         } else if (shaderVariable instanceof ShaderVariablePointerByte) {
-            updateShaderAttribute((ShaderVariablePointerByte) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerByte) shaderVariable, record, useVBO);
         } else if (shaderVariable instanceof ShaderVariablePointerInt) {
-            updateShaderAttribute((ShaderVariablePointerInt) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerInt) shaderVariable, record, useVBO);
         } else if (shaderVariable instanceof ShaderVariablePointerShort) {
-            updateShaderAttribute((ShaderVariablePointerShort) shaderVariable);
+            updateShaderAttribute((ShaderVariablePointerShort) shaderVariable, record, useVBO);
         } else {
             logger.warning("updateShaderAttribute: Unknown shaderVariable type!");
             return;
         }
-
-        record.enabledAttributes.add(shaderVariable.variableID);
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerFloat shaderUniform) {
-        final GL gl = GLU.getCurrentGL();
-
-        shaderUniform.data.rewind();
-        gl.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        gl.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, GL.GL_FLOAT,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
-    }
-
-    private static void updateShaderAttribute(final ShaderVariablePointerFloatMatrix shaderUniform) {
-        final GL gl = GLU.getCurrentGL();
-        final FloatBuffer data = shaderUniform.data.duplicate();
-        final int size = shaderUniform.size;
-        final int length = data.capacity() / size;
-        int pos = 0;
-        for (int i = 0; i < size; i++) {
-            pos = (i * length);
-            data.limit(pos + length - 1);
-            data.position(pos);
-            gl.glEnableVertexAttribArrayARB(shaderUniform.variableID + i);
-            gl.glVertexAttribPointerARB(shaderUniform.variableID + i, size, GL.GL_FLOAT, shaderUniform.normalized, 0,
-                    data);
+    public static void useShaderProgram(final int id, final ShaderObjectsStateRecord record) {
+        if (record.shaderId != id) {
+            GLU.getCurrentGL().glUseProgramObjectARB(id);
+            record.shaderId = id;
         }
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerByte shaderUniform) {
-        final GL gl = GLU.getCurrentGL();
-
-        shaderUniform.data.rewind();
-        gl.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        gl.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, GL.GL_UNSIGNED_BYTE,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void enableVertexAttribute(final int id, final ShaderObjectsStateRecord record) {
+        if (!record.enabledAttributes.contains(id)) {
+            GLU.getCurrentGL().glEnableVertexAttribArrayARB(id);
+            record.enabledAttributes.add(id);
+        }
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerInt shaderUniform) {
-        final GL gl = GLU.getCurrentGL();
-
-        shaderUniform.data.rewind();
-        gl.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        gl.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, GL.GL_UNSIGNED_INT,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void updateShaderAttribute(final ShaderVariablePointerFloat variable,
+            final ShaderObjectsStateRecord record, final boolean useVBO) {
+        enableVertexAttribute(variable.variableID, record);
+        if (useVBO) {
+            final RenderContext context = ContextManager.getCurrentContext();
+            final int vboId = JoglRenderer.setupVBO(variable.data, context);
+            JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size, GL.GL_FLOAT,
+                    variable.normalized, variable.stride, 0);
+        } else {
+            variable.data.getBuffer().rewind();
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size, GL.GL_FLOAT,
+                    variable.normalized, variable.stride, variable.data.getBuffer());
+        }
     }
 
-    private static void updateShaderAttribute(final ShaderVariablePointerShort shaderUniform) {
+    private static void updateShaderAttribute(final ShaderVariablePointerFloatMatrix variable,
+            final ShaderObjectsStateRecord record, final boolean useVBO) {
         final GL gl = GLU.getCurrentGL();
+        final int size = variable.size;
+        final int length = variable.data.getBuffer().capacity() / size;
+        final RenderContext context = ContextManager.getCurrentContext();
+        int pos = 0;
+        for (int i = 0; i < size; i++) {
+            pos = (i * length);
+            enableVertexAttribute(variable.variableID + i, record);
+            if (useVBO) {
+                final int vboId = JoglRenderer.setupVBO(variable.data, context);
+                JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
+                gl.glVertexAttribPointerARB(variable.variableID + i, size, GL.GL_FLOAT, variable.normalized, 0, pos);
+            } else {
+                variable.data.getBuffer().limit(pos + length - 1);
+                variable.data.getBuffer().position(pos);
+                gl.glVertexAttribPointerARB(variable.variableID + i, size, GL.GL_FLOAT, variable.normalized, 0,
+                        variable.data.getBuffer());
+            }
+        }
+    }
 
-        shaderUniform.data.rewind();
-        gl.glEnableVertexAttribArrayARB(shaderUniform.variableID);
-        gl.glVertexAttribPointerARB(shaderUniform.variableID, shaderUniform.size, GL.GL_UNSIGNED_SHORT,
-                shaderUniform.normalized, shaderUniform.stride, shaderUniform.data);
+    private static void updateShaderAttribute(final ShaderVariablePointerByte variable,
+            final ShaderObjectsStateRecord record, final boolean useVBO) {
+        enableVertexAttribute(variable.variableID, record);
+        if (useVBO) {
+            final RenderContext context = ContextManager.getCurrentContext();
+            final int vboId = JoglRenderer.setupVBO(variable.data, context);
+            JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride, 0);
+        } else {
+            variable.data.getBuffer().rewind();
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_BYTE : GL.GL_BYTE, variable.normalized, variable.stride,
+                    variable.data.getBuffer());
+        }
+    }
+
+    private static void updateShaderAttribute(final ShaderVariablePointerInt variable,
+            final ShaderObjectsStateRecord record, final boolean useVBO) {
+        enableVertexAttribute(variable.variableID, record);
+        if (useVBO) {
+            final RenderContext context = ContextManager.getCurrentContext();
+            final int vboId = JoglRenderer.setupVBO(variable.data, context);
+            JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_INT : GL.GL_INT, variable.normalized, variable.stride, 0);
+        } else {
+            variable.data.getBuffer().rewind();
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_INT : GL.GL_INT, variable.normalized, variable.stride,
+                    variable.data.getBuffer());
+        }
+    }
+
+    private static void updateShaderAttribute(final ShaderVariablePointerShort variable,
+            final ShaderObjectsStateRecord record, final boolean useVBO) {
+        enableVertexAttribute(variable.variableID, record);
+        if (useVBO) {
+            final RenderContext context = ContextManager.getCurrentContext();
+            final int vboId = JoglRenderer.setupVBO(variable.data, context);
+            JoglRendererUtil.setBoundVBO(context.getRendererRecord(), vboId);
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized, variable.stride, 0);
+        } else {
+            variable.data.getBuffer().rewind();
+            GLU.getCurrentGL().glVertexAttribPointerARB(variable.variableID, variable.size,
+                    variable.unsigned ? GL.GL_UNSIGNED_SHORT : GL.GL_SHORT, variable.normalized, variable.stride,
+                    variable.data.getBuffer());
+        }
     }
 }

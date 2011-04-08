@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -14,14 +14,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.util.export.Savable;
 
 /**
  * Simple utility class that uses BinaryImporter/Exporter in memory to clone a spatial.
  */
 public class BinaryCloner {
-    public Spatial copy(final Spatial source) {
+    @SuppressWarnings("unchecked")
+    public <T extends Savable> T copy(final T source) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             final BinaryExporter exporter = new BinaryExporter();
@@ -29,8 +29,7 @@ public class BinaryCloner {
             bos.flush();
             final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
             final BinaryImporter importer = new BinaryImporter();
-            final Savable sav = importer.load(bis);
-            return (Spatial) sav;
+            return (T) importer.load(bis);
         } catch (final IOException ex) {
             // should not happen, since we are dealing with only byte array streams.
             throw new RuntimeException(ex);

@@ -25,7 +25,7 @@ import com.google.common.collect.Sets;
  * Takes two blend sources and uses linear interpolation to merge TransformData values. If one of the sources is null,
  * or does not have a key that the other does, we disregard weighting and use the non-null side's full value.
  * </p>
- *<p>
+ * <p>
  * Source data that is not TransformData is not combined, rather A's value will always be used unless it is null.
  * </p>
  */
@@ -214,5 +214,17 @@ public class BinaryLERPSource extends AbstractTwoPartSource {
         }
 
         return rVal;
+    }
+
+    @Override
+    public boolean isActive(final AnimationManager manager) {
+        boolean foundActive = false;
+        if (getSourceA() != null) {
+            foundActive |= getSourceA().isActive(manager);
+        }
+        if (getSourceB() != null) {
+            foundActive |= getSourceB().isActive(manager);
+        }
+        return foundActive;
     }
 }

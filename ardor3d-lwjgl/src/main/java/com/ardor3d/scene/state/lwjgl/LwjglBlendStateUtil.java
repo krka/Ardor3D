@@ -23,7 +23,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.BlendState.BlendEquation;
 import com.ardor3d.renderer.state.BlendState.DestinationFunction;
@@ -34,7 +33,7 @@ import com.ardor3d.renderer.state.record.BlendStateRecord;
 
 public abstract class LwjglBlendStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final BlendState state) {
+    public static void apply(final BlendState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final BlendStateRecord record = (BlendStateRecord) context.getStateRecord(StateType.Blend);
@@ -130,8 +129,8 @@ public abstract class LwjglBlendStateUtil {
             if (applyConstant && caps.isConstantBlendColorSupported()) {
                 final ReadOnlyColorRGBA constant = state.getConstantColor();
                 if (!record.isValid() || (caps.isConstantBlendColorSupported() && !record.blendColor.equals(constant))) {
-                    ARBImaging.glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(), constant
-                            .getAlpha());
+                    ARBImaging.glBlendColor(constant.getRed(), constant.getGreen(), constant.getBlue(),
+                            constant.getAlpha());
                     record.blendColor.set(constant);
                 }
             }

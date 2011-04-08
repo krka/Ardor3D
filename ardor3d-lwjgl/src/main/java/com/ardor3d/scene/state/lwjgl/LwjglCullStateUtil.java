@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.CullState.PolygonWind;
@@ -23,7 +22,7 @@ import com.ardor3d.renderer.state.record.CullStateRecord;
 
 public abstract class LwjglCullStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final CullState state) {
+    public static void apply(final CullState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final CullStateRecord record = (CullStateRecord) context.getStateRecord(StateType.Cull);

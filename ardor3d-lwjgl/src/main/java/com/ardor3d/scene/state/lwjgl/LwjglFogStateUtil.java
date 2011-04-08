@@ -17,7 +17,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.FogState;
 import com.ardor3d.renderer.state.FogState.CoordinateSource;
 import com.ardor3d.renderer.state.FogState.DensityFunction;
@@ -27,7 +26,7 @@ import com.ardor3d.renderer.state.record.FogStateRecord;
 
 public abstract class LwjglFogStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final FogState state) {
+    public static void apply(final FogState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final FogStateRecord record = (FogStateRecord) context.getStateRecord(StateType.Fog);
@@ -95,8 +94,8 @@ public abstract class LwjglFogStateUtil {
         if (!record.isValid() || !color.equals(record.fogColor)) {
             record.fogColor.set(color);
             record.colorBuff.clear();
-            record.colorBuff.put(record.fogColor.getRed()).put(record.fogColor.getGreen()).put(
-                    record.fogColor.getBlue()).put(record.fogColor.getAlpha());
+            record.colorBuff.put(record.fogColor.getRed()).put(record.fogColor.getGreen())
+                    .put(record.fogColor.getBlue()).put(record.fogColor.getAlpha());
             record.colorBuff.flip();
             GL11.glFog(GL11.GL_FOG_COLOR, record.colorBuff);
         }

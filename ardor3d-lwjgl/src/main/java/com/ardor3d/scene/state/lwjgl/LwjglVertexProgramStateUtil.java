@@ -20,9 +20,8 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.VertexProgramState;
 import com.ardor3d.renderer.state.record.VertexProgramStateRecord;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -64,7 +63,7 @@ public abstract class LwjglVertexProgramStateUtil {
      * 
      * @see com.ardor3d.renderer.state.RenderState#apply()
      */
-    public static void apply(final LwjglRenderer renderer, final VertexProgramState state) {
+    public static void apply(final VertexProgramState state) {
         final RenderContext context = ContextManager.getCurrentContext();
         if (context.getCapabilities().isVertexProgramSupported()) {
             // ask for the current state record
@@ -92,8 +91,9 @@ public abstract class LwjglVertexProgramStateUtil {
                     for (int i = 0; i < VertexProgramState._getEnvParameters().length; i++) {
                         if (VertexProgramState._getEnvParameters()[i] != null) {
                             ARBProgram.glProgramEnvParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, i,
-                                    VertexProgramState._getEnvParameters()[i][0], VertexProgramState
-                                            ._getEnvParameters()[i][1], VertexProgramState._getEnvParameters()[i][2],
+                                    VertexProgramState._getEnvParameters()[i][0],
+                                    VertexProgramState._getEnvParameters()[i][1],
+                                    VertexProgramState._getEnvParameters()[i][2],
                                     VertexProgramState._getEnvParameters()[i][3]);
                         }
                     }
@@ -104,8 +104,8 @@ public abstract class LwjglVertexProgramStateUtil {
                         for (int i = 0; i < state._getParameters().length; i++) {
                             if (state._getParameters()[i] != null) {
                                 ARBProgram.glProgramLocalParameter4fARB(ARBVertexProgram.GL_VERTEX_PROGRAM_ARB, i,
-                                        state._getParameters()[i][0], state._getParameters()[i][1], state
-                                                ._getParameters()[i][2], state._getParameters()[i][3]);
+                                        state._getParameters()[i][0], state._getParameters()[i][1],
+                                        state._getParameters()[i][2], state._getParameters()[i][3]);
                             }
                         }
                     }

@@ -28,7 +28,7 @@ import org.lwjgl.opengl.RenderTexture;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Texture.Type;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
 import com.ardor3d.renderer.ContextCapabilities;
@@ -82,7 +82,10 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
      * <code>setupTexture</code> initializes a new Texture object for use with TextureRenderer. Generates a valid gl
      * texture id for this texture and inits the data type for the texture.
      */
-    public void setupTexture(final Texture2D tex) {
+    public void setupTexture(final Texture tex) {
+        if (tex.getType() != Type.TwoDimensional) {
+            throw new IllegalArgumentException("Unsupported type: " + tex.getType());
+        }
         final RenderContext context = ContextManager.getCurrentContext();
         final TextureStateRecord record = (TextureStateRecord) context.getStateRecord(RenderState.StateType.Texture);
 
@@ -267,9 +270,9 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 giveBackContext();
                 ContextManager.removeContext(_pbuffer);
             }
-            final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(), _settings
-                    .getStencilBits()).withSamples(_settings.getSamples()).withBitsPerPixel(_settings.getColorDepth())
-                    .withStereo(_settings.isStereo());
+            final PixelFormat format = new PixelFormat(_settings.getAlphaBits(), _settings.getDepthBits(),
+                    _settings.getStencilBits()).withSamples(_settings.getSamples())
+                    .withBitsPerPixel(_settings.getColorDepth()).withStereo(_settings.isStereo());
             _pbuffer = new Pbuffer(_width, _height, format, _texture, null);
             final Object contextKey = _pbuffer;
             try {
@@ -279,15 +282,14 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
             }
 
             final LwjglContextCapabilities caps = new LwjglContextCapabilities(GLContext.getCapabilities());
-            ContextManager.addContext(contextKey, new RenderContext(contextKey, caps, ContextManager
-                    .getCurrentContext()));
+            ContextManager.addContext(contextKey,
+                    new RenderContext(contextKey, caps, ContextManager.getCurrentContext()));
 
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "initPbuffer()", "Exception", e);
 
             if (_texture != null && _useDirectRender) {
-                logger
-                        .warning("Your card claims to support Render to Texture but fails to enact it.  Updating your driver might solve this problem.");
+                logger.warning("Your card claims to support Render to Texture but fails to enact it.  Updating your driver might solve this problem.");
                 logger.warning("Attempting to fall back to Copy Texture.");
                 _texture = null;
                 _useDirectRender = false;
@@ -324,8 +326,8 @@ public class LwjglPbufferTextureRenderer extends AbstractPbufferTextureRenderer 
                 ContextManager.getCurrentContext().enforceStates(_enforcedStates);
 
                 if (_bgColorDirty) {
-                    GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor
-                            .getBlue(), _backgroundColor.getAlpha());
+                    GL11.glClearColor(_backgroundColor.getRed(), _backgroundColor.getGreen(),
+                            _backgroundColor.getBlue(), _backgroundColor.getAlpha());
                     _bgColorDirty = false;
                 }
             } catch (final LWJGLException e) {

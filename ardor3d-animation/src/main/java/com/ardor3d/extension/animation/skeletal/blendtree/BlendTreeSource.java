@@ -47,4 +47,13 @@ public interface BlendTreeSource {
      */
     void resetClips(AnimationManager manager, double globalStartTime);
 
+    /**
+     * Check if there are still active clips in the tree.
+     * 
+     * @param manager
+     *            the manager this is being called from.
+     * @return true if we found at least one active clip in the tree
+     */
+    boolean isActive(AnimationManager manager);
+
 }

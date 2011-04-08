@@ -60,6 +60,11 @@ public class FloatBufferData extends AbstractBufferData<FloatBuffer> implements 
         _valuesPerTuple = valuesPerTuple;
     }
 
+    @Override
+    public int getByteCount() {
+        return 4;
+    }
+
     public int getTupleCount() {
         return getBufferLimit() / _valuesPerTuple;
     }

@@ -929,13 +929,28 @@ public abstract class ParticleSystem extends Node {
     }
 
     @Override
+    public ParticleSystem makeCopy(final boolean shareGeometricData) {
+        synchronized (this) {
+            // Do not call make copy on the "generated" particle geometry.
+            final Spatial geom = getParticleGeometry();
+            detachChild(geom);
+            final ParticleSystem copy = (ParticleSystem) super.makeCopy(shareGeometricData);
+            // Reattach
+            attachChild(geom);
+            return copy;
+        }
+    }
+
+    @Override
     public void write(final OutputCapsule capsule) throws IOException {
-        // Do not save the "generated" particle geometry.
-        final Spatial geom = getParticleGeometry();
-        detachChild(geom);
-        super.write(capsule);
-        // Reattach
-        attachChild(geom);
+        synchronized (this) {
+            // Do not save the "generated" particle geometry.
+            final Spatial geom = getParticleGeometry();
+            detachChild(geom);
+            super.write(capsule);
+            // Reattach
+            attachChild(geom);
+        }
 
         capsule.write(_particleType, "particleType", ParticleType.Quad);
         capsule.write(_particleEmitter, "particleEmitter", null);

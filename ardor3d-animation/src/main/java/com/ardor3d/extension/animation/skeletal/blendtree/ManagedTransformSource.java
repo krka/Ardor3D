@@ -132,6 +132,14 @@ public class ManagedTransformSource implements BlendTreeSource {
     }
 
     /**
+     * Does nothing.
+     */
+    @Override
+    public boolean isActive(final AnimationManager manager) {
+        return true;
+    }
+
+    /**
      * Setup transform data on this source, using the first frame from a specific clip and jointNames from a specific
      * pose.
      * 

@@ -59,17 +59,15 @@ public class UIScrollPanel extends UIPanel {
                 updateScrollBarSliders();
             }
         });
+        applySkin();
     }
 
     @Override
     protected void drawComponent(final Renderer renderer) {
-        horizontalScrollBar.onDraw(renderer);
-        verticalScrollBar.onDraw(renderer);
         renderer.pushClip(getHudX() + getTotalLeft(), getHudY() + getTotalBottom()
                 + horizontalScrollBar.getContentHeight(), getContentWidth() - verticalScrollBar.getContentWidth(),
                 getContentHeight() - horizontalScrollBar.getContentHeight());
         // temporary translate the view - this is a hack and there may be a better solution
-        // System.out.println("draw view port");
         final int x = view.getLocalX();
         final int y = view.getLocalY();
         view.setLocalXY(x - offsetX, y - offsetY);
@@ -77,11 +75,15 @@ public class UIScrollPanel extends UIPanel {
         view.draw(renderer);
         view.setLocalXY(x, y);
         renderer.popClip();
+        horizontalScrollBar.onDraw(renderer);
+        verticalScrollBar.onDraw(renderer);
     }
 
     @Override
     public void updateMinimumSizeFromContents() {
-        setMinimumContentSize(verticalScrollBar.getContentWidth() + 1, horizontalScrollBar.getContentHeight() + 1);
+        super.updateMinimumSizeFromContents();
+        setMinimumContentSize(verticalScrollBar.getLocalComponentWidth() + 1, horizontalScrollBar
+                .getLocalComponentHeight() + 1);
         updateScrollBarSliders();
     }
 

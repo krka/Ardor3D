@@ -235,6 +235,9 @@ public abstract class Texture implements Savable {
         Add;
     }
 
+    /**
+     * Formula to use for texture coordinate generation
+     */
     public enum EnvironmentalMapMode {
         /**
          * Use texture coordinates as they are. (Do not do texture coordinate generation.)
@@ -1336,7 +1339,7 @@ public abstract class Texture implements Savable {
         rVal.setAnisotropicFilterPercent(_anisotropicFilterPercent);
         rVal.setApply(_apply);
         rVal.setConstantColor(_constantColor);
-        rVal.setBorderColor(_constantColor);
+        rVal.setBorderColor(_borderColor);
         rVal.setCombineFuncAlpha(_combineFuncAlpha);
         rVal.setCombineFuncRGB(_combineFuncRGB);
         rVal.setCombineOp0Alpha(_combineOp0Alpha);
@@ -1418,22 +1421,29 @@ public abstract class Texture implements Savable {
         capsule.write(_combineScaleRGB, "combineScaleRGB", CombinerScale.One);
         capsule.write(_combineScaleAlpha, "combineScaleAlpha", CombinerScale.One);
         capsule.write(_storeFormat, "storeFormat", TextureStoreFormat.RGBA8);
-        if (!_storeImage) {
-            capsule.write(_key, "textureKey", null);
-        }
+        capsule.write(_key, "textureKey", null);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
         _minificationFilter = capsule.readEnum("minificationFilter", MinificationFilter.class,
                 MinificationFilter.NearestNeighborNoMipMaps);
         _image = (Image) capsule.readSavable("image", null);
-        if (_image == null) {
-            final TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
-            _key = TextureKey.getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getMinificationFilter());
-            if (_key != null && _key.getSource() != null) {
-                TextureManager.loadFromKey(_key, null, this);
-            }
+
+        // pull our key, if exists
+        final TextureKey key = (TextureKey) capsule.readSavable("textureKey", null);
+        if (key != null) {
+            _key = TextureKey.getKey(key.getSource(), key.isFlipped(), key.getFormat(), key.getId(),
+                    key.getMinificationFilter());
+        } else {
+            // none set, so pop in a generated key
+            _key = TextureKey.getRTTKey(_minificationFilter);
         }
+
+        // pull texture image from resource, if possible.
+        if (_image == null && _key != null && _key.getSource() != null) {
+            TextureManager.loadFromKey(_key, null, this);
+        }
+
         _constantColor.set((ColorRGBA) capsule.readSavable("constantColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _borderColor.set((ColorRGBA) capsule.readSavable("borderColor", new ColorRGBA(ColorRGBA.BLACK_NO_ALPHA)));
         _texMatrix.set((Matrix4) capsule.readSavable("texMatrix", new Matrix4(Matrix4.IDENTITY)));

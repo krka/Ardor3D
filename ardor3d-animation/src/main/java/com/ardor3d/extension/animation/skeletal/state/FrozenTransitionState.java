@@ -57,5 +57,13 @@ public class FrozenTransitionState extends AbstractTwoStateLerpTransition {
         if (getStateB() != null) {
             getStateB().update(globalTime, layer);
         }
+    }
+
+    @Override
+    public void postUpdate(final AnimationLayer layer) {
+        // update only the B state - the first is frozen
+        if (getStateB() != null) {
+            getStateB().postUpdate(layer);
+        }
     };
 }

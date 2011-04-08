@@ -25,7 +25,7 @@ import javax.media.opengl.glu.GLU;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.image.Texture;
-import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.Texture.Type;
 import com.ardor3d.renderer.AbstractPbufferTextureRenderer;
 import com.ardor3d.renderer.ContextCapabilities;
 import com.ardor3d.renderer.ContextManager;
@@ -71,7 +71,10 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
      * <code>setupTexture</code> initializes a new Texture object for use with TextureRenderer. Generates a valid gl
      * texture id for this texture and inits the data type for the texture.
      */
-    public void setupTexture(final Texture2D tex) {
+    public void setupTexture(final Texture tex) {
+        if (tex.getType() != Type.TwoDimensional) {
+            throw new IllegalArgumentException("Unsupported type: " + tex.getType());
+        }
         final GL gl = GLU.getCurrentGL();
 
         final RenderContext context = ContextManager.getCurrentContext();
@@ -273,15 +276,14 @@ public class JoglPbufferTextureRenderer extends AbstractPbufferTextureRenderer {
             _context.makeCurrent();
 
             final JoglContextCapabilities contextCaps = new JoglContextCapabilities(_pbuffer.getGL());
-            ContextManager.addContext(_context, new RenderContext(_context, contextCaps, ContextManager
-                    .getCurrentContext()));
+            ContextManager.addContext(_context,
+                    new RenderContext(_context, contextCaps, ContextManager.getCurrentContext()));
 
         } catch (final Exception e) {
             logger.logp(Level.SEVERE, this.getClass().toString(), "initPbuffer()", "Exception", e);
 
             if (_useDirectRender) {
-                logger
-                        .warning("Your card claims to support Render to Texture but fails to enact it.  Updating your driver might solve this problem.");
+                logger.warning("Your card claims to support Render to Texture but fails to enact it.  Updating your driver might solve this problem.");
                 logger.warning("Attempting to fall back to Copy Texture.");
                 _useDirectRender = false;
                 initPbuffer();

@@ -10,19 +10,20 @@
       <excludeFolder url="file://$MODULE_DIR$/target/archive-tmp" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
+      <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ardor3d-core" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:r08" level="project" />
     <orderEntry type="module" module-name="ardor3d-lwjgl" />
-    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl:2.6.0" level="project" />
-    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_util:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl:2.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_util:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: net.java.games.input:jinput:ardor3d-20100503" level="project" />
-    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_natives:linux:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.lwjgl:lwjgl_natives:windows:2.7.1" level="project" />
     <orderEntry type="module" module-name="ardor3d-awt" />
     <orderEntry type="module" module-name="ardor3d-swt" />
-    <orderEntry type="library" name="Maven: org.eclipse.swt:swt:linux-x86_64:3650" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.swt:swt:win32-x86:3650" level="project" />
     <orderEntry type="module" module-name="ardor3d-jogl" />
     <orderEntry type="library" name="Maven: net.java.dev.jogl:jogl:ardor3d-1.1.2-pre-20080523" level="project" />
     <orderEntry type="library" name="Maven: com.projectdarkstar.ext.net.java.dev.gluegen:gluegen-rt:1.0b06" level="project" />

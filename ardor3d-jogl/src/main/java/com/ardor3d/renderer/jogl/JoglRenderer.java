@@ -827,21 +827,21 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    private int setupVBO(final FloatBufferData data, final RenderContext context, final RendererRecord rendRecord) {
+    public static int setupVBO(final AbstractBufferData<? extends Buffer> data, final RenderContext context) {
         if (data == null) {
             return 0;
         }
 
         final GL gl = GLU.getCurrentGL();
 
+        final RendererRecord rendRecord = context.getRendererRecord();
         int vboID = data.getVBOID(context.getGlContextRep());
         if (vboID != 0) {
             updateVBO(data, rendRecord, vboID, 0);
-
             return vboID;
         }
 
-        final FloatBuffer dataBuffer = data.getBuffer();
+        final Buffer dataBuffer = data.getBuffer();
         if (dataBuffer != null) {
             // XXX: should we be rewinding? Maybe make that the programmer's responsibility.
             dataBuffer.rewind();
@@ -850,22 +850,23 @@ public class JoglRenderer extends AbstractRenderer {
 
             rendRecord.invalidateVBO();
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, dataBuffer.limit() * 4, dataBuffer,
+            gl.glBufferDataARB(GL.GL_ARRAY_BUFFER_ARB, dataBuffer.limit() * data.getByteCount(), dataBuffer,
                     getGLVBOAccessMode(data.getVboAccessMode()));
         } else {
-            throw new Ardor3dException("Attempting to create a vbo id for a FloatBufferData with no Buffer value.");
+            throw new Ardor3dException("Attempting to create a vbo id for an AbstractBufferData with no Buffer value.");
         }
         return vboID;
     }
 
-    private void updateVBO(final FloatBufferData data, final RendererRecord rendRecord, final int vboID,
-            final int offsetBytes) {
+    private static void updateVBO(final AbstractBufferData<? extends Buffer> data, final RendererRecord rendRecord,
+            final int vboID, final int offsetBytes) {
         if (data.isNeedsRefresh()) {
             final GL gl = GLU.getCurrentGL();
-            final FloatBuffer dataBuffer = data.getBuffer();
+            final Buffer dataBuffer = data.getBuffer();
             dataBuffer.rewind();
             JoglRendererUtil.setBoundVBO(rendRecord, vboID);
-            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offsetBytes, dataBuffer.limit() * 4, dataBuffer);
+            gl.glBufferSubDataARB(GL.GL_ARRAY_BUFFER_ARB, offsetBytes, dataBuffer.limit() * data.getByteCount(),
+                    dataBuffer);
             data.setNeedsRefresh(false);
         }
     }
@@ -915,7 +916,7 @@ public class JoglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
@@ -923,7 +924,6 @@ public class JoglRenderer extends AbstractRenderer {
             gl.glVertexPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
         } else {
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
-            JoglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -933,7 +933,7 @@ public class JoglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
@@ -941,7 +941,6 @@ public class JoglRenderer extends AbstractRenderer {
             gl.glNormalPointer(GL.GL_FLOAT, 0, 0);
         } else {
             gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
-            JoglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -951,7 +950,7 @@ public class JoglRenderer extends AbstractRenderer {
         final RenderContext context = ContextManager.getCurrentContext();
         final RendererRecord rendRecord = context.getRendererRecord();
 
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             gl.glEnableClientState(GL.GL_COLOR_ARRAY);
@@ -959,7 +958,6 @@ public class JoglRenderer extends AbstractRenderer {
             gl.glColorPointer(data.getValuesPerTuple(), GL.GL_FLOAT, 0, 0);
         } else {
             gl.glDisableClientState(GL.GL_COLOR_ARRAY);
-            JoglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -974,7 +972,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
 
         final RendererRecord rendRecord = context.getRendererRecord();
-        final int vboID = setupVBO(data, context, rendRecord);
+        final int vboID = setupVBO(data, context);
 
         if (vboID != 0) {
             gl.glEnableClientState(GL.GL_FOG_COORDINATE_ARRAY_EXT);
@@ -982,7 +980,6 @@ public class JoglRenderer extends AbstractRenderer {
             gl.glFogCoordPointerEXT(GL.GL_FLOAT, 0, 0);
         } else {
             gl.glDisableClientState(GL.GL_FOG_COORDINATE_ARRAY_EXT);
-            JoglRendererUtil.setBoundVBO(rendRecord, 0);
         }
     }
 
@@ -1023,7 +1020,7 @@ public class JoglRenderer extends AbstractRenderer {
 
                     // grab a vboID and make sure it exists and is up to date.
                     final FloatBufferData data = textureCoords.get(i);
-                    final int vboID = setupVBO(data, context, rendRecord);
+                    final int vboID = setupVBO(data, context);
 
                     // Found good vbo
                     if (vboID != 0) {
@@ -1050,9 +1047,6 @@ public class JoglRenderer extends AbstractRenderer {
                             // disable state
                             gl.glDisableClientState(GL.GL_TEXTURE_COORD_ARRAY);
                         }
-
-                        // set our active vbo to 0
-                        JoglRendererUtil.setBoundVBO(rendRecord, 0);
                     }
                 }
             }
@@ -1168,8 +1162,6 @@ public class JoglRenderer extends AbstractRenderer {
         } else {
             gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
         }
-
-        JoglRendererUtil.setBoundVBO(rendRecord, 0);
     }
 
     private void initializeInterleavedVBO(final RenderContext context, final FloatBufferData interleaved,
@@ -1315,7 +1307,7 @@ public class JoglRenderer extends AbstractRenderer {
         }
     }
 
-    public int makeVBOId() {
+    private static int makeVBOId() {
         final GL gl = GLU.getCurrentGL();
 
         final IntBuffer idBuff = BufferUtils.createIntBuffer(1);
@@ -1330,7 +1322,7 @@ public class JoglRenderer extends AbstractRenderer {
         JoglRendererUtil.setBoundElementVBO(rendRecord, 0);
     }
 
-    private int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
+    private static int getGLVBOAccessMode(final VBOAccessMode vboAccessMode) {
         int glMode = GL.GL_STATIC_DRAW_ARB;
         switch (vboAccessMode) {
             case StaticDraw:

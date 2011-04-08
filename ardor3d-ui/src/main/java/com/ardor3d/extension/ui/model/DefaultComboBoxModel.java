@@ -14,9 +14,22 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Default implementation of a ComboBox model.
+ */
 public class DefaultComboBoxModel implements ComboBoxModel {
 
     protected List<ModelElement> _elements = Lists.newArrayList();
+
+    public DefaultComboBoxModel() {}
+
+    public DefaultComboBoxModel(final Object... data) {
+        if (data != null) {
+            for (int i = 0; i < data.length; i++) {
+                addItem(data[i]);
+            }
+        }
+    }
 
     @Override
     public int addItem(final Object value) {

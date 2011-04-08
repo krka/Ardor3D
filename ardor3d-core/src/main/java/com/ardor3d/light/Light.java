@@ -56,9 +56,9 @@ public abstract class Light implements Serializable, Savable {
     }
 
     // light attributes.
-    private final ColorRGBA ambient = new ColorRGBA(DEFAULT_AMBIENT);
-    private final ColorRGBA diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
-    private final ColorRGBA specular = new ColorRGBA(DEFAULT_SPECULAR);
+    private final ColorRGBA _ambient = new ColorRGBA(DEFAULT_AMBIENT);
+    private final ColorRGBA _diffuse = new ColorRGBA(DEFAULT_DIFFUSE);
+    private final ColorRGBA _specular = new ColorRGBA(DEFAULT_SPECULAR);
 
     private boolean _attenuate;
     private float _constant = 1;
@@ -70,7 +70,7 @@ public abstract class Light implements Serializable, Savable {
 
     private boolean _enabled;
 
-    private String name;
+    private String _name;
 
     /** when true, indicates the lights in this lightState will cast shadows. */
     protected boolean _shadowCaster;
@@ -192,7 +192,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the specular color value of the light.
      */
     public ReadOnlyColorRGBA getSpecular() {
-        return specular;
+        return _specular;
     }
 
     /**
@@ -202,7 +202,7 @@ public abstract class Light implements Serializable, Savable {
      *            the specular color value of the light.
      */
     public void setSpecular(final ReadOnlyColorRGBA specular) {
-        this.specular.set(specular);
+        this._specular.set(specular);
     }
 
     /**
@@ -211,7 +211,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the diffuse color value for this light.
      */
     public ReadOnlyColorRGBA getDiffuse() {
-        return diffuse;
+        return _diffuse;
     }
 
     /**
@@ -221,7 +221,7 @@ public abstract class Light implements Serializable, Savable {
      *            the diffuse color value for this light.
      */
     public void setDiffuse(final ReadOnlyColorRGBA diffuse) {
-        this.diffuse.set(diffuse);
+        this._diffuse.set(diffuse);
     }
 
     /**
@@ -230,7 +230,7 @@ public abstract class Light implements Serializable, Savable {
      * @return the ambient color value for this light.
      */
     public ReadOnlyColorRGBA getAmbient() {
-        return ambient;
+        return _ambient;
     }
 
     /**
@@ -240,7 +240,7 @@ public abstract class Light implements Serializable, Savable {
      *            the ambient color value for this light.
      */
     public void setAmbient(final ReadOnlyColorRGBA ambient) {
-        this.ambient.set(ambient);
+        this._ambient.set(ambient);
     }
 
     /**
@@ -300,29 +300,29 @@ public abstract class Light implements Serializable, Savable {
      *            the Light to copy from.
      */
     public void copyFrom(final Light light) {
-        ambient.set(light.ambient);
+        _ambient.set(light._ambient);
         _attenuate = light._attenuate;
         _constant = light._constant;
-        diffuse.set(light.diffuse);
+        _diffuse.set(light._diffuse);
         _enabled = light._enabled;
         _linear = light._linear;
         _quadratic = light._quadratic;
         _shadowCaster = light._shadowCaster;
-        specular.set(light.specular);
+        _specular.set(light._specular);
     }
 
     public String getName() {
-        return name;
+        return _name;
     }
 
     public void setName(final String name) {
-        this.name = name;
+        this._name = name;
     }
 
     public void write(final OutputCapsule capsule) throws IOException {
-        capsule.write(ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
-        capsule.write(diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
-        capsule.write(specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
+        capsule.write(_ambient, "ambient", new ColorRGBA(DEFAULT_AMBIENT));
+        capsule.write(_diffuse, "diffuse", new ColorRGBA(DEFAULT_DIFFUSE));
+        capsule.write(_specular, "specular", new ColorRGBA(DEFAULT_SPECULAR));
         capsule.write(_attenuate, "attenuate", false);
         capsule.write(_constant, "constant", 1);
         capsule.write(_linear, "linear", 0);
@@ -331,12 +331,13 @@ public abstract class Light implements Serializable, Savable {
         capsule.write(_backLightMask, "backLightMask", 0);
         capsule.write(_enabled, "enabled", false);
         capsule.write(_shadowCaster, "shadowCaster", false);
+        capsule.write(_name, "name", null);
     }
 
     public void read(final InputCapsule capsule) throws IOException {
-        ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
-        diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
-        specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
+        _ambient.set((ColorRGBA) capsule.readSavable("ambient", new ColorRGBA(DEFAULT_AMBIENT)));
+        _diffuse.set((ColorRGBA) capsule.readSavable("diffuse", new ColorRGBA(DEFAULT_DIFFUSE)));
+        _specular.set((ColorRGBA) capsule.readSavable("specular", new ColorRGBA(DEFAULT_SPECULAR)));
         _attenuate = capsule.readBoolean("attenuate", false);
         _constant = capsule.readFloat("constant", 1);
         _linear = capsule.readFloat("linear", 0);
@@ -345,6 +346,7 @@ public abstract class Light implements Serializable, Savable {
         _backLightMask = capsule.readInt("backLightMask", 0);
         _enabled = capsule.readBoolean("enabled", false);
         _shadowCaster = capsule.readBoolean("shadowCaster", false);
+        _name = capsule.readString("name", null);
     }
 
     public Class<? extends Light> getClassTag() {

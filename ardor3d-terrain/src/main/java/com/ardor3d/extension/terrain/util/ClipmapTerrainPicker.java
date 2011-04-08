@@ -224,9 +224,9 @@ public class ClipmapTerrainPicker {
             return false;
         }
 
-        if (!_workRay.intersects(_gridTriA.getA(), _gridTriA.getB(), _gridTriA.getC(), store, true)) {
-            final boolean intersects = _workRay.intersects(_gridTriB.getA(), _gridTriB.getB(), _gridTriB.getC(), store,
-                    true);
+        if (!_workRay.intersectsTriangle(_gridTriA.getA(), _gridTriA.getB(), _gridTriA.getC(), store)) {
+            final boolean intersects = _workRay.intersectsTriangle(_gridTriB.getA(), _gridTriB.getB(),
+                    _gridTriB.getC(), store);
             if (intersects && normalStore != null) {
                 final Vector3 edge1 = Vector3.fetchTempInstance().set(_gridTriB.getB()).subtractLocal(_gridTriB.getA());
                 final Vector3 edge2 = Vector3.fetchTempInstance().set(_gridTriB.getC()).subtractLocal(_gridTriB.getA());

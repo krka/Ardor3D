@@ -224,6 +224,14 @@ public class AnimationManager {
         } else {
             AnimationManager.logger.warning("No poses to apply to.");
         }
+
+        // post update to clear states
+        for (final AnimationLayer layer : _layers) {
+            final AbstractFiniteState state = layer.getCurrentState();
+            if (state != null) {
+                state.postUpdate(layer);
+            }
+        }
     }
 
     /**

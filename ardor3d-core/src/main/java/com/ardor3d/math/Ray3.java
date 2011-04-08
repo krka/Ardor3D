@@ -149,23 +149,19 @@ public class Ray3 extends Line3Base implements ReadOnlyRay3, Poolable {
     }
 
     /**
-     * Actual intersection implementation.
+     * Ray vs triangle implementation.
      * 
      * @param pointA
      * @param pointB
      * @param pointC
      * @param locationStore
-     *            see {@link #intersects(Vector3, Vector3, Vector3, Vector3, boolean)} and
-     *            {@link #intersectsPlanar(Vector3, Vector3, Vector3, Vector3, boolean)}
      * @param doPlanar
-     *            see {@link #intersects(Vector3, Vector3, Vector3, Vector3, boolean)} and
-     *            {@link #intersectsPlanar(Vector3, Vector3, Vector3, Vector3, boolean)}
-     * @return true if this ray intersects a triangle (or quad) formed by the given three points.
+     * @return true if this ray intersects a triangle formed by the given three points.
      * @throws NullPointerException
      *             if any of the points are null.
      */
-    public boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB, final ReadOnlyVector3 pointC,
-            final Vector3 locationStore, final boolean doPlanar) {
+    protected boolean intersects(final ReadOnlyVector3 pointA, final ReadOnlyVector3 pointB,
+            final ReadOnlyVector3 pointC, final Vector3 locationStore, final boolean doPlanar) {
         final Vector3 diff = Vector3.fetchTempInstance().set(_origin).subtractLocal(pointA);
         final Vector3 edge1 = Vector3.fetchTempInstance().set(pointB).subtractLocal(pointA);
         final Vector3 edge2 = Vector3.fetchTempInstance().set(pointC).subtractLocal(pointA);

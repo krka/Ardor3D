@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -23,6 +23,7 @@ import com.ardor3d.extension.animation.skeletal.AnimationListener;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.AttachmentPoint;
 import com.ardor3d.extension.animation.skeletal.SkeletonPose;
+import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.blendtree.ManagedTransformSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
@@ -38,11 +39,11 @@ import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
 import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.UIHud;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIRadioButton;
-import com.ardor3d.extension.ui.UIFrame.FrameButtons;
 import com.ardor3d.extension.ui.event.ActionEvent;
 import com.ardor3d.extension.ui.event.ActionListener;
 import com.ardor3d.extension.ui.layout.AnchorLayout;
@@ -60,10 +61,14 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Renderer;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.GLSLShaderObjectsState;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.controller.SpatialController;
-import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.DataMode;
 import com.ardor3d.scenegraph.shape.Cylinder;
+import com.ardor3d.scenegraph.visitor.Visitor;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
@@ -95,6 +100,10 @@ public class AnimationDemoExample extends ExampleBase {
     private UIButton runWalkButton, punchButton;
     private OutputStore layerOutput;
     private Cylinder staff;
+
+    private GLSLShaderObjectsState gpuShader;
+
+    private final Node skNode = new Node("skeletons");
 
     public static void main(final String[] args) {
         ExampleBase.start(AnimationDemoExample.class);
@@ -134,8 +143,8 @@ public class AnimationDemoExample extends ExampleBase {
 
         // Add fps display
         frameRateLabel = new UILabel("X");
-        frameRateLabel.setHudXY(5, _canvas.getCanvasRenderer().getCamera().getHeight() - 5
-                - frameRateLabel.getContentHeight());
+        frameRateLabel.setHudXY(5,
+                _canvas.getCanvasRenderer().getCamera().getHeight() - 5 - frameRateLabel.getContentHeight());
         frameRateLabel.setForegroundColor(ColorRGBA.WHITE);
         hud.add(frameRateLabel);
 
@@ -169,7 +178,6 @@ public class AnimationDemoExample extends ExampleBase {
         punchButton
                 .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, runWalkButton, Alignment.BOTTOM_LEFT, 0, -5));
         punchButton.addActionListener(new ActionListener() {
-
             public void actionPerformed(final ActionEvent event) {
                 manager.findAnimationLayer("punch").setCurrentState("punch_right", true);
                 punchButton.setEnabled(false);
@@ -188,20 +196,46 @@ public class AnimationDemoExample extends ExampleBase {
         });
         basePanel.add(headCheck);
 
-        final UICheckBox skinCheck = new UICheckBox("Show skin mesh");
-        skinCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
-        skinCheck.setSelected(true);
-        skinCheck.addActionListener(new ActionListener() {
-
+        final UICheckBox gpuSkinningCheck = new UICheckBox("Use GPU skinning");
+        gpuSkinningCheck
+                .setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, headCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        gpuSkinningCheck.setSelected(false);
+        gpuSkinningCheck.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
-                colladaNode.getSceneHints().setCullHint(skinCheck.isSelected() ? CullHint.Dynamic : CullHint.Always);
+                _root.acceptVisitor(new Visitor() {
+                    @Override
+                    public void visit(final Spatial spatial) {
+                        if (spatial instanceof SkinnedMesh) {
+                            final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                            if (gpuSkinningCheck.isSelected()) {
+                                skinnedSpatial.setGPUShader(gpuShader);
+                                skinnedSpatial.setUseGPU(true);
+                            } else {
+                                skinnedSpatial.setGPUShader(null);
+                                skinnedSpatial.clearRenderState(StateType.GLSLShader);
+                                skinnedSpatial.setUseGPU(false);
+                            }
+                        }
+                    }
+                }, true);
             }
         });
-        basePanel.add(skinCheck);
+        basePanel.add(gpuSkinningCheck);
+
+        final UICheckBox vboCheck = new UICheckBox("Use VBO");
+        vboCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, gpuSkinningCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        vboCheck.setSelected(false);
+        vboCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+                skNode.getSceneHints().setDataMode(vboCheck.isSelected() ? DataMode.VBO : DataMode.Arrays);
+                gpuShader.setUseAttributeVBO(vboCheck.isSelected());
+            }
+        });
+        basePanel.add(vboCheck);
 
         final UICheckBox skeletonCheck = new UICheckBox("Show skeleton");
         final UICheckBox boneLabelCheck = new UICheckBox("Show joint labels");
-        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, skinCheck, Alignment.BOTTOM_LEFT, 0, -5));
+        skeletonCheck.setLayoutData(new AnchorLayoutData(Alignment.TOP_LEFT, vboCheck, Alignment.BOTTOM_LEFT, 0, -5));
         skeletonCheck.setSelected(showSkeleton);
         skeletonCheck.addActionListener(new ActionListener() {
 
@@ -282,8 +316,8 @@ public class AnimationDemoExample extends ExampleBase {
 
     private void createCharacter() {
         try {
-            // detach the old colladaNode, if present.
-            _root.detachChild(colladaNode);
+            skNode.detachAllChildren();
+            _root.attachChild(skNode);
 
             final long time = System.currentTimeMillis();
             final ColladaImporter colladaImporter = new ColladaImporter();
@@ -300,9 +334,6 @@ public class AnimationDemoExample extends ExampleBase {
             System.out.println("Importing: " + mainFile);
             System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
-            // Add colladaNode to root
-            _root.attachChild(colladaNode);
-
             // TODO temp camera positioning until reading camera instances...
             ReadOnlyVector3 upAxis = Vector3.UNIT_Y;
             if (storage.getAssetData().getUpAxis() != null) {
@@ -311,32 +342,42 @@ public class AnimationDemoExample extends ExampleBase {
 
             positionCamera(upAxis);
 
-            // Uncomment to try out gpu skinning
-            // final GLSLShaderObjectsState gpuShader = new GLSLShaderObjectsState();
-            // gpuShader.setEnabled(true);
-            // try {
-            // gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationDemoExample.class,
-            // "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
-            // gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
-            // AnimationDemoExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
-            // } catch (final IOException ioe) {
-            // ioe.printStackTrace();
-            // }
-            //
-            // colladaNode.acceptVisitor(new Visitor() {
-            // @Override
-            // public void visit(final Spatial spatial) {
-            // if (spatial instanceof SkinnedMesh) {
-            // final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
-            // skinnedSpatial.setGPUShader(gpuShader);
-            // skinnedSpatial.setUseGPU(true);
-            // }
-            // }
-            // }, true);
+            gpuShader = new GLSLShaderObjectsState();
+            gpuShader.setEnabled(true);
+            try {
+                gpuShader.setVertexShader(ResourceLocatorTool.getClassPathResourceAsStream(AnimationDemoExample.class,
+                        "com/ardor3d/extension/animation/skeletal/skinning_gpu.vert"));
+                gpuShader.setFragmentShader(ResourceLocatorTool.getClassPathResourceAsStream(
+                        AnimationDemoExample.class, "com/ardor3d/extension/animation/skeletal/skinning_gpu.frag"));
+            } catch (final IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+            // turn on the buffers in our skeleton so they can be shared.
+            colladaNode.acceptVisitor(new Visitor() {
+                @Override
+                public void visit(final Spatial spatial) {
+                    if (spatial instanceof SkinnedMesh) {
+                        final SkinnedMesh skinnedSpatial = (SkinnedMesh) spatial;
+                        skinnedSpatial.recreateWeightAttributeBuffer();
+                        skinnedSpatial.recreateJointAttributeBuffer();
+                    }
+                }
+            }, true);
 
             final CullState cullState = new CullState();
             cullState.setCullFace(Face.Back);
-            _root.setRenderState(cullState);
+            colladaNode.setRenderState(cullState);
+
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    // Add colladaNode to root
+                    final Node copy = colladaNode.makeCopy(true);
+                    copy.setTranslation(-i * 50, 0, -50 - (j * 50));
+                    skNode.attachChild(copy);
+                }
+            }
+
         } catch (final Exception ex) {
             ex.printStackTrace();
         }
@@ -422,8 +463,8 @@ public class AnimationDemoExample extends ExampleBase {
                 radius = ((BoundingSphere) bounding).getRadius();
             } else if (bounding instanceof BoundingBox) {
                 final BoundingBox boundingBox = (BoundingBox) bounding;
-                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()), boundingBox
-                        .getZExtent());
+                radius = Math.max(Math.max(boundingBox.getXExtent(), boundingBox.getYExtent()),
+                        boundingBox.getZExtent());
             }
 
             final Vector3 vec = new Vector3(center);
@@ -439,7 +480,7 @@ public class AnimationDemoExample extends ExampleBase {
             cam.setLocation(vec);
             cam.lookAt(center, upAxis);
             final double near = Math.max(radius / 500.0, 0.25);
-            final double far = Math.min(radius * 5, 10000.0);
+            final double far = Math.min(radius * 15, 10000.0);
             cam.setFrustumPerspective(50.0, cam.getWidth() / (double) cam.getHeight(), near, far);
             cam.update();
 

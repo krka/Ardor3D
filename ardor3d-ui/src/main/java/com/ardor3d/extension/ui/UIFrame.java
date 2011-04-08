@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 
 import com.ardor3d.extension.ui.backdrop.SolidBackdrop;
 import com.ardor3d.extension.ui.event.DragListener;
+import com.ardor3d.extension.ui.event.FrameDragListener;
 import com.ardor3d.extension.ui.layout.BorderLayout;
 import com.ardor3d.extension.ui.layout.BorderLayoutData;
 import com.ardor3d.math.ColorRGBA;
@@ -422,7 +423,7 @@ public class UIFrame extends UIContainer {
         }
     }
 
-	/**
+    /**
      * Enumeration of possible frame chrome buttons.
      */
     public enum FrameButtons {

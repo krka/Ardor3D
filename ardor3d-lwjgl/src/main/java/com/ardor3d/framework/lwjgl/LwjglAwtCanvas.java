@@ -53,14 +53,21 @@ public class LwjglAwtCanvas extends AWTGLCanvas implements Canvas {
     }
 
     public void draw(final CountDownLatch latch) {
-        if (latch != null && _updated) {
-            throw new IllegalStateException("'_updated' should be false when draw() is called");
+        if (!shouldDraw(latch)) {
+            latch.countDown();
+            return;
         }
 
         // need to set _latch before _updated, for memory consistency reasons
         _latch = latch;
         _updated = true;
         repaint();
+    }
+
+    private boolean shouldDraw(final CountDownLatch latch) {
+        final boolean showing = isShowing();
+        final boolean lastUpdateComplete = latch == null || !_updated;
+        return showing && lastUpdateComplete;
     }
 
     @Override

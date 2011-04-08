@@ -13,6 +13,7 @@ package com.ardor3d.util.shader.uniformtypes;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
+import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.util.export.InputCapsule;
 import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.shader.ShaderVariable;
@@ -34,7 +35,7 @@ public class ShaderVariablePointerFloat extends ShaderVariable {
      */
     public boolean normalized;
     /** The data for the attribute value */
-    public FloatBuffer data;
+    public FloatBufferData data;
 
     @Override
     public void write(final OutputCapsule capsule) throws IOException {
@@ -51,6 +52,13 @@ public class ShaderVariablePointerFloat extends ShaderVariable {
         size = capsule.readInt("size", 0);
         stride = capsule.readInt("stride", 0);
         normalized = capsule.readBoolean("normalized", false);
-        data = capsule.readFloatBuffer("data", null);
+        data = (FloatBufferData) capsule.readSavable("data", null);
+        // XXX: transitional
+        if (data == null) {
+            final FloatBuffer buff = capsule.readFloatBuffer("data", null);
+            if (buff != null) {
+                data = new FloatBufferData(buff, size);
+            }
+        }
     }
 }

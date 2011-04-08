@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2010 Ardor Labs, Inc.
+ * Copyright (c) 2008-2011 Ardor Labs, Inc.
  *
  * This file is part of Ardor3D.
  *
@@ -10,17 +10,22 @@
 
 package com.ardor3d.extension.ui.skin.generic;
 
+import com.ardor3d.extension.ui.LabelState;
 import com.ardor3d.extension.ui.Orientation;
 import com.ardor3d.extension.ui.UIButton;
 import com.ardor3d.extension.ui.UICheckBox;
+import com.ardor3d.extension.ui.UIComboBox;
+import com.ardor3d.extension.ui.UIComponent;
 import com.ardor3d.extension.ui.UIFrame;
 import com.ardor3d.extension.ui.UIFrameBar;
 import com.ardor3d.extension.ui.UIFrameStatusBar;
 import com.ardor3d.extension.ui.UILabel;
 import com.ardor3d.extension.ui.UIPanel;
 import com.ardor3d.extension.ui.UIPasswordField;
+import com.ardor3d.extension.ui.UIPopupMenu;
 import com.ardor3d.extension.ui.UIProgressBar;
 import com.ardor3d.extension.ui.UIRadioButton;
+import com.ardor3d.extension.ui.UIScrollBar;
 import com.ardor3d.extension.ui.UISlider;
 import com.ardor3d.extension.ui.UISliderKnob;
 import com.ardor3d.extension.ui.UIState;
@@ -37,7 +42,9 @@ import com.ardor3d.extension.ui.border.EmptyBorder;
 import com.ardor3d.extension.ui.border.ImageBorder;
 import com.ardor3d.extension.ui.border.SolidBorder;
 import com.ardor3d.extension.ui.border.UIBorder;
+import com.ardor3d.extension.ui.layout.RowLayout;
 import com.ardor3d.extension.ui.skin.Skin;
+import com.ardor3d.extension.ui.skin.SkinningTask;
 import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.extension.ui.util.Insets;
 import com.ardor3d.extension.ui.util.SubTex;
@@ -744,5 +751,173 @@ public class GenericSkin extends Skin {
         }
         back.setLayout(null);
         back.setBackdrop(new SolidBackdrop(ColorRGBA.WHITE));
+    }
+
+    @Override
+    protected void applyToPopupMenu(final UIPopupMenu component) {
+        component.getTitleBar().removeFromParent();
+        component.getStatusBar().removeFromParent();
+        applyToFrame(component);
+    }
+
+    @Override
+    protected void applyToComboBox(final UIComboBox component) {
+        final ColorRGBA upTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
+        final ColorRGBA upBottom = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
+        final GradientBackdrop upBack = new GradientBackdrop(upTop, upTop, upBottom, upBottom);
+
+        // value label
+        {
+            final UIBorder labelBorder = new ImageBorder(
+            // left
+                    new SubTex(_sharedTex, 155, 11, 4, 10),
+                    // right
+                    new SubTex(_sharedTex, 185, 11, 4, 10),
+                    // top
+                    new SubTex(_sharedTex, 159, 7, 16, 4),
+                    // bottom
+                    new SubTex(_sharedTex, 159, 21, 16, 4),
+                    // top left
+                    new SubTex(_sharedTex, 155, 7, 4, 4),
+                    // top right
+                    new SubTex(_sharedTex, 177, 7, 1, 4),
+                    // bottom left
+                    new SubTex(_sharedTex, 155, 21, 4, 4),
+                    // bottom right
+                    new SubTex(_sharedTex, 177, 21, 1, 4));
+
+            final UILabel label = component.getValueLabel();
+            label.setBackdrop(upBack);
+            label.setBorder(labelBorder);
+            label.setAlignment(Alignment.LEFT);
+            label.setPadding(new Insets(0, 2, 0, 2));
+        }
+
+        // drop down button
+        {
+            final UIBorder buttonBorder = new ImageBorder(
+            // left
+                    new SubTex(_sharedTex, 177, 11, 1, 10),
+                    // right
+                    new SubTex(_sharedTex, 185, 11, 4, 10),
+                    // top
+                    new SubTex(_sharedTex, 178, 7, 7, 4),
+                    // bottom
+                    new SubTex(_sharedTex, 178, 21, 7, 4),
+                    // top left
+                    new SubTex(_sharedTex, 177, 7, 1, 4),
+                    // top right
+                    new SubTex(_sharedTex, 185, 7, 4, 4),
+                    // bottom left
+                    new SubTex(_sharedTex, 177, 21, 1, 4),
+                    // bottom right
+                    new SubTex(_sharedTex, 185, 21, 4, 4));
+
+            final UIButton button = component.getOpenButton();
+            button.setButtonText("");
+            button.setButtonIcon(new SubTex(_sharedTex, 196, 12, 10, 9));
+            button.getMouseOverState().setIcon(new SubTex(_sharedTex, 210, 12, 10, 9));
+            button.setBorder(buttonBorder);
+            button.setBackdrop(upBack);
+            button.setMargin(new Insets(0, 0, 0, 0));
+            button.setPadding(new Insets(0, 1, 0, 1));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(buttonBorder);
+                state.setBackdrop(upBack);
+            }
+        }
+
+        // skin for menuitems
+        {
+            final EmptyBorder itemBorder = new EmptyBorder();
+            final EmptyBackdrop itemBackdrop = new EmptyBackdrop();
+            final SolidBackdrop overBackdrop = new SolidBackdrop(new ColorRGBA(50 / 255f, 50 / 255f, 200 / 255f, 1));
+            component.setItemSkinCallback(new SkinningTask() {
+                @Override
+                public void skinComponent(final UIComponent c) {
+                    c.setBorder(itemBorder);
+                    c.setBackdrop(itemBackdrop);
+                    c.setMargin(new Insets(0, 0, 0, 0));
+                    c.setPadding(new Insets(0, 2, 0, 2));
+                    c.setForegroundColor(ColorRGBA.BLACK);
+                    if (c instanceof UIButton) {
+                        final UIButton button = (UIButton) c;
+                        button.setAlignment(Alignment.LEFT);
+                        for (final UIState state : button.getStates()) {
+                            state.setBorder(null);
+                            state.setBackdrop(itemBackdrop);
+                            state.setForegroundColor(ColorRGBA.BLACK);
+                        }
+                        final LabelState over = button.getMouseOverState();
+                        over.setForegroundColor(ColorRGBA.WHITE);
+                        over.setBackdrop(overBackdrop);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void applyToScrollBar(final UIScrollBar component) {
+        final SolidBorder border = new SolidBorder(1, 1, 1, 1);
+        border.setColor(new ColorRGBA(165 / 255f, 165 / 255f, 165 / 255f, 1f));
+        component.setMargin(new Insets());
+        component.setPadding(new Insets());
+        component.setBorder(border);
+        {
+            final UIButton button = component.getBtTopLeft();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            if (component.getOrientation() == Orientation.Horizontal) {
+                button.setButtonIcon(new SubTex(_sharedTex, 130, 121, 16, 15));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 130, 137, 16, 15));
+            } else {
+                button.setButtonIcon(new SubTex(_sharedTex, 97, 120, 15, 16));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 120, 15, 16));
+            }
+        }
+        {
+            final UIButton button = component.getBtBottomRight();
+            button.setBackdrop(null);
+            button.setBorder(new EmptyBorder());
+            button.setPadding(new Insets(0, 0, 0, 0));
+            button.setMargin(new Insets(0, 0, 0, 0));
+            for (final UIState state : button.getStates()) {
+                state.setBorder(null);
+                state.setBackdrop(null);
+            }
+            button.setButtonText("");
+            if (component.getOrientation() == Orientation.Horizontal) {
+                button.setButtonIcon(new SubTex(_sharedTex, 147, 121, 16, 15));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 147, 137, 16, 15));
+            } else {
+                button.setButtonIcon(new SubTex(_sharedTex, 97, 137, 15, 16));
+                button.getMouseOverState().setIcon(new SubTex(_sharedTex, 113, 137, 15, 16));
+            }
+        }
+        {
+            final UISlider slider = component.getSlider();
+            slider.getBackPanel().setBorder(new EmptyBorder());
+            slider.setMargin(new Insets());
+            slider.setPadding(new Insets());
+            slider.getBackPanel().setLayout(new RowLayout(false));
+
+            final UISliderKnob knob = slider.getKnob();
+            knob.getKnobLabel().setIcon(null);
+            knob.setPadding(new Insets(0, 0, 0, 0));
+            knob.setMargin(new Insets());
+            final ColorRGBA colorTop = new ColorRGBA(235 / 255f, 235 / 255f, 235 / 255f, 1);
+            final ColorRGBA colorBtm = new ColorRGBA(200 / 255f, 200 / 255f, 200 / 255f, 1);
+            final GradientBackdrop knobColor = new GradientBackdrop(colorTop, colorTop, colorBtm, colorBtm);
+            knob.getKnobLabel().setBackdrop(knobColor);
+            knob.getKnobLabel().setBorder(border);
+        }
     }
 }

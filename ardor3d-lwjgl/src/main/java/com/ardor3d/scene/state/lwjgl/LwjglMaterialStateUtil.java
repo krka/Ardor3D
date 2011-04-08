@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GL11;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
 import com.ardor3d.renderer.state.MaterialState.MaterialFace;
@@ -24,7 +23,7 @@ import com.ardor3d.renderer.state.record.MaterialStateRecord;
 
 public abstract class LwjglMaterialStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final MaterialState state) {
+    public static void apply(final MaterialState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final MaterialStateRecord record = (MaterialStateRecord) context.getStateRecord(StateType.Material);

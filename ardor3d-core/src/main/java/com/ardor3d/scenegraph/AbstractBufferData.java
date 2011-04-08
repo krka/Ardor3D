@@ -66,6 +66,11 @@ public abstract class AbstractBufferData<T extends Buffer> {
     }
 
     /**
+     * @return the number of bytes per entry in the buffer. For example, an IntBuffer would return 4.
+     */
+    public abstract int getByteCount();
+
+    /**
      * Gets the count.
      * 
      * @return the count

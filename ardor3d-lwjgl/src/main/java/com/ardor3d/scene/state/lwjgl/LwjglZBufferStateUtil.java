@@ -14,14 +14,13 @@ import org.lwjgl.opengl.GL11;
 
 import com.ardor3d.renderer.ContextManager;
 import com.ardor3d.renderer.RenderContext;
-import com.ardor3d.renderer.lwjgl.LwjglRenderer;
-import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.renderer.state.record.ZBufferStateRecord;
 
 public abstract class LwjglZBufferStateUtil {
 
-    public static void apply(final LwjglRenderer renderer, final ZBufferState state) {
+    public static void apply(final ZBufferState state) {
         // ask for the current state record
         final RenderContext context = ContextManager.getCurrentContext();
         final ZBufferStateRecord record = (ZBufferStateRecord) context.getStateRecord(StateType.ZBuffer);
